@@ -284,7 +284,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <input autocomplete="one-time-code" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
@@ -890,10 +890,10 @@
         })
 
         $(".harga, .qty").keyup(function() {
-            let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
+            let harga = $(".harga").val() ? Number($(".harga").val()) : 0;
             let qty = $(".qty").val() ? Number($(".qty").val()) : 0;
 
-            let total = (harga * qty).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            let total = (harga * qty);
             $(".total").val(total);
         })
 
@@ -1037,20 +1037,20 @@
                                         tag_html += nama_satuan;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + harga;
+                                        tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += qty;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + total;
+                                        tag_html += "Rp " + Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += keterangan;
                                         tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
                                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -1066,17 +1066,17 @@
                                             nama_barang: nama_barang,
                                             nama_satuan: nama_satuan,
                                             satuan: satuan,
-                                            harga: harga,
+                                            harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                                             qty: qty,
-                                            total: total,
+                                            total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                                             keterangan: keterangan
                                         });
 
                                         row = row + 1;
 
-                                        total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
+                                        total_harga_barang = total_harga_barang + Number(harga);
                                         total_qty = total_qty + Number(qty);
-                                        total_harga = total_harga + Number(total.replaceAll(",", ""));
+                                        total_harga = total_harga + Number(total);
                                     } else {
                                         tag_html += `<tr>`;
                                         tag_html += `<td>`;
@@ -1179,15 +1179,15 @@
                                     nama_barang: nama_barang,
                                     nama_satuan: nama_satuan,
                                     satuan: satuan,
-                                    harga: harga,
+                                    harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                                     qty: qty,
-                                    total: total,
+                                    total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                                     keterangan: keterangan
                                 })
 
-                                total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
+                                total_harga_barang = total_harga_barang + Number(harga);
                                 total_qty = total_qty + Number(qty);
-                                total_harga = total_harga + Number(total.replaceAll(",", ""));
+                                total_harga = total_harga + Number(total);
 
                                 let tag_html = "";
                                 let tag_total = "";
@@ -1206,20 +1206,20 @@
                                 tag_html += nama_satuan;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += "Rp " + harga;
+                                tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += qty;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += "Rp " + total;
+                                tag_html += "Rp " + Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += keterangan;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
-                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">
+                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">
                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                 </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -1514,9 +1514,9 @@
         $(".barang_id").val(barang_id)
         $(".nama_barang").val(nama_barang)
 
-        $(".harga").val(harga)
+        $(".harga").val(harga.replaceAll(",", ""))
         $(".qty").val(qty)
-        $(".total").val((harga.replaceAll(",", "") * Number(qty)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+        $(".total").val(Number(harga.replaceAll(",", "")) * Number(qty))
 
         $.ajax({
             url: `<?= base_url("barang/dropdown/type"); ?>`,

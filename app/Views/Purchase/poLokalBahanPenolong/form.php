@@ -135,7 +135,7 @@
                                 if (!empty($dataSupplier)) {
                                     foreach ($dataSupplier as $supplier) {
                                 ?>
-                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
+                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->name; ?></option>
                                 <?php
                                     }
                                 }
@@ -337,7 +337,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
+                                <input autocomplete="one-time-code" readonly="true" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
                                 <label for="floatingInput">Harga Satuan</label>
                             </div>
                         </div>
@@ -351,13 +351,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control additional_cost" name="additional_cost" id="additional_cost" placeholder="Biaya Tambahan">
+                                <input autocomplete="one-time-code" type="number" class="form-control additional_cost" name="additional_cost" id="additional_cost" placeholder="Biaya Tambahan">
                                 <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                                <input autocomplete="one-time-code" type="number" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
                                 <label for="floatingInput">Total</label>
                             </div>
                         </div>
@@ -1066,7 +1066,7 @@
                             tag_html += disc ? disc : 0;
                             tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += additional_cost ? ("Rp " + additional_cost) : "Rp 0.00";
+                            tag_html += additional_cost ? ("Rp " + Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : "Rp 0.00";
                             tag_html += "</td>";
                             // tag_html += `<td>`;
                             // tag_html += nilai_ppn ? nilai_ppn : 0;
@@ -1076,7 +1076,7 @@
                             // tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
-                            <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-ppn="${ppn}" data-pph="${pph}" data-total="${item.total}" data-additional_cost="${additional_cost}" data-disc="${disc}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
+                            <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-ppn="${ppn}" data-pph="${pph}" data-total="${item.total}" data-additional_cost="${Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-disc="${disc}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button>`;
                             tag_html += "</td>";
@@ -1084,7 +1084,7 @@
 
                             new_list_items.push({
                                 ...item,
-                                additional_cost: additional_cost,
+                                additional_cost: Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                                 disc: disc,
                                 ppn: ppn,
                                 pph: pph,
@@ -1440,13 +1440,13 @@
                 $(".nama_barang").val(nama_barang)
                 $(".nama_satuan").val(nama_satuan)
 
-                $(".harga").val(harga)
+                $(".harga").val(harga.replaceAll(",", ""))
                 $(".qty").val(qty)
-                $(".total").val(total)
+                $(".total").val(total.replaceAll(",", ""))
 
                 $(".ppn").val(ppn)
                 $(".pph").val(pph)
-                $(".additional_cost").val(additional_cost)
+                $(".additional_cost").val(additional_cost.replaceAll(",", ""))
                 $(".disc").val(disc)
 
                 $(".detail-modal").modal("show");
