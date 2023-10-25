@@ -8,6 +8,7 @@ use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
 use App\Models\SupplierHargaModel;
 use App\Models\BarangMasterModel;
+use App\Models\BagianModel;
 
 class Supplier extends BaseController
 {
@@ -21,6 +22,7 @@ class Supplier extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->supplierHargaModel = new SupplierHargaModel();
         $this->barangMasterModel = new BarangMasterModel();
+        $this->bagianModel = new BagianModel();
     }
 
     // bahan baku
@@ -41,6 +43,7 @@ class Supplier extends BaseController
     {
         $supplierData = $this->supplierModel->getSupplierById($id);
         $barangData = $this->barangMasterModel->getBarangByType('bahan_baku');
+        $bagianData =  $this->bagianModel->asObject()->findAll();
 
         $dataSupplier = [];
         $dataSupplierHarga = [];
@@ -57,6 +60,7 @@ class Supplier extends BaseController
         $data = [
             "dataSupplier" => $dataSupplier,
             "dataSupplierHarga" => $dataSupplierHarga,
+            "dataBagian" => $bagianData,
             "dataBarang" => $barangData
         ];
 
@@ -179,6 +183,7 @@ class Supplier extends BaseController
                 "email" => $this->request->getPost("email"),
                 "province_id" => $this->request->getPost("province_parent_id"),
                 "city_id" => $this->request->getPost("city_parent_id"),
+                "bagian_id" => $this->request->getPost("bagian"),
                 "postal_code" => $this->request->getPost("postal_code"),
                 "country_code"      => $this->request->getPost("country_code"),
                 "account_receivable" => $this->request->getPost("account_receivable"),

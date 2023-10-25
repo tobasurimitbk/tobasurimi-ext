@@ -56,26 +56,39 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesfikasi" name="spesifikasi" placeholder="Spesifikasi">
-                            <label for="floatingInput">Spesifikasi</label>
+                            <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataBagian as $b) : ?>
+                                    <option value="<?= $b->id; ?>">
+                                        <?= $b->nama_bagian; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Bagian</label>
                         </div>
                     </div>
                 </div>
                 <div class="row"> 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesfikasi" name="spesifikasi" placeholder="Spesifikasi">
+                            <label for="floatingInput">Spesifikasi</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
@@ -106,6 +119,7 @@
                             <tr>
                                 <th width="10">No</th>
                                 <th>Nama Barang</th>
+                                <th>Nama Bagian</th>
                                 <th>Spesifikasi</th>
                                 <th>Harga Umum</th>
                                 <th>Harga Harian</th>
@@ -125,6 +139,9 @@
                                 </td>
                                 <td>
                                     <?= $item["barang_name"]; ?>
+                                </td>
+                                <td>
+                                    <?= $item["nama_bagian"]; ?>
                                 </td>
                                 <td>
                                     <?= $item["spesifikasi"]; ?>
@@ -172,7 +189,9 @@
             row: Number(row),
             id: Number('<?= $item["id"]?>'),
             bahan_baku_id: Number('<?= $item["bahan_baku_id"]?>'),
+            bagian_id: Number('<?= $item["bagian_ids"]?>'),
             barang_name: '<?= $item["barang_name"]?>',
+            bagian_name: '<?= $item["nama_bagian"]?>',
             spesifikasi: '<?= $item["spesifikasi"]?>',
             harga_umum: Number('<?= $item["harga_umum"] ? $item["harga_umum"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             harga_harian: Number('<?= $item["harga_harian"] ? $item["harga_harian"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -203,6 +222,11 @@
 
     $('.bahan_baku').select2({
         placeholder: "Pilih Nama Barang",
+        theme: "bootstrap-5"
+    })
+
+    $('.bagian').select2({
+        placeholder: "Pilih Nama Bagian",
         theme: "bootstrap-5"
     })
 
@@ -354,6 +378,7 @@
         $(".row").val('');
         $(".id_supplier_harga").val('')
         $(".bahan_baku").val('').change()
+        $(".bagian").val('').change()
         $(".harga_umum").val(0)
         $(".harga_harian").val(0)
         $(".harga_bulanan").val(0)
@@ -371,6 +396,8 @@
         let id_supplier_harga = $(".id_supplier_harga").val()
         let bahan_baku_id = $(".bahan_baku option:selected").val()
         let barang_name = $(".bahan_baku option:selected").text()
+        let bagian_id = $(".bagian option:selected").val()
+        let bagian_name = $(".bagian option:selected").text()
         let spesifikasi = $(".spesifikasi").val()
         let harga_umum = $(".harga_umum").val()
         let harga_harian = $(".harga_harian").val()
@@ -407,6 +434,9 @@
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += barang_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += bagian_name;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += spesifikasi;
@@ -447,6 +477,9 @@
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += item.barang_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += item.bagian_name;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += item.spesifikasi;
@@ -527,6 +560,9 @@
                                 tag_html += item.barang_name;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
+                                tag_html += item.bagian_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
                                 tag_html += item.spesifikasi;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
@@ -557,6 +593,9 @@
                             tag_html += barang_name;
                             tag_html += "</td>";
                             tag_html += "<td>";
+                            tag_html += bagian_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
                             tag_html += spesifikasi;
                             tag_html += "</td>";
                             tag_html += "<td>";
@@ -584,6 +623,7 @@
                                 row: row,
                                 id: id_supplier_harga,
                                 bahan_baku_id: bahan_baku_id,
+                                bagian_id: bagian_id,
                                 barang_name: barang_name,
                                 spesifikasi: spesifikasi,
                                 harga_umum: Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -615,6 +655,7 @@
         $(".harga_umum").val(current_row?.harga_umum.replaceAll(",", ""));
         $(".harga_bulanan").val(current_row?.harga_bulanan.replaceAll(",", ""));
         $(".bahan_baku").val(current_row?.bahan_baku_id).change();
+        $(".bagian").val(current_row?.bagian_id).change();
         $(".spesifikasi").val(current_row?.spesifikasi);
     }
 

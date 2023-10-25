@@ -77,6 +77,7 @@ class SupplierHarga extends BaseController
                 $insertData = [
                     "supplier_id"      => $this->request->getPost("supplier_id"),
                     "bahan_baku_id"    => $item->bahan_baku_id,
+                    "bagian_id"    => $item->bagian_id,
                     "spesifikasi"      => $item->spesifikasi,
                     "harga_umum"       => formatter($item->harga_umum, "CURR_TO_FLOAT"),
                     "harga_harian"     => formatter($item->harga_harian, "CURR_TO_FLOAT"),

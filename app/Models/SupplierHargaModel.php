@@ -18,6 +18,7 @@ class SupplierHargaModel extends Model
         'id',
         'supplier_id',
         'bahan_baku_id',
+        'bagian_id',
         'spesifikasi',
         'harga_umum',
         'harga_harian',
@@ -99,9 +100,10 @@ class SupplierHargaModel extends Model
             'supplier_harga.supplier_id' => $id
         ];
 
-        $builder = $this->db->table('supplier_harga')->select('supplier_harga.*, supplier_harga.id as supplier_harga_id, barang_master.barang_name, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan');
+        $builder = $this->db->table('supplier_harga')->select('supplier_harga.*, bagian.id as bagian_ids, bagian.nama_bagian as nama_bagian, supplier_harga.id as supplier_harga_id, barang_master.barang_name, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan');
         $builder->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
         ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
+        ->join('bagian', 'bagian.id = supplier_harga.bagian_id', 'left')
         ->where($arrCondition)
         ->orderBy('supplier_harga.updatedAt', 'desc');
         $query = $builder->get();
