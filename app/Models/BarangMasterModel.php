@@ -125,4 +125,23 @@ class BarangMasterModel extends Model
 
         return $data;
     }
+
+    public function getBySupplier($id)
+    {
+        $arrCondition = [
+            'barang_master.deletedAt' => null,
+            'supplier_harga.deletedAt' => null,
+            'supplier_harga.supplier_id' => $id
+        ];
+
+        $selectQry = "barang_master.*";
+        $data = $this->select($selectQry)
+            ->join('supplier_harga', 'barang_master.id = supplier_harga.bahan_baku_id', 'left')
+            ->where($arrCondition)
+            ->groupBy('id')
+            ->orderBy('barang_name', 'asc')
+            ->findAll();
+
+        return $data;
+    }
 }

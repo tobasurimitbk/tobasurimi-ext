@@ -183,8 +183,8 @@
                 ?>
                     <tr>
                         <td><?= $detail->peti ?></td>
-                        <td><?= $detail->divisiName ?></td>
-                        <td><?= $detail->spec ?></td>
+                        <td><?= $detail->nama_bagian ?></td>
+                        <td><?= $detail->spesifikasi ?></td>
                         <td class="txt-right"><?= $detail->qty ?></td>
                         <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>

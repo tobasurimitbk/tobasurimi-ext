@@ -4,12 +4,12 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 
-use App\Models\BarangModel;
 use App\Models\CompaniesModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\BeaCukaiModel;
+use App\Models\BarangMasterModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanBaku extends BaseController
@@ -32,7 +32,7 @@ class POLokalBahanBaku extends BaseController
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->SupplierModel = new SupplierModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
-        $this->barangModel = new BarangModel();
+        $this->barangModel = new BarangMasterModel();
         $this->CompaniesModel = new CompaniesModel();
         $this->dompdf = new Dompdf();
     }
@@ -50,10 +50,6 @@ class POLokalBahanBaku extends BaseController
         //Get Supplier
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
 
-        // get Barang list
-        $barangData = $this->barangModel->asObject()
-            ->getBarangByType('BAHAN BAKU LOKAL');
-
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
@@ -61,8 +57,7 @@ class POLokalBahanBaku extends BaseController
         $data = [
             "today"         => date("d/m/Y"),
             "dataSupplier"  => $dataSupplier,
-            "dataCompany"   => $dataCompany,
-            "barangData"    => $barangData
+            "dataCompany"   => $dataCompany
         ];
 
         return view('Purchase/poLokalBahanBaku/form', $data);
@@ -89,6 +84,8 @@ class POLokalBahanBaku extends BaseController
         if (!empty($id)) {
             $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
             $dataBBLokalDetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
+            $dataBarang = $this->barangModel->getBySupplier($id);
+            $data["dataBarang"] = $dataBarang;
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
@@ -165,6 +162,9 @@ class POLokalBahanBaku extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
+                "barang_id" => [
+                    "rules" => "required"
+                ],
                 "company_id" => [
                     "rules" => "required"
                 ],
@@ -199,6 +199,7 @@ class POLokalBahanBaku extends BaseController
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => $this->request->getPost("supplier_id"),
+                    "barang_id" => $this->request->getPost("barang_id"),
                     "pph" => $this->request->getPost("pph"),
                     "is_posted" => false,
                     "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
@@ -221,7 +222,6 @@ class POLokalBahanBaku extends BaseController
                 $insert = $this->RMPurchaseOrderModel->insert($insertData);
 
                 foreach ($insertData["items"] as $value) {
-                    $value->barang_id = $value->barang_id;
                     $value->rm_purchase_order_id = $insert;
                     $value->remaining_qty = $value->qty;
                 }
@@ -271,6 +271,9 @@ class POLokalBahanBaku extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
+                "barang_id" => [
+                    "rules" => "required"
+                ],
                 "company_id" => [
                     "rules" => "required"
                 ],
@@ -307,6 +310,7 @@ class POLokalBahanBaku extends BaseController
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => $this->request->getPost("supplier_id"),
+                    "barang_id" => $this->request->getPost("barang_id"),
                     "pph" => $this->request->getPost("pph"),
                     "is_posted" => false,
                     "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
@@ -330,7 +334,6 @@ class POLokalBahanBaku extends BaseController
                     $this->RMPurchaseOrderModel->update($id, $insertData);
 
                     foreach ($insertData["items"] as $value) {
-                        $value->barang_id = $value->barang_id;
                         $value->rm_purchase_order_id = $id;
 
                         if (!empty($value->isDeleted)) {
@@ -340,9 +343,7 @@ class POLokalBahanBaku extends BaseController
                         $dataDetail = [
                             "id" => $value->id ?? null,
                             "rm_purchase_order_id" => $this->request->getPost("id"),
-                            "barang_id" => $value->barang_id,
                             "supplier_harga_id" => $value->supplier_harga_id,
-                            "spec" => $value->spec,
                             "bagian" => $value->bagian,
                             "peti" => $value->peti,
                             "quality" => $value->quality,
@@ -507,6 +508,7 @@ class POLokalBahanBaku extends BaseController
 
             $data = [];
             $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
+            $dataPO->itemName = $dataPO->barangName;
 
             if ($dataPO) {
                 $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
@@ -525,7 +527,6 @@ class POLokalBahanBaku extends BaseController
                 $pphTax *= $objPph[$dataPO->pph];
 
                 foreach ($dataPODetail as $value) {
-                    $dataPO->itemName = $value->barangName;
                     $totalPrice += formatter($value->general_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
                     $totalDailyPrice += formatter($value->daily_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
                     $totalQty += formatter($value->qty, "STR_TO_FLOAT");

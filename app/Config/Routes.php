@@ -168,8 +168,12 @@ $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/all', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/supplier/(:num)', 'Supplier\SupplierHarga::getByIdSupplier/$1', ['filter' => 'Auth']);
+$routes->get('/supplier-harga/barang-and-supplier', 'Supplier\SupplierHarga::getByBarangandSupplierId', ['filter' => 'Auth']);
 $routes->post('/supplier-harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/id/(:num)', 'Supplier\SupplierHarga::getByIdSupplierHarga/$1', ['filter' => 'Auth']);
+
+// BAGIAN
+$routes->get('/bagian/dropdown', 'Master\Bagian::getAllBagian', ['filter' => 'Auth']);
 
 // SUPPLIER
 $routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => 'Auth']);
@@ -516,6 +520,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'Warehouse\Barang::delete');
     $routes->post('generate-new-code', 'Warehouse\Barang::generateNewCode');
 });
+$routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 
 // $routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
 //     $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');

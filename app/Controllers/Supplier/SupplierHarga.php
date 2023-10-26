@@ -215,4 +215,25 @@ class SupplierHarga extends BaseController
 
         return;
     }
+
+    public function getByBarangandSupplierId()
+    {
+        $barang_id = $this->request->getGet("barang_id");
+        $supplier_id = $this->request->getGet("supplier_id");
+
+        $find = $this->SupplierHargaModel->getByBarangandSupplier($barang_id, $supplier_id);
+
+        if($find)
+        {
+            return json_encode([
+                "data" => $find
+            ]);
+        }
+        else
+        {
+            return json_encode([
+                "data" => []
+            ]);
+        }
+    }
 }

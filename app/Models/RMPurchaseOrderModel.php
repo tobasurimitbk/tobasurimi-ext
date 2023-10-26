@@ -22,6 +22,7 @@ class RMPurchaseOrderModel extends Model
         'po_no',
         'po_date',
         'supplier_id',
+        'barang_id',
         'pph',
         'cong_sebenarnya',
         'cong_batasan',
@@ -158,7 +159,8 @@ class RMPurchaseOrderModel extends Model
                             suppliers.address AS supplierAddress,
                             suppliers.phone AS supplierPhone,
                             suppliers.no_npwp AS supplierNPWP,
-                            users.name AS createdBy
+                            users.name AS createdBy,
+                            barang_master.barang_name AS barangName
                             ";
 
         $poBBLokalData = $this->asObject()
@@ -166,6 +168,7 @@ class RMPurchaseOrderModel extends Model
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
             ->find($id);
 
         return $poBBLokalData;

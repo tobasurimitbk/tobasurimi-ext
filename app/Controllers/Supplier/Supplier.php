@@ -12,7 +12,7 @@ use App\Models\BagianModel;
 
 class Supplier extends BaseController
 {
-    protected $this_company_id, $provinceModel, $countryModel, $supplierModel, $supplierHargaModel, $barangMasterModel;
+    protected $this_company_id, $provinceModel, $countryModel, $supplierModel, $supplierHargaModel, $barangMasterModel, $bagianModel;
 
     public function __construct()
     {
