@@ -31,7 +31,6 @@ class OrderForm extends BaseController
     protected $CustomerModel;
     protected $BarangModel;
     protected $WarehousesModel;
-    protected $DetailStockBarang;
     private $stockDetailModel;
     protected $SalesOrderDetailModel;
     protected $db;
@@ -50,7 +49,6 @@ class OrderForm extends BaseController
         $this->CustomerModel = new CustomerModel();
         $this->BarangModel = new BarangMasterModel();
         $this->WarehousesModel = new WarehousesModel();
-        $this->DetailStockBarang = new DetailStockBarang();
         $this->stockDetailModel = new StockDetailModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->AllNoModel = new AllNoModel();
@@ -771,6 +769,7 @@ class OrderForm extends BaseController
             ->select('barang_master.id as id_barang')
             ->select('barang_master.barang_name as nama_barang')
             ->select('warehouses.warehouse_name as warehouse_name')
+            ->select('stock_details.qty as qty_stock')
             ->select('satuans.nama_satuan as nama_satuan')
             ->where('type_barang', 'bahan_jadi')
             ->where('stock_details.qty >', 0)
