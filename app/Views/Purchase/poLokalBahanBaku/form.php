@@ -848,21 +848,6 @@
                 validator_detail.reset();
 
                 $.ajax({
-                    url: `<?= base_url("bagian/dropdown"); ?>`,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        $(".bagian").empty()
-                        $(".bagian").append(`<option value=""></option>`)
-                        res.data.forEach(function(item) {
-                            $(".bagian").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
-                        })
-
-                        $(".bagian").val('').change()
-                    }
-                }) 
-
-                $.ajax({
                     url: `<?= base_url("supplier-harga/barang-and-supplier"); ?>`,
                     method: "GET",
                     data: {
@@ -880,9 +865,24 @@
                         })
 
                         $(".spesifikasi").val("").change();
-                        $(".detail-modal").modal("show");
                     }
                 })  
+
+                $.ajax({
+                    url: `<?= base_url("bagian/dropdown"); ?>`,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        $(".bagian").empty()
+                        $(".bagian").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".bagian").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
+                        })
+
+                        $(".bagian").val('').change()
+                        $(".detail-modal").modal("show");
+                    }
+                }) 
             }
         })
 
@@ -1052,21 +1052,6 @@
             trigger = false;
 
             $.ajax({
-                url: `<?= base_url("bagian/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".bagian").empty()
-                    $(".bagian").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".bagian").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
-                    })
-
-                    $(".bagian").val(Number(bagian)).change()
-                }
-            }) 
-
-            $.ajax({
                 url: `<?= base_url("supplier-harga/barang-and-supplier"); ?>`,
                 method: "GET",
                 data: {
@@ -1085,9 +1070,24 @@
 
                     $(".spesifikasi").val(Number(spesifikasi)).change();
                     trigger = true;
-                    $(".detail-modal").modal("show");
                 }
             })   
+
+            $.ajax({
+                url: `<?= base_url("bagian/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".bagian").empty()
+                    $(".bagian").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".bagian").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
+                    })
+
+                    $(".bagian").val(Number(bagian)).change()
+                    $(".detail-modal").modal("show");
+                }
+            }) 
         })
 
         $(".btn-submit-parent").click(function() {
