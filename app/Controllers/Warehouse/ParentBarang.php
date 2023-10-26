@@ -40,7 +40,7 @@ class ParentBarang extends BaseController
         $parentName = $this->request->getVar('parentName');
         $kategori = $this->request->getVar('kategori');
 
-        if ($parentBarangModel->where('parent_name', $parentName)->where('parent_type', $type)->first() != null) {
+        if ($parentBarangModel->where('parent_name', $parentName)->where('parent_type', $type)->where('deletedAt', null)->first() != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'status' => false,

@@ -33,10 +33,10 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Log Attendance</h1>
+        <h1>Log Absensi</h1>
         <div class="col-button-tambah-spp">
             <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-print"></i> Export
+                <i class="fa-solid fa-print"></i> Print
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                 <li><a target="_blank" class="dropdown-item" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">PDF</a></li>

@@ -42,18 +42,23 @@
                 <input type="hidden" name="month" id="month" value="<?= $month ?>">
 
                 <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa-solid fa-print"></i> Export
+                    <i class="fa-solid fa-print"></i> Print
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><a target="_blank" class="dropdown-item" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">PDF</a></li>
-                    <li><a class="dropdown-item" href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Excel</a></li>
+                    <li><a target="_blank" class="dropdown-item" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Bulanan PDF</a></li>
+                    <li><a class="dropdown-item" href="#" id="triwulanBtnPDF">Triwulan PDF</a></li>
+                    <li><a class="dropdown-item" href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Bulanan Excel</a></li>
                 </ul>
             <?php endif ?>
             </form>
         </div>
     </div>
     <?= csrf_field() ?>
-
+    <?php if (session()->has('error')) : ?>
+        <div class="alert alert-danger">
+            <?= session('error') ?>
+        </div>
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-page-list-attendance">
@@ -573,6 +578,52 @@
     </div>
 </div>
 
+<div class="modal" id="triwulanModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Print Triwulan Absensi</h5>
+            </div>
+            <form id="printTriwulanPDF" class="create-form" role="form" method="GET">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-2">
+                                <select class="form-select" name="divisionID" aria-label="Floating label select example">
+                                    <option value="">
+                                        Cari Departemen
+                                    </option>
+                                    <?php foreach ($divisi as $d) : ?>
+                                        <option value="<?= $d['id'] ?>">
+                                            <?= $d['divisi']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Cari Departemen</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="month" class="form-control" name="startMonth" id="startMonth">
+                                <label for="startMonth">Mulai</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="month" class="form-control" name="endMonth" id="endMonth">
+                                <label for="endMonth">Selesai</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="hideModalTriwulan">Batal</button>
+                    <button type="submit" class="btn btn-submit-form" id="printBtnTriwulan">Print</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function() {
@@ -582,7 +633,10 @@
         const csrfToken = '<?= csrf_token() ?>';
         // hide modal
         $('.btn-discard').click(function() {
-            $('#updateModal').hide();
+            $('#updateModal').modal('hide');
+        });
+        $('#hideModalTriwulan').click(function() {
+            $('#triwulanModal').modal('hide');
         });
         // select2 divisi
         $("select[name='divisiID']").select2({
@@ -1041,6 +1095,69 @@
                 cache: true
             }
         });
+        $('#triwulanBtnPDF').click(function() {
+            $('#triwulanModal').modal('show');
+        });
+
+        $('#btn-discard').click(function() {
+            $('#triwulanModal').modal('hide');
+        });
+
+        var validator = $(".create-form").validate({
+            rules: {
+                divisionID: {
+                    required: true
+                },
+                startMonth: {
+                    required: true
+                },
+                endMonth: {
+                    required: true
+                },
+            },
+            messages: {
+                divisionID: {
+                    required: "Pilih Departemen"
+                },
+                startMonth: {
+                    required: "Mulai bulan wajib diisi"
+                },
+                endMonth: {
+                    required: "Selesai bulan wajib diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('#printBtnTriwulan').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form').valid()) {
+                var startMonth = $('#startMonth').val();
+                var endMonth = $('#endMonth').val();
+                var divisionID = $('select[name="divisionID"]').val();
+                window.open("<?= base_url('list-attendance/triwulan/id') ?>" + '/' + startMonth + '/' + endMonth + '/' + divisionID, "_blank");
+            }
+        })
+
         // style helper
         $('.form-select')
             .parent('div')

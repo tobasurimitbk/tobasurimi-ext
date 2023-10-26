@@ -158,6 +158,7 @@
                                 <th onclick="changeSortHarga('bahan_baku_name')" class="sort">Barang</th>
                                 <th onclick="changeSortHarga('createdAt')" class="sort">Tgl</th>
                                 <th onclick="changeSortHarga('spesifikasi')" class="sort">Spesifikasi</th>
+                                <th onclick="changeSortHarga('bagian')" class="sort">Bagian</th>
                                 <th onclick="changeSortHarga('harga_umum')" class="sort">Umum</th>
                                 <th onclick="changeSortHarga('harga_harian')" class="sort">Harian</th>
                                 <th onclick="changeSortHarga('harga_bulanan')" class="sort">Bulanan</th>
@@ -386,6 +387,9 @@
             className: "text-center"
         }, {
             data: "spesifikasi",
+            className: "text-center"
+        }, {
+            data: "bagian",
             className: "text-center"
         }, {
             data: "harga_umum",

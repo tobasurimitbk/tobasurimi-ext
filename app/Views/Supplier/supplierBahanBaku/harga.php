@@ -385,6 +385,8 @@
 
         $(".bahan_baku").removeAttr("disabled")
         $(".spesifikasi").removeAttr("disabled")
+        $(".bagian").removeAttr("disabled")
+        
     }
 
     const setHarga = function() {
@@ -644,6 +646,7 @@
         validator.reset();
         $(".bahan_baku").attr("disabled", true)
         $(".spesifikasi").attr("disabled", true)
+        $(".bagian").attr("disabled", true)
 
         let current_row = list_item.find(item => (
             item.row === Number(nilai_row)

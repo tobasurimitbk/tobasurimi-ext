@@ -650,6 +650,7 @@ $routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttenda
 $routes->get('/attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 $routes->get('/list-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFPresensi/$1', ['filter' => 'Auth']);
 $routes->get('/list-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelPresensi/$1', ['filter' => 'Auth']);
+$routes->get('/list-attendance/triwulan/id/(:segment)/(:segment)/(:segment)', 'HR\Attendance::exportTriwulanAbsensi/$1/$2/$3', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
