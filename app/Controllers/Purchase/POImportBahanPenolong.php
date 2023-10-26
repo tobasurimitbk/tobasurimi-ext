@@ -822,6 +822,20 @@ class POImportBahanPenolong extends BaseController
 
             if (!empty($id)) {
                 $findBarang = $this->amPurchaseOrderModel->find($id);
+
+                // spp return to waiting when deleted
+                $responsespp = $this->sppModel->where(['id' => $findBarang->purchase_request_id])->set(['request_status' => 'waiting'])->update();
+
+                if (empty($responsespp)) {
+                    $data = [
+                        "status"     => false,
+                        "message"    => "Data Gagal Dihapus",
+                        'token'      => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+
                 if ($findBarang) {
                     $response =  $this->amPurchaseOrderModel->delete($id);
                     if ($response) {
