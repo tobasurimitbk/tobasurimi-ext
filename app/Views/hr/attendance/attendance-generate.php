@@ -617,7 +617,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="hideModalTriwulan">Batal</button>
                     <button type="submit" class="btn btn-submit-form" id="printBtnTriwulan">Print</button>
                 </div>
             </form>
@@ -634,6 +634,9 @@
         // hide modal
         $('.btn-discard').click(function() {
             $('#updateModal').hide();
+        });
+        $('#hideModalTriwulan').click(function() {
+            $('#triwulanModal').hide();
         });
         // select2 divisi
         $("select[name='divisiID']").select2({

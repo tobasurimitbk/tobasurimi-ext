@@ -287,11 +287,11 @@ class AttendancesModel extends Model
                 $totalCutiHaid = static::hitungKehadiranSebulan($ym, $ed['id'], ['CUTI HAID_CHD']);
                 $maxCupon = 15;
                 if ($totalCutiHaid == 1) {
-                    $maxCupon -= $maxCupon - 8;
+                    $maxCupon = $maxCupon - 8;
                 } elseif ($totalCutiHaid == 2) {
-                    $maxCupon -= $maxCupon - 10;
+                    $maxCupon = $maxCupon - 10;
                 } elseif ($totalCutiHaid == 3) {
-                    $maxCupon -= $maxCupon - 12;
+                    $maxCupon = $maxCupon - 12;
                 } elseif ($totalCutiHaid >= 4) {
                     $maxCupon = 0;
                 }
