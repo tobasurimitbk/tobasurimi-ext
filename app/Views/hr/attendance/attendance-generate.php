@@ -683,51 +683,53 @@
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     // append to form
-                    var formData = new FormData();
-                    formData.append('monthYear', monthYearGlobal);
-                    formData.append('startDate', startDateGlobal);
-                    formData.append('finishDate', finishDateGlobal);
+                    if (result.isConfirmed) {
+                        var formData = new FormData();
+                        formData.append('monthYear', monthYearGlobal);
+                        formData.append('startDate', startDateGlobal);
+                        formData.append('finishDate', finishDateGlobal);
 
-                    $.ajax({
-                        url: "<?= base_url("generate-attendance/global"); ?>",
-                        data: formData,
-                        method: "POST",
-                        dataType: "json",
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            // show loading
-                            $('#loadingSpinner').show();
-                        },
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                }).then((result) => {
-                                    // update table
-                                    location.reload();
-                                });
-                            } else {
+                        $.ajax({
+                            url: "<?= base_url("generate-attendance/global"); ?>",
+                            data: formData,
+                            method: "POST",
+                            dataType: "json",
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                // show loading
+                                $('#loadingSpinner').show();
+                            },
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    }).then((result) => {
+                                        // update table
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                }
+                                $('#loadingSpinner').hide();
+                            },
+                            onError: function(response) {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: response.message,
+                                    title: 'Terjadi kesalahan pada sistem',
                                     confirmButtonColor: '#4e73df',
                                 });
+                                $('#loadingSpinner').hide();
                             }
-                            $('#loadingSpinner').hide();
-                        },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi kesalahan pada sistem',
-                                confirmButtonColor: '#4e73df',
-                            });
-                            $('#loadingSpinner').hide();
-                        }
-                    });
+                        });
+                    }
                 });
             }
         });
@@ -783,53 +785,56 @@
                     confirmButtonText: 'Simpan',
                     cancelButtonText: 'Batal',
                 }).then((result) => {
-                    // append to form
-                    var formData = new FormData();
-                    formData.append('monthYear', monthYearPersonal);
-                    formData.append('startDate', startDatePersonal);
-                    formData.append('finishDate', finishDatePersonal);
-                    formData.append('employeeID', employeeID);
+                    if (result.isConfirmed) {
+                        // append to form
+                        var formData = new FormData();
+                        formData.append('monthYear', monthYearPersonal);
+                        formData.append('startDate', startDatePersonal);
+                        formData.append('finishDate', finishDatePersonal);
+                        formData.append('employeeID', employeeID);
 
-                    $.ajax({
-                        url: "<?= base_url("generate-attendance/personal"); ?>",
-                        data: formData,
-                        method: "POST",
-                        dataType: "json",
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            // show loading
-                            $('#loadingSpinner').show();
-                        },
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                }).then((result) => {
-                                    // update table
-                                    location.reload();
-                                });
-                            } else {
+                        $.ajax({
+                            url: "<?= base_url("generate-attendance/personal"); ?>",
+                            data: formData,
+                            method: "POST",
+                            dataType: "json",
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                // show loading
+                                $('#loadingSpinner').show();
+                            },
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    }).then((result) => {
+                                        // update table
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                }
+                                $('#loadingSpinner').hide();
+                            },
+                            onError: function(response) {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: response.message,
+                                    title: 'Terjadi kesalahan pada sistem',
                                     confirmButtonColor: '#4e73df',
                                 });
+                                $('#loadingSpinner').hide();
                             }
-                            $('#loadingSpinner').hide();
-                        },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi kesalahan pada sistem',
-                                confirmButtonColor: '#4e73df',
-                            });
-                            $('#loadingSpinner').hide();
-                        }
-                    });
+                        });
+                    }
+
                 });
             }
         });

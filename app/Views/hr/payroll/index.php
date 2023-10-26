@@ -446,54 +446,57 @@
                 confirmButtonText: 'Simpan',
                 cancelButtonText: 'Batal',
             }).then((result) => {
-                var formData = new FormData();
-                formData.append('yearMonth', monthYearGlobal);
-                formData.append('startDate', startDateGlobal);
-                formData.append('finishDate', finishDateGlobal);
-                formData.append('divisionGlobalID', divisionGlobalID);
+                if (result.isConfirmed) {
+                    var formData = new FormData();
+                    formData.append('yearMonth', monthYearGlobal);
+                    formData.append('startDate', startDateGlobal);
+                    formData.append('finishDate', finishDateGlobal);
+                    formData.append('divisionGlobalID', divisionGlobalID);
 
-                $.ajax({
-                    url: "<?= base_url("payroll/generate-global"); ?>",
-                    data: formData,
-                    method: "POST",
-                    dataType: "json",
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        // show loading
-                        $('#loadingSpinner').show();
-                    },
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                // update table
-                                table.ajax.reload();
-                            });
-                        } else {
+                    $.ajax({
+                        url: "<?= base_url("payroll/generate-global"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            // show loading
+                            $('#loadingSpinner').show();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then((result) => {
+                                    // update table
+                                    table.ajax.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                            $('#loadingSpinner').hide();
+                            $('#generateModal').modal('hide');
+                            location.reload();
+                        },
+                        onError: function(response) {
                             Swal.fire({
                                 icon: 'error',
-                                title: response.message,
+                                title: 'Terjadi kesalahan pada sistem',
                                 confirmButtonColor: '#4e73df',
                             });
+                            $('#loadingSpinner').hide();
                         }
-                        $('#loadingSpinner').hide();
-                        $('#generateModal').modal('hide');
-                        location.reload();
-                    },
-                    onError: function(response) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Terjadi kesalahan pada sistem',
-                            confirmButtonColor: '#4e73df',
-                        });
-                        $('#loadingSpinner').hide();
-                    }
-                });
+                    });
+                }
+
             });
         }
     });
@@ -550,53 +553,56 @@
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 // append to form
-                var formData = new FormData();
-                formData.append('yearMonth', monthYearPersonal);
-                formData.append('startDate', startDatePersonal);
-                formData.append('finishDate', finishDatePersonal);
-                formData.append('employeeID', employeeID);
+                if (result.isConfirmed) {
+                    var formData = new FormData();
+                    formData.append('yearMonth', monthYearPersonal);
+                    formData.append('startDate', startDatePersonal);
+                    formData.append('finishDate', finishDatePersonal);
+                    formData.append('employeeID', employeeID);
 
-                $.ajax({
-                    url: "<?= base_url("payroll/generate-single"); ?>",
-                    data: formData,
-                    method: "POST",
-                    dataType: "json",
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        // show loading
-                        $('#loadingSpinner').show();
-                    },
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                // update table
-                                table.ajax.reload();
-                            });
-                        } else {
+                    $.ajax({
+                        url: "<?= base_url("payroll/generate-single"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            // show loading
+                            $('#loadingSpinner').show();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then((result) => {
+                                    // update table
+                                    table.ajax.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                            $('#loadingSpinner').hide();
+                            $('#generateModal').modal('hide');
+                        },
+                        onError: function(response) {
                             Swal.fire({
                                 icon: 'error',
-                                title: response.message,
+                                title: 'Terjadi kesalahan pada sistem',
                                 confirmButtonColor: '#4e73df',
                             });
+                            $('#loadingSpinner').hide();
                         }
-                        $('#loadingSpinner').hide();
-                        $('#generateModal').modal('hide');
-                    },
-                    onError: function(response) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Terjadi kesalahan pada sistem',
-                            confirmButtonColor: '#4e73df',
-                        });
-                        $('#loadingSpinner').hide();
-                    }
-                });
+                    });
+                }
+
             });
         }
     });

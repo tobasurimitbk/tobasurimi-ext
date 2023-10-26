@@ -700,6 +700,9 @@
                         tag_html += item.barang_name;
                         tag_html += "</td>";
                         tag_html += "<td>";
+                        tag_html += item.bagian_name;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
                         tag_html += item.spesifikasi;
                         tag_html += "</td>";
                         tag_html += "<td>";
