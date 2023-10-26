@@ -84,7 +84,7 @@ class POLokalBahanBaku extends BaseController
         if (!empty($id)) {
             $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
             $dataBBLokalDetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
-            $dataBarang = $this->barangModel->getBySupplier($id);
+            $dataBarang = $this->barangModel->getBySupplier($dataBBLokal->supplier_id);
             $data["dataBarang"] = $dataBarang;
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
