@@ -275,6 +275,8 @@ class AttendancesModel extends Model
 
         foreach ($employeeData as $ed) {
             $totalAPH = 0;
+            $maxCupon = 15;
+            $totalCutiHaid = 0;
             $kehadiran = [];
             foreach ($yearMonth as $ym) {
                 $kehadiran[] = [
@@ -284,21 +286,21 @@ class AttendancesModel extends Model
                     'H' => static::hitungKehadiranSebulan($ym, $ed['id'], ['RL_RL', 'HADIR_H'])
                 ];
 
-                $totalCutiHaid = static::hitungKehadiranSebulan($ym, $ed['id'], ['CUTI HAID_CHD']);
-                $maxCupon = 15;
-                if ($totalCutiHaid == 1) {
-                    $maxCupon = $maxCupon - 8;
-                } elseif ($totalCutiHaid == 2) {
-                    $maxCupon = $maxCupon - 10;
-                } elseif ($totalCutiHaid == 3) {
-                    $maxCupon = $maxCupon - 12;
-                } elseif ($totalCutiHaid >= 4) {
-                    $maxCupon = 0;
-                }
+                $totalCutiHaid += static::hitungKehadiranSebulan($ym, $ed['id'], ['CUTI HAID_CHD']);
             }
 
             foreach ($kehadiran as $k) {
                 $totalAPH += ($k['A'] + $k['P'] + $k['H']);
+            }
+
+            if ($totalCutiHaid == 1) {
+                $maxCupon = $maxCupon - 8;
+            } elseif ($totalCutiHaid == 2) {
+                $maxCupon = $maxCupon - 10;
+            } elseif ($totalCutiHaid == 3) {
+                $maxCupon = $maxCupon - 12;
+            } elseif ($totalCutiHaid >= 4) {
+                $maxCupon = 0;
             }
 
             $res[] = [
