@@ -238,7 +238,7 @@ class PayrollsModel extends Model
         return $this->asArray()->select('payrolls.*, employees.name AS employeeName, employees.nip, divisis.divisi, bagian.nama_bagian')
             ->join('employees', 'employees.id = payrolls.employee_id')
             ->join('divisis', 'divisis.id = employees.division_id')
-            ->join('bagian', 'bagian.division_id = divisis.id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
             ->where('payrolls.id', $payrollID)
             ->where('employees.deletedAt', null)
             ->first();
