@@ -212,7 +212,7 @@ class POLokalBahanBaku extends BaseController
                 $totalPrice = 0;
 
                 foreach ($insertData["items"] as $value) {
-                    $totalPrice += $value->qty * ($value->general_price + $value->daily_price_price + $value->monthly_price);
+                    $totalPrice += $value->qty * ($value->general_price + $value->daily_price + $value->monthly_price);
                 };
 
                 $insertData["total"] = $totalPrice;
@@ -324,7 +324,7 @@ class POLokalBahanBaku extends BaseController
 
                 foreach ($insertData["items"] as $value) {
                     if (empty($value->isDeleted)) {
-                        $totalPrice += $value->qty * ($value->general_price + $value->daily_price_price + $value->monthly_price);
+                        $totalPrice += $value->qty * ($value->general_price + $value->daily_price + $value->monthly_price);
                     }
                 };
 
