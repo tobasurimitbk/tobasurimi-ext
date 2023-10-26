@@ -20,14 +20,14 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="number" class="form-control" id="safetyNumber" name="safetyNumber" placeholder="Angka Safety Stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
-                                <label for="floatingInput">Angka Safety Stock</label>
+                                <label for="floatingInput">Angka Safety Stok</label>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input name="reStockNumber" autocomplete="one-time-code" type="number" id="reStockNumber" class="form-control target input-picker" value="" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
-                                <label for="reStockNumber" id="reStockNumber">Angka Harus Restock</label>
+                                <label for="reStockNumber" id="reStockNumber">Angka Harus Restok</label>
                             </div>
                         </div>
 
@@ -43,7 +43,7 @@
 </div>
 <section class="section">
     <div class="section-header">
-        <h1>Stock Safety</h1>
+        <h1>Stok Safety</h1>
     </div>
     <div class="card">
         <div class="card-body">
@@ -60,7 +60,7 @@
                                 <th>No.</th>
                                 <th>Tipe Barang</th>
                                 <th>Safety</th>
-                                <th>Harus Restock</th>
+                                <th>Harus Restok</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -163,11 +163,11 @@
         },
         messages: {
             safetyNumber: {
-                required: "Angka Safety Stock wajib diisi",
+                required: "Angka Safety Stok wajib diisi",
                 number: "Masukkan angka valid"
             },
             reStockNumber: {
-                required: "Angka harus Restock wajib diisi",
+                required: "Angka harus Restok wajib diisi",
                 number: "Masukkan angka valid"
             }
         },

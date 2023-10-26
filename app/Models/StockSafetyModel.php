@@ -78,4 +78,13 @@ class StockSafetyModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function tipeBarangInArray()
+    {
+        $res = [];
+        foreach ($this->where('deletedAt', null)->findAll() as $row) {
+            array_push($res, $row['kode']);
+        }
+        return $res;
+    }
 }
