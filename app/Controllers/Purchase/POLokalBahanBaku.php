@@ -518,6 +518,8 @@ class POLokalBahanBaku extends BaseController
                 $totalQty = 0;
                 $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
 
+                $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
+
                 $objPph = [
                     "None" => 0,
                     "Supplier" => 1,
@@ -531,7 +533,6 @@ class POLokalBahanBaku extends BaseController
                     $totalDailyPrice += formatter($value->daily_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
                     $totalQty += formatter($value->qty, "STR_TO_FLOAT");
                 }
-
                 $dataPO->totalPrice = number_format($totalPrice, 2, '.', ',');
                 $dataPO->totalDailyPrice = number_format($totalDailyPrice, 2, '.', ',');
                 $dataPO->totalQty = number_format($totalQty, 2, '.', ',');
