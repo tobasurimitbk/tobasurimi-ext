@@ -13,6 +13,7 @@ use App\Models\FormPerijinanModel;
 use App\Models\JamKerjaModel;
 use App\Models\MetadataModel;
 use CodeIgniter\I18n\Time;
+use DateTime;
 use Dompdf\Dompdf;
 use Locale;
 
@@ -730,6 +731,45 @@ class Attendance extends BaseController
         ];
 
         return \view('hr/attendance/excel-attendance', $data);
+    }
+
+    public function exportTriwulanAbsensi($startMonth, $endMonth, $divisionID)
+    {
+        $startDateTime = DateTime::createFromFormat('Y-m', $startMonth);
+        $endDateTime = DateTime::createFromFormat('Y-m', $endMonth);
+
+        $companyModel = new CompaniesModel();
+        $divisiModel = new DivisisModel();
+        $attendanceModel = new AttendancesModel();
+
+        if ($startDateTime > $endDateTime) {
+            return redirect()->back()->with('error', 'Selesai Bulan tidak boleh lebih kecil dari mulai Bulan.');
+        } elseif ($startDateTime->diff($endDateTime)->m != 2) {
+            return redirect()->back()->with('error', 'Rentang mulai Bulan dan selesai Bulan adalah 3 bulan.');
+        } else {
+
+            $middleMonthDt = clone $startDateTime;
+            $middleMonthDt->modify('+1 month');
+            $middleMonth = $middleMonthDt->format('Y-m');
+
+            $data = [
+                'middleMonth' => $middleMonth,
+                'startMonth' => $startMonth,
+                'endMonth' => $endMonth,
+                'unit' => $companyModel->where('id', $this->this_company_id)->first(),
+                'divisi' => $divisiModel->where('id', $divisionID)->first(),
+                'data' => $attendanceModel->triwulanPDF([$startMonth, $middleMonth, $endMonth], $divisionID, $this->this_company_id)
+            ];
+
+            $dompdf = new Dompdf();
+
+            $dompdf->loadHtml(view('hr/attendance/triwulan-attendance', $data));
+            $dompdf->setPaper('legal', 'portrait');
+            $dompdf->render();
+            $dompdf->stream("Data Absensi Karyawan", array("Attachment" => false));
+
+            exit(0);
+        }
     }
 
     // helper

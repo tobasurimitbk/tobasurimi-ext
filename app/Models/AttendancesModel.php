@@ -251,4 +251,91 @@ class AttendancesModel extends Model
         $res = $this->asArray()->where('employee_id', $employeeID)->where('year_month', $yearMonth)->findAll();
         return (count($res) == 0) ? false : true;
     }
+
+    public function triwulanPDF($yearMonth, $divisionID, $companyID)
+    {
+        $res = [];
+        $employeeModel = new EmployeesModel();
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $companyID,
+            'divisis.id' => $divisionID,
+            'divisis.deletedAt' => null,
+            'employees.status' => "Aktif",
+            'employees.gender' => "Wanita"
+        ];
+
+        $employeeData = $employeeModel->select('*')
+            ->select("employees.*, divisis.divisi, bagian.nama_bagian")
+            ->join('divisis', 'employees.division_id = divisis.id', 'left')
+            ->join('bagian', 'employees.bagian_id = bagian.id', 'left')
+            ->groupStart()->where($arrCondition)->groupEnd()
+            ->get()
+            ->getResultArray();
+
+        foreach ($employeeData as $ed) {
+            $totalAPH = 0;
+            $kehadiran = [];
+            foreach ($yearMonth as $ym) {
+                $kehadiran[] = [
+                    'yearMonth' => $ym,
+                    'A' => static::hitungKehadiranSebulan($ym, $ed['id'], ['ALPHA_A', 'LIBUR_L']),
+                    'P' => static::hitungKehadiranSebulan($ym, $ed['id'], ['CUTI TAHUNAN_CT', 'CUTI HAID_CHD', 'CUTI HAMIL_CHL', 'CUTI MELAHIRKAN_CM', 'IJIN_I', 'SAKIT_S']),
+                    'H' => static::hitungKehadiranSebulan($ym, $ed['id'], ['RL_RL', 'HADIR_H'])
+                ];
+
+                $totalCutiHaid = static::hitungKehadiranSebulan($ym, $ed['id'], ['CUTI HAID_CHD']);
+                $maxCupon = 15;
+                if ($totalCutiHaid == 1) {
+                    $maxCupon = $maxCupon - 8;
+                } elseif ($totalCutiHaid == 2) {
+                    $maxCupon = $maxCupon - 10;
+                } elseif ($totalCutiHaid == 3) {
+                    $maxCupon = $maxCupon - 12;
+                } elseif ($totalCutiHaid >= 4) {
+                    $maxCupon = 0;
+                }
+            }
+
+            foreach ($kehadiran as $k) {
+                $totalAPH += ($k['A'] + $k['P'] + $k['H']);
+            }
+
+            $res[] = [
+                'id' => $ed['id'],
+                'name' => $ed['name'],
+                'kehadiran' => $kehadiran,
+                'totalAPH' => $totalAPH,
+                'totalKupon' => $maxCupon
+            ];
+        }
+
+        return [
+            'res' => $res
+        ];
+    }
+
+
+    static function hitungKehadiranSebulan($yearMonth, $employeeID, $status)
+    {
+        $AttendanceModel = new AttendancesModel();
+        $res = $AttendanceModel
+            ->select('status, COUNT(DISTINCT DATE(periode)) as count')
+            ->where('employee_id', $employeeID)
+            ->where('year_month', $yearMonth)
+            ->whereIn('status', $status)
+            ->where('deletedAt', null)
+            ->groupBy('status')
+            ->get()
+            ->getResultArray();
+
+        $resultCount = 0;
+
+        foreach ($res as $row) {
+            $count = $row['count'];
+            $resultCount += $count;
+        }
+
+        return $resultCount;
+    }
 }

@@ -99,8 +99,8 @@ if (!function_exists('formatter')) {
             return intval(str_replace(",", "", $value));
             break;
          case "CURR_TO_FLOAT":
-               return floatval(str_replace(",", "", $value));
-               break;
+            return floatval(str_replace(",", "", $value));
+            break;
          case "NUM_TO_CURR":
             return str_replace(",", ".", number_format($value));
             break;
@@ -145,30 +145,31 @@ function romanMonthNumber(int $number): string
    return $returnValue;
 }
 
-function penyebut(int $nilai): string {
+function penyebut(int $nilai): string
+{
    $huruf = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
    $temp = "";
 
    if ($nilai < 12) {
-       $temp = " ". $huruf[floor($nilai)];
-   } elseif ($nilai <20) {
-       $temp = penyebut($nilai - 10). " belas";
+      $temp = " " . $huruf[floor($nilai)];
+   } elseif ($nilai < 20) {
+      $temp = penyebut($nilai - 10) . " belas";
    } elseif ($nilai < 100) {
-       $temp = penyebut($nilai/10)." puluh". penyebut(floor($nilai) % 10);
+      $temp = penyebut($nilai / 10) . " puluh" . penyebut(floor($nilai) % 10);
    } elseif ($nilai < 200) {
-       $temp = " seratus" . penyebut($nilai - 100);
+      $temp = " seratus" . penyebut($nilai - 100);
    } else if ($nilai < 1000) {
-       $temp = penyebut($nilai/100) . " ratus" . penyebut(floor($nilai) % 100);
+      $temp = penyebut($nilai / 100) . " ratus" . penyebut(floor($nilai) % 100);
    } else if ($nilai < 2000) {
-       $temp = " seribu" . penyebut($nilai - 1000);
+      $temp = " seribu" . penyebut($nilai - 1000);
    } else if ($nilai < 1000000) {
-       $temp = penyebut($nilai/1000) . " ribu" . penyebut($nilai % 1000);
+      $temp = penyebut($nilai / 1000) . " ribu" . penyebut($nilai % 1000);
    } else if ($nilai < 1000000000) {
-      $temp = penyebut($nilai/1000000) . " juta" . penyebut($nilai % 1000000);
+      $temp = penyebut($nilai / 1000000) . " juta" . penyebut($nilai % 1000000);
    } else if ($nilai < 1000000000000) {
-      $temp = penyebut($nilai/1000000000) . " milyar" . penyebut(fmod($nilai,1000000000));
+      $temp = penyebut($nilai / 1000000000) . " milyar" . penyebut(fmod($nilai, 1000000000));
    } else if ($nilai < 1000000000000000) {
-      $temp = penyebut($nilai/1000000000000) . " trilyun" . penyebut(fmod($nilai,1000000000000));
+      $temp = penyebut($nilai / 1000000000000) . " trilyun" . penyebut(fmod($nilai, 1000000000000));
    }
 
    return $temp;
@@ -198,5 +199,34 @@ function terbilang($x)
       return terbilang($x / 1000000000) . " Miliar" . " " . terbilang($x % 1000000000);
    elseif ($x < 1000000000000000)
       return terbilang($x / 1000000000000) . " Triliun" . " " . terbilang($x % 1000000000000);
+}
 
+function convertToIndonesianMonth($date)
+{
+   $months = [
+      '01' => 'Januari',
+      '02' => 'Februari',
+      '03' => 'Maret',
+      '04' => 'April',
+      '05' => 'Mei',
+      '06' => 'Juni',
+      '07' => 'Juli',
+      '08' => 'Agustus',
+      '09' => 'September',
+      '10' => 'Oktober',
+      '11' => 'November',
+      '12' => 'Desember'
+   ];
+
+   $dateComponents = explode('-', $date);
+   if (count($dateComponents) === 2) {
+      $year = $dateComponents[0];
+      $month = $dateComponents[1];
+      if (isset($months[$month])) {
+         return $months[$month] . ' ' . $year;
+      }
+   }
+
+   // Jika format tidak valid, kembalikan tanggal asli
+   return $date;
 }
