@@ -194,14 +194,12 @@
                             <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } if($dataPO->pph === "Supplier") { 
-                            $nilai_pph = $nilai_pph + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
                             $nilai_total = $nilai_total + ($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");  
                         ?>
                             <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } if($dataPO->pph === "Company") { 
                             $nilai_total = $nilai_total + (((formatter($detail->general_price, "STR_TO_FLOAT")) + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));    
-                            $nilai_pph = $nilai_pph + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
                             <td class="txt-right"><?= number_format((formatter($detail->general_price, "STR_TO_FLOAT")) + (formatter($detail->general_price, "STR_TO_FLOAT") * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(((formatter($detail->general_price, "STR_TO_FLOAT")) + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
@@ -216,11 +214,19 @@
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">PPH</td>
-                    <td class="txt-right"><?= number_format(formatter($nilai_pph, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                    <td class="txt-right"><?= number_format(($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php } else { ?>
+                    <td class="txt-right">0.00</td>
+                    <?php } ?>
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">DIBAYARKAN</td>
-                    <td class="txt-right"><?= number_format(formatter(($nilai_total - $nilai_pph), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                    <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php } else { ?>
+                    <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    <?php } ?>
                 </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer">
