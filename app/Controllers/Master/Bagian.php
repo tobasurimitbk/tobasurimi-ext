@@ -204,4 +204,15 @@ class Bagian extends BaseController
             'data' => $res,
         ]);
     }
+
+    public function getAllBagian()
+    {
+        $bagianModel = new BagianModel();
+        $res = $bagianModel->where('deletedAt', null)->findAll();
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $res,
+        ]);
+    }
 }

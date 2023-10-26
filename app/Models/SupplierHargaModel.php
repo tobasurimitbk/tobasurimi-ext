@@ -111,4 +111,23 @@ class SupplierHargaModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function getByBarangandSupplier($barang_id, $supplier_id)
+    {
+        $arrCondition = [
+            'supplier_harga.deletedAt' => null,
+            'supplier_harga.supplier_id' => $supplier_id,
+            'supplier_harga.bahan_baku_id' => $barang_id
+        ];
+
+        $builder = $this->db->table('supplier_harga')->select('supplier_harga.*, bagian.id as bagian_ids, bagian.nama_bagian as nama_bagian, supplier_harga.id as supplier_harga_id, barang_master.barang_name, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan');
+        $builder->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
+        ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
+        ->join('bagian', 'bagian.id = supplier_harga.bagian_id', 'left')
+        ->where($arrCondition)
+        ->orderBy('supplier_harga.updatedAt', 'desc');
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }

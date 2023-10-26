@@ -266,4 +266,18 @@ class Barang extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function getBySupplier($id)
+    {
+        $barangModel = new BarangMasterModel();
+
+        $dataBarang = $barangModel->getBySupplier($id);
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

@@ -572,7 +572,22 @@ class POLokalBahanPenolong extends BaseController
         try {
             $id = $this->request->getPost("id");
 
-            if (empty($id)) {
+            $dataBPLokal = $this->AMPurchaseOrderModel->getPOById($id);
+
+            if (empty($dataBPLokal)) {
+                $data = [
+                    "status"     => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token'      => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            // spp return to waiting when deleted
+            $responsespp = $this->SppModel->where(['id' => $dataBPLokal->purchase_request_id])->set(['request_status' => 'waiting'])->update();
+
+            if (empty($responsespp)) {
                 $data = [
                     "status"     => false,
                     "message"    => "Data Gagal Dihapus",

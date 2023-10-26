@@ -578,7 +578,7 @@
     </div>
 </div>
 
-<div class="modal" id="triwulanModal" tabindex="-1">
+<div class="modal" id="triwulanModal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -633,10 +633,10 @@
         const csrfToken = '<?= csrf_token() ?>';
         // hide modal
         $('.btn-discard').click(function() {
-            $('#updateModal').hide();
+            $('#updateModal').modal('hide');
         });
         $('#hideModalTriwulan').click(function() {
-            $('#triwulanModal').hide();
+            $('#triwulanModal').modal('hide');
         });
         // select2 divisi
         $("select[name='divisiID']").select2({
