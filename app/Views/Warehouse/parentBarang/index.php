@@ -13,13 +13,13 @@
 
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link <?= $type == "" || $type == "bahan_baku" ? "active" : "" ?> " href="<?= base_url('parent-barang?type=bahan_baku') ?>">Bahan Baku</a>
+                    <a class="nav-link <?= $type == "" || $type == "bahan_baku" ? "active" : "" ?> " href="<?= base_url('parent-barang?type=bahan_baku') ?>">Barang Baku</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_penolong" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_penolong') ?>">Bahan Penolong</a>
+                    <a class="nav-link <?= $type == "bahan_penolong" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_penolong') ?>">Barang Penolong</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_jadi" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_jadi') ?>">Bahan Jadi</a>
+                    <a class="nav-link <?= $type == "bahan_jadi" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_jadi') ?>">Barang Jadi</a>
                 </li>
             </ul>
             <div class="row justify-content-end mt-3">
@@ -245,8 +245,9 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        table.ajax.reload()
-                                        $(".add-modal").modal("hide")
+                                        table.ajax.reload();
+                                        $(".add-modal").modal("hide");
+                                        $('#parentName').val(null);
                                     });
                             } else {
                                 $('#parentName').val(null);
