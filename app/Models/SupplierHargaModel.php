@@ -68,11 +68,12 @@ class SupplierHargaModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'supplier_harga.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "supplier_harga.*, barang_master.barang_name AS bahan_baku_name";
+        $selectQry = "supplier_harga.*, barang_master.barang_name AS bahan_baku_name, bagian.nama_bagian as nama_bagian";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
+            ->join('bagian', 'bagian.id = supplier_harga.bagian_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);

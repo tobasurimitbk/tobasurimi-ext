@@ -47,6 +47,7 @@ class SupplierHarga extends BaseController
                 "bahan_baku_name"   => $data->bahan_baku_name,
                 "createdAt"         => $data->createdAt ? date("d/m/Y", strtotime($data->createdAt)) : "",
                 "spesifikasi"       => $data->spesifikasi,
+                "bagian"       => $data->nama_bagian,
                 "harga_umum"        => "Rp " . number_format($data->harga_umum, 2, '.', ','),
                 "harga_harian"      => "Rp " . number_format($data->harga_harian, 2, '.', ','),
                 "harga_bulanan"     => "Rp " . number_format($data->harga_bulanan, 2, '.', ',')
