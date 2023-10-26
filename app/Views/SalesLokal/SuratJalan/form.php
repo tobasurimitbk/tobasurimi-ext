@@ -61,7 +61,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">SO</label>
+                            <label for="floatingInput">No Order</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -365,7 +365,7 @@
                 required: "PO wajib diisi"
             },
             'id_so[]': {
-                required: "SO wajib diisi"
+                required: "No Order wajib diisi"
             },
             no_surat_jalan: {
                 required: "No Surat jalan wajib diisi"
