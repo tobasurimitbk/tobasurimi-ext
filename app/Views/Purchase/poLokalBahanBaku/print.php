@@ -179,6 +179,8 @@
                     <th class="txt-right">TOTAL</th>
                 </tr>
                 <?php
+                $nilai_pph = 0;
+                $nilai_total = 0;
                 foreach ($dataPODetail as $detail) {
                 ?>
                     <tr>
@@ -186,23 +188,39 @@
                         <td><?= $detail->nama_bagian ?></td>
                         <td><?= $detail->spesifikasi ?></td>
                         <td class="txt-right"><?= $detail->qty ?></td>
-                        <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                        <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <?php if($dataPO->pph === "None") { 
+                            $nilai_total = $nilai_total + ($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");   
+                        ?>
+                            <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <?php } if($dataPO->pph === "Supplier") { 
+                            $nilai_pph = $nilai_pph + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
+                            $nilai_total = $nilai_total + ($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");  
+                        ?>
+                            <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <?php } if($dataPO->pph === "Company") { 
+                            $nilai_total = $nilai_total + (((formatter($detail->general_price, "STR_TO_FLOAT")) + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));    
+                            $nilai_pph = $nilai_pph + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
+                        ?>
+                            <td class="txt-right"><?= number_format((formatter($detail->general_price, "STR_TO_FLOAT")) + (formatter($detail->general_price, "STR_TO_FLOAT") * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                            <td class="txt-right"><?= number_format(((formatter($detail->general_price, "STR_TO_FLOAT")) + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <?php } ?>
                     </tr>
                 <?php } ?>
                 <tr class="table-border">
                     <td class="skip" colspan="3">JUMLAH</td>
-                    <td class="skip txt-right"><?= $dataPO->totalQty ?></td>\
+                    <td class="skip txt-right"><?= $dataPO->totalQty ?></td>
                     <td class="skip"></td>
-                    <td class="txt-right"><?= $dataPO->totalPrice ?></td>
+                    <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">PPH</td>
-                    <td class="txt-right"><?= $dataPO->totalPph ?></td>
+                    <td class="txt-right"><?= number_format(formatter($nilai_pph, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">DIBAYARKAN</td>
-                    <td class="txt-right"><?= $dataPO->totalPaid ?></td>
+                    <td class="txt-right"><?= number_format(formatter(($nilai_total - $nilai_pph), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer">
@@ -252,7 +270,7 @@
                 <tr>
                     <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;"><?= $dataPO->amount ?></td>
+                    <td style="vertical-align: top;"><?= terbilang(formatter(($nilai_total - $nilai_pph), "STR_TO_FLOAT")) ?></td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
@@ -265,17 +283,17 @@
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
-                    <td class="txt-right"><?= $dataPO->totalPrice ?></td>
+                    <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
                 <tr>
                     <td>PPh</td>
                     <td>Rp.</td>
-                    <td class="txt-right"><?= $dataPO->totalPph ?></td>
+                    <td class="txt-right"><?= number_format(formatter($nilai_pph, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
                 <tr>
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
-                    <td class="txt-right"><?= $dataPO->totalPaid ?></td>
+                    <td class="txt-right"><?= number_format(formatter(($nilai_total - $nilai_pph), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
             </table>
 
