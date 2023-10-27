@@ -22,12 +22,15 @@ class SupplierBahanBaku extends BaseController
     {
         $provinceModel = new ProvinceModel();
         $countryModel = new CountryModel();
+        $supplierModel = new SupplierModel();
 
         $provinceData = $provinceModel->asObject()->findAll();
         $countryData = $countryModel->asObject()->findAll();
+        $supplierData = $supplierModel->asObject()->findAll();
 
         $data = [
             "dataProvinces" => $provinceData,
+            "dataSuppliers" => $supplierData,
             "country" => $countryData
         ];
 

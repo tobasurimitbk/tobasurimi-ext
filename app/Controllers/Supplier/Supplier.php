@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers\Supplier;
+use Dompdf\Dompdf;
 
 use App\Controllers\BaseController;
 use App\Models\CountryModel;
@@ -9,6 +10,7 @@ use App\Models\SupplierModel;
 use App\Models\SupplierHargaModel;
 use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
+use App\Models\WarehousesModel;
 
 class Supplier extends BaseController
 {
@@ -23,6 +25,7 @@ class Supplier extends BaseController
         $this->supplierHargaModel = new SupplierHargaModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->bagianModel = new BagianModel();
+        $this->warehousesModel = new WarehousesModel();
     }
 
     // bahan baku
@@ -30,9 +33,15 @@ class Supplier extends BaseController
     {
         $provinceData = $this->provinceModel->asObject()->findAll();
         $countryData = $this->countryModel->asObject()->findAll();
+        $supplierData = $this->supplierModel->asObject()->findAll();
+        $barangMasterData = $this->barangMasterModel->asObject()->findAll();
+        $warehousesData = $this->warehousesModel->asObject()->findAll();
 
         $data = [
             "dataProvinces" => $provinceData,
+            "dataSuppliers" => $supplierData,
+            "dataBarangMasters" => $barangMasterData,
+            "dataWarehouses" => $warehousesData,
             "country" => $countryData
         ];
 
@@ -883,5 +892,26 @@ class Supplier extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function printSupplierBahanBaku(){
+        $domPdf = new Dompdf();
+
+        $fileName = 'Order Form';
+        
+        // load HTML content
+        $domPdf->loadHtml(view('Supplier/supplierBahanBaku/print'));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper([0, 0, 792.96, 528]);
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+
+        exit();
+        // return view('Supplier/supplierBahanBaku/print');
     }
 }

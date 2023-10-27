@@ -250,7 +250,24 @@
                 {
                     data: "stok",
                     className: "text-center",
-                    width: "10%"
+                    width: "10%",
+                    render: function(data, type, row) {
+                        var status = row?.status;
+                        if (status == "IN") {
+                            return `
+                            <div class="text-success">
+                            <b>(+) ${data}</b>
+                            </div>
+                        `
+                        } else {
+                            return `
+                            <div class="text-danger">
+                            <b>(-) ${data}</b>
+                            </div>
+                        `
+                        }
+
+                    }
                 }
             ],
             columnDefs: [{

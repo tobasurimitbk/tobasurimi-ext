@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use Config\Services;
 
 use App\Models\CustomerModel;
+use App\Models\BarangMasterModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesOrderExportModel;
@@ -30,6 +31,7 @@ class SalesKontrak extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
         $this->customerModel = new CustomerModel();
+        $this->barangMasterModel = new BarangMasterModel();
         $this->salesKontrakModel = new SalesKontrakModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
@@ -49,6 +51,7 @@ class SalesKontrak extends BaseController
     {
         //Get Buyer From Customer
         $dataCustomer = $this->customerModel->getCustomer();
+        $dataBarangMaster = $this->barangMasterModel->asObject()->findAll();
         
         $data = [
             "dataCustomer" => $dataCustomer

@@ -25,8 +25,6 @@
                                 <th onclick="changeSort('parent_barang.parent_name')" class="sort">Kelompok</th>
                                 <th onclick="changeSort('barang_master.kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_master.barang_name')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('satuans.nama_satuan')" class="sort">Satuan</th>
-                                <th onclick="changeSort('barang_master.stok')" class="sort">Stok</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
@@ -159,21 +157,6 @@
                 {
                     data: "barang_name",
                     className: "text-center",
-                },
-                {
-                    data: "satuan",
-                    className: "text-center",
-                },
-                {
-                    data: "stok",
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        return `
-                            <div class="text-danger">
-                                ${data}
-                            </div>
-                        `
-                    }
                 },
                 {
                     data: "id",

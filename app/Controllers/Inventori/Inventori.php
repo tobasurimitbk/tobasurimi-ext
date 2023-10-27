@@ -153,6 +153,7 @@ class Inventori extends BaseController
                 "kondisi" => $data['stock_type'] == "New" ? "Baru" : "Bekas",
                 "barang" => $data['barang_name'],
                 "spesifikasi" => $data['spesifikasi'],
+                "satuan" => $data['nama_satuan'],
                 "status" => strtoupper($data['status']),
                 "stok" => $data['qty']
             ]);

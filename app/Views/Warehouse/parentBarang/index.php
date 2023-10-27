@@ -90,7 +90,7 @@
 
 <script>
     let sort = "nomor";
-    let sortType = "asc";
+    let sortType = "desc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -175,7 +175,7 @@
             let type = $("input[name='type']").val();
             let formData = new FormData();
             $('#parentName').val(null);
-            $('#kategori').val(null).trigger("change");
+            $('#kategori').val('').trigger("change");
             formData.append("id", id);
 
             $('.title-name').text("Update Kategori " + repairStr(type));
@@ -332,7 +332,7 @@
                                             .then(() => {
                                                 table.ajax.reload();
                                                 $('#parentName').val(null);
-                                                $('#kategori').val(null).trigger("change");
+                                                $('#kategori').val('').trigger("change");
                                                 $(".add-modal").modal("hide");
                                             })
                                     } else {
@@ -342,7 +342,7 @@
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
                                             $('#parentName').val(null);
-                                            $('#kategori').val(null).trigger("change");
+                                            $('#kategori').val('').trigger("change");
                                             $(".add-modal").modal("hide")
                                         });
                                     }
@@ -380,7 +380,7 @@
                                             .then(() => {
                                                 table.ajax.reload();
                                                 $('#parentName').val(null);
-                                                $('#kategori').val(null).trigger("change");
+                                                $('#kategori').val('').trigger("change");
                                                 $(".add-modal").modal("hide")
                                             })
                                     } else {
@@ -390,7 +390,7 @@
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
                                             $('#parentName').val(null);
-                                            $('#kategori').val(null).trigger("change");
+                                            $('#kategori').val('').trigger("change");
                                             $(".add-modal").modal("hide")
                                         });
                                     }
