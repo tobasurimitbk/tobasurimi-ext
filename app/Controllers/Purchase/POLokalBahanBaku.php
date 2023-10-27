@@ -10,6 +10,9 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\BeaCukaiModel;
 use App\Models\BarangMasterModel;
+use App\Models\BagianModel;
+use App\Models\SatuansModel;
+use App\Models\SupplierHargaModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanBaku extends BaseController
@@ -22,6 +25,9 @@ class POLokalBahanBaku extends BaseController
     protected $SupplierModel;
     protected $BeaCukaiModel;
     private $barangModel;
+    protected $BagianModel;
+    protected $SatuansModel;
+    protected $SupplierHargaModel;
     protected $dompdf;
 
     public function __construct()
@@ -33,7 +39,10 @@ class POLokalBahanBaku extends BaseController
         $this->SupplierModel = new SupplierModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
         $this->barangModel = new BarangMasterModel();
+        $this->BagianModel = new BagianModel();
         $this->CompaniesModel = new CompaniesModel();
+        $this->SatuansModel = new SatuansModel();
+        $this->SupplierHargaModel = new SupplierHargaModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -50,12 +59,20 @@ class POLokalBahanBaku extends BaseController
         //Get Supplier
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
 
+        // Get Bagian
+        $dataBagian = $this->BagianModel->where('deletedAt', null)->findAll();
+
+        // Get Satuan
+        $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
+
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         $data = [
             "today"         => date("d/m/Y"),
+            "dataSatuan"    => $dataSatuan,
+            "dataBagian"    => $dataBagian,
             "dataSupplier"  => $dataSupplier,
             "dataCompany"   => $dataCompany
         ];
@@ -71,27 +88,38 @@ class POLokalBahanBaku extends BaseController
         //Get Supplier
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
 
+        // Get Bagian
+        $dataBagian = $this->BagianModel->where('deletedAt', null)->findAll();
+
+        // Get Satuan
+        $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
+
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         $data = [
             "today" => date("d/m/Y"),
+            "dataSatuan"    => $dataSatuan,
+            "dataBagian"    => $dataBagian,
             "dataCompany" => $dataCompany,
             "dataSupplier" => $dataSupplier
         ];
+
+        $spesifikasi = [];
 
         if (!empty($id)) {
             $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
             $dataBBLokalDetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
             $dataBarang = $this->barangModel->getBySupplier($dataBBLokal->supplier_id);
+            $spesifikasi = $this->SupplierHargaModel->getByBarangandSupplier($dataBBLokal->barang_id, $dataBBLokal->supplier_id);
+            $data["dataSpesifikasi"] = $spesifikasi;
             $data["dataBarang"] = $dataBarang;
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
 
         return view('Purchase/poLokalBahanBaku/form', $data);
-        return;
     }
 
     public function allPOLokalBahanBaku()
@@ -344,6 +372,7 @@ class POLokalBahanBaku extends BaseController
                             "id" => $value->id ?? null,
                             "rm_purchase_order_id" => $this->request->getPost("id"),
                             "supplier_harga_id" => $value->supplier_harga_id,
+                            "satuan_id" => $value->satuan_id,
                             "bagian" => $value->bagian,
                             "peti" => $value->peti,
                             "quality" => $value->quality,
