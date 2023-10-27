@@ -141,7 +141,7 @@
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Tanggal    : <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></span></div>
+                    <div><span class="txt-bold">Tanggal    : <?= $dataPenerimaanBarang->createdAt ? date("d/m/Y", strtotime($dataPenerimaanBarang->createdAt)) : ""; ?></span></div>
                 </td>
                 <td>
                     <div><span class="txt-bold">No. PO  &nbsp; : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?></span></div>
@@ -183,20 +183,20 @@
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_packaging"] . "/" . $detail["packaging_qty"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= $detail["jml_masuk"]; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
-                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
-                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["spp_no"]; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
             <tr>
                 <td class="txt-left" style="padding-left: 5px" colspan="6"><b>TOTAL</b></td>
-                <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total); ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
                 <td style="padding-left: 5px;" colspan="2"></td>
             </tr>
             <tr>
                 <td class="txt-left" style="padding-left: 5px" colspan="6"><b>ONGKOS KIRIM</b></td>
-                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                 <td style="padding-left: 5px;" colspan="2"></td>
             </tr>
         </table>

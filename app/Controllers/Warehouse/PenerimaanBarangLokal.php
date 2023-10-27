@@ -6,7 +6,7 @@ use App\Controllers\BaseController;
 
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
-use App\Models\BarangModel;
+use App\Models\BarangMasterModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
@@ -49,7 +49,7 @@ class PenerimaanBarangLokal extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-        $this->barangModel = new BarangModel();
+        $this->barangModel = new BarangMasterModel();
         $this->metadataModel = new MetadataModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
@@ -775,7 +775,7 @@ class PenerimaanBarangLokal extends BaseController
                         $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_FLOAT") : 0;
 
                         $payloadupdateStok = [
-                            'stok' => $stok + $packaging_qty
+                            'stok' => $stok - $packaging_qty
                         ];
         
                         $responseStok = $this->barangModel->where('id', $packaging)
@@ -796,10 +796,10 @@ class PenerimaanBarangLokal extends BaseController
                     }
 
                     // add stock detail barang
-                    $this->stockDetailModel->addStock($barang_id, $dataPenerimaanBarang->warehouse_id, $jml_masuk, 'New');
+                    $this->stockDetailModel->addOrReduceStock($barang_id, $dataPenerimaanBarang->warehouse_id, 'New', $jml_masuk, 'IN', '');
 
                     // add stock detail barang kemasan
-                    $this->stockDetailModel->addStock($packaging, $dataPenerimaanBarang->warehouse_id, $packaging_qty, 'Scrap');
+                    $this->stockDetailModel->addOrReduceStock($packaging, $dataPenerimaanBarang->warehouse_id, 'Scrap', $packaging_qty, 'OUT', '');
                 }
             }
 

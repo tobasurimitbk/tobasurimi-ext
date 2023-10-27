@@ -178,7 +178,7 @@ class AMPurchaseOrderModel extends Model
         return $query->getRow();
     }
 
-    public function getNoPenerimaanBarang($po_type, $supplier_id, $company_id)
+    public function getNoPenerimaanBarang($po_type, $supplier_id)
     {
         $arrCondition = [
             'deletedAt' => null,
