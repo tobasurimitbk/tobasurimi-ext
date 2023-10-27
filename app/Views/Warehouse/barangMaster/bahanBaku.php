@@ -83,14 +83,24 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select" name="satuan_id" id="satuan_id">
-                                    <option value=""></option>
-                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                        <option value="<?= $sb['id'] ?>"><?= $sb['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Satuan Barang</label>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="satuan_id" id="satuan_id">
+                                            <option value=""></option>
+                                            <?php foreach ($satuanBarang as $sb) : ?>
+                                                <option value="<?= $sb['id'] ?>"><?= $sb['kode_satuan'] ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput">Satuan Barang</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="number" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
+                                        <label for="floatingInput">Stok Minimum</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -108,7 +118,7 @@
 
 <script>
     let sort = "nomor";
-    let sortType = "asc";
+    let sortType = "desc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -227,7 +237,11 @@
                 },
                 satuan_id: {
                     required: true
-                }
+                },
+                minimum_stock: {
+                    required: true,
+                    number: true
+                },
             },
             messages: {
                 parent_type_id: {
@@ -241,6 +255,10 @@
                 },
                 satuan_id: {
                     required: "Satuan Barang Wajib Diisi"
+                },
+                minimum_stock: {
+                    required: "Minimal stock harus diisi",
+                    number: "Masukkan angka valid"
                 }
             },
             errorElement: 'span',
@@ -289,6 +307,7 @@
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
                     $('select[name="satuan_id"]').val(res.data.satuan_id).change();
                     $('input[name="barang_name"]').val(res.data.barang_name);
+                    $('input[name="minimum_stock"]').val(res.data.minimum_stock);
                     $('input[name="id"]').val(res.data.id);
 
                     $('.add-modal').modal('show');

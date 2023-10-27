@@ -24,7 +24,6 @@
                                 <th onclick="changeSort('barang_master.kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_master.barang_name')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('satuans.nama_satuan')" class="sort">Satuan</th>
-                                <th onclick="changeSort('barang_master.stok')" class="sort">Stok</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
@@ -70,7 +69,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-sm">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select" name="satuan_id" id="satuan_id">
                                     <option value=""></option>
@@ -79,6 +78,12 @@
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Satuan Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
+                                <label for="floatingInput">Stok Minimum</label>
                             </div>
                         </div>
                     </div>
@@ -96,7 +101,7 @@
 
 <script>
     let sort = "nomor";
-    let sortType = "asc";
+    let sortType = "desc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -147,17 +152,6 @@
                 {
                     data: "satuan",
                     className: "text-center",
-                },
-                {
-                    data: "stok",
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        return `
-                            <div class="text-danger">
-                                ${data}
-                            </div>
-                        `
-                    }
                 },
                 {
                     data: "id",
@@ -220,7 +214,11 @@
                 },
                 satuan_id: {
                     required: true
-                }
+                },
+                minimum_stock: {
+                    required: true,
+                    number: true
+                },
             },
             messages: {
                 barang_name: {
@@ -231,6 +229,10 @@
                 },
                 satuan_id: {
                     required: "Satuan Barang Wajib Diisi"
+                },
+                minimum_stock: {
+                    required: "Minimal stock harus diisi",
+                    number: "Masukkan angka valid"
                 }
             },
             errorElement: 'span',
@@ -279,6 +281,7 @@
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
                     $('select[name="satuan_id"]').val(res.data.satuan_id).change();
                     $('input[name="barang_name"]').val(res.data.barang_name);
+                    $('input[name="minimum_stock"]').val(res.data.minimum_stock);
                     $('input[name="id"]').val(res.data.id);
 
                     $('.add-modal').modal('show');

@@ -9,7 +9,7 @@
             <ul class="nav nav-tabs">
                 <?php foreach ($typeAll as $t) : ?>
                     <li class="nav-item">
-                        <a class="nav-link <?= $t['kode'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-list?type=' . $t['kode']) ?>"><?= $t['tipe_barang'] ?></a>
+                        <a class="nav-link <?= $t['description'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-list?type=' . $t['description']) ?>"><?= $t['value'] ?></a>
                     </li>
                 <?php endforeach; ?>
             </ul>

@@ -22,12 +22,10 @@ class BarangMasterModel extends Model
         'barang_name',
         'kode_barang',
         'type_barang',
-        'stok',
+        'minimum_stock',
         'createdAt',
         'updatedAt',
         'deletedAt',
-        //data sementara
-        'warehouse_id'
     ];
 
     // Dates
