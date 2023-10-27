@@ -420,21 +420,25 @@
                     <td><?= $dataPO->cong_sebenarnya ?></td>
                     <td><?= $dataPO->cong_batasan ?></td>
                     <td><?= $dataPO->selisih ?></td>
-                    <td><?= $dataPO->totalTambahan ?></td>
+                    <td><?= number_format($dataPO->totalTambahan, 2, '.', ',') ?></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                     <td></td>
                     <td>PPH</td>
-                    <td><?= $dataPO->pphTambahan ?></td>
+                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                    <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php } else { ?>
+                    <td>0.00</td>
+                    <?php } ?>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                     <td></td>
                     <td>DIBAYARKAN</td>
-                    <td><?= $dataPO->subsidi_langsung ?></td>
+                    <td><?= number_format($dataPO->subsidi_langsung, 2, '.', ',') ?></td>
                 </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer">

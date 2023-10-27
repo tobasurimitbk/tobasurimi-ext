@@ -311,7 +311,7 @@
                             ?> 
                                     <td><?= $no; ?></td>
                                     <td><?= $details["kode_barang"]; ?></td>
-                                    <td><?= $details["nama_barang"]; ?></td>
+                                    <td><?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?></td>
                                     <td><?= $details["po_no"]; ?></td>
                                     <td><?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?></td>
                                     <td><?= $details["nama_packaging"]; ?></td>
@@ -325,14 +325,14 @@
                                     <td><?= $details["sub_total"] ? number_format($details["sub_total"], 2, '.', ',') : 0; ?></td>
                                     <td><?= $details["keterangan"]; ?></td>
                                     <td>
-                                        <button data-packaging="<?= $details["packaging"]; ?>" data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" data-pph="<?= $pph; ?>" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= formatter($details["jml_masuk"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"], 2, '.', ',') : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"], 2, '.', ',') : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
+                                        <button data-packaging="<?= $details["packaging"]; ?>" data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" data-pph="<?= $pph; ?>" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= formatter($details["jml_masuk"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"], 2, '.', ',') : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"], 2, '.', ',') : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button>
                                     </td>
                                 <?php } else { ?>
                                     <td><?= $no; ?></td>
                                     <td><?= $details["kode_barang"]; ?></td>
-                                    <td><?= $details["nama_barang"]; ?></td>
+                                    <td><?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?></td>
                                     <td><?= $details["po_no"]; ?></td>
                                     <td><?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?></td>
                                     <td><?= $details["nama_packaging"]; ?></td>
@@ -570,7 +570,7 @@
         barang_id: Number(<?= $details["barang_id"]; ?>),
         unit: Number(<?= $details["unit"]; ?>),
         kode_barang: '<?= $details["kode_barang"]; ?>',
-        nama_barang: '<?= $details["nama_barang"]; ?>',
+        nama_barang: '<?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?>',
         nama_barang_dokumen: '<?= $details["nama_barang_dok"]; ?>',
         qty: Number(<?= $details["qty"]; ?>),
         qty_diterima: Number(<?= $details["qty_diterima"]; ?>),
@@ -1835,7 +1835,7 @@
                                         barang_id: item.barang_id,
                                         unit: item.id_satuan,
                                         kode_barang: item.kode_barang,
-                                        nama_barang: item.nama_barang,
+                                        nama_barang: item.nama_barang + " (" + item.spesifikasi + ")",
                                         nama_barang_dokumen: item.nama_barang,
                                         qty: qty_sementara,
                                         qty_diterima: qty_diterima,
@@ -1860,7 +1860,7 @@
                                     tag_html += item.kode_barang;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += item.nama_barang;
+                                    tag_html += item.nama_barang + " (" + item.spesifikasi + ")";
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
                                     tag_html += item.po_no;
@@ -1900,7 +1900,7 @@
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += `
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.id_satuan}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
+                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.id_satuan}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang + " (" + item.spesifikasi + ")"}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
                                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                     </button>`;
                                     tag_html += "</td>";
@@ -1947,10 +1947,10 @@
                                     // tag_total += total_jml_masuk;
                                     // tag_total += "</td>";
                                     tag_total += `<td>`;
-                                    tag_total += total_jml_harga.toLocaleString();
+                                    tag_total += total_jml_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     tag_total += "</td>";
                                     tag_total += `<td>`;
-                                    tag_total += total_jml_sub_total.toLocaleString();
+                                    tag_total += total_jml_sub_total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     tag_total += "</td>";
                                     tag_total += `<td colspan="2">`;
                                     tag_total += "</td>";
