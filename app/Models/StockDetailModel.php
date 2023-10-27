@@ -96,7 +96,8 @@ class StockDetailModel extends Model
             'stock_details.qty' => 'qty',
             'stock_details.status' => 'status',
             'stock_details.spesifikasi' => 'spesifikasi',
-            'stock_details.stock_date' => 'stock_date'
+            'stock_details.stock_date' => 'stock_date',
+            'companies.company' => 'companies.company'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -125,6 +126,9 @@ class StockDetailModel extends Model
                 ->like('stock_details.stock_date', $addCondition['search'])
                 ->orLike('barang_master.barang_name', $addCondition['search'])
                 ->orLike('satuans.nama_satuan', $addCondition['search'])
+                ->orLike('warehouses.warehouse_name', $addCondition['search'])
+                ->orLike('companies.company', $addCondition['search'])
+                ->orLike('stock_details.stock_date', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -141,10 +145,10 @@ class StockDetailModel extends Model
     public function getListStock($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'companies.company' => 'barang_id',
+            'companies.company' => 'companies.company',
             'stock_details.warehouse_id' => 'stock_details.warehouse_id',
             'barang_master.parent_type_id' => 'barang_master.parent_type_id',
-            'barang_master.barang.name' => 'barang_master.barang.name',
+            'barang_master.barang_name' => 'barang_master.barang_name',
             'satuans.nama_satuan' => 'satuans.nama_satuan',
         ];
 
@@ -186,7 +190,6 @@ class StockDetailModel extends Model
                 ->orLike('warehouses.warehouse_name', $addCondition['search'])
                 ->orLike('parent_barang.parent_name', $addCondition['search'])
                 ->orLike('satuans.nama_satuan', $addCondition['search'])
-                ->orLike('totalStock', $addCondition['search'])
                 ->groupEnd();
         }
 

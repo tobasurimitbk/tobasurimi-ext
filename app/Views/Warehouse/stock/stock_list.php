@@ -26,37 +26,37 @@
                             <?php if ($typeSelected == "bahan_baku") : ?>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Company</th>
-                                    <th>Warehouse</th>
-                                    <th>Kelompok</th>
-                                    <th>Barang</th>
+                                    <th onclick="changeSort('companies.company')">Company</th>
+                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
+                                    <th onclick="changeSort('barang_master.parent_type_id')">Kelompok</th>
+                                    <th onclick="changeSort('barang_master.barang_name')">Barang</th>
                                     <th>Stok</th>
                                     <th>Status</th>
                                 </tr>
                             <?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi") : ?>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Company</th>
-                                    <th>Warehouse</th>
-                                    <th>Kelompok</th>
-                                    <th>Barang</th>
-                                    <th>Satuan</th>
+                                    <th onclick="changeSort('companies.company')">Company</th>
+                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
+                                    <th onclick="changeSort('barang_master.parent_type_id')">Kelompok</th>
+                                    <th onclick="changeSort('barang_master.barang_name')">Barang</th>
+                                    <th onclick="changeSort('satuans.nama_satuan')">Satuan</th>
                                     <th>Stok</th>
                                     <th>Status</th>
                                 </tr>
                             <?php elseif ($typeSelected == "bahan_scrap") : ?>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Company</th>
-                                    <th>Warehouse</th>
-                                    <th>Barang</th>
-                                    <th>Satuan</th>
+                                    <th onclick="changeSort('companies.company')">Company</th>
+                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
+                                    <th onclick="changeSort('barang_master.barang_name')">Barang</th>
+                                    <th onclick="changeSort('satuans.nama_satuan')">Satuan</th>
                                     <th>Stok</th>
                                     <th>Status</th>
                                 </tr>
                             <?php endif; ?>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -381,5 +381,13 @@
     $(".search").keyup(function() {
         table.ajax.reload();
     });
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "ASC";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 <?= $this->endSection(); ?>

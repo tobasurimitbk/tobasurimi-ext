@@ -26,26 +26,26 @@
                             <?php if ($typeSelected == "bahan_baku") : ?>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Tanggal</th>
-                                    <th>Company</th>
-                                    <th>Warehouse</th>
+                                    <th onclick="changeSort('stock_details.stock_date')">Tanggal</th>
+                                    <th onclick="changeSort('companies.company')">Company</th>
+                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
                                     <th>Kondisi</th>
-                                    <th>Barang</th>
-                                    <th>Spesifikasi</th>
-                                    <th>Status</th>
-                                    <th>Stok</th>
+                                    <th onclick="changeSort('stock_details.barang_id')">Barang</th>
+                                    <th onclick="changeSort('stock_details.spesifikasi')">Spesifikasi</th>
+                                    <th onclick="changeSort('stock_details.status')">Status</th>
+                                    <th onclick="changeSort('stock_details.qty')">Stok</th>
                                 </tr>
                             <?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi" || $typeSelected == "bahan_scrap") : ?>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Tanggal</th>
-                                    <th>Company</th>
-                                    <th>Warehouse</th>
+                                    <th onclick="changeSort('stock_details.stock_date')">Tanggal</th>
+                                    <th onclick="changeSort('companies.company')">Company</th>
+                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
                                     <th>Kondisi</th>
-                                    <th>Barang</th>
+                                    <th onclick="changeSort('stock_details.barang_id')">Barang</th>
                                     <th>Satuan</th>
-                                    <th>Status</th>
-                                    <th>Stok</th>
+                                    <th onclick="changeSort('stock_details.status')">Status</th>
+                                    <th onclick="changeSort('stock_details.qty')">Stok</th>
                                 </tr>
                             <?php endif; ?>
                         </thead>
@@ -272,5 +272,13 @@
     $(".search").keyup(function() {
         table.ajax.reload();
     });
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "ASC";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 <?= $this->endSection(); ?>
