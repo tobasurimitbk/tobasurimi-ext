@@ -37,7 +37,7 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     let sort = "";
-    let sortType = "asc";
+    let sortType = "desc";
     let trigger = true;
 
     let list_address = [];

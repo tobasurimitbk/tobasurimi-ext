@@ -73,69 +73,71 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Data Kurs</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end row-col-spp">
-            <div class="col mb-3">
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+    <div class="section-header">
+        <h1>Data Kurs</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end row-col-spp">
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col mb-3">
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
                     </div>
                 </div>
+                <div class="col mb-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Valas" value="" />
+                </div>
             </div>
-            <div class="col mb-3">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Valas" value="" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th onclick="changeSort('valas')" class="sort">Valas</th>
-                            <th onclick="changeSort('nilai_kurs')" class="sort">Nilai Kurs</th>
-                            <th onclick="changeSort('start_date')" class="sort">Tanggal Mulai</th>
-                            <th onclick="changeSort('end_date')" class="sort">Tanggal Akhir</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('valas')" class="sort">Valas</th>
+                                <th onclick="changeSort('nilai_kurs')" class="sort">Nilai Kurs</th>
+                                <th onclick="changeSort('start_date')" class="sort">Tanggal Mulai</th>
+                                <th onclick="changeSort('end_date')" class="sort">Tanggal Akhir</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "valas";
-    let sortType = "asc";
+    let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -154,36 +156,37 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            orderable: false,
-            width: "5%"
-        },
-        {
-            data: "valas",
-            className: "text-center"
-        },
-        {
-            data: "nilai_kurs",
-            className: "text-center"
-        },
-        {
-            data: "start_date",
-            className: "text-center"
-        },
-        {
-            data: "end_date",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                orderable: false,
+                width: "5%"
+            },
+            {
+                data: "valas",
+                className: "text-center"
+            },
+            {
+                data: "nilai_kurs",
+                className: "text-center"
+            },
+            {
+                data: "start_date",
+                className: "text-center"
+            },
+            {
+                data: "end_date",
+                className: "text-center"
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -205,7 +208,7 @@
                 return false;
             }
         });
-        
+
         var validator = $(".create-form").validate({
             rules: {
                 metadata_id: {
@@ -333,11 +336,11 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd").change(function () {
+        $(".dateStart, .dateEnd").change(function() {
             table.ajax.reload();
         })
 
@@ -372,13 +375,10 @@
         })
 
         $(".metadata_id").change(function() {
-            let id = $(".metadata_id option:selected").data("id") 
-            if(!id)
-            {
+            let id = $(".metadata_id option:selected").data("id")
+            if (!id) {
                 $(".valas").val($(".metadata_id option:selected").val())
-            }
-            else
-            {
+            } else {
                 $(".valas").val("")
             }
         })
@@ -406,15 +406,13 @@
                         let start_date = res?.data?.start_date;
                         let end_date = res?.data?.end_date;
 
-                        if(start_date)
-                        {
-                            let split_start_date = start_date.split("-") 
+                        if (start_date) {
+                            let split_start_date = start_date.split("-")
                             $(".start_date").datepicker('setDate', split_start_date[2] + "/" + split_start_date[1] + "/" + split_start_date[0]);
                         }
 
-                        if(end_date)
-                        {
-                            let split_end_date = end_date.split("-") 
+                        if (end_date) {
+                            let split_end_date = end_date.split("-")
                             $(".end_date").datepicker('setDate', split_end_date[2] + "/" + split_end_date[1] + "/" + split_end_date[0]);
                         }
 

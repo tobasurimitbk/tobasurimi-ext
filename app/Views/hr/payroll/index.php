@@ -252,7 +252,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nomor";
-    let sortType = "asc";
+    let sortType = "desc";
     $('#loadingSpinner').hide();
 
     const table = $('.dataTable').DataTable({

@@ -167,18 +167,18 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Pemesanan">
-                                                <label for="floatingInput">Tanggal Awal</label>
-                                            </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Pemesanan">
+                                            <label for="floatingInput">Tanggal Awal</label>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Pemesanan">
-                                                <label for="floatingInput">Tanggal Akhir</label>
-                                            </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Pemesanan">
+                                            <label for="floatingInput">Tanggal Akhir</label>
                                         </div>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
@@ -349,7 +349,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
-    let sortType = "asc";
+    let sortType = "desc";
     let sortHarga = "createdAt";
     let sortTypeHarga = "desc";
     let trigger = true;
@@ -365,10 +365,10 @@
             if (selectedOption) {
                 dynamicButtons.append('<a href="<?= base_url("/supplier-bahan-baku/print"); ?>" target="_blank" class="btn btn-submit-form btn-submit-' + selectedOption + ' mr-2">Tampil</a>');
             }
-            
+
             // Sembunyikan semua div yang terkait dengan laporan
             $(".col-md-12 > div[class^='laporan-']").hide();
-            
+
             // Tampilkan div yang sesuai dengan pilihan saat ini
             if (selectedOption) {
                 $("." + selectedOption).show();
@@ -378,13 +378,13 @@
     });
 
     $(".awal_date, .akhir_date").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
 
-    
+
     $('.laporan_id').select2({
         placeholder: "",
         theme: "bootstrap-5"
@@ -412,12 +412,12 @@
         placeholder: "",
         theme: "bootstrap-5",
     });
-    
+
     $('.barang_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
     });
-    
+
     $('.warehouse_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
@@ -511,7 +511,7 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-                    return `
+                return `
                         <a class="btn btn-warning" href="<?= base_url(); ?>supplier-bahan-baku/harga/${id}" style="box-shadow: none !important;">
                             Set Harga
                         </a>
@@ -694,19 +694,16 @@
             $(".city_parent_id").empty()
             $(".city_parent_id").append(`<option value=""></option>`)
             $(".country_code").val('').change()
-            
+
             $.ajax({
                 url: "<?= base_url("supplier/generate"); ?>",
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if(res?.status)
-                    {
+                    if (res?.status) {
                         $(".kode").val(res?.data)
                         $(".add-modal").modal("show");
-                    }
-                    else
-                    {
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
@@ -724,7 +721,7 @@
         $(".btn-hide-harga").click(function() {
             $(".harga-modal").modal("hide")
         })
-        
+
         $(".btn-hide-laporan").click(function() {
             $(".laporan-modal").hide()
             $(".laporan_id").val("").change()
@@ -759,8 +756,8 @@
                         $(".account_receivable").val(res?.data?.account_receivable);
                         $(".account_payable").val(res?.data?.account_payable);
 
-                         // AJAX GET CITY
-                         $.ajax({
+                        // AJAX GET CITY
+                        $.ajax({
                             url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
                             method: "GET",
                             dataType: "json",
@@ -966,9 +963,6 @@
         secondTable.ajax.reload()
         $(".harga-modal").modal("show")
     }
-
-    
-    
 </script>
 
 <?= $this->endSection(); ?>

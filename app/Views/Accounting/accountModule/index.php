@@ -25,7 +25,7 @@
                                         <select class="form-select module" name="module" id="module">
                                             <option value="">Pilih Module</option>
                                             <option value="pembelian">Pembelian</option>
-                                            <option value="penjualan">Penjualan</option>                                            
+                                            <option value="penjualan">Penjualan</option>
                                         </select>
                                         <label for="floatingInput">Module</label>
                                     </div>
@@ -41,7 +41,7 @@
                                         <select class="form-select tipe" name="tipe" id="tipe">
                                             <option value="">Pilih Tipe</option>
                                             <option value="BAHAN BAKU">BAHAN BAKU</option>
-                                            <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>                                            
+                                            <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>
                                         </select>
                                         <label for="floatingInput">Tipe Barang Disediakan</label>
                                     </div>
@@ -52,7 +52,7 @@
                                             <option value="">Pilih Kategori</option>
                                             <option value="LOKAL">LOKAL</option>
                                             <option value="IMPORT">IMPORT</option>
-                                            <option value="EKSPORT">EKSPORT</option>   
+                                            <option value="EKSPORT">EKSPORT</option>
                                         </select>
                                         <label for="floatingInput">Kategori Supplier</label>
                                     </div>
@@ -150,7 +150,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
-    let sortType = "asc";
+    let sortType = "desc";
     let trigger = true;
 
     let list_address = [];
@@ -193,7 +193,7 @@
             data: "no",
             className: "text-center",
             sortable: false
-        },  {
+        }, {
             data: "name",
             className: "text-center"
         }, {
@@ -202,8 +202,7 @@
         }, {
             data: "ar_id",
             className: "text-center"
-        }
-        ],
+        }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"

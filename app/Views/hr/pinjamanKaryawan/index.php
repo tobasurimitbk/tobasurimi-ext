@@ -255,7 +255,7 @@
 </div>
 <script>
     let sort = "nomor";
-    let sortType = "asc";
+    let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
     $('#loadingSpinner').hide();
     // $("input[name='startDate'], input[name='finishDate']").datepicker({
