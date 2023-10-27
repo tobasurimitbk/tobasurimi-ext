@@ -230,12 +230,12 @@
                     width: "10%"
                 },
                 {
-                    data: "stok",
+                    data: "satuan",
                     className: "text-center",
                     width: "10%"
                 },
                 {
-                    data: "satuan",
+                    data: "stok",
                     className: "text-center",
                     width: "10%"
                 },
