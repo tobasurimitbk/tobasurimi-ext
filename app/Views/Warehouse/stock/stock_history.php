@@ -49,7 +49,7 @@
                                 </tr>
                             <?php endif; ?>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
