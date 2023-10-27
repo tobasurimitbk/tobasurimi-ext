@@ -53,7 +53,7 @@ class StockDetailModel extends Model
         $this->insert([
             'barang_id' => $barangID,
             'warehouse_id' => $warehouseID,
-            'stock_type' => $$stockType,
+            'stock_type' => $stockType,
             'qty' => $qty,
             'status' => $status,
             'spesifikasi' => $spesifikasi,

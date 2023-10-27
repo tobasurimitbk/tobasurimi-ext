@@ -622,7 +622,7 @@ class POLokalBahanPenolong extends BaseController
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
 
-        $dataPOLokal = $this->AMPurchaseOrderModel->getNoPenerimaanBarang("LOKAL", $id, $this->this_company_id);
+        $dataPOLokal = $this->AMPurchaseOrderModel->getNoPenerimaanBarang("LOKAL", $id);
 
         $data = [
             "data" => $dataPOLokal

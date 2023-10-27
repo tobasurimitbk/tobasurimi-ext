@@ -928,7 +928,7 @@ class POImportBahanPenolong extends BaseController
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
 
-        $dataPOImport = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Import", $id, $this->this_company_id);
+        $dataPOImport = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Import", $id);
 
         $data = [
             "data" => $dataPOImport
