@@ -272,19 +272,27 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
                                 <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
-                                    <option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>
+                                    <option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" data-kode_barang="" value=""></option>
                                 </select>
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control stok" id="stok" name="stok" placeholder="Stok">
+                                <label for="floatingInput">Stok</label>
                             </div>
                         </div>
                     </div>
@@ -699,7 +707,7 @@
         $(".btn-submit-detail").click(function() {
             let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
             let barang_id = $(".barang_id").val()
-            let kode_barang = $(".kode").val()
+            let kode_barang = $(".kode_barang option:selected").data("kode_barang") ? $(".kode_barang option:selected").data("kode_barang") : "";
             let nama_barang = $(".nama_barang").val()
             let remark = $(".remark").val()
             let nama_satuan = $(".satuan option:selected").text()
@@ -709,6 +717,8 @@
             let total = $(".total").val()
 
             let validate_same = false;
+
+            console.log(kode_barang);
 
             if (validate_same) {
                 Swal.fire({
@@ -1272,19 +1282,20 @@
             $(".keterangan").val('')
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
                 method: "GET",
                 dataType: "json",
-                data: {
-                    kategori: "Jadi"
-                },
                 success: function(res) {
+
                     $(".kode_barang").empty();
 
-                    $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
+                    $(".kode_barang").append(`<option  data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" data-kode_barang="" value=""></option>`);
 
-                    res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                    res.dataBarang.forEach(function(item) {
+                        // if (item.id == id_barang) {
+                        //     valData = item.id_barang
+                        // }
+                        $(".kode_barang").append(`<option data-barang_id="${item.id_barang}" data-stok="${item.qty_stock}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-kode_barang="${item.kode_barang}" value="${item.id_barang}" >${item.nama_barang}</option>`);
                     })
 
                     $(".kode_barang").val("").change();
@@ -1331,18 +1342,21 @@
                 let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
+                $(".stok").attr("readonly", stok ? true : false);
 
                 $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
                 $(".barang_id").val(barang_id);
                 $(".satuan").val(satuan).change();
-                $(".qty").val(stok);
-                $(".harga").val(harga ? Number(harga).toLocaleString() : "");
-                $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
+                $(".stok").val(stok);
+                // $(".harga").val(harga ? Number(harga).toLocaleString() : "");
+                // $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
             } else {
                 $(".nama_barang").attr("readonly", false)
+                $(".stok").attr("readonly", false)
                 $(".kode").val("");
                 $(".nama_barang").val("");
+                $(".stok").val("");
                 $(".barang_id").val("");
                 $(".satuan").val("").change();
                 $(".qty").val("");
@@ -1609,26 +1623,25 @@
         $(".remark").val(remark);
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+            url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
             method: "GET",
             dataType: "json",
-            data: {
-                kategori: "Jadi"
-            },
             success: function(res) {
                 $(".kode_barang").empty();
 
-                $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
+                $(".kode_barang").append(`<option  data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" data-kode_barang="" value=""></option>`);
 
                 if (barang_id === "") {
                     $(".kode_barang").append(`<option selected data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value="${kode_barang}">${kode_barang}</option>`);
                 }
 
-                res.data.forEach(function(item) {
+                res.dataBarang.forEach(function(item) {
                     if (kode_barang === item.kode_barang) {
-                        $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        $(".kode_barang").append(`<option selected data-barang_id="${item.id_barang}" data-stok="${item.qty_stock}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-kode_barang="${item.kode_barang}" value="${item.id_barang}" >${item.nama_barang}</option>`);
+                        // $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                     } else {
-                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        $(".kode_barang").append(`<option data-barang_id="${item.id_barang}" data-stok="${item.qty_stock}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-kode_barang="${item.kode_barang}" value="${item.id_barang}" >${item.nama_barang}</option>`);
+                        // $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                     }
                 })
             }
