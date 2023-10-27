@@ -151,7 +151,8 @@ class Inventori extends BaseController
                 "barang" => $data['barang_name'],
                 "satuan" => $data['nama_satuan'],
                 "stok" => $data['totalStock'],
-                "statusStock" => ($stockTotal <= $data['totalStock']) ? "Safety" : "Harus Restok"
+                "statusStock" => ($stockTotal <= $data['totalStock']) ? "Safety" : "Harus Restok",
+                "minimumStock" => $barangMaster['minimum_stock'],
             ]);
         }
 
