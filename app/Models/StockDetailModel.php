@@ -150,7 +150,7 @@ class StockDetailModel extends Model
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_details.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = '
@@ -159,9 +159,10 @@ class StockDetailModel extends Model
             SUM(CASE WHEN stock_details.status = "Out" 
             THEN stock_details.qty ELSE 0 END)) 
             AS totalStock, 
+            barang_master.id,
             barang_master.barang_name,
             satuans.nama_satuan, 
-            warehouses.warehouse_name AS warehousesName
+            warehouses.warehouse_name AS warehousesName,
             companies.company AS companyName,
             parent_barang.parent_name AS kelompok';
 
@@ -169,7 +170,7 @@ class StockDetailModel extends Model
             ->select($selectQry)
             ->join('barang_master', 'barang_master.id = stock_details.barang_id')
             ->join('satuans', 'satuans.id = barang_master.satuan_id')
-            ->join('warehouses', 'warehouses.id', '=', 'stock_details.warehouse_id')
+            ->join('warehouses', 'warehouses.id = stock_details.warehouse_id')
             ->join('companies', 'companies.id = warehouses.company_id')
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'LEFT')
             ->where($condition)

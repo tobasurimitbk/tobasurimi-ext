@@ -2,14 +2,14 @@
 <?= $this->Section('content'); ?>
 <section class="section">
     <div class="section-header">
-        <h1>Stok Histori</h1>
+        <h1>Stok List</h1>
     </div>
     <div class="card">
         <div class="card-body">
             <ul class="nav nav-tabs">
                 <?php foreach ($typeAll as $t) : ?>
                     <li class="nav-item">
-                        <a class="nav-link <?= $t['kode'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-histori?type=' . $t['kode']) ?>"><?= $t['tipe_barang'] ?></a>
+                        <a class="nav-link <?= $t['kode'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-list?type=' . $t['kode']) ?>"><?= $t['tipe_barang'] ?></a>
                     </li>
                 <?php endforeach; ?>
             </ul>
@@ -26,26 +26,33 @@
                             <?php if ($typeSelected == "bahan_baku") : ?>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Tanggal</th>
                                     <th>Company</th>
                                     <th>Warehouse</th>
-                                    <th>Kondisi</th>
+                                    <th>Kelompok</th>
                                     <th>Barang</th>
-                                    <th>Spesifikasi</th>
-                                    <th>Status</th>
                                     <th>Stok</th>
+                                    <th>Status</th>
                                 </tr>
-                            <?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi" || $typeSelected == "bahan_scrap") : ?>
+                            <?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi") : ?>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Tanggal</th>
                                     <th>Company</th>
                                     <th>Warehouse</th>
-                                    <th>Kondisi</th>
+                                    <th>Kelompok</th>
                                     <th>Barang</th>
                                     <th>Satuan</th>
-                                    <th>Status</th>
                                     <th>Stok</th>
+                                    <th>Status</th>
+                                </tr>
+                            <?php elseif ($typeSelected == "bahan_scrap") : ?>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Company</th>
+                                    <th>Warehouse</th>
+                                    <th>Barang</th>
+                                    <th>Satuan</th>
+                                    <th>Stok</th>
+                                    <th>Status</th>
                                 </tr>
                             <?php endif; ?>
                         </thead>
@@ -81,7 +88,7 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("stock-histori/all"); ?>",
+                url: "<?= base_url("stock-list/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
@@ -103,11 +110,6 @@
                     sortable: false,
                     width: "5%"
                 }, {
-                    data: "tanggal",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
                     data: "company",
                     className: "text-center",
                     width: "10%"
@@ -118,7 +120,7 @@
                     width: "10%"
                 },
                 {
-                    data: "kondisi",
+                    data: "kelompok",
                     className: "text-center",
                     width: "10%"
                 },
@@ -128,31 +130,26 @@
                     width: "10%"
                 },
                 {
-                    data: "spesifikasi",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "status",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
                     data: "stok",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
+                    data: "statusStock",
                     className: "text-center",
                     width: "10%",
                     render: function(data, type, row) {
-                        var status = row?.status;
-                        if (status == "IN") {
+                        var status = row?.statusStock;
+                        if (status == "Safety") {
                             return `
                             <div class="text-success">
-                            <b>(+) ${data}</b>
+                            <b>${data}</b>
                             </div>
                         `
                         } else {
                             return `
                             <div class="text-danger">
-                            <b>(-) ${data}</b>
+                            <b>${data}</b>
                             </div>
                         `
                         }
@@ -174,7 +171,7 @@
             }
         });
     </script>
-<?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi" || $typeSelected == "bahan_scrap") : ?>
+<?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi") : ?>
     <script>
         table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -191,7 +188,7 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("stock-histori/all"); ?>",
+                url: "<?= base_url("stock-list/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
@@ -213,11 +210,6 @@
                     sortable: false,
                     width: "5%"
                 }, {
-                    data: "tanggal",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
                     data: "company",
                     className: "text-center",
                     width: "10%"
@@ -228,7 +220,7 @@
                     width: "10%"
                 },
                 {
-                    data: "kondisi",
+                    data: "kelompok",
                     className: "text-center",
                     width: "10%"
                 },
@@ -238,12 +230,102 @@
                     width: "10%"
                 },
                 {
+                    data: "stok",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
                     data: "satuan",
                     className: "text-center",
                     width: "10%"
                 },
                 {
-                    data: "status",
+                    data: "statusStock",
+                    className: "text-center",
+                    width: "10%",
+                    render: function(data, type, row) {
+                        var status = row?.statusStock;
+                        if (status == "Safety") {
+                            return `
+                            <div class="text-success">
+                            <b>${data}</b>
+                            </div>
+                        `
+                        } else {
+                            return `
+                            <div class="text-danger">
+                            <b>${data}</b>
+                            </div>
+                        `
+                        }
+
+                    }
+                }
+            ],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak ada stok histori " + "<?= str_replace('_', ' ', $typeSelected) ?>",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+    </script>
+<?php elseif ($typeSelected == "bahan_scrap") : ?>
+    <script>
+        table = $('.dataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [1, 'asc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("stock-list/all"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.search = $(".search").val();
+                    data.sort = sort;
+                    data.sortType = sortType;
+                    data.typeBarang = "<?= $typeSelected ?>"
+                }
+            },
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            columns: [{
+                    data: "no",
+                    className: "text-center",
+                    sortable: false,
+                    width: "5%"
+                }, {
+                    data: "company",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
+                    data: "warehouse",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
+                    data: "barang",
                     className: "text-center",
                     width: "10%"
                 },
@@ -251,6 +333,33 @@
                     data: "stok",
                     className: "text-center",
                     width: "10%"
+                },
+                {
+                    data: "satuan",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
+                    data: "statusStock",
+                    className: "text-center",
+                    width: "10%",
+                    render: function(data, type, row) {
+                        var status = row?.statusStock;
+                        if (status == "Safety") {
+                            return `
+                            <div class="text-success">
+                            <b>${data}</b>
+                            </div>
+                        `
+                        } else {
+                            return `
+                            <div class="text-danger">
+                            <b>${data}</b>
+                            </div>
+                        `
+                        }
+
+                    }
                 }
             ],
             columnDefs: [{

@@ -169,6 +169,24 @@ class Inventori extends BaseController
         return response()->setJSON($data);
     }
 
+    public function stockListView()
+    {
+        $stockSafetyModel = new StockSafetyModel();
+
+        $typeSelected = 'bahan_baku';
+        $typeAll = $stockSafetyModel->where('deletedAt', null)->findAll();
+
+        if (isset($_GET['type'])) {
+            $typeSelected = $_GET['type'];
+        }
+
+        $res = [
+            'typeAll' => $typeAll,
+            'typeSelected' => $typeSelected
+        ];
+        return view('Warehouse/stock/stock_list', $res);
+    }
+
     public function stockListAll()
     {
         $payload = [
@@ -205,7 +223,7 @@ class Inventori extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $stockTotal = ($stockSafetyNumber == null) ? 0 : $stockSafetyNumber['safety'];
+            $stockTotal = ($stockSafetyNumber == null) ? 0 : $stockSafetyNumber['safety_number'];
             array_push($rdata, [
                 "no" => $no++,
                 "id" => $data['id'],

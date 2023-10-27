@@ -561,6 +561,8 @@ $routes->get('/stock-safety/all', 'Inventori\Inventori::stockSafetyAll', ['filte
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\Inventori::stockHistoriView', ['filter' => 'Auth']);
 $routes->get('/stock-histori/all', 'Inventori\Inventori::stockHistoriAll', ['filter' => 'Auth']);
+$routes->get('/stock-list', 'Inventori\Inventori::stockListView', ['filter' => 'Auth']);
+$routes->get('/stock-list/all', 'Inventori\Inventori::stockListAll', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL
 $routes->get('/penerimaan-barang-lokal', 'Warehouse\PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
