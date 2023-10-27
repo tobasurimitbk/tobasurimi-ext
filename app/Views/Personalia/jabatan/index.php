@@ -67,7 +67,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "jabatan_name";
-    let sortType = "asc";
+    let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -125,7 +125,7 @@
     });
 
     $(document).ready(function() {
-        
+
         var validator = $(".create-form").validate({
             rules: {
                 jabatan_name: {

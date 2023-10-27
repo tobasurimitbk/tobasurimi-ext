@@ -71,7 +71,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label>  Company dan Role</h5>
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Company dan Role</h5>
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -112,42 +112,42 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Company Access</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end mb-3">
-            <div class="col-md-2">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+    <div class="section-header">
+        <h1>Company Access</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th onclick="changeSort('name')" class="sort">User</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('name')" class="sort">User</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "name";
-    let sortType = "asc";
+    let sortType = "desc";
 
     let company_role = [];
     var row = 0;
@@ -157,7 +157,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -174,10 +176,10 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
@@ -205,44 +207,44 @@
     });
 
     var validator_detail = $(".detail-form").validate({
-            rules: {
-                company_id: {
-                    required: true
-                },
-                role_id: {
-                    required: true
-                }
+        rules: {
+            company_id: {
+                required: true
             },
-            messages: {
-                company_id: {
-                    required: "Company wajib diisi"
-                },
-                role_id: {
-                    required: "Role wajib diisi"
-                },
+            role_id: {
+                required: true
+            }
+        },
+        messages: {
+            company_id: {
+                required: "Company wajib diisi"
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
+            role_id: {
+                required: "Role wajib diisi"
             },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-    
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
     $(document).ready(function() {
         $('.user_id').select2({
             placeholder: "",
@@ -264,64 +266,64 @@
 
         //CSS SELECT2 FLOATING LABEL
         $(".user_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".user_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".user_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $(".company_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".company_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".company_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $(".role_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".role_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".role_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -357,14 +359,14 @@
                     error.insertAfter(element);
                 }
             },
-            highlight: function (element) {
+            highlight: function(element) {
                 $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');                      
+                $(element).addClass('select-class');
 
             },
-            unhighlight: function (element) {
+            unhighlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');   
+                $(element).removeClass('select-class');
             },
         });
 
@@ -402,8 +404,7 @@
 
         $(".btn-show-detail").click(function() {
             let user_id = $(".id").val();
-            if(user_id)
-            {
+            if (user_id) {
                 $(".title-detail-name").text("Tambah")
                 $(".delete-detail").css('display', 'none');
                 $(".id_detail").val('')
@@ -441,9 +442,7 @@
                         $(".detail-modal").modal("show");
                     }
                 })
-            }
-            else
-            {
+            } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'User Wajib Dipilih',
@@ -504,22 +503,18 @@
             let role_name = $(".role_id option:selected").text();
 
             // update detail
-            if(id)
-            {
+            if (id) {
                 let validate_exist = true;
 
                 company_role.map(item => {
-                    if(item.row != id)
-                    {
-                        if(item.company_id == company_id)
-                        {
+                    if (item.row != id) {
+                        if (item.company_id == company_id) {
                             validate_exist = false;
                         }
                     }
                 })
 
-                if(validate_exist)
-                {
+                if (validate_exist) {
                     if ($(".detail-form").valid()) {
                         Swal.fire({
                             icon: 'question',
@@ -541,8 +536,7 @@
                                 $(".body-detail-table").empty()
 
                                 company_role.map(item => {
-                                    if(item.row == id)
-                                    {
+                                    if (item.row == id) {
                                         tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
                                         tag_html += "<td>";
                                         tag_html += company_name;
@@ -559,9 +553,7 @@
                                             company_name: company_name,
                                             role_name: role_name,
                                         });
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
                                         tag_html += "<td>";
                                         tag_html += item.company_name;
@@ -585,9 +577,7 @@
                             }
                         })
                     }
-                }
-                else
-                {
+                } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Company Already Exist',
@@ -596,19 +586,16 @@
                 }
             }
             // create detail
-            else
-            {
+            else {
                 let validate_exist = true;
 
                 company_role.map(item => {
-                    if(item.company_id == company_id)
-                    {
+                    if (item.company_id == company_id) {
                         validate_exist = false;
                     }
                 })
 
-                if(validate_exist)
-                {
+                if (validate_exist) {
                     if ($(".detail-form").valid()) {
                         Swal.fire({
                             icon: 'question',
@@ -628,8 +615,8 @@
                                     company_name: company_name,
                                     role_name: role_name,
                                 })
-                                
-                            let tag_html = "";
+
+                                let tag_html = "";
                                 tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
                                 tag_html += "<td>";
                                 tag_html += company_name;
@@ -644,9 +631,7 @@
                             }
                         })
                     }
-                }
-                else
-                {
+                } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Company Already Exist',
@@ -660,16 +645,13 @@
             $(".detail-modal").modal("hide")
 
             // CHECK IF NO COMPANY ROLE
-            if(company_role.length === 0)
-            {
+            if (company_role.length === 0) {
                 Swal.fire({
                     icon: 'error',
                     title: "Company Role Tidak Boleh Kosong",
                     confirmButtonColor: '#4e73df',
                 })
-            }
-            else
-            {
+            } else {
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -682,7 +664,7 @@
                         cancelButtonText: 'Batal',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                        
+
                             const csrf = $(`[name="${csrfToken}"]`);
                             let data = new FormData(document.querySelector(".create-form"));
 
@@ -739,11 +721,11 @@
         })
     })
 
-    $(document).on('show.bs.modal','.detail-modal', function () {
-       document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
+    $(document).on('show.bs.modal', '.detail-modal', function() {
+        document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
     })
 
-    $(document).on('hide.bs.modal','.detail-modal', function () {
+    $(document).on('hide.bs.modal', '.detail-modal', function() {
         document.getElementById("add_modal").style = "display: block;";
     })
 
@@ -769,8 +751,7 @@
                 $(".body-detail-table").empty()
 
                 company_role.map(item => {
-                    if(item.row != id)
-                    {
+                    if (item.row != id) {
                         tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
                         tag_html += "<td>";
                         tag_html += item.company_name;
@@ -780,7 +761,10 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_company_role.push({...item, row: row + 1});
+                        new_company_role.push({
+                            ...item,
+                            row: row + 1
+                        });
 
                         row = row + 1;
                     }
@@ -843,8 +827,7 @@
     const changeUser = function() {
         let user_id = $(".user_id option:selected").val();
         $(".id").val(user_id);
-        if(user_id)
-        {
+        if (user_id) {
             $.ajax({
                 url: "<?= base_url("user/id"); ?>" + "/" + user_id,
                 method: "GET",
@@ -853,13 +836,13 @@
                     if (res.status) {
                         $(".name").val(res?.data?.name);
                         $(".username").val(res?.data?.username);
-                        $(".employee_id").val(res?.data?.employee_id); 
+                        $(".employee_id").val(res?.data?.employee_id);
                         $(".status").val(res?.data?.status);
 
                         $(".body-detail-table").empty()
                         row = 0;
                         company_role = []
-                        let tag_html = "" 
+                        let tag_html = ""
 
                         res.data.company_role.map((item) => {
                             tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
@@ -883,9 +866,7 @@
                         })
 
                         $(".body-detail-table").append(tag_html)
-                    }
-                    else
-                    {
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
@@ -898,13 +879,10 @@
     }
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }

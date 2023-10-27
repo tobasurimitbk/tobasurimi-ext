@@ -285,7 +285,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
-    let sortType = "asc";
+    let sortType = "desc";
     let trigger = true;
 
     let list_address = [];
@@ -325,54 +325,54 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "kode",
-            className: "text-center"
-        }, {
-            data: "name",
-            className: "text-center"
-        }, {
-            data: "address",
-            className: "text-center"
-        }, {
-            data: "province_name",
-            className: "text-center"
-        }, {
-            data: "city_name",
-            className: "text-center"
-        }, {
-            data: "postal_code",
-            className: "text-center"
-        }, {
-            data: "no_npwp",
-            className: "text-center"
-        }, {
-            data: "phone",
-            className: "text-center"
-        }, {
-            data: "contact_person",
-            className: "text-center"
-        }, {
-            data: "email",
-            className: "text-center"
-        }, {
-            data: "no_rekening",
-            className: "text-center"
-        }
-        // , {
-        //     data: "supplier_buyer",
-        //     className: "text-center"
-        // }, {
-        //     data: "ap_name",
-        //     className: "text-center"
-        // }, {
-        //     data: "ar_name",
-        //     className: "text-center"
-        // }
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "kode",
+                className: "text-center"
+            }, {
+                data: "name",
+                className: "text-center"
+            }, {
+                data: "address",
+                className: "text-center"
+            }, {
+                data: "province_name",
+                className: "text-center"
+            }, {
+                data: "city_name",
+                className: "text-center"
+            }, {
+                data: "postal_code",
+                className: "text-center"
+            }, {
+                data: "no_npwp",
+                className: "text-center"
+            }, {
+                data: "phone",
+                className: "text-center"
+            }, {
+                data: "contact_person",
+                className: "text-center"
+            }, {
+                data: "email",
+                className: "text-center"
+            }, {
+                data: "no_rekening",
+                className: "text-center"
+            }
+            // , {
+            //     data: "supplier_buyer",
+            //     className: "text-center"
+            // }, {
+            //     data: "ap_name",
+            //     className: "text-center"
+            // }, {
+            //     data: "ar_name",
+            //     className: "text-center"
+            // }
         ],
         columnDefs: [{
             defaultContent: "-",

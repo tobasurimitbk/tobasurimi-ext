@@ -40,7 +40,7 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     let sort = "";
-    let sortType = "asc";
+    let sortType = "desc";
     let trigger = true;
 
     let list_address = [];
@@ -90,32 +90,31 @@
         //responsive: true,
         display: "stripe",
         searching: false,
-        columns: [
-            {
+        columns: [{
                 data: "no",
                 className: "text-center",
                 sortable: false
-            }, 
+            },
             {
                 data: "no_faktur",
                 className: "text-center"
-            }, 
+            },
             {
                 data: "tanggal_faktur",
                 className: "text-center"
-            }, 
+            },
             {
                 data: "nama_pelanggan",
                 className: "text-center"
-            }, 
+            },
             {
                 data: "document_type",
                 className: "text-center"
-            }, 
+            },
             {
                 data: "document_no",
                 className: "text-center"
-            }, 
+            },
             {
                 data: "id",
                 className: "text-center actions",

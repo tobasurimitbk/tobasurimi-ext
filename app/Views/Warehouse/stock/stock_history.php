@@ -9,7 +9,7 @@
             <ul class="nav nav-tabs">
                 <?php foreach ($typeAll as $t) : ?>
                     <li class="nav-item">
-                        <a class="nav-link <?= $t['kode'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-histori?type=' . $t['kode']) ?>"><?= $t['tipe_barang'] ?></a>
+                        <a class="nav-link <?= $t['description'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-histori?type=' . $t['description']) ?>"><?= $t['value'] ?></a>
                     </li>
                 <?php endforeach; ?>
             </ul>
@@ -49,7 +49,7 @@
                                 </tr>
                             <?php endif; ?>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>

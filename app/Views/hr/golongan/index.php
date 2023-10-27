@@ -74,7 +74,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "parent_barang";
-    let sortType = "asc";
+    let sortType = "desc";
 
     $('.btn-hide-form').click(function() {
         $(".add-modal").modal("hide")

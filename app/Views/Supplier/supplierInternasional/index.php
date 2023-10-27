@@ -108,7 +108,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
-    let sortType = "asc";
+    let sortType = "desc";
     let trigger = true;
 
     const table = $('.dataTable').DataTable({
@@ -233,19 +233,16 @@
 
             $(".create-form")[0].reset()
             $(".delete-form").css('display', 'none');
-            
+
             $.ajax({
                 url: "<?= base_url("supplier/generate"); ?>",
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if(res?.status)
-                    {
+                    if (res?.status) {
                         $(".kode").val(res?.data)
                         $(".add-modal").modal("show");
-                    }
-                    else
-                    {
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,

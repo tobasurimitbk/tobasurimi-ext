@@ -175,7 +175,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "username";
-    let sortType = "asc";
+    let sortType = "desc";
 
     let company_role = [];
     var row = 0;

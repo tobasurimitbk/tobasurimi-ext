@@ -203,7 +203,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
-    let sortType = "asc";
+    let sortType = "desc";
     let trigger = true;
 
     $('.province_parent_id').select2({
@@ -394,19 +394,16 @@
             $(".city_parent_id").empty()
             $(".city_parent_id").append(`<option value=""></option>`)
             $(".country_code").val('').change()
-            
+
             $.ajax({
                 url: "<?= base_url("supplier/generate"); ?>",
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if(res?.status)
-                    {
+                    if (res?.status) {
                         $(".kode").val(res?.data)
                         $(".add-modal").modal("show");
-                    }
-                    else
-                    {
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
@@ -452,8 +449,8 @@
                         $(".province_parent_id").val(res?.data?.province_id).change();
                         $(".country_code").val(res?.data?.country_code).change();
 
-                         // AJAX GET CITY
-                         $.ajax({
+                        // AJAX GET CITY
+                        $.ajax({
                             url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
                             method: "GET",
                             dataType: "json",
