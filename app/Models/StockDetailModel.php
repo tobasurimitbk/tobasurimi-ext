@@ -48,14 +48,8 @@ class StockDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function addOrReduceStock(
-        $barangID,
-        $warehouseID,
-        $stockType = 'New', // New or Scrap
-        $qty, // Total
-        $status = 'IN', // In or Out
-        $spesifikasi, // Baik, Jelek, ...
-    ) {
+    public function addOrReduceStock($barangID, $warehouseID, $stockType = 'New', $qty, $status = 'IN', $spesifikasi)
+    {
         $this->insert([
             'barang_id' => $barangID,
             'warehouse_id' => $warehouseID,
