@@ -770,7 +770,7 @@
             let tag_total = ""
 
             tag_total += `<tr>`;
-            tag_total += "<td colspan='2'>";
+            tag_total += "<td colspan='3'>";
             tag_total += "</td>";
             tag_total += "<td>";
             tag_total += "<b>TOTAL</b>";
@@ -823,7 +823,7 @@
             let tag_total = ""
 
             tag_total += `<tr>`;
-            tag_total += "<td colspan='2'>";
+            tag_total += "<td colspan='3'>";
             tag_total += "</td>";
             tag_total += "<td>";
             tag_total += "<b>TOTAL</b>";
