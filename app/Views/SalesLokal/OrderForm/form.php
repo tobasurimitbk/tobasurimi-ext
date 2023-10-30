@@ -247,10 +247,26 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select warehouse" name="warehouse" id="warehouse" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">warehouse</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="number" readonly="true" class="form-control stok" name="stok" id="stok" placeholder="Stok">
                                     <label for="floatingInput">Stok</label>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control satuan" name="satuan" id="satuan" placeholder="Satuan">
+                                <label for="floatingInput">Satuan</label>
                             </div>
                         </div>
                     </div>
@@ -277,24 +293,16 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
-                                <label for="floatingInput">Keterangan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input step="1" autocomplete="one-time-code" type="number" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
                                 <label for="floatingInput">disc%</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select warehouse" name="warehouse" id="warehouse" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">warehouse</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
+                                <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
                     </div>
@@ -721,7 +729,8 @@
                 let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
                 let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
                 // let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : "";
-                let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
+                
+                // let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
                 $.ajax({
@@ -729,23 +738,41 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".warehouse").empty();
+                        $(".warehouse").empty();                                                                                                                 
                         //bug di penjualan lokal
                         // $(".warehouse").append(`<option value=""></option>`);
 
                         // console.log(res.dataWarehouse)
                         res.dataWarehouse.forEach(function(item) {
-                            $(".warehouse").append(`<option  value="${item.warehouse_id}" ${warehouseId==item.id?"selected":""}>${item.warehouse_name}</option>`);
-                            $(".stok").val(item.qty);
+                            $(".warehouse").append(`<option  value="${item.warehouse_id}" ${warehouseId==item.id?"selected":""}>${item.warehouse_name}</option>`).change();
+                            // $(".stok").val(item.qty);
                         })
                     }
                 })
 
                 $(".nama_barang").val(nama);
-                // $(".harga").val(harga ? Number(harga).toLocaleString('en-EN') : "");
-                // $(".amount").val(Number((harga ? Number(harga) : 0) * ($(".qty").val() ? Number($(".qty").val()) : 0)).toLocaleString())
-                // $(".id_warehouse").val(warehouseId);
-                // $(".warehouse").val(warehouseName);
+                $(".warehouse").on('change',function() {
+                    let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
+                    let warehouseId = $(this).val();
+                    $(".stok").val("");                                                                                                                 
+                        $.ajax({
+                            url: "<?= base_url('/order-form-lokal/stok'); ?>" + "/" + idBarang + "/" + warehouseId,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(res) {
+                                //bug di penjualan lokal
+                                // $(".warehouse").append(`<option value=""></option>`);
+
+                                // console.log(res.dataWarehouse)
+                                if (res.dataDetailStock.length > 0) {
+                                    // You can set the value of .stok based on the selected warehouse here
+                                    let selectedWarehouse = res.dataDetailStock; // Assuming you want the first item in the response
+                                    $(".stok").val(res.dataDetailStock);
+                                }
+                            }
+                        })
+                });
+                $(".satuan").val(satuan);
             } else {
                 $(".nama_barang").attr("readonly", false)
                 // $(".harga").val("0");
@@ -859,6 +886,7 @@
 
                         if (list_delete.length !== 0) {
                             list_delete.map(obj => {
+                                console.log(obj)
                                 update_list_items.push({
                                     id: obj.id ? Number(obj.id) : 0,
                                     id_barang: obj.id_barang ? Number(obj.id_barang) : 0,

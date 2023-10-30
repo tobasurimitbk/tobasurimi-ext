@@ -58,21 +58,22 @@ class SalesOrderDetailModel extends Model
         if (!is_array($ids)) $ids = [$ids];
 
         $selectQry = "sales_order_detail.id AS id,
-                      barangs.kode_barang AS kode_barang,
-                      barangs.nama_barang AS nama_barang,
+                    barang_master.kode_barang AS kode_barang,
+                      barang_master.barang_name AS nama_barang,
                       sales_order_detail.qty AS qty,
                       satuans.kode_satuan AS satuan,
                       sales_order_detail.discount_percentage AS disc,
                       sales_order_detail.tax AS tax,
-                      sales_order_detail.amount AS amount";
+                      sales_order_detail.amount AS amount,
+                      sales_order_detail.harga_barang AS harga_barang";
 
         $datas = $this->asObject()
             ->select($selectQry)
-            ->join('barangs', 'barangs.id = sales_order_detail.id_barang AND barangs.deletedAt IS NULL')
-            ->join('satuans', 'satuans.id = barangs.satuan_id', 'LEFT')
+            ->join('barang_master', 'barang_master.id = sales_order_detail.id_barang AND barang_master.deletedAt IS NULL')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id', 'LEFT')
             ->whereIn('id_sales_order', $ids)
             ->orderBy('sales_order_detail.id_sales_order', 'ASC')
-            ->orderBy('barangs.nama_barang', 'ASC')
+            ->orderBy('barang_master.barang_name', 'ASC')
             ->findAll();
 
         foreach ($datas as &$data) {
