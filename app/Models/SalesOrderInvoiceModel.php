@@ -171,6 +171,10 @@ class SalesOrderInvoiceModel extends Model
             $numbers = $number + 1; // increment nomer invoice
         
             $invNumber = $format . $numbers . $numberTemplate;
+        }else{
+            $numbers = 1; // nomer invoice awal jika tidak ada data
+        
+            $invNumber = $format . $numbers . $numberTemplate;
         }
 
         return $invNumber;
