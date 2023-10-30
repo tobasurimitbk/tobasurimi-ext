@@ -7,7 +7,7 @@
     <title>PO Lokal Bahan Penolong</title>
     <style>
         body {
-            font-size: 13px;
+            font-size: 10px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
@@ -149,7 +149,7 @@
                     No. SPP: <?= $dataPOLokal->spp_no ?>
                 </td>
                 <td class="txt-right">
-                    <div>NPMWP: <span class="txt-bold"><?= $dataPOLokal->supplierNPWP ?></span></div>
+                    <div>NPWP: <span class="txt-bold"><?= $dataPOLokal->supplierNPWP ?></span></div>
                 </td>
             </tr>
             <tr>
@@ -198,10 +198,13 @@
         <div class="header mt-025">
             <div class="txt-right">
                 <div>
-                    Sub Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
+                    Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
                 </div>
                 <div class="mt-025">
                     Diskon: <span class="txt-bold">Rp. <?= $dataPOLokal->totalDisc ?></span>
+                </div>
+                <div class="mt-025">
+                    Sub Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
                 </div>
                 <div class="mt-025">
                     PPN (dikreditkan): <span class="txt-bold">Rp. <?= $dataPOLokal->totalPpn ?></span>

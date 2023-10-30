@@ -1753,7 +1753,7 @@
                             $(".packaging").val('').change()
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Stok kemasan sudah mencapai angka minimum dan harus di restock dahulu',
+                                title: 'Stok sudah mencapai batas minimum. Proses tidak dapat dilanjutkan',
                                 confirmButtonColor: '#4e73df',
                             })
                         }
