@@ -9,7 +9,7 @@
             <ul class="nav nav-tabs">
                 <?php foreach ($typeAll as $t) : ?>
                     <li class="nav-item">
-                        <a class="nav-link <?= $t['kode'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-list?type=' . $t['kode']) ?>"><?= $t['tipe_barang'] ?></a>
+                        <a class="nav-link <?= $t['description'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-list?type=' . $t['description']) ?>"><?= $t['value'] ?></a>
                     </li>
                 <?php endforeach; ?>
             </ul>
@@ -30,7 +30,8 @@
                                     <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
                                     <th onclick="changeSort('barang_master.parent_type_id')">Kelompok</th>
                                     <th onclick="changeSort('barang_master.barang_name')">Barang</th>
-                                    <th>Stok</th>
+                                    <th>Stok Minimal</th>
+                                    <th>Stok Gudang</th>
                                     <th>Status</th>
                                 </tr>
                             <?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi") : ?>
@@ -41,7 +42,8 @@
                                     <th onclick="changeSort('barang_master.parent_type_id')">Kelompok</th>
                                     <th onclick="changeSort('barang_master.barang_name')">Barang</th>
                                     <th onclick="changeSort('satuans.nama_satuan')">Satuan</th>
-                                    <th>Stok</th>
+                                    <th>Stok Minimal</th>
+                                    <th>Stok Gudang</th>
                                     <th>Status</th>
                                 </tr>
                             <?php elseif ($typeSelected == "bahan_scrap") : ?>
@@ -51,7 +53,8 @@
                                     <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
                                     <th onclick="changeSort('barang_master.barang_name')">Barang</th>
                                     <th onclick="changeSort('satuans.nama_satuan')">Satuan</th>
-                                    <th>Stok</th>
+                                    <th>Stok Minimal</th>
+                                    <th>Stok Gudang</th>
                                     <th>Status</th>
                                 </tr>
                             <?php endif; ?>
@@ -126,6 +129,11 @@
                 },
                 {
                     data: "barang",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
+                    data: "minimumStock",
                     className: "text-center",
                     width: "10%"
                 },
@@ -235,6 +243,11 @@
                     width: "10%"
                 },
                 {
+                    data: "minimumStock",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
                     data: "stok",
                     className: "text-center",
                     width: "10%"
@@ -326,6 +339,11 @@
                 },
                 {
                     data: "barang",
+                    className: "text-center",
+                    width: "10%"
+                },
+                {
+                    data: "minimumStock",
                     className: "text-center",
                     width: "10%"
                 },

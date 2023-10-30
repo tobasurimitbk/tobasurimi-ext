@@ -741,62 +741,69 @@ class PenerimaanBarangLokal extends BaseController
                         }
                     }
 
-                    // ADD STOK BARANG
-                    $find = $this->barangModel->find($barang_id);
+                    // // ADD STOK BARANG
+                    // $find = $this->barangModel->find($barang_id);
 
-                    // ADD STOK KEMASAN
-                    $find_packaging = $this->barangModel->find($packaging);
+                    // // ADD STOK KEMASAN
+                    // $find_packaging = $this->barangModel->find($packaging);
 
-                    if ($find) {
-                        $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_FLOAT") : 0;
+                    // if ($find) {
+                    //     $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_FLOAT") : 0;
 
-                        $payloadupdateStok = [
-                            'stok' => $stok + $jml_masuk
-                        ];
+                    //     $payloadupdateStok = [
+                    //         'stok' => $stok + $jml_masuk
+                    //     ];
         
-                        $responseStok = $this->barangModel->where('id', $barang_id)
-                            ->set($payloadupdateStok)
-                            ->update();    
+                    //     $responseStok = $this->barangModel->where('id', $barang_id)
+                    //         ->set($payloadupdateStok)
+                    //         ->update();    
 
-                        if (!$responseStok) {
-                            $message =  'Gagal Tambah Stok';
-                            $data = [
-                                "status"    => false,
-                                "message"   => $message,
-                                "payload"   => "",
-                                'token'     => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
+                    //     if (!$responseStok) {
+                    //         $message =  'Gagal Tambah Stok';
+                    //         $data = [
+                    //             "status"    => false,
+                    //             "message"   => $message,
+                    //             "payload"   => "",
+                    //             'token'     => csrf_hash()
+                    //         ];
+                    //         echo json_encode($data);
+                    //         return;
+                    //     }
+                    // }
+
+                    // if ($find_packaging) {
+                    //     $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_FLOAT") : 0;
+
+                    //     $payloadupdateStok = [
+                    //         'stok' => $stok - $packaging_qty
+                    //     ];
+        
+                    //     $responseStok = $this->barangModel->where('id', $packaging)
+                    //         ->set($payloadupdateStok)
+                    //         ->update();    
+
+                    //     if (!$responseStok) {
+                    //         $message =  'Gagal Tambah Stok';
+                    //         $data = [
+                    //             "status"    => false,
+                    //             "message"   => $message,
+                    //             "payload"   => "",
+                    //             'token'     => csrf_hash()
+                    //         ];
+                    //         echo json_encode($data);
+                    //         return;
+                    //     }
+                    // }
+
+                    $spesifikasi = "";
+                    if ($tipe_bahan === "BAKU") {
+                        $find_baku = $this->rmPurchaseOrderDetailModel->getPurchaseOrderDetailById($purchase_order_details_id);
+                        if($find_baku) {
+                            $spesifikasi = $find_baku->spesifikasi;
                         }
                     }
-
-                    if ($find_packaging) {
-                        $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_FLOAT") : 0;
-
-                        $payloadupdateStok = [
-                            'stok' => $stok - $packaging_qty
-                        ];
-        
-                        $responseStok = $this->barangModel->where('id', $packaging)
-                            ->set($payloadupdateStok)
-                            ->update();    
-
-                        if (!$responseStok) {
-                            $message =  'Gagal Tambah Stok';
-                            $data = [
-                                "status"    => false,
-                                "message"   => $message,
-                                "payload"   => "",
-                                'token'     => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
-                        }
-                    }
-
                     // add stock detail barang
-                    $this->stockDetailModel->addOrReduceStock($barang_id, $dataPenerimaanBarang->warehouse_id, 'New', $jml_masuk, 'IN', '');
+                    $this->stockDetailModel->addOrReduceStock($barang_id, $dataPenerimaanBarang->warehouse_id, 'New', $jml_masuk, 'IN', $spesifikasi);
 
                     // add stock detail barang kemasan
                     $this->stockDetailModel->addOrReduceStock($packaging, $dataPenerimaanBarang->warehouse_id, 'Scrap', $packaging_qty, 'OUT', '');

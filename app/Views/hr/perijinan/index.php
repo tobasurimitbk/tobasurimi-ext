@@ -85,7 +85,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "periode";
-    let sortType = "asc";
+    let sortType = "desc";
     let trigger = true;
     let year = new Date().getFullYear();
 

@@ -330,7 +330,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nip";
-    let sortType = "asc";
+    let sortType = "desc";
     let bagianID = 0;
 
     let list_delete = [];

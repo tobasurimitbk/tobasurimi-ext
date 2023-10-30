@@ -28,9 +28,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -38,50 +38,52 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Penomoran Rak</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-    <div class="row justify-content-end mb-3">
-        <div class="col-md-2">
-            <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
-        </div>
+    <div class="section-header">
+        <h1>Penomoran Rak</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
     </div>
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>No.</th>
-                        <th onclick="changeSort('nomor')" class="sort">Nomor</th>
-                        <th onclick="changeSort('rak')" class="sort">Rak</th>
-                    </tr>
-                </thead>
-                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('nomor')" class="sort">Nomor</th>
+                                <th onclick="changeSort('rak')" class="sort">Rak</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
 </section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nomor";
-    let sortType = "asc";
+    let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -98,27 +100,28 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "nomor",
-            className: "text-center"
-        },
-        {
-            data: "rak",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "nomor",
+                className: "text-center"
+            },
+            {
+                data: "rak",
+                className: "text-center"
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -132,7 +135,7 @@
             }
         }
     });
-    
+
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
@@ -162,14 +165,14 @@
                     error.insertAfter(element);
                 }
             },
-            highlight: function (element) {
+            highlight: function(element) {
                 $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');                      
+                $(element).addClass('select-class');
 
             },
-            unhighlight: function (element) {
+            unhighlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');   
+                $(element).removeClass('select-class');
             },
         });
 
@@ -208,11 +211,9 @@
                         $(".id").val(id);
                         $(".nomor").val(res?.data?.nomor);
                         $(".rak").val(res?.data?.rak);
-                        
+
                         $(".add-modal").modal("show")
-                    }
-                    else
-                    {
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
@@ -223,7 +224,7 @@
             })
         })
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
@@ -246,8 +247,7 @@
 
                         let id = $(".id").val();
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("penomoran-rak/update"); ?>",
                                 data: data,
@@ -263,14 +263,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -292,8 +292,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("penomoran-rak/save"); ?>",
                                 data: data,
@@ -309,14 +308,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -372,14 +371,14 @@
                             if (response.status) {
                                 stopLoading()
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                    $(".add-modal").modal("hide")
-                                })
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                        $(".add-modal").modal("hide")
+                                    })
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -405,13 +404,10 @@
     })
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }

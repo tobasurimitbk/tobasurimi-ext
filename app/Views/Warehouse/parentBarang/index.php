@@ -13,10 +13,10 @@
 
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link <?= $type == "" || $type == "bahan_baku" ? "active" : "" ?> " href="<?= base_url('parent-barang?type=bahan_baku') ?>">Barang Baku</a>
+                    <a class="nav-link <?= $type == "" || $type == "bahan_baku" ? "active" : "" ?> " href="<?= base_url('parent-barang?type=bahan_baku') ?>">Bahan Baku</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_penolong" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_penolong') ?>">Barang Penolong</a>
+                    <a class="nav-link <?= $type == "bahan_penolong" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_penolong') ?>">Bahan Penolong</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <?= $type == "bahan_jadi" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_jadi') ?>">Barang Jadi</a>

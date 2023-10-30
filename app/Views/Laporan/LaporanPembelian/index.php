@@ -28,33 +28,33 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select list_supplier" name="list_supplier" id="list_supplier">
-                                            <option value=""></option>
-                                            <?php
-                                            if (!empty($suppliers)) {
-                                                foreach ($suppliers as $sub) {
-                                            ?>
-                                                    <option value="<?= $sub->id; ?>"><?= $sub->name; ?></option>
-                                            <?php
-                                                }
-                                            }
-                                            ?>
-                                        </select>
-                                        <label for="floatingInput">Supplier</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select dokumen" name="dokumen" id="dokumen">
-                                            <option value="" data-code=""></option>
-                                            <option value="pabean" data-code="">Dokumen Pabean</option>
-                                            <option value="non" data-code="">Non Pabean</option>
-                                            <option value="all" data-code="">ALL</option>
-                                        </select>
-                                        <label for="floatingInput">Dokumen</label>
-                                    </div>
-                                </div>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select list_supplier" name="list_supplier" id="list_supplier">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($suppliers)) {
+                                        foreach ($suppliers as $sub) {
+                                    ?>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Supplier</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select dokumen" name="dokumen" id="dokumen">
+                                    <option value="" data-code=""></option>
+                                    <option value="pabean" data-code="">Dokumen Pabean</option>
+                                    <option value="non" data-code="">Non Pabean</option>
+                                    <option value="all" data-code="">ALL</option>
+                                </select>
+                                <label for="floatingInput">Dokumen</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
 
 <script>
     let sort = "payment_no";
-    let sortType = "asc";
+    let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -261,60 +261,60 @@
         window.open(url, "_blank");
     }
 
-        // Data Supplier
-        $('.list_supplier').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".card .card-body")
-        })
+    // Data Supplier
+    $('.list_supplier').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".card .card-body")
+    })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.list_supplier')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    //CSS SELECT2 FLOATING LABEL
+    $('.list_supplier')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-        $('.list_supplier')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.list_supplier')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.list_supplier')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    $('.list_supplier')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
-        // Data Supplier
-        $('.dokumen').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".card .card-body")
-        })
+    // Data Supplier
+    $('.dokumen').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".card .card-body")
+    })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.dokumen')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    //CSS SELECT2 FLOATING LABEL
+    $('.dokumen')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-        $('.dokumen')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.dokumen')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.dokumen')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    $('.dokumen')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 </script>
 <?= $this->endSection(); ?>

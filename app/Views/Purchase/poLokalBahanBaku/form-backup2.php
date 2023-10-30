@@ -174,138 +174,18 @@
                     <div class="col-md-6">
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                     </div>
-                </div>
-            </div>
-            <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                <div class="row">
                     <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
-                            <select onchange="changeSpesifikasi()" class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataSpesifikasi)) {
-                                    foreach ($dataSpesifikasi as $spesifikasi) {
-                                ?>
-                                        <option data-satuan="<?= $spesifikasi["id_satuan"]; ?>" data-bagian="<?= $spesifikasi["bagian_id"]; ?>" data-umum="<?= number_format($spesifikasi["harga_umum"], 2, '.', ','); ?>" data-harian="<?= number_format($spesifikasi["harga_harian"], 2, '.', ','); ?>" data-bulanan="<?= number_format($spesifikasi["harga_bulanan"], 2, '.', ','); ?>" data-barang_id="<?= $spesifikasi["bahan_baku_id"]; ?>" data-nama="<?= $spesifikasi["barang_name"]; ?>" value="<?= $spesifikasi["supplier_harga_id"]; ?>"><?= $spesifikasi["spesifikasi"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Spesifikasi</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataBagian)) {
-                                    foreach ($dataBagian as $bagian) {
-                                ?>
-                                        <option value="<?= $bagian["id"]; ?>"><?= $bagian["nama_bagian"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Bagian</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataSatuan)) {
-                                    foreach ($dataSatuan as $satuan) {
-                                ?>
-                                        <option value="<?= $satuan["id"]; ?>"><?= $satuan["nama_satuan"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Satuan</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum">
-                            <label for="floatingInput">Harga Umum</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian">
-                            <label for="floatingInput">Harga Harian</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan">
-                            <label for="floatingInput">Harga Bulanan</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
-                            <label for="floatingInput">QTY</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
-                            <label for="floatingInput">Total Harga</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control peti" name="peti" id="peti" placeholder="Peti">
-                            <label for="floatingInput">Peti / Tong</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select quality" name="quality" id="quality" aria-label="Floating label select example">
-                                <option value="Baik">Baik</option>
-                                <option value="Jelek">Jelek</option>
-                            </select>
-                            <label for="floatingInput">Kualitas</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-floating mb-3">
-                            <textarea autocomplete="one-time-code" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan (Opsional)"></textarea>
-                            <label for="floatingInput">Keterangan (Opsional)</label>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-
-                    </div>
-                    <div class="col-md-6">
-                        <button class="btn btn-add btn-block float-right btn-submit-detail">
-                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
-                        </button>
-                        <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="setBarang()">
-                            Reset
-                        </button>
+                        <?php if (!empty($dataPOLokal)) {
+                            if ($dataPOLokal->is_posted === "0") { ?>
+                                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            <?php }
+                        } else { ?>
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
@@ -317,7 +197,6 @@
                                 <th>No.</th>
                                 <th>Spesifikasi</th>
                                 <th>Bagian</th>
-                                <th>Satuan</th>
                                 <th>Umum</th>
                                 <th>Harian</th>
                                 <th>Bulanan</th>
@@ -354,9 +233,6 @@
                                     <?= $details->nama_bagian; ?>
                                 </td>
                                 <td>
-                                    <?= $details->nama_satuan; ?>
-                                </td>
-                                <td>
                                     Rp <?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
                                 </td>
                                 <td>
@@ -376,7 +252,7 @@
                                 </td>
                                 <td>
                                     <?php if ($dataPOLokal->is_posted === "0") { ?>
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="<?= $details->id_satuan; ?>" data data-spesifikasi="<?= $details->supplier_harga_id; ?>"
+                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-spesifikasi="<?= $details->supplier_harga_id; ?>"
                                     data-harga="<?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-daily="<?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-monthly="<?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" 
                                     data-bagian="<?= $details->bagian; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-total="<?= number_format(formatter($total, "STR_TO_FLOAT"), 2, '.', ',') ?>" data-keterangan="<?= $details->note; ?>" data-peti="<?= $details->peti; ?>" data-quality="<?= $details->quality; ?>" data-id="<?= $details->id; ?>" data-row="<?= $row; ?>">
                                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -390,7 +266,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="3"></td>
+                                <td colspan="2"></td>
                                 <td><b>TOTAL</b></td>
                                 <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= "Rp " . number_format(formatter($total_harian, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
@@ -405,6 +281,112 @@
         </div>
     </div>
 </section>
+
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+                <!-- <button type="button" onclick="addBarang('<?= base_url("barang"); ?>')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button> -->
+            </div>
+            <div class="modal-body">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <div class="row">
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Barang</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
+                                <select onchange="changeSpesifikasi()" class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Spesifikasi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Bagian</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum">
+                                <label for="floatingInput">Harga Umum</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian">
+                                <label for="floatingInput">Harga Harian</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan">
+                                <label for="floatingInput">Harga Bulanan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">QTY</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                                <label for="floatingInput">Total Harga</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control peti" name="peti" id="peti" placeholder="Peti">
+                                <label for="floatingInput">Peti / Tong</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select quality" name="quality" id="quality" aria-label="Floating label select example">
+                                    <option value="Baik">Baik</option>
+                                    <option value="Jelek">Jelek</option>
+                                </select>
+                                <label for="floatingInput">Kualitas</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea autocomplete="one-time-code" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan (Opsional)"></textarea>
+                                <label for="floatingInput">Keterangan (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -434,13 +416,11 @@
             list_items.push({
                 id: <?= $details->id; ?>,
                 row: row,
-                satuan: '<?= $details->id_satuan; ?>',
-                satuanName: '<?= $details->nama_satuan; ?>',
                 spesifikasi: '<?= $details->supplier_harga_id; ?>',
                 spesifikasiName: '<?= $details->spesifikasi; ?>',
                 harga: '<?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
                 qty: Number('<?= $details->qty; ?>'),
-                total: '<?= number_format((($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0) + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0) + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0)) * formatter($details->qty, "STR_TO_FLOAT"), 2, '.', ','); ?>',
+                total: '<?= ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0) * formatter($details->qty, "STR_TO_FLOAT"); ?>',
                 keterangan: '<?= $details->note; ?>',
                 bagian_id: '<?= $details->bagian; ?>',
                 bagian_name: '<?= $details->nama_bagian; ?>',
@@ -461,9 +441,6 @@
                 required: true
             },
             bagian: {
-                required: true
-            },
-            satuan: {
                 required: true
             },
             peti: {
@@ -491,9 +468,6 @@
             },
             bagian: {
                 required: "Bagian wajib diisi"
-            },
-            satuan: {
-                required: "Satuan wajib diisi"
             },
             peti: {
                 required: "Peti wajib diisi"
@@ -544,13 +518,11 @@
                 let umum = $(".spesifikasi option:selected").data("umum") ? $(".spesifikasi option:selected").data("umum") : "";
                 let harian = $(".spesifikasi option:selected").data("harian") ? $(".spesifikasi option:selected").data("harian") : "";
                 let bulanan = $(".spesifikasi option:selected").data("bulanan") ? $(".spesifikasi option:selected").data("bulanan") : "";
-                let satuan = $(".spesifikasi option:selected").data("satuan") ? $(".spesifikasi option:selected").data("satuan") : "";
 
                 $(".bagian").val(Number(bagian)).change();
                 $(".harga").val(umum.replaceAll(",", ""));
                 $(".daily_price").val(harian.replaceAll(",", ""));
                 $(".monthly_price").val(bulanan.replaceAll(",", ""));
-                $(".satuan").val(satuan).change();
                 $(".qty").val("");
                 $(".total").val("");
             } else {
@@ -558,7 +530,6 @@
                 $(".harga").val("");
                 $(".daily_price").val("");
                 $(".monthly_price").val("");
-                $(".satuan").val("").change();
                 $(".qty").val("");
                 $(".total").val("");
             }
@@ -597,15 +568,10 @@
 
         // SPESIFIKASI
         $('.spesifikasi').select2({
-            placeholder: "Pilih Spesifikasi (Supplier & Bahan Baku required)",
+            placeholder: "Pilih Spesifikasi",
             theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
             allowClear: true
-        })
-
-        // SATUAN
-        $('.satuan').select2({
-            placeholder: "Pilih Satuan",
-            theme: "bootstrap-5"
         })
 
         // SUPPLIER
@@ -616,8 +582,9 @@
 
         // BAGIAN
         $('.bagian').select2({
-            placeholder: "Pilih Bagian",
-            theme: "bootstrap-5"
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -727,27 +694,6 @@
         });
 
         $(".barang_id").change(function() {
-            $.ajax({
-                url: `<?= base_url("supplier-harga/barang-and-supplier"); ?>`,
-                method: "GET",
-                data: {
-                    barang_id: $(".barang_id option:selected").val(),
-                    supplier_id: $(".supplier_id option:selected").val()
-                },
-                dataType: "json",
-                success: function(res) {
-                    $(".spesifikasi").empty();
-
-                    $(".spesifikasi").append(`<option data-satuan="" data-bagian="" data-umum="" data-harian="" data-bulanan="" data-nama="" value=""></option>`);
-
-                    res.data.forEach(function(item) {
-                        $(".spesifikasi").append(`<option data-satuan="${item.id_satuan}" data-bagian="${item.bagian_id}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" value="${item.supplier_harga_id}">${item.spesifikasi}</option>`);
-                    })
-
-                    $(".spesifikasi").val("").change();
-                }
-            }) 
-
             list_items.map((item) => {
                 if(item.id){
                     list_delete.push(item);
@@ -770,7 +716,7 @@
             let tag_total = ""
 
             tag_total += `<tr>`;
-            tag_total += "<td colspan='3'>";
+            tag_total += "<td colspan='2'>";
             tag_total += "</td>";
             tag_total += "<td>";
             tag_total += "<b>TOTAL</b>";
@@ -795,12 +741,6 @@
         })
 
         $(".supplier_id").change(function() {
-            $(".spesifikasi").empty();
-
-            $(".spesifikasi").append(`<option data-bagian="" data-umum="" data-harian="" data-bulanan="" data-nama="" value=""></option>`);
-
-            $(".spesifikasi").val("").change();
-
             list_items.map((item) => {
                 if(item.id){
                     list_delete.push(item);
@@ -823,7 +763,7 @@
             let tag_total = ""
 
             tag_total += `<tr>`;
-            tag_total += "<td colspan='3'>";
+            tag_total += "<td colspan='2'>";
             tag_total += "</td>";
             tag_total += "<td>";
             tag_total += "<b>TOTAL</b>";
@@ -879,6 +819,203 @@
             $(".total").val(total);
         })
 
+        $(".btn-show-detail").click(function() {
+            if($(".barang_id option:selected").val() === "")
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Bahan Baku wajib diisi terlebih dahulu!',
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+            else
+            {
+                $(".delete-detail").css('display', 'none');
+
+                $(".title-detail-name").text("Tambah");
+                $(".id_detail").val('');
+
+                $(".qty").val('')
+                $(".harga").val('')
+                $(".daily_price").val('')
+                $(".monthly_price").val('')
+                $(".quality").val('')
+                $(".peti").val('')
+                $(".total").val('')
+                $(".keterangan").val('')
+
+                validator_detail.resetForm();
+                validator_detail.reset();
+
+                $.ajax({
+                    url: `<?= base_url("supplier-harga/barang-and-supplier"); ?>`,
+                    method: "GET",
+                    data: {
+                        barang_id: $(".barang_id option:selected").val(),
+                        supplier_id: $(".supplier_id option:selected").val()
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        $(".spesifikasi").empty();
+
+                        $(".spesifikasi").append(`<option data-bagian="" data-umum="" data-harian="" data-bulanan="" data-nama="" value=""></option>`);
+
+                        res.data.forEach(function(item) {
+                            $(".spesifikasi").append(`<option data-bagian="${item.bagian_id}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" value="${item.supplier_harga_id}">${item.spesifikasi}</option>`);
+                        })
+
+                        $(".spesifikasi").val("").change();
+                    }
+                })  
+
+                $.ajax({
+                    url: `<?= base_url("bagian/dropdown"); ?>`,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        $(".bagian").empty()
+                        $(".bagian").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".bagian").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
+                        })
+
+                        $(".bagian").val('').change()
+                        $(".detail-modal").modal("show");
+                    }
+                }) 
+            }
+        })
+
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
+        })
+
+        $(document).on('click', '.delete-detail', function() {
+            let id = $(".id_detail").val()
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log(id)
+                    let new_list_items = []
+                    let tag_html = "";
+                    let tag_total = "";
+
+                    $(".body-detail-table").empty()
+
+                    row = 0;
+
+                    console.log(list_items)
+
+                    total_qty = 0;
+                    total_harga = 0;
+                    total_harian = 0;
+                    total_bulanan = 0;
+
+                    list_items.map(item => {
+                        if (item.row != id) {
+                            tag_html += `<tr>`;
+                            tag_html += `<td>`;
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += item.spesifikasiName;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += item.bagian_name;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += "Rp " + item.harga;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += "Rp " + item.daily_price;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += "Rp " + item.monthly_price;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += item.qty;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += item.peti;
+                            tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += item.quality;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += `
+                            <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-spesifikasi="${item.spesifikasi}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" 
+                            data-daily="${item.daily_price}" data-monthly="${item.monthly_price}" data-bagian="${item.bagian_id}" data-qty="${item.qty}" data-total="${item.total}" data-keterangan="${item.keterangan}" data-peti="${item.peti}" data-quality="${item.quality}" data-id="${item.id}" data-row="${row + 1}">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>`;
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+
+                            new_list_items.push({
+                                ...item,
+                                row: row + 1
+                            });
+
+                            row = row + 1;
+
+                            total_qty = total_qty + Number(item.qty);
+                            total_harga =  total_harga + Number(item.harga.replaceAll(",", ""));
+                            total_harian = total_harian + Number(item.daily_price.replaceAll(",", ""));
+                            total_bulanan = total_bulanan + Number(item.monthly_price.replaceAll(",", ""));
+                        } else {
+                            // sent parameter isDelete if have customer id and id
+                            if (item.id) {
+                                list_delete.push(item)
+                            }
+                        }
+                    })
+
+                    list_items = [];
+
+                    list_items = new_list_items;
+
+                    $(".body-detail-table").append(tag_html)
+
+                    $(".foot-detail-table").empty()
+
+                    tag_total += `<tr>`;
+                    tag_total += "<td colspan='2'>";
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += "<b>TOTAL</b>";
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += `<b>${"Rp " + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += `<b>${"Rp " + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += `<b>${"Rp " + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += `<b>${total_qty}</b>`;
+                    tag_total += "</td>";
+                    tag_total += "<td colspan='3'>";
+                    tag_total += "</td>";
+                    tag_total += "</tr>";
+
+                    $(".foot-detail-table").append(tag_total);
+
+                    $(".detail-modal").modal("hide")
+                }
+            })
+        })
+
         $(document).on('click', '.edit-table-detail', function(evt) {
             $(".title-detail-name").text("Update")
             $(".delete-detail").css('display', '');
@@ -886,7 +1023,6 @@
             let daily = $(this).data('daily')
             let monthly = $(this).data('monthly')
             let bagian = $(this).data('bagian')
-            let satuan = $(this).data('satuan')
             let qty = $(this).data('qty')
             let total = $(this).data('total')
             let peti = $(this).data('peti')
@@ -901,20 +1037,57 @@
 
             $(".id_detail").val(rowid);
 
-            $(".qty").val(Number(qty))
+            $(".qty").val(qty)
             $(".harga").val(harga.replaceAll(",", ""))
             $(".daily_price").val(daily.replaceAll(",", ""))
             $(".monthly_price").val(monthly.replaceAll(",", ""))
             $(".quality").val(quality)
             $(".peti").val(peti)
-            $(".total").val(Number(total.replaceAll(",", "")))
+            $(".total").val(total.replaceAll(",", ""))
             $(".keterangan").val(keterangan)
-            trigger = false;
-            $(".spesifikasi").val(Number(spesifikasi)).change();
 
-            $(".bagian").val(Number(bagian)).change();
-            $(".satuan").val(Number(satuan)).change();
-            trigger = true;
+            validator_detail.resetForm();
+            validator_detail.reset();
+
+            trigger = false;
+
+            $.ajax({
+                url: `<?= base_url("supplier-harga/barang-and-supplier"); ?>`,
+                method: "GET",
+                data: {
+                    barang_id: $(".barang_id option:selected").val(),
+                    supplier_id: $(".supplier_id option:selected").val()
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".spesifikasi").empty();
+
+                    $(".spesifikasi").append(`<option data-bagian="" data-umum="" data-harian="" data-bulanan="" data-nama="" value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".spesifikasi").append(`<option data-bagian="${item.bagian_id}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" value="${item.supplier_harga_id}">${item.spesifikasi}</option>`);
+                    })
+
+                    $(".spesifikasi").val(Number(spesifikasi)).change();
+                    trigger = true;
+                }
+            })   
+
+            $.ajax({
+                url: `<?= base_url("bagian/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".bagian").empty()
+                    $(".bagian").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".bagian").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
+                    })
+
+                    $(".bagian").val(Number(bagian)).change()
+                    $(".detail-modal").modal("show");
+                }
+            }) 
         })
 
         $(".btn-submit-parent").click(function() {
@@ -964,7 +1137,6 @@
                                     list_delete.map(obj => {
                                         update_list_items.push({
                                             id: obj.id ? Number(obj.id) : 0,
-                                            satuan_id: obj.satuan ? Number(obj.satuan) : 0,
                                             supplier_harga_id: obj.spesifikasi ? Number(obj.spesifikasi) : 0,
                                             bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
                                             peti: obj.peti,
@@ -983,7 +1155,6 @@
                                     if (obj.id) {
                                         update_list_items.push({
                                             id: obj.id ? Number(obj.id) : 0,
-                                            satuan_id: obj.satuan ? Number(obj.satuan) : 0,
                                             supplier_harga_id: obj.spesifikasi ? Number(obj.spesifikasi) : 0,
                                             bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
                                             peti: obj.peti,
@@ -997,7 +1168,6 @@
                                     } else {
                                         update_list_items.push({
                                             supplier_harga_id: obj.spesifikasi ? Number(obj.spesifikasi) : 0,
-                                            satuan_id: obj.satuan ? Number(obj.satuan) : 0,
                                             bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
                                             peti: obj.peti,
                                             quality: obj.quality,
@@ -1034,7 +1204,6 @@
                                                         confirmButtonColor: '#4e73df',
                                                     })
                                                     .then(() => {
-                                                        window.open('<?= base_url("po-lokal-bahan-baku/print") ?>/' + id, "_blank")
                                                         window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
                                                     })
                                             } else {
@@ -1078,7 +1247,6 @@
                                                         confirmButtonColor: '#4e73df',
                                                     })
                                                     .then(() => {
-                                                        window.open('<?= base_url("po-lokal-bahan-baku/print") ?>/' + response.id, "_blank")
                                                         window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
                                                     })
                                             } else {
@@ -1247,8 +1415,6 @@
             let bagianName = $(".bagian option:selected").text()
             let spesifikasi = $(".spesifikasi option:selected").val()
             let spesifikasiName = $(".spesifikasi option:selected").text()
-            let satuan = $(".satuan option:selected").val()
-            let satuanName = $(".satuan option:selected").text()
             let peti = $(".peti").val()
             let quality = $(".quality").val()
             let harga = $(".harga").val()
@@ -1320,9 +1486,6 @@
                                         tag_html += bagianName;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += satuanName;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
                                         tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
@@ -1342,7 +1505,7 @@
                                         tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${satuan}" data-spesifikasi="${spesifikasi}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-spesifikasi="${spesifikasi}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
                                         data-daily="${Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-monthly="${Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bagian="${bagian}" data-qty="${qty}" data-total="${Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-keterangan="${keterangan}" data-peti="${peti}" data-quality="${quality}" data-id="" data-row="${row + 1}">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1356,8 +1519,6 @@
                                             row: row + 1,
                                             spesifikasi: spesifikasi,
                                             spesifikasiName: spesifikasiName,
-                                            satuan: satuan,
-                                            satuanName: satuanName,
                                             bagian_id: bagian,
                                             bagian_name: bagianName,
                                             harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -1387,9 +1548,6 @@
                                         tag_html += `<td>`;
                                         tag_html += item.bagian_name;
                                         tag_html += "</td>";
-                                         tag_html += `<td>`;
-                                        tag_html += item.satuanName;
-                                        tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += "Rp " + item.harga;
                                         tag_html += "</td>";
@@ -1410,7 +1568,7 @@
                                         tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" 
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-spesifikasi="${item.spesifikasi}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" 
                                         data-daily="${item.daily_price}" data-monthly="${item.monthly_price}" data-bagian="${item.bagian_id}" data-qty="${item.qty}" data-total="${item.total}" data-keterangan="${item.keterangan}" data-peti="${item.peti}" data-quality="${item.quality}" data-id="${item.id}" data-row="${row + 1}">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1439,7 +1597,7 @@
                                 $(".foot-detail-table").empty()
 
                                 tag_total += `<tr>`;
-                                tag_total += "<td colspan='3'>";
+                                tag_total += "<td colspan='2'>";
                                 tag_total += "</td>";
                                 tag_total += "<td>";
                                 tag_total += "<b>TOTAL</b>";
@@ -1462,7 +1620,7 @@
 
                                 $(".foot-detail-table").append(tag_total);
 
-                                reset()
+                                $(".detail-modal").modal("hide")
                             }
                             // create detail
                             else {
@@ -1472,8 +1630,6 @@
                                         row: row + 1,
                                         spesifikasi: spesifikasi,
                                         spesifikasiName: spesifikasiName,
-                                        satuan: satuan,
-                                        satuanName: satuanName,
                                         bagian_id: bagian,
                                         bagian_name: bagianName,
                                         harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -1505,9 +1661,6 @@
                                     tag_html += bagianName;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += satuanName;
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
                                     tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
@@ -1527,7 +1680,7 @@
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += `
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${satuan}" data-spesifikasi="${spesifikasi}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-spesifikasi="${spesifikasi}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
                                     data-daily="${Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-monthly="${Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bagian="${bagian}" data-qty="${qty}" data-total="${Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-keterangan="${keterangan}" data-peti="${peti}" data-quality="${quality}" data-id="" data-row="${row + 1}">
                                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                     </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1540,7 +1693,7 @@
                                     $(".foot-detail-table").empty()
 
                                     tag_total += `<tr>`;
-                                    tag_total += "<td colspan='3'>";
+                                    tag_total += "<td colspan='2'>";
                                     tag_total += "</td>";
                                     tag_total += "<td>";
                                     tag_total += "<b>TOTAL</b>";
@@ -1563,7 +1716,7 @@
 
                                     $(".foot-detail-table").append(tag_total);
 
-                                    reset()
+                                    $(".detail-modal").modal("hide")
                                     row = row + 1;
                                 }
                             }
@@ -1615,9 +1768,6 @@
                         tag_html += item.bagian_name;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += item.satuanName;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
                         tag_html += "Rp " + item.harga;
                         tag_html += "</td>";
                         tag_html += `<td>`;
@@ -1637,7 +1787,7 @@
                         tag_html += "</td>";
                         tag_html += "<td>";
                         tag_html += `
-                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" 
+                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-spesifikasi="${item.spesifikasi}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" 
                         data-daily="${item.daily_price}" data-monthly="${item.monthly_price}" data-bagian="${item.bagian_id}" data-qty="${item.qty}" data-total="${item.total}" data-keterangan="${item.keterangan}" data-peti="${item.peti}" data-quality="${item.quality}" data-id="${item.id}" data-row="${row + 1}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1674,7 +1824,7 @@
                 $(".foot-detail-table").empty()
 
                 tag_total += `<tr>`;
-                tag_total += "<td colspan='3'>";
+                tag_total += "<td colspan='2'>";
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
@@ -1697,7 +1847,7 @@
 
                 $(".foot-detail-table").append(tag_total);
 
-                reset()
+                $(".detail-modal").modal("hide")
             }
         })
     }
@@ -1712,29 +1862,6 @@
             $(".po_no").attr("readonly", false);
             $(".po_no").val("");
         }
-    }
-
-    let reset = function() {
-        $(".id_detail").val('');
-
-        $(".qty").val('')
-        $(".harga").val('')
-        $(".daily_price").val('')
-        $(".monthly_price").val('')
-        $(".quality").val('Baik')
-        $(".peti").val('')
-        $(".total").val('')
-        $(".keterangan").val('')
-        $(".satuan").val("").change()
-        $(".spesifikasi").val("").change()
-        $(".bagian").val('').change()
-
-        validator_detail.resetForm();
-        validator_detail.reset();
-    }
-
-    const setBarang = function() {
-        reset()
     }
 
     const print = function(url) {

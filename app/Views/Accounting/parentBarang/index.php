@@ -135,7 +135,7 @@
 
 <script>
     let sort = "nomor";
-    let sortType = "asc";
+    let sortType = "desc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -182,11 +182,10 @@
                         data: "kategori",
                         className: "text-center"
                     },
-                <?php endif; ?>
-                {
+                <?php endif; ?> {
                     data: "ap_id",
                     className: "text-center",
-                },{
+                }, {
                     data: "ar_id",
                     className: "text-center",
                 },
@@ -487,61 +486,61 @@
         }
     }
 
-        // Akun AR
-        $('.akun_ar_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
+    // Akun AR
+    $('.akun_ar_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.akun_ar_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    //CSS SELECT2 FLOATING LABEL
+    $('.akun_ar_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-        $('.akun_ar_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.akun_ar_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.akun_ar_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    $('.akun_ar_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
-        // Akun AP
-        $('.akun_ap_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
+    // Akun AP
+    $('.akun_ap_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.akun_ap_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    //CSS SELECT2 FLOATING LABEL
+    $('.akun_ap_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-        $('.akun_ap_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.akun_ap_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.akun_ap_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    $('.akun_ap_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 </script>
 
 <?= $this->endSection(); ?>

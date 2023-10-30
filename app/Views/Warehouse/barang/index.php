@@ -92,11 +92,11 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select type" onchange="changeType()" name="type" id="type" aria-label="Floating label select example">
                                         <option value="">Pilih Tipe</option>
-                                        <?php if($kategoriBarang !== "Bahan Baku"){ ?>
+                                        <?php if ($kategoriBarang !== "Bahan Baku") { ?>
                                             <option value="BAHAN PENOLONG LOKAL">Bahan Penolong Lokal</option>
                                             <option value="BAHAN PENOLONG IMPORT">Bahan Penolong Import</option>
                                         <?php } ?>
-                                        <?php if($kategoriBarang !== "Bahan Penolong"){ ?>
+                                        <?php if ($kategoriBarang !== "Bahan Penolong") { ?>
                                             <option value="BAHAN BAKU IMPORT">Bahan Baku Import</option>
                                             <option value="BAHAN BAKU LOKAL">Bahan Baku Lokal</option>
                                         <?php } ?>
@@ -260,7 +260,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "parent_barang";
-    let sortType = "asc";
+    let sortType = "desc";
     let list_spek = [];
     var row_detail = 0;
     let changeParent = true;
