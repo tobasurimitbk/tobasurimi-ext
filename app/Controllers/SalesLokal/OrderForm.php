@@ -119,13 +119,19 @@ class OrderForm extends BaseController
 
         $dataSalesOrder = [];
         foreach ($dataOrderForm['data'] as $data) {
+            $totalQty =0; $totalHarga = 0;
+            $dataQtySalesOrderDetail = $this->SalesOrderDetailModel->getItemListByIds(json_decode($data->id));
+            foreach ($dataQtySalesOrderDetail as $datas) {
+                $totalQty = $datas->qty;
+                $totalHarga = str_replace(',', '', $datas->harga_barang);
+            }
             array_push($dataSalesOrder, [
                 "no"            => $no++,
                 "id"            => $data->id,
                 "no_sales_order"      => $data->no_sales_order,
                 "destination"        => $data->destination,
-                "qty_barang" => $data->qty_barang,
-                "total_harga"         => number_format($data->total_harga),
+                "qty_barang" => $totalQty,
+                "total_harga"         => number_format($totalHarga),
                 "keterangan"  => $data->keterangan
             ]);
         }
@@ -728,15 +734,15 @@ class OrderForm extends BaseController
                         ->where('barang_id', $item['id_barang'])
                         ->where('warehouse_id', $item['id_warehouse'])
                         ->first();
-                    $stok = ['qty' => $itemStock->qty + $item['qty']];
-                    $this->stockDetailModel->where('barang_id', $item['id_barang'])->set('qty', $itemStock->qty + $item['qty'])->update();
+                    // $stok = ['qty' => $itemStock->qty + $item['qty']];
+                    $this->stockDetailModel->addOrReduceStock($item['id_barang'], $item['id_warehouse'], 'New', $item['qty'], 'In', '');;
                     $this->SalesOrderDetailModel->delete($item['id']);
                 }
                 $this->db->transCommit();
 
                 $data = [
                     "status"            => true,
-                    "message"    => "Data SO Berhasil Dihapus",
+                    "message"    => "Data Order Berhasil Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);

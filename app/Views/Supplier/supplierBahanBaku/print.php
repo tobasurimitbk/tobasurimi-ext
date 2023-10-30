@@ -75,45 +75,27 @@
     </style>
 </head>
 <body>
+    <h2>Laporan pendapatan supplier</h2>
     <table class="w-100">
-        <tr>
-            <td style="width: 60%;padding-right: 100px">
-                <div class="company-name"></div>
-                <div>
-                    <table class="w-100">
-                        <tr>
-                            <td style="width: 1px;vertical-align: top">Customer: </td>
-                            <td style="border: 1px solid;border-radius: 7px;padding: 5px">
-                                <div></div>
-                                <div></div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </td>
-            <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center">SURAT JALAN</div>
-                <table class="w-100" style="border: 1px solid;border-radius: 7px;margin-left: auto;margin-right: 0">
-                    <tr>
-                        <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">
-                            <div>Tgl</div>
-                            <div class="txt-center"></div>
-                        </td>
-                        <td>
-                            <div>No. Surat</div>
-                            <div class="txt-center"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid;border-style: dashed dashed hidden hidden"></td>
-                        <td style="border-top: 1px solid;border-top-style: dashed">
-                            <div>PO. No.</div>
-                            <div class="txt-center">&nbsp;</div>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <td width="120px">Tanggal</td>
+                <td>:</td>
+                <td>01-01-2022</td>
+                <td> S/D </td>
+                <td>31-01-2022</td>
+            </tr>
+            <tr>
+                <td>Bahan Baku</td>
+                <td>:</td>
+                <td colspan="3" style="text-transform: uppercase;">Cumi</td>
+            </tr>
+            <tr>
+                <td>Lokasi Gudang</td>
+                <td>:</td>
+                <td colspan="3" style="text-transform: uppercase;">Warehouse1</td>
+            </tr>
+        </tbody>
     </table>
     
     <table class="item-table">
