@@ -80,6 +80,7 @@ class SPP extends BaseController
         $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
+            "today"         => date("d/m/Y"),
             "dataCompany"   => $dataCompany,
             "dataOrderType" => $dataOrderType,
             "dataDivisi" => $dataDivisi
@@ -100,6 +101,7 @@ class SPP extends BaseController
         $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
+            "today"         => date("d/m/Y"),
             "dataCompany"   => $dataCompany,
             "dataOrderType" => $dataOrderType,
             "dataDivisi" => $dataDivisi

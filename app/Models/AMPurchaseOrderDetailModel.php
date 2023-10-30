@@ -71,6 +71,7 @@ class AMPurchaseOrderDetailModel extends Model
             am_purchase_order_details.price AS price,
             am_purchase_order_details.additional_cost AS additional_cost,
             barang_master.barang_name as nama_barang, 
+            am_purchase_order_details.note AS spp_note,
             barang_master.kode_barang,
             taxppn.tax_value as ppnValue, 
             taxpph.tax_value as pphValue, 
@@ -81,6 +82,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
             ->join('taxes AS taxpph', 'taxpph.id = am_purchase_order_details.pph', 'left');
@@ -107,6 +109,7 @@ class AMPurchaseOrderDetailModel extends Model
             (am_purchase_order_details.additional_cost) AS additional_cost,
             barang_master.barang_name as nama_barang, 
             barang_master.kode_barang,
+            am_purchase_order_details.note AS spp_note,
             taxppn.tax_value as ppnValue, 
             taxpph.tax_value as pphValue, 
             satuans.id as id_satuan, 
@@ -144,6 +147,7 @@ class AMPurchaseOrderDetailModel extends Model
             barang_master.kode_barang,
             taxppn.tax_value as ppnValue, 
             taxpph.tax_value as pphValue, 
+            am_purchase_order_details.note AS spp_note,
             satuans.id as id_satuan, 
             satuans.nama_satuan";
 
@@ -151,6 +155,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
             ->join('taxes AS taxpph', 'taxpph.id = am_purchase_order_details.pph', 'left');

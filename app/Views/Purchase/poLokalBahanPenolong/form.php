@@ -186,7 +186,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOLokal) ? $dataPOLokal->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                            <input autocomplete="one-time-code" readonly <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOLokal) ? $dataPOLokal->spp_note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
@@ -215,6 +215,7 @@
                                 <th>Total</th>
                                 <th>Disc (%)</th>
                                 <th>Tambahan</th>
+                                <th>Keterangan</th>
                                 <!-- <th>PPN</th>
                                 <th>PPH</th> -->
                                 <th>Action</th>
@@ -255,8 +256,9 @@
                                             <td><?= "Rp " . number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <!-- <td><?= $details->ppn; ?></td>
                                             <td><?= $details->pph; ?></td> -->
+                                            <td><?= $details->spp_note; ?></td>
                                             <td>
-                                                <button data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-additional_cost="<?= number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
+                                                <button data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-additional_cost="<?= number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->spp_note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                                 </button>
                                             </td>
@@ -275,6 +277,7 @@
                                             <td><?= "Rp " . number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <!-- <td><?= $details->ppn; ?></td>
                                             <td><?= $details->pph; ?></td> -->
+                                            <td><?= $details->spp_note; ?></td>
                                             <td></td>
                                         <?php } ?>
                                     </tr>
@@ -292,7 +295,7 @@
                                 <!-- <td><b><?= $total_remaining_qty; ?></b></td>
                                 <td><b><?= $total_qty_diterima; ?></b></td> -->
                                 <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td colspan="3"></td>
+                                <td colspan="4"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -329,6 +332,14 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" readonly="true" type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea autocomplete="one-time-code" readonly class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan (Opsional)"></textarea>
+                                <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
                     </div>
@@ -450,7 +461,7 @@
                 harga: '<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
                 qty: Number('<?= $details->qty; ?>'),
                 total: '<?= number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                keterangan: '<?= $details->note; ?>',
+                keterangan: '<?= $details->spp_note; ?>',
                 additional_cost: '<?= number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?>',
                 disc: Number('<?= $details->disc; ?>'),
                 ppn: '<?= $details->ppn; ?>',
@@ -641,6 +652,7 @@
                     success: function(res) {
                         if (res.status) {
                             $(".divisi_id").val(res?.data?.divisi_id)
+                            $(".note").val(res?.data?.note)
                             $(".divisi").val(res?.data?.divisiName)
                             $(".company").val(res?.data?.companyName)
 
@@ -697,6 +709,9 @@
                                 // tag_html += `<td>`;
                                 // tag_html += 0;
                                 // tag_html += "</td>";
+                                tag_html += `<td>`;
+                                tag_html += item.note;
+                                tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
                                 <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.satuanName}" data-ppn="" data-pph="" data-total="${Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-harga="${Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-qty="${Number(item.qty)}" data-keterangan="${item.note}" data-id="" data-row="${row + 1}">
@@ -760,7 +775,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>Rp ${total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='3'>";
+                            tag_total += "<td colspan='4'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -769,6 +784,7 @@
                             $(".divisi_id").val('')
                             $(".divisi").val('')
                             $(".company").val('')
+                            $(".note").val('')
 
                             list_items = []
 
@@ -801,7 +817,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>Rp 0.00</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='3'>";
+                            tag_total += "<td colspan='4'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1008,6 +1024,9 @@
                             tag_html += `<td>`;
                             tag_html += additional_cost ? ("Rp " + Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : "Rp 0.00";
                             tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += item.keterangan;
+                            tag_html += "</td>";
                             // tag_html += `<td>`;
                             // tag_html += nilai_ppn ? nilai_ppn : 0;
                             // tag_html += "</td>";
@@ -1074,6 +1093,9 @@
                             // tag_html += `<td>`;
                             // tag_html += item.nilai_pph ? item.nilai_pph : 0;
                             // tag_html += "</td>";
+                            tag_html += `<td>`;
+                            tag_html += item.keterangan;
+                            tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
                             <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.nama_satuan} data-ppn="${item.ppn}" data-pph="${item.pph}" data-total="${item.total}" data-additional_cost="${item.additional_cost}" data-disc="${item.disc}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
@@ -1335,12 +1357,14 @@
         let satuan = $(this).data('satuan')
         let harga = $(this).data('harga')
         let qty = $(this).data('qty')
+        let keterangan = $(this).data('keterangan')
         // let keterangan = $(this).data('keterangan')
         let rowid = $(this).data('row')
         let id = $(this).data('id')
 
         $(".id_detail").val(rowid)
         $(".kode").val(kode_barang)
+        $(".keterangan").val(keterangan)
         // $(".keterangan").val(keterangan)
 
         $.ajax({

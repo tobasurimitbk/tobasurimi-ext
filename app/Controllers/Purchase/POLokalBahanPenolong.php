@@ -251,7 +251,7 @@ class POLokalBahanPenolong extends BaseController
                     //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                    "note"                  => $this->request->getPost("note"),
+                    // "note"                  => $this->request->getPost("note"),
                     "isPosted"              => false,
                     "createdBy"             => session()->get("login")->user_id,
                     "items"                 => json_decode($this->request->getPost("items"))
@@ -380,7 +380,7 @@ class POLokalBahanPenolong extends BaseController
                         //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                         "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                         //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                        "note"                  => $this->request->getPost("note"),
+                        // "note"                  => $this->request->getPost("note"),
                         "isPosted"              => false,
                         "createdBy"             => session()->get("login")->user_id,
                         "items"                 => json_decode($this->request->getPost("items"))
@@ -396,7 +396,7 @@ class POLokalBahanPenolong extends BaseController
                         //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                         "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                         //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                        "note"                  => $this->request->getPost("note"),
+                        // "note"                  => $this->request->getPost("note"),
                         "isPosted"              => false,
                         "createdBy"             => session()->get("login")->user_id,
                         "items"                 => json_decode($this->request->getPost("items"))

@@ -139,6 +139,7 @@ class AMPurchaseOrderModel extends Model
     {
         $selectQry = "am_purchase_orders.*,
         purchase_requests.spp_no AS spp_no,
+        purchase_requests.note AS spp_note,
         divisis.id AS divisi_id,
         divisis.divisi AS divisiName,
         suppliers.name AS supplierName,

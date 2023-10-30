@@ -212,7 +212,7 @@
             </div>
         </div>
         <div style="text-decoration: underline;">
-            Keterangan: <?= $dataPOLokal->note ?>
+            Keterangan: <?= $dataPOLokal->spp_note ?>
         </div>
         <table class="w-50 sign-table border-collapse footer" style="padding-top: 0px; margin-top: 0px">
             <tr style="border: 0px;">
