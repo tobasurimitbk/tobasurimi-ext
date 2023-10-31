@@ -93,7 +93,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? number_format($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->nominal_faktur) : ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" onkeyup="formatNumber(this)" placeholder="Nominal Faktur">
+                            <input type="number" autocomplete="one-time-code" <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->nominal_faktur) : ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" placeholder="Nominal Faktur">
                             <label for="floatingInput">Nominal Faktur</label>
                         </div>
                     </div>
@@ -144,7 +144,7 @@
                                         <th>Qty</th>
                                         <th>satuan</th>
                                         <th>Total</th>
-                                        <th></th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="body-table">
@@ -164,19 +164,19 @@
                     </div> -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= number_format($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->tambahan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                            <input autocomplete="one-time-code" type="number" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= ($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->tambahan) ?? ""; ?>" placeholder="Keterangan">
                             <label for="floatingInput">Potongan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= number_format($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->potongan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                            <input autocomplete="one-time-code" type="number" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= ($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->potongan) ?? ""; ?>" placeholder="Keterangan">
                             <label for="floatingInput">Penambahan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= number_format($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->nominal_faktur) ?? 0; ?>" />
+                            <input autocomplete="one-time-code" readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= (formatter($dataTerimaFaktur->nominal_faktur, "STR_TO_FLOAT") + formatter($dataTerimaFaktur->potongan, "STR_TO_FLOAT") - formatter($dataTerimaFaktur->tambahan, "STR_TO_FLOAT")); ?>" />
                             <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
                         </div>
                     </div>
@@ -231,7 +231,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" onkeyup="formatNumber(this)" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
+                            <input autocomplete="one-time-code" type="number" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
                             <label for="floatingInput">Jumlah</label>
                         </div>
                     </div>
@@ -272,7 +272,7 @@
                                         <th>Jumlah</th>
                                         <th>Status</th>
                                         <th>Keterangan</th>
-                                        <th></th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="body-table">
@@ -449,10 +449,10 @@
                     if ($statusUpdate) { ?>
                         return ``;
                     <?php } else { ?>
-                        return `<button type="button" class="btn btn-danger" data-action="delete-item">Delete</button>`;
+                        return `<button type="button" class="btn btn-danger" data-action="delete-item"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                     <?php }
                 } else { ?>
-                    return `<button type="button" class="btn btn-danger" data-action="delete-item">Delete</button>`;
+                    return `<button type="button" class="btn btn-danger" data-action="delete-item"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                 <?php } ?>
             },
             targets: -1
@@ -512,10 +512,10 @@
                     if ($statusUpdate) { ?>
                         return ``;
                     <?php } else { ?>
-                        return `<button type="button" class="btn btn-danger" data-action="delete-tax-item">Delete</button>`;
+                        return `<button type="button" class="btn btn-danger" data-action="delete-tax-item"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                     <?php }
                 } else { ?>
-                    return `<button type="button" class="btn btn-danger" data-action="delete-tax-item">Delete</button>`;
+                    return `<button type="button" class="btn btn-danger" data-action="delete-tax-item"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                 <?php } ?>
             },
             targets: -1
@@ -1068,7 +1068,7 @@
                 const selectedItemTotal = selectedItemTable.rows().data().toArray().reduce((total, obj) => {
                     return total += +obj.total;
                 }, 0);
-                $('#nominal_faktur').val(selectedItemTotal.toLocaleString());
+                $('#nominal_faktur').val(selectedItemTotal);
                 $('#nominal_faktur').trigger('change');
             }
 
@@ -1140,7 +1140,7 @@
             const tambahanNumber = tambahan.replace(/\D/g, '');
 
             const total = +invAmtNumber + +potonganNumber - +tambahanNumber;
-            $('#InvFinalAmt').val(total.toLocaleString());
+            $('#InvFinalAmt').val(total);
         }
 
         if (id) {
@@ -1157,7 +1157,10 @@
         $(".sender").val("");
         if ($(".tipe_bahan").val() === "BAKU") {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+                url: `<?= base_url("supplier/dropdown"); ?>`,
+                data: {
+                    tipe: 'BAHAN BAKU'
+                },
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -1175,7 +1178,10 @@
         }
         if ($(".tipe_bahan").val() === "PENOLONG") {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+                url: `<?= base_url("supplier/dropdown"); ?>`,
+                data: {
+                    tipe: 'BAHAN PENOLONG'
+                },
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
