@@ -276,6 +276,7 @@ class POImportBahanBaku extends BaseController
                 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
+                    "is_bc"                 => $this->request->getPost("is_bc"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
@@ -476,6 +477,7 @@ class POImportBahanBaku extends BaseController
 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
+                    "is_bc"                 => $this->request->getPost("is_bc"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "divisi_id" => $divisi_id,

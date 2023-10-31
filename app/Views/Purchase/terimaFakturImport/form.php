@@ -176,7 +176,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= (formatter($dataTerimaFaktur->nominal_faktur, "STR_TO_FLOAT") + formatter($dataTerimaFaktur->potongan, "STR_TO_FLOAT") - formatter($dataTerimaFaktur->tambahan, "STR_TO_FLOAT")); ?>" />
+                            <input autocomplete="one-time-code" readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= ($dataTerimaFaktur == null ? "" : (formatter($dataTerimaFaktur->nominal_faktur, "STR_TO_FLOAT") + formatter($dataTerimaFaktur->potongan, "STR_TO_FLOAT") - formatter($dataTerimaFaktur->tambahan, "STR_TO_FLOAT"))); ?>" />
                             <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
                         </div>
                     </div>
