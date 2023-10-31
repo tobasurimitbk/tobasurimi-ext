@@ -228,7 +228,7 @@ class RMPurchaseOrderModel extends Model
         return $generatedPoNo;
     }
 
-    public function getPoBBLokalForSupplierReport($startDate,$finishDate,$bahanBaku,$warehouse)
+    public function getPoBBLokalForSupplierReport($startDate,$finishDate,$supplier,$bahanBaku,$warehouse)
     {
         $selectQry = "
         suppliers.no_npwp AS supplierNpwp,
@@ -256,6 +256,9 @@ class RMPurchaseOrderModel extends Model
         }                  
         if (!empty($warehouse)) {
             $condition['penerimaan_barang.warehouse_id'] = $warehouse;
+        }                  
+        if (!empty($supplier)) {
+            $condition['rm_purchase_orders.supplier_id'] = $supplier;
         }                  
 
         $poBBLokalData = $this->asObject()
