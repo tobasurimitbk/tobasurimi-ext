@@ -106,59 +106,82 @@
         }
 
         .footer {
-            position: absolute;
+            /* position: absolute; */
             bottom: 0;
             width: 100%;
             height: 90px;
+            margin-top: 10px;
         }
     </style>
 </head>
 
 <body>
     <?php if (!empty($dataPOLokal)) { ?>
-        <table class="w-100">
+        <table class="w-100" style="margin-top: -15px;">
             <tr>
-                <td colspan="2">
-                    <div class="txt-underline txt-bold">PO LOKAL BAHAN PENOLONG</div>
-                </td>
-                <td class="txt-right">
-                    <div>Kepada: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
+                <td style="text-align: right; font-weight:bold;">
+                    <div style="font-size: 13px;">
+                        <u> Tanggal: <?= date("d-m-Y", strtotime($dataPOLokal->po_date)) ?></u>
+                    </div>
                 </td>
             </tr>
+        </table>
+        <table class="w-100" style="margin-top: -8000px;">
             <tr>
                 <td colspan="2">
-                    <div class="mt-025 txt-bold">No. PO: <?= $dataPOLokal->po_no ?></div>
+                    <h1 class="txt-underline txt-bold">PO LOKAL BAHAN PENOLONG</h1> <br>
+                    <div style="margin-top: -20px;">
+                        <table>
+                            <tr>
+                                <td>No SPP</td>
+                                <td>:</td>
+                                <td><?= $dataPOLokal->spp_no ?></td>
+                            </tr>
+                            <tr>
+                                <td>Departemen</td>
+                                <td>:</td>
+                                <td><?= $dataPOLokal->divisiName ?></td>
+                            </tr>
+                            <tr>
+                                <td>Unit</td>
+                                <td>:</td>
+                                <td><?= $dataPOLokal->companyName ?></td>
+                            </tr>
+                            <tr>
+                                <td>Keterangan</td>
+                                <td>:</td>
+                                <td><?= $dataPOLokal->spp_note ?></td>
+                            </tr>
+                        </table>
+                    </div>
+
                 </td>
-                <td class="txt-right">
-                    <div>Alamat: <span class="txt-bold"><?= $dataPOLokal->supplierAddress ?></span></div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    &nbsp;
-                </td>
-                <td class="txt-right">
-                    <div>Telepon: <span class="txt-bold"><?= $dataPOLokal->supplierPhone ?></span></div>
-                </td>
-            </tr>
-            <tr>
                 <td>
-                    Tanggal: <?= date("d-m-Y", strtotime($dataPOLokal->po_date)) ?>
-                </td>
-                <td>
-                    No. SPP: <?= $dataPOLokal->spp_no ?>
-                </td>
-                <td class="txt-right">
-                    <div>NPWP: <span class="txt-bold"><?= $dataPOLokal->supplierNPWP ?></span></div>
+                    <h3>No. PO : <?= $dataPOLokal->po_no ?></h3>
+
                 </td>
             </tr>
+        </table>
+        <table class="w-100" style="text-align: right; margin-top:-40px">
             <tr>
-                <td>
-                    Departemen: <?= $dataPOLokal->divisiName ?>
-                </td>
-                <td colspan="2">
-                    Lokasi: <?= $dataPOLokal->companyName ?>
-                </td>
+                <td style="width: 450px;">Kepada Yth</td>
+                <td style="width: 10px;">:</td>
+                <td style="text-align:left"><?= strtoupper($dataPOLokal->supplierName) ?></td>
+            </tr>
+            <tr>
+                <td>Alamat</td>
+                <td>:</td>
+                <td style="text-align:left"><?= strtoupper($dataPOLokal->supplierAddress) ?></td>
+            </tr>
+            <tr>
+                <td>Telepon</td>
+                <td>:</td>
+                <td style="text-align:left"><?= $dataPOLokal->supplierPhone ?></td>
+            </tr>
+            <tr>
+                <td>NPWP</td>
+                <td>:</td>
+                <td style="text-align:left"><?= $dataPOLokal->supplierNPWP ?></td>
             </tr>
         </table>
         <div class="mt-025 txt-bold" style="margin-bottom: 3px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
@@ -196,60 +219,72 @@
             <?php } ?>
         </table>
         <div class="header mt-025">
-            <div class="txt-right">
-                <div>
-                    Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
-                </div>
-                <div class="mt-025">
-                    Diskon: <span class="txt-bold">Rp. <?= $dataPOLokal->totalDisc ?></span>
-                </div>
-                <div class="mt-025">
-                    Sub Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
-                </div>
-                <div class="mt-025">
-                    PPN (dikreditkan): <span class="txt-bold">Rp. <?= $dataPOLokal->totalPpn ?></span>
-                </div>
-                <div class="mt-025">
-                    Grand Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPo ?></span>
-                </div>
-            </div>
+            <table style="text-align:right; width:100%; margin-top:30px; font-weight:bold;">
+                <tr>
+                    <td colspan="3">____________</td>
+                </tr>
+                <tr>
+                    <td style="width:630px">Total</td>
+                    <td style="width: 10px;">:</td>
+                    <td>Rp. <?= $dataPOLokal->totalPrice ?></td>
+                </tr>
+                <tr>
+                    <td>Tambahan</td>
+                    <td>:</td>
+                    <td>Rp. <?= $dataPOLokal->totalTambahan ?></td>
+                </tr>
+                <tr>
+                    <td>Diskon</td>
+                    <td>:</td>
+                    <td>Rp. <?= $dataPOLokal->totalDisc ?></td>
+                </tr>
+                <tr>
+                    <td>Sub Total</td>
+                    <td>:</td>
+                    <td>Rp. <?= $dataPOLokal->totalPrice ?></td>
+                </tr>
+                <tr>
+                    <td>PPN (dikreditkan)</td>
+                    <td>:</td>
+                    <td>Rp. <?= $dataPOLokal->totalPpn ?></td>
+                </tr>
+                <tr>
+                    <td>Grand Total</td>
+                    <td>:</td>
+                    <td>Rp. <?= $dataPOLokal->totalPo ?></td>
+                </tr>
+            </table>
         </div>
-        <div style="text-decoration: underline;">
-            Keterangan: <?= $dataPOLokal->spp_note ?>
-        </div>
-        <table class="w-50 sign-table border-collapse footer" style="padding-top: 0px; margin-top: 0px">
+        <table class="w-50 sign-table border-collapse footer" style="padding-top: 0px;margin-left:-30px;">
+            <tr>
+                <td style="text-align: center;"><b><u>Keterangan: <?= $dataPOLokal->spp_note ?></u></b></td>
+            </tr>
             <tr style="border: 0px;">
-                <td style="height: 30px; border: 0px;">Pemesan Order</td>
-                <td style="border: 0px;">Pembuat Order</td>
-                <td style="border: 0px;">Diketahui oleh</td>
-                <td style="border: 0px;">Diperiksa oleh</td>
-                <td style="border: 0px;">Disetujui oleh</td>
+                <td style="height: 30px; border: 0px; text-align:center; ">Pemesan Order :</td>
+                <td style="border: 0px;text-align:center">Pembuat Order</td>
+                <td style="border: 0px;text-align:center">Diketahui oleh</td>
+                <td style="border: 0px;text-align:center">Diperiksa oleh</td>
+                <td style="border: 0px;text-align:center">Disetujui oleh</td>
             </tr>
             <tr>
-                <th>
-                    <div class="sign-row txt-left">
-                        <div>(divisi)</div>
-                    </div>
+                <th style="font-weight: normal;">
+                    <br><br><br> <br>
+                    (Warehouse)
                 </th>
-                <th>
-                    <div class="sign-row txt-left">
-                        <div>(Pembelian)</div>
-                    </div>
+                <th style="font-weight: normal;">
+                    <br><br><br><br>
+                    (Pembelian)
                 </th>
-                <th>
-                    <div class="sign-row txt-left">
-                        <div>(Kabag Pembelian)</div>
-                    </div>
+                <th style="font-weight: normal;">
+                    <br><br><br><br>
+                    (Kabag Pembelian)
                 </th>
-                <th>
-                    <div class="sign-row txt-left">
-                        <div>(Audit)</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row txt-left">
-                        <div>(Direktur)</div>
-                    </div>
+                <th style="font-weight: normal;">
+                    <br><br><br><br>
+                    (Audit)
+                <th style="font-weight: normal;">
+                    <br><br><br><br>
+                    (Direktur)
                 </th>
             </tr>
         </table>
