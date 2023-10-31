@@ -26,29 +26,27 @@ class KwitansiTb extends BaseController
         $supplierModel = new SupplierModel();
 
         $res = [];
-        if ($this->request->getVar("year") != "" && $this->request->getVar("month") != "") {
-            $supplierModel = new SupplierModel();
-            $supplier = $supplierModel->getSupplierByType('BAHAN BAKU');
+        $supplierModel = new SupplierModel();
+        $supplier = $supplierModel->getSupplierByType('BAHAN BAKU');
 
-            $noKwitansi = '';
-            foreach ($supplier as $i => $s) {
-                if ($i == 0) {
-                    $noKwitansi = "001/KTB/$month/$year";
-                } else {
-                    $noKwitansi = generateNoKwitansiTB($noKwitansi, $month, $year);
-                }
-                $noKwitansi = sprintf($noKwitansi);
-                $kwitansiTB = $supplierModel->getKwitansiTB($s['id'], $year, $month);
+        $noKwitansi = '';
+        foreach ($supplier as $i => $s) {
+            if ($i == 0) {
+                $noKwitansi = "001/KTB/$month/$year";
+            } else {
+                $noKwitansi = generateNoKwitansiTB($noKwitansi, $month, $year);
+            }
+            $noKwitansi = sprintf($noKwitansi);
+            $kwitansiTB = $supplierModel->getKwitansiTB($s['id'], $year, $month);
 
-                if ($kwitansiTB['hargaBulananWithQtyPphTotal'] != 0) {
-                    $res[] = [
-                        'id' => $s['id'],
-                        'supplier' => $s['name'],
-                        'total' => $kwitansiTB['hargaBulananWithQtyPphTotal'],
-                        'noKwitansi' => $noKwitansi,
-                        "tanggal" => $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
-                    ];
-                }
+            if ($kwitansiTB['hargaBulananWithQtyPphTotal'] != 0) {
+                $res[] = [
+                    'id' => $s['id'],
+                    'supplier' => $s['name'],
+                    'total' => $kwitansiTB['hargaBulananWithQtyPphTotal'],
+                    'noKwitansi' => $noKwitansi,
+                    "tanggal" => $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
+                ];
             }
         }
 
