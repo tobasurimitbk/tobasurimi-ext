@@ -185,7 +185,7 @@
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
-                <td class="txt-left" style="padding-left: 5px;"><?= $detail["spp_no"]; ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= !empty($detail["spp_no"]) ? $detail["spp_no"] : ""; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
