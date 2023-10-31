@@ -333,7 +333,7 @@
                                             <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td>
                                                 <button 
-                                                class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_FLOAT"); ?>" data-nama="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" 
+                                                class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_FLOAT"); ?>" data-nama="<?= $details["nama_barang"]; ?>" data-nama_satuan="<?= $details["nama_satuan"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" 
                                                 data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-disc="<?= formatter($details["disc"], "STR_TO_FLOAT"); ?>" data-total="<?= number_format((formatter($details["price"], "STR_TO_FLOAT") * formatter($details["qty"], "STR_TO_FLOAT")), 2, '.', ','); ?>" data-additional="<?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"
                                                >
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -419,18 +419,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataSatuan)) {
-                                    foreach ($dataSatuan as $satuan) {
-                                ?>
-                                        <option value="<?= $satuan["id"]; ?>"><?= $satuan["nama_satuan"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
+                            <input type="hidden" class="satuan" name="satuan" id="satuan" />
+                            <input autocomplete="one-time-code" readonly="true" type="text" class="form-control nama_satuan" id="nama_satuan" name="nama_satuan" placeholder="Nama satuan">
                             <label for="floatingInput">Satuan</label>
                         </div>
                         </div>
@@ -506,7 +496,8 @@
         $(".id_detail").val('');
         $(".kode_barang").val("").change()
         $(".nama_barang").val("")
-        $(".satuan").val("").change()
+        $(".satuan").val("")
+        $(".nama_satuan").val("")
         $(".qty").val("")
         $(".harga").val("")
         $(".disc").val("")
@@ -563,9 +554,6 @@
             },
             harga: {
                 required: true
-            },
-            satuan: {
-                required: true
             }
         },
         messages: {
@@ -577,9 +565,6 @@
             },
             harga: {
                 required: "Harga wajib diisi"
-            },
-            satuan: {
-                required: "Satuan wajib diisi"
             }
         },
         errorElement: 'span',
@@ -663,13 +648,6 @@
             dropdownParent: $(".detail-modal .modal-content"),
             tags: false,
             allowClear: true
-        })
-
-        // SATUAN
-        $('.satuan').select2({
-            placeholder: "Pilih Satuan",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -830,26 +808,10 @@
                 $(".additional_cost").val('')
                 $(".total").val('')
                 $(".keterangan").val('')
+                $(".satuan").val("");
 
                 validator_detail.resetForm();
                 validator_detail.reset();
-
-                $.ajax({
-                    url: `<?= base_url("satuan/dropdown"); ?>`,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        $(".satuan").empty();
-
-                        $(".satuan").append(`<option value=""></option>`);
-
-                        res.data.forEach(function(item) {
-                            $(".satuan").append(`<option value="${item.id}">${item.nama_satuan}</option>`);
-                        })
-
-                        $(".satuan").val("").change();
-                    }
-                }) 
 
                 $.ajax({
                     url: `<?= base_url("barang/dropdown/type"); ?>`,
@@ -1025,8 +987,8 @@
 
             let barang = $(".kode_barang option:selected").val()
             let barangName = $(".nama_barang").val()
-            let satuan = $(".satuan option:selected").val()
-            let satuanName = $(".satuan option:selected").text()
+            let satuan = $(".satuan").val()
+            let satuanName = $(".nama_satuan").val()
             let qty = $(".qty").val()
             let harga = $(".harga").val()
             let disc = $(".disc").val()
@@ -1112,7 +1074,7 @@
                                         tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang}" data-nama="${barangName}" data-satuan="${satuan}" 
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang}" data-nama="${barangName}" data-satuan="${satuan}" data-nama_satuan="${satuanName}"
                                         data-qty="${qty}" data-keterangan="${keterangan}" data-disc="${disc}" data-total="${Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-additional="${Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-id="${item.id}" data-row="${row + 1}">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1171,7 +1133,7 @@
                                         tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan}" 
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan}" data-nama_satuan="${item.nama_satuan}"
                                         data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-disc="${item.disc}" data-total="${item.total}" data-additional="${item.additional_cost}" data-harga="${item.harga}" data-id="${item.id}" data-row="${row + 1}">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1283,7 +1245,7 @@
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += `
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang}" data-nama="${barangName}" data-satuan="${satuan}" 
+                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang}" data-nama="${barangName}" data-satuan="${satuan}" data-nama_satuan="${satuanName}"
                                     data-qty="${qty}" data-keterangan="${keterangan}" data-disc="${disc}" data-total="${Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-additional="${Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-id="" data-row="${row + 1}">
                                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                     </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1923,7 +1885,7 @@
                         tag_html += "</td>";
                         tag_html += "<td>";
                         tag_html += `
-                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan}" 
+                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan}" data-nama_satuan="${item.nama_satuan}"
                         data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-disc="${item.disc}" data-total="${item.total}" data-additional="${item.additional_cost}" data-harga="${item.harga}" data-id="${item.id}" data-row="${row + 1}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
@@ -1998,6 +1960,7 @@
         let barang_id = $(this).data('barang_id')
         let nama = $(this).data('nama')
         let satuan = $(this).data('satuan')
+        let nama_satuan = $(this).data('nama_satuan')
         let qty = $(this).data('qty')
         let harga = $(this).data('harga')
         let disc = $(this).data('disc')
@@ -2019,24 +1982,9 @@
         $(".additional_cost").val(Number(additional.replaceAll(",", "")))
         $(".total").val(Number(total.replaceAll(",", "")))
         $(".keterangan").val(keterangan)
+        $(".satuan").val(satuan);
+        $(".nama_satuan").val(nama_satuan);
         trigger = false;
-
-        $.ajax({
-            url: `<?= base_url("satuan/dropdown"); ?>`,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                $(".satuan").empty();
-
-                $(".satuan").append(`<option value=""></option>`);
-
-                res.data.forEach(function(item) {
-                    $(".satuan").append(`<option value="${item.id}">${item.nama_satuan}</option>`);
-                })
-
-                $(".satuan").val(satuan).change();
-            }
-        }) 
 
         $.ajax({
             url: `<?= base_url("barang/dropdown/type"); ?>`,
@@ -2067,16 +2015,19 @@
         {
             if ($(".kode_barang option:selected").val()) {
                 let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
-                let satuan = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
+                let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
+                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
                 let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
                 
                 $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
-                $(".satuan").val(satuan).change();
+                $(".satuan").val(satuan_id);
+                $(".nama_satuan").val(satuan);
             } else {
                 $(".kode").val("");
                 $(".nama_barang").val("");
-                $(".satuan").val("").change();
+                $(".satuan").val("");
+                $(".nama_satuan").val("");
             }
         }
         else
@@ -2142,7 +2093,7 @@
                         tag_html += "</td>";
                         tag_html += "<td>";
                         tag_html += `
-                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan}" 
+                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan}" data-nama_satuan="${item.nama_satuan}"
                         data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-disc="${item.disc}" data-total="${item.total}" data-additional="${item.additional_cost}" data-harga="${item.harga}" data-id="${item.id}" data-row="${row + 1}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
