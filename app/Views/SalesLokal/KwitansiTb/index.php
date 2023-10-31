@@ -11,7 +11,7 @@
             <div class="row justify-content-end row-col-page-list-attendance">
                 <div class="col-6 mb-2">
                     <form id="search_form" action="<?= base_url('kwitansi-tb?year=' . $year . '&month=' . $month) ?>" name="search_form" class="kt-form kt-form--fit kt-margin-b-20">
-                        <select name="month" id="month">
+                        <select required name="month" id="month">
                             <?php
                             for ($i = 1; $i <= 12; $i++) {
                                 $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
@@ -22,7 +22,7 @@
                             }
                             ?>
                         </select>
-                        <select name="year" id="year">
+                        <select required name="year" id="year">
                             <?php
                             for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) {
                                 $checked = ($year == $i) ? "selected" : "";
@@ -118,7 +118,7 @@
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         language: {
-            emptyTable: "Pilih periode dahulu "
+            emptyTable: "Tidak ada pembelian pada supplier "
         }
     })
 

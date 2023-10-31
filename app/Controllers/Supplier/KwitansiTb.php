@@ -40,13 +40,15 @@ class KwitansiTb extends BaseController
                 $noKwitansi = sprintf($noKwitansi);
                 $kwitansiTB = $supplierModel->getKwitansiTB($s['id'], $year, $month);
 
-                $res[] = [
-                    'id' => $s['id'],
-                    'supplier' => $s['name'],
-                    'total' => $kwitansiTB['hargaBulananWithQtyPphTotal'],
-                    'noKwitansi' => $noKwitansi,
-                    "tanggal" => $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
-                ];
+                if ($kwitansiTB['hargaBulananWithQtyPphTotal'] != 0) {
+                    $res[] = [
+                        'id' => $s['id'],
+                        'supplier' => $s['name'],
+                        'total' => $kwitansiTB['hargaBulananWithQtyPphTotal'],
+                        'noKwitansi' => $noKwitansi,
+                        "tanggal" => $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
+                    ];
+                }
             }
         }
 
