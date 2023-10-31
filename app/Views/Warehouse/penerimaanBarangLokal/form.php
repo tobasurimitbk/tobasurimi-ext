@@ -314,7 +314,7 @@
                                     <td><?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?></td>
                                     <td><?= $details["po_no"]; ?></td>
                                     <td><?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?></td>
-                                    <td><?= $details["nama_packaging"]; ?></td>
+                                    <td><?= $details["packaging"]; ?></td>
                                     <td><?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?></td>
                                     <td><?= $details["nama_satuan"]; ?></td>
                                     <td><?= formatter($details["qty"], "STR_TO_FLOAT"); ?></td>
@@ -335,7 +335,7 @@
                                     <td><?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?></td>
                                     <td><?= $details["po_no"]; ?></td>
                                     <td><?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?></td>
-                                    <td><?= $details["nama_packaging"]; ?></td>
+                                    <td><?= $details["packaging"]; ?></td>
                                     <td><?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?></td>
                                     <td><?= $details["nama_satuan"]; ?></td>
                                     <td><?= formatter($details["qty"], "STR_TO_FLOAT"); ?></td>
@@ -508,9 +508,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select packaging" name="packaging" id="packaging" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
+                                <input autocomplete="one-time-code" type="text" class="form-control packaging" id="packaging" name="packaging" placeholder="Kemasan">
                                 <label for="floatingInput">Kemasan</label>
                             </div>
                         </div>
@@ -586,8 +584,7 @@
         nilai_pph: '<?= $details["pph"]; ?>',
         status_penerimaan: '<?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?>',
         po_no: '<?= $details["po_no"]; ?>',
-        nama_packaging: '<?= $details["nama_packaging"]; ?>',
-        packaging: Number(<?= $details["packaging"] ? $details["packaging"] : 0; ?>),
+        packaging: '<?= $details["packaging"]; ?>',
         packaging_qty: Number(<?= $details["packaging_qty"] ? $details["packaging_qty"] : 0; ?>),
     })
     <?php 
@@ -966,35 +963,6 @@
             .find('label')
             .css('z-index', '1');
 
-        // PACKAGING
-        $('.packaging').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content"),
-            allowClear: true
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.packaging')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.packaging')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.packaging')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         // delete
         $(".delete-parent").click(function() {
             Swal.fire({
@@ -1080,8 +1048,7 @@
             let qty_diterima = $(".qty_diterima").val() ? Number($(".qty_diterima").val()) : 0
             let remaining_qty = $(".remaining_qty").val() ? Number($(".remaining_qty").val()) : 0
 
-            let packaging = $(".packaging option:selected").val() ? Number($(".packaging option:selected").val()) : 0
-            let nama_packaging = $(".packaging option:selected").text() ? $(".packaging option:selected").text() : ""
+            let packaging = $(".packaging").val()
             let packaging_qty = $(".packaging_qty").val() ? Number($(".packaging_qty").val()) : 0
 
             var all_qty = 0;
@@ -1185,7 +1152,7 @@
                                                     tag_html += item.status_penerimaan;
                                                     tag_html += "</td>";
                                                     tag_html += `<td>`;
-                                                    tag_html += nama_packaging;
+                                                    tag_html += packaging;
                                                     tag_html += "</td>";
                                                     tag_html += `<td>`;
                                                     tag_html += packaging_qty;
@@ -1249,7 +1216,6 @@
                                                         nilai_pph: 0,
                                                         status_penerimaan: item.status_penerimaan,
                                                         po_no: item.po_no,
-                                                        nama_packaging: nama_packaging,
                                                         packaging: packaging,
                                                         packaging_qty: packaging_qty,
                                                     });
@@ -1510,8 +1476,7 @@
                                                 keterangan: obj.keterangan,
                                                 ppn: obj.ppn ? Number(obj.ppn) : 0,
                                                 pph: obj.pph ? Number(obj.pph) : 0,
-                                                packaging: obj.packaging ? Number(obj.packaging) : 0,
-                                                packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
+                                                packaging: obj.packaging,
                                                 is_delete: true
                                             }
                                         )
@@ -1536,8 +1501,7 @@
                                                 keterangan: obj.keterangan,
                                                 ppn: obj.ppn ? Number(obj.ppn) : 0,
                                                 pph: obj.pph ? Number(obj.pph) : 0,
-                                                packaging: obj.packaging ? Number(obj.packaging) : 0,
-                                                packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
+                                                packaging: obj.packaging,
                                                 is_delete: false
                                             }
                                         )
@@ -1560,7 +1524,7 @@
                                                 keterangan: obj.keterangan,
                                                 ppn: obj.ppn ? Number(obj.ppn) : 0,
                                                 pph: obj.pph ? Number(obj.pph) : 0,
-                                                packaging: obj.packaging ? Number(obj.packaging) : 0,
+                                                packaging: obj.packaging,
                                                 packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
                                                 is_delete: false
                                             }
@@ -1649,7 +1613,7 @@
                                             keterangan: obj.keterangan,
                                             ppn: obj.ppn ? Number(obj.ppn) : 0,
                                             pph: obj.pph ? Number(obj.pph) : 0,
-                                            packaging: obj.packaging ? Number(obj.packaging) : 0,
+                                            packaging: obj.packaging,
                                             packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
                                         }
                                     )
@@ -1738,28 +1702,6 @@
 
         $(".btn-hide-detail").click(function() {
             $(".detail-modal").modal("hide")
-        })
-
-        $('.packaging').change(function() {
-            if($(".packaging option:selected").val())
-            {
-                $.ajax({
-                    url: "<?= base_url("order-form-lokal/stok"); ?>" + "/" + $(".packaging option:selected").val() + "/" + $(".warehouse_id option:selected").val(),
-                    method: "GET",
-                    dataType: "json",
-                    success: function(response) {
-                        if(Number(response?.dataDetailStock) <= 0)
-                        {
-                            $(".packaging").val('').change()
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Stok sudah mencapai batas minimum. Proses tidak dapat dilanjutkan',
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    }
-                })
-            }
         })
 
         $(".multiple_po_id").change(function() {
@@ -1868,7 +1810,6 @@
                                         keterangan: item.note,
                                         status_penerimaan: "OPEN",
                                         po_no: item.po_no,
-                                        nama_packaging: "",
                                         packaging: "",
                                         packaging_qty: 0
                                     })
@@ -2024,10 +1965,9 @@
                                         jml_masuk: 0,
                                         harga: harga_sementara,
                                         sub_total: sub_total_sementara,
-                                        keterangan: item.note,
+                                        keterangan: item.spp_note,
                                         status_penerimaan: "OPEN",
                                         po_no: item.po_no,
-                                        nama_packaging: "",
                                         packaging: "",
                                         packaging_qty: 0
                                     })
@@ -2076,11 +2016,11 @@
                                     tag_html += "Rp " + sub_total_sementara;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += item.note;
+                                    tag_html += item.spp_note;
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += `
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
+                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.spp_note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
                                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                     </button>`;
                                     tag_html += "</td>";
@@ -2282,122 +2222,93 @@
     }
 
     $(document).on('click', '.edit-table-detail', function(evt) {
-        if($('.warehouse_id option:selected').val())
-        {
-            $(".title-detail-name").text("Update")
-            // $(".delete-detail").css('display', '');
-            let ppn = $(this).data('ppn') ? Number($(this).data('ppn')) : ""
-            let pph = $(this).data('pph') ? Number($(this).data('pph')) : ""
-            let sub_total = $(this).data('sub_total')
-            let harga = $(this).data('harga')
-            let qty = $(this).data('qty')
-            let nama_barang_dokumen = $(this).data('nama_barang_dokumen')
-            let satuan = $(this).data('satuan')
-            let nama_barang = $(this).data('nama_barang')
-            let kode = $(this).data('kode')
-            let keterangan = $(this).data('keterangan')
-            let purchase_order_details_id = $(this).data('purchase_order_details_id')
-            let unit = $(this).data('unit')
-            let rowid = $(this).data('row')
-            let id = $(this).data('id')
-            let barang_id = $(this).data('barang_id')
-            let jml_masuk = $(this).data('jml_masuk')
-            let qty_diterima = $(this).data('qty_diterima')
-            let remaining_qty = $(this).data('remaining_qty')
+        $(".title-detail-name").text("Update")
+        // $(".delete-detail").css('display', '');
+        let ppn = $(this).data('ppn') ? Number($(this).data('ppn')) : ""
+        let pph = $(this).data('pph') ? Number($(this).data('pph')) : ""
+        let sub_total = $(this).data('sub_total')
+        let harga = $(this).data('harga')
+        let qty = $(this).data('qty')
+        let nama_barang_dokumen = $(this).data('nama_barang_dokumen')
+        let satuan = $(this).data('satuan')
+        let nama_barang = $(this).data('nama_barang')
+        let kode = $(this).data('kode')
+        let keterangan = $(this).data('keterangan')
+        let purchase_order_details_id = $(this).data('purchase_order_details_id')
+        let unit = $(this).data('unit')
+        let rowid = $(this).data('row')
+        let id = $(this).data('id')
+        let barang_id = $(this).data('barang_id')
+        let jml_masuk = $(this).data('jml_masuk')
+        let qty_diterima = $(this).data('qty_diterima')
+        let remaining_qty = $(this).data('remaining_qty')
 
-            let packaging = $(this).data('packaging')
-            let packaging_qty = $(this).data('packaging_qty')
+        let packaging = $(this).data('packaging')
+        let packaging_qty = $(this).data('packaging_qty')
 
-            validator_detail.resetForm();
-            validator_detail.reset();
+        validator_detail.resetForm();
+        validator_detail.reset();
 
-            $(".id_detail").val(rowid)
-            $(".kode").val(kode)
-            $(".unit").val(unit)
-            trigger = false;
+        $(".id_detail").val(rowid)
+        $(".kode").val(kode)
+        $(".unit").val(unit)
+        trigger = false;
 
-            $(".jml_masuk").val(jml_masuk)
-            $(".nilai_sub_total").val(sub_total.replaceAll(",", ""))
-            $(".harga_barang_jasa").val(harga.replaceAll(",", ""))
-            $(".keterangan").val(keterangan)
-            $(".barang_id").val(barang_id)
-            $(".qty").val(qty)
-            $(".qty_diterima").val(qty_diterima)
-            $(".remaining_qty").val(remaining_qty)
-            $(".nama_barang_dokumen").val(nama_barang_dokumen)
-            $(".satuan_order").val(satuan)
-            $(".nama_barang").val(nama_barang)
-            $(".purchase_order_details_id").val(purchase_order_details_id)
-            $(".kode_barang").val(kode)
+        $(".jml_masuk").val(jml_masuk)
+        $(".nilai_sub_total").val(sub_total.replaceAll(",", ""))
+        $(".harga_barang_jasa").val(harga.replaceAll(",", ""))
+        $(".keterangan").val(keterangan)
+        $(".barang_id").val(barang_id)
+        $(".qty").val(qty)
+        $(".qty_diterima").val(qty_diterima)
+        $(".remaining_qty").val(remaining_qty)
+        $(".nama_barang_dokumen").val(nama_barang_dokumen)
+        $(".satuan_order").val(satuan)
+        $(".nama_barang").val(nama_barang)
+        $(".purchase_order_details_id").val(purchase_order_details_id)
+        $(".kode_barang").val(kode)
 
-            $(".packaging_qty").val(packaging_qty)
+        $(".packaging_qty").val(packaging_qty)
 
-            $.ajax({
-                url: `<?= base_url("barang/dropdown/type"); ?>`,
-                method: "GET",
-                dataType: "json",
-                data: {
-                    type: "bahan_penolong"
-                },
-                success: function(res) {
-                    $(".packaging").empty();
+        $(".packaging").val(packaging);
+        $(".detail-modal").modal("show")
 
-                    $(".packaging").append(`<option value=""></option>`);
+        // $.ajax({
+        //     url: `<?= base_url("tax/dropdown"); ?>`,
+        //     method: "GET",
+        //     data: {
+        //         type: 'ppn'
+        //     },
+        //     dataType: "json",
+        //     success: function(res) {
+        //         $(".ppn").empty()
+        //         $(".ppn").append(`<option value=""></option>`)
+        //         res.data.forEach(function(item) {
+        //             $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
+        //         })
 
-                    res.data.forEach(function(item) {
-                        $(".packaging").append(`<option value="${item.id}">${item.barang_name}</option>`);
-                    })
+        //         $(".ppn").val(ppn).change();
+        //     }
+        // })
 
-                    $(".packaging").val(packaging).change();
-                    $(".detail-modal").modal("show")
-                }
-            })
+        // $.ajax({
+        //     url: `<?= base_url("tax/dropdown"); ?>`,
+        //     method: "GET",
+        //     data: {
+        //         type: 'pph'
+        //     },
+        //     dataType: "json",
+        //     success: function(res) {
+        //         $(".pph").empty()
+        //         $(".pph").append(`<option value=""></option>`)
+        //         res.data.forEach(function(item) {
+        //             $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
+        //         })
 
-            // $.ajax({
-            //     url: `<?= base_url("tax/dropdown"); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         type: 'ppn'
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         $(".ppn").empty()
-            //         $(".ppn").append(`<option value=""></option>`)
-            //         res.data.forEach(function(item) {
-            //             $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
-            //         })
-
-            //         $(".ppn").val(ppn).change();
-            //     }
-            // })
-
-            // $.ajax({
-            //     url: `<?= base_url("tax/dropdown"); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         type: 'pph'
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         $(".pph").empty()
-            //         $(".pph").append(`<option value=""></option>`)
-            //         res.data.forEach(function(item) {
-            //             $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
-            //         })
-
-            //         $(".pph").val(pph).change();
-                    
-            //     }
-            // })
-        }
-        else
-        {
-            Swal.fire({
-                icon: 'error',
-                title: 'Gudang wajib diisi terlebih dahulu',
-                confirmButtonColor: '#4e73df',
-            })
-        }
+        //         $(".pph").val(pph).change();
+                
+        //     }
+        // })
     })
 
     const changeTipeBahan = function()
