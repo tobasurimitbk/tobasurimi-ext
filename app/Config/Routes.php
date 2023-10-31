@@ -187,7 +187,7 @@ $routes->get('/supplier-bahan-baku/harga/(:segment)', 'Supplier\Supplier::getSup
 $routes->get('/supplier-bahan-baku/all', 'Supplier\Supplier::allSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/save', 'Supplier\Supplier::saveSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/update', 'Supplier\Supplier::updateSupplierBahanBaku', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-baku/print', 'Supplier\Supplier::printSupplierBahanBaku', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-baku/print/(:segment)', 'Supplier\Supplier::printSupplierBahanBaku/$1', ['filter' => 'Auth']);
 
 // BAHAN PENOLONG
 $routes->get('/supplier-bahan-penolong', 'Supplier\Supplier::supplierBahanPenolong', ['filter' => 'Auth']);
