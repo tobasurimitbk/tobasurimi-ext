@@ -287,8 +287,7 @@ class POLokalBahanPenolong extends BaseController
                     // spp number cannot be used again
                     $responsespp = $this->SppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
 
-                    if(!$responsespp)
-                    {
+                    if (!$responsespp) {
                         $data = [
                             "status"            => false,
                             "message"    => "No. SPP gagal di close",
@@ -298,7 +297,7 @@ class POLokalBahanPenolong extends BaseController
                         echo json_encode($data);
                         return;
                     }
-                    
+
                     $data = [
                         "id"        => $insert,
                         "status"    => true,
@@ -316,7 +315,7 @@ class POLokalBahanPenolong extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
+            }
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,
@@ -366,8 +365,7 @@ class POLokalBahanPenolong extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                if(!empty($this->request->getPost("auto_generate")))
-                {
+                if (!empty($this->request->getPost("auto_generate"))) {
                     $dataDivisi = $this->DivisisModel->find($this->request->getPost("divisi_id"));
                     $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
 
@@ -385,9 +383,7 @@ class POLokalBahanPenolong extends BaseController
                         "createdBy"             => session()->get("login")->user_id,
                         "items"                 => json_decode($this->request->getPost("items"))
                     ];
-                }
-                else
-                {
+                } else {
                     $insertData = [
                         "po_no"                 => $this->request->getPost("po_no"),
                         "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
@@ -459,7 +455,7 @@ class POLokalBahanPenolong extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
+            }
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -480,8 +476,7 @@ class POLokalBahanPenolong extends BaseController
             // spp close
             $responsespp = $this->SppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
 
-            if(!$responsespp)
-            {
+            if (!$responsespp) {
                 $data = [
                     "status"            => false,
                     "message"    => "Gagal close SPP",
@@ -662,6 +657,7 @@ class POLokalBahanPenolong extends BaseController
                 $totalPrice = 0;
                 $totalDisc = 0;
                 $totalPpn = 0;
+                $totalTambahan = 0;
 
                 foreach ($dataBPLokalDetail as $value) {
                     $no++;
@@ -669,11 +665,13 @@ class POLokalBahanPenolong extends BaseController
                     $totalan = formatter($value->price, "CURR_TO_INT") * formatter($value->qty, "STR_TO_FLOAT") +  formatter($value->additional_cost, "CURR_TO_INT");
                     $value->nilaiPpn = number_format($totalan * (float)$value->ppnValue / 100);
                     $value->nilaiPph = number_format($totalan * (float)$value->pphValue / 100);
+                    $totalTambahan += formatter($value->additional_cost, "CURR_TO_INT");
                     $totalPrice += $totalan;
                     $totalDisc += $totalan * (float)$value->disc / 100;
                     $totalPpn += $totalan * (float)$value->ppnValue / 100;
                 }
 
+                $dataBPLokal->totalTambahan = number_format(formatter($totalTambahan, "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalPrice = number_format(formatter($totalPrice, "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalDisc = number_format(formatter($totalDisc, "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalPpn = number_format(formatter($totalPpn, "STR_TO_FLOAT"), 2, '.', ',');

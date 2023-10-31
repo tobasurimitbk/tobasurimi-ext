@@ -180,7 +180,7 @@
             <tr>
                 <td class="txt-center" style="padding-left: 5px;"><?= $no++; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $detail["spesifikasi"] . ")" : ""); ?></td>
-                <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_packaging"] . "/" . $detail["packaging_qty"]; ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= $detail["packaging"] . "/" . $detail["packaging_qty"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= $detail["jml_masuk"]; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>

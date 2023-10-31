@@ -86,8 +86,8 @@ class SupplierModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "suppliers.*";
-                    //   cities.city_name AS city_name, 
-                    //   provinces.province_name AS province_name";
+        //   cities.city_name AS city_name, 
+        //   provinces.province_name AS province_name";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
@@ -151,6 +151,7 @@ class SupplierModel extends Model
 
         $builder = $this->db->table('suppliers');
         $builder->where($arrCondition);
+        $builder->orderBy('suppliers.name', "ASC");
         $query = $builder->get();
 
         return $query->getResultArray();
@@ -179,5 +180,101 @@ class SupplierModel extends Model
         }
 
         return $invNumber;
+    }
+
+    public function getKwitansiTB($supplierID, $year, $month)
+    {
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $supplierModel = new SupplierModel();
+
+        $supplierDet = $supplierModel->where('id', $supplierID)->first();
+
+        $condition = [
+            'MONTH(rm_purchase_orders.po_date)' => $month,
+            'YEAR(rm_purchase_orders.po_date)' => $year,
+            'rm_purchase_orders.supplier_id' => $supplierID,
+            'rm_purchase_orders.is_posted' => 1,
+            'rm_purchase_orders.status_penerimaan' => 1,
+            'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_order_details.deletedAt' => null,
+        ];
+
+        $res = [];
+        $selectQry = "
+            rm_purchase_order_details.monthly_price,
+            barang_master.id AS barang_id,
+            satuans.kode_satuan AS kode_satuan,
+            rm_purchase_orders.id AS id,
+            barang_master.barang_name,
+            rm_purchase_orders.supplier_id,
+            rm_purchase_orders.pph,
+            rm_purchase_order_details.qty_diterima AS qty
+        ";
+
+        $allPo = $rmPurchaseOrderModel
+            ->select($selectQry)
+            ->join('barang_master', 'barang_master.id  = rm_purchase_orders.barang_id')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id')
+            ->where($condition)
+            ->groupBy('rm_purchase_orders.id')
+            ->findAll();
+
+        $hargaBulananTotal = 0;
+        $hargaBulananWithQtyTotal = 0;
+        $hargaBulananWithQtyPphTotal = 0;
+        $barangName = "";
+        $qtyTotal = 0;
+        $satuan = "";
+
+        foreach ($allPo as $ap) {
+            if ($ap['pph'] == "None") {
+                $pph = 0;
+            } else {
+                if ($supplierDet['no_npwp'] != "") {
+                    // ada npwp
+                    $pph = $ap['monthly_price'] * 0.0025;
+                } else {
+                    // tidak ada npwp
+                    $pph = $ap['monthly_price'] * 0.005;
+                }
+            }
+
+            $barangName = $ap['barang_name'];
+            $satuan = $ap['kode_satuan'];
+
+            $hargaBulanan = ($ap['monthly_price'] * $ap['qty']) + $pph;
+            $hargaBulananWithQty = $pph;
+            $hargaBulananWithQtyPph =  $hargaBulanan - $hargaBulananWithQty;
+
+            $qtyTotal += $ap['qty'];
+            $hargaBulananTotal += $hargaBulanan;
+            $hargaBulananWithQtyTotal += $hargaBulananWithQty;
+            $hargaBulananWithQtyPphTotal += $hargaBulananWithQtyPph;
+
+            $res[] = [
+                'id' => $ap['id'],
+                'barang' => $ap['barang_name'],
+                'barang_id' => $ap['barang_id'],
+                'satuan' => $ap['kode_satuan'],
+                'pph' => $pph,
+                'hargaBulanan' => $hargaBulanan,
+                'hargaBulananWithQty' => $hargaBulananWithQty,
+                'hargaBulananWithQtyPph' => $hargaBulananWithQtyPph
+            ];
+        }
+
+        return [
+            'supplierID' => $supplierDet['id'],
+            'supplierName' => $supplierDet['name'],
+            'hargaBulananTotal' => $hargaBulananTotal,
+            'hargaBulananWithQtyTotal' => $hargaBulananWithQtyTotal,
+            'hargaBulananWithQtyPphTotal' => $hargaBulananWithQtyPphTotal,
+            'barangName' => $barangName,
+            'qtyTotal' => $qtyTotal,
+            'satuan' => $satuan,
+            'detailHarga' => $res,
+            'allPO' => $allPo,
+        ];
     }
 }
