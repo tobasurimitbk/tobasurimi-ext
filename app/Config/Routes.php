@@ -428,6 +428,10 @@ $routes->get('/supplier-bahan-penolong/dropdown', 'Supplier\SupplierBahanPenolon
 $routes->get('/supplier-bahan-baku-import/dropdown', 'Supplier\SupplierBahanBakuImport::dropdownSupplier', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-penolong-import/dropdown', 'Supplier\SupplierBahanPenolongImport::dropdownSupplier', ['filter' => 'Auth']);
 
+// KWITANSI TB
+$routes->get('/kwitansi-tb', 'Supplier\KwitansiTb::index', ['filter' => 'Auth']);
+$routes->get('/kwitansi-tb/print/(:segment)/(:segment)/(:segment)/(:segment)', 'Supplier\KwitansiTb::exportPDFKwitansiTB/$1/$2/$3/$4', ['filter' => 'Auth']);
+
 // PO
 $routes->get('/po-lokal-bahan-baku/dropdown', 'Purchase\POLokalBahanBaku::dropdownPOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/dropdown', 'Purchase\POLokalBahanPenolong::dropdownPOLokalBahanPenolong', ['filter' => 'Auth']);
