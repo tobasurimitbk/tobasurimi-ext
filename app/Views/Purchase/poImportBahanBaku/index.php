@@ -40,13 +40,14 @@
                         <tr>
                             <th>No.</th>
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
+                            <th onclick="changeSort('companyName')" class="sort">Company</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
-                            <th onclick="changeSort('total')" class="sort">Total Harga</th>
+                            <!-- <th onclick="changeSort('total')" class="sort">Total</th> -->
                             <th onclick="changeSort('currencyName')" class="sort">Valas</th>
-                            <th>Jumlah Order</th>
+                            <th>Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
-                            <th>Actions</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -108,6 +109,10 @@
             className: "text-center"
         },
         {
+            data: "companyName",
+            className: "text-center"
+        },
+        {
             data: "po_no",
             className: "text-center"
         },
@@ -115,10 +120,10 @@
             data: "supplierName",
             className: "text-center"
         },
-        {
-            data: "total",
-            className: "text-center"
-        },
+        // {
+        //     data: "total",
+        //     className: "text-center"
+        // },
         {
             data: "currencyName",
             className: "text-center"

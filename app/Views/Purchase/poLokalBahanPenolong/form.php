@@ -233,11 +233,11 @@
                             
                             if (!empty($dataPOLokal)) {
                                 foreach ($dataPOLokal->am_purchase_order_details as $details) {
-                                    $total_harga_barang = $total_harga_barang + ($details->price ? formatter(str_replace(",", "", $details->price), "STR_TO_INT") : 0);
+                                    $total_harga_barang = $total_harga_barang + ($details->price ? formatter(str_replace(",", "", $details->price), "STR_TO_FLOAT") : 0);
                                     $total_qty = $total_qty + $details->qty;
                                     $total_qty_diterima = $total_qty_diterima + ($details->qty_diterima ? formatter($details->qty_diterima, "STR_TO_FLOAT") : 0);
                                     $total_remaining_qty = $total_remaining_qty + ($details->remaining_qty ? formatter($details->remaining_qty, "STR_TO_FLOAT") : 0);
-                                    $total_harga = $total_harga + ($details->totalPriceWithoutAdditional ? formatter(str_replace(",", "", $details->totalPriceWithoutAdditional), "STR_TO_INT") : 0);
+                                    $total_harga = $total_harga + ($details->totalPriceWithoutAdditional ? formatter(str_replace(",", "", $details->totalPriceWithoutAdditional), "STR_TO_FLOAT") : 0);
                             ?>
 
                                     <tr>

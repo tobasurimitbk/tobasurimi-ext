@@ -4,12 +4,13 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 use App\Models\BarangModel;
+use App\Models\CompaniesModel;
 use App\Models\MetadataModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
-use App\Models\SppModel;
 use App\Models\SupplierModel;
 use App\Models\BeaCukaiModel;
+use App\Models\DivisisModel;
 use Dompdf\Dompdf;
 
 class POImportBahanBaku extends BaseController
@@ -17,13 +18,14 @@ class POImportBahanBaku extends BaseController
     protected $token;
     protected $this_company_id;
     protected $user_id;
+    protected $companiesModel;
     protected $barangModel;
     protected $metadataModel;
     protected $rmImportPOModel;
     protected $rmImportPODetailModel;
-    protected $sppModel;
     protected $supplierModel;
     protected $beaCukaiModel;
+    protected $divisisModel;
     protected $dompdf;
 
     public function __construct()
@@ -31,13 +33,14 @@ class POImportBahanBaku extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->user_id = session()->get("login")->user_id;
+        $this->companiesModel = new CompaniesModel();
         $this->barangModel = new BarangModel();
         $this->metadataModel = new MetadataModel();
         $this->rmImportPOModel = new RMImportPOModel();
         $this->rmImportPODetailModel = new RMImportPODetailModel();
-        $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
         $this->beaCukaiModel = new BeaCukaiModel();
+        $this->divisisModel = new DivisisModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -48,8 +51,14 @@ class POImportBahanBaku extends BaseController
 
     public function createPOImportBahanBaku()
     {
-        //Get SPP Number
-        $dataSPP = $this->sppModel->getNoSPP("Bahan Baku Import");
+        //Get Divisi
+        $dataDivisi = $this->divisisModel->asObject()->findAll();
+
+        //Get Company
+        $dataCompany =  $this->companiesModel->getCompanies();
+
+        //Get Shipment By Metadata
+        $dataShipment = $this->metadataModel->get_by_name('Shipment');
 
         //Get Supplier
         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
@@ -59,7 +68,9 @@ class POImportBahanBaku extends BaseController
         
         $data = [
             "today" => date("d/m/Y"),
-            "dataSPP" => $dataSPP,
+            "dataDivisi" => $dataDivisi,
+            "dataCompany" => $dataCompany,
+            "dataShipment" => $dataShipment,
             "dataSupplier" => $dataSupplier,
             "dataValuta" => $dataValuta
         ];
@@ -69,8 +80,14 @@ class POImportBahanBaku extends BaseController
 
     public function getByIdPOImportBahanBaku($id = null)
     {
-        //Get SPP Number
-        $dataSPP = $this->sppModel->getNoSPP("Bahan Baku Import");
+        //Get Divisi
+        $dataDivisi = $this->divisisModel->asObject()->findAll();
+
+        //Get Company
+        $dataCompany =  $this->companiesModel->getCompanies();
+
+        //Get Shipment By Metadata
+        $dataShipment = $this->metadataModel->get_by_name('Shipment');
 
         //Get Supplier
         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
@@ -80,7 +97,9 @@ class POImportBahanBaku extends BaseController
         
         $data = [
             "today" => date("d/m/Y"),
-            "dataSPP" => $dataSPP,
+            "dataDivisi" => $dataDivisi,
+            "dataCompany" => $dataCompany,
+            "dataShipment" => $dataShipment,
             "dataSupplier" => $dataSupplier,
             "dataValuta" => $dataValuta
         ];
@@ -141,8 +160,8 @@ class POImportBahanBaku extends BaseController
                 "no"            => $no++,
                 "id"            => $data->id,
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
-                "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
+                "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
                 "currencyName"  => $data->currencyName,
@@ -169,12 +188,6 @@ class POImportBahanBaku extends BaseController
     {
         try{
             $rules = [
-                "purchase_request_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'SPP tidak boleh kosong'
-                    ]
-                ],
                 "po_no" => [
                     "rules" => "required",
                     'errors' => [
@@ -185,6 +198,12 @@ class POImportBahanBaku extends BaseController
                     "rules" => "required",
                     'errors' => [
                         'required' => 'Tanggal tidak boleh kosong'
+                    ]
+                ],
+                "payment_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Pembayaran tidak boleh kosong'
                     ]
                 ],
                 "supplier_id" => [
@@ -204,7 +223,37 @@ class POImportBahanBaku extends BaseController
                     'errors' => [
                         'required' => 'Valas tidak boleh kosong'
                     ]
-                ]
+                ],
+                "port_origin" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Port Of Origin tidak boleh kosong'
+                    ]
+                ],
+                "port_destination" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Port Of Destination tidak boleh kosong'
+                    ]
+                ],
+                "shipment" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Shipment tidak boleh kosong'
+                    ]
+                ],
+                "latest_shipment_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Latest Shipment Date tidak boleh kosong'
+                    ]
+                ],
+                "attn" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'ATTN tidak boleh kosong'
+                    ]
+                ]    
             ];
 
             if (!$this->validate($rules)) {
@@ -220,16 +269,16 @@ class POImportBahanBaku extends BaseController
 
             if ($this->validate($rules)) {
                 $divisi_id = formatter($this->request->getPost("divisi_id"), "STR_TO_INT");
-                $divisi = $this->request->getPost("divisi");
+                $find = $this->divisisModel->asObject()->find($divisi_id);
+                $divisi = $find->divisi;
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
                 $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $divisi, date('y'), $divisi_id, $last_day);
-                $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
                 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                    "purchase_request_id" => $purchase_request_id,
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     "divisi_id" => $divisi_id,
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
@@ -238,24 +287,26 @@ class POImportBahanBaku extends BaseController
                     "note" => $this->request->getPost("note"),
                     "createdBy" => $this->user_id,
                     "is_posted" => 0,
+
+                    "shipper" => $this->request->getPost("shipper"),
+                    "consigne" => $this->request->getPost("consigne"),
+                    "port_origin" => $this->request->getPost("port_origin"),
+                    "port_destination" => $this->request->getPost("port_destination"),
+                    "location_transaction" => $this->request->getPost("location_transaction"),
+                    "shipment" => $this->request->getPost("shipment"),
+                    "latest_shipment_date" => $this->request->getPost("latest_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("latest_shipment_date")))) : "",
+                    "attn" => $this->request->getPost("attn")
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
 
-                // spp number cannot be used again
-                $responsespp = $this->sppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
-
-                if(!$responsespp)
-                {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "No. SPP gagal di close",
-                        "payload"   => "",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                    return;
-                }
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => json_encode($items),
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // return json_encode($data);
                 
                 $response =  $this->rmImportPOModel->insert($payload);
 
@@ -301,9 +352,7 @@ class POImportBahanBaku extends BaseController
 
                         $detailPayload = [
                             'rm_import_po_id' => $response,
-                            'purchase_request_detail_id' => $data->purchase_request_detail_id,
-                            'barang_id' =>$barang_id,
-                            'spec' => $data->spec,
+                            'barang_id' => $barang_id,
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
@@ -420,7 +469,8 @@ class POImportBahanBaku extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
                 $divisi_id = formatter($this->request->getPost("divisi_id"), "STR_TO_INT");
-                $divisi_name = $this->request->getPost("divisi_name");
+                $find = $this->divisisModel->asObject()->find($divisi_id);
+                $divisi_name = $find->divisi;
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
                 $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $divisi_name, date('y'), $divisi_id, $last_day);
 
@@ -495,14 +545,13 @@ class POImportBahanBaku extends BaseController
 
                         $detailPayload = [
                             'rm_import_po_id' => $id,
-                            // 'barang_id' =>$barang_id,
-                            // 'spec' => $data->spec,
-                            // 'note' => $data->note,
-                            // 'unit' => $data->unit,
-                            // 'qty' => $data->qty,
-                            // 'remaining_qty' => $data->qty,
-                            // 'qty_diterima' => 0,
-                            // 'price' => $data->price,
+                            'barang_id' => $barang_id,
+                            'note' => $data->note,
+                            'unit' => $data->unit,
+                            'qty' => $data->qty,
+                            'remaining_qty' => $data->qty,
+                            'qty_diterima' => 0,
+                            'price' => $data->price,
                             'disc' => $data->disc,
                             'additional_cost' => $data->additional_cost
                         ];
@@ -611,22 +660,6 @@ class POImportBahanBaku extends BaseController
     {
         try{
             $id = $this->request->getPost("id");
-            $spp = $this->request->getPost("spp");
-
-            // spp close
-            $responsespp = $this->sppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
-
-            if(!$responsespp)
-            {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Gagal close SPP",
-                    "payload"   => "",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
 
             // po posting
 

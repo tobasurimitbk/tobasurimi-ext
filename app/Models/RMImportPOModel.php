@@ -14,8 +14,9 @@ class RMImportPOModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'company_id', 'po_no', 'po_date', 'divisi_id',
-    'currency', 'supplier_id', 'total', 'payment_term', 'note', 'is_posted', 'createdBy', 'status_penerimaan'];
+    protected $allowedFields    = ['id', 'company_id', 'po_no', 'po_date', 'payment_date', 'divisi_id',
+    'currency', 'supplier_id', 'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin', 
+    'port_destination', 'location_transaction', 'shipment', 'latest_shipment_date', 'attn', 'is_posted', 'createdBy', 'status_penerimaan'];
 
     // Dates
     protected $useTimestamps = true;
@@ -51,7 +52,8 @@ class RMImportPOModel extends Model
             'currencyName'      => 'metadata.value',
             'createdAt'         => 'rm_import_pos.createdAt',
             'updatedAt'         => 'rm_import_pos.updatedAt',
-            'statusPenerimaan'  => 'rm_import_pos.status_penerimaan'
+            'statusPenerimaan'  => 'rm_import_pos.status_penerimaan',
+            'companyName'       => 'companies.company'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -61,12 +63,14 @@ class RMImportPOModel extends Model
         $selectQry = "rm_import_pos.*, 
                       suppliers.name AS supplierName, 
                       metadata.value AS currencyName,
+                      companies.company AS companyName,
                       COUNT(rm_import_po_details.id) AS itemCount";
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
-            ->join('metadata', 'metadata.id = rm_import_pos.currency')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
+            ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
             ->join('rm_import_po_details', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
             ->groupBy(('rm_import_pos.id'))
             ->orderBy($sort, $sortType);
