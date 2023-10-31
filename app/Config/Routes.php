@@ -423,6 +423,7 @@ $routes->get('/penerimaan-barang-lokal/dropdown/bySupplier/(:num)', 'Warehouse\P
 $routes->get('/penerimaan-barang-import/dropdown', 'Warehouse\PenerimaanBarangImport::dropdownpenerimaanBarangImport', ['filter' => 'Auth']);
 
 // SUPPLIER 
+$routes->get('/supplier/dropdown', 'Supplier\Supplier::dropdownSupplier', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku/dropdown', 'Supplier\SupplierBahanBaku::dropdownSupplier', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-penolong/dropdown', 'Supplier\SupplierBahanPenolong::dropdownSupplier', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku-import/dropdown', 'Supplier\SupplierBahanBakuImport::dropdownSupplier', ['filter' => 'Auth']);

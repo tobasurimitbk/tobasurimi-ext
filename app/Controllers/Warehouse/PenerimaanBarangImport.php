@@ -168,7 +168,7 @@ class PenerimaanBarangImport extends BaseController
                         $dataNo = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Import", $supplier_id, $this->this_company_id);
 
                         //Get Supplier
-                        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN PENOLONG');
+                        $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
 
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
@@ -785,68 +785,68 @@ class PenerimaanBarangImport extends BaseController
                             }
                         }
 
-                        // ADD STOK BARANG
-                        $find = $this->barangModel->find($barang_id);
+                        // // ADD STOK BARANG
+                        // $find = $this->barangModel->find($barang_id);
 
-                        // ADD STOK KEMASAN
-                        $find_packaging = $this->barangModel->find($packaging);
+                        // // ADD STOK KEMASAN
+                        // $find_packaging = $this->barangModel->find($packaging);
 
-                        if($find)
-                        {
-                            $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_FLOAT") : 0;
+                        // if($find)
+                        // {
+                        //     $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_FLOAT") : 0;
 
-                            $conditionUpdateStok = [
-                                'id' => $barang_id
-                            ];
+                        //     $conditionUpdateStok = [
+                        //         'id' => $barang_id
+                        //     ];
 
-                            $payloadupdateStok = [
-                                'stok' => $stok + $jml_masuk
-                            ];
+                        //     $payloadupdateStok = [
+                        //         'stok' => $stok + $jml_masuk
+                        //     ];
             
-                            $responseStok = $this->barangModel->where($conditionUpdateStok)->set($payloadupdateStok)->update();    
+                        //     $responseStok = $this->barangModel->where($conditionUpdateStok)->set($payloadupdateStok)->update();    
 
-                            if(!$responseStok) {
-                                $message =  'Gagal Tambah Stok';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => "",
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
+                        //     if(!$responseStok) {
+                        //         $message =  'Gagal Tambah Stok';
+                        //         $data = [
+                        //             "status"            => false,
+                        //             "message"    => $message,
+                        //             "payload"   => "",
+                        //             'token' => csrf_hash()
+                        //         ];
+                        //         echo json_encode($data);
+                        //         return;
+                        //     }
+                        // }
 
-                        if ($find_packaging) {
-                            $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_FLOAT") : 0;
+                        // if ($find_packaging) {
+                        //     $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_FLOAT") : 0;
 
-                            $payloadupdateStok = [
-                                'stok' => $stok + $packaging_qty
-                            ];
+                        //     $payloadupdateStok = [
+                        //         'stok' => $stok + $packaging_qty
+                        //     ];
             
-                            $responseStok = $this->barangModel->where('id', $packaging)
-                                ->set($payloadupdateStok)
-                                ->update();    
+                        //     $responseStok = $this->barangModel->where('id', $packaging)
+                        //         ->set($payloadupdateStok)
+                        //         ->update();    
 
-                            if (!$responseStok) {
-                                $message =  'Gagal Tambah Stok';
-                                $data = [
-                                    "status"    => false,
-                                    "message"   => $message,
-                                    "payload"   => "",
-                                    'token'     => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
+                        //     if (!$responseStok) {
+                        //         $message =  'Gagal Tambah Stok';
+                        //         $data = [
+                        //             "status"    => false,
+                        //             "message"   => $message,
+                        //             "payload"   => "",
+                        //             'token'     => csrf_hash()
+                        //         ];
+                        //         echo json_encode($data);
+                        //         return;
+                        //     }
+                        // }
 
                         // add stock detail barang
-                        $this->stockDetailModel->addStock($barang_id, $dataPenerimaanBarang->warehouse_id, $jml_masuk, 'New');
+                        $this->stockDetailModel->addOrReduceStock($barang_id, $dataPenerimaanBarang->warehouse_id, 'New', $jml_masuk, 'IN', '');
 
                         // add stock detail barang kemasan
-                        $this->stockDetailModel->addStock($packaging, $dataPenerimaanBarang->warehouse_id, $packaging_qty, 'Scrap');
+                        $this->stockDetailModel->addOrReduceStock($packaging, $dataPenerimaanBarang->warehouse_id, 'Scrap', $packaging_qty, 'OUT', '');
                     }
                 }
             }

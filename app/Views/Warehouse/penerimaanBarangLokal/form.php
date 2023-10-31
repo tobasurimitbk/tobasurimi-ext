@@ -1233,50 +1233,56 @@
                                                 else
                                                 {
                                                     tag_html += `<tr>`;
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += row + 1;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.kode_barang;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.nama_barang;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.po_no;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.status_penerimaan;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
-                                                    tag_html += item.nama_packaging;
+                                                    tag_html += `<td>`;
+                                                    tag_html += item.packaging;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.packaging_qty ? item.packaging_qty : 0;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.satuan;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.qty;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.qty_diterima;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.remaining_qty;
                                                     tag_html += "</td>";
-                                                    // tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    // tag_html += `<td>`;
                                                     // tag_html += item.jml_masuk;
                                                     // tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += "Rp " + item.harga;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += "Rp " + item.sub_total;
                                                     tag_html += "</td>";
-                                                    tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                                    tag_html += `<td>`;
                                                     tag_html += item.keterangan;
+                                                    tag_html += "</td>";
+                                                    tag_html += `<td>`;
+                                                    tag_html += `
+                                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">
+                                                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                                    </button>`;
                                                     tag_html += "</td>";
                                                     // tag_html += `<td>`;
                                                     // tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
@@ -1425,92 +1431,197 @@
             }
             else
             {
-                if ($(".create-form").valid()) {
+                let checkKemasan = null;
+
+                checkKemasan = list_items.find(item => (
+                    item.packaging === ""
+                ));
+
+                if(checkKemasan)
+                {
                     Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
+                        icon: 'error',
+                        title: "Data kemasan wajib diisi",
                         confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            setLoading()
-                            let data = new FormData(document.querySelector(".create-form"));
+                    })
+                }
+                else
+                {
+                    if ($(".create-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const csrf = $(`[name="${csrfToken}"]`);
+                                setLoading()
+                                let data = new FormData(document.querySelector(".create-form"));
 
-                            let update_list_items = [];
+                                let update_list_items = [];
 
-                            data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
-                            var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
-                                return elem.text 
-                            });
-                            console.log(arr_no)
-                            data.append("acceptance_type", ($('.multiple_po_id').val().length > 1) ? "MULTIPLE ORDER" : "SINGLE ORDER")
-                            data.append("multiple_po_no", JSON.stringify(arr_no));
+                                data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
+                                var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
+                                    return elem.text 
+                                });
+                                console.log(arr_no)
+                                data.append("acceptance_type", ($('.multiple_po_id').val().length > 1) ? "MULTIPLE ORDER" : "SINGLE ORDER")
+                                data.append("multiple_po_no", JSON.stringify(arr_no));
 
-                            let id = $(".id").val();
-                            let validate_jml_masuk = false;
+                                let id = $(".id").val();
+                                let validate_jml_masuk = false;
 
-                            // UPDATE
-                            if(id)
-                            {
-                                if(list_delete.length !== 0)
+                                // UPDATE
+                                if(id)
                                 {
-                                    list_delete.map(obj => {
-                                        update_list_items.push(
-                                            {
-                                                id: obj.id ? Number(obj.id) : "",
-                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
-                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                                unit: obj.unit ? Number(obj.unit) : 0,
-                                                nama_barang_dok: obj.nama_barang_dokumen,
-                                                qty: obj.qty ? Number(obj.qty) : 0,
-                                                remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
-                                                qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
-                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
-                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                                sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
-                                                keterangan: obj.keterangan,
-                                                ppn: obj.ppn ? Number(obj.ppn) : 0,
-                                                pph: obj.pph ? Number(obj.pph) : 0,
-                                                packaging: obj.packaging,
-                                                is_delete: true
-                                            }
-                                        )
-                                    })
-                                }
+                                    if(list_delete.length !== 0)
+                                    {
+                                        list_delete.map(obj => {
+                                            update_list_items.push(
+                                                {
+                                                    id: obj.id ? Number(obj.id) : "",
+                                                    purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                    barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                    unit: obj.unit ? Number(obj.unit) : 0,
+                                                    nama_barang_dok: obj.nama_barang_dokumen,
+                                                    qty: obj.qty ? Number(obj.qty) : 0,
+                                                    remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
+                                                    qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
+                                                    jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                    harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                    sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
+                                                    keterangan: obj.keterangan,
+                                                    ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                                    pph: obj.pph ? Number(obj.pph) : 0,
+                                                    packaging: obj.packaging,
+                                                    is_delete: true
+                                                }
+                                            )
+                                        })
+                                    }
 
-                                list_items.map(obj => {
-                                    if (obj.id) {
-                                        update_list_items.push(
-                                            {
-                                                id: obj.id ? Number(obj.id) : "",
-                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
-                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                                unit: obj.unit ? Number(obj.unit) : 0,
-                                                nama_barang_dok: obj.nama_barang_dokumen,
-                                                qty: obj.qty ? Number(obj.qty) : 0,
-                                                remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
-                                                qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
-                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
-                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                                sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
-                                                keterangan: obj.keterangan,
-                                                ppn: obj.ppn ? Number(obj.ppn) : 0,
-                                                pph: obj.pph ? Number(obj.pph) : 0,
-                                                packaging: obj.packaging,
-                                                is_delete: false
-                                            }
-                                        )
+                                    list_items.map(obj => {
+                                        if (obj.id) {
+                                            update_list_items.push(
+                                                {
+                                                    id: obj.id ? Number(obj.id) : "",
+                                                    purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                    barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                    unit: obj.unit ? Number(obj.unit) : 0,
+                                                    nama_barang_dok: obj.nama_barang_dokumen,
+                                                    qty: obj.qty ? Number(obj.qty) : 0,
+                                                    remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
+                                                    qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
+                                                    jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                    harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                    sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
+                                                    keterangan: obj.keterangan,
+                                                    ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                                    pph: obj.pph ? Number(obj.pph) : 0,
+                                                    packaging: obj.packaging,
+                                                    is_delete: false
+                                                }
+                                            )
+                                        }
+                                        else
+                                        {
+                                            update_list_items.push(
+                                                {
+                                                    id: obj.id ? Number(obj.id) : "",
+                                                    purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                    barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                    unit: obj.unit ? Number(obj.unit) : 0,
+                                                    nama_barang_dok: obj.nama_barang_dokumen,
+                                                    qty: obj.qty ? Number(obj.qty) : 0,
+                                                    remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
+                                                    qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
+                                                    jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                    harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                    sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
+                                                    keterangan: obj.keterangan,
+                                                    ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                                    pph: obj.pph ? Number(obj.pph) : 0,
+                                                    packaging: obj.packaging,
+                                                    packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
+                                                    is_delete: false
+                                                }
+                                            )
+                                        }
+
+                                        let jml_masuk = obj.jml_masuk ? Number(obj.jml_masuk) : 0;
+                                        if(jml_masuk === 0)
+                                        {
+                                            validate_jml_masuk = true;
+                                        }
+                                    })
+
+                                    data.append("items", JSON.stringify(update_list_items))
+
+                                    // validasi jumlah masuk kosong
+                                    if(validate_jml_masuk)
+                                    {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: "Jumlah masuk tidak boleh kosong",
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
                                     }
                                     else
                                     {
+                                        $.ajax({
+                                            url: "<?= base_url("penerimaan-barang-lokal/update"); ?>",
+                                            data: data,
+                                            beforeSend: function(xhr) {
+                                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            },
+                                            method: "POST",
+                                            dataType: "json",
+                                            processData: false,
+                                            contentType: false,
+                                            success: function(response) {
+                                                csrf.val(response.token);
+                                                if (response.status) {
+                                                    Swal.fire({
+                                                        icon: 'success',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    .then(() => {
+                                                        window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
+                                                    })
+                                                } else {
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    stopLoading()
+                                                }
+                                            },
+                                            onError: function(response) {
+                                                csrf.val(response.token);
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                stopLoading()
+                                            }
+                                        });
+                                    }
+                                }
+                                // CREATE
+                                else
+                                {
+                                    list_items.map(obj => {
                                         update_list_items.push(
                                             {
-                                                id: obj.id ? Number(obj.id) : "",
                                                 purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
                                                 barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                                 unit: obj.unit ? Number(obj.unit) : 0,
@@ -1526,163 +1637,75 @@
                                                 pph: obj.pph ? Number(obj.pph) : 0,
                                                 packaging: obj.packaging,
                                                 packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
-                                                is_delete: false
                                             }
                                         )
-                                    }
 
-                                    let jml_masuk = obj.jml_masuk ? Number(obj.jml_masuk) : 0;
-                                    if(jml_masuk === 0)
-                                    {
-                                        validate_jml_masuk = true;
-                                    }
-                                })
-
-                                data.append("items", JSON.stringify(update_list_items))
-
-                                // validasi jumlah masuk kosong
-                                if(validate_jml_masuk)
-                                {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: "Jumlah masuk tidak boleh kosong",
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                                else
-                                {
-                                    $.ajax({
-                                        url: "<?= base_url("penerimaan-barang-lokal/update"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            csrf.val(response.token);
-                                            if (response.status) {
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
-                                                })
-                                            } else {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                stopLoading()
-                                            }
-                                        },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Disimpan, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    });
-                                }
-                            }
-                            // CREATE
-                            else
-                            {
-                                list_items.map(obj => {
-                                    update_list_items.push(
+                                        let jml_masuk = obj.jml_masuk ? Number(obj.jml_masuk) : 0;
+                                        if(jml_masuk === 0)
                                         {
-                                            purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
-                                            barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            unit: obj.unit ? Number(obj.unit) : 0,
-                                            nama_barang_dok: obj.nama_barang_dokumen,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
-                                            qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
-                                            jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
-                                            harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                            sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
-                                            keterangan: obj.keterangan,
-                                            ppn: obj.ppn ? Number(obj.ppn) : 0,
-                                            pph: obj.pph ? Number(obj.pph) : 0,
-                                            packaging: obj.packaging,
-                                            packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
+                                            validate_jml_masuk = true;
                                         }
-                                    )
-
-                                    let jml_masuk = obj.jml_masuk ? Number(obj.jml_masuk) : 0;
-                                    if(jml_masuk === 0)
-                                    {
-                                        validate_jml_masuk = true;
-                                    }
-                                })
-
-                                data.append("items", JSON.stringify(update_list_items))
-
-                                // validasi jumlah masuk kosong
-                                if(validate_jml_masuk)
-                                {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: "Jumlah masuk tidak boleh kosong",
-                                        confirmButtonColor: '#4e73df',
                                     })
-                                    stopLoading()
-                                }
-                                else
-                                {
-                                    $.ajax({
-                                        url: "<?= base_url("penerimaan-barang-lokal/save"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            csrf.val(response.token);
-                                            if (response.status) {
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
-                                                })
-                                            } else {
+
+                                    data.append("items", JSON.stringify(update_list_items))
+
+                                    // validasi jumlah masuk kosong
+                                    if(validate_jml_masuk)
+                                    {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: "Jumlah masuk tidak boleh kosong",
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                    else
+                                    {
+                                        $.ajax({
+                                            url: "<?= base_url("penerimaan-barang-lokal/save"); ?>",
+                                            data: data,
+                                            beforeSend: function(xhr) {
+                                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            },
+                                            method: "POST",
+                                            dataType: "json",
+                                            processData: false,
+                                            contentType: false,
+                                            success: function(response) {
+                                                csrf.val(response.token);
+                                                if (response.status) {
+                                                    Swal.fire({
+                                                        icon: 'success',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    .then(() => {
+                                                        window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
+                                                    })
+                                                } else {
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    stopLoading()
+                                                }
+                                            },
+                                            onError: function(response) {
+                                                csrf.val(response.token);
                                                 Swal.fire({
                                                     icon: 'error',
-                                                    title: response.message,
+                                                    title: 'Data Gagal Disimpan, coba Lagi',
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 stopLoading()
                                             }
-                                        },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Disimpan, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
                             }
-                        }
-                    })
+                        })
+                    }
                 }
             }
         })
@@ -2376,7 +2399,10 @@
         if($(".tipe_bahan").val() === "BAKU")
         {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+                url: `<?= base_url("supplier/dropdown"); ?>`,
+                data: {
+                    tipe: 'BAHAN BAKU'
+                },
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -2396,7 +2422,10 @@
         if($(".tipe_bahan").val() === "PENOLONG")
         {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+                url: `<?= base_url("supplier/dropdown"); ?>`,
+                data: {
+                    tipe: 'BAHAN PENOLONG'
+                },
                 method: "GET",
                 dataType: "json",
                 success: function(res) {

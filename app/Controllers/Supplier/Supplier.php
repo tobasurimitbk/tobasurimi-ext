@@ -833,7 +833,7 @@ class Supplier extends BaseController
 
     public function dropdownSupplier()
     {
-        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
+        $dataSupplier = $this->supplierModel->getSupplierByType($this->request->getGet('tipe'));
 
         $data = [
             "data" => $dataSupplier
