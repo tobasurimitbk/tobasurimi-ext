@@ -74,10 +74,10 @@ class TerimaFakturImport extends BaseController
         }
 
         $supplierCond = [
-            'company_id'        => $this->this_company_id,
+            // 'company_id'        => $this->this_company_id,
             'type'              => ($data->tipe_bahan === 'BAKU') ? 'BAHAN BAKU' : 'BAHAN PENOLONG',
             // 'supplier_buyer'    => 'SUPPLIER',
-            'kategori'          => 'LOKAL'
+            // 'kategori'          => 'LOKAL'
         ];
         $supplierList = $supplierModel->asObject()
             ->where($supplierCond)
