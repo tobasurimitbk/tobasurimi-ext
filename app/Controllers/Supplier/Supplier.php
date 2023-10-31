@@ -911,10 +911,13 @@ class Supplier extends BaseController
         $newAwalDate = date("Y-m-d", strtotime($awalDate));
         $akhirDate = $this->request->getPost('akhir_date');
         $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
+        $supplierId = $this->request->getPost('supplier_id');
+        $barangId = $this->request->getPost('barang_id');
+        $warehouseId = $this->request->getPost('warehouse_id');
         
         switch ($laporan) {
             case 'laporan-pendapatan-supplier':
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate,$newAkhirDate,$this->request->getPost('barang_id'),$this->request->getPost('warehouse_id'));
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate,$newAkhirDate,$supplierId,$barangId,$warehouseId);
                 $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $this->request->getPost('barang_id'))->first();
                 $dataWarehouse = $this->warehousesModel->asObject()->where('id', $this->request->getPost('warehouse_id'))->first();
                 if (!empty($dataBBLokal)) {
@@ -970,7 +973,7 @@ class Supplier extends BaseController
         $fileName = 'Order Form';
         
         // load HTML content
-        $domPdf->loadHtml(view('Supplier/supplierBahanBaku/print', $data));
+        $domPdf->loadHtml(view('Supplier/supplierBahanBaku/print-'.$laporan.'', $data));
 
         // (optional) setup the paper size and orientation
         $domPdf->setPaper('legal', 'landscape');

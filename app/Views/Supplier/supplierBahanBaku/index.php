@@ -234,7 +234,41 @@
                             </div>
                         </div>
                         <div class="laporan-rincian-per-barang">
-                            Laporan Rincian Per Barang
+                            <h6>Laporan Rincian Per Barang</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date_per_barang" placeholder="Tanggal Pemesanan">
+                                                <label for="floatingInput">Tanggal Awal</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date_per_barang" placeholder="Tanggal Pemesanan">
+                                                <label for="floatingInput">Tanggal Akhir</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <select class="form-select barang_id" id="barang_id" name="barang_id_per_barang" aria-label="Floating label select example">
+                                                    <option value=""></option>
+                                                    <?php
+                                                    if (!empty($dataBarangMasters)) : ?>
+                                                        <?php foreach ($dataBarangMasters as $barang) : ?>
+                                                            <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </select>
+                                                <label for="floatingInput">Barang</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="laporan-rekap-all-supplier">
                             Laporan Rekap All Supplier
