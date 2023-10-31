@@ -226,7 +226,18 @@ function convertToIndonesianMonth($date)
          return $months[$month] . ' ' . $year;
       }
    }
-
-   // Jika format tidak valid, kembalikan tanggal asli
    return $date;
+}
+
+function generateNoKwitansiTB($noStart, $month, $year)
+{
+   $format = "%03d/KTB/%02d/%d";
+   sscanf($noStart, $format, $lastNumber, $startMonth, $startYear);
+   if ($year == $startYear && $month == $startMonth) {
+      $nextNumber = $lastNumber + 1;
+   } else {
+      $nextNumber = 1;
+   }
+   $nextKwitansi = sprintf($format, $nextNumber, $month, $year);
+   return $nextKwitansi;
 }

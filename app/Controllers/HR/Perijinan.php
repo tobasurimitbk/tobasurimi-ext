@@ -170,6 +170,14 @@ class Perijinan extends BaseController
         $tglAkhir = strtotime($this->request->getVar('end_date'));
         $tglAwal = strtotime($this->request->getVar('start_date'));
 
+        if ($tglAkhir < $tglAwal) {
+            return \response()->setJSON([
+                'message' => "Tanggal mulai dan tanggal selesai tidak valid",
+                'token' => csrf_hash(),
+                'status' => false,
+            ]);
+        }
+
         for ($currentDate = $tglAwal; $currentDate <= $tglAkhir; $currentDate += 86400) {
             $currentDateFormatted = date('Y-m-d', $currentDate);
             $insertData['periode'] = $currentDateFormatted;
