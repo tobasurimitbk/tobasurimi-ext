@@ -145,114 +145,117 @@
                 <h5 class="modal-title">Laporan</h5>
             </div>
             <div class="modal-body">
-                <div class="col-md-12">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select laporan_id" name="laporan_id" id="laporan_id">
-                            <option value="" data-code=""></option>
-                            <option value="laporan-pendapatan-supplier" data-code="">Pendapatan Supplier</option>
-                            <option value="laporan-rincian-per-barang" data-code="">Rincian Per Barang</option>
-                            <option value="laporan-rekap-all-supplier" data-code="">Rekap All Supplier</option>
-                            <option value="laporan-rekap-per-supplier" data-code="">Rekap Per Supplier</option>
-                            <option value="laporan-rekap-all-barang" data-code="">Rekap All Barang</option>
-                            <option value="laporan-rekap-per-barang" data-code="">Rekap Per Barang</option>
-                            <option value="laporan-bukti-penerimaaan-barang" data-code="">Bukti Penerimaan Barang</option>
-                            <option value="laporan-kwitansi-tb" data-code="">Kwitansi TB</option>
-                        </select>
-                        <label for="floatingInput">Pilih Laporan</label>
+                <form class="laporan-form" id="laporan-form" role="form" method="POST" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select laporan_id" name="laporan_id" id="laporan_id">
+                                <option value="" data-code=""></option>
+                                <option value="laporan-pendapatan-supplier" data-code="">Pendapatan Supplier</option>
+                                <option value="laporan-rincian-per-barang" data-code="">Rincian Per Barang</option>
+                                <option value="laporan-rekap-all-supplier" data-code="">Rekap All Supplier</option>
+                                <option value="laporan-rekap-per-supplier" data-code="">Rekap Per Supplier</option>
+                                <option value="laporan-rekap-all-barang" data-code="">Rekap All Barang</option>
+                                <option value="laporan-rekap-per-barang" data-code="">Rekap Per Barang</option>
+                                <option value="laporan-bukti-penerimaaan-barang" data-code="">Bukti Penerimaan Barang</option>
+                                <option value="laporan-kwitansi-tb" data-code="">Kwitansi TB</option>
+                            </select>
+                            <label for="floatingInput">Pilih Laporan</label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="laporan-pendapatan-supplier">
-                        <h6>Laporan Pendapatan Supplier</h6>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Pemesanan">
-                                            <label for="floatingInput">Tanggal Awal</label>
+                    <div class="col-md-12">
+                        <div class="laporan-pendapatan-supplier">
+                            <h6>Laporan Pendapatan Supplier</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Pemesanan">
+                                                <label for="floatingInput">Tanggal Awal</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Pemesanan">
+                                                <label for="floatingInput">Tanggal Akhir</label>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Pemesanan">
-                                            <label for="floatingInput">Tanggal Akhir</label>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                                                    <option value=""></option>
+                                                    <?php
+                                                    if (!empty($dataSuppliers)) : ?>
+                                                        <?php foreach ($dataSuppliers as $supplier) : ?>
+                                                            <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->name; ?></option>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </select>
+                                                <label for="floatingInput">Supplier</label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
-                                                <option value=""></option>
-                                                <?php
-                                                if (!empty($dataSuppliers)) : ?>
-                                                    <?php foreach ($dataSuppliers as $supplier) : ?>
-                                                        <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->name; ?></option>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            </select>
-                                            <label for="floatingInput">Supplier</label>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
+                                                    <option value=""></option>
+                                                    <?php
+                                                    if (!empty($dataBarangMasters)) : ?>
+                                                        <?php foreach ($dataBarangMasters as $barang) : ?>
+                                                            <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </select>
+                                                <label for="floatingInput">Barang</label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
-                                                <option value=""></option>
-                                                <?php
-                                                if (!empty($dataBarangMasters)) : ?>
-                                                    <?php foreach ($dataBarangMasters as $barang) : ?>
-                                                        <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            </select>
-                                            <label for="floatingInput">Barang</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
-                                                <option value=""></option>
-                                                <?php
-                                                if (!empty($dataWarehouses)) : ?>
-                                                    <?php foreach ($dataWarehouses as $warehouses) : ?>
-                                                        <option value="<?= $warehouses->id; ?>" data-name="<?= $warehouses->warehouse_name; ?>"><?= $warehouses->warehouse_name; ?></option>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            </select>
-                                            <label for="floatingInput">Warehouse</label>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                                                    <option value=""></option>
+                                                    <?php
+                                                    if (!empty($dataWarehouses)) : ?>
+                                                        <?php foreach ($dataWarehouses as $warehouses) : ?>
+                                                            <option value="<?= $warehouses->id; ?>" data-name="<?= $warehouses->warehouse_name; ?>"><?= $warehouses->warehouse_name; ?></option>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </select>
+                                                <label for="floatingInput">Warehouse</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="laporan-rincian-per-barang">
+                            Laporan Rincian Per Barang
+                        </div>
+                        <div class="laporan-rekap-all-supplier">
+                            Laporan Rekap All Supplier
+                        </div>
+                        <div class="laporan-rekap-per-supplier">
+                            Laporan Rekap Per Supplier
+                        </div>
+                        <div class="laporan-rekap-all-barang">
+                            Laporan Rekap All Barang
+                        </div>
+                        <div class="laporan-rekap-per-barang">
+                            Laporan Rekap Per Barang
+                        </div>
+                        <div class="laporan-bukti-penerimaaan-barang">
+                            Laporan Bukti Penerimaan Barang
+                        </div>
+                        <div class="laporan-kwitansi-tb">
+                            Laporan Kwitansi TB
+                        </div>
                     </div>
-                    <div class="laporan-rincian-per-barang">
-                        Laporan Rincian Per Barang
-                    </div>
-                    <div class="laporan-rekap-all-supplier">
-                        Laporan Rekap All Supplier
-                    </div>
-                    <div class="laporan-rekap-per-supplier">
-                        Laporan Rekap Per Supplier
-                    </div>
-                    <div class="laporan-rekap-all-barang">
-                        Laporan Rekap All Barang
-                    </div>
-                    <div class="laporan-rekap-per-barang">
-                        Laporan Rekap Per Barang
-                    </div>
-                    <div class="laporan-bukti-penerimaaan-barang">
-                        Laporan Bukti Penerimaan Barang
-                    </div>
-                    <div class="laporan-kwitansi-tb">
-                        Laporan Kwitansi TB
-                    </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <div id="laporan-buttons">
@@ -357,14 +360,21 @@
 
     $(document).ready(function() {
         $("#laporan_id").change(function() {
-            var selectedOption = $(this).val();
+            let selectedOption = $(this).val();
             var dynamicButtons = $("#laporan-buttons");
+            var awalTanggal = $(".awal_date").val();
+            var akhirTanggal = $(".akhir_date").val();
+            var supplierId = $(".supplier_id").val();
+            var bahanBakuId = $(".barang_id").val();
+            var warehouseId = $(".warehouse_id").val();
 
             dynamicButtons.empty();
+            console.log(selectedOption);
 
             if (selectedOption) {
-                dynamicButtons.append('<a href="<?= base_url("/supplier-bahan-baku/print"); ?>" target="_blank" class="btn btn-submit-form btn-submit-' + selectedOption + ' mr-2">Tampil</a>');
+                dynamicButtons.append(`<a onclick="printLaporan('${selectedOption}')" target="_blank" class="btn btn-submit-form btn-submit-${selectedOption} mr-2">Tampil</a>`);
             }
+
 
             // Sembunyikan semua div yang terkait dengan laporan
             $(".col-md-12 > div[class^='laporan-']").hide();
@@ -379,7 +389,7 @@
 
     $(".awal_date, .akhir_date").datepicker({
         todayHighlight: true,
-        format: "dd/mm/yyyy",
+        format: "dd-mm-yyyy",
         orientation: "bottom auto",
         autoclose: true
     })
@@ -962,6 +972,15 @@
         sortTypeHarga = "desc";
         secondTable.ajax.reload()
         $(".harga-modal").modal("show")
+    }
+
+    let printLaporan = function(val) {
+
+        var form = document.getElementById('laporan-form');
+        var newAction = "<?= base_url("/supplier-bahan-baku/print/"); ?>" + val; // Your new action URL
+
+        form.action = newAction;
+        form.submit();
     }
 </script>
 

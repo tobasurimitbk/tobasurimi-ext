@@ -46,10 +46,15 @@
         .item-table th {
             border-right: 1px solid;
             border-bottom: 1px solid;
+            font-size: 13px;
+            font-weight: normal;
+            padding: 2px
         }
 
         .item-table td {
-            border-right: 1px solid;
+            border: 1px solid;
+            font-size: 10px;
+            padding: 2px
         }
 
         .signature-table {
@@ -75,95 +80,92 @@
     </style>
 </head>
 <body>
-    <h2>Laporan pendapatan supplier</h2>
+    <h2><?= $header; ?></h2>
     <table class="w-100">
         <tbody>
             <tr>
-                <td width="120px">Tanggal</td>
-                <td>:</td>
-                <td>01-01-2022</td>
-                <td> S/D </td>
-                <td>31-01-2022</td>
+                <td style="width:100px">Tanggal</td>
+                <td style="width:10px">:</td>
+                <td style="width:80px"><?= $tanggalAwal; ?></td>
+                <td style="width:10px"> S/D </td>
+                <td><?= $tanggalAkhir; ?></td>
             </tr>
             <tr>
                 <td>Bahan Baku</td>
                 <td>:</td>
-                <td colspan="3" style="text-transform: uppercase;">Cumi</td>
+                <td colspan="3" style="text-transform: uppercase;"><?= $bahanBaku; ?></td>
             </tr>
             <tr>
                 <td>Lokasi Gudang</td>
                 <td>:</td>
-                <td colspan="3" style="text-transform: uppercase;">Warehouse1</td>
+                <td colspan="3" style="text-transform: uppercase;"><?= $warehouse; ?></td>
             </tr>
         </tbody>
     </table>
     
-    <table class="item-table">
+    <table class="w-100 item-table">
         <tr>
-            <th>No</th>
-            <th style="height: 1px;">Item Description</th>
-            <th>No. OF</th>
-            <th>Qty</th>
-            <th>Satuan</th>
-            <th>Harga</th>
-            <th>% Diskon</th>
-            <th>Jumlah</th>
-        </tr>
-    </table>
-
-    <table class="w-100" style="border-spacing: 3px 0;">
-        <tr>
-            <td colspan="2"></td>
-            <td>
-                <div class="txt-right" style="border: 1px solid;">Biaya Lain-lain: </div>
-            </td>
-            <td>
-                <div class="txt-right" style="border: 1px solid;">0</div>
-            </td>
+            <th rowspan="2" >No.</th>
+            <th rowspan="2" >Supplier</th>
+            <th rowspan="2">No PO</th>
+            <th rowspan="2">Tgl PO</th>
+            <th rowspan="2">Bahan Baku</th>
+            <th rowspan="2">Gudang</th>
+            <th rowspan="2">Qty</th>
+            <th rowspan="2">Satuan</th>
+            <th rowspan="2">Unit</th>
+            <th colspan="3">Harian</th>
+            <th colspan="3">Tambahan Harian</th>
+            <th colspan="3">Tambahan Bulanan</th>
+            <th colspan="3">Subsidi</th>
+            <th rowspan="2">Total</th>
         </tr>
         <tr>
-            <td style="width: 1px;">Terbilang</td>
-            <td style="width: 65%;">
-                <div style="border: 1px solid;"></div>
-            </td>
-            <td>
-                <div class="txt-right" style="border: 1px solid;">Total Faktur: </div> 
-            </td>
-            <td>
-                <div class="txt-right" style="border: 1px solid;"></div>
-            </td>
+            <th >DPP</th>
+            <th >PPh</th>
+            <th >Dibayarkan</th>
+            <th >DPP</th>
+            <th >PPh</th>
+            <th >Dibayarkan</th>
+            <th >DPP</th>
+            <th >PPh</th>
+            <th >Dibayarkan</th>
+            <th >DPP</th>
+            <th >PPh</th>
+            <th >Dibayarkan</th>  
         </tr>
-    </table>
-
-    <table class="w-100">
-        <tr>
-            <td style="width: 350px;">
-                <div>Catatan: </div>
-                <div>Surat Jalan ini tidak berfungsi sebagai Penagihan</div>
-                <div>Barang yang sudah diterima tidak dapat dikembalikan</div>
-                <div>Kecuali memenuhi ketentuan perjanjian BS Exp Date</div>
-            </td>
-            <td style="padding-left: 50px">
-                <div class="description-container">
-                    <label class="description-label">Description: </label>
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    <table class="signature-table">
-        <tr style="vertical-align: top;">
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Disiapkan</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Disetujui Oleh</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">diantar Oleh</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Diterima Oleh</td>
-        </tr>
-        <tr>
-            <td>Date: </td>
-            <td>Date: </td>
-            <td>Date: </td>
-            <td>Date: </td>
-        </tr>
+        <?php if (!empty($dataOrder)): ?>
+            <?php foreach ($dataOrder as $do) : ?>
+                <tr>
+                    <td ><?= $no++; ?></td>
+                    <td ><?= $do->supplierName; ?></td>
+                    <td ><?= $do->poNum; ?></td>
+                    <td ><?= $do->poDate; ?></td>
+                    <td ><?= $do->barangName; ?></td>
+                    <td ><?= $do->warehouseName; ?></td>
+                    <td ><?= $do->qtyPO; ?></td>
+                    <td ><?= $do->satuanName; ?></td>
+                    <td ><?= $do->companyName; ?></td>
+                    <td ><?= number_format($do->dppUmum, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->pphUmum, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalUmum, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->dppHarian, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->pphHarian, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalHarian, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->dppBulanan, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->pphBulanan, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalBulanan, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->subsidi, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->pphSubsidi, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalSubsidi, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalRow, 0, '.', ''); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+                <tr>
+                    <td colspan="23">Tidak ada data yang tersedia.</td>
+                </tr>
+        <?php endif; ?>
     </table>
 
 </body>

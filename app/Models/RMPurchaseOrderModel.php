@@ -226,4 +226,51 @@ class RMPurchaseOrderModel extends Model
 
         return $generatedPoNo;
     }
+
+    public function getPoBBLokalForSupplierReport($startDate,$finishDate,$bahanBaku,$warehouse)
+    {
+        $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
+        suppliers.name AS supplierName, 
+        rm_purchase_orders.po_no AS poNum, 
+        rm_purchase_orders.po_date AS poDate, 
+        barang_master.barang_name AS barangName, 
+        warehouses.warehouse_name AS warehouseName, 
+        rm_purchase_order_details.qty AS qtyPO, 
+        satuans.nama_satuan AS satuanName, 
+        companies.company AS companyName, 
+        rm_purchase_orders.subsidi_langsung AS subsidi, 
+        rm_purchase_order_details.daily_price AS dppHarian,
+        rm_purchase_order_details.monthly_price AS dppBulanan,
+        rm_purchase_order_details.general_price AS dppUmum,
+        rm_purchase_orders.pph AS poPPH
+        ";
+        $condition = [
+            'rm_purchase_orders.is_posted' => '1',
+            'rm_purchase_orders.po_date >=' => $startDate,
+            'rm_purchase_orders.po_date <=' => $finishDate,
+        ];
+        if (!empty($bahanBaku)) {
+            $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
+        }                  
+        if (!empty($warehouse)) {
+            $condition['penerimaan_barang.warehouse_id'] = $warehouse;
+        }                  
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->where($condition)
+            ->findAll();
+
+        return $poBBLokalData;
+    }
 }
