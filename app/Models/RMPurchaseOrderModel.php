@@ -19,6 +19,7 @@ class RMPurchaseOrderModel extends Model
     protected $allowedFields    = [
         'id',
         'company_id',
+        'is_bc',
         'po_no',
         'po_date',
         'supplier_id',

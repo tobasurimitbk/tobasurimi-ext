@@ -17,10 +17,10 @@ class AMPurchaseOrderModel extends Model
     protected $allowedFields    = [
         'id',
         'purchase_request_id',
+        'is_bc',
         'po_no',
         'po_date',
         'po_type',
-        'bc_type',
         'currency',
         'supplier_id',
         'total',

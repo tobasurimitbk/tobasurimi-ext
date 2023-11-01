@@ -224,6 +224,7 @@ class POLokalBahanBaku extends BaseController
             if ($this->validate($rules)) {
                 $insertData = [
                     "company_id" => $this->request->getPost("company_id"),
+                    "is_bc"                 => $this->request->getPost("is_bc"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => $this->request->getPost("supplier_id"),
@@ -335,6 +336,7 @@ class POLokalBahanBaku extends BaseController
 
                 $insertData = [
                     "company_id" => $this->request->getPost("company_id"),
+                    "is_bc"                 => $this->request->getPost("is_bc"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => $this->request->getPost("supplier_id"),

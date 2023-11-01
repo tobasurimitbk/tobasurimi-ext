@@ -272,6 +272,7 @@ class POImportBahanPenolong extends BaseController
                 
                 $payload = [
                     "purchase_request_id" => $purchase_request_id,
+                    "is_bc"                 => $this->request->getPost("is_bc"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
@@ -515,6 +516,7 @@ class POImportBahanPenolong extends BaseController
 
                 $payload = [
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
+                    "is_bc"                 => $this->request->getPost("is_bc"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     "po_type" => "Import",

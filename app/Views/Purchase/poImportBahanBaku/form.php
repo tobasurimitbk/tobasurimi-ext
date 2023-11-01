@@ -62,7 +62,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOImport) ? $dataPOImport->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -88,9 +88,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataCompany)) {
@@ -103,6 +104,15 @@
                                 ?>
                             </select>
                             <label for="floatingInput">Company</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select is_bc" id="is_bc" name="is_bc" aria-label="Floating label select example">
+                                <option <?= !empty($dataPOImport) ? ($dataPOImport->is_bc === "1" ? "selected" : "") : ""; ?> value="1">Memakai BC</option>
+                                <option <?= !empty($dataPOImport) ? ($dataPOImport->is_bc === "0" ? "selected" : "") : ""; ?> value="0">Tidak Memakai BC</option>
+                            </select>
+                            <label for="floatingInput">Status Dokumen</label>
                         </div>
                     </div>
                 </div>

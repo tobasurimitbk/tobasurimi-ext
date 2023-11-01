@@ -156,19 +156,11 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataBC)) {
-                                    foreach ($dataBC as $bc) {
-                                ?>
-                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->bc_type === $bc->id ? "selected" : "") : ""; ?> value="<?= $bc->id; ?>"><?= $bc->value; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select is_bc" id="is_bc" name="is_bc" aria-label="Floating label select example">
+                                <option <?= !empty($dataPOLokal) ? ($dataPOLokal->is_bc === "1" ? "selected" : "") : ""; ?> value="1">Memakai BC</option>
+                                <option <?= !empty($dataPOLokal) ? ($dataPOLokal->is_bc === "0" ? "selected" : "") : ""; ?> value="0">Tidak Memakai BC</option>
                             </select>
-                            <label for="floatingInput">Dokumen BC (Opsional)</label>
+                            <label for="floatingInput">Status Dokumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
