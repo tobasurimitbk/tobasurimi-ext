@@ -658,6 +658,7 @@ class POLokalBahanPenolong extends BaseController
                 $totalDisc = 0;
                 $totalPpn = 0;
                 $totalTambahan = 0;
+                $keterangan = [];
 
                 foreach ($dataBPLokalDetail as $value) {
                     $no++;
@@ -669,6 +670,7 @@ class POLokalBahanPenolong extends BaseController
                     $totalPrice += $totalan;
                     $totalDisc += $totalan * (float)$value->disc / 100;
                     $totalPpn += $totalan * (float)$value->ppnValue / 100;
+                    $keterangan[] = $value->note;
                 }
 
                 $dataBPLokal->totalTambahan = number_format(formatter($totalTambahan, "STR_TO_FLOAT"), 2, '.', ',');
@@ -676,13 +678,14 @@ class POLokalBahanPenolong extends BaseController
                 $dataBPLokal->totalDisc = number_format(formatter($totalDisc, "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalPpn = number_format(formatter($totalPpn, "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalPo = number_format(formatter(($totalPrice - $totalDisc + $totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->keterangan = implode(",", array_unique($keterangan));
+                $dataBPLokal->jatuhTempoHari = \totalDayInRange($dataBPLokal->po_date, $dataBPLokal->payment_date);
                 // $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
 
                 $data["dataPOLokal"] = $dataBPLokal;
                 $data["dataPOLokal"]->am_purchase_order_details = $dataBPLokalDetail;
             }
 
-            // dd($data);
             // return view('Purchase/poLokalBahanPenolong/print', $data);
 
             // load HTML content
