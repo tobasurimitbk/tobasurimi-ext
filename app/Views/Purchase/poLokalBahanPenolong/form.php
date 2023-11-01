@@ -162,7 +162,7 @@
                                 if (!empty($dataBCType)) {
                                     foreach ($dataBCType as $bc) {
                                 ?>
-                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->bc_type === $bc->id ? "selected" : "") : ""; ?> value="<?= $bc->id; ?>"><?= $bc->value; ?></option>
+                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->bc_type === $bc["id"] ? "selected" : "") : ""; ?> value="<?= $bc["id"]; ?>"><?= $bc["value"]; ?></option>
                                 <?php
                                     }
                                 }

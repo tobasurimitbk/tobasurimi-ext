@@ -114,7 +114,7 @@
                                 if (!empty($dataBCType)) {
                                     foreach ($dataBCType as $bc) {
                                 ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->bc_type === $bc->id ? "selected" : "") : ""; ?> value="<?= $bc->id; ?>"><?= $bc->value; ?></option>
+                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->bc_type === $bc["id"] ? "selected" : "") : ""; ?> value="<?= $bc["id"]; ?>"><?= $bc["value"]; ?></option>
                                 <?php
                                     }
                                 }
