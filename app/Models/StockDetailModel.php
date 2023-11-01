@@ -179,6 +179,7 @@ class StockDetailModel extends Model
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'LEFT')
             ->where($condition)
             ->groupBy('stock_details.barang_id')
+            ->groupBy('stock_details.warehouse_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $DataQry->countAllResults(false);
