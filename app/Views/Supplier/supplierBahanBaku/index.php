@@ -171,13 +171,13 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Awal">
                                                 <label for="floatingInput">Tanggal Awal</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Akhir">
                                                 <label for="floatingInput">Tanggal Akhir</label>
                                             </div>
                                         </div>
@@ -240,13 +240,13 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date_per_barang" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_per_barang" name="awal_date_per_barang" placeholder="Tanggal Pemesanan">
                                                 <label for="floatingInput">Tanggal Awal</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date_per_barang" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_per_barang" name="akhir_date_per_barang" placeholder="Tanggal Pemesanan">
                                                 <label for="floatingInput">Tanggal Akhir</label>
                                             </div>
                                         </div>
@@ -254,7 +254,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-floating mb-3" style="height: 50px;">
-                                                <select class="form-select barang_id" id="barang_id" name="barang_id_per_barang" aria-label="Floating label select example">
+                                                <select class="form-select barang_id" id="barang_id_per_barang" name="barang_id_per_barang" aria-label="Floating label select example">
                                                     <option value=""></option>
                                                     <?php
                                                     if (!empty($dataBarangMasters)) : ?>
@@ -1011,7 +1011,7 @@
     let printLaporan = function(val) {
 
         var form = document.getElementById('laporan-form');
-        var newAction = "<?= base_url("/supplier-bahan-baku/print/"); ?>" + val; // Your new action URL
+        var newAction = "<?= base_url("/supplier-bahan-baku/print/"); ?>" + val;
 
         form.action = newAction;
         form.submit();
