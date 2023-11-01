@@ -154,7 +154,7 @@
                     </div>
                 </div> -->
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
                                 <option value=""></option>

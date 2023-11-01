@@ -119,7 +119,6 @@
                             </select>
                             <label for="floatingInput">Jenis Dokumen (Opsional)</label>
                         </div>
-                    </div>iv>
                     </div>
                 </div>
                 <div class="row">
