@@ -668,158 +668,167 @@
                     confirmButtonColor: '#4e73df',
                 })
             } else {
-                if ($(".create-form").valid()) {
+                // CHECK IF NO BARANG
+                if (list_items.length > 6) {
                     Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
+                        icon: 'error',
+                        title: "Maksimal barang yang diinput adalah 6",
                         confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            setLoading()
-                            let data = new FormData(document.querySelector(".create-form"));
+                    })
+                } else {
+                    if ($(".create-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const csrf = $(`[name="${csrfToken}"]`);
+                                setLoading()
+                                let data = new FormData(document.querySelector(".create-form"));
 
-                            let update_list_items = [];
+                                let update_list_items = [];
 
-                            if (list_delete.length !== 0) {
-                                list_delete.map(obj => {
-                                    update_list_items.push({
-                                        id: obj.id ? Number(obj.id) : 0,
-                                        item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                        item_code: obj.kode_barang,
-                                        item_name: obj.nama_barang,
-                                        qty: obj.qty ? Number(obj.qty) : 0,
-                                        unit: obj.satuan ? Number(obj.satuan) : 0,
-                                        price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan,
-                                        isDeleted: true
-                                    })
-                                })
-                            }
-
-                            list_items.map(obj => {
-                                if (obj.id) {
-                                    update_list_items.push({
-                                        id: obj.id ? Number(obj.id) : 0,
-                                        item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                        item_code: obj.kode_barang,
-                                        item_name: obj.nama_barang,
-                                        qty: obj.qty ? Number(obj.qty) : 0,
-                                        unit: obj.satuan ? Number(obj.satuan) : 0,
-                                        price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan
-                                    })
-                                } else {
-                                    update_list_items.push({
-                                        item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                        item_code: obj.kode_barang,
-                                        item_name: obj.nama_barang,
-                                        qty: obj.qty ? Number(obj.qty) : 0,
-                                        unit: obj.satuan ? Number(obj.satuan) : 0,
-                                        price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan
+                                if (list_delete.length !== 0) {
+                                    list_delete.map(obj => {
+                                        update_list_items.push({
+                                            id: obj.id ? Number(obj.id) : 0,
+                                            item_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                            item_code: obj.kode_barang,
+                                            item_name: obj.nama_barang,
+                                            qty: obj.qty ? Number(obj.qty) : 0,
+                                            unit: obj.satuan ? Number(obj.satuan) : 0,
+                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                            note: obj.keterangan,
+                                            isDeleted: true
+                                        })
                                     })
                                 }
-                            })
 
-                            data.append("items", JSON.stringify(update_list_items))
+                                list_items.map(obj => {
+                                    if (obj.id) {
+                                        update_list_items.push({
+                                            id: obj.id ? Number(obj.id) : 0,
+                                            item_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                            item_code: obj.kode_barang,
+                                            item_name: obj.nama_barang,
+                                            qty: obj.qty ? Number(obj.qty) : 0,
+                                            unit: obj.satuan ? Number(obj.satuan) : 0,
+                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                            note: obj.keterangan
+                                        })
+                                    } else {
+                                        update_list_items.push({
+                                            item_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                            item_code: obj.kode_barang,
+                                            item_name: obj.nama_barang,
+                                            qty: obj.qty ? Number(obj.qty) : 0,
+                                            unit: obj.satuan ? Number(obj.satuan) : 0,
+                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                            note: obj.keterangan
+                                        })
+                                    }
+                                })
 
-                            let id = $(".id").val();
-                            // UPDATE
-                            if (id) {
-                                $.ajax({
-                                    url: "<?= base_url("spp/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            stopLoading()
-                                            Swal.fire({
-                                                    icon: 'success',
+                                data.append("items", JSON.stringify(update_list_items))
+
+                                let id = $(".id").val();
+                                // UPDATE
+                                if (id) {
+                                    $.ajax({
+                                        url: "<?= base_url("spp/update"); ?>",
+                                        data: data,
+                                        beforeSend: function(xhr) {
+                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        },
+                                        method: "POST",
+                                        dataType: "json",
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            csrf.val(response.token);
+                                            if (response.status) {
+                                                stopLoading()
+                                                Swal.fire({
+                                                        icon: 'success',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    .then(() => {
+                                                        window.location.href = "<?= base_url("spp"); ?>";
+                                                    })
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
                                                     title: response.message,
                                                     confirmButtonColor: '#4e73df',
                                                 })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("spp"); ?>";
-                                                })
-                                        } else {
+                                                stopLoading()
+                                            }
+                                        },
+                                        onError: function(response) {
+                                            csrf.val(response.token);
                                             Swal.fire({
                                                 icon: 'error',
-                                                title: response.message,
+                                                title: 'Data Gagal Diubah, coba Lagi',
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             stopLoading()
                                         }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Diubah, coba Lagi',
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                });
-                            }
-                            // CREATE
-                            else {
-                                $.ajax({
-                                    url: "<?= base_url("spp/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            stopLoading()
-                                            Swal.fire({
-                                                    icon: 'success',
+                                    });
+                                }
+                                // CREATE
+                                else {
+                                    $.ajax({
+                                        url: "<?= base_url("spp/save"); ?>",
+                                        data: data,
+                                        beforeSend: function(xhr) {
+                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        },
+                                        method: "POST",
+                                        dataType: "json",
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            csrf.val(response.token);
+                                            if (response.status) {
+                                                stopLoading()
+                                                Swal.fire({
+                                                        icon: 'success',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    .then(() => {
+                                                        window.location.href = "<?= base_url("spp"); ?>";
+                                                    })
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
                                                     title: response.message,
                                                     confirmButtonColor: '#4e73df',
                                                 })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("spp"); ?>";
-                                                })
-                                        } else {
+                                                stopLoading()
+                                            }
+                                        },
+                                        onError: function(response) {
+                                            csrf.val(response.token);
                                             Swal.fire({
                                                 icon: 'error',
-                                                title: response.message,
+                                                title: 'Data Gagal Diubah, coba Lagi',
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             stopLoading()
                                         }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Diubah, coba Lagi',
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                });
+                                    });
+                                }
                             }
-                        }
-                    })
+                        })
+                    }   
                 }
             }
         })
