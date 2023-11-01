@@ -2163,7 +2163,7 @@
             tag_total += `<td>`;
             tag_total += 0;
             tag_total += "</td>";
-            tag_total += `<td colspan="1">`;
+            tag_total += `<td colspan="2">`;
             tag_total += "</td>";
             tag_total += "</tr>";
 
