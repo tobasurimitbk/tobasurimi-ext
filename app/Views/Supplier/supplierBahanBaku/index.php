@@ -158,7 +158,6 @@
                                 <option value="laporan-rekap-all-barang" data-code="">Rekap All Barang</option>
                                 <option value="laporan-rekap-per-barang" data-code="">Rekap Per Barang</option>
                                 <option value="laporan-bukti-penerimaaan-barang" data-code="">Bukti Penerimaan Barang</option>
-                                <option value="laporan-kwitansi-tb" data-code="">Kwitansi TB</option>
                             </select>
                             <label for="floatingInput">Pilih Laporan</label>
                         </div>
@@ -171,13 +170,13 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Awal" required>
                                                 <label for="floatingInput">Tanggal Awal</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Akhir" required>
                                                 <label for="floatingInput">Tanggal Akhir</label>
                                             </div>
                                         </div>
@@ -240,13 +239,13 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date_per_barang" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_per_barang" name="awal_date_per_barang" placeholder="Tanggal Pemesanan">
                                                 <label for="floatingInput">Tanggal Awal</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date_per_barang" placeholder="Tanggal Pemesanan">
+                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_per_barang" name="akhir_date_per_barang" placeholder="Tanggal Pemesanan">
                                                 <label for="floatingInput">Tanggal Akhir</label>
                                             </div>
                                         </div>
@@ -254,7 +253,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-floating mb-3" style="height: 50px;">
-                                                <select class="form-select barang_id" id="barang_id" name="barang_id_per_barang" aria-label="Floating label select example">
+                                                <select class="form-select barang_id" id="barang_id_per_barang" name="barang_id_per_barang" aria-label="Floating label select example">
                                                     <option value=""></option>
                                                     <?php
                                                     if (!empty($dataBarangMasters)) : ?>
@@ -1012,9 +1011,92 @@
 
         var form = document.getElementById('laporan-form');
         var newAction = "<?= base_url("/supplier-bahan-baku/print/"); ?>" + val; // Your new action URL
+        var validator = $(".laporan-form").validate({
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
 
-        form.action = newAction;
-        form.submit();
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+            switch (val) {
+                case 'laporan-pendapatan-supplier':
+                    validator.settings.rules = {
+                        awal_date: {
+                            required: true
+                        },
+                        akhir_date: {
+                            required: true
+                        }
+                    };
+                    validator.settings.messages = {
+                        awal_date: {
+                            required: "Tanggal Awal wajib diisi"
+                        },
+                        akhir_date: {
+                            required: "Tanggal Akhir wajib diisi"
+                        }
+                    };
+                    break;
+
+                case 'laporan-rincian-per-barang':
+                    validator.settings.rules = {
+                        awal_date_per_barang: {
+                            required: true
+                        },
+                        akhir_date_per_barang: {
+                            required: true
+                        },
+                        barang_id_per_barang: {
+                            required: true
+                        }
+                    };
+                    validator.settings.messages = {
+                        awal_date_per_barang: {
+                            required: "Tanggal Awal wajib diisi"
+                        },
+                        akhir_date_per_barang: {
+                            required: "Tanggal Akhir wajib diisi"
+                        },
+                        barang_id_per_barang: {
+                            required: "Barang wajib diisi"
+                        }
+                    };
+                    break;
+                case 'laporan-rekap-all-supplier':
+                
+                    break;
+                case 'laporan-rekap-per-supplier':
+                    
+                    break;
+                case 'laporan-rekap-all-barang':
+                    
+                    break;
+                case 'laporan-rekap-per-barang':
+                    
+                    break;
+                case 'laporan-bukti-penerimaaan-barang':
+                    
+                    break;
+            }
+        if ($(".laporan-form").valid()) {
+            form.action = newAction;
+            form.submit();
+        }
     }
 </script>
 

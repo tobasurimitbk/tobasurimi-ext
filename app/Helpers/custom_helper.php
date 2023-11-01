@@ -241,3 +241,12 @@ function generateNoKwitansiTB($noStart, $month, $year)
    $nextKwitansi = sprintf($format, $nextNumber, $month, $year);
    return $nextKwitansi;
 }
+
+function totalDayInRange($startDate, $endDate)
+{
+   $start = new DateTime($startDate);
+   $end = new DateTime($endDate);
+   $interval = $start->diff($end);
+   $totalHari = $interval->days;
+   return $totalHari;
+}
