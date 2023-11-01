@@ -51,6 +51,9 @@ class POImportBahanBaku extends BaseController
 
     public function createPOImportBahanBaku()
     {
+        //Get BC Type By Metadata
+        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
+
         //Get Divisi
         $dataDivisi = $this->divisisModel->asObject()->findAll();
 
@@ -67,6 +70,7 @@ class POImportBahanBaku extends BaseController
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
         
         $data = [
+            "dataBCType" => $dataBCType,
             "today" => date("d/m/Y"),
             "dataDivisi" => $dataDivisi,
             "dataCompany" => $dataCompany,
@@ -80,6 +84,9 @@ class POImportBahanBaku extends BaseController
 
     public function getByIdPOImportBahanBaku($id = null)
     {
+        //Get BC Type By Metadata
+        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
+
         //Get Divisi
         $dataDivisi = $this->divisisModel->asObject()->findAll();
 
@@ -96,6 +103,7 @@ class POImportBahanBaku extends BaseController
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
         
         $data = [
+            "dataBCType" => $dataBCType,
             "today" => date("d/m/Y"),
             "dataDivisi" => $dataDivisi,
             "dataCompany" => $dataCompany,
@@ -276,7 +284,7 @@ class POImportBahanBaku extends BaseController
                 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                    "is_bc"                 => $this->request->getPost("is_bc"),
+                    "bc_type" => $this->request->getPost("bc_type"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
@@ -477,7 +485,7 @@ class POImportBahanBaku extends BaseController
 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                    "is_bc"                 => $this->request->getPost("is_bc"),
+                    "bc_type" => $this->request->getPost("bc_type"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "divisi_id" => $divisi_id,

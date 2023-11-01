@@ -12,6 +12,7 @@ use App\Models\BeaCukaiModel;
 use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
 use App\Models\SatuansModel;
+use App\Models\MetadataModel;
 use App\Models\SupplierHargaModel;
 use Dompdf\Dompdf;
 
@@ -25,6 +26,7 @@ class POLokalBahanBaku extends BaseController
     protected $SupplierModel;
     protected $BeaCukaiModel;
     private $barangModel;
+    protected $metadataModel;
     protected $BagianModel;
     protected $SatuansModel;
     protected $SupplierHargaModel;
@@ -39,6 +41,7 @@ class POLokalBahanBaku extends BaseController
         $this->SupplierModel = new SupplierModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
         $this->barangModel = new BarangMasterModel();
+        $this->metadataModel = new MetadataModel();
         $this->BagianModel = new BagianModel();
         $this->CompaniesModel = new CompaniesModel();
         $this->SatuansModel = new SatuansModel();
@@ -53,6 +56,9 @@ class POLokalBahanBaku extends BaseController
 
     public function createPOLokalBahanBaku()
     {
+        //Get BC Type By Metadata
+        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
+
         //Get Company
         $dataCompany =  $this->CompaniesModel->getCompanies();
 
@@ -70,6 +76,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         $data = [
+            "dataBCType"    => $dataBCType,
             "today"         => date("d/m/Y"),
             "dataSatuan"    => $dataSatuan,
             "dataBagian"    => $dataBagian,
@@ -224,7 +231,7 @@ class POLokalBahanBaku extends BaseController
             if ($this->validate($rules)) {
                 $insertData = [
                     "company_id" => $this->request->getPost("company_id"),
-                    "is_bc"                 => $this->request->getPost("is_bc"),
+                    "bc_type" => $this->request->getPost("bc_type"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => $this->request->getPost("supplier_id"),
@@ -336,7 +343,7 @@ class POLokalBahanBaku extends BaseController
 
                 $insertData = [
                     "company_id" => $this->request->getPost("company_id"),
-                    "is_bc"                 => $this->request->getPost("is_bc"),
+                    "bc_type" => $this->request->getPost("bc_type"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => $this->request->getPost("supplier_id"),

@@ -117,11 +117,19 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select is_bc" id="is_bc" name="is_bc" aria-label="Floating label select example">
-                                <option <?= !empty($dataPOImport) ? ($dataPOImport->is_bc === "1" ? "selected" : "") : ""; ?> value="1">Memakai BC</option>
-                                <option <?= !empty($dataPOImport) ? ($dataPOImport->is_bc === "0" ? "selected" : "") : ""; ?> value="0">Tidak Memakai BC</option>
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataBCType)) {
+                                    foreach ($dataBCType as $bc) {
+                                ?>
+                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->bc_type === $bc->id ? "selected" : "") : ""; ?> value="<?= $bc->id; ?>"><?= $bc->value; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
                             </select>
-                            <label for="floatingInput">Status Dokumen</label>
+                            <label for="floatingInput">Jenis Dokumen (Opsional)</label>
                         </div>
                     </div>
                 </div>
