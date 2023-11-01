@@ -583,6 +583,7 @@ $routes->post('/penerimaan-barang-lokal/update-status', 'Warehouse\PenerimaanBar
 $routes->post('/penerimaan-barang-lokal/delete', 'Warehouse\PenerimaanBarangLokal::deletePenerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal/export-table', 'Warehouse\PenerimaanBarangLokal::exportTable', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangLokal::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/generate', 'Warehouse\PenerimaanBarangLokal::generatePenerimaanBarang', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG IMPORT
 $routes->get('/penerimaan-barang-import', 'Warehouse\PenerimaanBarangImport::penerimaanBarangImport', ['filter' => 'Auth']);
@@ -595,6 +596,7 @@ $routes->post('/penerimaan-barang-import/update', 'Warehouse\PenerimaanBarangImp
 $routes->post('/penerimaan-barang-import/update-status', 'Warehouse\PenerimaanBarangImport::updateStatusPenerimaanBarangImport', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImport::deletePenerimaanBarangImport', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
 // BEA CUKAI 2.3 - 4.1
 

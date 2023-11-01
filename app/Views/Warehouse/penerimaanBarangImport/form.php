@@ -2250,17 +2250,21 @@
         })
     })
 
-    const changeStatus = function()
-    {
+    const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
 
-        if(value)
-        {
+        if (value) {
             $(".no_penerimaan_barang").attr("readonly", true);
-            $(".no_penerimaan_barang").val("AUTO GENERATE");
-        }
-        else
-        {
+
+            $.ajax({
+                url: `<?= base_url("penerimaan-barang-import/generate"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".no_penerimaan_barang").val(res?.data);
+                }
+            })
+        } else {
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");
         }
