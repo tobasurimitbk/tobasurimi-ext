@@ -29,8 +29,8 @@ class RekapFaktur extends BaseController
     {
         $supplierModel = new SupplierModel();
         $supplierData = $supplierModel->asObject()
-            ->where('company_id', $this->this_company_id)
-            ->where('kategori', 'LOKAL')
+            // ->where('company_id', $this->this_company_id)
+            // ->where('kategori', 'LOKAL')
             ->findAll();
 
         $data = [
