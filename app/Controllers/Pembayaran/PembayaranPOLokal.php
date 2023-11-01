@@ -32,7 +32,7 @@ class PembayaranPOLokal extends BaseController
         $supplierModel = new SupplierModel();
 
         $supplierList = $supplierModel->asObject()
-            ->where('company_id', $this->this_company_id)
+            // ->where('company_id', $this->this_company_id)
             ->findAll();
 
         $data = [
@@ -123,7 +123,7 @@ class PembayaranPOLokal extends BaseController
         $dataPembayaranPOLokal = [];
 
         $condition = [
-            "suppliers.company_id"  => $this->this_company_id
+            //"suppliers.company_id"  => $this->this_company_id
         ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
