@@ -393,6 +393,7 @@ class POLokalBahanPenolong extends BaseController
                     ];
                 } else {
                     $insertData = [
+                        "bc_type"               => $this->request->getPost("bc_type"),
                         "po_no"                 => $this->request->getPost("po_no"),
                         "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                         "po_type"               => 'Lokal',
