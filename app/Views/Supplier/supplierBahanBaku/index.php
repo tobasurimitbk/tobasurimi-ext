@@ -158,7 +158,6 @@
                                 <option value="laporan-rekap-all-barang" data-code="">Rekap All Barang</option>
                                 <option value="laporan-rekap-per-barang" data-code="">Rekap Per Barang</option>
                                 <option value="laporan-bukti-penerimaaan-barang" data-code="">Bukti Penerimaan Barang</option>
-                                <option value="laporan-kwitansi-tb" data-code="">Kwitansi TB</option>
                             </select>
                             <label for="floatingInput">Pilih Laporan</label>
                         </div>
