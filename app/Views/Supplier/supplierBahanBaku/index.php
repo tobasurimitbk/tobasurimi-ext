@@ -436,7 +436,7 @@
                             <tr>
                                 <th width="10">No</th>
                                 <th onclick="changeSortHarga('bahan_baku_name')" class="sort">Barang</th>
-                                <th onclick="changeSortHarga('createdAt')" class="sort">Tgl</th>
+                                <th onclick="changeSortHarga('createdAt')" class="sort">Tanggal</th>
                                 <th onclick="changeSortHarga('spesifikasi')" class="sort">Spesifikasi</th>
                                 <th onclick="changeSortHarga('bagian')" class="sort">Bagian</th>
                                 <th onclick="changeSortHarga('harga_umum')" class="sort">Umum</th>

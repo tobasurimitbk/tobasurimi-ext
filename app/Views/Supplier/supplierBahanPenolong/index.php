@@ -141,7 +141,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10">No</th>
-                                <th>Tgl</th>
+                                <th>Tanggal</th>
                                 <th>Barang</th>
                                 <th>Warehouse</th>
                                 <th>QTY</th>
