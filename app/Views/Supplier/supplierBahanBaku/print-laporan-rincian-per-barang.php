@@ -137,6 +137,15 @@
                     <td ><?= number_format($do->totalHarian, 0, '.', ''); ?></td>
                 </tr>
             <?php endforeach; ?>
+            <tr>
+                    <td colspan="10">Total</td>
+                    <td id="totalDppUmum" ><?= $totalDppUmum; ?></td>
+                    <td id="totalPphUmum" ><?= $totalPphUmum; ?></td>
+                    <td id="totalTotalUmum" ><?= $totalTotalUmum; ?></td>
+                    <td id="totalDppHarian" ><?= $totalDppHarian; ?></td>
+                    <td id="totalPphHarian" ><?= $totalPphHarian; ?></td>
+                    <td id="totalTotalHarian" ><?= $totalTotalHarian; ?></td>
+                </tr>
         <?php else: ?>
                 <tr>
                     <td colspan="23">Tidak ada data yang tersedia.</td>
