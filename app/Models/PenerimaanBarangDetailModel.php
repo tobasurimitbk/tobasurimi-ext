@@ -19,6 +19,8 @@ class PenerimaanBarangDetailModel extends Model
         'purchase_order_details_id',
         'penerimaan_barang_id',
         'harga',
+        'harga_harian',
+        'harga_bulanan',
         'sub_total',
         'keterangan',
         'barang_id',

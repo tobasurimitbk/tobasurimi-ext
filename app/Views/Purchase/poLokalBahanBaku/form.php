@@ -596,6 +596,12 @@
             autoclose: true
         })
 
+        // BC Type
+        $('.bc_type').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
         // COMPANY ID
         $('.company_id').select2({
             placeholder: "",

@@ -431,12 +431,24 @@ class PenerimaanBarangLokal extends BaseController
                 $this->penerimaanBarangModel->db->transException(true)->transStart();
                 $response =  $this->penerimaanBarangModel->insert($payload);
 
+                // $data = [
+                //     "id"        => $response,
+                //     "status"    => false,
+                //     "message"   => json_encode($items),
+                //     "payload"   => $payload,
+                //     "response"  => $response,
+                //     'token'     => csrf_hash()
+                // ];
+                // return json_encode($data);
+
                 foreach($items as $data) {
 
                     $detailPayload[] = [
                         'purchase_order_details_id' => $data->purchase_order_details_id,
                         'penerimaan_barang_id' => $response,
                         'harga' => $data->harga,
+                        'harga_harian' => $data->harga_harian,
+                        'harga_bulanan' => $data->harga_bulanan,
                         'sub_total' => $data->sub_total,
                         'keterangan' => $data->keterangan,
                         'barang_id' => $data->barang_id,
@@ -555,6 +567,8 @@ class PenerimaanBarangLokal extends BaseController
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $id,
                             'harga' => $data->harga,
+                            'harga_harian' => $data->harga_harian,
+                            'harga_bulanan' => $data->harga_bulanan,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
                             'barang_id' => $data->barang_id,

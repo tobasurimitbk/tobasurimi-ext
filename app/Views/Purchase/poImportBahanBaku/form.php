@@ -629,6 +629,12 @@
             autoclose: true
         })
 
+        // BC Type
+        $('.bc_type').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
         // PURCHASE REQUEST ID
         $('.purchase_request_id').select2({
             placeholder: "",
