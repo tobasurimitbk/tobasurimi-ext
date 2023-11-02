@@ -72,13 +72,22 @@ class SupplierHarga extends BaseController
             $list_item = json_decode($this->request->getPost("list_item"));
             $list_delete = json_decode($this->request->getPost("list_delete"));
 
+            // $data = [
+            //     "status"    => false,
+            //     "message"   => json_encode($list_item),
+            //     "payload"   => json_encode($list_item),
+            //     'token'     => csrf_hash()
+            // ];
+            // echo json_encode($data);
+            // return;
+
             // for create and update
             foreach($list_item as $item)
             {
                 $insertData = [
                     "supplier_id"      => $this->request->getPost("supplier_id"),
                     "bahan_baku_id"    => $item->bahan_baku_id,
-                    "bagian_id"    => $item->bagian_id,
+                    "bagian_id"        => $item->bagian_id,
                     "spesifikasi"      => $item->spesifikasi,
                     "harga_umum"       => formatter($item->harga_umum, "CURR_TO_FLOAT"),
                     "harga_harian"     => formatter($item->harga_harian, "CURR_TO_FLOAT"),
@@ -137,7 +146,7 @@ class SupplierHarga extends BaseController
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
-                "payload"   => json_encode($insertData),
+                "payload"   => json_encode($list_item),
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);
