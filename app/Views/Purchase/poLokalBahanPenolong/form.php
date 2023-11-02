@@ -571,6 +571,9 @@
                 purchase_request_id: {
                     required: true
                 },
+                po_no: {
+                    required: true
+                },
                 po_date: {
                     required: true
                 },
@@ -587,6 +590,9 @@
             messages: {
                 purchase_request_id: {
                     required: "No. SPP wajib diisi"
+                },
+                po_no: {
+                    required: "Nomor PO wajib diisi"
                 },
                 po_date: {
                     required: "Tanggal Dibuat wajib diisi"
@@ -1010,7 +1016,7 @@
                             tag_html += item.nama_satuan;
                             tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += "Rp" + item.harga;
+                            tag_html += "Rp " + item.harga;
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.qty;
@@ -1073,7 +1079,7 @@
                             tag_html += item.nama_satuan;
                             tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += "Rp" + item.harga;
+                            tag_html += "Rp " + item.harga;
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.qty;
@@ -1085,7 +1091,7 @@
                             // tag_html += item.qty_diterima;
                             // tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += "Rp" + item.total;
+                            tag_html += "Rp " + item.total;
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.disc ? item.disc : 0;
