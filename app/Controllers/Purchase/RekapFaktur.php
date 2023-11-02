@@ -243,7 +243,7 @@ class RekapFaktur extends BaseController
         $summaryData = $localPOInvSum->asObject()
             ->select($selectQry)
             ->join('local_po_inv_sum_details', 'local_po_inv_sum_details.local_po_inv_summary_id = local_po_inv_summaries.id')
-            ->where('company_id', $this->this_company_id)
+            // ->where('company_id', $this->this_company_id)
             ->groupBy('local_po_inv_summaries.id') // if this line is commented, $summaryData will return object instead of null (because of GROUP_CONCAT)
             ->find($id);
 
@@ -256,13 +256,13 @@ class RekapFaktur extends BaseController
 
         // get supplier list
         $supplierList = $supplierModel->asObject()
-            ->where('company_id', $this->this_company_id)
-            ->where('kategori', 'LOKAL')
+            // ->where('company_id', $this->this_company_id)
+            // ->where('kategori', 'LOKAL')
             ->findAll();
 
         // get faktur list
         $fakturList = $penerimaanBarangModel->asObject()
-            ->where('company_id', $this->this_company_id)
+            // ->where('company_id', $this->this_company_id)
             ->where('supplier_id', $summaryData->supplier_id)
             ->findAll();
 

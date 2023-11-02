@@ -274,7 +274,9 @@
                             <th>Jml. Diterima</th>
                             <th>Sisa</th>
                             <!-- <th>Jml. Masuk</th> -->
-                            <th>Harga</th>
+                            <th class="label-harga"><?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'Harga' : 'Harga Umum') : 'Harga'; ?></th>
+                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>" class="col_harian">Harga Harian</th>
+                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>" class="col_bulanan">Harga Bulanan</th>
                             <th>Sub Total</th>
                             <th>Keterangan</th>
                             <th>Action</th>
@@ -289,6 +291,8 @@
                         $total_qty_diterima = 0;
                         $total_remaining_qty = 0;
                         $total_harga = 0;
+                        $total_harga_harian = 0;
+                        $total_harga_bulanan = 0;
                         $total_sub_total = 0;
 
                         if(!empty($dataPenerimaanBarang) && !empty($dataPenerimaanBarangDetail)){ 
@@ -299,11 +303,13 @@
                                 $total_qty_diterima = $total_qty_diterima + $details["qty_diterima"];
                                 $total_remaining_qty = $total_remaining_qty + $details["remaining_qty"];
                                 $total_harga = $total_harga + ($details["harga"] ? (float)$details["harga"] : 0);
+                                $total_harga_harian = $total_harga_harian + ($details["harga_harian"] ? (float)$details["harga_harian"] : 0);
+                                $total_harga_bulanan = $total_harga_bulanan + ($details["harga_bulanan"] ? (float)$details["harga_bulanan"] : 0);
                                 $total_sub_total = $total_sub_total + ($details["sub_total"] ? (float)$details["sub_total"] : 0);
                         ?> 
     
                             <tr>
-                            <?php if($dataPenerimaanBarang->status_post === "WAITING" && $details["status_penerimaan"] === "0"){ 
+                            <?php 
                                 $qty_diterima = $details["qty_diterima"] ? formatter($details["qty_diterima"], "STR_TO_FLOAT") : 0;
                                 $remaining_qty = $details["remaining_qty"] ? formatter($details["remaining_qty"], "STR_TO_FLOAT") : 0;    
                                 $ppn = $details["ppn"] ? formatter($details["id_ppn"], "STR_TO_INT") : 0;
@@ -322,31 +328,33 @@
                                     <td><?= $details["remaining_qty"] ? formatter($details["remaining_qty"], "STR_TO_FLOAT") : 0; ?></td>
                                     <!-- <td><?= $details["jml_masuk"]; ?></td> -->
                                     <td>Rp <?= $details["harga"] ? number_format($details["harga"], 2, '.', ',') : 0; ?></td>
+                                    <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>">Rp <?= $details["harga_harian"] ? number_format($details["harga_harian"], 2, '.', ',') : 0; ?></td>
+                                    <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>">Rp <?= $details["harga_bulanan"] ? number_format($details["harga_bulanan"], 2, '.', ',') : 0; ?></td>
                                     <td>Rp <?= $details["sub_total"] ? number_format($details["sub_total"], 2, '.', ',') : 0; ?></td>
                                     <td><?= $details["keterangan"]; ?></td>
                                     <td>
-                                        <button data-packaging="<?= $details["packaging"]; ?>" data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" data-pph="<?= $pph; ?>" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= formatter($details["jml_masuk"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"], 2, '.', ',') : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"], 2, '.', ',') : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
+                                    <?php if($dataPenerimaanBarang->status_post === "WAITING" && $details["status_penerimaan"] === "0"){ ?>
+                                        <button data-packaging="<?= $details["packaging"]; ?>" 
+                                        data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" 
+                                        data-pph="<?= $pph; ?>" data-qty_diterima="<?= $qty_diterima; ?>" 
+                                        data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= formatter($details["jml_masuk"], "STR_TO_FLOAT"); ?>" 
+                                        data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" 
+                                        data-keterangan="<?=  $details["keterangan"]; ?>"  
+                                        data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"], 2, '.', ',') : 0; ?>" 
+                                        data-harga="<?=  $details["harga"] ?  number_format($details["harga"], 2, '.', ',') : 0; ?>" 
+                                        data-harga_harian="<?=  $details["harga_harian"] ?  number_format($details["harga_harian"], 2, '.', ',') : 0; ?>" 
+                                        data-harga_bulanan="<?=  $details["harga_bulanan"] ?  number_format($details["harga_bulanan"], 2, '.', ',') : 0; ?>" 
+                                        data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" 
+                                        data-qty="<?=  formatter($details["qty"], "STR_TO_FLOAT"); ?>" 
+                                        data-satuan="<?=  $details["nama_satuan"]; ?>" 
+                                        data-nama_barang="<?=  $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?>" 
+                                        data-kode="<?=  $details["kode_barang"]; ?>" 
+                                        data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" 
+                                        data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button>
+                                    <?php } ?>
                                     </td>
-                                <?php } else { ?>
-                                    <td><?= $no; ?></td>
-                                    <td><?= $details["kode_barang"]; ?></td>
-                                    <td><?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?></td>
-                                    <td><?= $details["po_no"]; ?></td>
-                                    <td><?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?></td>
-                                    <td><?= $details["packaging"]; ?></td>
-                                    <td><?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?></td>
-                                    <td><?= $details["nama_satuan"]; ?></td>
-                                    <td><?= formatter($details["qty"], "STR_TO_FLOAT"); ?></td>
-                                    <td><?= $details["qty_diterima"] ? formatter($details["qty_diterima"], "STR_TO_FLOAT") : 0; ?></td>
-                                    <td><?= $details["remaining_qty"] ? formatter($details["remaining_qty"], "STR_TO_FLOAT") : 0; ?></td>
-                                    <!-- <td><?= $details["jml_masuk"]; ?></td> -->
-                                    <td>Rp <?= $details["harga"] ? number_format($details["harga"], 2, '.', ',') : 0; ?></td>
-                                    <td>Rp <?= $details["sub_total"] ? number_format($details["sub_total"], 2, '.', ',') : 0; ?></td>
-                                    <td><?= $details["keterangan"]; ?></td>
-                                    <td></td>
-                                <?php } ?>
                             </tr>
                         <?php 
                             $no++;
@@ -365,6 +373,8 @@
                             <td><b><?= $total_remaining_qty; ?></b></td>
                             <!-- <td><b><?= $total_jml_masuk; ?></b></td> -->
                             <td><b>Rp <?= number_format($total_harga, 2, '.', ','); ?></b></td>
+                            <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>"><b>Rp <?= number_format($total_harga_harian, 2, '.', ','); ?></b></td>
+                            <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>"><b>Rp <?= number_format($total_harga_bulanan, 2, '.', ','); ?></b></td>
                             <td><b>Rp <?= number_format($total_sub_total, 2, '.', ','); ?></b></td>
                             <td colspan="2"></td>
                         </tr>
@@ -465,7 +475,21 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="number" class="form-control harga_barang_jasa" name="harga_barang_jasa" id="harga_barang_jasa" placeholder="Harga barang/jasa">
-                                <label for="floatingInput">Harga barang/jasa</label>
+                                <label for="floatingInput" class="label-input-harga">Harga barang/jasa</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row baku">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" readonly type="number" class="form-control harga_barang_jasa_harian" name="harga_barang_jasa_harian" id="harga_barang_jasa_harian" placeholder="Harga Harian">
+                                <label for="floatingInput">Harga Harian</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" readonly type="number" class="form-control harga_barang_jasa_bulanan" name="harga_barang_jasa_bulanan" id="harga_barang_jasa_bulanan" placeholder="Harga Bulanan">
+                                <label for="floatingInput">Harga Bulanan</label>
                             </div>
                         </div>
                     </div>
@@ -541,8 +565,12 @@
     let total_qty_diterima = 0;
     let total_remaining_qty = 0;
     let total_jml_harga = 0;
+    let total_jml_harga_harian = 0;
+    let total_jml_harga_bulanan = 0;
     let total_jml_sub_total = 0;
     var priceEdit = 0;
+    var priceHarianEdit = 0;
+    var priceBulananEdit = 0;
     var sub_totalEdit = 0;
 
     <?php if(!empty($dataPenerimaanBarangDetail)){ 
@@ -550,6 +578,8 @@
     ?>
 
     priceEdit = Number('<?= $details["harga"]; ?>');
+    priceHarianEdit = Number('<?= $details["harga_harian"]; ?>');
+    priceBulananEdit = Number('<?= $details["harga_bulanan"]; ?>');
     sub_totalEdit = Number('<?= $details["sub_total"]; ?>');
     row = row + 1;
 
@@ -559,6 +589,8 @@
     total_qty_diterima = total_qty_diterima + Number(<?= $details["qty_diterima"]; ?>);
     total_remaining_qty = total_remaining_qty + Number(<?= $details["remaining_qty"]; ?>);
     total_jml_harga = total_jml_harga + priceEdit;
+    total_jml_harga_harian = total_jml_harga_harian + priceHarianEdit;
+    total_jml_harga_bulanan = total_jml_harga_bulanan + priceBulananEdit;
     total_jml_sub_total = total_jml_sub_total + sub_totalEdit;
 
     list_items.push({
@@ -575,8 +607,10 @@
         remaining_qty: Number(<?= $details["remaining_qty"]; ?>),
         satuan: '<?= $details["nama_satuan"]; ?>',
         jml_masuk: Number(<?= $details["jml_masuk"]; ?>),
-        harga: Number('<?= $details["harga"] ? $details["harga"] : 0; ?>').toLocaleString(),
-        sub_total: Number('<?= $details["sub_total"] ? $details["sub_total"] : 0; ?>').toLocaleString(),
+        harga: Number('<?= $details["harga"] ? $details["harga"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        harga_harian: Number('<?= $details["harga_harian"] ? $details["harga_harian"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        harga_bulanan: Number('<?= $details["harga_bulanan"] ? $details["harga_bulanan"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        sub_total: Number('<?= $details["sub_total"] ? $details["sub_total"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
         keterangan: '<?= $details["keterangan"]; ?>',
         ppn: Number(<?= $details["id_ppn"] ? $details["id_ppn"] : 0; ?>),
         nilai_ppn: '<?= $details["ppn"]; ?>',
@@ -1043,6 +1077,8 @@
             // let nilai_pph = $(".pph option:selected").text()
             let nilai_sub_total = $(".nilai_sub_total").val() ? Number($(".nilai_sub_total").val()).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0
             let purchase_order_details_id = $(".purchase_order_details_id").val()
+            let harga_harian = Number($(".harga_barang_jasa_harian").val()).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            let harga_bulanan = Number($(".harga_barang_jasa_bulanan").val()).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
             let harga = Number($(".harga_barang_jasa").val()).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
             let jml_masuk = $(".jml_masuk").val() ? Number($(".jml_masuk").val()) : 0
             let qty_diterima = $(".qty_diterima").val() ? Number($(".qty_diterima").val()) : 0
@@ -1127,225 +1163,477 @@
                                             total_remaining_qty = 0;
                                             total_jml_masuk = 0;
                                             total_jml_harga = 0;
+                                            total_jml_harga_harian = 0;
+                                            total_jml_bulanan = 0;
                                             total_jml_sub_total = 0;
+
+                                            console.log(list_items)
 
                                             $(".body-detail-table").empty()
 
-                                            console.log(list_items)
-                                            list_items.map(item => {
-                                                if(item.row == row_detail)
-                                                {
-                                                    tag_html += `<tr>`;
-                                                    tag_html += `<td>`;
-                                                    tag_html += row + 1;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += kode_barang;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += nama_barang;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.po_no;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.status_penerimaan;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += packaging;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += packaging_qty;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += satuan;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += qty;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += qty_diterima;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += remaining_qty;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += "Rp " + harga;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += "Rp " + nilai_sub_total;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += keterangan;
-                                                    tag_html += "</td>";
-                                                    tag_html += "<td>";
-                                                    tag_html += `
-                                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="${packaging}" data-packaging_qty="${packaging_qty}" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="${jml_masuk}" data-barang_id="${barang_id}" data-unit="${unit}" data-keterangan="${keterangan}" data-ppn="${ppn}" data-pph="${pph}" data-sub_total="${nilai_sub_total}" data-harga="${harga}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">
-                                                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                                    </button>`;
-                                                    tag_html += "</td>";
-                                                    // tag_html += `<td>`;
-                                                    // tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                                                    // tag_html += "</td>";
-                                                    tag_html += "</tr>";
+                                            // jika bahan baku
+                                            if($(".tipe_bahan").val() === "BAKU")
+                                            {
+                                                list_items.map(item => {
+                                                    if(item.row == row_detail)
+                                                    {
+                                                        tag_html += `<tr>`;
+                                                        tag_html += `<td>`;
+                                                        tag_html += row + 1;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += kode_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += nama_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.po_no;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.status_penerimaan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += packaging;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += packaging_qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += satuan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += qty_diterima;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += remaining_qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + harga;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + harga_harian;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + harga_bulanan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + nilai_sub_total;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += keterangan;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += `
+                                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-harga_harian="${harga_harian}" data-harga_bulanan="${harga_bulanan}" data-packaging="${packaging}" data-packaging_qty="${packaging_qty}" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="${jml_masuk}" data-barang_id="${barang_id}" data-unit="${unit}" data-keterangan="${keterangan}" data-ppn="${ppn}" data-pph="${pph}" data-sub_total="${nilai_sub_total}" data-harga="${harga}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">
+                                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                                        </button>`;
+                                                        tag_html += "</td>";
+                                                        // tag_html += `<td>`;
+                                                        // tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                                                        // tag_html += "</td>";
+                                                        tag_html += "</tr>";
 
-                                                    new_list_items.push({
-                                                        id: item.id,
-                                                        purchase_order_details_id: purchase_order_details_id,
-                                                        row: row + 1,
-                                                        barang_id: barang_id,
-                                                        unit: unit,
-                                                        kode_barang: kode_barang,
-                                                        nama_barang: nama_barang,
-                                                        nama_barang_dokumen: nama_barang_dokumen,
-                                                        qty: qty,
-                                                        qty_diterima: qty_diterima,
-                                                        remaining_qty: remaining_qty,
-                                                        satuan: satuan,
-                                                        jml_masuk: jml_masuk,
-                                                        harga: harga,
-                                                        sub_total: nilai_sub_total,
-                                                        keterangan: keterangan,
-                                                        // ppn: ppn,
-                                                        // nilai_ppn: nilai_ppn,
-                                                        // pph: pph,
-                                                        // nilai_pph: nilai_pph,
-                                                        ppn: 0,
-                                                        nilai_ppn: 0,
-                                                        pph: 0,
-                                                        nilai_pph: 0,
-                                                        status_penerimaan: item.status_penerimaan,
-                                                        po_no: item.po_no,
-                                                        packaging: packaging,
-                                                        packaging_qty: packaging_qty,
-                                                    });
+                                                        new_list_items.push({
+                                                            id: item.id,
+                                                            purchase_order_details_id: purchase_order_details_id,
+                                                            row: row + 1,
+                                                            barang_id: barang_id,
+                                                            unit: unit,
+                                                            kode_barang: kode_barang,
+                                                            nama_barang: nama_barang,
+                                                            nama_barang_dokumen: nama_barang_dokumen,
+                                                            qty: qty,
+                                                            qty_diterima: qty_diterima,
+                                                            remaining_qty: remaining_qty,
+                                                            satuan: satuan,
+                                                            jml_masuk: jml_masuk,
+                                                            harga: harga,
+                                                            harga_harian: harga_harian,
+                                                            harga_bulanan: harga_bulanan,
+                                                            sub_total: nilai_sub_total,
+                                                            keterangan: keterangan,
+                                                            // ppn: ppn,
+                                                            // nilai_ppn: nilai_ppn,
+                                                            // pph: pph,
+                                                            // nilai_pph: nilai_pph,
+                                                            ppn: 0,
+                                                            nilai_ppn: 0,
+                                                            pph: 0,
+                                                            nilai_pph: 0,
+                                                            status_penerimaan: item.status_penerimaan,
+                                                            po_no: item.po_no,
+                                                            packaging: packaging,
+                                                            packaging_qty: packaging_qty,
+                                                        });
 
-                                                    total_jml_kemasan = total_jml_kemasan + packaging_qty;
-                                                    total_jml_order = total_jml_order + qty;
-                                                    total_jml_masuk = total_jml_masuk + jml_masuk;
-                                                    total_qty_diterima = total_qty_diterima + qty_diterima;
-                                                    total_remaining_qty = total_remaining_qty + remaining_qty;
-                                                    total_jml_harga = total_jml_harga + (harga ? Number(harga.replaceAll(",", "")) : 0);
-                                                    total_jml_sub_total = total_jml_sub_total + (nilai_sub_total ? Number(nilai_sub_total.replaceAll(",", "")) : 0);
-                                                
+                                                        total_jml_kemasan = total_jml_kemasan + packaging_qty;
+                                                        total_jml_order = total_jml_order + qty;
+                                                        total_jml_masuk = total_jml_masuk + jml_masuk;
+                                                        total_qty_diterima = total_qty_diterima + qty_diterima;
+                                                        total_remaining_qty = total_remaining_qty + remaining_qty;
+                                                        total_jml_harga = total_jml_harga + (harga ? Number(harga.replaceAll(",", "")) : 0);
+                                                        total_jml_harga_harian = total_jml_harga_harian + (harga_harian ? Number(harga_harian.replaceAll(",", "")) : 0);
+                                                        total_jml_harga_bulanan = total_jml_harga_bulanan + (harga_bulanan ? Number(harga_bulanan.replaceAll(",", "")) : 0);
+                                                        total_jml_sub_total = total_jml_sub_total + (nilai_sub_total ? Number(nilai_sub_total.replaceAll(",", "")) : 0);
+                                                    
 
-                                                }
-                                                else
-                                                {
-                                                    tag_html += `<tr>`;
-                                                    tag_html += `<td>`;
-                                                    tag_html += row + 1;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.kode_barang;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.nama_barang;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.po_no;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.status_penerimaan;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.packaging;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.packaging_qty ? item.packaging_qty : 0;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.satuan;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.qty;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.qty_diterima;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.remaining_qty;
-                                                    tag_html += "</td>";
-                                                    // tag_html += `<td>`;
-                                                    // tag_html += item.jml_masuk;
-                                                    // tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += "Rp " + item.harga;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += "Rp " + item.sub_total;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += item.keterangan;
-                                                    tag_html += "</td>";
-                                                    tag_html += `<td>`;
-                                                    tag_html += `
-                                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">
-                                                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                                    </button>`;
-                                                    tag_html += "</td>";
-                                                    // tag_html += `<td>`;
-                                                    // tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                                                    // tag_html += "</td>";
-                                                    tag_html += "</tr>";
+                                                    }
+                                                    else
+                                                    {
+                                                        tag_html += `<tr>`;
+                                                        tag_html += `<td>`;
+                                                        tag_html += row + 1;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.kode_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.nama_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.po_no;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.status_penerimaan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.packaging;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.packaging_qty ? item.packaging_qty : 0;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.satuan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.qty_diterima;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.remaining_qty;
+                                                        tag_html += "</td>";
+                                                        // tag_html += `<td>`;
+                                                        // tag_html += item.jml_masuk;
+                                                        // tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + item.harga;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + item.harga_harian;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + item.harga_bulanan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + item.sub_total;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.keterangan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += `
+                                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-harga_harian="${item.harga_harian}" data-harga_bulanan="${item.harga_bulanan}" data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">
+                                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                                        </button>`;
+                                                        tag_html += "</td>";
+                                                        // tag_html += `<td>`;
+                                                        // tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                                                        // tag_html += "</td>";
+                                                        tag_html += "</tr>";
 
-                                                    new_list_items.push(item);
+                                                        new_list_items.push(item);
 
-                                                    total_jml_kemasan = total_jml_kemasan + item.packaging_qty;
-                                                    total_jml_order = total_jml_order + item.qty;
-                                                    total_jml_masuk = total_jml_masuk + item.jml_masuk;
-                                                    total_qty_diterima = total_qty_diterima + item.qty_diterima;
-                                                    total_remaining_qty = total_remaining_qty + item.remaining_qty;
-                                                    total_jml_harga = total_jml_harga + (item.harga ? Number(item.harga.replaceAll(",", "")) : 0);
-                                                    total_jml_sub_total = total_jml_sub_total + (item.sub_total ? Number(item.sub_total.replaceAll(",", "")) : 0);
-                                                
-                                                }
-                                                row = row + 1;
-                                            })
+                                                        total_jml_kemasan = total_jml_kemasan + item.packaging_qty;
+                                                        total_jml_order = total_jml_order + item.qty;
+                                                        total_jml_masuk = total_jml_masuk + item.jml_masuk;
+                                                        total_qty_diterima = total_qty_diterima + item.qty_diterima;
+                                                        total_remaining_qty = total_remaining_qty + item.remaining_qty;
+                                                        total_jml_harga = total_jml_harga + (item.harga ? Number(item.harga.replaceAll(",", "")) : 0);
+                                                        total_jml_harga_harian = total_jml_harga_harian + (item.harga_harian ? Number(item.harga_harian.replaceAll(",", "")) : 0);
+                                                        total_jml_harga_bulanan = total_jml_harga_bulanan + (item.harga_bulanan ? Number(item.harga_bulanan.replaceAll(",", "")) : 0);
+                                                        total_jml_sub_total = total_jml_sub_total + (item.sub_total ? Number(item.sub_total.replaceAll(",", "")) : 0);
+                                                    
+                                                    }
+                                                    row = row + 1;
+                                                })
 
-                                            list_items = [];
+                                                list_items = [];
 
-                                            list_items = new_list_items;
+                                                list_items = new_list_items;
 
-                                            $(".body-detail-table").append(tag_html)
+                                                $(".body-detail-table").append(tag_html)
 
-                                            $(".foot-detail-table").empty()
-                                            tag_total += `<tr>`;
-                                            tag_total += `<td>`;
-                                            tag_total += "</td>";
-                                            tag_total += `<td>`;
-                                            tag_total += `GRAND TOTAL`;
-                                            tag_total += "</td>";
-                                            tag_total += `<td colspan='4'>`;
-                                            tag_total += "</td>";
-                                            tag_total += `<td>`;
-                                            tag_total += total_jml_kemasan;
-                                            tag_total += "</td>";
-                                            tag_total += `<td colspan='1'>`;
-                                            tag_total += "</td>";
-                                            tag_total += `<td>`;
-                                            tag_total += total_jml_order;
-                                            tag_total += "</td>";
-                                            tag_total += `<td>`;
-                                            tag_total += total_qty_diterima;
-                                            tag_total += "</td>";
-                                            tag_total += `<td>`;
-                                            tag_total += total_remaining_qty;
-                                            tag_total += "</td>";
-                                            // tag_total += `<td>`;
-                                            // tag_total += total_jml_masuk;
-                                            // tag_total += "</td>";
-                                            tag_total += `<td>`;
-                                            tag_total += "Rp " + total_jml_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                            tag_total += "</td>";
-                                            tag_total += `<td>`;
-                                            tag_total += "Rp " + total_jml_sub_total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                            tag_total += "</td>";
-                                            tag_total += `<td colspan="2">`;
-                                            tag_total += "</td>";
-                                            tag_total += "</tr>";
+                                                $(".foot-detail-table").empty()
+                                                tag_total += `<tr>`;
+                                                tag_total += `<td>`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += `GRAND TOTAL`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td colspan='4'>`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_jml_kemasan;
+                                                tag_total += "</td>";
+                                                tag_total += `<td colspan='1'>`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_jml_order;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_qty_diterima;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_remaining_qty;
+                                                tag_total += "</td>";
+                                                // tag_total += `<td>`;
+                                                // tag_total += total_jml_masuk;
+                                                // tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += "Rp " + total_jml_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += "Rp " + total_jml_harga_harian.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += "Rp " + total_jml_harga_bulanan.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += "Rp " + total_jml_sub_total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                                tag_total += "</td>";
+                                                tag_total += `<td colspan="2">`;
+                                                tag_total += "</td>";
+                                                tag_total += "</tr>";
 
-                                            $(".foot-detail-table").append(tag_total);
+                                                $(".foot-detail-table").append(tag_total);
+                                            }
+
+                                            // jika bahan penolong
+                                            if($(".tipe_bahan").val() === "PENOLONG")
+                                            {
+                                                list_items.map(item => {
+                                                    if(item.row == row_detail)
+                                                    {
+                                                        tag_html += `<tr>`;
+                                                        tag_html += `<td>`;
+                                                        tag_html += row + 1;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += kode_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += nama_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.po_no;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.status_penerimaan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += packaging;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += packaging_qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += satuan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += qty_diterima;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += remaining_qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + harga;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + nilai_sub_total;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += keterangan;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += `
+                                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-harga_harian="0.00" data-harga_bulanan="0.00" data-packaging="${packaging}" data-packaging_qty="${packaging_qty}" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="${jml_masuk}" data-barang_id="${barang_id}" data-unit="${unit}" data-keterangan="${keterangan}" data-ppn="${ppn}" data-pph="${pph}" data-sub_total="${nilai_sub_total}" data-harga="${harga}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">
+                                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                                        </button>`;
+                                                        tag_html += "</td>";
+                                                        // tag_html += `<td>`;
+                                                        // tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                                                        // tag_html += "</td>";
+                                                        tag_html += "</tr>";
+
+                                                        new_list_items.push({
+                                                            id: item.id,
+                                                            purchase_order_details_id: purchase_order_details_id,
+                                                            row: row + 1,
+                                                            barang_id: barang_id,
+                                                            unit: unit,
+                                                            kode_barang: kode_barang,
+                                                            nama_barang: nama_barang,
+                                                            nama_barang_dokumen: nama_barang_dokumen,
+                                                            qty: qty,
+                                                            qty_diterima: qty_diterima,
+                                                            remaining_qty: remaining_qty,
+                                                            satuan: satuan,
+                                                            jml_masuk: jml_masuk,
+                                                            harga: harga,
+                                                            harga_harian: 0.00,
+                                                            harga_bulanan: 0.00,
+                                                            sub_total: nilai_sub_total,
+                                                            keterangan: keterangan,
+                                                            // ppn: ppn,
+                                                            // nilai_ppn: nilai_ppn,
+                                                            // pph: pph,
+                                                            // nilai_pph: nilai_pph,
+                                                            ppn: 0,
+                                                            nilai_ppn: 0,
+                                                            pph: 0,
+                                                            nilai_pph: 0,
+                                                            status_penerimaan: item.status_penerimaan,
+                                                            po_no: item.po_no,
+                                                            packaging: packaging,
+                                                            packaging_qty: packaging_qty,
+                                                        });
+
+                                                        total_jml_kemasan = total_jml_kemasan + packaging_qty;
+                                                        total_jml_order = total_jml_order + qty;
+                                                        total_jml_masuk = total_jml_masuk + jml_masuk;
+                                                        total_qty_diterima = total_qty_diterima + qty_diterima;
+                                                        total_remaining_qty = total_remaining_qty + remaining_qty;
+                                                        total_jml_harga = total_jml_harga + (harga ? Number(harga.replaceAll(",", "")) : 0);
+                                                        total_jml_sub_total = total_jml_sub_total + (nilai_sub_total ? Number(nilai_sub_total.replaceAll(",", "")) : 0);
+                                                    
+
+                                                    }
+                                                    else
+                                                    {
+                                                        tag_html += `<tr>`;
+                                                        tag_html += `<td>`;
+                                                        tag_html += row + 1;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.kode_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.nama_barang;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.po_no;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.status_penerimaan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.packaging;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.packaging_qty ? item.packaging_qty : 0;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.satuan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.qty;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.qty_diterima;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.remaining_qty;
+                                                        tag_html += "</td>";
+                                                        // tag_html += `<td>`;
+                                                        // tag_html += item.jml_masuk;
+                                                        // tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + item.harga;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += "Rp " + item.sub_total;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += item.keterangan;
+                                                        tag_html += "</td>";
+                                                        tag_html += `<td>`;
+                                                        tag_html += `
+                                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-harga_harian="0.00" data-harga_bulanan="0.00" data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">
+                                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                                        </button>`;
+                                                        tag_html += "</td>";
+                                                        // tag_html += `<td>`;
+                                                        // tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                                                        // tag_html += "</td>";
+                                                        tag_html += "</tr>";
+
+                                                        new_list_items.push(item);
+
+                                                        total_jml_kemasan = total_jml_kemasan + item.packaging_qty;
+                                                        total_jml_order = total_jml_order + item.qty;
+                                                        total_jml_masuk = total_jml_masuk + item.jml_masuk;
+                                                        total_qty_diterima = total_qty_diterima + item.qty_diterima;
+                                                        total_remaining_qty = total_remaining_qty + item.remaining_qty;
+                                                        total_jml_harga = total_jml_harga + (item.harga ? Number(item.harga.replaceAll(",", "")) : 0);
+                                                        total_jml_sub_total = total_jml_sub_total + (item.sub_total ? Number(item.sub_total.replaceAll(",", "")) : 0);
+                                                    
+                                                    }
+                                                    row = row + 1;
+                                                })
+
+                                                list_items = [];
+
+                                                list_items = new_list_items;
+
+                                                $(".body-detail-table").append(tag_html)
+
+                                                $(".foot-detail-table").empty()
+                                                tag_total += `<tr>`;
+                                                tag_total += `<td>`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += `GRAND TOTAL`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td colspan='4'>`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_jml_kemasan;
+                                                tag_total += "</td>";
+                                                tag_total += `<td colspan='1'>`;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_jml_order;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_qty_diterima;
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += total_remaining_qty;
+                                                tag_total += "</td>";
+                                                // tag_total += `<td>`;
+                                                // tag_total += total_jml_masuk;
+                                                // tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += "Rp " + total_jml_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                                tag_total += "</td>";
+                                                tag_total += `<td>`;
+                                                tag_total += "Rp " + total_jml_sub_total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                                tag_total += "</td>";
+                                                tag_total += `<td colspan="2">`;
+                                                tag_total += "</td>";
+                                                tag_total += "</tr>";
+
+                                                $(".foot-detail-table").append(tag_total);  
+                                            }
 
                                             $(".detail-modal").modal("hide")
                                         }
@@ -1494,11 +1782,14 @@
                                                     qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
                                                     jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
                                                     harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                    harga_harian: obj.harga_harian ? Number(obj.harga_harian.replaceAll(",", "")) : 0,
+                                                    harga_bulanan: obj.harga_bulanan ? Number(obj.harga_bulanan.replaceAll(",", "")) : 0,
                                                     sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
                                                     keterangan: obj.keterangan,
                                                     ppn: obj.ppn ? Number(obj.ppn) : 0,
                                                     pph: obj.pph ? Number(obj.pph) : 0,
                                                     packaging: obj.packaging,
+                                                    packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
                                                     is_delete: true
                                                 }
                                             )
@@ -1519,11 +1810,14 @@
                                                     qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
                                                     jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
                                                     harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                    harga_harian: obj.harga_harian ? Number(obj.harga_harian.replaceAll(",", "")) : 0,
+                                                    harga_bulanan: obj.harga_bulanan ? Number(obj.harga_bulanan.replaceAll(",", "")) : 0,
                                                     sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
                                                     keterangan: obj.keterangan,
                                                     ppn: obj.ppn ? Number(obj.ppn) : 0,
                                                     pph: obj.pph ? Number(obj.pph) : 0,
                                                     packaging: obj.packaging,
+                                                    packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
                                                     is_delete: false
                                                 }
                                             )
@@ -1542,6 +1836,8 @@
                                                     qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
                                                     jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
                                                     harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                    harga_harian: obj.harga_harian ? Number(obj.harga_harian.replaceAll(",", "")) : 0,
+                                                    harga_bulanan: obj.harga_bulanan ? Number(obj.harga_bulanan.replaceAll(",", "")) : 0,
                                                     sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
                                                     keterangan: obj.keterangan,
                                                     ppn: obj.ppn ? Number(obj.ppn) : 0,
@@ -1631,6 +1927,8 @@
                                                 qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
                                                 jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
                                                 harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                harga_harian: obj.harga_harian ? Number(obj.harga_harian.replaceAll(",", "")) : 0,
+                                                harga_bulanan: obj.harga_bulanan ? Number(obj.harga_bulanan.replaceAll(",", "")) : 0,
                                                 sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
                                                 keterangan: obj.keterangan,
                                                 ppn: obj.ppn ? Number(obj.ppn) : 0,
@@ -1713,7 +2011,9 @@
         $(".harga_barang_jasa, .jml_masuk").keyup(function() {
             let qty = $(".jml_masuk").val() !== null ? Number($(".jml_masuk").val()) : 0;
             let harga = $(".harga_barang_jasa").val() !== null ? Number($(".harga_barang_jasa").val()) : 0;
-            $(".nilai_sub_total").val(qty * harga)
+            let harga_harian = $(".harga_barang_jasa_harian").val() !== null ? Number($(".harga_barang_jasa_harian").val()) : 0;
+            let harga_bulanan = $(".harga_barang_jasa_bulanan").val() !== null ? Number($(".harga_barang_jasa_bulanan").val()) : 0;
+            $(".nilai_sub_total").val(qty * (harga + harga_harian + harga_bulanan))
         })
 
         $(".nilai_sub_total").keyup(function() {
@@ -1734,6 +2034,8 @@
             total_qty_diterima = 0;
             total_remaining_qty = 0;
             total_jml_harga = 0;
+            total_jml_harga_harian = 0;
+            total_jml_harga_bulanan = 0;
             total_jml_sub_total = 0;
 
             list_items.map((item) => {
@@ -1749,47 +2051,104 @@
             let arr = $('.multiple_po_id').val();
 
             let tag_html = "";
-            let tag_total = "";
 
             $(".body-detail-table").empty();
-            $(".foot-detail-table").empty();
 
-            tag_total += `<tr>`;
-            tag_total += `<td>`;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += `GRAND TOTAL`;
-            tag_total += "</td>";
-            tag_total += `<td colspan='4'>`;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += total_jml_kemasan;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += total_jml_order;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            // tag_total += `<td>`;
-            // tag_total += 0;
-            // tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td colspan="2">`;
-            tag_total += "</td>";
-            tag_total += "</tr>";
+            if($(".tipe_bahan").val() === "BAKU")
+            {
+                $(".col_harian").css("display", "")
+                $(".col_bulanan").css("display", "")
 
-            $(".foot-detail-table").append(tag_total);
+                let tag_total = "";
+                $(".foot-detail-table").empty()
+                tag_total += `<tr>`;
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += `GRAND TOTAL`;
+                tag_total += "</td>";
+                tag_total += `<td colspan='4'>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += total_jml_kemasan;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += total_jml_order;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                // tag_total += `<td>`;
+                // tag_total += 0;
+                // tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td colspan="2">`;
+                tag_total += "</td>";
+                tag_total += "</tr>";
+
+                $(".foot-detail-table").append(tag_total);
+            }
+            else
+            {
+                $(".col_harian").css("display", "none")
+                $(".col_bulanan").css("display", "none")
+
+                let tag_total = "";
+                $(".foot-detail-table").empty()
+                tag_total += `<tr>`;
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += `GRAND TOTAL`;
+                tag_total += "</td>";
+                tag_total += `<td colspan='4'>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += total_jml_kemasan;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += total_jml_order;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                // tag_total += `<td>`;
+                // tag_total += 0;
+                // tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td colspan="2">`;
+                tag_total += "</td>";
+                tag_total += "</tr>";
+
+                $(".foot-detail-table").append(tag_total);
+            }
+            
 
             if($(".tipe_bahan").val() === "BAKU")
             {
@@ -1807,6 +2166,8 @@
                             res.data.forEach(function(item) {
                                 let sub_total_sementara = (0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 let harga_sementara = item.general_price ? Number(item.general_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0;
+                                let harga_harian_sementara = item.daily_price ? Number(item.daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0;
+                                let harga_bulanan_sementara = item.monthly_price ? Number(item.monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0;
                                 let qty_sementara = item.qty ? Number(item.qty) : 0;
                                 let qty_diterima = item.qty_diterima ? Number(item.qty_diterima) : 0;
                                 let remaining_qty = item.remaining_qty ? Number(item.remaining_qty) : 0;
@@ -1822,13 +2183,15 @@
                                         unit: item.id_satuan,
                                         kode_barang: item.kode_barang,
                                         nama_barang: item.nama_barang + " (" + item.spesifikasi + ")",
-                                        nama_barang_dokumen: item.nama_barang,
+                                        nama_barang_dokumen: item.nama_barang + " (" + item.spesifikasi + ")",
                                         qty: qty_sementara,
                                         qty_diterima: qty_diterima,
                                         remaining_qty: remaining_qty,
                                         satuan: item.nama_satuan,
                                         jml_masuk: 0,
                                         harga: harga_sementara,
+                                        harga_harian: harga_harian_sementara,
+                                        harga_bulanan: harga_bulanan_sementara,
                                         sub_total: sub_total_sementara,
                                         keterangan: item.note,
                                         status_penerimaan: "OPEN",
@@ -1878,6 +2241,12 @@
                                     tag_html += "Rp " + harga_sementara;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
+                                    tag_html += "Rp " + harga_harian_sementara;
+                                    tag_html += "</td>";
+                                    tag_html += `<td>`;
+                                    tag_html += "Rp " + harga_bulanan_sementara;
+                                    tag_html += "</td>";
+                                    tag_html += `<td>`;
                                     tag_html += "Rp " + sub_total_sementara;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
@@ -1885,7 +2254,7 @@
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += `
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.id_satuan}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang + " (" + item.spesifikasi + ")"}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
+                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-harga_harian="${harga_harian_sementara}" data-harga_bulanan="${harga_bulanan_sementara}" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.id_satuan}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang + " (" + item.spesifikasi + ")"}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang + " (" + item.spesifikasi + ")"}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
                                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                     </button>`;
                                     tag_html += "</td>";
@@ -1898,6 +2267,8 @@
                                     total_qty_diterima = total_qty_diterima + qty_diterima;
                                     total_remaining_qty = total_remaining_qty + remaining_qty;
                                     total_jml_harga = total_jml_harga + Number(harga_sementara.replaceAll(",", ""));
+                                    total_jml_harga_harian = total_jml_harga_harian + Number(harga_harian_sementara.replaceAll(",", ""));
+                                    total_jml_harga_bulanan = total_jml_harga_bulanan + Number(harga_bulanan_sementara.replaceAll(",", ""));
                                     total_jml_sub_total = total_jml_sub_total + (sub_total_sementara ? Number(sub_total_sementara.replaceAll(",", "")) : 0);
 
                                     row = row + 1;
@@ -1933,6 +2304,12 @@
                                     // tag_total += "</td>";
                                     tag_total += `<td>`;
                                     tag_total += "Rp " + total_jml_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_total += "</td>";
+                                    tag_total += `<td>`;
+                                    tag_total += "Rp " + total_jml_harga_harian.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_total += "</td>";
+                                    tag_total += `<td>`;
+                                    tag_total += "Rp " + total_jml_harga_bulanan.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     tag_total += "</td>";
                                     tag_total += `<td>`;
                                     tag_total += "Rp " + total_jml_sub_total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1987,6 +2364,8 @@
                                         satuan: item.nama_satuan,
                                         jml_masuk: 0,
                                         harga: harga_sementara,
+                                        harga_harian: 0.00,
+                                        harga_bulanan: 0.00,
                                         sub_total: sub_total_sementara,
                                         keterangan: item.spp_note,
                                         status_penerimaan: "OPEN",
@@ -2043,7 +2422,7 @@
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += `
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.spp_note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
+                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-harga_harian="0.00" data-harga_bulanan="0.00" data-packaging="" data-packaging_qty="" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.spp_note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">
                                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                     </button>`;
                                     tag_html += "</td>";
@@ -2130,44 +2509,100 @@
             list_items = [];
             $(".body-detail-table").empty();
 
-            let tag_total = "";
-            $(".foot-detail-table").empty()
-            tag_total += `<tr>`;
-            tag_total += `<td>`;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += `GRAND TOTAL`;
-            tag_total += "</td>";
-            tag_total += `<td colspan='4'>`;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            // tag_total += `<td>`;
-            // tag_total += 0;
-            // tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += 0;
-            tag_total += "</td>";
-            tag_total += `<td colspan="1">`;
-            tag_total += "</td>";
-            tag_total += "</tr>";
+            if($(".tipe_bahan").val() === "BAKU")
+            {
+                $(".col_harian").css("display", "")
+                $(".col_bulanan").css("display", "")
 
-            $(".foot-detail-table").append(tag_total);
+                let tag_total = "";
+                $(".foot-detail-table").empty()
+                tag_total += `<tr>`;
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += `GRAND TOTAL`;
+                tag_total += "</td>";
+                tag_total += `<td colspan='4'>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                // tag_total += `<td>`;
+                // tag_total += 0;
+                // tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td colspan="2">`;
+                tag_total += "</td>";
+                tag_total += "</tr>";
+
+                $(".foot-detail-table").append(tag_total);
+            }
+            else
+            {
+                $(".col_harian").css("display", "none")
+                $(".col_bulanan").css("display", "none")
+
+                let tag_total = "";
+                $(".foot-detail-table").empty()
+                tag_total += `<tr>`;
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += `GRAND TOTAL`;
+                tag_total += "</td>";
+                tag_total += `<td colspan='4'>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += 0;
+                tag_total += "</td>";
+                // tag_total += `<td>`;
+                // tag_total += 0;
+                // tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td>`;
+                tag_total += "Rp 0,00";
+                tag_total += "</td>";
+                tag_total += `<td colspan="2">`;
+                tag_total += "</td>";
+                tag_total += "</tr>";
+
+                $(".foot-detail-table").append(tag_total);
+            }
 
             // $(".supplier_id").attr("disabled", "true");
             
@@ -2228,17 +2663,21 @@
         })
     })
 
-    const changeStatus = function()
-    {
+    const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
 
-        if(value)
-        {
+        if (value) {
             $(".no_penerimaan_barang").attr("readonly", true);
-            $(".no_penerimaan_barang").val("AUTO GENERATE");
-        }
-        else
-        {
+
+            $.ajax({
+                url: `<?= base_url("penerimaan-barang-lokal/generate"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".no_penerimaan_barang").val(res?.data);
+                }
+            })
+        } else {
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");
         }
@@ -2251,6 +2690,8 @@
         let pph = $(this).data('pph') ? Number($(this).data('pph')) : ""
         let sub_total = $(this).data('sub_total')
         let harga = $(this).data('harga')
+        let harga_harian = $(this).data('harga_harian')
+        let harga_bulanan = $(this).data('harga_bulanan')
         let qty = $(this).data('qty')
         let nama_barang_dokumen = $(this).data('nama_barang_dokumen')
         let satuan = $(this).data('satuan')
@@ -2280,6 +2721,24 @@
         $(".jml_masuk").val(jml_masuk)
         $(".nilai_sub_total").val(sub_total.replaceAll(",", ""))
         $(".harga_barang_jasa").val(harga.replaceAll(",", ""))
+        $(".harga_barang_jasa_harian").val(harga_harian.replaceAll(",", ""))
+        $(".harga_barang_jasa_bulanan").val(harga_bulanan.replaceAll(",", ""))
+
+        if($(".tipe_bahan").val() === "BAKU")
+        {
+            $(".nilai_sub_total").attr("readonly", true)
+            $(".harga_barang_jasa").attr("readonly", true)
+            $(".baku").css("display", "")
+            $(".label-input-harga").text("Harga Umum")
+        }
+        else
+        {
+            $(".nilai_sub_total").attr("readonly", false)
+            $(".harga_barang_jasa").attr("readonly", false)
+            $(".baku").css("display", "none")
+            $(".label-input-harga").text("Harga barang/jasa")
+        }
+
         $(".keterangan").val(keterangan)
         $(".barang_id").val(barang_id)
         $(".qty").val(qty)
@@ -2344,6 +2803,7 @@
         total_jml_harga = 0;
         total_jml_sub_total = 0;
 
+        
         list_items.map(item => {
             if(item.id)
             {
@@ -2354,45 +2814,6 @@
         row = 0;
         list_items = [];
         $(".body-detail-table").empty();
-
-        let tag_total = "";
-        $(".foot-detail-table").empty()
-        tag_total += `<tr>`;
-        tag_total += `<td>`;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += `GRAND TOTAL`;
-        tag_total += "</td>";
-        tag_total += `<td colspan='4'>`;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
-        tag_total += "</td>";
-        // tag_total += `<td>`;
-        // tag_total += 0;
-        // tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
-        tag_total += "</td>";
-        tag_total += `<td colspan="2">`;
-        tag_total += "</td>";
-        tag_total += "</tr>";
-
-        $(".foot-detail-table").append(tag_total);
 
         //$(".supplier_id").attr("disabled", "true");
 
@@ -2441,6 +2862,103 @@
                     $(".supplier_id").val("").change();
                 }
             })
+        }
+
+        if($(".tipe_bahan").val() === "BAKU")
+        {
+            $(".label-harga").text("Harga Umum");
+            $(".col_harian").css("display", "")
+            $(".col_bulanan").css("display", "")
+
+            let tag_total = "";
+            $(".foot-detail-table").empty()
+            tag_total += `<tr>`;
+            tag_total += `<td>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += `GRAND TOTAL`;
+            tag_total += "</td>";
+            tag_total += `<td colspan='4'>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            // tag_total += `<td>`;
+            // tag_total += 0;
+            // tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "Rp 0,00";
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "Rp 0,00";
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "Rp 0,00";
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "Rp 0,00";
+            tag_total += "</td>";
+            tag_total += `<td colspan="2">`;
+            tag_total += "</td>";
+            tag_total += "</tr>";
+
+            $(".foot-detail-table").append(tag_total);
+        }
+        else
+        {
+            $(".label-harga").text("Harga");
+            $(".col_harian").css("display", "none")
+            $(".col_bulanan").css("display", "none")
+
+            let tag_total = "";
+            $(".foot-detail-table").empty()
+            tag_total += `<tr>`;
+            tag_total += `<td>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += `GRAND TOTAL`;
+            tag_total += "</td>";
+            tag_total += `<td colspan='4'>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            // tag_total += `<td>`;
+            // tag_total += 0;
+            // tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "Rp 0,00";
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += "Rp 0,00";
+            tag_total += "</td>";
+            tag_total += `<td colspan="2">`;
+            tag_total += "</td>";
+            tag_total += "</tr>";
+
+            $(".foot-detail-table").append(tag_total);
         }
     }
 

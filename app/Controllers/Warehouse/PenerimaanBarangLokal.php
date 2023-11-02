@@ -413,7 +413,7 @@ class PenerimaanBarangLokal extends BaseController
 
                 $payload = [
                     "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
+                    "no_penerimaan_barang" => $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
@@ -431,12 +431,24 @@ class PenerimaanBarangLokal extends BaseController
                 $this->penerimaanBarangModel->db->transException(true)->transStart();
                 $response =  $this->penerimaanBarangModel->insert($payload);
 
+                // $data = [
+                //     "id"        => $response,
+                //     "status"    => false,
+                //     "message"   => json_encode($items),
+                //     "payload"   => $payload,
+                //     "response"  => $response,
+                //     'token'     => csrf_hash()
+                // ];
+                // return json_encode($data);
+
                 foreach($items as $data) {
 
                     $detailPayload[] = [
                         'purchase_order_details_id' => $data->purchase_order_details_id,
                         'penerimaan_barang_id' => $response,
                         'harga' => $data->harga,
+                        'harga_harian' => $data->harga_harian,
+                        'harga_bulanan' => $data->harga_bulanan,
                         'sub_total' => $data->sub_total,
                         'keterangan' => $data->keterangan,
                         'barang_id' => $data->barang_id,
@@ -529,7 +541,7 @@ class PenerimaanBarangLokal extends BaseController
 
                 $payload = [
                     "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
+                    "no_penerimaan_barang" => $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
@@ -555,6 +567,8 @@ class PenerimaanBarangLokal extends BaseController
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $id,
                             'harga' => $data->harga,
+                            'harga_harian' => $data->harga_harian,
+                            'harga_bulanan' => $data->harga_bulanan,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
                             'barang_id' => $data->barang_id,
@@ -1204,6 +1218,28 @@ class PenerimaanBarangLokal extends BaseController
         ];
 
         echo json_encode($data);
+        return;
+    }
+
+    public function generatePenerimaanBarang()
+    {
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
+        if ($no) {
+            $data = [
+                "status"  => true,
+                "data"  => $no
+            ];
+            echo json_encode($data);
+        } else {
+            $message = 'Gagal Auto Generate';
+            $data = [
+                "status" => false,
+                "message"  => $message
+            ];
+            echo json_encode($data);
+        }
+
         return;
     }
 

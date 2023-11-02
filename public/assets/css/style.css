@@ -6300,6 +6300,18 @@ table.dataTable tbody tr td .btn {
   color: #2f4858;
 }
 
+/* Master Data - Departemen */
+
+#tabelGaji .body-table tr td {
+  font-weight: 500 !important;
+}
+
+/* Master Data - Kurs */
+
+.select2-selection.select2-selection--single.select2-selection--clearable .select2-selection__clear {
+  top: 25px;
+}
+
 /* .detail-form .form-floating .select2 .selection .select2-selection__clear {
   top: 35%;
 } */

@@ -431,7 +431,7 @@ class PenerimaanBarangImport extends BaseController
 
                 $payload = [
                     "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
+                    "no_penerimaan_barang" => $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
@@ -566,7 +566,7 @@ class PenerimaanBarangImport extends BaseController
 
                 $payload = [
                     "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
+                    "no_penerimaan_barang" => $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
@@ -1168,6 +1168,28 @@ class PenerimaanBarangImport extends BaseController
         echo json_encode($data);
         return;
     } */
+
+    public function generatePenerimaanBarang()
+    {
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
+        if ($no) {
+            $data = [
+                "status"  => true,
+                "data"  => $no
+            ];
+            echo json_encode($data);
+        } else {
+            $message = 'Gagal Auto Generate';
+            $data = [
+                "status" => false,
+                "message"  => $message
+            ];
+            echo json_encode($data);
+        }
+
+        return;
+    }
 
     public function getReceivedItemsBySupplier($supplierId)
     {

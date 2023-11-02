@@ -12,6 +12,10 @@
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
+        .table-font-size {
+            font-size: 11px !important;
+        }
+
         @page {
             size: 9.44in 4.33in landscape;
             margin: 29px;
@@ -92,12 +96,12 @@
         <table class="mt-5 table-border">
             <thead class="table-border">
                 <tr class="table-border">
-                    <td class="table-border" style="width: 5px;"><b>No.</b></td>
-                    <td class="table-border" style="width: 105px;"><b>Kode Barang</b></td>
-                    <td class="table-border" style="width: 220px;"><b>Nama Barang</b></td>
-                    <td class="table-border" style="width: 90px;"><b>Qty</b></td>
-                    <td class="table-border" style="width: 10px;"><b>Keterangan</b></td>
-                    <td class="table-border" style="width: 70px;"><b>Harga</b></td>
+                    <td class="table-border" style="width: 5px;"><b class="table-font-size">No.</b></td>
+                    <td class="table-border" style="width: 105px;"><b class="table-font-size">Kode Barang</b></td>
+                    <td class="table-border" style="width: 220px;"><b class="table-font-size">Nama Barang</b></td>
+                    <td class="table-border" style="width: 90px;"><b class="table-font-size">Qty</b></td>
+                    <td class="table-border" style="width: 10px;"><b class="table-font-size">Keterangan</b></td>
+                    <td class="table-border" style="width: 70px;"><b class="table-font-size">Harga</b></td>
                     <td class="table-border"><b></b></td>
                 </tr>
             </thead>
@@ -106,12 +110,12 @@
                 foreach ($dataSPP->purchase_request_details as $detail) {
                 ?>
                     <tr>
-                        <td class="table-border"><b><?= $detail->no ?></b></td>
-                        <td class="table-border"><b><?= $detail->kodeBarang ?></b></td>
-                        <td class="table-border"><b><?= $detail->barangName ?></b></td>
-                        <td class="table-border"><b><?= $detail->qty . " " . $detail->satuanName ?></b></td>
-                        <td class="table-border"><b><?= $detail->note ?></b></td>
-                        <td class="table-border"><b><?= "Rp " . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->no ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->kodeBarang ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->barangName ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->qty . " " . $detail->satuanName ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->note ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= "Rp " . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                         <td class="table-border"><b></b></td>
                     </tr>
                 <?php } ?>
