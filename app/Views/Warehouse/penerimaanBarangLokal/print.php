@@ -126,7 +126,7 @@
 
 <body>
     <?php if (!empty($dataPenerimaanBarang)) { ?>
-        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
+        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG <?= $dataPenerimaanBarang->tipe_bahan; ?></span></div>
         <table class="w-100 mt-050">
             <tr>
                 <td>
@@ -160,7 +160,7 @@
                 <th class="txt-left" style="padding-left: 5px; width: 30px;">Satuan</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">@ Rp</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">Jumlah</th>
-                <th class="txt-left" style="padding-left: 5px; width: 150px;">No. SPP</th>
+                <th class="txt-left" style="<?= $dataPenerimaanBarang->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px; width: 150px;" : "padding-left: 5px; width: 150px;"; ?>">No. SPP</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">Keterangan</th>
             </tr>
             
@@ -185,19 +185,21 @@
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format((formatter($detail["harga"], "STR_TO_FLOAT") + formatter($detail["harga_harian"], "STR_TO_INT") + formatter($detail["harga_bulanan"], "STR_TO_INT")), 2, '.', ','); ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                <td class="txt-left" style="padding-left: 5px;"><?= !empty($detail["spp_no"]) ? $detail["spp_no"] : ""; ?></td>
+                <td class="txt-left" style="<?= $dataPenerimaanBarang->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px;" : "padding-left: 5px;"; ?>"><?= !empty($detail["spp_no"]) ? $detail["spp_no"] : ""; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
             <tr>
                 <td class="txt-left" style="padding-left: 5px" colspan="6"><b>TOTAL</b></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
-                <td style="padding-left: 5px;" colspan="2"></td>
+                <td style="<?= $dataPenerimaanBarang->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px;" : "padding-left: 5px;"; ?>"></td>
+                <td style="padding-left: 5px;"></td>
             </tr>
             <tr>
                 <td class="txt-left" style="padding-left: 5px" colspan="6"><b>ONGKOS KIRIM</b></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                <td style="padding-left: 5px;" colspan="2"></td>
+                <td style="<?= $dataPenerimaanBarang->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px;" : "padding-left: 5px;"; ?>"></td>
+                <td style="padding-left: 5px;"></td>
             </tr>
         </table>
         <div class="header mt-050">

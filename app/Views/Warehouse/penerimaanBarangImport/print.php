@@ -126,7 +126,7 @@
 
 <body>
     <?php if (!empty($dataPenerimaanBarang)) { ?>
-        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
+        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG <?= $dataPenerimaanBarang->tipe_bahan; ?></span></div>
         <table class="w-100 mt-050">
             <tr>
                 <td>

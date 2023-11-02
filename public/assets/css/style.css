@@ -6312,6 +6312,36 @@ table.dataTable tbody tr td .btn {
   top: 25px;
 }
 
+/* Personalia - Payroll */
+
+.section .section-header .btn.btn-dropdown-export{
+  box-shadow: none !important;
+}
+
+/* Personalia - Log Absensi */
+
+.btn {
+  box-shadow: none !important;
+}
+
+/* Personalia - Karyawan */
+
+#tabelKomponenGaji tbody tr td div {
+  font-weight: 500 !important;
+}
+
+/* Personalia - Komponen Gajih */
+
+.form-switch-lg .form-check-input{
+  box-shadow: none !important;
+}
+
+/* Pembelian - T.Terima Supplier */
+
+.form-check .form-check-input{
+  box-shadow: none !important;
+}
+
 /* .detail-form .form-floating .select2 .selection .select2-selection__clear {
   top: 35%;
 } */

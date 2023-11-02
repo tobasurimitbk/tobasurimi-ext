@@ -154,31 +154,37 @@
 
         <table class="w-100 bank-table border-collapse">
             <tr>
-                <th class="txt-left" style="width: 450px;">KETERANGAN</th>
+                <th class="txt-left" style="width: 150px;">NO. LPB</th>
+                <th class="txt-left" style="width: 300px;">KETERANGAN</th>
                 <th class="txt-right">JUMLAH</th>
                 <th class="txt-left">NO. PERKIRAAN</th>
             </tr>
             <tr>
+                <td><?= $lpbNo ?></td>
                 <td><?= $itemName ?></td>
                 <td class="txt-right">RP. <?= $itemTotal ?></td>
                 <td></td>
             </tr>
             <tr>
+                <td></td>
                 <td>POTONGAN</td>
                 <td class="txt-right">RP. <?= $potongan ?></td>
                 <td></td>
             </tr>
             <tr>
+                <td></td>
                 <td>TAMBAHAN</td>
                 <td class="txt-right">RP. <?= $tambahan ?></td>
                 <td></td>
             </tr>
             <tr>
+                <td></td>
                 <td><?= $taxList ?></td>
                 <td class="txt-right">RP. <?= $taxTotal ?></td>
                 <td></td>
             </tr>
             <tr>
+                <th></th>
                 <th class="txt-right">TOTAL</th>
                 <th class="txt-right">RP. <?= $total ?></th>
                 <th></th>
@@ -187,17 +193,17 @@
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span><?= $terbilang . ' rupiah' ?></span>
+            <span style="text-transform: uppercase;"><?= $terbilang . ' RUPIAH' ?></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
             <tr>
-                <td class="txt-center">DISETUJUI</td>
-                <td class="txt-center">DIKETAHUI</td>
-                <td class="txt-center">DIPERIKSA</td>
-                <td class="txt-center">KASIR</td>
-                <td class="txt-center">DIBUKUKAN</td>
-                <td class="txt-center">DITERIMA OLEH</td>
+                <td class="txt-center" style="width: 5% !important;">DISETUJUI</td>
+                <td class="txt-center" style="width: 5% !important;">DIKETAHUI</td>
+                <td class="txt-center" style="width: 5% !important;">DIPERIKSA</td>
+                <td class="txt-center" style="width: 5% !important;">KASIR</td>
+                <td class="txt-center" style="width: 5% !important;">DIBUKUKAN</td>
+                <td class="txt-center" style="width: 15% !important;">DITERIMA OLEH</td>
             </tr>
             <tr>
                 <td style="height: 50px;"></td>
@@ -284,7 +290,7 @@
 
         <table class="w-100 bank-table border-collapse">
             <tr>
-                <th class="txt-left" style="width: 450px;">KETERANGAN</th>
+                <th class="txt-left" style="width: 300px;">KETERANGAN</th>
                 <th class="txt-right">JUMLAH</th>
                 <th class="txt-left">NO. PERKIRAAN</th>
             </tr>
@@ -304,17 +310,17 @@
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span><?= $taxReturnTerbilang . ' rupiah' ?></span>
+            <span style="text-transform: uppercase;"><?= $taxReturnTerbilang . ' RUPIAH' ?></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
             <tr>
-                <td class="txt-center">DISETUJUI</td>
-                <td class="txt-center">DIKETAHUI</td>
-                <td class="txt-center">DIPERIKSA</td>
-                <td class="txt-center">KASIR</td>
-                <td class="txt-center">DIBUKUKAN</td>
-                <td class="txt-center">DITERIMA OLEH</td>
+                <td class="txt-center" style="width: 5% !important;">DISETUJUI</td>
+                <td class="txt-center" style="width: 5% !important;">DIKETAHUI</td>
+                <td class="txt-center" style="width: 5% !important;">DIPERIKSA</td>
+                <td class="txt-center" style="width: 5% !important;">KASIR</td>
+                <td class="txt-center" style="width: 5% !important;">DIBUKUKAN</td>
+                <td class="txt-center" style="width: 15% !important;">DITERIMA OLEH</td>
             </tr>
             <tr>
                 <td style="height: 50px;"></td>
