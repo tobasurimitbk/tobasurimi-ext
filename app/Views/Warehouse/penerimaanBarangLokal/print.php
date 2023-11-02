@@ -174,7 +174,7 @@
             foreach($dataPenerimaanBarangDetail as $detail){ 
                 $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_FLOAT");
                 $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_FLOAT");
-                $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
+                $jml_harga = $jml_harga + (formatter($detail["harga"], "STR_TO_INT") + formatter($detail["harga_harian"], "STR_TO_INT") + formatter($detail["harga_bulanan"], "STR_TO_INT"));
                 $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>
             <tr>
@@ -183,7 +183,7 @@
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["packaging"] . "/" . $detail["packaging_qty"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= $detail["jml_masuk"]; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
-                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format((formatter($detail["harga"], "STR_TO_FLOAT") + formatter($detail["harga_harian"], "STR_TO_INT") + formatter($detail["harga_bulanan"], "STR_TO_INT")), 2, '.', ','); ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= !empty($detail["spp_no"]) ? $detail["spp_no"] : ""; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
