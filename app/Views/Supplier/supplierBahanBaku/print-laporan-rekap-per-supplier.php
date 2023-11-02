@@ -157,6 +157,23 @@
                     <td ><?= number_format($do->totalRow, 0, '.', ''); ?></td>
                 </tr>
             <?php endforeach; ?>
+                <tr>
+                    <td colspan ="7" >Total</td>
+                    <td id="totalDppUmum" ><?= $totalDppUmum; ?></td>
+                    <td id="totalPphUmum" ><?= $totalPphUmum; ?></td>
+                    <td id="totalTotalUmum" ><?= $totalTotalUmum; ?></td>
+                    <td id="totalDppHarian" ><?= $totalDppHarian; ?></td>
+                    <td id="totalPphHarian" ><?= $totalPphHarian; ?></td>
+                    <td id="totalTotalHarian" ><?= $totalTotalHarian; ?></td>
+                    <td id="totalDppBulanan" ><?= $totalDppBulanan; ?></td>
+                    <td id="totalPphBulanan" ><?= $totalPphBulanan; ?></td>
+                    <td id="totalTotalBulanan" ><?= $totalTotalBulanan; ?></td>
+                    <td id="totalDppSubsidi" ><?= $totalDppSubsidi; ?></td>
+                    <td id="totalPphSubsidi" ><?= $totalPphSubsidi; ?></td>
+                    <td id="totalTotalSubsidi" ><?= $totalTotalSubsidi; ?></td>
+                    <td id="totalTotalRow" ><?= $totalTotalRow; ?></td>
+                    
+                </tr>
         <?php else: ?>
                 <tr>
                     <td colspan="23">Tidak ada data yang tersedia.</td>

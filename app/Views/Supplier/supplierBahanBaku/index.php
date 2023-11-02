@@ -157,7 +157,6 @@
                                 <option value="laporan-rekap-per-supplier" data-code="">Rekap Per Supplier</option>
                                 <option value="laporan-rekap-all-barang" data-code="">Rekap All Barang</option>
                                 <option value="laporan-rekap-per-barang" data-code="">Rekap Per Barang</option>
-                                <option value="laporan-bukti-penerimaaan-barang" data-code="">Bukti Penerimaan Barang</option>
                             </select>
                             <label for="floatingInput">Pilih Laporan</label>
                         </div>
@@ -397,7 +396,57 @@
                             </div>
                         </div>
                         <div class="laporan-rekap-per-barang">
-                            Laporan Rekap Per Barang
+                            <h6>Laporan Rekap Per Barang</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_rekap_per_barang" name="awal_date_rekap_per_barang" placeholder="Tanggal Awal" required>
+                                                <label for="floatingInput">Tanggal Awal</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_rekap_per_barang" name="akhir_date_rekap_per_barang" placeholder="Tanggal Akhir" required>
+                                                <label for="floatingInput">Tanggal Akhir</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <select class="form-select barang_id" id="barang_id_rekap_per_barang" name="barang_id_rekap_per_barang" aria-label="Floating label select example">
+                                                    <option value=""></option>
+                                                    <?php
+                                                    if (!empty($dataBarangMasters)) : ?>
+                                                        <?php foreach ($dataBarangMasters as $barang) : ?>
+                                                            <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </select>
+                                                <label for="floatingInput">Barang</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <select class="form-select warehouse_id" id="warehouse_id_rekap_per_barang" name="warehouse_id_rekap_per_barang" aria-label="Floating label select example">
+                                                    <option value=""></option>
+                                                    <?php
+                                                    if (!empty($dataWarehouses)) : ?>
+                                                        <?php foreach ($dataWarehouses as $warehouses) : ?>
+                                                            <option value="<?= $warehouses->id; ?>" data-name="<?= $warehouses->warehouse_name; ?>"><?= $warehouses->warehouse_name; ?></option>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </select>
+                                                <label for="floatingInput">Warehouse</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="laporan-bukti-penerimaaan-barang">
                             Laporan Bukti Penerimaan Barang
@@ -1249,6 +1298,34 @@
                     };
                     break;
                 case 'laporan-rekap-per-barang':
+                    validator.settings.rules = {
+                        awal_date_rekap_per_barang: {
+                            required: true
+                        },
+                        akhir_date_rekap_per_barang: {
+                            required: true
+                        },
+                        barang_id_rekap_per_barang: {
+                            required: true
+                        },
+                        warehouse_id_rekap_per_barang: {
+                            required: true
+                        }
+                    };
+                    validator.settings.messages = {
+                        awal_date_rekap_per_barang: {
+                            required: "Tanggal Awal wajib diisi"
+                        },
+                        akhir_date_rekap_per_barang: {
+                            required: "Tanggal Akhir wajib diisi"
+                        },
+                        barang_id_rekap_per_barang: {
+                            required: "Barang wajib diisi"
+                        },
+                        warehouse_id_rekap_per_barang: {
+                            required: "Warehouse wajib diisi"
+                        }
+                    };
                     
                     break;
                 case 'laporan-bukti-penerimaaan-barang':
