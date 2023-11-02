@@ -18,6 +18,7 @@ class SalesOrderExportDetailModel extends Model
         'sales_order_export_detail_id',
         'sales_order_export_id',
         'barang_id',
+        'warehouses_id',
         'qty',
         'unit',
         'remark',
@@ -60,12 +61,12 @@ class SalesOrderExportDetailModel extends Model
         ];
 
         $builder = $this->db->table('sales_order_detail_export')
-        ->select('sales_order_detail_export.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
-        ->join('barangs', 'barangs.id = sales_order_detail_export.barang_id', 'left')
-        ->join('satuans', 'satuans.id = sales_order_detail_export.unit', 'left');
+            ->select('sales_order_detail_export.*, barang_master.barang_name as nama_barang, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
+            ->join('barang_master', 'barang_master.id = sales_order_detail_export.barang_id', 'left')
+            ->join('satuans', 'satuans.id = sales_order_detail_export.unit', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }

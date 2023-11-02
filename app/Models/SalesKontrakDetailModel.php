@@ -18,6 +18,7 @@ class SalesKontrakDetailModel extends Model
         'sales_contract_detail_id',
         'sales_contract_id',
         'barang_id',
+        'warehouses_id',
         'qty',
         'unit',
         'remark',
@@ -60,12 +61,12 @@ class SalesKontrakDetailModel extends Model
         ];
 
         $builder = $this->db->table('sales_contract_detail')
-        ->select('sales_contract_detail.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
-        ->join('barangs', 'barangs.id = sales_contract_detail.barang_id', 'left')
-        ->join('satuans', 'satuans.id = sales_contract_detail.unit', 'left');
+            ->select('sales_contract_detail.*, barang_master.barang_name AS nama_barang, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
+            ->join('barang_master', 'barang_master.id = sales_contract_detail.barang_id', 'left')
+            ->join('satuans', 'satuans.id = sales_contract_detail.unit', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }

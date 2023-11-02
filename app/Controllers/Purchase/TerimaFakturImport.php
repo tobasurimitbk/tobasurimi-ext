@@ -769,6 +769,7 @@ class TerimaFakturImport extends BaseController
         $filename = "PO Import Bahan Baku";
 
         $data = [];
+        $noList = [];
         $itemsList = [];
         $taxList = [];
         $taxReturnList = [];
@@ -795,6 +796,7 @@ class TerimaFakturImport extends BaseController
             ->findAll();
 
         foreach ($dataDet as $det) {
+            $noList[] = "$det->lpb_no";
             $itemsList[] = "$det->qty $det->unit $det->item_name";
             $itemTotal += $det->qty * $det->price;
         }
@@ -813,6 +815,7 @@ class TerimaFakturImport extends BaseController
 
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
+        $data["lpbNo"] = implode(', ', $noList);
         $data["itemName"] = implode(', ', $itemsList);
         $data['taxList'] = implode(', ', $taxList);
         $data['taxReturnList'] = implode(', ', $taxReturnList);

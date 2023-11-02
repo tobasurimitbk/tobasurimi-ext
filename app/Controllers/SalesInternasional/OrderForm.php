@@ -48,7 +48,9 @@ class OrderForm extends BaseController
         ];
 
         $condition = [
-            "sales_order_export.company_id"    => $this->this_company_id
+            "sales_order_export.company_id"    => $this->this_company_id,
+            "status"      => $this->request->getGet("status"),
+            "sales_order_export.deletedAt" => null
         ];
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -94,9 +96,8 @@ class OrderForm extends BaseController
 
     public function getById($id = null)
     {
-        //Get Buyer From Customer
         $dataCustomer = $this->customerModel->getCustomer();
-        
+
         $data = [
             "dataCustomer" => $dataCustomer
         ];
@@ -107,13 +108,9 @@ class OrderForm extends BaseController
 
             $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
 
-            if($dataSODetail)
-            {
+            if ($dataSODetail) {
                 $data["dataSODetail"] = $dataSODetail;
             }
-
-            // var_dump($dataSO);
-            // die;
         }
 
         return view('SalesInternasional/OrderForm/form', $data);
@@ -121,47 +118,45 @@ class OrderForm extends BaseController
 
     public function update()
     {
-        try{
-                $id = $this->request->getPost("id");
+        try {
+            $id = $this->request->getPost("id");
 
-                $payload = [
-                    "director_name" => $this->request->getPost("director_name"),
-                    "marketing_name" => $this->request->getPost("marketing_name"),
-                    "exim_name" => $this->request->getPost("exim_name"),
-                    "procurement_name" => $this->request->getPost("procurement_name"),
-                    "production_name" => $this->request->getPost("production_name"),
-                    "qc_name" => $this->request->getPost("qc_name"),
+            $payload = [
+                "director_name" => $this->request->getPost("director_name"),
+                "marketing_name" => $this->request->getPost("marketing_name"),
+                "exim_name" => $this->request->getPost("exim_name"),
+                "procurement_name" => $this->request->getPost("procurement_name"),
+                "production_name" => $this->request->getPost("production_name"),
+                "qc_name" => $this->request->getPost("qc_name"),
+            ];
+
+            $condition = [
+                'sales_order_export_id' => $id
+            ];
+
+            $response = $this->salesOrderExportModel->where($condition)->set($payload)->update();
+
+            if ($response) {
+                $data = [
+                    "id" => "",
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    "response" => $response,
+                    'token' => csrf_hash()
                 ];
-
-                $condition = [
-                    'sales_order_export_id' => $id
+                echo json_encode($data);
+            } else {
+                $message = 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
                 ];
-
-                $response = $this->salesOrderExportModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    $data = [
-                        "id" => "",
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-        }
-        catch(\Exception $e)
-        {
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -174,14 +169,14 @@ class OrderForm extends BaseController
 
     public function updateStatus()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
             $status = $this->request->getPost("status");
 
             $payload = [
                 "status" => $status
             ];
-            
+
             $condition = [
                 'sales_order_export_id' => $id
             ];
@@ -206,9 +201,7 @@ class OrderForm extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -219,24 +212,21 @@ class OrderForm extends BaseController
         return;
     }
 
-    public function print($id = null) 
+    public function print($id = null)
     {
-        if($id)
-        {
+        if ($id) {
             $filename = "ORDER FORM";
 
             $data = [];
             $dataSO = $this->salesOrderExportModel->getById($id);
 
-            if($dataSO)
-            {
+            if ($dataSO) {
                 $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
 
                 // var_dump($dataSO);
                 // die;
 
-                if($dataSODetail)
-                {
+                if ($dataSODetail) {
                     $data["dataSO"] = $dataSO;
                     $data["dataSODetail"] = $dataSODetail;
                 }
