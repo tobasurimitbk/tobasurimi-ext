@@ -90,23 +90,33 @@
                 <td style="width:10px"> S/D </td>
                 <td><?= $tanggalAkhir; ?></td>
             </tr>
+            <tr>
+                <td>Supplier</td>
+                <td>:</td>
+                <td colspan="3" style="text-transform: uppercase;"><?= $supplierName; ?></td>
+            </tr>
+            <tr>
+                <td>Alamat</td>
+                <td>:</td>
+                <td colspan="3" style="text-transform: uppercase;"><?= $supplierAddress; ?></td>
+            </tr>
         </tbody>
     </table>
     
     <table class="w-100 item-table">
         <tr>
             <th rowspan="2" >No.</th>
-            <th rowspan="2" >Supplier</th>
-            <th rowspan="2" >NPWP</th>
-            <th rowspan="2">Jenis</th>
-            <th rowspan="2">Spesifikasi</th>
-            <th rowspan="2">Divisi</th>
+            <th rowspan="2">Bahan Baku</th>
+            <th rowspan="2">Gudang</th>
             <th rowspan="2">No PO</th>
             <th rowspan="2">Tgl PO</th>
             <th rowspan="2">Qty</th>
             <th rowspan="2">Satuan</th>
             <th colspan="3">Harian</th>
             <th colspan="3">Tambahan Harian</th>
+            <th colspan="3">Tambahan Bulanan</th>
+            <th colspan="3">Subsidi</th>
+            <th rowspan="2">Total</th>
         </tr>
         <tr>
             <th >DPP</th>
@@ -115,15 +125,18 @@
             <th >DPP</th>
             <th >PPh</th>
             <th >Dibayarkan</th>
+            <th >DPP</th>
+            <th >PPh</th>
+            <th >Dibayarkan</th>
+            <th >DPP</th>
+            <th >PPh</th>
+            <th >Dibayarkan</th>  
         </tr>
         <?php if (!empty($dataOrder)): ?>
             <?php foreach ($dataOrder as $do) : ?>
                 <tr>
                     <td ><?= $no++; ?></td>
-                    <td ><?= $do->supplierName; ?></td>
-                    <td ><?= $do->supplierNpwp; ?></td>
                     <td ><?= $do->barangName; ?></td>
-                    <td ><?= $do->spekName; ?></td>
                     <td ><?= $do->warehouseName; ?></td>
                     <td ><?= $do->poNum; ?></td>
                     <td ><?= $do->poDate; ?></td>
@@ -135,6 +148,13 @@
                     <td ><?= number_format($do->dppHarian, 0, '.', ''); ?></td>
                     <td ><?= number_format($do->pphHarian, 0, '.', ''); ?></td>
                     <td ><?= number_format($do->totalHarian, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->dppBulanan, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->pphBulanan, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalBulanan, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->subsidi, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->pphSubsidi, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalSubsidi, 0, '.', ''); ?></td>
+                    <td ><?= number_format($do->totalRow, 0, '.', ''); ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
