@@ -126,7 +126,7 @@
 
 <body>
     <?php if (!empty($dataPenerimaanBarang)) { ?>
-        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG <?= $dataPenerimaanBarang->tipe_bahan; ?></span></div>
+        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
         <table class="w-100 mt-050">
             <tr>
                 <td>
@@ -134,6 +134,9 @@
                 </td>
                 <td>
                     <div><span class="txt-bold">Supplier   : <?= $dataPenerimaanBarang->supplier_name; ?></span></div>
+                </td>
+                <td class="txt-right">
+                    <div><span class="txt-bold">Tipe:  <?= $dataPenerimaanBarang->tipe_bahan; ?></span></div>
                 </td>
                 <!-- <td class="txt-right">
                     <div><span class="txt-bold">Jenis Dokumen:    <?php // $dataPenerimaanBarang->aju_type_name; ?></span></div>
