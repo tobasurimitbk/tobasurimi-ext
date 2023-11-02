@@ -981,13 +981,103 @@ class Supplier extends BaseController
                 ];
                 break;
             case 'laporan-rekap-all-supplier':
-                # code...
+                $awalDate = $this->request->getPost('awal_date_all_supplier');
+                $newAwalDate = date("Y-m-d", strtotime($awalDate));
+                $akhirDate = $this->request->getPost('akhir_date_all_supplier');
+                $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
+                
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForAllSupplierReport($newAwalDate,$newAkhirDate);
+                
+                if (!empty($dataBBLokal)) {
+                    foreach ($dataBBLokal as $row) {
+                        $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
+                        $row->totalUmum     = $row->dppUmum - $row->pphUmum;
+                        $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
+                        $row->totalHarian   = $row->dppHarian - $row->pphHarian;
+                        $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
+                        $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+                        $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
+                        $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
+                        $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+                    }
+                }
+                $no = 1;
+
+                $data = [
+                    'no'    => $no,
+                    'header'   => "Laporan Rekap Pendapatan Supplier",
+                    'tanggalAwal'=> $awalDate,
+                    'tanggalAkhir'       => $akhirDate,
+                    'dataOrder'      => $dataBBLokal
+                ];
                 break;
             case 'laporan-rekap-per-supplier':
-                # code...
+                $awalDate = $this->request->getPost('awal_date_per_supplier');
+                $newAwalDate = date("Y-m-d", strtotime($awalDate));
+                $akhirDate = $this->request->getPost('akhir_date_per_supplier');
+                $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
+                $supplierId = $this->request->getPost('supplier_id_per_supplier');
+
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate,$newAkhirDate,$supplierId,'','');
+                $dataSupplier = $this->supplierModel->asObject()->where('id', $supplierId)->first();
+                if (!empty($dataBBLokal)) {
+                    foreach ($dataBBLokal as $row) {
+                        $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
+                        $row->totalUmum     = $row->dppUmum - $row->pphUmum;
+                        $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
+                        $row->totalHarian   = $row->dppHarian - $row->pphHarian;
+                        $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
+                        $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+                        $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
+                        $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
+                        $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+                    }
+                }
+                $no = 1;
+
+                $data = [
+                    'no'    => $no,
+                    'header'   => "Laporan Detail Pendapatan Supplier",
+                    'tanggalAwal'=> $awalDate,
+                    'tanggalAkhir'       => $akhirDate,
+                    'supplierName'        => !empty($dataSupplier) ? $dataSupplier->name : "",
+                    'supplierAddress'      => !empty($dataSupplier) ? $dataSupplier->address : "",
+                    'dataOrder'      => $dataBBLokal
+                ];
                 break;
             case 'laporan-rekap-all-barang':
-                # code...
+                $awalDate = $this->request->getPost('awal_date_rekap_all_barang');
+                $newAwalDate = date("Y-m-d", strtotime($awalDate));
+                $akhirDate = $this->request->getPost('akhir_date_rekap_all_barang');
+                $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
+                $warehouseId = $this->request->getPost('warehouse_id_rekap_all_barang');
+
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportRekap($newAwalDate,$newAkhirDate,'','',$warehouseId);
+                
+                if (!empty($dataBBLokal)) {
+                    foreach ($dataBBLokal as $row) {
+                        $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
+                        $row->totalUmum     = $row->dppUmum - $row->pphUmum;
+                        $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
+                        $row->totalHarian   = $row->dppHarian - $row->pphHarian;
+                        $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
+                        $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+                        $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
+                        $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
+                        $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+                    }
+                }
+                $no = 1;
+
+                $data = [
+                    'no'    => $no,
+                    'header'   => "Laporan Detail Pendapatan Supplier",
+                    'tanggalAwal'=> $awalDate,
+                    'tanggalAkhir'       => $akhirDate,
+                    'supplierName'        => !empty($dataSupplier) ? $dataSupplier->name : "",
+                    'supplierAddress'      => !empty($dataSupplier) ? $dataSupplier->address : "",
+                    'dataOrder'      => $dataBBLokal
+                ];
                 break;
             case 'laporan-rekap-per-barang':
                 # code...
