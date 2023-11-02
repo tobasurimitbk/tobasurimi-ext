@@ -11,6 +11,7 @@ use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportDetailModel;
+use App\Models\StockDetailModel;
 use Dompdf\Dompdf;
 
 class SalesKontrak extends BaseController
@@ -23,6 +24,8 @@ class SalesKontrak extends BaseController
     protected $salesKontrakDetailModel;
     protected $salesOrderExportModel;
     protected $salesOrderExportDetailModel;
+    protected $barangMasterModel;
+    protected $stokDetailModel;
     protected $dompdf;
 
     public function __construct()
@@ -36,14 +39,12 @@ class SalesKontrak extends BaseController
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+        $this->stokDetailModel = new StockDetailModel();
         $this->dompdf = new Dompdf();
     }
 
     public function index()
     {
-        // $dataSO = $this->salesKontrakModel->getById(2);
-        // var_dump($dataSO->sales_contract_id);
-        // die;
         return view('SalesInternasional/SalesKontrak/index');
     }
 
@@ -52,7 +53,7 @@ class SalesKontrak extends BaseController
         //Get Buyer From Customer
         $dataCustomer = $this->customerModel->getCustomer();
         $dataBarangMaster = $this->barangMasterModel->asObject()->findAll();
-        
+
         $data = [
             "dataCustomer" => $dataCustomer
         ];
@@ -64,7 +65,7 @@ class SalesKontrak extends BaseController
     {
         //Get Buyer From Customer
         $dataCustomer = $this->customerModel->getCustomer();
-        
+
         $data = [
             "dataCustomer" => $dataCustomer
         ];
@@ -76,8 +77,7 @@ class SalesKontrak extends BaseController
             $statusSOExport = "";
             $dataSOExport = $this->salesOrderExportModel->getBySalesContractId($id);
 
-            if($dataSOExport)
-            {
+            if ($dataSOExport) {
                 $statusSOExport = $dataSOExport[0]->status;
             }
 
@@ -85,8 +85,7 @@ class SalesKontrak extends BaseController
 
             $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
 
-            if($dataSODetail)
-            {
+            if ($dataSODetail) {
                 $data["dataSODetail"] = $dataSODetail;
             }
         }
@@ -107,7 +106,8 @@ class SalesKontrak extends BaseController
         ];
 
         $condition = [
-            "sales_contract.company_id"    => $this->this_company_id
+            "sales_contract.company_id"    => $this->this_company_id,
+            "status"      => $this->request->getGet("status")
         ];
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -153,7 +153,7 @@ class SalesKontrak extends BaseController
 
     public function save()
     {
-        try{
+        try {
             $rules = [
                 "sales_contract_no" => [
                     "rules" => "required",
@@ -230,7 +230,7 @@ class SalesKontrak extends BaseController
 
             if ($this->validate($rules)) {
                 $no = $this->salesKontrakModel->get_no(date('Y'), date('y'));
-                
+
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
                     "sales_contract_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("sales_contract_no"),
@@ -238,54 +238,38 @@ class SalesKontrak extends BaseController
                     "customer_po_no" => $this->request->getPost("customer_po_no"),
                     "loading_port" => $this->request->getPost("loading_port"),
                     "dicharge_port" => $this->request->getPost("dicharge_port"),
-                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
+                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("due_date")))) : "",
                     "total_amount" => $this->request->getPost("total_amount") ? formatter($this->request->getPost("total_amount"), "CURR_TO_INT") : 0,
                     "tolerance" => $this->request->getPost("tolerance"),
-                    "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("shipment_date")))) : "",
+                    "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("shipment_date")))) : "",
                     "payment_term" => $this->request->getPost("payment_term"),
                     "documents_required" => $this->request->getPost("documents_required"),
                     "special_instructions" => $this->request->getPost("special_instructions"),
                     "status" => "NEW"
                 ];
 
-                $items = json_decode($this->request->getPost("items"));
+                $items = json_decode($this->request->getVar("items"));
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
-                
                 $response =  $this->salesKontrakModel->insert($payload);
 
                 if ($response) {
-                    foreach($items as $data)
-                    {
+                    foreach ($items as $data) {
                         $detailPayload = [];
 
                         $detailPayload = [
                             'sales_contract_id' => $response,
-                            'barang_id' =>$data->barang_id,
+                            'barang_id' => $data->barang_id,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
                             'remark' => $data->remark,
                             'price' => $data->price,
-                            'total_price' => $data->total_price
+                            'total_price' => $data->total_price,
+                            'warehouses_id' => $data->warehouse_id
                         ];
-
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
 
                         $responseDetail = $this->salesKontrakDetailModel->insert($detailPayload);
 
-                        if(!$responseDetail) {
+                        if (!$responseDetail) {
                             $message =  'Data Gagal Disimpan';
                             $data = [
                                 "status"            => false,
@@ -317,9 +301,7 @@ class SalesKontrak extends BaseController
                     echo json_encode($data);
                 }
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -332,7 +314,7 @@ class SalesKontrak extends BaseController
 
     public function update()
     {
-        try{
+        try {
             $rules = [
                 "sales_contract_no" => [
                     "rules" => "required",
@@ -418,24 +400,16 @@ class SalesKontrak extends BaseController
                     "customer_po_no" => $this->request->getPost("customer_po_no"),
                     "loading_port" => $this->request->getPost("loading_port"),
                     "dicharge_port" => $this->request->getPost("dicharge_port"),
-                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
+                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("due_date")))) : "",
                     "total_amount" => $this->request->getPost("total_amount") ? formatter($this->request->getPost("total_amount"), "CURR_TO_INT") : 0,
                     "tolerance" => $this->request->getPost("tolerance"),
-                    "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("shipment_date")))) : "",
+                    "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("shipment_date")))) : "",
                     "payment_term" => $this->request->getPost("payment_term"),
                     "documents_required" => $this->request->getPost("documents_required"),
                     "special_instructions" => $this->request->getPost("special_instructions"),
                 ];
-                
-                $items = json_decode($this->request->getPost("items"));
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
+                $items = json_decode($this->request->getVar("items"));
 
                 $condition = [
                     'sales_contract_id' => $id
@@ -444,34 +418,24 @@ class SalesKontrak extends BaseController
                 $response = $this->salesKontrakModel->where($condition)->set($payload)->update();
 
                 if ($response) {
-                    foreach($items as $data)
-                    {
+                    foreach ($items as $data) {
                         $detailPayload = [];
 
                         $detailPayload = [
                             'sales_contract_id' => $id,
-                            'barang_id' =>$data->barang_id,
+                            'barang_id' => $data->barang_id,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
                             'remark' => $data->remark,
                             'price' => $data->price,
-                            'total_price' => $data->total_price
+                            'total_price' => $data->total_price,
+                            'warehouses_id' => $data->warehouse_id
                         ];
 
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
-
-                        // kalau hapus
-                        if($data->isDeleted)
-                        {
+                        if ($data->isDeleted) {
                             $responseDetail = $this->salesKontrakDetailModel->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -483,16 +447,15 @@ class SalesKontrak extends BaseController
                             }
                         }
 
-                         // kalau update
-                        if($data->id)
-                        {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'sales_contract_detail_id' => $data->id
                             ];
 
                             $responseDetail = $this->salesKontrakDetailModel->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -505,11 +468,10 @@ class SalesKontrak extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->salesKontrakDetailModel->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -521,7 +483,7 @@ class SalesKontrak extends BaseController
                             }
                         }
                     }
-                    
+
                     $data = [
                         "id" => "",
                         "status"            => true,
@@ -541,10 +503,8 @@ class SalesKontrak extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
-        }
-        catch(\Exception $e)
-        {
+            }
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -557,23 +517,22 @@ class SalesKontrak extends BaseController
 
     public function updateStatus()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
             $status = $this->request->getPost("status");
 
             $payload = [
                 "status" => $status
             ];
-            
+
             $condition = [
                 'sales_contract_id' => $id
             ];
 
-            if($status === "POSTED")
-            {
+            if ($status === "POSTED") {
                 // CREATE SALES ORDER EXPORT
                 $dataSO = $this->salesKontrakModel->getById($id);
-                
+
                 $payloadExport = [
                     "sales_order_export_no" => "SC/" . $dataSO->sales_contract_no,
                     "sales_contract_id" => $id,
@@ -593,8 +552,7 @@ class SalesKontrak extends BaseController
 
                 $responseExport = $this->salesOrderExportModel->insert($payloadExport);
 
-                if(!$responseExport)
-                {
+                if (!$responseExport) {
                     $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
@@ -607,15 +565,13 @@ class SalesKontrak extends BaseController
 
                 $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
 
-                if($dataSODetail)
-                {
-                    foreach($dataSODetail as $detail)
-                    {
+                if ($dataSODetail) {
+                    foreach ($dataSODetail as $detail) {
                         $detailPayloadExport = [];
 
                         $detailPayloadExport = [
                             'sales_order_export_id' => $responseExport,
-                            'barang_id' =>$detail["barang_id"],
+                            'barang_id' => $detail["barang_id"],
                             'unit' => $detail["unit"],
                             'qty' => $detail["qty"],
                             'remark' => $detail["remark"],
@@ -623,9 +579,21 @@ class SalesKontrak extends BaseController
                             'total_price' => $detail["total_price"]
                         ];
 
+                        // // masukkan ke detail_stok
+                        if ($detail['warehouses_id'] != null) {
+                            $this->stokDetailModel->addOrReduceStock(
+                                $detail['barang_id'],
+                                $detail['warehouses_id'],
+                                $detail['remark'],
+                                $detail['qty'],
+                                "OUT",
+                                null
+                            );
+                        }
+
                         $responseDetailExport = $this->salesOrderExportDetailModel->insert($detailPayloadExport);
 
-                        if(!$responseDetailExport) {
+                        if (!$responseDetailExport) {
                             $message =  'Data Gagal Disimpan';
                             $data = [
                                 "status"            => false,
@@ -638,20 +606,28 @@ class SalesKontrak extends BaseController
                     }
                 }
             }
-            if($status === "NEW")
-            {
+            if ($status === "NEW") {
                 // CHECK SALES ORDER EXPORT DATA
                 $find = $this->salesOrderExportModel->getBySalesContractId($id);
-
-                if($find)
-                {
-                    foreach($find as $item)
-                    {
+                $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
+                foreach ($dataSODetail as $detail) {
+                    if ($detail['warehouses_id'] != null) {
+                        $this->stokDetailModel->addOrReduceStock(
+                            $detail['barang_id'],
+                            $detail['warehouses_id'],
+                            $detail['remark'],
+                            $detail['qty'],
+                            "IN",
+                            null
+                        );
+                    }
+                }
+                if ($find) {
+                    foreach ($find as $item) {
                         $this->salesOrderExportModel->delete($item->sales_order_export_id);
-                        
+
                         $find_detail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
-                        foreach($find_detail as $item_detail)
-                        {
+                        foreach ($find_detail as $item_detail) {
                             $this->salesOrderExportDetailModel->delete($item_detail["sales_order_export_detail_id"]);
                         }
                     }
@@ -678,9 +654,7 @@ class SalesKontrak extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -693,7 +667,7 @@ class SalesKontrak extends BaseController
 
     public function delete()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -732,9 +706,7 @@ class SalesKontrak extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -745,24 +717,21 @@ class SalesKontrak extends BaseController
         return;
     }
 
-    public function print($id = null) 
+    public function print($id = null)
     {
-        if($id)
-        {
+        if ($id) {
             $filename = "Sales Kontrak";
 
             $data = [];
             $dataSO = $this->salesKontrakModel->getById($id);
 
-            if($dataSO)
-            {
+            if ($dataSO) {
                 $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
 
                 // var_dump($dataSO);
                 // die;
 
-                if($dataSODetail)
-                {
+                if ($dataSODetail) {
                     $data["dataSO"] = $dataSO;
                     $data["dataSODetail"] = $dataSODetail;
                 }
