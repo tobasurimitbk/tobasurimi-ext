@@ -253,6 +253,7 @@ class RMPurchaseOrderModel extends Model
             'rm_purchase_orders.po_date <=' => $finishDate,
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
         ];
         if (!empty($bahanBaku)) {
             $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
@@ -300,6 +301,7 @@ class RMPurchaseOrderModel extends Model
             'rm_purchase_orders.po_date <=' => $finishDate,
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
         ];                
 
         $poBBLokalData = $this->asObject()
@@ -341,6 +343,7 @@ class RMPurchaseOrderModel extends Model
             'rm_purchase_orders.po_date <=' => $finishDate,
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
         ];
         if (!empty($bahanBaku)) {
             $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
@@ -366,7 +369,7 @@ class RMPurchaseOrderModel extends Model
             ->join('bagian', 'bagian.id = rm_purchase_order_details.bagian', 'left')
             ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->where($condition)
-            ->groupBy(['bagian.nama_bagian', 'barang_master.barang_name'])
+            ->groupBy(['bagian.nama_bagian', 'barang_master.barang_name', 'suppliers.name'])
             ->findAll();
 
         return $poBBLokalData;
