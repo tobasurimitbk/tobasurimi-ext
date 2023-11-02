@@ -195,7 +195,7 @@ class PenerimaanBarangModel extends Model
                       penerimaan_barang.multiple_po_no,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       (`penerimaan_barang_detail`.`qty` - `penerimaan_barang_detail`.`summarized_qty`) AS lpb_qty,
-                      penerimaan_barang_detail.harga AS price,
+                      (penerimaan_barang_detail.harga + penerimaan_barang_detail.harga_harian + penerimaan_barang_detail.harga_bulanan) AS price,
                       satuans.kode_satuan AS unit";
         $receiveDataQry = $this->asObject()
             ->select($selectQry)
