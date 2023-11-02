@@ -390,6 +390,9 @@ $routes->post('/sales-kontrak/save', 'SalesInternasional\SalesKontrak::save', ['
 $routes->post('/sales-kontrak/update', 'SalesInternasional\SalesKontrak::update', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/update-status', 'SalesInternasional\SalesKontrak::updateStatus', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/warehouseAll/(:segment)', 'SalesLokal\OrderForm::getAllWarehouse/$1', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/stok/(:segment)/(:segment)', 'SalesLokal\OrderForm::getStockDetail/$1/$2', ['filter' => 'Auth']);
 
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);

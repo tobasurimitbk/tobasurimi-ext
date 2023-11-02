@@ -74,7 +74,7 @@ class OrderForm extends BaseController
             ->findAll();
 
         $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
-        
+
 
         $data = [
             "dataCustomers" => $customers,
@@ -119,7 +119,8 @@ class OrderForm extends BaseController
 
         $dataSalesOrder = [];
         foreach ($dataOrderForm['data'] as $data) {
-            $totalQty =0; $totalHarga = 0;
+            $totalQty = 0;
+            $totalHarga = 0;
             $dataQtySalesOrderDetail = $this->SalesOrderDetailModel->getItemListByIds(json_decode($data->id));
             foreach ($dataQtySalesOrderDetail as $datas) {
                 $totalQty = $datas->qty;
@@ -346,7 +347,7 @@ class OrderForm extends BaseController
                     "id_sales_order"        => $dataSalesOrder,
                     "id_barang"             => $row->id_barang,
                     "qty"                   => $row->qty,
-                    "harga_barang"          => str_replace(',','',$row->harga_barang),
+                    "harga_barang"          => str_replace(',', '', $row->harga_barang),
                     "amount"                => formatter($row->amount, "CURR_TO_INT"),
                     "keterangan"            => $row->keterangan,
                     // "tax"                   => $row->tax,
@@ -414,11 +415,11 @@ class OrderForm extends BaseController
             ->join('metadata', 'metadata.id = customers.termin')
             ->where('customers.company_id', $this->this_company_id)
             ->findAll();
-        
+
         $metadatas = $this->MetaDataModel->findAll();
 
         $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
-        
+
         // dd($dataSalesOrder->detail);
         $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
         $dataSalesOrder->shipping_date = $dataSalesOrder->shipping_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->shipping_date)) : "";
@@ -669,7 +670,7 @@ class OrderForm extends BaseController
 
                             $this->stockDetailModel->update($item['id'], $stok);
                         }
-                            $totalQty = $totalQty + $row->qty;
+                        $totalQty = $totalQty + $row->qty;
 
                         $valueBarang = [
                             "id_barang" => $row->id_barang,
@@ -778,9 +779,9 @@ class OrderForm extends BaseController
             $dataBarang = json_decode($responseBarang["body"])->data;
         }*/
         $dataBarang = $this->BarangModel
-        ->join('satuans', 'satuans.id = barang_master.satuan_id', 'left')
-        ->join('stock_details', 'stock_details.barang_id = barang_master.id', 'left')
-        ->join('warehouses', 'warehouses.id = stock_details.warehouse_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id', 'left')
+            ->join('stock_details', 'stock_details.barang_id = barang_master.id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_details.warehouse_id', 'left')
             ->select('barang_master.*')
             ->select('barang_master.id as id_barang')
             ->select('barang_master.kode_barang as kode_barang')
@@ -790,6 +791,7 @@ class OrderForm extends BaseController
             ->select('stock_details.qty as qty_stock')
             ->select('satuans.nama_satuan as nama_satuan')
             ->where('type_barang', 'bahan_jadi')
+            ->where('barang_master.deletedAt', null)
             ->where('stock_details.qty >', 0)
             ->groupBy('id_barang')
             ->findAll();
@@ -827,7 +829,7 @@ class OrderForm extends BaseController
         return;
     }
 
-    public function getStockDetail($id_barang,$id_warehouse)
+    public function getStockDetail($id_barang, $id_warehouse)
     {
 
         /* $dataWarehouse = $this->DetailStockBarang
@@ -932,11 +934,12 @@ class OrderForm extends BaseController
         exit();
     }
 
-    public function getMetaData($id){
+    public function getMetaData($id)
+    {
 
         $metadatas = $this->MetaDataModel
-        ->where('metadata.id', $id)
-        ->findAll();
+            ->where('metadata.id', $id)
+            ->findAll();
 
         $data = [
             "dataMetaData" => $metadatas,

@@ -86,7 +86,7 @@ class SalesOrderExportModel extends Model
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('customers', 'customers.id = sales_order_export.customer_id', 'left')
+            ->join('customers', 'customers.id = sales_order_export.customer_id', 'inner')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -143,7 +143,7 @@ class SalesOrderExportModel extends Model
             ->join('customers', 'customers.id = sales_order_export.customer_id', 'LEFT')
             ->where('sales_contract_id', $id)->where('sales_order_export.deletedAt', NULL);
         $query = $builder->get();
-        
+
         return $query->getResult();
     }
 }
