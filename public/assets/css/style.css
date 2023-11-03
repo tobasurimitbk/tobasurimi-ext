@@ -6240,8 +6240,6 @@ table.dataTable .body-table tr td .btn.btn-danger {
   }
 }
 
-/* test */
-
 @media (min-width: 768px) and (max-width: 1024px) {
   .navbar ul.navbar-nav li.dropdown .dropdown-menu.dropdown-menu-right {
     left: -53px;
