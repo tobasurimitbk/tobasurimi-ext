@@ -533,6 +533,9 @@
                 supplier_id: {
                     required: true
                 },
+                invoice_date: {
+                    required: true
+                },
                 nominal_faktur: {
                     required: true
                 },
@@ -561,6 +564,9 @@
                 },
                 supplier_id: {
                     required: "Supplier wajib diisi"
+                },
+                invoice_date: {
+                    required: "Tanggal Terima wajib diisi"
                 },
                 nominal_faktur: {
                     required: "Nominal Faktur wajib diisi"
