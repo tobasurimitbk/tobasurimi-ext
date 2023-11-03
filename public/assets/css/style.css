@@ -6370,3 +6370,15 @@ table.dataTable tbody tr td .btn {
   color: #2f4858;
   line-height: 1.8em;
 }
+
+.modal.m-t-bahan-baku
+  .modal-dialog
+  .modal-content
+  .modal-body
+  .create-form
+  .select2
+  .selection
+  .select2-selection
+  .select2-selection__rendered {
+  padding-left: 0;
+}
