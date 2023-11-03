@@ -221,7 +221,7 @@
                     <td style="padding-left: 5px;"><?= $detail->nama_barang ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= "" . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail->disc ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= "" . number_format(formatter($detail->totalPrice, "STR_TO_FLOAT") - (formatter($detail->totalPrice, "STR_TO_FLOAT") * (formatter($detail->disc, "STR_TO_FLOAT") / 100)), 2, '.', ',') ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= "" . number_format(formatter($detail->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                 </tr>
             <?php } ?>
         </table>

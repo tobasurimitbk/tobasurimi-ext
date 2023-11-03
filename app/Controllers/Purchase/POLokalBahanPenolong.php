@@ -672,12 +672,12 @@ class POLokalBahanPenolong extends BaseController
                 foreach ($dataBPLokalDetail as $value) {
                     $no++;
                     $value->no = $no;
-                    $totalan = formatter($value->price, "CURR_TO_INT") * formatter($value->qty, "STR_TO_FLOAT") +  formatter($value->additional_cost, "CURR_TO_INT");
+                    $totalan = formatter($value->price, "CURR_TO_INT") * formatter($value->qty, "STR_TO_FLOAT");
                     $value->nilaiPpn = number_format($totalan * (float)$value->ppnValue / 100);
                     $value->nilaiPph = number_format($totalan * (float)$value->pphValue / 100);
                     $totalTambahan += formatter($value->additional_cost, "CURR_TO_INT");
                     $totalPrice += $totalan;
-                    $totalDisc += $totalan * (float)$value->disc / 100;
+                    $totalDisc += ($totalan + formatter($value->additional_cost, "CURR_TO_INT")) * (float)$value->disc / 100;
                     $totalPpn += $totalan * (float)$value->ppnValue / 100;
                     $keterangan[] = $value->note;
                 }
