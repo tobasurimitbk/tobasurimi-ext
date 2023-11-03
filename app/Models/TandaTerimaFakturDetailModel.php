@@ -49,4 +49,15 @@ class TandaTerimaFakturDetailModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getListTandaTerimaItemFaktur($tandaTerimaFakturID)
+    {
+        $condition = [
+            'tanda_terima_faktur_detail.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'tanda_terima_faktur_detail.deletedAt' => null
+        ];
+        $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
+        $res = $tandaTerimaFakturDetailModel->where($condition)->findAll();
+        return $res;
+    }
 }

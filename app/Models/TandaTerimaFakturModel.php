@@ -17,6 +17,7 @@ class TandaTerimaFakturModel extends Model
     protected $allowedFields    = [
         'supplier_id',
         'faktur_no',
+        'jatuh_tempo',
         'nominal_faktur',
         'invoice_date',
         'receive_date',
@@ -94,9 +95,9 @@ class TandaTerimaFakturModel extends Model
             $supplierDataQry->groupStart()
                 ->like('suppliers.name', $addCondition['search'])
                 ->orLike('faktur_no', $addCondition['search'])
-            ->groupEnd();
+                ->groupEnd();
         }
-        
+
         $totalFilteredData = $supplierDataQry->countAllResults(false);
         $data = $supplierDataQry->findAll($limit, $offset);
 
@@ -105,5 +106,29 @@ class TandaTerimaFakturModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+
+    public function getListTandaTerimaFakturNotProcessed($supplierID)
+    {
+        $condition = [
+            'tanda_terima_faktur.supplier_id' => $supplierID,
+            'local_po_payments.tanda_terima_faktur_id' => null,
+            'tanda_terima_faktur.deletedAt' => null
+        ];
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+        $res = $tandaTerimaFakturModel
+            ->select('tanda_terima_faktur.id, tanda_terima_faktur.faktur_no')
+            ->join('local_po_payments', 'local_po_payments.tanda_terima_faktur_id = tanda_terima_faktur.id',  'LEFT')
+            ->where($condition)
+            ->orderBy('tanda_terima_faktur.id', "ASC")
+            ->findAll();
+
+        return $res;
+    }
+
+    public function getByID($tandaTerimaFakturID)
+    {
+        $res = $this->where('id', $tandaTerimaFakturID)->first();
+        return $res;
     }
 }
