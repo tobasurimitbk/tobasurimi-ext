@@ -6025,7 +6025,7 @@ table.dataTable .body-table tr td .btn.btn-danger {
 
   .section .section-header .btn.btn-add {
     position: relative;
-    margin-left: auto!important;
+    margin-left: auto !important;
     margin: 0;
     margin-top: 0px;
     margin-top: 0.75rem;
@@ -6284,7 +6284,11 @@ table.dataTable .body-table tr td .btn.btn-danger {
   font-weight: 500;
 }
 
-#harga_modal .modal-dialog .modal-content .modal-body .form-control.search-harga {
+#harga_modal
+  .modal-dialog
+  .modal-content
+  .modal-body
+  .form-control.search-harga {
   padding: 12px;
 }
 
@@ -6308,13 +6312,14 @@ table.dataTable tbody tr td .btn {
 
 /* Master Data - Kurs */
 
-.select2-selection.select2-selection--single.select2-selection--clearable .select2-selection__clear {
+.select2-selection.select2-selection--single.select2-selection--clearable
+  .select2-selection__clear {
   top: 25px;
 }
 
 /* Personalia - Payroll */
 
-.section .section-header .btn.btn-dropdown-export{
+.section .section-header .btn.btn-dropdown-export {
   box-shadow: none !important;
 }
 
@@ -6332,16 +6337,23 @@ table.dataTable tbody tr td .btn {
 
 /* Personalia - Komponen Gajih */
 
-.form-switch-lg .form-check-input{
+.form-switch-lg .form-check-input {
   box-shadow: none !important;
 }
 
 /* Pembelian - T.Terima Supplier */
 
-.form-check .form-check-input{
+.form-check .form-check-input {
   box-shadow: none !important;
 }
 
-/* .detail-form .form-floating .select2 .selection .select2-selection__clear {
-  top: 35%;
-} */
+.modal .modal-dialog .modal-content .modal-body .laporan-form h6 {
+  font-family: "Poppins", sans-serif !important;
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: inline-block;
+  font-size: 14px !important;
+  margin-top: 0px;
+  color: #2f4858;
+  line-height: 1.8em;
+}
