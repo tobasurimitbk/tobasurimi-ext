@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1 class="title-name">Tambah</h1>
+    <h1 class="title-name">Tambah Penerimaan Barang Import</h1>
     <div class="col-button-tambah-spp">
         <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-import"); ?>">
             Batal
@@ -299,7 +299,7 @@
                             <th>Harga</th>
                             <th>Sub Total</th>
                             <th>Keterangan</th>
-                            <th>Action</th>
+                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>">Action</th>
                         </tr>
                     </thead>
                     <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -346,7 +346,7 @@
                                     <td>Rp <?= $details["harga"] ? number_format($details["harga"], 2, '.', ',') : 0; ?></td>
                                     <td>Rp <?= $details["sub_total"] ? number_format($details["sub_total"], 2, '.', ',') : 0; ?></td>
                                     <td><?= $details["keterangan"]; ?></td>
-                                    <td>
+                                    <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>">
                                     <?php if($dataPenerimaanBarang->status_post === "WAITING" && $details["status_penerimaan"] === "0"){ ?>
                                         <button data-packaging="<?= $details["packaging"]; ?>" data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" data-pph="<?= $pph; ?>" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= formatter($details["jml_masuk"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"], 2, '.', ',') : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"], 2, '.', ',') : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -372,7 +372,8 @@
                             <!-- <td><b><?= $total_jml_masuk; ?></b></td> -->
                             <td><b>Rp <?= number_format($total_harga, 2, '.', ','); ?></b></td>
                             <td><b>Rp <?= number_format($total_sub_total, 2, '.', ','); ?></b></td>
-                            <td colspan="2"></td>
+                            <td></td>
+                            <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>"></td>
                         </tr>
                     </tfoot>
                 </table>

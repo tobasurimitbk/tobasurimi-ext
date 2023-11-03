@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1 class="title-name">Tambah</h1>
+    <h1 class="title-name">Tambah Penerimaan Barang Lokal</h1>
     <div class="col-button-tambah-spp">
         <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-lokal"); ?>">
             Batal
@@ -279,7 +279,7 @@
                             <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>" class="col_bulanan">Harga Bulanan</th>
                             <th>Sub Total</th>
                             <th>Keterangan</th>
-                            <th>Action</th>
+                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>">Action</th>
                         </tr>
                     </thead>
                     <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -332,7 +332,7 @@
                                     <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>">Rp <?= $details["harga_bulanan"] ? number_format($details["harga_bulanan"], 2, '.', ',') : 0; ?></td>
                                     <td>Rp <?= $details["sub_total"] ? number_format($details["sub_total"], 2, '.', ',') : 0; ?></td>
                                     <td><?= $details["keterangan"]; ?></td>
-                                    <td>
+                                    <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>">
                                     <?php if($dataPenerimaanBarang->status_post === "WAITING" && $details["status_penerimaan"] === "0"){ ?>
                                         <button data-packaging="<?= $details["packaging"]; ?>" 
                                         data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" 
@@ -376,7 +376,8 @@
                             <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>"><b>Rp <?= number_format($total_harga_harian, 2, '.', ','); ?></b></td>
                             <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>"><b>Rp <?= number_format($total_harga_bulanan, 2, '.', ','); ?></b></td>
                             <td><b>Rp <?= number_format($total_sub_total, 2, '.', ','); ?></b></td>
-                            <td colspan="2"></td>
+                            <td></td>
+                            <td style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>"></td>
                         </tr>
                     </tfoot>
                 </table>
