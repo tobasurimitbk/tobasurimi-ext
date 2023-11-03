@@ -250,3 +250,11 @@ function totalDayInRange($startDate, $endDate)
    $totalHari = $interval->days;
    return $totalHari;
 }
+
+function repairDouble($nominal)
+{
+   $angka = preg_replace("/[^0-9,]/", "", $nominal);
+   $angka = str_replace(",", ".", $angka);
+   $angkaDesimal = number_format((float) $angka, 3, '.', '');
+   return $angkaDesimal;
+}
