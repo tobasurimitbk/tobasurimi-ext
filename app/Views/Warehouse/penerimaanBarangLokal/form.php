@@ -262,24 +262,24 @@
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th>No.</th>
-                            <th>Kode Barang</th>
-                            <th>Nama Barang</th>
-                            <th>No. PO</th>
-                            <th>Status Penerimaan</th>
-                            <th>Kemasan</th>
-                            <th>Jumlah Kemasan</th>
-                            <th>Satuan</th>
-                            <th>Jml. Order</th>
-                            <th>Jml. Diterima</th>
-                            <th>Sisa</th>
+                            <th style="text-align: center;">No.</th>
+                            <th style="text-align: center;">Kode Barang</th>
+                            <th style="text-align: center;">Nama Barang</th>
+                            <th style="text-align: center;">No. PO</th>
+                            <th style="text-align: center;">Status Penerimaan</th>
+                            <th style="text-align: center;">Kemasan</th>
+                            <th style="text-align: center;">Jumlah Kemasan</th>
+                            <th style="text-align: center;">Satuan</th>
+                            <th style="text-align: center;">Jml. Order</th>
+                            <th style="text-align: center;">Jml. Diterima</th>
+                            <th style="text-align: center;">Sisa</th>
                             <!-- <th>Jml. Masuk</th> -->
-                            <th class="label-harga"><?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'Harga' : 'Harga Umum') : 'Harga'; ?></th>
-                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>" class="col_harian">Harga Harian</th>
-                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none' : '') : ''; ?>" class="col_bulanan">Harga Bulanan</th>
-                            <th>Sub Total</th>
-                            <th>Keterangan</th>
-                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>">Action</th>
+                            <th class="label-harga" style="text-align: center;"><?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'Harga' : 'Harga Umum') : 'Harga'; ?></th>
+                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none; text-align:center;' : 'text-align:center;') : 'text-align:center;'; ?>" class="col_harian">Harga Harian</th>
+                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? 'display: none; text-align:center;' : 'text-align:center;') : 'text-align:center;'; ?>" class="col_bulanan">Harga Bulanan</th>
+                            <th style="text-align: center;">Sub Total</th>
+                            <th style="text-align: center;">Keterangan</th>
+                            <th style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none; text-align:center;' : 'text-align:center;') : 'text-align:center;'; ?>">Action</th>
                         </tr>
                     </thead>
                     <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">

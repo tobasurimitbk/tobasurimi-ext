@@ -383,19 +383,9 @@
                                 <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" readonly="true" class="form-control total" name="total" id="total" placeholder="Total Sebelum Biaya Tambahan dan Diskon">
-                                <label for="floatingInput">Total Sebelum Biaya Tambahan dan Diskon</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" readonly="true" class="form-control total_after" name="total_after" id="total_after" placeholder="Total Setelah Biaya Tambahan dan Diskon">
-                                <label for="floatingInput">Total Setelah Biaya Tambahan dan Diskon</label>
-                            </div>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="number" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                            <label for="floatingInput">Total</label>
                         </div>
                     </div>
                     <div class="row">
@@ -649,7 +639,6 @@
             } else {
                 $(".disc").val();
             }
-            $(".total_after").val(Number($(".total").val()) + Number($(".additional_cost").val()) - Number((Number($(".total").val())) * (Number($(".disc").val()) /100)) )
         })
 
         // $(".supplier_id").change(function() {
@@ -1428,8 +1417,7 @@
                 $(".harga").val(harga.replaceAll(",", ""))
                 $(".qty").val(qty)
                 $(".total").val(total.replaceAll(",", ""))
-                $(".total_after").val(Number(total.replaceAll(",", "")) - (Number(total.replaceAll(",", "")) * (Number(disc) / 100)) + Number(additional_cost.replaceAll(",", "")))
-
+                
                 $(".ppn").val(ppn)
                 $(".pph").val(pph)
                 $(".additional_cost").val(additional_cost.replaceAll(",", ""))
