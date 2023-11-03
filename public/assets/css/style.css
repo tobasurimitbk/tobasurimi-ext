@@ -5963,7 +5963,20 @@ form.create-form.form-add-spp.form-hp .nav.nav-tabs button.nav-link {
   height: 50px;
 }
 
+ul.nav.nav-tabs li.nav-item .nav-link {
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: #2f4858;
+  height: 50px;
+}
+
 form.create-form.form-add-spp.form-hp .nav.nav-tabs button.nav-link.active {
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: #e7323a;
+}
+
+ul.nav.nav-tabs li.nav-item .nav-link.active {
   font-size: 14px;
   font-weight: 600 !important;
   color: #e7323a;
@@ -6356,4 +6369,16 @@ table.dataTable tbody tr td .btn {
   margin-top: 0px;
   color: #2f4858;
   line-height: 1.8em;
+}
+
+.modal
+  .modal-dialog
+  .modal-content
+  .modal-body
+  .create-form
+  .select2
+  .selection
+  .select2-selection
+  .select2-selection__rendered {
+  padding-left: 0;
 }
