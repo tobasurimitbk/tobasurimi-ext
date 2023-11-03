@@ -63,8 +63,10 @@
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th>Jumlah Order</th>
-                                <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
-                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
+                                <th>Tanggal Order</th>
+                                <th>Tanggal Dibuat</th>
+                                <!-- <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th> -->
+                                <!-- <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th> -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -160,11 +162,15 @@
             },
             {
                 data: "request_date",
-                className: "text-center"
+                className: "text-center",
+                sortable: false,
+                orderable: false,
             },
             {
                 data: "createdAt",
-                className: "text-center"
+                className: "text-center",
+                sortable: false,
+                orderable: false,
             },
             {
                 data: "id",
