@@ -6349,6 +6349,13 @@ table.dataTable tbody tr td .btn {
   box-shadow: none !important;
 }
 
-/* .detail-form .form-floating .select2 .selection .select2-selection__clear {
-  top: 35%;
-} */
+.modal .modal-dialog .modal-content .modal-body .laporan-form h6 {
+  font-family: "Poppins", sans-serif !important;
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: inline-block;
+  font-size: 14px !important;
+  margin-top: 0px;
+  color: #2f4858;
+  line-height: 1.8em;
+}
