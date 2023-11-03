@@ -204,6 +204,19 @@ class PembayaranPOLokal extends BaseController
         exit(0);
     }
 
+    public function delete()
+    {
+        $id = $this->request->getVar('id');
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
+        $localPOPaymentModel->where('id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Pembayaran lokal bahan penolong berhasil dihapus",
+            'status' => true
+        ]);
+    }
+
     public function getByIdPembayaranPOLokal($id)
     {
         $localPOPaymentModel = new LocalPOPaymentModel();

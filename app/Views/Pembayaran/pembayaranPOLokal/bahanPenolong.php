@@ -56,6 +56,7 @@
         </div>
     </div>
 </section>
+<?= csrf_field() ?>
 
 <script>
     let sort = "id";
@@ -140,6 +141,9 @@
                     let id = row?.id;
                     return `
                         <div class="mt-0">
+                            <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
@@ -202,6 +206,48 @@
     });
     const print = function(url) {
         window.open(url, "_blank");
+    }
+    const remove = function(id) {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Pembayaran Ini ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('id', id);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-lokal/delete"); ?>",
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                // update table
+                                table.ajax.reload();
+                            });
+                        }
+                    },
+                });
+            }
+        });
     }
 </script>
 <?= $this->endSection(); ?>

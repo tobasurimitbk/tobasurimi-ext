@@ -4,8 +4,8 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pembayaran PO Lokal</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal/create"); ?>">
+        <h1>Pembayaran PO Lokal Bahan Baku</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal-bp/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
@@ -14,7 +14,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Pembayaran">
+                        <input autocomplete="one-time-code" class="form-control input-picker dueDate" id="dueDate" name="dueDate" placeholder="Tanggal Jatuh Tempo">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -22,7 +22,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Pembayaran">
+                        <input autocomplete="one-time-code" class="form-control input-picker paymentDate" id="paymentDate" name="paymentDate" placeholder="Tanggal Pembayaran">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -39,6 +39,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th>No. Pembayaran</th>
+                                <th>No. Faktur</th>
                                 <th>Supplier</th>
                                 <th>Tanggal Jatuh Tempo</th>
                                 <th>Tanggal Pembayaran</th>
@@ -48,7 +49,6 @@
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
                         </tbody>
                     </table>
                 </div>
@@ -58,7 +58,7 @@
 </section>
 
 <script>
-    let sort = "payment_no";
+    let sort = "id";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
@@ -81,8 +81,9 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
+                data.dueDate = $(".dueDate").val();
+                data.paymentDate = $(".paymentDate").val();
+                data.type_po = "Bahan Penolong";
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -104,6 +105,10 @@
             },
             {
                 data: "payment_no",
+                className: "text-center"
+            },
+            {
+                data: "faktur_no",
                 className: "text-center"
             },
             {
@@ -135,7 +140,7 @@
                     let id = row?.id;
                     return `
                         <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="printPoLokal('<?= base_url("pembayaran-po-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -158,14 +163,14 @@
     });
 
     $(document).ready(function() {
-        $(".dateStart").datepicker({
+        $(".dueDate").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
         })
 
-        $(".dateEnd").datepicker({
+        $(".paymentDate").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -173,11 +178,11 @@
         })
 
         $('.icon-dateStart').click(function() {
-            $(".dateStart").focus();
+            $(".dueDate").focus();
         });
 
         $('.icon-dateEnd').click(function() {
-            $(".dateEnd").focus();
+            $(".paymentDate").focus();
         });
 
         $(".dataTable_info").addClass("pt-0");
@@ -186,16 +191,16 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd").change(function() {
+        $(".dueDate, .paymentDate").change(function() {
             table.ajax.reload();
         })
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-po-lokal/"); ?>${data.id}`);
+            location.replace(`<?= base_url("pembayaran-po-lokal-bp/id/"); ?>${data.id}`);
         });
     });
-    const printPoLokal = function(url) {
+    const print = function(url) {
         window.open(url, "_blank");
     }
 </script>

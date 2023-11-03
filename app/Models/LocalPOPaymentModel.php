@@ -12,7 +12,7 @@ class LocalPOPaymentModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
         'payment_no',
@@ -22,7 +22,9 @@ class LocalPOPaymentModel extends Model
         'amount',
         'payment_date',
         'payment_method',
-        'pembayaran_oleh'
+        'pembayaran_oleh',
+        'type_po',
+        'deletedAt'
     ];
 
     // Dates
