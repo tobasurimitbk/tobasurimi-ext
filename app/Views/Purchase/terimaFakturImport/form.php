@@ -536,6 +536,9 @@
                 nominal_faktur: {
                     required: true
                 },
+                tipe_bahan: {
+                    required: true
+                },
                 recipient: {
                     required: true
                 },
@@ -561,6 +564,9 @@
                 },
                 nominal_faktur: {
                     required: "Nominal Faktur wajib diisi"
+                },
+                tipe_bahan: {
+                    required: "Tipe wajib diisi"
                 },
                 recipient: {
                     required: "Penerima wajib diisi"

@@ -218,7 +218,7 @@
                                 <th>Keterangan</th>
                                 <!-- <th>PPN</th>
                                 <th>PPH</th> -->
-                                <th>Action</th>
+                                <th style="<?= !empty($dataPOLokal) ? ($dataPoLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
                                 <!-- <th>Keterangan</th> -->
                             </tr>
                         </thead>
@@ -278,7 +278,6 @@
                                             <!-- <td><?= $details->ppn; ?></td>
                                             <td><?= $details->pph; ?></td> -->
                                             <td><?= $details->note; ?></td>
-                                            <td></td>
                                         <?php } ?>
                                     </tr>
                             <?php
@@ -295,7 +294,8 @@
                                 <!-- <td><b><?= $total_remaining_qty; ?></b></td>
                                 <td><b><?= $total_qty_diterima; ?></b></td> -->
                                 <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td colspan="4"></td>
+                                <td colspan="3"></td>
+                                <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                             </tr>
                         </tfoot>
                     </table>

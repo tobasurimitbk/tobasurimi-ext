@@ -195,7 +195,7 @@
                     </div>
                 </div>
             </div>
-            <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+            <form class="detail-form" role="form" method="POST" enctype="multipart/form-data" style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
                 <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                 <div class="row">
                     <div class="col-md-6">
@@ -313,7 +313,7 @@
                     </div>
                 </div>
             </form>
-            <div class="col-subtitle-modal">
+            <div class="col-subtitle-modal" style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
                 <div class="row mt-3">
                     <div class="col-md-6">
 
@@ -343,7 +343,7 @@
                                 <th>QTY</th>
                                 <th>Peti</th>
                                 <th>Kualitas</th>
-                                <th>Action</th>
+                                <th style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -393,7 +393,7 @@
                                 <td>
                                     <?= $details->quality; ?>
                                 </td>
-                                <td>
+                                <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
                                     <?php if ($dataPOLokal->is_posted === "0") { ?>
                                     <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="<?= $details->id_satuan; ?>" data data-spesifikasi="<?= $details->supplier_harga_id; ?>"
                                     data-harga="<?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-daily="<?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-monthly="<?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" 
@@ -415,7 +415,8 @@
                                 <td><b><?= "Rp " . number_format(formatter($total_harian, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= "Rp " . number_format(formatter($total_bulanan, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
-                                <td colspan="3"></td>
+                                <td colspan="2"></td>
+                                <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                             </tr>
                         </tfoot>
                     </table>

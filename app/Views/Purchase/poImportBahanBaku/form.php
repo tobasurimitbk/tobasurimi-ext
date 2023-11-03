@@ -316,7 +316,7 @@
                                 <th>Total</th>
                                 <th>Disc (%)</th>
                                 <th>Tambahan</th>
-                                <th>Action</th>
+                                <th style="<?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -371,7 +371,6 @@
                                             <td><?= number_format((formatter($details["price"], "STR_TO_FLOAT") * formatter($details["qty"], "STR_TO_FLOAT")), 2, '.', ','); ?></td>
                                             <td><?= formatter($details["disc"], "STR_TO_FLOAT"); ?></td>
                                             <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td></td>
                                         <?php } ?>
                                     </tr>
                             <?php
@@ -388,7 +387,7 @@
                                 <td><b><?= number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td></td>
                                 <td><b><?= number_format(formatter($total_tambahan, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td></td>
+                                <td style="<?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                             </tr>
                         </tfoot>
                     </table>

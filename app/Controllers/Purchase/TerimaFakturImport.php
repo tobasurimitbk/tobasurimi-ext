@@ -516,7 +516,7 @@ class TerimaFakturImport extends BaseController
                 "penerimaan_barang.*.id" => [
                     "rules" => "required|is_natural_no_zero",
                     'errors' => [
-                        'required' => 'Daftar penerimaan barang yang akan dibuat tanda terima tidak boleh kosong'
+                        'required' => 'Pilih daftar penerimaan barang!'
                     ]
                 ],
                 // "penerimaan_barang.*.no_po" => [
@@ -894,7 +894,7 @@ class TerimaFakturImport extends BaseController
                 "penerimaan_barang.*.id" => [
                     "rules" => "required|is_natural_no_zero",
                     'errors' => [
-                        'required' => 'Daftar penerimaan barang yang akan dibuat tanda terima tidak boleh kosong'
+                        'required' => 'Pilih daftar penerimaan barang!'
                     ]
                 ],
                 // "penerimaan_barang.*.no_po" => [
