@@ -22,7 +22,7 @@
                     <a class="nav-link <?= $type == "bahan_jadi" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_jadi') ?>">Barang Jadi</a>
                 </li>
             </ul>
-            <div class="row justify-content-end mt-3">
+            <div class="row justify-content-end mt-4">
                 <div class="col-md-2">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kelompok Barang" value="" />
                 </div>
