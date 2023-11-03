@@ -97,6 +97,12 @@
                             <label for="floatingInput">Nominal Faktur</label>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->jatuh_tempo ?? ""; ?>" class="form-control input-picker datepicker" id="jatuh_tempo" name="jatuh_tempo" placeholder="Jatuh Tempo">
+                            <label for="floatingInput">Jatuh Tempo</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="row">
