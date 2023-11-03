@@ -686,7 +686,7 @@ class POLokalBahanPenolong extends BaseController
                 $dataBPLokal->totalPrice = number_format(formatter($totalPrice, "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalDisc = number_format(formatter($totalDisc, "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalPpn = number_format(formatter($totalPpn, "STR_TO_FLOAT"), 2, '.', ',');
-                $dataBPLokal->totalPo = number_format(formatter(($totalPrice - $totalDisc + $totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPo = number_format(formatter(($totalTambahan + $totalPrice - $totalDisc + $totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->keterangan = implode(",", array_unique($keterangan));
                 $dataBPLokal->jatuhTempoHari = \totalDayInRange($dataBPLokal->po_date, $dataBPLokal->payment_date);
                 // $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
