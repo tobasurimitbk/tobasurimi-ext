@@ -102,7 +102,7 @@ class PayrollsModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['employee_id'] || $addCondition['divisi_id']) {
+        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
             $dataQry->groupStart();
         }
 
@@ -114,7 +114,11 @@ class PayrollsModel extends Model
             $dataQry->like('employees.division_id', $addCondition['divisi_id']);
         }
 
-        if ($addCondition['employee_id'] || $addCondition['divisi_id']) {
+        if ($addCondition['tipe']) {
+            $dataQry->where('employees.tipe', $addCondition['tipe']);
+        }
+
+        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
             $dataQry->groupEnd();
         }
 

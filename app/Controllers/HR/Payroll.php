@@ -12,6 +12,7 @@ use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
 use App\Models\FormPerizinanNotApprovedModel;
 use App\Models\GajiDivisiModel;
+use App\Models\GolonganModel;
 use App\Models\PayrollGajiConjunctionModel;
 use App\Models\PayrollsModel;
 use App\Models\PinjamanKaryawanModel;
@@ -36,6 +37,7 @@ class Payroll extends BaseController
 
         $payrollModel = new PayrollsModel();
         $divisiModel = new DivisisModel();
+        $golonganModel = new GolonganModel();
 
         $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
         $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
@@ -51,6 +53,7 @@ class Payroll extends BaseController
             'endDate' => $endDate,
             'divisi' => $divisiModel->get_by_company_id($this->this_company_id),
             'isGenerate' => ($isGenerate == 0) ? false : true,
+            'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
         ];
 
         return view('hr/payroll/index', $data);
@@ -82,6 +85,7 @@ class Payroll extends BaseController
         $addCondition = [
             "divisi_id"          => $this->request->getGet("divisi_id"),
             "employee_id"        => $this->request->getGet("employee_id"),
+            "tipe"               => $this->request->getGet("golongan")
         ];
 
         $limit = $this->request->getGet("length");

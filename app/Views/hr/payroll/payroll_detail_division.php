@@ -140,7 +140,7 @@
                     <td>
                         <table>
                             <tr>
-                                <td>Hari Kerja</td>
+                                <td style="width: 248px;">Hari Kerja</td>
                                 <td>:</td>
                                 <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                             </tr>
@@ -188,7 +188,7 @@
                     <td>
                         <table>
                             <tr>
-                                <td>Hari Kerja</td>
+                                <td style="width: 248px;">Hari Kerja</td>
                                 <td>:</td>
                                 <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                             </tr>
@@ -243,7 +243,7 @@
                     <td>
                         <table>
                             <tr>
-                                <td>Total Gaji & Lembur</td>
+                                <td style="width: 248px;">Total Gaji & Lembur</td>
                                 <td>:</td>
                                 <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                             </tr>
@@ -282,7 +282,7 @@
                     <td>
                         <table>
                             <tr>
-                                <td>Total Gaji & Lembur</td>
+                                <td style="width: 248px;">Total Gaji & Lembur</td>
                                 <td>:</td>
                                 <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                             </tr>
@@ -482,7 +482,7 @@
                         <td>
                             <table>
                                 <tr>
-                                    <td>Hari Kerja</td>
+                                    <td style="width: 248px;">Hari Kerja</td>
                                     <td>:</td>
                                     <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                                 </tr>
@@ -530,7 +530,7 @@
                         <td>
                             <table>
                                 <tr>
-                                    <td>Hari Kerja</td>
+                                    <td style="width: 248px;">Hari Kerja</td>
                                     <td>:</td>
                                     <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                                 </tr>
@@ -585,7 +585,7 @@
                         <td>
                             <table>
                                 <tr>
-                                    <td>Total Gaji & Lembur</td>
+                                    <td style="width: 248px;">Total Gaji & Lembur</td>
                                     <td>:</td>
                                     <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                                 </tr>
@@ -624,7 +624,7 @@
                         <td>
                             <table>
                                 <tr>
-                                    <td>Total Gaji & Lembur</td>
+                                    <td style="width: 248px;">Total Gaji & Lembur</td>
                                     <td>:</td>
                                     <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                                 </tr>
