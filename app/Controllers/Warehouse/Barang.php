@@ -86,7 +86,7 @@ class Barang extends BaseController
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
-            'minimum_stock' => $this->request->getVar('minimum_stock'),
+            'minimum_stock' => str_replace('.','',$this->request->getVar('minimum_stock')),
         ]);
 
         return response()->setJSON([
@@ -108,7 +108,7 @@ class Barang extends BaseController
             'parent_type' => $this->request->getVar('parent_type'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
-            'minimum_stock' => $this->request->getVar('minimum_stock'),
+            'minimum_stock' => str_replace('.','',$this->request->getVar('minimum_stock')),
         ]);
 
         return response()->setJSON([

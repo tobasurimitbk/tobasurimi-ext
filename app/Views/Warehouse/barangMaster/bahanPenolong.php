@@ -21,10 +21,10 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('parent_barang.parent_name')" class="sort">Kelompok</th>
-                                <th onclick="changeSort('barang_master.kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('barang_master.barang_name')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('satuans.nama_satuan')" class="sort">Satuan</th>
+                                <th onclick="changeSort('kelompok_barang')" class="sort">Kelompok</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
+                                <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('satuan')" class="sort">Satuan</th>
                                 <th class="sort">Harga Terakhir</th>
                                 <th class="sort">Supplier Terakhir</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
@@ -556,6 +556,14 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>
