@@ -155,13 +155,13 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mt-3">
-                                <input value="<?= "01/$month/$year" ?>" readonly autocomplete="one-time-code" name="startDate" type="text" required class="form-control target input-picker">
+                                <input value="<?= "$start[value]/$month/$year" ?>" readonly autocomplete="one-time-code" name="startDate" type="text" required class="form-control target input-picker">
                                 <label for="floatingInput">Tanggal Mulai</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mt-3">
-                                <input value="<?= "12/$month/$year" ?>" readonly autocomplete="one-time-code" name="finishDate" type="text" required class="form-control target input-picker">
+                                <input value="<?= "$finish[value]/$month/$year" ?>" readonly autocomplete="one-time-code" name="finishDate" type="text" required class="form-control target input-picker">
                                 <label for="floatingInput">Tanggal Selesai</label>
                             </div>
                         </div>

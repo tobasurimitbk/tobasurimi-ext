@@ -9,6 +9,7 @@ use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
 use App\Models\GolonganModel;
+use App\Models\MetadataModel;
 use App\Models\PinjamanKaryawanModel;
 use Dompdf\Dompdf;
 use Exception;
@@ -31,13 +32,19 @@ class PinjamanKaryawan extends BaseController
         $divisiModel = new DivisisModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
         $golonganModel = new GolonganModel();
+        $metaDataModel = new MetadataModel();
+
+        $start = $metaDataModel->where('name', 'Cut Off Pinjaman Start')->first();
+        $finish = $metaDataModel->where('name', 'Cut Off Pinjaman Finish')->first();
 
         $data = [
             'year' => $year,
             'month' => $month,
             'divisi' => $divisiModel->get_by_company_id($this->this_company_id),
             'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
-            'pinjamanCheck' => $pinjamanKaryawanModel->where('month_year', $year . "-" . $month)->where('company_id', $this->this_company_id)->findAll()
+            'pinjamanCheck' => $pinjamanKaryawanModel->where('month_year', $year . "-" . $month)->where('company_id', $this->this_company_id)->findAll(),
+            'start' => $start,
+            'finish' => $finish
         ];
 
         return view('hr/pinjamanKaryawan/index', $data);
