@@ -6,7 +6,8 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
     Unit: <?= $company['company'] ?><br>
     Departemen: <?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?><br>
     Bulan: <?= date('F - Y', strtotime($yearMonth)) ?> <br>
-    Periode: <?= $startDate ?> s.d <?= $endDate ?>
+    Periode: <?= $startDate ?> s.d <?= $endDate ?> <br>
+    Golongan: <?= $golongan != null ? $golongan['golongan_name'] : "Semua Golongan" ?>
 </b>
 <br>
 <b>

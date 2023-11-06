@@ -45,9 +45,9 @@
                     <i class="fa-solid fa-print"></i> Print
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><a target="_blank" class="dropdown-item" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Bulanan PDF</a></li>
+                    <li><a target="_blank" class="dropdown-item" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID'] . "&golongan=" .  @$_GET['golongan']) ?>">Bulanan PDF</a></li>
+                    <li><a class="dropdown-item" href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID'] . "&golongan=" .  @$_GET['golongan']) ?>">Bulanan Excel</a></li>
                     <li><a class="dropdown-item" href="#" id="triwulanBtnPDF">Triwulan PDF</a></li>
-                    <li><a class="dropdown-item" href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Bulanan Excel</a></li>
                 </ul>
             <?php endif ?>
             </form>
@@ -105,7 +105,7 @@
             <div class="row row-col-page-list-attendance mt-4">
                 <form action="#" method="get">
                     <div class="row mb-4">
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="form-floating">
                                 <select class="form-select" name="divisiID" aria-label="Floating label select example">
                                     <option value="">
@@ -120,7 +120,22 @@
                                 <label for="floatingInput">Cari Departemen</label>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
+                            <div class="form-floating">
+                                <select class="form-select" name="filterGolongan" aria-label="Floating label select example">
+                                    <option value="">
+                                        Cari Tipe / Golongan
+                                    </option>
+                                    <?php foreach ($golongan as $g) : ?>
+                                        <option <?= @$_GET['golongan'] == $g['golongan_name'] ? "selected" : "" ?> value="<?= $g['golongan_name'] ?>">
+                                            <?= $g['golongan_name']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Cari Tipe / Golongan</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
                             <div class="form-floating">
                                 <select class="form-select" name="select2EmployeesName" aria-label="Floating label select example">
                                     <?php if ($employeeDetailFilter != null) : ?>
@@ -129,10 +144,10 @@
                                         </option>
                                     <?php endif; ?>
                                 </select>
-                                <label for="floatingInput">Cari Data Karyawan</label>
+                                <label for="floatingInput">Cari Karyawan</label>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <a href="<?= base_url("list-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary btn_reset">
                                 <i class="fa-solid fa-rotate-right"></i>
                                 Reset
@@ -1052,15 +1067,18 @@
             $('.startDate').val(formattedStartDate).attr('readonly', true);
             $('.endDate').val(formattedEndDate).attr('readonly', true);
         });
-        // filter table by employee
-        $("select[name='select2EmployeesName']").on("change", function() {
-            var selectedValue = $(this).val();
-            window.location.href = "<?= base_url("list-attendance?month=$month&year=$year") ?>&employeesID=" + selectedValue;
+        $("select[name='filterGolongan']").select2({
+            placeholder: "Cari Tipe/Golongan Pegawai",
+            theme: "bootstrap-5",
+            allowClear: true,
         });
-        // filter htable by division
-        $("select[name='divisiID']").on("change", function() {
-            var selectedValue = $(this).val();
-            window.location.href = "<?= base_url("list-attendance?month=$month&year=$year") ?>&divisiID=" + selectedValue;
+        // filter
+        $("select[name='select2EmployeesName'], select[name='divisiID'], select[name='filterGolongan']").on("change", function() {
+            var divisiID = $("select[name='divisiID']").val();
+            var golongan = $("select[name='filterGolongan']").val();
+            var employeesID = $("select[name='select2EmployeesName']").val();
+            var link = "<?= base_url("list-attendance?month=$month&year=$year") ?>&divisiID=" + divisiID + "&employeesID=" + employeesID + "&golongan=" + golongan;
+            window.location.href = link;
         });
         // filter select2 init
         $("select[name='filterDivisi']").select2({

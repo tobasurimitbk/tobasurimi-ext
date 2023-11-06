@@ -116,6 +116,7 @@ class Attendance extends BaseController
         $EmployeesModel = new EmployeesModel();
         $DivisiModel = new DivisisModel();
         $metaDataModel = new MetadataModel();
+        $golonganModel = new GolonganModel();
 
         $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
         $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
@@ -141,7 +142,12 @@ class Attendance extends BaseController
             ->where('company_id', $this->this_company_id)
             ->countAllResults();
 
-        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'), $this->request->getGet('divisiID'));
+        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination(
+            $this->this_company_id,
+            $this->request->getGet('employeesID'),
+            $this->request->getGet('divisiID'),
+            $this->request->getGet('golongan')
+        );
         $pager = \Config\Services::pager();
         $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
 
@@ -161,7 +167,8 @@ class Attendance extends BaseController
             'endDate' => $endDate,
             'allDates' => $allDates,
             'startMonth' => $resStartEndMonth[0],
-            'endMonth' => $resStartEndMonth[1]
+            'endMonth' => $resStartEndMonth[1],
+            'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
         ];
 
         $data['pager'] = $pager;
@@ -368,7 +375,7 @@ class Attendance extends BaseController
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $this->this_company_id,
-            'users.id' => null
+            //'users.id' => null
         ];
 
         if ($divisionID != "") {
@@ -633,6 +640,7 @@ class Attendance extends BaseController
     public function exportPDFPresensi($yearMonth)
     {
         $divisiID = $this->request->getGet('divisiID');
+        $golongan = $this->request->getGet('golongan');
 
         $dompdf = new Dompdf();
 
@@ -640,9 +648,14 @@ class Attendance extends BaseController
         $metaDataModel = new MetadataModel();
         $companyModel = new CompaniesModel();
         $divisiModel = new DivisisModel();
+        $golonganModel = new GolonganModel();
 
-        if (!empty($divisiID)) {
-            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        if (!empty($divisiID) || !empty($golongan)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID(
+                $this->this_company_id,
+                $divisiID,
+                $golongan
+            );
         } else {
             $employeeData = $employeesModel->getEmployeesAndDivisi($this->this_company_id);
         }
@@ -686,6 +699,7 @@ class Attendance extends BaseController
             'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
                 ->orderBy('name', "ASC")
                 ->findAll(),
+            'golongan' => $golonganModel->where('golongan_name', $golongan)->first(),
         ];
 
         $dompdf->loadHtml(view('hr/attendance/print-attendance', $data));

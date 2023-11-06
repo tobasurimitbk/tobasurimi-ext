@@ -241,6 +241,11 @@
                     <td><?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?></td>
                 </tr>
                 <tr>
+                    <td width="100px"><b>Tipe/Golongan</b></td>
+                    <td width="10px">:</td>
+                    <td><?= $golongan != null ? $golongan['golongan_name'] : "Semua Golongan" ?></td>
+                </tr>
+                <tr>
                     <td width="100px"><b>Bulan</b></td>
                     <td width="10px">:</td>
                     <td><?= date('F - Y', strtotime($yearMonth)) ?></td>

@@ -56,6 +56,11 @@
                 <td><?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?></td>
             </tr>
             <tr>
+                <td width="100px"><b>Tipe/Golongan</b></td>
+                <td width="10px">:</td>
+                <td><?= $golongan != null ? $golongan['golongan_name'] : "Semua Golongan" ?></td>
+            </tr>
+            <tr>
                 <td width="100px"><b>Bulan</b></td>
                 <td width="10px">:</td>
                 <td><?= date('F - Y', strtotime($yearMonth)) ?></td>
@@ -104,7 +109,7 @@
                         &nbsp;<?= $e["divisi"]; ?></td>
                     </td>
                     <td style="color: black; font-weight:normal;">
-                        &nbsp;<?= $e["namaBagian"]; ?></td>
+                        &nbsp;<?= $e["nama_bagian"]; ?></td>
                     </td>
                     <?php $j = 1; ?>
                     <?php foreach ($allDates as $a) : ?>
@@ -193,9 +198,14 @@
                     <td><?= $company['company'] ?></td>
                 </tr>
                 <tr>
-                    <td width="100px"><b>Bagian</b></td>
+                    <td width="100px"><b>Departemen</b></td>
                     <td width="10px">:</td>
                     <td><?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?></td>
+                </tr>
+                <tr>
+                    <td width="100px"><b>Tipe/Golongan</b></td>
+                    <td width="10px">:</td>
+                    <td><?= $golongan != null ? $golongan['golongan_name'] : "Semua Golongan" ?></td>
                 </tr>
                 <tr>
                     <td width="100px"><b>Bulan</b></td>
@@ -235,7 +245,7 @@
                             &nbsp;<?= $e['divisi'] ?></td>
                         </td>
                         <td>
-                            &nbsp;<?= $e['namaBagian'] ?></td>
+                            &nbsp;<?= $e['nama_bagian'] ?></td>
                         </td>
                         <?php foreach ($statusPerizinan as $s) : ?>
                             <td width="20" align="center">
