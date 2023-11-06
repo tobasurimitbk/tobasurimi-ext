@@ -24,7 +24,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;" class="sort">No</th>
-                                <th onclick="changeSort('employeeName')" class="sort">Jenis Jam Kerja</th>
+                                <th onclick="changeSort('jenis')" class="sort">Jenis Jam Kerja</th>
                                 <th style="width: 100px;">Actions</th>
                             </tr>
                         </thead>
@@ -40,7 +40,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "periode";
+    let sort = "id";
     let sortType = "desc";
     let trigger = true;
     let year = 2023;
@@ -65,7 +65,7 @@
         serverSide: true,
         ordering: true,
         order: [
-            [0, 'asc']
+            [1, 'asc']
         ],
         fixedHeader: true,
         lengthMenu: [
@@ -93,7 +93,9 @@
         searching: false,
         columns: [{
             data: "no",
-            className: "text-center"
+            className: "text-center",
+            sortable: false,
+            orderable: false,
         }, {
             data: "jenis",
             className: "text-center"

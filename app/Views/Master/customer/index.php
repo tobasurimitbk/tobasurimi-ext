@@ -193,7 +193,7 @@
         serverSide: true,
         ordering: true,
         order: [
-            [1, 'asc']
+            // [1, 'asc']
         ],
         fixedHeader: true,
         lengthMenu: [
@@ -235,12 +235,8 @@
                 className: "text-center"
             }, {
                 data: "contact_person",
-                className: "text-center"
+                className: "text-center",
             },
-            // {
-            //     data: "saldo",
-            //     className: "text-center"
-            // }, 
             {
                 data: "currencyName",
                 className: "text-center"

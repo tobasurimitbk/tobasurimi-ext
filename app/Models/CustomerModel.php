@@ -76,6 +76,7 @@ class CustomerModel extends Model
         $availableSort = [
             'kode'              => 'customers.kode',
             'name'              => 'customers.name',
+            'contact_person'    => 'customers.contact_person',
             'phone'             => 'customers.phone',
             'saldo'             => 'customers.saldo',
             'currencyName'      => 'metadata.value',

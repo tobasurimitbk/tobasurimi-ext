@@ -35,7 +35,8 @@ class JamKerja extends BaseController
         ];
 
         $addCondition = [
-            "jenis"          => $this->request->getGet("jenis"),
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
         ];
 
         $condition = [

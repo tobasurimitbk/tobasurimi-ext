@@ -47,12 +47,13 @@ class JamKerjaModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'jenis'    => 'jenis',
+            'id'    => 'jam_kerja.id',
+            'jenis'    => 'jam_kerja.jenis',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'id'] ?? 'id';
+        $sort = $availableSort[$addCondition['sort'] ?? 'id'] ?? 'jam_kerja.id';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $dataQry = $this->asObject()
@@ -62,15 +63,15 @@ class JamKerjaModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['jenis']) {
+        if ($addCondition['search']) {
             $dataQry->groupStart();
         }
 
-        if ($addCondition['jenis']) {
-            $dataQry->like('jam_kerja.jenis', $addCondition['jenis']);
+        if ($addCondition['search']) {
+            $dataQry->like('jam_kerja.jenis', $addCondition['search']);
         }
 
-        if ($addCondition['jenis']) {
+        if ($addCondition['search']) {
             $dataQry->groupEnd();
         }
 
