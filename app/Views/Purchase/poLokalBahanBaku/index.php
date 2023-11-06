@@ -69,7 +69,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'desc']],
+        order: [],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -100,6 +100,7 @@
         columns: [{
             data: "no",
             className: "text-center",
+            sortable: false,
             orderable: false
         },
         {
