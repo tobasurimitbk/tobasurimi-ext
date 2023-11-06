@@ -39,8 +39,8 @@
                 <i class="fa-solid fa-print"></i> Print
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><a target="_blank" class="dropdown-item" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">PDF</a></li>
-                <li><a class="dropdown-item" href="<?= base_url('log-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Excel</a></li>
+                <li><a target="_blank" class="dropdown-item" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID'] . "&golongan=" .  @$_GET['golongan']) ?>">PDF</a></li>
+                <li><a class="dropdown-item" href="<?= base_url('log-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID'] . "&golongan=" .  @$_GET['golongan']) ?>">Excel</a></li>
             </ul>
         </div>
 

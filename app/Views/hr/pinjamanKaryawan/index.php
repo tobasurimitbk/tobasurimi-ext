@@ -118,8 +118,7 @@
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
                                 <th onclick="changeSort('employees.division_id')" class="sort">Departemen</th>
-                                <th onclick="changeSort('pinjaman_karyawan.start_date')">Mulai Absen</th>
-                                <th onclick="changeSort('pinjaman_karyawan.end_date')">Selesai Absen</th>
+                                <th onclick="changeSort('pinjaman_karyawan.start_date')">Detail Absen</th>
                                 <th onclick="changeSort('pinjaman_karyawan.hadir')">Hadir</th>
                                 <th onclick="changeSort('pinjaman_karyawan.tidak_hadir')">Tidak Hadir</th>
                                 <th>Nominal</th>
@@ -359,11 +358,15 @@
             },
             {
                 data: "mulaiAbsen",
-                className: "text-center"
-            },
-            {
-                data: "selesaiAbsen",
-                className: "text-center"
+                className: "text-center",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let startDate = row?.mulaiAbsen;
+                    let endDate = row?.selesaiAbsen;
+                    return startDate + ' - ' + endDate;
+                }
             },
             {
                 data: "hadir",

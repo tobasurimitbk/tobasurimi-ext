@@ -171,15 +171,22 @@ class EmployeesModel extends Model
         return $query->getResultArray();
     }
 
-    public function getEmployeesByDivisionID($company_id, $divisionID)
+    public function getEmployeesByDivisionID($company_id, $divisionID, $golongan = null)
     {
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'divisis.id' => $divisionID,
             'divisis.deletedAt' => null,
             'employees.status' => "Aktif"
         ];
+
+        if ($golongan != null && !empty($golongan)) {
+            $arrCondition['employees.tipe'] = $golongan;
+        }
+
+        if ($divisionID != null && !empty($divisionID)) {
+            $arrCondition['divisis.id'] = $divisionID;
+        }
 
         $builder = $this->db->table('employees')
             ->select("employees.*, divisis.divisi, bagian.nama_bagian")

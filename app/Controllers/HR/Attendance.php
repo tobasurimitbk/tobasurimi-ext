@@ -478,6 +478,7 @@ class Attendance extends BaseController
     public function exportPDFLogPresensi($yearMonth)
     {
         $divisiID = $this->request->getGet('divisiID');
+        $golongan = $this->request->getGet('golongan');
 
         $employeesModel = new EmployeesModel();
         $divisiModel = new DivisisModel();
@@ -486,11 +487,16 @@ class Attendance extends BaseController
         $AttendancesLogModel = new AttendancesLogModel();
         $FormPerijinanModel = new FormPerijinanModel();
         $divisiModel = new DivisisModel();
+        $golonganModel = new GolonganModel();
 
         $dompdf = new Dompdf();
 
-        if (!empty($divisiID)) {
-            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        if (!empty($divisiID) || !empty($golongan)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID(
+                $this->this_company_id,
+                $divisiID,
+                $golongan
+            );
         } else {
             $employeeData = $employeesModel->getEmployees($this->this_company_id);
         }
@@ -527,6 +533,7 @@ class Attendance extends BaseController
             'res_user'  => $dataResult,
             'yearMonth' => $yearMonth,
             'divisi' => $divisiModel->where('id', $divisiID)->first(),
+            'golongan' => $golonganModel->where('golongan_name', $golongan)->first(),
             'company' => $companyModel->where('id', $this->this_company_id)->first(),
             'month' => $splitYearMonth[1],
             'year' => $splitYearMonth[0],
@@ -551,6 +558,7 @@ class Attendance extends BaseController
     public function exportExcelLogPresensi($yearMonth)
     {
         $divisiID = $this->request->getGet('divisiID');
+        $golongan = $this->request->getGet('golongan');
 
         $employeesModel = new EmployeesModel();
         $divisiModel = new DivisisModel();
@@ -559,9 +567,14 @@ class Attendance extends BaseController
         $AttendancesLogModel = new AttendancesLogModel();
         $FormPerijinanModel = new FormPerijinanModel();
         $divisiModel = new DivisisModel();
+        $golonganModel = new GolonganModel();
 
-        if (!empty($divisiID)) {
-            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        if (!empty($divisiID) || !empty($golongan)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID(
+                $this->this_company_id,
+                $divisiID,
+                $golongan
+            );
         } else {
             $employeeData = $employeesModel->getEmployees($this->this_company_id);
         }
@@ -599,6 +612,7 @@ class Attendance extends BaseController
             'res_user'  => $dataResult,
             'yearMonth' => $yearMonth,
             'divisi' => $divisiModel->where('id', $divisiID)->first(),
+            'golongan' => $golonganModel->where('golongan_name', $golongan)->first(),
             'company' => $companyModel->where('id', $this->this_company_id)->first(),
             'month' => $splitYearMonth[1],
             'year' => $splitYearMonth[0],
@@ -685,14 +699,15 @@ class Attendance extends BaseController
     public function exportExcelPresensi($yearMonth)
     {
         $divisiID = $this->request->getGet('divisiID');
+        $golongan = $this->request->getGet('golongan');
 
         $employeesModel = new EmployeesModel();
         $metaDataModel = new MetadataModel();
         $companyModel = new CompaniesModel();
         $divisiModel = new DivisisModel();
 
-        if (!empty($divisiID)) {
-            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        if (!empty($divisiID) || !empty($golongan)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID, $golongan);
         } else {
             $employeeData = $employeesModel->getEmployeesAndDivisi($this->this_company_id);
         }

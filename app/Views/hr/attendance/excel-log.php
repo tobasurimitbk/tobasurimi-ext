@@ -5,7 +5,8 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
 <b>
     Unit: <?= $company['company'] ?><br>
     Departemen: <?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?><br>
-    Bulan: <?= date('F - Y', strtotime($yearMonth)) ?>
+    Bulan: <?= date('F - Y', strtotime($yearMonth)) ?> <br>
+    Golongan: <?= $golongan != null ? $golongan['golongan_name'] : "Semua Golongan" ?>
 </b>
 <br>
 <b>
