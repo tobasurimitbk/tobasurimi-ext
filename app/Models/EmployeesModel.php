@@ -122,7 +122,7 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'users.id' => null,
+            //'users.id' => null,
             'employees.status' => "Aktif"
         ];
 
