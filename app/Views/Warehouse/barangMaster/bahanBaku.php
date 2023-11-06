@@ -22,10 +22,10 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('parent_barang.parent_name')" class="sort">Kelompok</th>
-                                <th onclick="changeSort('barang_master.kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('barang_master.barang_name')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('satuans.nama_satuan')" class="sort">Satuan</th>
+                                <th onclick="changeSort('kelompok_barang')" class="sort">Kelompok</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
+                                <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('satuan')" class="sort">Satuan</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
@@ -97,7 +97,7 @@
                                 </div>
                                 <div class="col-sm">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="number" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
+                                        <input autocomplete="one-time-code" onchange="this.value = formatRupiah(this.value);" type="text" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
                                         <label for="floatingInput">Stok Minimum</label>
                                     </div>
                                 </div>
@@ -239,8 +239,7 @@
                     required: true
                 },
                 minimum_stock: {
-                    required: true,
-                    number: true
+                    required: true
                 },
             },
             messages: {
@@ -305,9 +304,9 @@
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
-                    $('select[name="satuan_id"]').val(res.data.satuan_id).change();
+                    $('select[name="satuan_id"]').val(formatRupiah(res.data.satuan_id));
                     $('input[name="barang_name"]').val(res.data.barang_name);
-                    $('input[name="minimum_stock"]').val(res.data.minimum_stock);
+                    $('input[name="minimum_stock"]').val(res.data.minimum_stock).change();
                     $('input[name="id"]').val(res.data.id);
 
                     $('.add-modal').modal('show');
@@ -547,6 +546,23 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
+    function formatRupiah(angka) {
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return ribuanFormatted;
+    }
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>
