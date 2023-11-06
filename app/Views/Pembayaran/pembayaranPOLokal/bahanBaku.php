@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran PO Lokal Bahan Baku</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal-bp/create"); ?>">
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal-bb/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>

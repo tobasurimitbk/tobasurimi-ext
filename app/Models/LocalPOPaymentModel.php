@@ -24,6 +24,9 @@ class LocalPOPaymentModel extends Model
         'payment_method',
         'pembayaran_oleh',
         'type_po',
+        'type_bayar',
+        'multiple_po_no',
+        'multiple_po_id',
         'deletedAt'
     ];
 
@@ -147,5 +150,66 @@ class LocalPOPaymentModel extends Model
             ->where('tanda_terima_faktur.user_id', $result['tandaTerimaSupplier']['user_id'])
             ->first();
         return $result;
+    }
+
+    public function getListLPBNotPaid($supplierID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $resLPB = [];
+
+        $conditionPenerimaanBarang = [
+            'deletedAt' => null,
+            'status_post' => 'FINISH',
+            'tipe_bahan' => 'BAKU',
+            'status_penerimaan' => 'LOKAL',
+            'supplier_id' => $supplierID
+        ];
+
+        $lpbList = $penerimaanBarangModel->where($conditionPenerimaanBarang)->findAll();
+        $poPayed = static::summaryArrPOIsPayed($supplierID, "Bahan Baku");
+
+        foreach ($lpbList as $l) {
+            $poID = array_diff(json_decode($l['multiple_po_id']), $poPayed['po_id']);
+            $poNo = array_diff(json_decode($l['multiple_po_no']), $poPayed['po_no']);
+            if (count($poID) != 0 && count($poNo) != 0) {
+                $resLPB[] = [
+                    'lpbID' => $l['id'],
+                    'lpbNO' => $l['no_penerimaan_barang'],
+                    'poNO' => $poNo,
+                    'poID' => $poID
+                ];
+            }
+        }
+
+        return $resLPB;
+    }
+
+    static function summaryArrPOIsPayed($supplierID, $typePO)
+    {
+        $localPaymentModel = new LocalPOPaymentModel();
+
+        $conditionLocalPayment = [
+            'deletedAt' => null,
+            'type_po' => $typePO,
+            'supplier_id' => $supplierID
+        ];
+
+        $paymentList = $localPaymentModel->where($conditionLocalPayment)->findAll();
+        $lpbIDArr = [];
+        $noPoArr = [];
+
+        foreach ($paymentList as $pl) {
+            foreach (json_decode($pl['multiple_po_id']) as $id) {
+                $lpbIDArr[] = $id;
+            }
+            foreach (json_decode($pl['multiple_po_no']) as $po) {
+                $noPoArr[] = $po;
+            }
+        }
+
+        return [
+            'po_id' => $lpbIDArr,
+            'po_no' => $noPoArr
+        ];
     }
 }

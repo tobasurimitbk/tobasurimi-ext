@@ -1,7 +1,6 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
         <h1 class="title-name">Tambah</h1>
@@ -27,7 +26,7 @@
                 <input type="hidden" name="tanda_terima_faktur_id" class="tanda_terima_faktur_id">
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -40,15 +39,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_date'] . '"' : '' ?>>
                             <label for="floatingInput">Tanggal Pembayaran</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
@@ -59,36 +56,55 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="tanda_terima_supplier" id="tanda_terima_supplier">
-                                <option value=""></option>
-                                <?php if (!empty($detail)) : ?>
-                                    <option value="<?= $detail['tandaTerimaSupplier']['faktur_no'] ?>" selected>
-                                        <?= $detail['tandaTerimaSupplier']['faktur_no'] ?>
-                                    </option>
-                                <?php endif; ?>
+                            <select class="form-select" name="tipe_pembayaran" id="tipe_pembayaran">
+                                <option disabled selected value=""></option>
+                                <option value="BULANAN">BULANAN</option>
+                                <option value="HARIAN">HARIAN</option>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Tanda Terima Supplier</label>
+                            <label for="floatingInput" style="z-index: 1;">Tipe Bayar</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <input type="text" name="jenis_dokumen" class="form-control" id="jenis_dokumen" readonly>
+                            <label for="floatingInput" style="z-index: 1;">Jenis Dokumen</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bulanan-form">
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <input type="month" name="bulan" id="bulan" class="form-control">
+                                <label for="floatingInput" style="z-index: 1;">Pilih Bulan</label>
+                            </div>
+                        </div>
+                        <div class="harian-form">
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <select class="form-select" name="lpb" id="lpb">
+                                    <option disabled selected value=""></option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" onkeyup="this.value = formatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly <?= !empty($detail) ? 'disabled value="' . "Rp " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  . '"' : '' ?>>
                             <label for="floatingInput">Nominal Pembayaran</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" readonly <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
                             <label for="floatingInput">Tanggal Jatuh Tempo</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value=""></option>
@@ -98,14 +114,13 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
                 </div>
-
                 <div class="col-subtitle-modal mt-3">
                     <div class="row">
                         <div class="col-md-12">
@@ -120,12 +135,12 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Tanggal LPB</th>
-                                        <th style="text-align: center;">No. LPB</th>
+                                        <th style="text-align: center;">Tanggal PO</th>
+                                        <th style="text-align: center;">No PO</th>
                                         <th style="text-align: center;">Barang</th>
-                                        <th style="text-align: center;">Qty</th>
-                                        <th style="text-align: center;">Satuan</th>
-                                        <th style="text-align: center;">Total</th>
+                                        <th style="text-align: center;">Total Order</th>
+                                        <th style="text-align: center;">Total Diterima</th>
+                                        <th style="text-align: center;">Total Harga</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-table" style="text-align: center;">
@@ -251,72 +266,39 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
-        })
+        });
 
-        $('#tanda_terima_supplier').select2({
+        $('.bulanan-form,.harian-form').hide();
+
+        $('#no_dokumen, #lpb').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        });
+
+        $('#tipe_pembayaran').select2({
             placeholder: "",
             theme: "bootstrap-5"
         }).change(function() {
-            var id = $('#tanda_terima_supplier').val();
-            $.ajax({
-                url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    // detail append
-                    var detail = res.detail;
-                    var dateSplit = detail.jatuh_tempo.split('-');
-                    $('.nominal_pembayaran').val(formatRupiah(detail.nominal_faktur));
-                    $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
-                    $('.tanda_terima_faktur_id').val(detail.id);
-                    // list append
-                    table.find('tbody').empty();
-                    var no = 1;
-                    $.each(res.list, function(i, v) {
-                        var dateSplit = v.lpb_date.split('-');
-                        var newRow = $('<tr>');
-                        newRow.append($('<td>').text(no++));
-                        newRow.append($('<td>').text(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]));
-                        newRow.append($('<td>').text(v.lpb_no));
-                        newRow.append($('<td>').text(v.item_name));
-                        newRow.append($('<td>').text(v.qty));
-                        newRow.append($('<td>').text(v.unit));
-                        newRow.append($('<td>').text(formatRupiah(v.price)));
-                        table.find('tbody').append(newRow);
-                    });
-                    var newRow = $('<tr>');
-                    newRow.append($('<td style="text-align:right;" colspan="6">').text('Total'));
-                    newRow.append($('<td>').text(formatRupiah(detail.nominal_faktur)));
-                    table.find('tbody').append(newRow);
-                }
-            })
+            var tipeBayar = $(this).val();
+            if (tipeBayar == "BULANAN") {
+                $('.bulanan-form').show();
+                $('.harian-form').hide();
+                $('#jenis_dokumen').val("KWITANSI TB");
+            } else {
+                $('.harian-form').show();
+                $('.bulanan-form').hide();
+                $('#jenis_dokumen').val("LPB");
+                generateLPBNo();
+            }
         });
 
         $('#supplier_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
         }).change(function(e) {
-            table.find('tbody').empty();
-            $("#tanda_terima_supplier").empty();
-            $.ajax({
-                url: '<?= base_url('pembayaran-po-lokal-bp/get-rekap-faktur/') ?>' + $(this).val(),
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.data.length == 0) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Nomor tanda terima supplier tidak ada',
-                            confirmButtonColor: '#4e73df',
-                        });
-                    } else {
-                        $("#tanda_terima_supplier").append(`<option value=""></option>`);
-                        res.data.forEach(function(item) {
-                            $("#tanda_terima_supplier").append(`<option  value="${item.id}">${item.faktur_no}</option>`);
-                        });
-                    }
-                }
-            });
+            if ($('#tipe_pembayaran').val() == "HARIAN") {
+                generateLPBNo();
+            }
         });
 
         $(".btn-submit-form").click(function() {
@@ -378,20 +360,48 @@
                 }
             }
         })
-    })
+    });
+
+    function generateLPBNo() {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append("supplierID", $('#supplier_id').val());
+
+        $.ajax({
+            url: "<?= base_url("pembayaran-po-lokal-bb/get-lpb-not-paid"); ?>",
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                $("#lpb").empty();
+                $("#lpb").append(`<option value=""></option>`);
+                response.data.forEach(function(item) {
+                    $("#lpb").append(`<option  value="${item.lpbID}">${item.lpbNO}</option>`);
+                });
+
+            }
+        });
+    }
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
         var formData = new FormData();
-        formData.append("type", "Bahan Penolong");
+        formData.append("type", "Bahan Baku");
         if (value) {
             $(".no_bukti_pembayaran").attr("readonly", true);
             $.ajax({
                 url: "<?= base_url("pembayaran-po-lokal-bp/generate-no-pembayaran"); ?>",
-                method: "POST",
                 data: formData,
+                method: "POST",
                 dataType: "json",
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
