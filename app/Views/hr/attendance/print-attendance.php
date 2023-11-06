@@ -109,7 +109,7 @@
                         &nbsp;<?= $e["divisi"]; ?></td>
                     </td>
                     <td style="color: black; font-weight:normal;">
-                        &nbsp;<?= $e["nama_bagian"]; ?></td>
+                        &nbsp;<?= $e["namaBagian"]; ?></td>
                     </td>
                     <?php $j = 1; ?>
                     <?php foreach ($allDates as $a) : ?>
@@ -245,7 +245,7 @@
                             &nbsp;<?= $e['divisi'] ?></td>
                         </td>
                         <td>
-                            &nbsp;<?= $e['nama_bagian'] ?></td>
+                            &nbsp;<?= $e['namaBagian'] ?></td>
                         </td>
                         <?php foreach ($statusPerizinan as $s) : ?>
                             <td width="20" align="center">
