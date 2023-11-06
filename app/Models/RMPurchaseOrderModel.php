@@ -97,7 +97,7 @@ class RMPurchaseOrderModel extends Model
             'poDate'            => 'rm_purchase_orders.po_date',
             'poNo'              => 'rm_purchase_orders.po_no',
             'companyName'       => 'companies.company',
-            'supplier'          => 'suppliers.supplier_name',
+            'supplier'          => 'suppliers.name',
             'createdAt'         => 'rm_purchase_orders.createdAt',
             'statusPenerimaan'  => 'rm_purchase_orders.status_penerimaan',
             'total'             => 'rm_purchase_orders.total'
@@ -132,10 +132,10 @@ class RMPurchaseOrderModel extends Model
         }
 
         if ($addCondition['dateStart']) {
-            $bbLokalDataQry->where('rm_purchase_orders.request_date >=',  $addCondition['dateStart']);
+            $bbLokalDataQry->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $bbLokalDataQry->where('rm_purchase_orders.request_date <=', $addCondition['dateEnd']);
+            $bbLokalDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
         }
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $bbLokalDataQry->groupEnd();

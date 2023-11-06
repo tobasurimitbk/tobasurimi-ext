@@ -39,7 +39,7 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>
-                            <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
+                            <th class="sort">Tanggal Dibuat</th>
                             <th onclick="changeSort('companyName')" class="sort">Company</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
