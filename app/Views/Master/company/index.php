@@ -345,7 +345,7 @@
                     required: "Kota wajib diisi"
                 },
                 email: {
-                    email: "Email harus benar",
+                    email: "Email harus valid",
                 },
             },
             errorElement: 'span',
