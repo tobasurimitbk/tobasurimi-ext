@@ -290,7 +290,8 @@ class AttendancesModel extends Model
             }
 
             foreach ($kehadiran as $k) {
-                $totalAPH += ($k['A'] + $k['P'] + $k['H']);
+                // $totalAPH += ($k['A'] + $k['P'] + $k['H']);
+                $totalAPH += ($k['P']);
             }
 
             if ($totalCutiHaid == 1) {

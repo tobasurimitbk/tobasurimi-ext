@@ -84,6 +84,21 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating">
+                        <select class="form-select" name="filterGolongan" aria-label="Floating label select example">
+                            <option value="">
+                                Cari Tipe / Golongan
+                            </option>
+                            <?php foreach ($golongan as $g) : ?>
+                                <option value="<?= $g['golongan_name'] ?>">
+                                    <?= $g['golongan_name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Cari Tipe / Golongan</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
                         <select class="form-select" name="filterEmployeeID" aria-label="Floating label select example">
                             <option value="">
                                 Cari Berdasarkan Nama Karyawan
@@ -284,6 +299,7 @@
             data: function(data) {
                 data.divisi_id = $("select[name='filterDivisiID']").val();
                 data.employee_id = $("select[name='filterEmployeeID']").val();
+                data.tipe = $("select[name='filterGolongan']").val();
                 data.year = "<?= $year ?>";
                 data.month = "<?= $month; ?>";
                 data.sort = sort;
@@ -467,6 +483,12 @@
 
     $("select[name='filterEmployeeID']").select2({
         placeholder: "Cari Berdasarkan Karyawan",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+
+    $("select[name='filterGolongan']").select2({
+        placeholder: "Cari Tipe/Golongan Pegawai",
         theme: "bootstrap-5",
         allowClear: true,
     });
@@ -874,10 +896,7 @@
             }
         });
     }
-    $("select[name='filterDivisiID']").change(function() {
-        table.ajax.reload();
-    });
-    $("select[name='filterEmployeeID']").change(function() {
+    $("select[name='filterEmployeeID'], select[name='filterGolongan'], select[name='filterDivisiID']").change(function() {
         table.ajax.reload();
     });
 </script>

@@ -117,20 +117,31 @@ class FormLembur extends BaseController
 
         foreach ($result['data'] as $p) {
             $tanggalObj = DateTime::createFromFormat('Y-m-d', $p->periode);
-            $splitJamMenit = \explode('.', $p->total_jam_lembur);
+            $splitJamMenit = explode('.', $p->total_jam_lembur);
+
+            if (count($splitJamMenit) == 2) {
+                $jam = $splitJamMenit[0];
+                if (count(str_split($splitJamMenit[1])) == 2) {
+                    $menit = str_pad($splitJamMenit[1], 2, '0', STR_PAD_LEFT);
+                } else {
+                    $menit = $splitJamMenit[1] . "0";
+                }
+            } else {
+                $jam = $p->total_jam_lembur;
+                $menit = '00';
+            }
 
             array_push($dataFormLembur, [
                 "no" => $no++,
                 "id" => $p->id,
                 "nip" => $p->employeesNIP,
-                "name"  => $p->employeesName,
+                "name" => $p->employeesName,
                 "divisi" => $p->divisiName,
                 "periode" => $tanggalObj->format('d/m/Y'),
-                "jam_lembur" => (\count($splitJamMenit) == 2) ? $splitJamMenit[0] . " Jam " . $splitJamMenit[1] . " Menit" : $splitJamMenit[0] . " Jam ",
+                "jam_lembur" => $jam . " Jam " . $menit . " Menit",
                 "uang_lembur" => "Rp. " . number_format($p->total_uang_lembur, 0, ',', '.')
             ]);
         }
-
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
             "recordsTotal"      => $result['totalData'],
@@ -193,6 +204,13 @@ class FormLembur extends BaseController
             ->get()
             ->getResult();
 
+        if (\count($logAttendance) == 0) {
+            return \response()->setJSON([
+                'message' => "Karyawan belum melakukan presensi fingerprint pada tanggal $tanggal",
+                'status' => false,
+                'code' => 400
+            ]);
+        }
         // asign to max date create
         if ($logAttendance[0]->checkout != $logAttendance[0]->checkin) {
             // ada in and out
@@ -388,7 +406,7 @@ class FormLembur extends BaseController
             'division_id' => $employee['division_id'],
             'employee_id' => $this->request->getVar('employeeID'),
             'periode' => $tanggalObj->format('Y-m-d'),
-            'total_jam_lembur' => $this->request->getVar('totalJamLembur'),
+            'total_jam_lembur' => (float)$this->request->getVar('totalJamLembur'),
             'total_uang_lembur' => $this->request->getVar('totalUangLembur'),
             'kurangi_jam_istirahat' => $this->request->getVar('kurangiJamIstirahat'),
             'jam_mulai_lembur' => $this->request->getVar('jamMulaiLembur'),

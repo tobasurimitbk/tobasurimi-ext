@@ -84,7 +84,7 @@ class PinjamanKaryawanModel extends Model
 
         $totalData = $pinjamanQry->countAllResults(false);
 
-        if ($addCondition['employee_id'] || $addCondition['divisi_id']) {
+        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['employees.tipe']) {
             $pinjamanQry->groupStart();
         }
 
@@ -96,7 +96,11 @@ class PinjamanKaryawanModel extends Model
             $pinjamanQry->like('pinjaman_karyawan.division_id', $addCondition['divisi_id']);
         }
 
-        if ($addCondition['employee_id'] || $addCondition['divisi_id']) {
+        if ($addCondition['employees.tipe']) {
+            $pinjamanQry->like('employees.tipe', $addCondition['employees.tipe']);
+        }
+
+        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['employees.tipe']) {
             $pinjamanQry->groupEnd();
         }
 

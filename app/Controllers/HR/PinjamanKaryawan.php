@@ -30,11 +30,13 @@ class PinjamanKaryawan extends BaseController
 
         $divisiModel = new DivisisModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
+        $golonganModel = new GolonganModel();
 
         $data = [
             'year' => $year,
             'month' => $month,
             'divisi' => $divisiModel->get_by_company_id($this->this_company_id),
+            'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'pinjamanCheck' => $pinjamanKaryawanModel->where('month_year', $year . "-" . $month)->where('company_id', $this->this_company_id)->findAll()
         ];
 
@@ -331,6 +333,7 @@ class PinjamanKaryawan extends BaseController
         $addCondition = [
             "divisi_id"          => $this->request->getGet("divisi_id"),
             "employee_id"        => $this->request->getGet("employee_id"),
+            "employees.tipe"     => $this->request->getGet("tipe")
         ];
 
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();

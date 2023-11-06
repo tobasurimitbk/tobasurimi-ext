@@ -10,6 +10,7 @@ use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
+use App\Models\GolonganModel;
 use App\Models\JamKerjaModel;
 use App\Models\MetadataModel;
 use CodeIgniter\I18n\Time;
@@ -39,13 +40,19 @@ class Attendance extends BaseController
         $FormPerijinanModel = new FormPerijinanModel();
         $DivisiModel = new DivisisModel();
         $metaDataModel = new MetadataModel();
+        $golonganModel = new GolonganModel();
 
         // get data $_GET
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
         // get data from model
-        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'), $this->request->getGet('divisiID'));
+        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination(
+            $this->this_company_id,
+            $this->request->getGet('employeesID'),
+            $this->request->getGet('divisiID'),
+            $this->request->getGet('golongan')
+        );
         $pager = \Config\Services::pager();
         $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
 
@@ -93,6 +100,7 @@ class Attendance extends BaseController
                 ->whereNotIn('value', ['LIBUR_L'])
                 ->orderBy('name', "ASC")
                 ->findAll(),
+            'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
 
         ];
         return view('hr/attendance/log-attendance', $data);

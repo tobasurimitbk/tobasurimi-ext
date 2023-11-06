@@ -209,7 +209,7 @@ class EmployeesModel extends Model
         return $query->getResultArray();
     }
 
-    public function getEmployeesWithPagination($companyID, $employeesID = null, $divisiID = null, $perPage = 10)
+    public function getEmployeesWithPagination($companyID, $employeesID = null, $divisiID = null, $tipe = null,  $perPage = 10)
     {
         $arrCondition = [
             'employees.deletedAt' => null,
@@ -218,12 +218,16 @@ class EmployeesModel extends Model
             'employees.status' => "Aktif"
         ];
 
-        if ($employeesID !== null) {
+        if ($employeesID !== null && $employeesID !== "null") {
             $arrCondition['employees.id'] = $employeesID;
         }
 
-        if ($divisiID !== null) {
+        if ($divisiID !== null && $divisiID !== "") {
             $arrCondition['employees.division_id'] = $divisiID;
+        }
+
+        if ($tipe !== null && $tipe !== "") {
+            $arrCondition['tipe'] = $tipe;
         }
 
         $this->builder()

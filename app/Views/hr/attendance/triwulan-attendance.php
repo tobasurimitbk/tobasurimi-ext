@@ -104,27 +104,27 @@
                         <td>
                             <?php foreach ($d['kehadiran'] as $k) : ?>
                                 <?php if ($k['yearMonth'] == $startMonth) : ?>
-                                    <?= $k['A'] ?> A
+                                    0 A
                                     <?= $k['P'] ?> P
-                                    <?= $k['H'] ?> H
+                                    0 H
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </td>
                         <td>
                             <?php foreach ($d['kehadiran'] as $k) : ?>
                                 <?php if ($k['yearMonth'] == $middleMonth) : ?>
-                                    <?= $k['A'] ?> A
+                                    0 A
                                     <?= $k['P'] ?> P
-                                    <?= $k['H'] ?> H
+                                    0 H
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </td>
                         <td>
                             <?php foreach ($d['kehadiran'] as $k) : ?>
                                 <?php if ($k['yearMonth'] == $endMonth) : ?>
-                                    <?= $k['A'] ?> A
+                                    0 A
                                     <?= $k['P'] ?> P
-                                    <?= $k['H'] ?> H
+                                    0 H
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </td>
@@ -132,7 +132,7 @@
                             <?= $d['totalAPH'] ?>
                         </td>
                         <td><?= $d['totalKupon']  ?></td>
-                        <td style="padding: 40px;"></td>
+                        <td style="padding: 20px;"></td>
                     </tr>
                     <?php $totalKupon += $d['totalKupon']; ?>
                 <?php endforeach; ?>

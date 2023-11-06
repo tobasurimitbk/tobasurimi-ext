@@ -152,6 +152,23 @@ class LocalPOPaymentModel extends Model
         return $result;
     }
 
+    public function getListPONotPaidByMonth($supplierID, $month)
+    {
+    }
+
+    public function getListPONotPaidByLPB($lpbID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $resBarang = [];
+
+        $conditionPenerimaanBarang = [
+            'deletedAt' => null,
+            'status_post' => 'FINISH',
+            'tipe_bahan' => 'BAKU',
+            'status_penerimaan' => 'LOKAL',
+        ];
+    }
+
     public function getListLPBNotPaid($supplierID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();

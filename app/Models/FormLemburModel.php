@@ -138,7 +138,7 @@ class FormLemburModel extends Model
 
         return [
             'jamPertama' => $lemburJamPertama,
-            'jamKedua' => $lemburJamKedua
+            'jamKedua' => number_format((($lemburJamKedua / 60) * 100), 2)
         ];
     }
 }
