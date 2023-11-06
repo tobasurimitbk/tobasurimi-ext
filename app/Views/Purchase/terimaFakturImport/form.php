@@ -97,6 +97,12 @@
                             <label for="floatingInput">Nominal Faktur</label>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->jatuh_tempo ? date("d/m/Y", strtotime($dataTerimaFaktur->jatuh_tempo)) : "") : ""; ?>" class="form-control input-picker datepicker" id="jatuh_tempo" name="jatuh_tempo" placeholder="Jatuh Tempo">
+                            <label for="floatingInput">Jatuh Tempo</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="row">
@@ -533,7 +539,13 @@
                 supplier_id: {
                     required: true
                 },
+                invoice_date: {
+                    required: true
+                },
                 nominal_faktur: {
+                    required: true
+                },
+                tipe_bahan: {
                     required: true
                 },
                 recipient: {
@@ -559,8 +571,14 @@
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },
+                invoice_date: {
+                    required: "Tanggal Terima wajib diisi"
+                },
                 nominal_faktur: {
                     required: "Nominal Faktur wajib diisi"
+                },
+                tipe_bahan: {
+                    required: "Tipe wajib diisi"
                 },
                 recipient: {
                     required: "Penerima wajib diisi"

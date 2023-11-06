@@ -15,7 +15,7 @@
         <div class="row justify-content-end row-col-spp">
             <div class="col mb-3">
                 <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                     </div>
@@ -23,7 +23,7 @@
             </div>
             <div class="col mb-3">
                 <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                     </div>
@@ -39,7 +39,7 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>
-                            <th class="sort">Tanggal Dibuat</th>
+                            <th>Tanggal Dibuat</th>
                             <th onclick="changeSort('companyName')" class="sort">Company</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
@@ -105,7 +105,9 @@
         },
         {
             data: "po_date",
-            className: "text-center"
+            className: "text-center",
+            sortable: false,
+            orderable: false,
         },
         {
             data: "companyName",

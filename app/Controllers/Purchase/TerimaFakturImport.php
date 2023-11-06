@@ -516,7 +516,7 @@ class TerimaFakturImport extends BaseController
                 "penerimaan_barang.*.id" => [
                     "rules" => "required|is_natural_no_zero",
                     'errors' => [
-                        'required' => 'Daftar penerimaan barang yang akan dibuat tanda terima tidak boleh kosong'
+                        'required' => 'Pilih daftar penerimaan barang!'
                     ]
                 ],
                 // "penerimaan_barang.*.no_po" => [
@@ -879,6 +879,9 @@ class TerimaFakturImport extends BaseController
                 "invoice_date" => [
                     "rules" => "required|valid_date[d/m/Y]"
                 ],
+                "jatuh_tempo" => [
+                    "rules" => "required|valid_date[d/m/Y]"
+                ],
                 "receive_date" => [
                     "rules" => "required|valid_date[d/m/Y]"
                 ],
@@ -894,7 +897,7 @@ class TerimaFakturImport extends BaseController
                 "penerimaan_barang.*.id" => [
                     "rules" => "required|is_natural_no_zero",
                     'errors' => [
-                        'required' => 'Daftar penerimaan barang yang akan dibuat tanda terima tidak boleh kosong'
+                        'required' => 'Pilih daftar penerimaan barang!'
                     ]
                 ],
                 // "penerimaan_barang.*.no_po" => [
@@ -956,6 +959,7 @@ class TerimaFakturImport extends BaseController
                 'supplier_id'       => $postData['supplier_id'],
                 'faktur_no'         => $fakturNo,
                 'faktur_type'       => 'LOKAL',
+                'jatuh_tempo'       => date("Y/m/d", strtotime(str_replace("/", "-", $postData['jatuh_tempo']))),
                 'invoice_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['invoice_date']))),
                 'tipe_bahan'        => $postData['tipe_bahan'],
                 'user_id'           => $this->user_id

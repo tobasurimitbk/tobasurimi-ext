@@ -135,7 +135,7 @@
                     <div class="row mb-2">
                         <div class="col-md-12">
                             <div class="form-floating mt-1">
-                                <input value="<?= $year . '-' . $month ?>" autocomplete="one-time-code" name="monthYear" type="month" required class="form-control target input-picker">
+                                <input value="<?= $year . '-' . $month ?>" autocomplete="one-time-code" readonly name="monthYear" type="month" required class="form-control target input-picker">
                                 <label>Periode Pinjaman</label>
                             </div>
                         </div>

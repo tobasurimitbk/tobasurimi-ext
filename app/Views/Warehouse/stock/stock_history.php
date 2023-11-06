@@ -14,7 +14,7 @@
                 <?php endforeach; ?>
             </ul>
 
-            <div class="row justify-content-end mb-3 mt-3">
+            <div class="row justify-content-end mb-3 mt-4">
                 <div class="col-md-2">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>

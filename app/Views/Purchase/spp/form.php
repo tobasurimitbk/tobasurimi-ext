@@ -167,7 +167,7 @@
                                 <th>Qty</th>
                                 <th>Total Harga</th>
                                 <th>Keterangan</th>
-                                <th>Action</th>
+                                <th style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -213,7 +213,6 @@
                                             <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
                                             <td><?= "Rp " . number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= $details->note; ?></td>
-                                            <td></td>
 
                                         <?php } ?>
 

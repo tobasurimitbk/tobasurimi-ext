@@ -55,7 +55,8 @@
                             <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                             <th>No. PO</th>
                             <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
-                            <th onclick="changeSort('createdAt')" class="sort">Tanggal</th>
+                            <th>Tanggal</th>
+                            <!-- <th onclick="changeSort('createdAt')" class="sort">Tanggal</th> -->
                             <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                             <!-- <th>Status BC</th> -->
                             <th>Jumlah Item</th>
@@ -136,7 +137,9 @@
         },
         {
             data: "createdAt",
-            className: "text-center"
+            className: "text-center",
+            sortable: false,
+            orderable: false,
         },
         {
             data: "supplier_name",

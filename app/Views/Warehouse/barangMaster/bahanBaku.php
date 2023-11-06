@@ -38,7 +38,7 @@
     </div>
 </section>
 
-<div class="modal add-modal" id="add_modal" tabindex="-1">
+<div class="modal add-modal m-t-bahan-baku" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">

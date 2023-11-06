@@ -218,7 +218,7 @@
                                 <th>Keterangan</th>
                                 <!-- <th>PPN</th>
                                 <th>PPH</th> -->
-                                <th>Action</th>
+                                <th style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
                                 <!-- <th>Keterangan</th> -->
                             </tr>
                         </thead>
@@ -278,7 +278,6 @@
                                             <!-- <td><?= $details->ppn; ?></td>
                                             <td><?= $details->pph; ?></td> -->
                                             <td><?= $details->note; ?></td>
-                                            <td></td>
                                         <?php } ?>
                                     </tr>
                             <?php
@@ -295,7 +294,8 @@
                                 <!-- <td><b><?= $total_remaining_qty; ?></b></td>
                                 <td><b><?= $total_qty_diterima; ?></b></td> -->
                                 <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td colspan="4"></td>
+                                <td colspan="3"></td>
+                                <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -383,11 +383,9 @@
                                 <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
-                                <label for="floatingInput">Total</label>
-                            </div>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="number" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                            <label for="floatingInput">Total</label>
                         </div>
                     </div>
                     <div class="row">
@@ -571,6 +569,9 @@
                 purchase_request_id: {
                     required: true
                 },
+                po_no: {
+                    required: true
+                },
                 po_date: {
                     required: true
                 },
@@ -587,6 +588,9 @@
             messages: {
                 purchase_request_id: {
                     required: "No. SPP wajib diisi"
+                },
+                po_no: {
+                    required: "Nomor PO wajib diisi"
                 },
                 po_date: {
                     required: "Tanggal Dibuat wajib diisi"
@@ -624,7 +628,7 @@
             $(".detail-modal").modal("hide")
         })
 
-        $(".disc").keyup(function() {
+        $(".disc, .additional_cost").keyup(function() {
             if ($(".disc").val()) {
                 if ($(".disc").val() > 100) {
                     $(".disc").val(100)
@@ -1010,7 +1014,7 @@
                             tag_html += item.nama_satuan;
                             tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += "Rp" + item.harga;
+                            tag_html += "Rp " + item.harga;
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.qty;
@@ -1073,7 +1077,7 @@
                             tag_html += item.nama_satuan;
                             tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += "Rp" + item.harga;
+                            tag_html += "Rp " + item.harga;
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.qty;
@@ -1085,7 +1089,7 @@
                             // tag_html += item.qty_diterima;
                             // tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += "Rp" + item.total;
+                            tag_html += "Rp " + item.total;
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.disc ? item.disc : 0;
@@ -1413,7 +1417,7 @@
                 $(".harga").val(harga.replaceAll(",", ""))
                 $(".qty").val(qty)
                 $(".total").val(total.replaceAll(",", ""))
-
+                
                 $(".ppn").val(ppn)
                 $(".pph").val(pph)
                 $(".additional_cost").val(additional_cost.replaceAll(",", ""))

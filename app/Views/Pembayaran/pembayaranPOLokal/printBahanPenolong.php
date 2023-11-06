@@ -18,6 +18,7 @@
             margin-bottom: 10px;
             text-align: center;
             font-weight: bold;
+            margin-top: 8px;
         }
 
         h6 {
@@ -39,36 +40,31 @@
             padding: 29px;
         }
 
-        .border-table {
+        #dashed-border-table {
             border-collapse: collapse;
-            width: 100%;
         }
 
-        .border-table tr {
-            border-bottom: 1px solid black;
-        }
-
-        .border-table td,
-        .border-table th {
-            border: 1px solid black;
-            padding: 8px;
-        }
-
-        .border-table th {
-            background-color: #f8f9fa;
+        #dashed-border-table th,
+        #dashed-border-table td {
+            border: 1px dashed #000;
+            padding: 5px;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
+    <div style="text-align: center;">
+        UNIT <?= strtoupper($detail['company']['company']) ?>
+    </div>
     <h5>
-        PEMBAYARAN PO LOKAL
+        PEMBAYARAN PO BP
     </h5>
     <table align="center">
         <tbody>
             <tr>
                 <td style=" font-size:13px;">
-                    NO. <?= $dataPembayaranPOLokal->payment_no ?>
+                    NO. <?= $detail['pembayaranDetail']['payment_no'] ?>
                 </td>
             </tr>
         </tbody>
@@ -79,37 +75,37 @@
             <tr>
                 <td>Supplier</td>
                 <td>:</td>
-                <td><?= $supplier != null ? $supplier->name : "-"; ?></td>
+                <td><?= $detail['supplierDetail']['name'] ?></td>
+            </tr>
+            <tr>
+                <td>No Tanda Terima Supplier</td>
+                <td>:</td>
+                <td><?= $detail['tandaTerimaSupplier']['faktur_no'] ?></td>
             </tr>
             <tr>
                 <td>Tanggal Bayar</td>
                 <td>:</td>
-                <td><?= $dataPembayaranPOLokal->payment_date ?></td>
+                <td><?= date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  ?></td>
             </tr>
             <tr>
                 <td>Jatuh Tempo</td>
                 <td>:</td>
-                <td><?= $dataPembayaranPOLokal->due_date; ?></td>
-            </tr>
-            <tr>
-                <td>Rekap Faktur</td>
-                <td>:</td>
-                <td><?= $summary->summary_no; ?></td>
+                <td><?= date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date'])); ?></td>
             </tr>
             <tr>
                 <td>Nominal Pembayaran</td>
                 <td>:</td>
-                <td>Rp. <?= number_format($dataPembayaranPOLokal->amount ?? 0, 2, ',', '.')  ?></td>
+                <td>Rp. <?= number_format($detail['pembayaranDetail']['amount'] ?? 0, 2, ',', '.')  ?></td>
             </tr>
             <tr>
                 <td>Metode Pembayaran</td>
                 <td>:</td>
-                <td><?= $dataPembayaranPOLokal->payment_method ?></td>
+                <td><?= $detail['pembayaranDetail']['payment_method'] ?></td>
             </tr>
             <tr>
                 <td>Pembayaran Oleh</td>
                 <td>:</td>
-                <td><?= session()->get("login")->name; ?></td>
+                <td><?= $detail['pembayaranDetail']['pembayaran_oleh'] ?></td>
             </tr>
         </tbody>
     </table>
@@ -118,10 +114,10 @@
         Item Pembayaran
     </h6>
 
-    <table width="100%" border="1" class="border-table" style="margin-top:-20px">
+    <table width="100%" border="1" id="dashed-border-table" style="margin-top:-20px">
         <thead>
             <tr align="center">
-                <td>NO</td>
+                <td style="width: 10px;">No</td>
                 <td>Tanggal LPB</td>
                 <td>No. LPB</td>
                 <td>Item Name</td>
@@ -132,19 +128,27 @@
         </thead>
         <tbody>
             <?php $no = 1; ?>
-            <?php foreach ($itemList as $i) : ?>
-                <tr align="center">
+            <?php foreach ($detail['itemLpbList'] as $d) : ?>
+                <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= $i->lpb_date ?></td>
-                    <td><?= $i->no_lpb ?></td>
-                    <td><?= $i->item_name ?></td>
-                    <td><?= $i->qty ?></td>
-                    <td><?= $i->unit ?></td>
-                    <td> Rp. <?= number_format($i->total ?? 0, 2, ',', '.')   ?></td>
+                    <td><?= date('d/m/Y', strtotime($d['lpb_date'])) ?></td>
+                    <td><?= $d['lpb_no'] ?></td>
+                    <td><?= $d['item_name'] ?></td>
+                    <td><?= $d['qty'] ?></td>
+                    <td><?= $d['unit'] ?></td>
+                    <td><?= "Rp " . number_format($d['price'], 2, ',', '.')  ?></td>
                 </tr>
             <?php endforeach; ?>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Total
+                </td>
+                <td><?= "Rp " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
+            </tr>
         </tbody>
     </table>
+
+
 </body>
 
 </html>

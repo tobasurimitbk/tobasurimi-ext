@@ -256,6 +256,9 @@
             bahan_baku: {
                 required: true
             },
+            bagian: {
+                required: true
+            },
             spesifikasi: {
                 required: true
             },
@@ -272,6 +275,9 @@
         messages: {
             bahan_baku: {
                 required: "Bahan Baku wajib diisi"
+            },
+            bagian: {
+                required: "Bagian wajib diisi"
             },
             spesifikasi: {
                 required: "Spesifikasi wajib diisi"
@@ -309,65 +315,76 @@
     });
 
     $(".btn-submit-harga").click(function() {
-        Swal.fire({
-            icon: 'question',
-            title: 'Simpan Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setLoading()
-                const csrf = $(`[name="${csrfToken}"]`);
+        if(list_item.length === 0)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Data Wajib Diisi!',
+                confirmButtonColor: '#4e73df',
+            })
+        }
+        else
+        {
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setLoading()
+                    const csrf = $(`[name="${csrfToken}"]`);
 
-                let data = new FormData(document.querySelector(".harga-form"));
-                data.append("supplier_id", $(".id_supplier").val())
-                data.append("list_item", JSON.stringify(list_item))
-                data.append("list_delete", JSON.stringify(list_delete))
+                    let data = new FormData(document.querySelector(".harga-form"));
+                    data.append("supplier_id", $(".id_supplier").val())
+                    data.append("list_item", JSON.stringify(list_item))
+                    data.append("list_delete", JSON.stringify(list_delete))
 
-                $.ajax({
-                    url: "<?= base_url("supplier-harga/save"); ?>",
-                    data: data,
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then(() => {
-                                window.location.href = "<?= base_url("supplier-bahan-baku"); ?>";
-                            })
-                        } else {
+                    $.ajax({
+                        url: "<?= base_url("supplier-harga/save"); ?>",
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    window.location.href = "<?= base_url("supplier-bahan-baku"); ?>";
+                                })
+                            } else {
+                                stopLoading()
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
                             stopLoading()
                             Swal.fire({
                                 icon: 'error',
-                                title: response.message,
+                                title: 'Data Gagal Disimpan, coba Lagi',
                                 confirmButtonColor: '#4e73df',
                             })
                         }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        stopLoading()
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                });
-            }
-        })
+                    });
+                }
+            })
+        }
     })
 
     let reset = function() {
