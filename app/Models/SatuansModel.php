@@ -45,7 +45,7 @@ class SatuansModel extends Model
     protected $beforeFind     = [];
     protected $afterFind      = [];
     protected $beforeDelete   = [];
-    
+
 
     public function get_by_id($id)
     {
@@ -59,6 +59,13 @@ class SatuansModel extends Model
     {
         $requete = "SELECT * FROM satuans WHERE satuans.deletedAt is null";
         //echo $requete;
+        $query = $this->db->query($requete);
+        return $query->getResultArray();
+    }
+
+    public function getSatuanAll()
+    {
+        $requete = "SELECT * FROM satuans WHERE satuans.deletedAt is null";
         $query = $this->db->query($requete);
         return $query->getResultArray();
     }

@@ -17,10 +17,12 @@ class AMPurchaseOrderModel extends Model
     protected $allowedFields    = [
         'id',
         'purchase_request_id',
+        'division_id',
         'bc_type',
         'po_no',
         'po_date',
         'po_type',
+        'company_id',
         'currency',
         'supplier_id',
         'total',
@@ -135,6 +137,74 @@ class AMPurchaseOrderModel extends Model
         ];
     }
 
+
+    // ALL PO BAHAN PENOLONG
+    public function getPOLokalBPList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'poDate'           => 'am_purchase_orders.po_date',
+            'companyName'      => 'companies.company',
+            'poNo'             => 'am_purchase_orders.po_no',
+            'supplierName'      => 'suppliers.name',
+            'divisis'             => 'am_purchase_orders.total',
+            'createdAt'         => 'am_purchase_orders.createdAt',
+            'updatedAt'         => 'am_purchase_orders.updatedAt',
+            'statusPenerimaan'  => 'am_purchase_orders.status_penerimaan'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'am_purchase_orders.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "am_purchase_orders.*, 
+                      suppliers.name AS supplierName, 
+                      companies.company AS companyName,
+                      COUNT(am_purchase_order_details.id) AS itemCount";
+
+        $poDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
+            ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->groupBy(('am_purchase_orders.id'))
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $poDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $poDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $poDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $poDataQry->countAllResults(false);
+        $data = $poDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+
     public function getPOById($id)
     {
         $selectQry = "am_purchase_orders.*,
@@ -218,7 +288,7 @@ class AMPurchaseOrderModel extends Model
 
         $builder = $this->db->table('am_purchase_orders');
         $builder->select('po_no')
-        ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left');
+            ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left');
         $builder->orderBy('po_no', 'desc')
             ->where('purchase_requests.divisi_id', $divisi_id)
             ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")

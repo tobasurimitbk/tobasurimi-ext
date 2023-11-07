@@ -258,3 +258,20 @@ function repairDouble($nominal)
    $angkaDesimal = number_format((float) $angka, 3, '.', '');
    return $angkaDesimal;
 }
+
+function getLastDay()
+{
+   return date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+}
+
+function formatYMDtoDMY($date)
+{
+   $dateObj = DateTime::createFromFormat('Y-m-d', $date);
+   return $dateObj->format('d/m/Y');
+}
+
+function formatDMYtoYMD($date)
+{
+   $dateObj = DateTime::createFromFormat('d/m/Y', $date);
+   return $dateObj->format('Y-m-d');
+}

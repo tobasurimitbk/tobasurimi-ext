@@ -6,38 +6,50 @@ use App\Controllers\BaseController;
 
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\BarangMasterModel;
 use App\Models\SupplierModel;
 use App\Models\SppModel;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\BeaCukaiModel;
+use App\Models\CompaniesModel;
+use App\Models\SatuansModel;
+use App\Models\TaxModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanPenolong extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    protected $AMPurchaseOrderModel;
-    protected $AMPurchaseOrderDetailModel;
+    protected $aMPurchaseOrderModel;
+    protected $aMPurchaseOrderDetailModel;
     protected $MetadataModel;
     protected $SppModel;
-    protected $SupplierModel;
-    protected $DivisisModel;
+    protected $supplierModel;
+    protected $divisionModel;
     protected $BeaCukaiModel;
     protected $dompdf;
+    protected $companyModel;
+    protected $barangMasterModel;
+    protected $satuanModel;
+    protected $taxModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->AMPurchaseOrderModel = new AMPurchaseOrderModel();
-        $this->AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $this->aMPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->MetadataModel = new MetadataModel();
         $this->SppModel = new SppModel();
-        $this->SupplierModel = new SupplierModel();
-        $this->DivisisModel = new DivisisModel();
+        $this->supplierModel = new SupplierModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
+        $this->divisionModel = new DivisisModel();
+        $this->companyModel = new CompaniesModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->satuanModel = new SatuansModel();
+        $this->taxModel = new TaxModel();
     }
 
     public function poLokalBahanPenolong()
@@ -47,132 +59,113 @@ class POLokalBahanPenolong extends BaseController
 
     public function createPOLokalBahanPenolong()
     {
-        //Get BC Type By Metadata
-        $dataBCType = $this->MetadataModel->get_by_name('Bea Cukai');
-
-        //Get SPP Number
-        $dataSPP = $this->SppModel->getNoSPP('Lokal');
-
-        foreach (array_keys($dataSPP) as $key) {
-            $dataSPP[$key] = (object)$dataSPP[$key];
-        }
-
-        //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN PENOLONG');
-
-        foreach (array_keys($dataSupplier) as $key) {
-            $dataSupplier[$key] = (object)$dataSupplier[$key];
-        }
-
-        //Get Valuta By Metadata
-        $dataValuta = $this->MetadataModel->get_by_name('Valuta');
-
-        foreach (array_keys($dataValuta) as $key) {
-            $dataValuta[$key] = (object)$dataValuta[$key];
-        }
-
-        //Get BC Type By Metadata
-        $dataBC = $this->MetadataModel->get_by_name('Bea Cukai');
-
-        foreach (array_keys($dataBC) as $key) {
-            $dataBC[$key] = (object)$dataBC[$key];
-        }
-
         $data = [
-            "dataBCType" => $dataBCType,
-            "today" => date("d/m/Y"),
-            "dataSPP" => $dataSPP,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta,
-            "dataBC" => $dataBC
+            "company" => $this->companyModel->getCompanies(),
+            "today" => date('Y-m-d'),
+            "supplier" => $this->supplierModel->getSupplierByType("Bahan Penolong"),
+            "barang" => $this->barangMasterModel->getBarangByType("bahan_penolong"),
+            "satuan" => $this->satuanModel->getSatuanAll(),
+            "ppn" => $this->taxModel->getTaxByType("ppn"),
+            "pph" => $this->taxModel->getTaxByType("pph")
         ];
 
         return view('Purchase/poLokalBahanPenolong/form', $data);
     }
 
-    public function getByIdPOLokalBahanPenolong($id = null)
+    public function getDivisionByCompany()
     {
-        //Get BC Type By Metadata
-        $dataBCType = $this->MetadataModel->get_by_name('Bea Cukai');
+        $companyID = $this->request->getVar('companyID');
+        $res = $this->divisionModel->get_by_company_id($companyID);
+        return response()->setJSON([
+            'data' => $res,
+            'token' => csrf_hash(),
+        ]);
+    }
 
-        //Get SPP Number
-        $dataSPP = $this->SppModel->getNoSPP('Bahan Penolong Lokal');
+    public function savePOLokalBahanPenolong()
+    {
+        $divisi = $this->divisionModel->get_by_id(
+            $this->request->getVar('divisionID')
+        );
 
-        foreach (array_keys($dataSPP) as $key) {
-            $dataSPP[$key] = (object)$dataSPP[$key];
-        }
+        $noPoNew =  $this->aMPurchaseOrderModel->get_no(
+            date('d'),
+            date('m'),
+            date('Y'),
+            $divisi[0]['divisi'],
+            date('y'),
+            $this->request->getPost("divisionID"),
+            getLastDay()
+        );
 
-        //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN PENOLONG');
-
-        foreach (array_keys($dataSupplier) as $key) {
-            $dataSupplier[$key] = (object)$dataSupplier[$key];
-        }
-
-        //Get Valuta By Metadata
-        $dataValuta = $this->MetadataModel->get_by_name('Valuta');
-
-        foreach (array_keys($dataValuta) as $key) {
-            $dataValuta[$key] = (object)$dataValuta[$key];
-        }
-
-        //Get BC Type By Metadata
-        $dataBC = $this->MetadataModel->get_by_name('Bea Cukai');
-
-        foreach (array_keys($dataBC) as $key) {
-            $dataBC[$key] = (object)$dataBC[$key];
-        }
-
-        $data = [
-            "dataBCType" => $dataBCType,
-            "today" => date("d/m/Y"),
-            "dataSPP" => $dataSPP,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta,
-            "dataBC" => $dataBC
+        $dataAmPurchaseOrderData = [
+            'po_no' => $noPoNew,
+            'po_date' => formatDMYtoYMD($this->request->getVar('poDate')),
+            'payment_date' => formatDMYtoYMD($this->request->getVar('paymentDate')),
+            'po_type' => "Lokal",
+            'supplier_id' => $this->request->getVar('supplierID'),
+            'company_id' => $this->request->getVar('companyID'),
+            'division_id' => $this->request->getVar('divisionID'),
+            'total' => $this->request->getVar('total'),
+            'note' => $this->request->getVar('note'),
+            "createdBy" => session()->get("login")->user_id,
         ];
 
-        if (!empty($id)) {
-            $dataBPLokal = $this->AMPurchaseOrderModel->getPOById($id);
-            $dataBPLokalDetail = $this->AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
-            foreach (array_keys($dataBPLokalDetail) as $key) {
-                $dataBPLokalDetail[$key] = (object)$dataBPLokalDetail[$key];
-            }
-            $data["dataPOLokal"] = $dataBPLokal;
-            $data["dataPOLokal"]->am_purchase_order_details = $dataBPLokalDetail;
+        // insert new po
+        $poID = $this->aMPurchaseOrderModel->insert($dataAmPurchaseOrderData);
+
+        $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
+
+        foreach ($aMPurchaseOrderDetailData as $d) {
+            $this->aMPurchaseOrderDetailModel->insert([
+                'am_purchase_order_id' => $poID,
+                'barang_id' => $d->barang_id,
+                'note' => $d->keterangan,
+                'unit' => $d->satuan_id,
+                'qty' => $d->qty,
+                'price' => $d->harga_satuan,
+                'disc' => $d->diskon,
+                'additional_cost' => $d->biaya_tambahan,
+                'ppn' => $d->ppn,
+                'pph' => $d->pph,
+                'total' => repairDouble($d->total)
+            ]);
         }
 
-        return view('Purchase/poLokalBahanPenolong/form', $data);
-
-        return;
+        return response()->setJSON([
+            'message' => "PO Bahan penolong berhasil ditambah",
+            'status' => true,
+        ]);
     }
 
     public function allPOLokalBahanPenolong()
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $condition = [
-            'po_type' => "Lokal"
+            'po_type' => "Lokal",
+            'am_purchase_orders.deletedAt' => null,
+            'am_purchase_order_details.deletedAt' => null
         ];
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
-        $poData = $this->AMPurchaseOrderModel->getPoList($condition, $addCondition, $limit, $offset);
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+        $poData = $this->aMPurchaseOrderModel->getPOLokalBPList($condition, $addCondition, $limit, $offset);
 
         $dataPOLokal = [];
 
@@ -183,7 +176,6 @@ class POLokalBahanPenolong extends BaseController
                 "no"            => $no++,
                 "id"            => $data->id,
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
-                "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
                 "companyName"  => $data->companyName,
                 "supplierName"  => $data->supplierName,
@@ -194,9 +186,8 @@ class POLokalBahanPenolong extends BaseController
             ]);
         }
 
-
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
+            "draw"              => intval($this->request->getVar("draw")),
             "recordsTotal"      => $poData['totalData'],
             "recordsFiltered"   => $poData['totalFilteredData'],
             "data"              => $dataPOLokal,
@@ -208,446 +199,146 @@ class POLokalBahanPenolong extends BaseController
         return;
     }
 
-    public function savePOLokalBahanPenolong()
+    public function getByIdPOLokalBahanPenolong($id)
     {
-        try {
-            $rules = [
-                "purchase_request_id" => [
-                    "rules" => "required"
-                ],
-                "po_no" => [
-                    "rules" => "required"
-                ],
-                "po_date" => [
-                    "rules" => "required"
-                ],
-                "supplier_id" => [
-                    "rules" => "required"
-                ],
-                // "payment_term" => [
-                //     "rules" => "required"
-                // ],
-                "payment_date" => [
-                    "rules" => "required"
-                ],
-                // "dpp" => [
-                //     "rules" => "required"
-                // ]
-            ];
+        $amPurchaseOrderCondition = [
+            'id' => $id,
+            'deletedAt' => null
+        ];
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
+        $amPurchaseOrderDetailCondition = [
+            'am_purchase_order_id' => $id,
+            'am_purchase_order_details.deletedAt' => null
+        ];
 
-            if ($this->validate($rules)) {
-                $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
+        $selectQryPurchaseOrderDetail = "
+            am_purchase_order_details.barang_id,
+            am_purchase_order_details.additional_cost AS biaya_tambahan,
+            am_purchase_order_details.disc AS diskon,
+            am_purchase_order_details.price AS harga_satuan,
+            am_purchase_order_details.note AS keterangan,
+            barang_master.kode_barang,
+            barang_master.barang_name AS nama_barang,
+            satuans.nama_satuan,
+            am_purchase_order_details.pph,
+            am_purchase_order_details.ppn,
+            am_purchase_order_details.qty,
+            am_purchase_order_details.unit AS satuan_id,
 
-                $insertData = [
-                    "purchase_request_id"   => $purchase_request_id,
-                    "bc_type"               => $this->request->getPost("bc_type"),
-                    "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
-                    "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "po_type"               => 'Lokal',
-                    "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                    "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                    "note"                  => $this->request->getPost("note"),
-                    "isPosted"              => false,
-                    "createdBy"             => session()->get("login")->user_id,
-                    "items"                 => json_decode($this->request->getPost("items"))
-                ];
+        ";
 
-                $totalPrice = 0;
+        $poDetail = $this->aMPurchaseOrderModel->where($amPurchaseOrderCondition)->first();
+        $listBarang = $this->aMPurchaseOrderDetailModel
+            ->select($selectQryPurchaseOrderDetail)
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->join('satuans', 'barang_master.satuan_id = satuans.id')
+            ->where($amPurchaseOrderDetailCondition)
+            ->findAll();
 
-                foreach ($insertData["items"] as $value) {
-                    $totalPrice += $value->qty * $value->price;
-                };
-
-                $insertData["total"] = $totalPrice;
-
-                if ($insertData["po_no"] === "") {
-                    $dataDivisi = $this->DivisisModel->find($this->request->getPost("divisi_id"));
-                    $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $this->request->getPost("divisi_id"), $last_day);
-                };
-
-                $insert = $this->AMPurchaseOrderModel->insert($insertData);
-
-                foreach ($insertData["items"] as $value) {
-                    $value->barang_id = $value->item_id;
-                    $value->am_purchase_order_id = $insert;
-                    $value->remaining_qty = $value->qty;
-                }
-
-                $this->AMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
-
-                $payload = json_encode($insertData);
-
-                if ($insert) {
-                    // spp number cannot be used again
-                    $responsespp = $this->SppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
-
-                    if (!$responsespp) {
-                        $data = [
-                            "status"            => false,
-                            "message"    => "No. SPP gagal di close",
-                            "payload"   => "",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                        return;
-                    }
-
-                    $data = [
-                        "id"        => $insert,
-                        "status"    => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token'     => csrf_hash(),
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $data = [
-                        "status"    => false,
-                        "message"   => "Data Gagal Disimpan",
-                        "payload"   => $payload,
-                        'token'     => csrf_hash(),
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"    => false,
-                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
+        if ($poDetail == null) {
+            return redirect()->to('po-lokal-bahan-penolong');
         }
-        return;
+
+        $data = [
+            "company" => $this->companyModel->getCompanies(),
+            "today" => date('Y-m-d'),
+            "supplier" => $this->supplierModel->getSupplierByType("Bahan Penolong"),
+            "barang" => $this->barangMasterModel->getBarangByType("bahan_penolong"),
+            "satuan" => $this->satuanModel->getSatuanAll(),
+            "ppn" => $this->taxModel->getTaxByType("ppn"),
+            "pph" => $this->taxModel->getTaxByType("pph"),
+            "poDetail" => $poDetail,
+            "listBarang" => $listBarang
+
+        ];
+
+        return view('Purchase/poLokalBahanPenolong/form', $data);
     }
 
     public function updatePOLokalBahanPenolong()
     {
-        try {
-            $rules = [
-                "po_no" => [
-                    "rules" => "required"
-                ],
-                "po_date" => [
-                    "rules" => "required"
-                ],
-                "supplier_id" => [
-                    "rules" => "required"
-                ],
-                // "payment_term" => [
-                //     "rules" => "required"
-                // ],
-                "payment_date" => [
-                    "rules" => "required"
-                ],
-                // "dpp" => [
-                //     "rules" => "required"
-                // ]
-            ];
+        $id = $this->request->getVar('id');
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
+        $dataAmPurchaseOrderData = [
+            'payment_date' => formatDMYtoYMD($this->request->getVar('paymentDate')),
+            'po_type' => "Lokal",
+            'supplier_id' => $this->request->getVar('supplierID'),
+            'company_id' => $this->request->getVar('companyID'),
+            'division_id' => $this->request->getVar('divisionID'),
+            'total' => $this->request->getVar('total'),
+            'note' => $this->request->getVar('note'),
+            "createdBy" => session()->get("login")->user_id,
+        ];
 
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+        $this->aMPurchaseOrderModel->update($id, $dataAmPurchaseOrderData);
 
-                if (!empty($this->request->getPost("auto_generate"))) {
-                    $dataDivisi = $this->DivisisModel->find($this->request->getPost("divisi_id"));
-                    $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        // deleteAllDetail
+        $this->aMPurchaseOrderDetailModel->where('am_purchase_order_details.am_purchase_order_id', $id)->delete();
+        // insert again
+        $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
 
-                    $insertData = [
-                        "po_no"                 => $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $this->request->getPost("divisi_id"), $last_day),
-                        "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                        "po_type"               => 'Lokal',
-                        "bc_type"               => $this->request->getPost("bc_type"),
-                        "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                        //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                        "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                        //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                        "note"                  => $this->request->getPost("note"),
-                        "isPosted"              => false,
-                        "createdBy"             => session()->get("login")->user_id,
-                        "items"                 => json_decode($this->request->getPost("items"))
-                    ];
-                } else {
-                    $insertData = [
-                        "bc_type"               => $this->request->getPost("bc_type"),
-                        "po_no"                 => $this->request->getPost("po_no"),
-                        "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                        "po_type"               => 'Lokal',
-                        "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                        //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                        "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                        //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                        "note"                  => $this->request->getPost("note"),
-                        "isPosted"              => false,
-                        "createdBy"             => session()->get("login")->user_id,
-                        "items"                 => json_decode($this->request->getPost("items"))
-                    ];
-                }
-
-                $totalPrice = 0;
-
-                foreach ($insertData["items"] as $value) {
-                    if (empty($value->isDeleted)) {
-                        $totalPrice += $value->qty * $value->price;
-                    }
-                };
-
-                $insertData["total"] = $totalPrice;
-
-                if ($insertData) {
-                    $this->AMPurchaseOrderModel->update($id, $insertData);
-
-                    foreach ($insertData["items"] as $value) {
-                        $value->barang_id = $value->item_id;
-                        $value->am_purchase_order_id = $id;
-
-                        if (!empty($value->isDeleted)) {
-                            $this->AMPurchaseOrderDetailModel->where('id', $value->id)->delete();
-                        }
-
-                        $dataDetail = [
-                            "id"                    => $value->id ?? null,
-                            "am_purchase_order_id"  => $this->request->getPost("id"),
-                            // "barang_id"             => $value->item_id,
-                            // "spec"                  => $value->spec,
-                            // "note"                  => $value->note,
-                            // "unit"                  => $value->unit,
-                            // "qty"                   => $value->qty,
-                            // "remaining_qty"         => $value->remaining_qty,
-                            // "price"                 => $value->price,
-                            "disc"                  => $value->disc,
-                            "additional_cost"       => $value->additional_cost,
-                            "ppn"                   => $value->ppn,
-                            "pph"                   => $value->pph,
-                        ];
-
-                        $this->AMPurchaseOrderDetailModel->upsert($dataDetail);
-                    }
-
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   =>  json_encode($insertData),
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => 'Data Gagal Diubah',
-                        "payload"   =>  json_encode($insertData),
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        foreach ($aMPurchaseOrderDetailData as $d) {
+            $this->aMPurchaseOrderDetailModel->insert([
+                'am_purchase_order_id' => $id,
+                'barang_id' => $d->barang_id,
+                'note' => $d->keterangan,
+                'unit' => $d->satuan_id,
+                'qty' => $d->qty,
+                'price' => $d->harga_satuan,
+                'disc' => $d->diskon,
+                'additional_cost' => $d->biaya_tambahan,
+                'ppn' => $d->ppn,
+                'pph' => $d->pph,
+                'total' => repairDouble($d->total)
+            ]);
         }
-        return;
+
+        return response()->setJSON([
+            'message' => "PO Bahan penolong berhasil diubah",
+            'status' => true,
+        ]);
     }
 
     public function updateStatusPOLokalBahanPenolong()
     {
-        try {
-            $id = $this->request->getPost("id");
-            $spp = $this->request->getPost("spp");
+        $id = $this->request->getPost("id");
 
-            // spp close
-            $responsespp = $this->SppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
+        $this->aMPurchaseOrderModel->update($id, [
+            'is_posted' => true
+        ]);
 
-            if (!$responsespp) {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Gagal close SPP",
-                    "payload"   => "",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            // po posting
-
-            $payload = [
-                "is_posted" => true
-            ];
-
-            if (!empty($id)) {
-                $this->AMPurchaseOrderModel->update($id, $payload);
-
-                $data = [
-                    "status"    => true,
-                    "message"   => "Data Berhasil diposting",
-                    "payload"   => json_encode($payload),
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Data Gagal diposting",
-                    "payload"   => json_encode($payload),
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"    => false,
-                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        return response()->setJSON([
+            'message' => "PO Berhasil diposting",
+            'status' => true,
+        ]);
     }
 
     public function closePOLokalBahanPenolong()
     {
-        try {
-            $id = $this->request->getPost("id");
+        $id = $this->request->getPost("id");
 
-            $payload = [
-                "status_penerimaan" => true
-            ];
+        $this->aMPurchaseOrderModel->update($id, [
+            'status_penerimaan' => true
+        ]);
 
-            if (!empty($id)) {
-                $this->AMPurchaseOrderModel->update($id, $payload);
-
-                $data = [
-                    "status"    => true,
-                    "message"   => "PO Berhasil di Close",
-                    "payload"   => json_encode($payload),
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $data = [
-                    "status"    => false,
-                    "message"   => "PO Gagal di Close",
-                    "payload"   => json_encode($payload),
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"    => false,
-                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        return response()->setJSON([
+            'message' => "Close PO berhasil",
+            'status' => true,
+        ]);
     }
 
     public function deletePOLokalBahanPenolong()
     {
-        try {
-            $id = $this->request->getPost("id");
+        $id = $this->request->getVar("id");
 
-            $dataBPLokal = $this->AMPurchaseOrderModel->getPOById($id);
+        $this->aMPurchaseOrderModel->delete($id);
+        $this->aMPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
 
-            if (empty($dataBPLokal)) {
-                $data = [
-                    "status"     => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token'      => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            // spp return to waiting when deleted
-            $responsespp = $this->SppModel->where(['id' => $dataBPLokal->purchase_request_id])->set(['request_status' => 'waiting'])->update();
-
-            if (empty($responsespp)) {
-                $data = [
-                    "status"     => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token'      => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            $this->AMPurchaseOrderModel->delete($id);
-            $this->AMPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
-
-            $data = [
-                "status"    => true,
-                "message"   => "Data Berhasil dihapus",
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function dropdownPOLokalBahanPenolong()
-    {
-        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-
-        $dataPOLokal = $this->AMPurchaseOrderModel->getNoPenerimaanBarang("LOKAL", $id);
-
-        $data = [
-            "data" => $dataPOLokal
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
-    public function dropdownBarangPOLokalBahanPenolong()
-    {
-        $id = $this->request->getGet("id");
-
-        $dataPOLokal = $this->AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
-
-        $data = [
-            "data" =>  $dataPOLokal
-        ];
-
-        echo json_encode($data);
-        return;
+        return response()->setJSON([
+            'message' => "PO berhasil dihapus",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
     }
 
     public function print($id = null)
@@ -656,8 +347,8 @@ class POLokalBahanPenolong extends BaseController
             $filename = "PO Lokal Bahan Penolong";
 
             if (!empty($id)) {
-                $dataBPLokal = $this->AMPurchaseOrderModel->getPOById($id);
-                $dataBPLokalDetail = $this->AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+                $dataBPLokal = $this->aMPurchaseOrderModel->getPOById($id);
+                $dataBPLokalDetail = $this->aMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
                 foreach (array_keys($dataBPLokalDetail) as $key) {
                     $dataBPLokalDetail[$key] = (object)$dataBPLokalDetail[$key];
                 }
@@ -710,8 +401,6 @@ class POLokalBahanPenolong extends BaseController
             $this->dompdf->stream($filename, array("Attachment" => false));
 
             exit(0);
-
-            // return view('Purchase/poImportBahanPenolong/print', $data);
         }
     }
 }
