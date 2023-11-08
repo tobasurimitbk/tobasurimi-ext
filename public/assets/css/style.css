@@ -4596,7 +4596,7 @@ footer.main-footer .footer-right a {
 .form-floating > .form-control:focus ~ label,
 .form-floating > .form-control:not(:placeholder-shown) ~ label,
 .form-floating > .form-select ~ label {
-  opacity: 0.25 !important;
+  opacity: 0.6 !important;
 }
 
 .select2-container .select2-selection--single {
