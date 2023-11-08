@@ -403,4 +403,15 @@ class POLokalBahanPenolong extends BaseController
             exit(0);
         }
     }
+
+    public function dropdownPOLokalBahanPenolong()
+    {
+        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
+        $dataPOLokal = $this->aMPurchaseOrderModel->getNoPenerimaanBarang("LOKAL", $id);
+        $data = [
+            "data" => $dataPOLokal
+        ];
+        echo json_encode($data);
+        return;
+    }
 }
