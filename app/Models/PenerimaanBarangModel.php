@@ -20,6 +20,7 @@ class PenerimaanBarangModel extends Model
         'id',
         'company_id',
         'supplier_id',
+        'bc_type',
         'warehouse_id',
         'no_penerimaan_barang',
         'acceptance_type',
@@ -108,7 +109,7 @@ class PenerimaanBarangModel extends Model
         if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
-        
+
         $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
         $data = $penerimaanBarangDataQry->findAll($limit, $offset);
 
@@ -144,7 +145,7 @@ class PenerimaanBarangModel extends Model
         $builder->select('no_penerimaan_barang');
         $builder->orderBy('no_penerimaan_barang', 'desc');
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-        ->where('createdAt <=', $last_day . " 23:59:59");
+            ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_penerimaan_barang', $lastStr);
         $query = $builder->get();
 
@@ -152,10 +153,10 @@ class PenerimaanBarangModel extends Model
 
         $lastPenerimaan = '1';
         if ($query->getResultArray()) {
-            foreach($query->getResultArray() as $string) {
+            foreach ($query->getResultArray() as $string) {
                 $explode = explode('/', $string['no_penerimaan_barang']);
                 $number = intval($explode[1]);
-                if($number > $lastPenerimaan) {
+                if ($number > $lastPenerimaan) {
                     $lastPenerimaan = $number;
                 }
             }
@@ -215,7 +216,7 @@ class PenerimaanBarangModel extends Model
                 ->orLike('kode', $condition['search'])
             ->groupEnd();
         } */
-        
+
         $totalFilteredData = $receiveDataQry->countAllResults(false);
         $data = $receiveDataQry->findAll($limit, $offset);
 

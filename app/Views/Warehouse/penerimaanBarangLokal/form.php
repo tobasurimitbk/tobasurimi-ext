@@ -155,6 +155,23 @@
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataAJU)) {
+                                    foreach ($dataAJU as $aju) {
+                                ?>
+                                        <option value="<?= $aju["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? ($aju["id"] === $dataPenerimaanBarang->aju_document_type ? "selected" : "") : ""); ?>><?= $aju["value"]; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput">Jenis Dokumen</label>
+                        </div>
+                    </div>
                 </div>
                 <!-- <div class="row mb-1">
                 <div class="col-md-4">
@@ -163,21 +180,7 @@
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataAJU)) {
-                                foreach ($dataAJU as $aju) {
-                            ?>
-                                    <option value="<?= $aju["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? ($aju["id"] === $dataPenerimaanBarang->aju_document_type ? "selected" : "") : ""); ?>><?= $aju["value"]; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                        <label for="floatingInput">Jenis Dokumen</label>
-                    </div>
+                    
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">

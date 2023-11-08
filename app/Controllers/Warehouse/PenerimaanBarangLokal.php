@@ -42,7 +42,7 @@ class PenerimaanBarangLokal extends BaseController
     protected $beaCukaiModel;
 
     protected $dompdf;
-    
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -113,26 +113,22 @@ class PenerimaanBarangLokal extends BaseController
         if (!empty($id)) {
             $dataPenerimaanBarang = $this->penerimaanBarangModel->asObject()->find($id);
 
-            if($dataPenerimaanBarang)
-            {
+            if ($dataPenerimaanBarang) {
                 $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
                 $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
 
-                if($status_penerimaan === "LOKAL")
-                {
+                if ($status_penerimaan === "LOKAL") {
                     $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
                     $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
 
                     // var_dump($dataPenerimaanBarangDetail);
                     // die;
 
-                    if($dataPenerimaanBarangDetail)
-                    {
+                    if ($dataPenerimaanBarangDetail) {
                         $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
                     }
 
-                    if($tipe_bahan === "BAKU")
-                    {
+                    if ($tipe_bahan === "BAKU") {
                         $supplier_id = $dataPenerimaanBarang->supplier_id;
 
                         $dataNo = $this->rmPurchaseOrderModel->getNoPenerimaanBarang($supplier_id, $this->this_company_id);
@@ -143,8 +139,7 @@ class PenerimaanBarangLokal extends BaseController
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
                     }
-                    if($tipe_bahan === "PENOLONG")
-                    {
+                    if ($tipe_bahan === "PENOLONG") {
                         $supplier_id = $dataPenerimaanBarang->supplier_id;
 
                         $dataNo = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Lokal", $supplier_id, $this->this_company_id);
@@ -155,7 +150,7 @@ class PenerimaanBarangLokal extends BaseController
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
                     }
-                } 
+                }
             }
         }
 
@@ -365,7 +360,7 @@ class PenerimaanBarangLokal extends BaseController
 
     public function savePenerimaanBarangLokal()
     {
-        try{
+        try {
             $rules = [
                 "no_penerimaan_barang" => [
                     "rules" => "required",
@@ -409,7 +404,7 @@ class PenerimaanBarangLokal extends BaseController
                 $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
-                $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
+                $multiple_po_id = formatter(json_decode($this->request->getVar("multiple_po_id")), "ARR_TO_INT");
 
                 $payload = [
                     "company_id" => $this->this_company_id,
@@ -420,11 +415,12 @@ class PenerimaanBarangLokal extends BaseController
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
                     "tipe_bahan" => $tipe_bahan,
+                    "bc_type" => $this->request->getVar('aju_document_type'),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "LOKAL",
                 ];
 
-                $items = json_decode($this->request->getPost("items"));
+                $items = json_decode($this->request->getVar("items"));
 
                 $detailPayload = [];
 
@@ -441,7 +437,7 @@ class PenerimaanBarangLokal extends BaseController
                 // ];
                 // return json_encode($data);
 
-                foreach($items as $data) {
+                foreach ($items as $data) {
 
                     $detailPayload[] = [
                         'purchase_order_details_id' => $data->purchase_order_details_id,
@@ -477,10 +473,8 @@ class PenerimaanBarangLokal extends BaseController
                     'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
-            } 
-        }
-        catch(\Exception $e)
-        {
+            }
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -493,7 +487,7 @@ class PenerimaanBarangLokal extends BaseController
 
     public function updatePenerimaanBarangLokal()
     {
-        try{
+        try {
             $rules = [
                 "no_penerimaan_barang" => [
                     "rules" => "required",
@@ -547,11 +541,12 @@ class PenerimaanBarangLokal extends BaseController
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
+                    "bc_type" => $this->request->getVar('aju_document_type'),
                     "tipe_bahan" => $tipe_bahan
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
-                
+
                 $condition = [
                     'id' => $id
                 ];
@@ -559,8 +554,7 @@ class PenerimaanBarangLokal extends BaseController
                 $response = $this->penerimaanBarangModel->where($condition)->set($payload)->update();
 
                 if ($response) {
-                    foreach($items as $data)
-                    {
+                    foreach ($items as $data) {
                         $detailPayload = [];
 
                         $detailPayload = [
@@ -581,11 +575,10 @@ class PenerimaanBarangLokal extends BaseController
                         ];
 
                         // kalau hapus
-                        if($data->is_delete)
-                        {
+                        if ($data->is_delete) {
                             $responseDetail = $this->penerimaanBarangDetailModel->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -598,16 +591,15 @@ class PenerimaanBarangLokal extends BaseController
                             }
                         }
 
-                         // kalau update
-                        if($data->id)
-                        {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'id' => $data->id
                             ];
 
                             $responseDetail = $this->penerimaanBarangDetailModel->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Disimpan';
                                 $data = [
                                     "status"            => false,
@@ -621,11 +613,10 @@ class PenerimaanBarangLokal extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -638,7 +629,7 @@ class PenerimaanBarangLokal extends BaseController
                             }
                         }
                     }
-                    
+
                     $data = [
                         "id" => "",
                         "status"            => true,
@@ -659,10 +650,8 @@ class PenerimaanBarangLokal extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
-        }
-        catch(\Exception $e)
-        {
+            }
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -693,7 +682,7 @@ class PenerimaanBarangLokal extends BaseController
 
             $multiple_po_id = json_decode($dataPenerimaanBarang->multiple_po_id);
             $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
-            
+
             $detail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
 
             $this->penerimaanBarangModel->db->transException(true)->transStart();
@@ -726,7 +715,7 @@ class PenerimaanBarangLokal extends BaseController
                             ->set($payloadRemain)
                             ->update();
 
-                        if(!$responseDet) {
+                        if (!$responseDet) {
                             $message =  'Gagal Ubah Remaining';
                             $data = [
                                 "status"    => false,
@@ -758,7 +747,7 @@ class PenerimaanBarangLokal extends BaseController
                     $spesifikasi = "";
                     if ($tipe_bahan === "BAKU") {
                         $find_baku = $this->rmPurchaseOrderDetailModel->getPurchaseOrderDetailById($purchase_order_details_id);
-                        if($find_baku) {
+                        if ($find_baku) {
                             $spesifikasi = $find_baku->spesifikasi;
                         }
                     }
@@ -773,7 +762,7 @@ class PenerimaanBarangLokal extends BaseController
             // automate close po check item by check ech po number
             foreach ($multiple_po_id as $item) {
                 $check_close = true;
-                
+
                 if ($tipe_bahan === "BAKU") {
                     $responseDetail = $this->rmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($item);
 
@@ -786,7 +775,7 @@ class PenerimaanBarangLokal extends BaseController
                         }
 
                         if ($check_close) {
-            
+
                             $responseStatusPenerimaan = $this->rmPurchaseOrderModel
                                 ->where('id', $item)
                                 ->set('status_penerimaan', 1)
@@ -809,16 +798,16 @@ class PenerimaanBarangLokal extends BaseController
                     $responseDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($item);
 
                     if ($responseDetail) {
-                        
+
                         foreach ($responseDetail as $itemDetail) {
                             // check if each item must 0 remaining qty to close
                             if ($itemDetail["remaining_qty"] !== "0.00") {
                                 $check_close = false;
-                            }  
+                            }
                         }
 
                         if ($check_close) {
-            
+
                             $responseStatusPenerimaan = $this->amPurchaseOrderModel
                                 ->where('id', $item)
                                 ->set('status_penerimaan', 1)
@@ -864,9 +853,7 @@ class PenerimaanBarangLokal extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -879,7 +866,7 @@ class PenerimaanBarangLokal extends BaseController
 
     public function deletePenerimaanBarangLokal()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -918,9 +905,7 @@ class PenerimaanBarangLokal extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -1074,7 +1059,7 @@ class PenerimaanBarangLokal extends BaseController
         // foreach (range('B', 'Q') as $letra) {  
         //     $spreadsheet->getActiveSheet()->getColumnDimension($letra)->setAutoSize(true);
         // }
-        
+
         // // tulis dalam format .xlsx
         // $writer = new Xlsx($spreadsheet);
         // $fileName = 'Penerimaan Barang Lokal';
@@ -1087,29 +1072,25 @@ class PenerimaanBarangLokal extends BaseController
         // $writer->save('php://output');
     }
 
-    public function print($id = null) 
+    public function print($id = null)
     {
-        if($id)
-        {
+        if ($id) {
             $filename = "Penerimaan Barang Lokal";
 
             $data = [];
             $dataPenerimaanBarang = $this->penerimaanBarangModel->getById($id);
 
-            if($dataPenerimaanBarang)
-            {
+            if ($dataPenerimaanBarang) {
                 $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
                 $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
 
-                if($status_penerimaan === "LOKAL")
-                {
+                if ($status_penerimaan === "LOKAL") {
                     $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
 
                     // var_dump($dataPenerimaanBarang);
                     // die;
 
-                    if($dataPenerimaanBarangDetail)
-                    {
+                    if ($dataPenerimaanBarangDetail) {
                         $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
                         $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
 
@@ -1201,7 +1182,7 @@ class PenerimaanBarangLokal extends BaseController
                 "item_name"             => $data->item_name,
                 "lpb_qty"               => formatter($data->lpb_qty, "STR_TO_FLOAT"),
                 "price"                 => number_format($data->price),
-                "return_qty"            => 0, 
+                "return_qty"            => 0,
                 "received_qty"          => 0,
                 "qty_will_be_received"  => formatter($data->lpb_qty, "STR_TO_FLOAT"),
                 "unit"                  => $data->unit
