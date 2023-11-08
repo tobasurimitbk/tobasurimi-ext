@@ -166,7 +166,7 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
-                "total"         => "Rp " . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),       
+                "total"         => "Rp " . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);
@@ -206,15 +206,15 @@ class POLokalBahanBaku extends BaseController
                 "pph" => [
                     "rules" => "required"
                 ],
-                "subsidi_langsung" => [
-                    "rules" => "required"
-                ],
-                "cong_sebenarnya" => [
-                    "rules" => "required"
-                ],
-                "cong_batasan" => [
-                    "rules" => "required"
-                ]
+                // "subsidi_langsung" => [
+                //     "rules" => "required"
+                // ],
+                // "cong_sebenarnya" => [
+                //     "rules" => "required"
+                // ],
+                // "cong_batasan" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if (!$this->validate($rules)) {
@@ -316,15 +316,15 @@ class POLokalBahanBaku extends BaseController
                 "pph" => [
                     "rules" => "required"
                 ],
-                "subsidi_langsung" => [
-                    "rules" => "required"
-                ],
-                "cong_sebenarnya" => [
-                    "rules" => "required"
-                ],
-                "cong_batasan" => [
-                    "rules" => "required"
-                ]
+                // "subsidi_langsung" => [
+                //     "rules" => "required"
+                // ],
+                // "cong_sebenarnya" => [
+                //     "rules" => "required"
+                // ],
+                // "cong_batasan" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if (!$this->validate($rules)) {

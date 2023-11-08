@@ -414,4 +414,18 @@ class POLokalBahanPenolong extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function dropdownBarangPOLokalBahanPenolong()
+    {
+        $id = $this->request->getGet("id");
+
+        $dataPOLokal = $this->aMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+
+        $data = [
+            "data" =>  $dataPOLokal
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

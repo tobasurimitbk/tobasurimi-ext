@@ -122,7 +122,7 @@
                     </div>
                 </div>
                 <div class="row">
-                <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -170,20 +170,20 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya">
-                            <label for="floatingInput">Cong Sebenarnya</label>
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya (Opsional)">
+                            <label for="floatingInput">Cong Sebenarnya (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan">
-                            <label for="floatingInput">Cong Batasan</label>
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan (Opsional)">
+                            <label for="floatingInput">Cong Batasan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung">
-                            <label for="floatingInput">Tambahan Langsung</label>
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
+                            <label for="floatingInput">Tambahan Langsung (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -323,7 +323,7 @@
                             <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                         </button>
                         <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="setBarang()">
-                            Reset
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Reset
                         </button>
                     </div>
                 </div>
@@ -347,65 +347,64 @@
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                            <?php 
-                                $total_harga = 0;
-                                $total_harian = 0;
-                                $total_bulanan = 0;
-                                $total_qty = 0;
-                                $row = 0; 
+                            <?php
+                            $total_harga = 0;
+                            $total_harian = 0;
+                            $total_bulanan = 0;
+                            $total_qty = 0;
+                            $row = 0;
 
-                                if (!empty($dataPOLokal)) {
-                                    foreach ($dataPOLokal->rm_purchase_order_details as $details) {
-                                        $total_harga = $total_harga + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0);
-                                        $total_qty = $total_qty + $details->qty;
-                                        $total = (($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0) + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0) + ($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0)) * formatter($details->qty, "STR_TO_FLOAT");
-                                        $total_harian = $total_harian + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0);
-                                        $total_bulanan = $total_bulanan + ($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0);
+                            if (!empty($dataPOLokal)) {
+                                foreach ($dataPOLokal->rm_purchase_order_details as $details) {
+                                    $total_harga = $total_harga + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0);
+                                    $total_qty = $total_qty + $details->qty;
+                                    $total = (($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0) + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0) + ($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0)) * formatter($details->qty, "STR_TO_FLOAT");
+                                    $total_harian = $total_harian + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0);
+                                    $total_bulanan = $total_bulanan + ($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0);
                             ?>
-                            <tr>
-                                <td>
-                                    <?= $row = $row + 1; ?>
-                                </td>
-                                <td>
-                                    <?= $details->spesifikasi; ?>
-                                </td>
-                                <td>
-                                    <?= $details->nama_bagian; ?>
-                                </td>
-                                <td>
-                                    <?= $details->nama_satuan; ?>
-                                </td>
-                                <td>
-                                    Rp <?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                </td>
-                                <td>
-                                    Rp <?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                </td>
-                                <td>
-                                    Rp <?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                </td>
-                                <td>
-                                    <?= formatter($details->qty, "STR_TO_FLOAT"); ?>
-                                </td>
-                                <td>
-                                    <?= $details->peti; ?>
-                                </td>
-                                <td>
-                                    <?= $details->quality; ?>
-                                </td>
-                                <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
-                                    <?php if ($dataPOLokal->is_posted === "0") { ?>
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="<?= $details->id_satuan; ?>" data data-spesifikasi="<?= $details->supplier_harga_id; ?>"
-                                    data-harga="<?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-daily="<?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-monthly="<?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" 
-                                    data-bagian="<?= $details->bagian; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-total="<?= number_format(formatter($total, "STR_TO_FLOAT"), 2, '.', ',') ?>" data-keterangan="<?= $details->note; ?>" data-peti="<?= $details->peti; ?>" data-quality="<?= $details->quality; ?>" data-id="<?= $details->id; ?>" data-row="<?= $row; ?>">
-                                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                    </button><button class="btn btn-danger" onclick="deleteRow(<?= $row; ?>)">
-                                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <?php } ?>
-                                </td>
-                            </tr>
-                            <?php } } ?>
+                                    <tr>
+                                        <td>
+                                            <?= $row = $row + 1; ?>
+                                        </td>
+                                        <td>
+                                            <?= $details->spesifikasi; ?>
+                                        </td>
+                                        <td>
+                                            <?= $details->nama_bagian; ?>
+                                        </td>
+                                        <td>
+                                            <?= $details->nama_satuan; ?>
+                                        </td>
+                                        <td>
+                                            Rp <?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                        </td>
+                                        <td>
+                                            Rp <?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                        </td>
+                                        <td>
+                                            Rp <?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                        </td>
+                                        <td>
+                                            <?= formatter($details->qty, "STR_TO_FLOAT"); ?>
+                                        </td>
+                                        <td>
+                                            <?= $details->peti; ?>
+                                        </td>
+                                        <td>
+                                            <?= $details->quality; ?>
+                                        </td>
+                                        <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
+                                            <?php if ($dataPOLokal->is_posted === "0") { ?>
+                                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="<?= $details->id_satuan; ?>" data data-spesifikasi="<?= $details->supplier_harga_id; ?>" data-harga="<?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-daily="<?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-monthly="<?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-bagian="<?= $details->bagian; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-total="<?= number_format(formatter($total, "STR_TO_FLOAT"), 2, '.', ',') ?>" data-keterangan="<?= $details->note; ?>" data-peti="<?= $details->peti; ?>" data-quality="<?= $details->quality; ?>" data-id="<?= $details->id; ?>" data-row="<?= $row; ?>">
+                                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                                </button><button class="btn btn-danger" onclick="deleteRow(<?= $row; ?>)">
+                                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                                </button>
+                                            <?php } ?>
+                                        </td>
+                                    </tr>
+                            <?php }
+                            } ?>
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
@@ -557,8 +556,7 @@
     });
 
     const changeSpesifikasi = function() {
-        if(trigger)
-        {
+        if (trigger) {
             if ($(".spesifikasi option:selected").val()) {
                 let bagian = $(".spesifikasi option:selected").data("bagian") ? $(".spesifikasi option:selected").data("bagian") : "";
                 let umum = $(".spesifikasi option:selected").data("umum") ? $(".spesifikasi option:selected").data("umum") : "";
@@ -582,9 +580,7 @@
                 $(".qty").val("");
                 $(".total").val("");
             }
-        }
-        else
-        {
+        } else {
             trigger = true
         }
     }
@@ -772,10 +768,10 @@
 
                     $(".spesifikasi").val("").change();
                 }
-            }) 
+            })
 
             list_items.map((item) => {
-                if(item.id){
+                if (item.id) {
                     list_delete.push(item);
                 }
             })
@@ -828,7 +824,7 @@
             $(".spesifikasi").val("").change();
 
             list_items.map((item) => {
-                if(item.id){
+                if (item.id) {
                     list_delete.push(item);
                 }
             })
@@ -872,8 +868,7 @@
 
             $(".foot-detail-table").append(tag_total);
 
-            if($(".supplier_id option:selected").val())
-            {
+            if ($(".supplier_id option:selected").val()) {
                 $.ajax({
                     url: `<?= base_url("barang/supplier"); ?>/` + $(".supplier_id option:selected").val(),
                     method: "GET",
@@ -887,9 +882,7 @@
                         })
                     }
                 })
-            }
-            else
-            {
+            } else {
                 $(".barang_id").val('').change()
                 $(".barang_id").empty()
                 $(".barang_id").append(`<option value=""></option>`)
@@ -1135,8 +1128,8 @@
         })
 
         $(".posting-po").click(function() {
-             // validate input
-             let validate_item = false;
+            // validate input
+            let validate_item = false;
 
             if (list_items.length === 0) {
                 validate_item = true;
@@ -1349,13 +1342,22 @@
                                         tag_html += satuanName;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += "Rp " + Number(daily_price).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += "Rp " + Number(monthly_price).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += qty;
@@ -1386,11 +1388,23 @@
                                             satuanName: satuanName,
                                             bagian_id: bagian,
                                             bagian_name: bagianName,
-                                            harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                            daily_price: Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                            monthly_price: Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                            harga: Number(harga).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
+                                            daily_price: Number(daily_price).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
+                                            monthly_price: Number(monthly_price).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
                                             qty: qty,
-                                            total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                            total: Number(total).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
                                             peti: peti,
                                             quality: quality,
                                             keterangan: keterangan
@@ -1399,7 +1413,7 @@
                                         row = row + 1;
 
                                         total_qty = total_qty + Number(qty);
-                                        total_harga =  total_harga + Number(harga);
+                                        total_harga = total_harga + Number(harga);
                                         total_harian = total_harian + Number(daily_price);
                                         total_bulanan = total_bulanan + Number(monthly_price);
                                     } else {
@@ -1413,7 +1427,7 @@
                                         tag_html += `<td>`;
                                         tag_html += item.bagian_name;
                                         tag_html += "</td>";
-                                         tag_html += `<td>`;
+                                        tag_html += `<td>`;
                                         tag_html += item.satuanName;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
@@ -1450,7 +1464,7 @@
                                         row = row + 1;
 
                                         total_qty = total_qty + Number(item.qty);
-                                        total_harga =  total_harga + Number(item.harga.replaceAll(",", ""));
+                                        total_harga = total_harga + Number(item.harga.replaceAll(",", ""));
                                         total_harian = total_harian + Number(item.daily_price.replaceAll(",", ""));
                                         total_bulanan = total_bulanan + Number(item.monthly_price.replaceAll(",", ""));
                                     }
@@ -1502,18 +1516,30 @@
                                         satuanName: satuanName,
                                         bagian_id: bagian,
                                         bagian_name: bagianName,
-                                        harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                        daily_price: Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                        monthly_price: Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                        harga: Number(harga).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
+                                        daily_price: Number(daily_price).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
+                                        monthly_price: Number(monthly_price).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
                                         qty: qty,
-                                        total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                        total: Number(total).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
                                         peti: peti,
                                         quality: quality,
                                         keterangan: keterangan
                                     })
 
                                     total_qty = total_qty + Number(qty);
-                                    total_harga =  total_harga + Number(harga);
+                                    total_harga = total_harga + Number(harga);
                                     total_harian = total_harian + Number(daily_price);
                                     total_bulanan = total_bulanan + Number(monthly_price);
 
@@ -1534,13 +1560,22 @@
                                     tag_html += satuanName;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += "Rp " + Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_html += "Rp " + Number(daily_price).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += "Rp " + Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_html += "Rp " + Number(monthly_price).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
                                     tag_html += qty;
@@ -1680,7 +1715,7 @@
                         row = row + 1;
 
                         total_qty = total_qty + Number(item.qty);
-                        total_harga =  total_harga + Number(item.harga.replaceAll(",", ""));
+                        total_harga = total_harga + Number(item.harga.replaceAll(",", ""));
                         total_harian = total_harian + Number(item.daily_price.replaceAll(",", ""));
                         total_bulanan = total_bulanan + Number(item.monthly_price.replaceAll(",", ""));
                     } else {
