@@ -135,11 +135,6 @@
                     <div style="margin-top: -20px;">
                         <table>
                             <tr>
-                                <td>No SPP</td>
-                                <td>:</td>
-                                <td><?= $dataPOLokal->spp_no ?></td>
-                            </tr>
-                            <tr>
                                 <td>Departemen</td>
                                 <td>:</td>
                                 <td><?= $dataPOLokal->divisiName ?></td>

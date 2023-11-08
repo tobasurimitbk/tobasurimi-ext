@@ -208,8 +208,6 @@ class AMPurchaseOrderModel extends Model
     public function getPOById($id)
     {
         $selectQry = "am_purchase_orders.*,
-        purchase_requests.spp_no AS spp_no,
-        purchase_requests.note AS spp_note,
         divisis.id AS divisi_id,
         divisis.divisi AS divisiName,
         suppliers.name AS supplierName,
@@ -224,11 +222,10 @@ class AMPurchaseOrderModel extends Model
 
         $sppData = $this->asObject()
             ->select($selectQry)
-            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
-            ->join('divisis', 'divisis.id = purchase_requests.divisi_id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
-            ->join('users', 'users.id = purchase_requests.createdBy', 'left')
-            ->join('companies', 'companies.id = purchase_requests.company_id', 'left')
+            ->join('users', 'users.id = am_purchase_orders.createdBy', 'left')
+            ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
             ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
             ->find($id);
 

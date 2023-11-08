@@ -31,9 +31,17 @@
                     <?php endif; ?>
                 <?php endif; ?>
             <?php endif ?>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan
-            </button>
+            <?php if (!empty($poDetail)) : ?>
+                <?php if (!$poDetail['is_posted']) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                        Simpan
+                    </button>
+                <?php endif; ?>
+            <?php else : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                    Simpan
+                </button>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -75,7 +83,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($company as $c) : ?>
                                     <option <?= !empty($poDetail) ? (($poDetail['company_id'] == $c['id']) ? 'selected' : '') : '' ?> value="<?= $c['id'] ?>"><?= $c['company'] ?></option>
@@ -88,7 +96,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select division_id" id="division_id" name="division_id" aria-label="Floating label select example">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select division_id" id="division_id" name="division_id" aria-label="Floating label select example">
                                 <option value=""></option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Departemen</label>
@@ -96,7 +104,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($supplier as $s) : ?>
                                     <option value="<?= $s['id'] ?>">
@@ -113,7 +121,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" value="<?= !empty($poDetail) ? formatYMDtoDMY($poDetail['payment_date']) : formatYMDtoDMY($today) ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
+                                    <input <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" value="<?= !empty($poDetail) ? formatYMDtoDMY($poDetail['payment_date']) : formatYMDtoDMY($today) ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
                                     <label for="floatingInput">Tanggal Pembayaran</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -124,7 +132,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($poDetail) ? $poDetail['note'] : '' ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                            <input <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" value="<?= !empty($poDetail) ? $poDetail['note'] : '' ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
@@ -137,7 +145,7 @@
                     </div>
                 </div>
             </div>
-            <form class="detail-form" role="form" method="POST" enctype="multipart/form-data" style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
+            <form class="detail-form" role="form" method="POST" enctype="multipart/form-data" style="<?= !empty($poDetail) ? ($poDetail['is_posted'] ? "display: none;" : "") : ""; ?>">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -242,7 +250,7 @@
                     </div>
                 </div>
             </form>
-            <div class="col-subtitle-modal" style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
+            <div class="col-subtitle-modal" style="<?= !empty($poDetail) ? ($poDetail['is_posted'] ? "display: none;" : "") : ""; ?>">
                 <div class="row mt-3">
                     <div class="col-md-6">
 
@@ -757,15 +765,32 @@
             newRow.append($('<td>').text(v.diskon));
             newRow.append($('<td>').text(formatRupiah(v.biaya_tambahan)));
             newRow.append($('<td>').text(v.total));
-            newRow.append($('<td>').html(
-                `
-                    <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.barang_id}')">
-                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button><button class="btn btn-danger" onclick="deleteRow('${v.barang_id}')">
-                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                    </button>
-                `
-            ));
+            <?php if (!empty($poDetail)) : ?>
+                <?php if (!$poDetail['is_posted']) : ?>
+                    newRow.append($('<td>').html(
+                        `
+                            <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.barang_id}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button class="btn btn-danger" onclick="deleteRow('${v.barang_id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `
+                    ));
+                <?php else : ?>
+                    newRow.append($('<td>').text('-'));
+                <?php endif; ?>
+            <?php else : ?>
+                newRow.append($('<td>').html(
+                    `
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.barang_id}')">
+                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        </button><button class="btn btn-danger" onclick="deleteRow('${v.barang_id}')">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    `
+                ));
+            <?php endif; ?>
+
             table.find('tbody').append(newRow);
             totalHarga += parseInt(formatCurrency(v.total));
         });
