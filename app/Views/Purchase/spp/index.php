@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col mb-3">
+                <div class="col mb-4">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
@@ -29,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col mb-3">
+                <div class="col mb-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -37,7 +37,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="">Pilih Tipe SPP</option>
@@ -46,8 +46,8 @@
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
                     </div>
-                </div>
-                <div class="col mb-3">
+                </div> -->
+                <div class="col mb-4">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No SPP" value="" />
                 </div>
             </div>
@@ -135,7 +135,7 @@
                 orderable: false
             },
             {
-                data: "spp_type",
+                data: "spp_types",
                 className: "text-center"
             },
             {
@@ -181,9 +181,8 @@
                     let id = row?.id;
                     let is_posted = row?.is_posted;
                     let spp_type = row.spp_type;
-                    
-                    if(is_posted === "0")
-                    {
+
+                    if (is_posted === "0") {
                         return `
                             <div class="mt-0">
                                 <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
@@ -195,8 +194,7 @@
                             </div>
                         `
                     }
-                    if(is_posted === "1")
-                    {
+                    if (is_posted === "1") {
                         return `
                             <div class="mt-0">
                                 <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
@@ -564,8 +562,7 @@
         })
     }
 
-    const print = function(url) 
-    {
+    const print = function(url) {
         window.open(url, "_blank");
     }
 

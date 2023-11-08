@@ -186,7 +186,7 @@ class SPP extends BaseController
             array_push($dataSPP, [
                 "no"            => $no++,
                 "id"            => $data->id,
-                "spp_type"      => $data->spp_type,
+                "spp_types"      => "Import BP",
                 "spp_no"        => $data->spp_no,
                 "companyName"  => $data->companyName,
                 "divisiName" => $data->divisiName,
@@ -297,7 +297,7 @@ class SPP extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
+            }
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -385,8 +385,7 @@ class SPP extends BaseController
                         $id_detail = $value->id ?? null;
                         $purchase_request_detail_id = "";
 
-                        if($id_detail)
-                        {
+                        if ($id_detail) {
                             $dataDetail = [
                                 "id" => $id_detail,
                                 "purchase_request_id" => $this->request->getPost("id"),
@@ -396,11 +395,9 @@ class SPP extends BaseController
                                 "price" => $value->price,
                                 "note" => $value->note,
                             ];
-    
+
                             $purchase_request_detail_id = $this->SppDetailModel->upsert($dataDetail);
-                        }
-                        else
-                        {
+                        } else {
                             $dataDetail = [
                                 "purchase_request_id" => $this->request->getPost("id"),
                                 "barang_id" => $value->item_id,
@@ -409,7 +406,7 @@ class SPP extends BaseController
                                 "price" => $value->price,
                                 "note" => $value->note,
                             ];
-    
+
                             $purchase_request_detail_id = $this->SppDetailModel->insert($dataDetail);
                         }
 
@@ -421,7 +418,7 @@ class SPP extends BaseController
                         //     if($responsePO)
                         //     {
                         //         $responseDetailPO = $this->RmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
-                                
+
                         //         // edit and delete po items
                         //         if($responseDetailPO)
                         //         {
@@ -440,7 +437,7 @@ class SPP extends BaseController
                         //                 "remaining_qty" => $value->qty,
                         //                 "general_price" => $value->price,
                         //             ];
-            
+
                         //             $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
                         //         }
                         //         // create po items
@@ -457,25 +454,22 @@ class SPP extends BaseController
                         //                 "remaining_qty" => $value->qty,
                         //                 "general_price" => $value->price,
                         //             ];
-            
+
                         //             $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
                         //         }
                         //     }
                         // }
                         // update item po bp lokal
-                        if($this->request->getPost("type") === "Lokal")
-                        {
+                        if ($this->request->getPost("type") === "Lokal") {
                             $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
 
-                            if($responsePO)
-                            {
+                            if ($responsePO) {
                                 $this->AmPurchaseOrderModel->where(['id' => $responsePO->id])->set(['total' => $totalPrice])->update();
 
                                 $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
                                 // edit and delete po items
-                                if($responseDetailPO)
-                                {
+                                if ($responseDetailPO) {
                                     // delete po
                                     if (!empty($value->isDeleted)) {
                                         $this->AmPurchaseOrderDetailModel->where('id', $responseDetailPO->id)->delete();
@@ -491,12 +485,11 @@ class SPP extends BaseController
                                         "price" => $value->price,
                                         "unit" => $value->unit,
                                     ];
-            
+
                                     $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
                                 }
                                 // create po items
-                                else
-                                {
+                                else {
                                     $dataDetail = [
                                         "id" => null,
                                         "am_purchase_order_id" =>  $responsePO->id,
@@ -508,7 +501,7 @@ class SPP extends BaseController
                                         "price" => $value->price,
                                         "unit" => $value->unit,
                                     ];
-            
+
                                     $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
                                 }
                             }
@@ -541,7 +534,7 @@ class SPP extends BaseController
                         //                 "price" => $value->price,
                         //                 "unit" => $value->unit,
                         //             ];
-            
+
                         //             $this->RmImportPODetailModel->upsert($dataDetail);
                         //         }
                         //         // create po items
@@ -559,25 +552,22 @@ class SPP extends BaseController
                         //                 "price" => $value->price,
                         //                 "unit" => $value->unit,
                         //             ];
-            
+
                         //             $this->RmImportPODetailModel->upsert($dataDetail);
                         //         }
                         //     }
                         // }
                         // update item po bp import
-                        if($this->request->getPost("type") === "Import")
-                        {
+                        if ($this->request->getPost("type") === "Import") {
                             $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
 
-                            if($responsePO)
-                            {
+                            if ($responsePO) {
                                 $this->AmPurchaseOrderModel->where(['id' => $responsePO->id])->set(['total' => $totalPrice])->update();
 
                                 $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
                                 // edit and delete po items
-                                if($responseDetailPO)
-                                {
+                                if ($responseDetailPO) {
                                     // delete po
                                     if (!empty($value->isDeleted)) {
                                         $this->AmPurchaseOrderDetailModel->where('id', $responseDetailPO->id)->delete();
@@ -593,12 +583,11 @@ class SPP extends BaseController
                                         "price" => $value->price,
                                         "unit" => $value->unit,
                                     ];
-            
+
                                     $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
                                 }
                                 // create po items
-                                else
-                                {
+                                else {
                                     $dataDetail = [
                                         "id" => null,
                                         "am_purchase_order_id" =>  $responsePO->id,
@@ -610,7 +599,7 @@ class SPP extends BaseController
                                         "price" => $value->price,
                                         "unit" => $value->unit,
                                     ];
-            
+
                                     $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
                                 }
                             }
@@ -633,7 +622,7 @@ class SPP extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
+            }
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,
@@ -762,8 +751,7 @@ class SPP extends BaseController
             $this->SppModel->delete($id);
             $deleteSPP = $this->SppDetailModel->where('purchase_request_id', $id)->delete();
 
-            if(!$deleteSPP)
-            {
+            if (!$deleteSPP) {
                 $data = [
                     "status"     => false,
                     "message"    => "Data Gagal Dihapus",
@@ -793,16 +781,13 @@ class SPP extends BaseController
             //         }
             //     }
             // }
-            if($tipe === "Lokal")
-            {
+            if ($tipe === "Lokal") {
                 $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($id);
 
-                if($responsePO)
-                {
+                if ($responsePO) {
                     $deletePO = $this->AmPurchaseOrderModel->where('id', $responsePO->id)->delete();
 
-                    if(!$deletePO)
-                    {
+                    if (!$deletePO) {
                         $data = [
                             "status"     => false,
                             "message"    => "Data PO Gagal Dihapus",
@@ -810,7 +795,7 @@ class SPP extends BaseController
                         ];
                         echo json_encode($data);
                         return;
-                    }    
+                    }
                 }
             }
             // if($tipe === "Bahan Baku Import")
@@ -833,16 +818,13 @@ class SPP extends BaseController
             //         }
             //     }
             // }
-            if($tipe === "Import")
-            {
+            if ($tipe === "Import") {
                 $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($id);
 
-                if($responsePO)
-                {
+                if ($responsePO) {
                     $deletePO = $this->AmPurchaseOrderModel->where('id', $responsePO->id)->delete();
 
-                    if(!$deletePO)
-                    {
+                    if (!$deletePO) {
                         $data = [
                             "status"     => false,
                             "message"    => "Data PO Gagal Dihapus",

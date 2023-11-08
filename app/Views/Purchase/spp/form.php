@@ -111,10 +111,11 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" type="hidden" class="form-control type" id="type" name="type" value="<?= !empty($dataSPP) ? $dataSPP->spp_type : ""; ?>">
-                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? 'disabled="true"' : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
-                                <option value="Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "selected" : "") : ""; ?>>Lokal</option>
-                                <option value="Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Import" ? "selected" : "") : ""; ?>>Import</option>
+                            <input autocomplete="one-time-code" type="hidden" class="form-control type" id="type" name="type" value="<?= !empty($dataSPP) ? $dataSPP->spp_type : "Import"; ?>">
+                            <input type="hidden" name="spp_type" value="Import">
+                            <select disabled onchange="changeTipeSPP()" <?= !empty($dataSPP) ? 'disabled="true"' : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
+                                <!-- <option value="Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "selected" : "") : ""; ?>>Lokal</option> -->
+                                <option selected value="Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Import" ? "selected" : "") : ""; ?>>Import Bahan Penolong</option>
                             </select>
 
                             <label for="floatingInput">Tipe SPP</label>
@@ -155,8 +156,8 @@
                 </div>
             </div>
             <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
@@ -827,7 +828,7 @@
                                 }
                             }
                         })
-                    }   
+                    }
                 }
             }
         })
@@ -1045,13 +1046,19 @@
                                         tag_html += nama_satuan;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += qty;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += "Rp " + Number(total).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += keterangan;
@@ -1074,9 +1081,15 @@
                                             nama_barang: nama_barang,
                                             nama_satuan: nama_satuan,
                                             satuan: satuan,
-                                            harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                            harga: Number(harga).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
                                             qty: qty,
-                                            total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                            total: Number(total).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
                                             keterangan: keterangan
                                         });
 
@@ -1187,9 +1200,15 @@
                                     nama_barang: nama_barang,
                                     nama_satuan: nama_satuan,
                                     satuan: satuan,
-                                    harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    harga: Number(harga).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
                                     qty: qty,
-                                    total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    total: Number(total).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
                                     keterangan: keterangan
                                 })
 
@@ -1214,13 +1233,19 @@
                                 tag_html += nama_satuan;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += "Rp " + Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += qty;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += "Rp " + Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += "Rp " + Number(total).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += keterangan;
