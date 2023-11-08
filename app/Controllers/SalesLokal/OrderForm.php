@@ -68,9 +68,10 @@ class OrderForm extends BaseController
         //Get Customers
         $customers = $this->CustomerModel
             ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
-            ->join('employees', 'employees.id = customers.sales_id')
-            ->join('metadata', 'metadata.id = customers.termin')
-            ->where('customers.company_id', $this->this_company_id)
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->orderBy('customers.name', "ASC")
+            //->where('customers.company_id', $this->this_company_id)
             ->findAll();
 
         $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
