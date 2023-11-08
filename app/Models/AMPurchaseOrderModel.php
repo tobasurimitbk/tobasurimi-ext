@@ -287,7 +287,8 @@ class AMPurchaseOrderModel extends Model
         $builder->select('po_no')
             ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left');
         $builder->orderBy('po_no', 'desc')
-            ->where('purchase_requests.divisi_id', $divisi_id)
+            ->where('am_purchase_orders.division_id', $divisi_id)
+            ->orWhere('purchase_requests.divisi_id', $divisi_id)
             ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
