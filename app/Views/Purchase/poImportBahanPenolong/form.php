@@ -28,12 +28,12 @@
                     </button>
                 <?php } ?>
 
-                <?php if ($dataPOImport->is_posted === "1") { 
+                <?php if ($dataPOImport->is_posted === "1") {
                     if ($dataPOImport->status_penerimaan === "0") { ?>
-                    <button class="btn btn-hapus close-parent float-right">
-                        Close PO
-                    </button>
-                <?php } 
+                        <button class="btn btn-hapus close-parent float-right">
+                            Close PO
+                        </button>
+                <?php }
                 } ?>
 
             <?php } ?>
@@ -63,7 +63,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="spp" name="spp" id="spp" value="<?= !empty($dataPOImport) ? $dataPOImport->purchase_request_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <?php if (!empty($dataPOImport)) { ?>
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
@@ -100,9 +100,7 @@
                             </div>
                         <?php } ?>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -113,23 +111,6 @@
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataBCType)) {
-                                    foreach ($dataBCType as $bc) {
-                                ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->bc_type === $bc["id"] ? "selected" : "") : ""; ?> value="<?= $bc["id"]; ?>"><?= $bc["value"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Jenis Dokumen (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -322,7 +303,7 @@
                             $total_harga = 0;
                             $total_qty_diterima = 0;
                             $total_remaining_qty = 0;
-                            
+
                             if (!empty($dataPOImport)) {
                                 foreach ($dataPOImportDetail as $details) {
                                     $total_harga_barang = $total_harga_barang + ($details["price"] ? formatter($details["price"], "CURR_TO_INT") : 0);
@@ -810,7 +791,10 @@
                                 tag_html += item.satuanName;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += Number(item.price).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += item.qty ? Number(item.qty) : 0;
@@ -822,7 +806,10 @@
                                 // tag_html += 0;
                                 // tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += Number(item.totalPrice).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += 0;
@@ -847,11 +834,17 @@
                                     nama_barang: item.barangName,
                                     nama_satuan: item.satuanName,
                                     satuan: item.unit ? Number(item.unit) : 0,
-                                    harga: Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    harga: Number(item.price).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
                                     disc: "",
                                     additional_cost: "",
                                     qty: item.qty ? Number(item.qty) : 0,
-                                    total: Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    total: Number(item.totalPrice).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
                                     keterangan: item.note,
                                     remaining_qty: 0,
                                     qty_diterima: 0
@@ -1130,7 +1123,10 @@
                             tag_html += disc ? disc : 0;
                             tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += additional_cost ? Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0;
+                            tag_html += additional_cost ? Number(additional_cost).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }) : 0;
                             tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
@@ -1145,7 +1141,10 @@
 
                             new_list_items.push({
                                 ...item,
-                                additional_cost: Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                additional_cost: Number(additional_cost).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }),
                                 disc: disc
                             });
 
@@ -1475,7 +1474,7 @@
     const addBarang = function(url) {
         window.open(url, "_blank");
     }
-    
+
     const print = function(url) {
         window.open(url, "_blank");
     }

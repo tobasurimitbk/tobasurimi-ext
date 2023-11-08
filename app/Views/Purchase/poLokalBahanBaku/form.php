@@ -61,7 +61,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOLokal) ? $dataPOLokal->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -74,7 +74,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -87,9 +87,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -101,23 +99,6 @@
                                 <?php endif; ?>
                             </select>
                             <label for="floatingInput">Supplier</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataBCType)) {
-                                    foreach ($dataBCType as $bc) {
-                                ?>
-                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->bc_type === $bc["id"] ? "selected" : "") : ""; ?> value="<?= $bc["id"]; ?>"><?= $bc["value"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Jenis Dokumen (Opsional)</label>
                         </div>
                     </div>
                 </div>

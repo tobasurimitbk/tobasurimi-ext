@@ -28,12 +28,12 @@
                     </button>
                 <?php } ?>
 
-                <?php if ($dataPOImport->is_posted === "1") { 
+                <?php if ($dataPOImport->is_posted === "1") {
                     if ($dataPOImport->status_penerimaan === "0") { ?>
-                    <button class="btn btn-hapus close-parent float-right">
-                        Close PO
-                    </button>
-                <?php } 
+                        <button class="btn btn-hapus close-parent float-right">
+                            Close PO
+                        </button>
+                <?php }
                 } ?>
 
             <?php } ?>
@@ -62,7 +62,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOImport) ? $dataPOImport->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -88,8 +88,7 @@
                             </div>
                         </div>
                     </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -104,23 +103,6 @@
                                 ?>
                             </select>
                             <label for="floatingInput">Company</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataBCType)) {
-                                    foreach ($dataBCType as $bc) {
-                                ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->bc_type === $bc["id"] ? "selected" : "") : ""; ?> value="<?= $bc["id"]; ?>"><?= $bc["value"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Jenis Dokumen (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -328,7 +310,7 @@
                             $total_tambahan = 0;
                             $total_qty_diterima = 0;
                             $total_remaining_qty = 0;
-                            
+
                             if (!empty($dataPOImport)) {
                                 foreach ($dataPOImportDetail as $details) {
                                     $total_tambahan = $total_tambahan + ($details["additional_cost"] ? formatter($details["additional_cost"], "CURR_TO_INT") : 0);
@@ -350,10 +332,7 @@
                                             <td><?= formatter($details["disc"], "STR_TO_FLOAT"); ?></td>
                                             <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td>
-                                                <button 
-                                                class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_FLOAT"); ?>" data-nama="<?= $details["nama_barang"]; ?>" data-nama_satuan="<?= $details["nama_satuan"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" 
-                                                data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-disc="<?= formatter($details["disc"], "STR_TO_FLOAT"); ?>" data-total="<?= number_format((formatter($details["price"], "STR_TO_FLOAT") * formatter($details["qty"], "STR_TO_FLOAT")), 2, '.', ','); ?>" data-additional="<?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"
-                                               >
+                                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_FLOAT"); ?>" data-nama="<?= $details["nama_barang"]; ?>" data-nama_satuan="<?= $details["nama_satuan"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-disc="<?= formatter($details["disc"], "STR_TO_FLOAT"); ?>" data-total="<?= number_format((formatter($details["price"], "STR_TO_FLOAT") * formatter($details["qty"], "STR_TO_FLOAT")), 2, '.', ','); ?>" data-additional="<?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>">
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                                 </button>
                                                 <button class="btn btn-danger" onclick="deleteRow(<?= $no; ?>)">
@@ -436,10 +415,10 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="hidden" class="satuan" name="satuan" id="satuan" />
-                            <input autocomplete="one-time-code" readonly="true" type="text" class="form-control nama_satuan" id="nama_satuan" name="nama_satuan" placeholder="Nama satuan">
-                            <label for="floatingInput">Satuan</label>
-                        </div>
+                                <input type="hidden" class="satuan" name="satuan" id="satuan" />
+                                <input autocomplete="one-time-code" readonly="true" type="text" class="form-control nama_satuan" id="nama_satuan" name="nama_satuan" placeholder="Nama satuan">
+                                <label for="floatingInput">Satuan</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -640,7 +619,7 @@
             theme: "bootstrap-5"
         })
 
-         // COMPANY
+        // COMPANY
         $('.company_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
@@ -816,47 +795,47 @@
             // }
             // else
             // {
-                $(".delete-detail").css('display', 'none');
+            $(".delete-detail").css('display', 'none');
 
-                $(".title-detail-name").text("Tambah");
-                $(".id_detail").val('');
+            $(".title-detail-name").text("Tambah");
+            $(".id_detail").val('');
 
-                $(".kode").val('')
-                $(".nama_barang").val('')
-                $(".barang_id").val('')
-                $(".qty").val('')
-                $(".nama_satuan").val('')
-                $(".harga").val('')
-                $(".disc").val('')
-                $(".additional_cost").val('')
-                $(".total").val('')
-                $(".keterangan").val('')
-                $(".satuan").val("");
+            $(".kode").val('')
+            $(".nama_barang").val('')
+            $(".barang_id").val('')
+            $(".qty").val('')
+            $(".nama_satuan").val('')
+            $(".harga").val('')
+            $(".disc").val('')
+            $(".additional_cost").val('')
+            $(".total").val('')
+            $(".keterangan").val('')
+            $(".satuan").val("");
 
-                validator_detail.resetForm();
-                validator_detail.reset();
+            validator_detail.resetForm();
+            validator_detail.reset();
 
-                $.ajax({
-                    url: `<?= base_url("barang/dropdown/type"); ?>`,
-                    method: "GET",
-                    dataType: "json",
-                    data: {
-                        type: "bahan_baku"
-                    },
-                    success: function(res) {
+            $.ajax({
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    type: "bahan_baku"
+                },
+                success: function(res) {
 
-                        $(".kode_barang").empty();
+                    $(".kode_barang").empty();
 
-                        $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+                    $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
 
-                        res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.id}">${item.kode_barang}</option>`);
-                        })
+                    res.data.forEach(function(item) {
+                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.id}">${item.kode_barang}</option>`);
+                    })
 
-                        $(".kode_barang").val("").change();
-                        $(".detail-modal").modal("show");
-                    }
-                }) 
+                    $(".kode_barang").val("").change();
+                    $(".detail-modal").modal("show");
+                }
+            })
             // }
         })
 
@@ -1081,19 +1060,28 @@
                                         tag_html += satuanName;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += Number(harga).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += qty;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += Number(total).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += disc;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        tag_html += Number(additional_cost).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                         tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `
@@ -1113,11 +1101,20 @@
                                             nama_barang: barangName,
                                             nama_satuan: satuanName,
                                             satuan: satuan,
-                                            harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                            harga: Number(harga).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
                                             qty: qty,
-                                            total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                            total: Number(total).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
                                             keterangan: keterangan,
-                                            additional_cost: Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                            additional_cost: Number(additional_cost).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }),
                                             disc: disc,
                                             keterangan: keterangan
                                         });
@@ -1125,9 +1122,9 @@
                                         row = row + 1;
 
                                         total_qty = total_qty + Number(qty);
-                                        total_harga =  total_harga + Number(harga);
-                                        total_harga_barang =  total_harga_barang + (Number(harga) * Number(qty));
-                                        total_tambahan =  total_tambahan + Number(additional_cost);
+                                        total_harga = total_harga + Number(harga);
+                                        total_harga_barang = total_harga_barang + (Number(harga) * Number(qty));
+                                        total_tambahan = total_tambahan + Number(additional_cost);
                                     } else {
                                         tag_html += `<tr>`;
                                         tag_html += `<td>`;
@@ -1170,9 +1167,9 @@
                                         row = row + 1;
 
                                         total_qty = total_qty + Number(item.qty.replaceAll(",", ""));
-                                        total_harga =  total_harga + Number(item.harga.replaceAll(",", ""));
-                                        total_harga_barang =  total_harga_barang + (Number(item.harga.replaceAll(",", "")) * Number(item.qty.replaceAll(",", "")));
-                                        total_tambahan =  total_tambahan + Number(item.additional_cost.replaceAll(",", ""));
+                                        total_harga = total_harga + Number(item.harga.replaceAll(",", ""));
+                                        total_harga_barang = total_harga_barang + (Number(item.harga.replaceAll(",", "")) * Number(item.qty.replaceAll(",", "")));
+                                        total_tambahan = total_tambahan + Number(item.additional_cost.replaceAll(",", ""));
                                     }
                                 })
 
@@ -1224,19 +1221,28 @@
                                         nama_barang: barangName,
                                         nama_satuan: satuanName,
                                         satuan: satuan,
-                                        harga: Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                        harga: Number(harga).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
                                         qty: qty,
-                                        total: Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                        total: Number(total).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
                                         keterangan: keterangan,
-                                        additional_cost: Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                        additional_cost: Number(additional_cost).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
                                         disc: disc,
                                         keterangan: keterangan
                                     })
 
                                     total_qty = total_qty + Number(qty);
-                                    total_harga =  total_harga + Number(harga);
-                                    total_harga_barang =  total_harga_barang + (Number(harga) * Number(qty));
-                                    total_tambahan =  total_tambahan + Number(additional_cost);
+                                    total_harga = total_harga + Number(harga);
+                                    total_harga_barang = total_harga_barang + (Number(harga) * Number(qty));
+                                    total_tambahan = total_tambahan + Number(additional_cost);
 
                                     let tag_html = "";
                                     let tag_total = "";
@@ -1252,19 +1258,28 @@
                                     tag_html += satuanName;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_html += Number(harga).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
                                     tag_html += qty;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_html += Number(total).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
                                     tag_html += disc;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    tag_html += Number(additional_cost).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += `
@@ -1925,9 +1940,9 @@
                         row = row + 1;
 
                         total_qty = total_qty + Number(item.qty.replaceAll(",", ""));
-                        total_harga =  total_harga + Number(item.harga.replaceAll(",", ""));
-                        total_harga_barang =  total_harga_barang + (Number(item.harga.replaceAll(",", "")) * Number(item.qty.replaceAll(",", "")));
-                        total_tambahan =  total_tambahan + Number(item.additional_cost.replaceAll(",", ""));
+                        total_harga = total_harga + Number(item.harga.replaceAll(",", ""));
+                        total_harga_barang = total_harga_barang + (Number(item.harga.replaceAll(",", "")) * Number(item.qty.replaceAll(",", "")));
+                        total_tambahan = total_tambahan + Number(item.additional_cost.replaceAll(",", ""));
                     } else {
                         // sent parameter isDelete if have customer id and id
                         if (item.id) {
@@ -2030,18 +2045,17 @@
                 trigger = true;
                 $(".detail-modal").modal("show");
             }
-        }) 
+        })
     })
 
     const changeKode = function() {
-        if(trigger)
-        {
+        if (trigger) {
             if ($(".kode_barang option:selected").val()) {
                 let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
                 let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
                 let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
                 let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-                
+
                 $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
                 $(".satuan").val(satuan_id);
@@ -2052,9 +2066,7 @@
                 $(".satuan").val("");
                 $(".nama_satuan").val("");
             }
-        }
-        else
-        {
+        } else {
             trigger = true
         }
     }
@@ -2133,9 +2145,9 @@
                         row = row + 1;
 
                         total_qty = total_qty + Number(item.qty.replaceAll(",", ""));
-                        total_harga =  total_harga + Number(item.harga.replaceAll(",", ""));
-                        total_harga_barang =  total_harga_barang + (Number(item.harga.replaceAll(",", "")) * Number(item.qty.replaceAll(",", "")));
-                        total_tambahan =  total_tambahan + Number(item.additional_cost.replaceAll(",", ""));
+                        total_harga = total_harga + Number(item.harga.replaceAll(",", ""));
+                        total_harga_barang = total_harga_barang + (Number(item.harga.replaceAll(",", "")) * Number(item.qty.replaceAll(",", "")));
+                        total_tambahan = total_tambahan + Number(item.additional_cost.replaceAll(",", ""));
                     } else {
                         // sent parameter isDelete if have customer id and id
                         if (item.id) {
@@ -2186,7 +2198,7 @@
     const addBarang = function(url) {
         window.open(url, "_blank");
     }
-    
+
     const print = function(url) {
         window.open(url, "_blank");
     }
