@@ -132,7 +132,7 @@ class PenerimaanBarangDetailModel extends Model
         if ($status_penerimaan === "LOKAL") {
             if ($tipe_bahan === "BAKU") {
                 $builder->select(
-                'penerimaan_barang_detail.*, satuans.id as id_satuan, 
+                    'penerimaan_barang_detail.*, satuans.id as id_satuan, 
                 satuans.nama_satuan, 
                 barang_master.kode_barang, 
                 barang_master.barang_name as nama_barang,
@@ -164,6 +164,7 @@ class PenerimaanBarangDetailModel extends Model
                 barang_master.barang_name as nama_barang,
                 penerimaan_barang_detail.ppn as id_ppn,
                 penerimaan_barang_detail.pph as id_pph,
+                am_purchase_order_details.*,
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
                 am_purchase_order_details.qty_diterima,

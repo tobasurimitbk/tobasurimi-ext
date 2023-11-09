@@ -153,6 +153,7 @@ class PenerimaanBarangLokal extends BaseController
                 }
             }
         }
+        // dd($dataPenerimaanBarangDetail);
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);
     }
@@ -388,6 +389,7 @@ class PenerimaanBarangLokal extends BaseController
                 ]
             ];
 
+
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
@@ -402,18 +404,18 @@ class PenerimaanBarangLokal extends BaseController
             if ($this->validate($rules)) {
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
                 $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
-                $status_post = $this->request->getPost("status_post");
-                $tipe_bahan = $this->request->getPost("tipe_bahan");
+                $status_post = $this->request->getVar("status_post");
+                $tipe_bahan = $this->request->getVar("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getVar("multiple_po_id")), "ARR_TO_INT");
 
                 $payload = [
                     "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => $this->request->getPost("no_penerimaan_barang"),
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                    "acceptance_type" => $this->request->getPost("acceptance_type"),
+                    "no_penerimaan_barang" => $this->request->getVar("no_penerimaan_barang"),
+                    "supplier_id" => formatter($this->request->getVar("supplier_id"), "STR_TO_INT"),
+                    "warehouse_id" => formatter($this->request->getVar("warehouse_id"), "STR_TO_INT"),
+                    "acceptance_type" => $this->request->getVar("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
-                    "multiple_po_no" => $this->request->getPost("multiple_po_no"),
+                    "multiple_po_no" => $this->request->getVar("multiple_po_no"),
                     "tipe_bahan" => $tipe_bahan,
                     "bc_type" => $this->request->getVar('aju_document_type'),
                     "status_post" => "WAITING",
@@ -426,16 +428,6 @@ class PenerimaanBarangLokal extends BaseController
 
                 $this->penerimaanBarangModel->db->transException(true)->transStart();
                 $response =  $this->penerimaanBarangModel->insert($payload);
-
-                // $data = [
-                //     "id"        => $response,
-                //     "status"    => false,
-                //     "message"   => json_encode($items),
-                //     "payload"   => $payload,
-                //     "response"  => $response,
-                //     'token'     => csrf_hash()
-                // ];
-                // return json_encode($data);
 
                 foreach ($items as $data) {
 
@@ -456,13 +448,17 @@ class PenerimaanBarangLokal extends BaseController
                         'packaging_qty' => $data->packaging_qty
                     ];
 
-                    // insert to stock
-                    // $this->stockDetailModel->addStock($data->barang_id, $payload['warehouse_id'], $data->qty);
+                    // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
+                    $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                        'remaining_qty' => ($data->qty - $data->jml_masuk),
+                        'qty_diterima' => $data->qty_diterima
+                    ]);
                 }
 
                 $this->penerimaanBarangDetailModel->insertBatch($detailPayload);
 
                 $this->penerimaanBarangModel->db->transComplete();
+
 
                 $data = [
                     "id"        => $response,
@@ -526,26 +522,32 @@ class PenerimaanBarangLokal extends BaseController
                 return;
             }
 
+            // return response()->setJSON([
+            //     'all' => $_POST,
+            //     'test' => json_decode($this->request->getVar("items")),
+            //     'token' => csrf_hash()
+            // ]);
+
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+                $id = $this->request->getVar("id");
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
                 $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
-                $tipe_bahan = $this->request->getPost("tipe_bahan");
-                $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
+                $tipe_bahan = $this->request->getVar("tipe_bahan");
+                $multiple_po_id = formatter(json_decode($this->request->getVar("multiple_po_id")), "ARR_TO_INT");
 
                 $payload = [
                     "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => $this->request->getPost("no_penerimaan_barang"),
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                    "acceptance_type" => $this->request->getPost("acceptance_type"),
+                    "no_penerimaan_barang" => $this->request->getVar("no_penerimaan_barang"),
+                    "supplier_id" => formatter($this->request->getVar("supplier_id"), "STR_TO_INT"),
+                    "warehouse_id" => formatter($this->request->getVar("warehouse_id"), "STR_TO_INT"),
+                    "acceptance_type" => $this->request->getVar("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
-                    "multiple_po_no" => $this->request->getPost("multiple_po_no"),
+                    "multiple_po_no" => $this->request->getVar("multiple_po_no"),
                     "bc_type" => $this->request->getVar('aju_document_type'),
                     "tipe_bahan" => $tipe_bahan
                 ];
 
-                $items = json_decode($this->request->getPost("items"));
+                $items = json_decode($this->request->getVar("items"));
 
                 $condition = [
                     'id' => $id
@@ -573,6 +575,18 @@ class PenerimaanBarangLokal extends BaseController
                             'packaging' => $data->packaging,
                             'packaging_qty' => $data->packaging_qty
                         ];
+
+                        // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
+                        $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                            'remaining_qty' => ($data->qty - $data->jml_masuk),
+                            'qty_diterima' => $data->jml_masuk
+                        ]);
+
+                        $conditionDetail = [
+                            'purchase_order_details_id' => $data->id
+                        ];
+
+                        $responseDetail = $this->penerimaanBarangDetailModel->where($conditionDetail)->set($detailPayload)->update();
 
                         // kalau hapus
                         if ($data->is_delete) {
@@ -665,7 +679,7 @@ class PenerimaanBarangLokal extends BaseController
     public function updateStatusPenerimaanBarangLokal()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = $this->request->getVar("id");
 
             $dataPenerimaanBarang = $this->penerimaanBarangModel->getById($id);
 
@@ -727,21 +741,21 @@ class PenerimaanBarangLokal extends BaseController
                             return;
                         }
                     } elseif ($tipe_bahan === "PENOLONG") {
-                        $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)
-                            ->set($payloadRemain)
-                            ->update();
+                        // $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)
+                        //     ->set($payloadRemain)
+                        //     ->update();
 
-                        if (!$responseDet) {
-                            $message =  'Gagal Ubah Remaining';
-                            $data = [
-                                "status"    => false,
-                                "message"   => $message,
-                                "payload"   => "",
-                                'token'     => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
-                        }
+                        // if (!$responseDet) {
+                        //     $message =  'Gagal Ubah Remaining';
+                        //     $data = [
+                        //         "status"    => false,
+                        //         "message"   => $message,
+                        //         "payload"   => "",
+                        //         'token'     => csrf_hash()
+                        //     ];
+                        //     echo json_encode($data);
+                        //     return;
+                        // }
                     }
 
                     $spesifikasi = "";
@@ -867,11 +881,19 @@ class PenerimaanBarangLokal extends BaseController
     public function deletePenerimaanBarangLokal()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = $this->request->getVar("id");
 
             if (!empty($id)) {
                 $findPenerimaanBarang = $this->penerimaanBarangModel->find($id);
                 if ($findPenerimaanBarang) {
+                    // HAPUS DI PENERIMAAN BARANG DETAIL
+                    $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
+                    // SET JUMLAH DITERIMA DAN REMEANING DI PO JADI 0
+                    $poArr = json_decode($findPenerimaanBarang['multiple_po_id']);
+                    // SET 0
+                    foreach ($poArr as $p) {
+                        $this->amPurchaseOrderDetailModel->where('am_purchase_order_id', $p)->set('remaining_qty', 0)->set('qty_diterima', 0)->update();
+                    }
                     $response =  $this->penerimaanBarangModel->delete($id);
                     if ($response) {
                         $data = [
