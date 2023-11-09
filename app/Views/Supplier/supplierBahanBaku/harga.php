@@ -671,12 +671,26 @@
 
         $(".row").val(current_row?.row);
         $(".id_supplier_harga").val(current_row?.id);
-        $(".harga_harian").val(current_row?.harga_harian.replaceAll(",", ""));
-        $(".harga_umum").val(current_row?.harga_umum.replaceAll(",", ""));
-        $(".harga_bulanan").val(current_row?.harga_bulanan.replaceAll(",", ""));
+        $(".harga_harian").val(hilangTitikdanKoma(current_row?.harga_harian));
+        $(".harga_umum").val(hilangTitikdanKoma(current_row?.harga_umum));
+        $(".harga_bulanan").val(hilangTitikdanKoma(current_row?.harga_bulanan));
         $(".bahan_baku").val(current_row?.bahan_baku_id).change();
         $(".bagian").val(current_row?.bagian_id).change();
         $(".spesifikasi").val(current_row?.spesifikasi);
+    }
+
+    const hilangTitikdanKoma = function(nilai){
+        // Menghilangkan titik
+        inputText = nilai.replaceAll(",", "");
+
+        // Menghapus angka dibelakang koma
+        var parts = inputText.split(".");
+        if (parts.length > 1) {
+            var integerPart = parts[0];
+            var decimalPart = parts[1].substring(0, 2); // Mengambil 2 digit angka dibelakang koma
+            inputText = integerPart;
+        }
+        return inputText;
     }
 
     const deleteHarga = function(nilai_row) {
