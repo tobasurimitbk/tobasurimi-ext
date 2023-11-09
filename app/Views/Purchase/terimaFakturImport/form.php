@@ -1171,7 +1171,25 @@
             taxTable.rows.add(taxList).draw(false);
         }
     });
+    $.ajax({
+        url: `<?= base_url("supplier/dropdown"); ?>`,
+        data: {
+            tipe: 'BAHAN PENOLONG'
+        },
+        method: "GET",
+        dataType: "json",
+        success: function(res) {
+            $(".supplier_id").empty();
 
+            $(".supplier_id").append(`<option value=""></option>`);
+
+            res.data.forEach(function(item) {
+                $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+            })
+
+            $(".supplier_id").val("").change();
+        }
+    })
     const changeTipeBahan = function() {
         $(".sender").val("");
         if ($(".tipe_bahan").val() === "BAKU") {
