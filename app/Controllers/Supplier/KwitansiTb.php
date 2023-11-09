@@ -31,15 +31,15 @@ class KwitansiTb extends BaseController
 
         $noKwitansi = '';
         foreach ($supplier as $i => $s) {
-            if ($i == 0) {
-                $noKwitansi = "001/KTB/$month/$year";
-            } else {
-                $noKwitansi = generateNoKwitansiTB($noKwitansi, $month, $year);
-            }
-            $noKwitansi = sprintf($noKwitansi);
             $kwitansiTB = $supplierModel->getKwitansiTB($s['id'], $year, $month);
 
             if ($kwitansiTB['hargaBulananWithQtyPphTotal'] != 0) {
+                if ($i == 0) {
+                    $noKwitansi = "001/KTB/$month/$year";
+                } else {
+                    $noKwitansi = generateNoKwitansiTB($noKwitansi, $month, $year);
+                }
+                $noKwitansi = sprintf($noKwitansi);
                 $res[] = [
                     'id' => $s['id'],
                     'supplier' => $s['name'],
