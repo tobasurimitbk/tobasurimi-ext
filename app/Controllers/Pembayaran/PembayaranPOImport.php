@@ -49,9 +49,7 @@ class PembayaranPOImport extends BaseController
         $poType = $paymentData->po_type == 'BAKU' ? 'BAHAN BAKU' : 'BAHAN PENOLONG';
 
         $supplierCondition = [
-            'kategori'  => 'IMPORT',
             'type'      => $poType,
-            'company_id' => $this->this_company_id
         ];
 
         $supplierList = $supplierModel->asObject()
@@ -111,9 +109,7 @@ class PembayaranPOImport extends BaseController
 
         $dataPembayaranPOImport = [];
 
-        $condition = [
-            "suppliers.company_id"  => $this->this_company_id
-        ];
+        $condition = [ ];
         $addCondition = [
             "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
