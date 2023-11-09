@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers\Supplier;
+
 use Dompdf\Dompdf;
 
 use App\Controllers\BaseController;
@@ -64,15 +65,13 @@ class Supplier extends BaseController
     {
         $supplierData = $this->supplierModel->getSupplierById($id);
         $barangData = $this->barangMasterModel->getBarangByType('bahan_baku');
-        $bagianData =  $this->bagianModel->asObject()->findAll();
+        $bagianData =  $this->bagianModel->where('deletedAt', null)->asObject()->findAll();
 
         $dataSupplier = [];
         $dataSupplierHarga = [];
 
-        if($supplierData)
-        {
-            if($supplierData->type === "BAHAN BAKU")
-            {
+        if ($supplierData) {
+            if ($supplierData->type === "BAHAN BAKU") {
                 $dataSupplier = $supplierData;
                 $dataSupplierHarga = $this->supplierHargaModel->getBySupplierId($id);
             }
@@ -906,14 +905,23 @@ class Supplier extends BaseController
         return;
     }
 
-    public function printSupplierBahanBaku($laporan){
-        
+    public function printSupplierBahanBaku($laporan)
+    {
+
         switch ($laporan) {
             case 'laporan-pendapatan-supplier':
-                $totalDppUmum = 0; $totalPphUmum = 0; $totalTotalUmum = 0;
-                $totalDppHarian = 0; $totalPphHarian = 0; $totalTotalHarian = 0;
-                $totalDppBulanan = 0; $totalPphBulanan = 0; $totalTotalBulanan = 0;
-                $totalDppSubsidi = 0; $totalPphSubsidi = 0; $totalTotalSubsidi = 0;
+                $totalDppUmum = 0;
+                $totalPphUmum = 0;
+                $totalTotalUmum = 0;
+                $totalDppHarian = 0;
+                $totalPphHarian = 0;
+                $totalTotalHarian = 0;
+                $totalDppBulanan = 0;
+                $totalPphBulanan = 0;
+                $totalTotalBulanan = 0;
+                $totalDppSubsidi = 0;
+                $totalPphSubsidi = 0;
+                $totalTotalSubsidi = 0;
                 $totalTotalRow = 0;
 
                 $awalDate = $this->request->getPost('awal_date');
@@ -924,7 +932,7 @@ class Supplier extends BaseController
                 $barangId = $this->request->getPost('barang_id');
                 $warehouseId = $this->request->getPost('warehouse_id');
 
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate,$newAkhirDate,$supplierId,$barangId,$warehouseId);
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate, $newAkhirDate, $supplierId, $barangId, $warehouseId);
                 $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $barangId)->where('type_barang', 'bahan_baku')->first();
                 $dataWarehouse = $this->warehousesModel->asObject()->where('id', $warehouseId)->first();
                 $dataTotalBBLokal = [];
@@ -959,7 +967,7 @@ class Supplier extends BaseController
                 $data = [
                     'no'    => $no,
                     'header'   => "Laporan Pendapatan Supplier",
-                    'tanggalAwal'=> $awalDate,
+                    'tanggalAwal' => $awalDate,
                     'tanggalAkhir'       => $akhirDate,
                     'bahanBaku'        => !empty($dataBahanBaku) ? $dataBahanBaku->barang_name : "",
                     'warehouse'      => !empty($dataWarehouse) ? $dataWarehouse->warehouse_name : "",
@@ -980,10 +988,18 @@ class Supplier extends BaseController
                 ];
                 break;
             case 'laporan-rincian-per-barang':
-                $totalDppUmum = 0; $totalPphUmum = 0; $totalTotalUmum = 0;
-                $totalDppHarian = 0; $totalPphHarian = 0; $totalTotalHarian = 0;
-                $totalDppBulanan = 0; $totalPphBulanan = 0; $totalTotalBulanan = 0;
-                $totalDppSubsidi = 0; $totalPphSubsidi = 0; $totalTotalSubsidi = 0;
+                $totalDppUmum = 0;
+                $totalPphUmum = 0;
+                $totalTotalUmum = 0;
+                $totalDppHarian = 0;
+                $totalPphHarian = 0;
+                $totalTotalHarian = 0;
+                $totalDppBulanan = 0;
+                $totalPphBulanan = 0;
+                $totalTotalBulanan = 0;
+                $totalDppSubsidi = 0;
+                $totalPphSubsidi = 0;
+                $totalTotalSubsidi = 0;
                 $totalTotalRow = 0;
 
                 $awalDate = $this->request->getPost('awal_date_per_barang');
@@ -991,10 +1007,10 @@ class Supplier extends BaseController
                 $akhirDate = $this->request->getPost('akhir_date_per_barang');
                 $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
                 $barangId = $this->request->getPost('barang_id_per_barang');
-                
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate,$newAkhirDate,'',$barangId,'');
+
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate, $newAkhirDate, '', $barangId, '');
                 $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $barangId)->where('type_barang', 'bahan_baku')->first();
-                
+
                 if (!empty($dataBBLokal)) {
                     foreach ($dataBBLokal as $row) {
                         $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
@@ -1026,7 +1042,7 @@ class Supplier extends BaseController
                 $data = [
                     'no'    => $no,
                     'header'   => "Laporan Pendapatan Supplier",
-                    'tanggalAwal'=> $awalDate,
+                    'tanggalAwal' => $awalDate,
                     'tanggalAkhir'       => $akhirDate,
                     'bahanBaku'        => !empty($dataBahanBaku) ? $dataBahanBaku->barang_name : "",
                     'dataOrder'      => $dataBBLokal,
@@ -1046,19 +1062,27 @@ class Supplier extends BaseController
                 ];
                 break;
             case 'laporan-rekap-all-supplier':
-                $totalDppUmum = 0; $totalPphUmum = 0; $totalTotalUmum = 0;
-                $totalDppHarian = 0; $totalPphHarian = 0; $totalTotalHarian = 0;
-                $totalDppBulanan = 0; $totalPphBulanan = 0; $totalTotalBulanan = 0;
-                $totalDppSubsidi = 0; $totalPphSubsidi = 0; $totalTotalSubsidi = 0;
+                $totalDppUmum = 0;
+                $totalPphUmum = 0;
+                $totalTotalUmum = 0;
+                $totalDppHarian = 0;
+                $totalPphHarian = 0;
+                $totalTotalHarian = 0;
+                $totalDppBulanan = 0;
+                $totalPphBulanan = 0;
+                $totalTotalBulanan = 0;
+                $totalDppSubsidi = 0;
+                $totalPphSubsidi = 0;
+                $totalTotalSubsidi = 0;
                 $totalTotalRow = 0;
 
                 $awalDate = $this->request->getPost('awal_date_all_supplier');
                 $newAwalDate = date("Y-m-d", strtotime($awalDate));
                 $akhirDate = $this->request->getPost('akhir_date_all_supplier');
                 $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
-                
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForAllSupplierReport($newAwalDate,$newAkhirDate);
-                
+
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForAllSupplierReport($newAwalDate, $newAkhirDate);
+
                 if (!empty($dataBBLokal)) {
                     foreach ($dataBBLokal as $row) {
                         $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
@@ -1090,7 +1114,7 @@ class Supplier extends BaseController
                 $data = [
                     'no'    => $no,
                     'header'   => "Laporan Rekap Pendapatan Supplier",
-                    'tanggalAwal'=> $awalDate,
+                    'tanggalAwal' => $awalDate,
                     'tanggalAkhir'       => $akhirDate,
                     'dataOrder'      => $dataBBLokal,
                     'totalDppUmum' => $totalDppUmum,
@@ -1109,10 +1133,18 @@ class Supplier extends BaseController
                 ];
                 break;
             case 'laporan-rekap-per-supplier':
-                $totalDppUmum = 0; $totalPphUmum = 0; $totalTotalUmum = 0;
-                $totalDppHarian = 0; $totalPphHarian = 0; $totalTotalHarian = 0;
-                $totalDppBulanan = 0; $totalPphBulanan = 0; $totalTotalBulanan = 0;
-                $totalDppSubsidi = 0; $totalPphSubsidi = 0; $totalTotalSubsidi = 0;
+                $totalDppUmum = 0;
+                $totalPphUmum = 0;
+                $totalTotalUmum = 0;
+                $totalDppHarian = 0;
+                $totalPphHarian = 0;
+                $totalTotalHarian = 0;
+                $totalDppBulanan = 0;
+                $totalPphBulanan = 0;
+                $totalTotalBulanan = 0;
+                $totalDppSubsidi = 0;
+                $totalPphSubsidi = 0;
+                $totalTotalSubsidi = 0;
                 $totalTotalRow = 0;
 
                 $awalDate = $this->request->getPost('awal_date_per_supplier');
@@ -1121,7 +1153,7 @@ class Supplier extends BaseController
                 $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
                 $supplierId = $this->request->getPost('supplier_id_per_supplier');
 
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate,$newAkhirDate,$supplierId,'','');
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate, $newAkhirDate, $supplierId, '', '');
                 $dataSupplier = $this->supplierModel->asObject()->where('id', $supplierId)->first();
                 if (!empty($dataBBLokal)) {
                     foreach ($dataBBLokal as $row) {
@@ -1154,7 +1186,7 @@ class Supplier extends BaseController
                 $data = [
                     'no'    => $no,
                     'header'   => "Laporan Detail Pendapatan Supplier",
-                    'tanggalAwal'=> $awalDate,
+                    'tanggalAwal' => $awalDate,
                     'tanggalAkhir'       => $akhirDate,
                     'supplierName'        => !empty($dataSupplier) ? $dataSupplier->name : "",
                     'supplierAddress'      => !empty($dataSupplier) ? $dataSupplier->address : "",
@@ -1175,10 +1207,18 @@ class Supplier extends BaseController
                 ];
                 break;
             case 'laporan-rekap-all-barang':
-                $totalDppUmum = 0; $totalPphUmum = 0; $totalTotalUmum = 0;
-                $totalDppHarian = 0; $totalPphHarian = 0; $totalTotalHarian = 0;
-                $totalDppBulanan = 0; $totalPphBulanan = 0; $totalTotalBulanan = 0;
-                $totalDppSubsidi = 0; $totalPphSubsidi = 0; $totalTotalSubsidi = 0;
+                $totalDppUmum = 0;
+                $totalPphUmum = 0;
+                $totalTotalUmum = 0;
+                $totalDppHarian = 0;
+                $totalPphHarian = 0;
+                $totalTotalHarian = 0;
+                $totalDppBulanan = 0;
+                $totalPphBulanan = 0;
+                $totalTotalBulanan = 0;
+                $totalDppSubsidi = 0;
+                $totalPphSubsidi = 0;
+                $totalTotalSubsidi = 0;
                 $totalTotalRow = 0;
 
                 $awalDate = $this->request->getPost('awal_date_rekap_all_barang');
@@ -1187,8 +1227,8 @@ class Supplier extends BaseController
                 $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
                 $warehouseId = $this->request->getPost('warehouse_id_rekap_all_barang');
 
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportRekap($newAwalDate,$newAkhirDate,'','',$warehouseId);
-                
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportRekap($newAwalDate, $newAkhirDate, '', '', $warehouseId);
+
                 if (!empty($dataBBLokal)) {
                     foreach ($dataBBLokal as $row) {
                         $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
@@ -1199,7 +1239,8 @@ class Supplier extends BaseController
                         $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
                         $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
                         $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
-                        $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;$totalDppUmum += $row->dppUmum;
+                        $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+                        $totalDppUmum += $row->dppUmum;
                         $totalPphUmum += $row->pphUmum;
                         $totalTotalUmum += $row->totalUmum;
                         $totalDppHarian += $row->dppHarian;
@@ -1219,7 +1260,7 @@ class Supplier extends BaseController
                 $data = [
                     'no'    => $no,
                     'header'   => "Laporan Detail Pendapatan Supplier",
-                    'tanggalAwal'=> $awalDate,
+                    'tanggalAwal' => $awalDate,
                     'tanggalAkhir'       => $akhirDate,
                     'supplierName'        => !empty($dataSupplier) ? $dataSupplier->name : "",
                     'supplierAddress'      => !empty($dataSupplier) ? $dataSupplier->address : "",
@@ -1240,12 +1281,20 @@ class Supplier extends BaseController
                 ];
                 break;
             case 'laporan-rekap-per-barang':
-                $totalDppUmum = 0; $totalPphUmum = 0; $totalTotalUmum = 0;
-                $totalDppHarian = 0; $totalPphHarian = 0; $totalTotalHarian = 0;
-                $totalDppBulanan = 0; $totalPphBulanan = 0; $totalTotalBulanan = 0;
-                $totalDppSubsidi = 0; $totalPphSubsidi = 0; $totalTotalSubsidi = 0;
+                $totalDppUmum = 0;
+                $totalPphUmum = 0;
+                $totalTotalUmum = 0;
+                $totalDppHarian = 0;
+                $totalPphHarian = 0;
+                $totalTotalHarian = 0;
+                $totalDppBulanan = 0;
+                $totalPphBulanan = 0;
+                $totalTotalBulanan = 0;
+                $totalDppSubsidi = 0;
+                $totalPphSubsidi = 0;
+                $totalTotalSubsidi = 0;
                 $totalTotalRow = 0;
-                
+
                 $awalDate = $this->request->getPost('awal_date_rekap_per_barang');
                 $newAwalDate = date("Y-m-d", strtotime($awalDate));
                 $akhirDate = $this->request->getPost('akhir_date_rekap_per_barang');
@@ -1253,10 +1302,10 @@ class Supplier extends BaseController
                 $barangId = $this->request->getPost('barang_id_rekap_per_barang');
                 $warehouseId = $this->request->getPost('warehouse_id_rekap_per_barang');
 
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportRekap($newAwalDate,$newAkhirDate,'','',$warehouseId);
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportRekap($newAwalDate, $newAkhirDate, '', '', $warehouseId);
                 $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $barangId)->where('type_barang', 'bahan_baku')->first();
                 $dataWarehouse = $this->warehousesModel->asObject()->where('id', $warehouseId)->first();
-                
+
                 if (!empty($dataBBLokal)) {
                     foreach ($dataBBLokal as $row) {
                         $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
@@ -1287,7 +1336,7 @@ class Supplier extends BaseController
                 $data = [
                     'no'    => $no,
                     'header'   => "Laporan Detail Pendapatan Supplier",
-                    'tanggalAwal'=> $awalDate,
+                    'tanggalAwal' => $awalDate,
                     'tanggalAkhir'       => $akhirDate,
                     'bahanBaku'        => !empty($dataBahanBaku) ? $dataBahanBaku->barang_name : "",
                     'warehouse'      => !empty($dataWarehouse) ? $dataWarehouse->warehouse_name : "",
@@ -1312,9 +1361,9 @@ class Supplier extends BaseController
         $domPdf = new Dompdf();
 
         $fileName = 'Order Form';
-        
+
         // load HTML content
-        $domPdf->loadHtml(view('Supplier/supplierBahanBaku/print-'.$laporan.'', $data));
+        $domPdf->loadHtml(view('Supplier/supplierBahanBaku/print-' . $laporan . '', $data));
 
         // (optional) setup the paper size and orientation
         $domPdf->setPaper('legal', 'landscape');
