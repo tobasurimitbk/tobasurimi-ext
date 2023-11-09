@@ -1184,7 +1184,7 @@
             $(".supplier_id").append(`<option value=""></option>`);
 
             res.data.forEach(function(item) {
-                $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name.toUpperCase()}</option>`);
             })
 
             $(".supplier_id").val("").change();
