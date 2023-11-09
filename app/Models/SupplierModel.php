@@ -162,7 +162,7 @@ class SupplierModel extends Model
         $month = idate('m');
         $year = date('y');
         $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "/S$type";
+        $numberTemplate = "-S$type";
 
         $lastData = $this->asObject()
             ->like('kode', $numberTemplate, 'before')
