@@ -64,7 +64,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="hidden" name="tipe_bahan" value="PENOLONG">
+                            <input type="hidden" name="tipe_bahan" class="tipe_bahan" value="PENOLONG">
                             <select disabled <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
                                 <option value="" disabled <?= empty($dataTerimaFaktur) ? 'selected' : '' ?>></option>
                                 <option value="BAKU" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "BAKU" ? "selected" : "") : ""; ?>>BAHAN BAKU</option>

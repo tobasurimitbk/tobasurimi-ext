@@ -628,7 +628,7 @@ class PenerimaanBarangLokal extends BaseController
 
                         // kalau create
                         else {
-                            $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
+                            // $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
 
                             if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
