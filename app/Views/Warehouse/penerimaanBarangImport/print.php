@@ -145,7 +145,7 @@
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></span></div>
+                    <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->createdAt ? date("d/m/Y", strtotime($dataPenerimaanBarang->createdAt)) : ""; ?></span></div>
                 </td>
                 <td>
                     <div><span class="txt-bold">No. PO &nbsp; : <?= implode(", ", json_decode($dataPenerimaanBarang->multiple_po_no)); ?></span></div>
