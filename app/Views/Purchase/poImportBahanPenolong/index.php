@@ -3,61 +3,61 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>PO Import Bahan Penolong</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-import-bahan-penolong/create"); ?>">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </a>
-</div>
-<div class="card">
-    <div class="card-body">
-        <?= csrf_field() ?>
-        <div class="row justify-content-end row-col-spp">
-            <div class="col mb-3">
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+    <div class="section-header">
+        <h1>PO Import Bahan Penolong</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-import-bahan-penolong/create"); ?>">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <?= csrf_field() ?>
+            <div class="row justify-content-end row-col-spp">
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col mb-3">
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
                     </div>
                 </div>
+                <div class="col mb-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
+                </div>
             </div>
-            <div class="col mb-3">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th>Tanggal Dibuat</th>
-                            <th onclick="changeSort('companyName')" class="sort">Company</th>
-                            <th onclick="changeSort('poNo')" class="sort">No. PO</th>
-                            <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
-                            <!-- <th onclick="changeSort('total')" class="sort">Total</th> -->
-                            <th onclick="changeSort('currencyName')" class="sort">Valas</th>
-                            <th>Order</th>
-                            <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>Tanggal Dibuat</th>
+                                <th onclick="changeSort('companyName')" class="sort">Company</th>
+                                <th onclick="changeSort('poNo')" class="sort">No. PO</th>
+                                <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
+                                <!-- <th onclick="changeSort('total')" class="sort">Total</th> -->
+                                <th onclick="changeSort('currencyName')" class="sort">Valas</th>
+                                <th>Order</th>
+                                <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -90,70 +90,70 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            orderable: false
-        },
-        {
-            data: "po_date",
-            className: "text-center",
-            sortable: false,
-            orderable: false,
-        },
-        {
-            data: "companyName",
-            className: "text-center"
-        },
-        {
-            data: "po_no",
-            className: "text-center"
-        },
-        {
-            data: "supplierName",
-            className: "text-center"
-        },
-        // {
-        //     data: "total",
-        //     className: "text-center"
-        // },
-        {
-            data: "currencyName",
-            className: "text-center"
-        },
-        {
-            data: "itemCount",
-            className: "text-center",
-            searchable: false,
-            sortable: false,
-        },
-        {
-            data: "status_penerimaan",
-            className: "text-center"
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                let status = row?.is_posted
-                let status_penerimaan = row?.status_penerimaan
-                let purchase_request_id = row?.purchase_request_id
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                orderable: false
+            },
+            {
+                data: "po_date",
+                className: "text-center",
+                sortable: false,
+                orderable: false,
+            },
+            {
+                data: "companyName",
+                className: "text-center"
+            },
+            {
+                data: "po_no",
+                className: "text-center"
+            },
+            {
+                data: "supplierName",
+                className: "text-center"
+            },
+            // {
+            //     data: "total",
+            //     className: "text-center"
+            // },
+            {
+                data: "currencyName",
+                className: "text-center"
+            },
+            {
+                data: "itemCount",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+            },
+            {
+                data: "status_penerimaan",
+                className: "text-center"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    let status = row?.is_posted
+                    let status_penerimaan = row?.status_penerimaan
+                    let purchase_request_id = row?.purchase_request_id
 
-                // jika belum posting
-                if (status !== "1") {
-                    return `
+                    // jika belum posting
+                    if (status !== "1") {
+                        return `
                         <div class="mt-0">
                         <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-penolong/print/"); ?>${id}')" style="box-shadow: none !important;">
                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -166,10 +166,10 @@
                         </button>
                         </div>
                     `
-                } else {
-                    // jika belum close po
-                    if (status_penerimaan !== "CLOSED") {
-                        return `
+                    } else {
+                        // jika belum close po
+                        if (status_penerimaan !== "CLOSED") {
+                            return `
                             <div class="mt-0">
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -179,18 +179,19 @@
                             </button>
                             </div>
                         `
-                    } else {
-                        return `
+                        } else {
+                            return `
                             <div class="mt-0">
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             </div>
                         `
+                        }
                     }
                 }
             }
-        }],
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -229,11 +230,11 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd").change(function () {
+        $(".dateStart, .dateEnd").change(function() {
             table.ajax.reload();
         })
 
@@ -409,8 +410,7 @@
         })
     }
 
-    const print = function(url) 
-    {
+    const print = function(url) {
         window.open(url, "_blank");
     }
 
