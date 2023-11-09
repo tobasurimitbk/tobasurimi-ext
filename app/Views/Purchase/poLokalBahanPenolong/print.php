@@ -144,14 +144,9 @@
                                 <td><?= $dataPOLokal->companyName ?></td>
                             </tr>
                             <tr>
-                                <td>No Faktur Pajak</td>
+                                <td>Catatan</td>
                                 <td>:</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Kode ACC</td>
-                                <td>:</td>
-                                <td>TSI</td>
+                                <td><?= $dataPOLokal->note ?></td>
                             </tr>
                         </table>
                     </div>
