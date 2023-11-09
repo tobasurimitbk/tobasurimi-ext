@@ -162,24 +162,24 @@ class SupplierModel extends Model
         $month = idate('m');
         $year = date('y');
         $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "-S$type";
+        $numberTemplate = "$type";
 
         $lastData = $this->asObject()
             ->like('kode', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-            
-            if (!empty($lastData)) {
-                $asd = explode('/', $lastData->kode);
-                $lastIncrement = intval($asd[0]) + 1;
-                $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-                
-                $invNumber = $paddedNumber . $numberTemplate;
-            }else{
-                
-                $invNumber = '001' . $numberTemplate;
-            }
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->kode);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        } else {
+
+            $invNumber = '001' . $numberTemplate;
+        }
 
         return $invNumber;
     }

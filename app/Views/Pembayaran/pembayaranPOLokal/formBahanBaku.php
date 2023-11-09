@@ -275,6 +275,10 @@
             theme: "bootstrap-5"
         });
 
+        $('#lpb').change(function() {
+
+        });
+
         $('#tipe_pembayaran').select2({
             placeholder: "",
             theme: "bootstrap-5"

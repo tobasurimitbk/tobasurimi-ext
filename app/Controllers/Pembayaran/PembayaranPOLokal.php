@@ -259,6 +259,24 @@ class PembayaranPOLokal extends BaseController
         $supplierID = $this->request->getVar('supplierID');
         $tipeBayar = $this->request->getVar('tipeBayar');
         $lpbID = $this->request->getVar('lpbID');
+
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
+        if (!empty($lpbID)) {
+            // HARIAN
+            return response()->setJson([
+                'token' => csrf_hash(),
+                'data' => $localPOPaymentModel->getListPONotPaidByLPB(
+                    $lpbID,
+                    $supplierID
+                )
+            ]);
+        } else {
+            // BULANAN (KWITANSI TB)
+            return response()->setJson([
+                'token' => csrf_hash()
+            ]);
+        }
     }
 
     public function generatePaymentNo()

@@ -132,7 +132,7 @@
                                 if (!empty($dataSupplier)) {
                                     foreach ($dataSupplier as $supplier) {
                                 ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= $supplier["name"]; ?></option>
+                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= strtoupper($supplier["name"]); ?></option>
                                 <?php
                                     }
                                 }

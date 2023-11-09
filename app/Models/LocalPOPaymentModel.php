@@ -156,17 +156,56 @@ class LocalPOPaymentModel extends Model
     {
     }
 
-    public function getListPONotPaidByLPB($lpbID)
+    public function getListPONotPaidByLPB($lpbID, $supplierID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
-        $resBarang = [];
+        $localPaymentModel = new LocalPOPaymentModel();
+        $amPurchaseOrder = new AMPurchaseOrderModel();
 
-        $conditionPenerimaanBarang = [
-            'deletedAt' => null,
-            'status_post' => 'FINISH',
-            'tipe_bahan' => 'BAKU',
-            'status_penerimaan' => 'LOKAL',
+        $conditionLpb = [
+            'penerimaan_barang.deletedAt' => null,
+            'id' => $lpbID
         ];
+
+        $lpb = $penerimaanBarangModel->where($conditionLpb)->first();
+        $poAll = json_decode($lpb['multiple_po_id']);
+
+        $conditionLocalPay = [
+            'deletedAt' => null,
+            'supplier_id' => $supplierID,
+            'type_po' => "Bahan Baku"
+        ];
+
+        $poIsPay = [];
+        $payLpbLatest = $localPaymentModel->where($conditionLocalPay)->findAll();
+
+        foreach ($payLpbLatest as $p) {
+            foreach (json_decode($p['multiple_po_id']) as $pm) {
+                array_push($poIsPay, $pm);
+            }
+        }
+
+        $poNotPay = array_diff($poAll, $poIsPay);
+
+        $selectQry = "
+            am_purchase_orders.po_no AS noPo,
+            am_purchase_orders.po_date AS tanggalPo,
+            am_purchase_order_details.qty AS totalOrder,
+            penerimaan_barang_detail.nama_barang_dok AS barang,
+            penerimaan_barang_detail.jml_masuk AS totalDiterima,
+            penerimaan_barang_detail.sub_total AS totalHarga,
+            SUM(am_purchase_order_details.qty) AS sumOrder,
+            SUM(am_purchase_order_details.jml_masuk) AS sumDiterima,
+            SUM(penerimaan_barang_detail.sub_total) AS sumHarga
+        ";
+
+        $res = $amPurchaseOrder->select($selectQry)
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id')
+            ->whereIn('am_purchase_orders.id', $poNotPay)
+            ->findAll();
+
+        return $res;
     }
 
     public function getListLPBNotPaid($supplierID)

@@ -314,6 +314,7 @@ $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::dele
 $routes->get('/pembayaran-po-lokal-bb', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBB', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/get-lpb-not-paid', 'Pembayaran\PembayaranPOLokal::getListDokumenLPBNotPaidBB', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/get-list-po-by-lpb', 'Pembayaran\PembayaranPOLokal::getListBarangLPBNotPaidBB', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO LOKAL
 $routes->get('/pembayaran-po-lokal', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokal', ['filter' => 'Auth']);

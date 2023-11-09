@@ -448,11 +448,19 @@ class PenerimaanBarangLokal extends BaseController
                         'packaging_qty' => $data->packaging_qty
                     ];
 
-                    // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
-                    $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
-                        'remaining_qty' => ($data->qty - $data->jml_masuk),
-                        'qty_diterima' => $data->qty_diterima
-                    ]);
+                    if ($tipe_bahan == "PENOLONG") {
+                        // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
+                        $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                            'remaining_qty' => ($data->qty - $data->jml_masuk),
+                            'qty_diterima' => $data->jml_masuk
+                        ]);
+                    } else {
+                        // BAKU
+                        $this->rmPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                            'remaining_qty' => ($data->qty - $data->jml_masuk),
+                            'qty_diterima' => $data->jml_masuk
+                        ]);
+                    }
                 }
 
                 $this->penerimaanBarangDetailModel->insertBatch($detailPayload);
@@ -576,11 +584,19 @@ class PenerimaanBarangLokal extends BaseController
                             'packaging_qty' => $data->packaging_qty
                         ];
 
-                        // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
-                        $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
-                            'remaining_qty' => ($data->qty - $data->jml_masuk),
-                            'qty_diterima' => $data->jml_masuk
-                        ]);
+                        if ($tipe_bahan == "PENOLONG") {
+                            // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
+                            $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                                'remaining_qty' => ($data->qty - $data->jml_masuk),
+                                'qty_diterima' => $data->jml_masuk
+                            ]);
+                        } else {
+                            // BAKU
+                            $this->rmPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                                'remaining_qty' => ($data->qty - $data->jml_masuk),
+                                'qty_diterima' => $data->jml_masuk
+                            ]);
+                        }
 
                         $conditionDetail = [
                             'purchase_order_details_id' => $data->id
