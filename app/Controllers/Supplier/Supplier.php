@@ -885,9 +885,9 @@ class Supplier extends BaseController
         return;
     }
 
-    public function supplierGenerate()
+    public function supplierGenerate($type)
     {
-        $response = $this->supplierModel->generateSupplierCode();
+        $response = $this->supplierModel->generateSupplierCode($type);
 
         if ($response) {
             $data = [

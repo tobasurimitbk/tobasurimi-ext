@@ -178,7 +178,7 @@ $routes->get('/bagian/dropdown', 'Master\Bagian::getAllBagian', ['filter' => 'Au
 // SUPPLIER
 $routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => 'Auth']);
 $routes->get('/supplier/id/(:num)', 'Supplier\Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
-$routes->get('/supplier/generate', 'Supplier\Supplier::supplierGenerate', ['filter' => 'Auth']);
+$routes->get('/supplier/generate/(:segment)', 'Supplier\Supplier::supplierGenerate/$1', ['filter' => 'Auth']);
 $routes->post('/supplier/delete', 'Supplier\Supplier::deleteSupplier', ['filter' => 'Auth']);
 
 // BAHAN BAKU LOKAL

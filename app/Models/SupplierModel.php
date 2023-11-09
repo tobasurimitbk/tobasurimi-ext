@@ -157,27 +157,29 @@ class SupplierModel extends Model
         return $query->getResultArray();
     }
 
-    public function generateSupplierCode(): string
+    public function generateSupplierCode($type): string
     {
         $month = idate('m');
         $year = date('y');
         $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "/SUP/$romanMonth/$year";
+        $numberTemplate = "/S$type";
 
         $lastData = $this->asObject()
             ->like('kode', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        $invNumber = '001' . $numberTemplate;
-
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->kode);
-            $lastIncrement = intval($asd[0]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-
-            $invNumber = $paddedNumber . $numberTemplate;
-        }
+            
+            if (!empty($lastData)) {
+                $asd = explode('/', $lastData->kode);
+                $lastIncrement = intval($asd[0]) + 1;
+                $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+                
+                $invNumber = $paddedNumber . $numberTemplate;
+            }else{
+                
+                $invNumber = '001' . $numberTemplate;
+            }
 
         return $invNumber;
     }

@@ -235,7 +235,7 @@
             $(".delete-form").css('display', 'none');
 
             $.ajax({
-                url: "<?= base_url("supplier/generate"); ?>",
+                url: "<?= base_url("supplier/generate/I"); ?>",
                 method: "GET",
                 dataType: "json",
                 success: function(res) {

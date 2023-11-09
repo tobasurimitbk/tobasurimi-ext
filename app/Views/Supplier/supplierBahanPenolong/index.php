@@ -396,7 +396,7 @@
             $(".country_code").val('').change()
 
             $.ajax({
-                url: "<?= base_url("supplier/generate"); ?>",
+                url: "<?= base_url("supplier/generate/BP"); ?>",
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
