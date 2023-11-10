@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Controllers\Supplier\SupplierHarga;
 use CodeIgniter\Model;
 
 class LocalPOPaymentModel extends Model
@@ -27,6 +28,8 @@ class LocalPOPaymentModel extends Model
         'type_bayar',
         'multiple_po_no',
         'multiple_po_id',
+        'month',
+        'lpb_no',
         'deletedAt'
     ];
 
@@ -73,6 +76,7 @@ class LocalPOPaymentModel extends Model
 
         $selectQry = "local_po_payments.id AS id,
                       local_po_payments.payment_no AS payment_no, 
+                      local_po_payments.type_bayar,
                       DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y') AS due_date, 
                       DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y') AS payment_date, 
                       local_po_payments.amount AS amount,
@@ -85,7 +89,7 @@ class LocalPOPaymentModel extends Model
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
-            ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payments.tanda_terima_faktur_id')
+            ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payments.tanda_terima_faktur_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
@@ -152,15 +156,208 @@ class LocalPOPaymentModel extends Model
         return $result;
     }
 
+    public function getBB($pembayaranID, $companyID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $supplierHargaModel = new SupplierHargaModel();
+        $supplierModel = new SupplierModel();
+        $companyModel = new CompaniesModel();
+
+        $result = [
+            'pembayaranDetail' => null,
+            'itemList' => null,
+            'company' => null,
+            'supplierDetail' => null,
+        ];
+
+        $result['pembayaranDetail'] = $this->where('id', $pembayaranID)->first();
+        $result['supplierDetail'] = $supplierModel->where('id', $result['pembayaranDetail']['supplier_id'])->first();
+        $result['company'] = $companyModel->select('companies.company')
+            ->where('id', $companyID)
+            ->first();
+
+        $rmDetail = $rmPurchaseOrderDetailModel
+            ->whereIn('rm_purchase_order_details.rm_purchase_order_id', \json_decode($result['pembayaranDetail']['multiple_po_id']))
+            ->where('rm_purchase_order_details.deletedAt', null)
+            ->findAll();
+
+        $hargaTotal = 0;
+        $totalOrder = 0;
+        $totalDiterima = 0;
+
+        $conditionLpb = [
+            "supplier_id" => $result['pembayaranDetail']['supplier_id'],
+            "tipe_bahan" => "BAKU",
+            "status_penerimaan" => "LOKAL",
+            "status_post" => "FINISH"
+        ];
+
+        foreach ($rmDetail as $rm) {
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $rm['rm_purchase_order_id'])->first();
+            $supplierHarga = $supplierHargaModel->select('supplier_harga.spesifikasi, barang_master.barang_name')
+                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+                ->where('supplier_harga.id', $rm['supplier_harga_id'])
+                ->first();
+
+            $lpbDetail = $penerimaanBarangModel->where($conditionLpb)->like('multiple_po_id', $rm['rm_purchase_order_id'])->first();
+
+            $harga = ($rm['general_price'] + $rm['daily_price'] + $rm['monthly_price']) *  $rm['qty_diterima'];
+            $hargaTotal += $harga;
+            $totalOrder += $rm['qty'];
+            $totalDiterima += $rm['qty_diterima'];
+
+            $res[] = [
+                'poID' => $rm['rm_purchase_order_id'],
+                'tanggalLpb' => date('d/m/Y', strtotime($lpbDetail['createdAt'])),
+                'lpbNo' => $lpbDetail['no_penerimaan_barang'],
+                'tanggalPo' => date('d/m/Y', \strtotime($rmPurchaseOrder['po_date'])),
+                'poNo' => $rmPurchaseOrder['po_no'],
+                'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
+                'totalOrder' => $rm['qty'],
+                'totalDiterima' => $rm['qty_diterima'],
+                'totalHarga' => toRupiah($harga)
+            ];
+        }
+
+        $itemList = [
+            'detail' => $res,
+            'totalOrder' => $totalOrder,
+            'totalDiterima' => $totalDiterima,
+            'totalHarga' => toRupiah($hargaTotal),
+        ];
+
+        $result['itemList'] = $itemList;
+        return $result;
+    }
+
     public function getListPONotPaidByMonth($supplierID, $month)
     {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $localPaymentModel = new LocalPOPaymentModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $supplierHargaModel = new SupplierHargaModel();
+
+        $query = "
+        SELECT *
+            FROM penerimaan_barang
+            WHERE deletedAt IS NULL
+                AND DATE_FORMAT(createdAt, '%Y-%m') = '" . $month . "'
+                AND supplier_id = '" . $supplierID . "'
+                AND tipe_bahan = 'BAKU'
+                AND status_penerimaan = 'LOKAL'
+                AND status_post = 'FINISH'
+        ";
+
+        $lpb = $this->db->query($query)->getResultArray();
+
+        if (count($lpb) == 0) {
+            return [
+                'detail' => 0,
+                'totalOrder' => 0,
+                'totalDiterima' => 0,
+                'totalHarga' => "Rp 0.0",
+            ];
+        }
+
+        $poAll = [];
+
+        foreach ($lpb as $l) {
+            $poarr = json_decode($l['multiple_po_id']);
+            foreach ($poarr as $p) {
+                $poAll[] = $p;
+            }
+        }
+
+        $conditionLocalPay = [
+            'deletedAt' => null,
+            'supplier_id' => $supplierID,
+            'type_po' => "Bahan Baku"
+        ];
+
+        $poIsPay = [];
+        $payLpbLatest = $localPaymentModel->where($conditionLocalPay)->findAll();
+
+        foreach ($payLpbLatest as $p) {
+            foreach (json_decode($p['multiple_po_id']) as $pm) {
+                array_push($poIsPay, $pm);
+            }
+        }
+
+        $poNotPay = array_diff($poAll, $poIsPay);
+        $res = [];
+
+        if (\count($poNotPay) == 0) {
+            return [
+                'detail' => 0,
+                'totalOrder' => 0,
+                'totalDiterima' => 0,
+                'totalHarga' => "Rp 0.0",
+            ];
+        }
+
+        $rmDetail = $rmPurchaseOrderDetailModel
+            ->whereIn('rm_purchase_order_details.rm_purchase_order_id', $poNotPay)
+            ->where('rm_purchase_order_details.deletedAt', null)
+            ->findAll();
+
+        $hargaTotal = 0;
+        $totalOrder = 0;
+        $totalDiterima = 0;
+
+        $conditionLpb = [
+            "DATE_FORMAT(createdAt, '%Y-%m')" => $month,
+            "supplier_id" => $supplierID,
+            "tipe_bahan" => "BAKU",
+            "status_penerimaan" => "LOKAL",
+            "status_post" => "FINISH"
+        ];
+
+        foreach ($rmDetail as $rm) {
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $rm['rm_purchase_order_id'])->first();
+            $supplierHarga = $supplierHargaModel->select('supplier_harga.spesifikasi, barang_master.barang_name')
+                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+                ->where('supplier_harga.id', $rm['supplier_harga_id'])
+                ->first();
+
+            $lpbDetail = $penerimaanBarangModel->where($conditionLpb)->like('multiple_po_id', $rm['rm_purchase_order_id'])->first();
+
+            $harga = ($rm['general_price'] + $rm['daily_price'] + $rm['monthly_price']) *  $rm['qty_diterima'];
+            $hargaTotal += $harga;
+            $totalOrder += $rm['qty'];
+            $totalDiterima += $rm['qty_diterima'];
+
+            $res[] = [
+                'poID' => $rm['rm_purchase_order_id'],
+                'tanggalLpb' => date('d/m/Y', strtotime($lpbDetail['createdAt'])),
+                'lpbNo' => $lpbDetail['no_penerimaan_barang'],
+                'tanggalPo' => date('d/m/Y', \strtotime($rmPurchaseOrder['po_date'])),
+                'poNo' => $rmPurchaseOrder['po_no'],
+                'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
+                'totalOrder' => $rm['qty'],
+                'totalDiterima' => $rm['qty_diterima'],
+                'totalHarga' => toRupiah($harga)
+            ];
+        }
+
+        return [
+            'detail' => $res,
+            'totalOrder' => $totalOrder,
+            'totalDiterima' => $totalDiterima,
+            'totalHarga' => toRupiah($hargaTotal),
+            'lpb' => $penerimaanBarangModel->where($conditionLpb)->findAll()
+        ];
     }
 
     public function getListPONotPaidByLPB($lpbID, $supplierID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $localPaymentModel = new LocalPOPaymentModel();
-        $amPurchaseOrder = new AMPurchaseOrderModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $supplierHargaModel = new SupplierHargaModel();
 
         $conditionLpb = [
             'penerimaan_barang.deletedAt' => null,
@@ -187,25 +384,48 @@ class LocalPOPaymentModel extends Model
 
         $poNotPay = array_diff($poAll, $poIsPay);
 
-        $selectQry = "
-            am_purchase_orders.po_no AS noPo,
-            am_purchase_orders.po_date AS tanggalPo,
-            am_purchase_order_details.qty AS totalOrder,
-            penerimaan_barang_detail.nama_barang_dok AS barang,
-            penerimaan_barang_detail.jml_masuk AS totalDiterima,
-            penerimaan_barang_detail.sub_total AS totalHarga,
-            SUM(am_purchase_order_details.qty) AS sumOrder,
-            SUM(am_purchase_order_details.jml_masuk) AS sumDiterima,
-            SUM(penerimaan_barang_detail.sub_total) AS sumHarga
-        ";
+        $res = [];
 
-        $res = $amPurchaseOrder->select($selectQry)
-            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id')
-            ->whereIn('am_purchase_orders.id', $poNotPay)
+        $rmDetail = $rmPurchaseOrderDetailModel
+            ->whereIn('rm_purchase_order_details.rm_purchase_order_id', $poNotPay)
+            ->where('rm_purchase_order_details.deletedAt', null)
             ->findAll();
 
-        return $res;
+        $hargaTotal = 0;
+        $totalOrder = 0;
+        $totalDiterima = 0;
+
+        foreach ($rmDetail as $rm) {
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $rm['rm_purchase_order_id'])->first();
+            $supplierHarga = $supplierHargaModel->select('supplier_harga.spesifikasi, barang_master.barang_name')
+                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+                ->where('supplier_harga.id', $rm['supplier_harga_id'])
+                ->first();
+
+            $harga = ($rm['general_price'] + $rm['daily_price'] + $rm['monthly_price']) *  $rm['qty_diterima'];
+            $hargaTotal += $harga;
+            $totalOrder += $rm['qty'];
+            $totalDiterima += $rm['qty_diterima'];
+
+            $res[] = [
+                'poID' => $rm['rm_purchase_order_id'],
+                'tanggalLpb' => date('d/m/Y', strtotime($lpb['createdAt'])),
+                'lpbNo' => $lpb['no_penerimaan_barang'],
+                'tanggalPo' => date('d/m/Y', \strtotime($rmPurchaseOrder['po_date'])),
+                'poNo' => $rmPurchaseOrder['po_no'],
+                'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
+                'totalOrder' => $rm['qty'],
+                'totalDiterima' => $rm['qty_diterima'],
+                'totalHarga' => toRupiah($harga)
+            ];
+        }
+
+        return [
+            'detail' => $res,
+            'totalOrder' => $totalOrder,
+            'totalDiterima' => $totalDiterima,
+            'totalHarga' => toRupiah($hargaTotal)
+        ];
     }
 
     public function getListLPBNotPaid($supplierID)
@@ -226,12 +446,12 @@ class LocalPOPaymentModel extends Model
 
         foreach ($lpbList as $l) {
             $poID = array_diff(json_decode($l['multiple_po_id']), $poPayed['po_id']);
-            $poNo = array_diff(json_decode($l['multiple_po_no']), $poPayed['po_no']);
-            if (count($poID) != 0 && count($poNo) != 0) {
+            // $poNo = array_diff(json_decode($l['multiple_po_no']), $poPayed['po_no']);
+            if (count($poID) != 0) {
                 $resLPB[] = [
                     'lpbID' => $l['id'],
                     'lpbNO' => $l['no_penerimaan_barang'],
-                    'poNO' => $poNo,
+                    // 'poNO' => $poNo,
                     'poID' => $poID
                 ];
             }
@@ -258,9 +478,9 @@ class LocalPOPaymentModel extends Model
             foreach (json_decode($pl['multiple_po_id']) as $id) {
                 $lpbIDArr[] = $id;
             }
-            foreach (json_decode($pl['multiple_po_no']) as $po) {
-                $noPoArr[] = $po;
-            }
+            // foreach (json_decode($pl['multiple_po_no']) as $po) {
+            //     $noPoArr[] = $po;
+            // }
         }
 
         return [

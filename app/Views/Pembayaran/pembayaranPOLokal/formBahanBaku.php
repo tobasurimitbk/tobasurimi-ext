@@ -5,11 +5,11 @@
     <div class="section-header">
         <h1 class="title-name">Tambah</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-lokal-bp"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-lokal-bb"); ?>">
                 Batal
             </a>
             <?php if (!empty($detail)) : ?>
-                <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . $detail['pembayaranDetail']['id'] ?? '') ?>">
+                <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bb/print/' . $detail['pembayaranDetail']['id'] ?? '') ?>">
                     <i class="fa-solid fa-print"></i> Print
                 </a>
             <?php else : ?>
@@ -23,7 +23,6 @@
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="" />
-                <input type="hidden" name="tanda_terima_faktur_id" class="tanda_terima_faktur_id">
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -41,7 +40,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_date'] . '"' : '' ?>>
+                            <input autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
                             <label for="floatingInput">Tanggal Pembayaran</label>
                         </div>
                     </div>
@@ -50,7 +49,7 @@
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($suppliers as $supplier) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier->id ? 'selected' : '') : '' ?> value="<?= $supplier->id ?>"><?= $supplier->name ?></option>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier->id ? 'selected' : '') : '' ?> value="<?= $supplier->id ?>"><?= strtoupper($supplier->name) ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
@@ -59,7 +58,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                        <div <?= !empty($detail) ? 'disabled' : '' ?> class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" name="tipe_pembayaran" id="tipe_pembayaran">
                                 <option disabled selected value=""></option>
                                 <option value="BULANAN">BULANAN</option>
@@ -76,31 +75,46 @@
                     </div>
                     <div class="col-md-4">
                         <div class="bulanan-form">
-                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input type="month" name="bulan" id="bulan" class="form-control">
-                                <label for="floatingInput" style="z-index: 1;">Pilih Bulan</label>
-                            </div>
+                            <?php if (!empty($detail)) : ?>
+                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                    <input <?= !empty($detail) ? 'disabled' : '' ?> value="<?= !empty($detail) ? $detail['pembayaranDetail']['month'] : '' ?>" type="text" class="form-control">
+                                    <label for="floatingInput" style="z-index: 1;">Pilih Bulan</label>
+                                </div>
+                            <?php else : ?>
+                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                    <input <?= !empty($detail) ? 'disabled' : '' ?> value="<?= !empty($detail) ? $detail['pembayaranDetail']['month'] : '' ?>" type="month" name="bulan" id="bulan" class="form-control">
+                                    <label for="floatingInput" style="z-index: 1;">Pilih Bulan</label>
+                                </div>
+                            <?php endif; ?>
+
                         </div>
                         <div class="harian-form">
-                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="lpb" id="lpb">
-                                    <option disabled selected value=""></option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
-                            </div>
+                            <?php if (!empty($detail)) : ?>
+                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                    <input <?= !empty($detail) ? 'disabled' : '' ?> value="<?= !empty($detail) ? $detail['pembayaranDetail']['lpb_no'] : '' ?>" type="text" class="form-control">
+                                    <label for="floatingInput" style="z-index: 1;">Nomor LPB</label>
+                                </div>
+                            <?php else : ?>
+                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                    <select class="form-select" name="lpb" id="lpb">
+                                        <option disabled selected value=""></option>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" onkeyup="this.value = formatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly <?= !empty($detail) ? 'disabled value="' . "Rp " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  . '"' : '' ?>>
+                            <input value="<?= !empty($detail) ? toRupiah($detail['pembayaranDetail']['amount']) : '' ?>" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly>
                             <label for="floatingInput">Nominal Pembayaran</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" readonly <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
+                            <input <?= !empty($detail) ? 'disabled' : '' ?> autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
                             <label for="floatingInput">Tanggal Jatuh Tempo</label>
                         </div>
                     </div>
@@ -116,7 +130,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
+                            <input name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
@@ -124,7 +138,7 @@
                 <div class="col-subtitle-modal mt-3">
                     <div class="row">
                         <div class="col-md-12">
-                            <label class="form-label font-weight-bold modal-sub-title">Item List</label>
+                            <label class="form-label font-weight-bold modal-sub-title">Data pembelian yang sudah diterima</label>
                         </div>
                     </div>
                 </div>
@@ -135,6 +149,8 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">Tanggal LPB</th>
+                                        <th style="text-align: center;">No LPB</th>
                                         <th style="text-align: center;">Tanggal PO</th>
                                         <th style="text-align: center;">No PO</th>
                                         <th style="text-align: center;">Barang</th>
@@ -146,27 +162,46 @@
                                 <tbody id="body-table" style="text-align: center;">
                                     <?php if (!empty($detail)) : ?>
                                         <?php $no = 1; ?>
-                                        <?php foreach ($detail['itemLpbList'] as $d) : ?>
+                                        <?php foreach ($detail['itemList']['detail'] as $d) : ?>
                                             <tr>
                                                 <td><?= $no++; ?></td>
-                                                <td><?= date('d/m/Y', strtotime($d['lpb_date'])) ?></td>
-                                                <td><?= $d['lpb_no'] ?></td>
-                                                <td><?= $d['item_name'] ?></td>
-                                                <td><?= $d['qty'] ?></td>
-                                                <td><?= $d['unit'] ?></td>
-                                                <td><?= "Rp " . number_format($d['price'], 2, ',', '.')  ?></td>
+                                                <td><?= $d['tanggalLpb'] ?></td>
+                                                <td><?= $d['lpbNo'] ?></td>
+                                                <td><?= $d['tanggalPo'] ?></td>
+                                                <td><?= $d['poNo'] ?></td>
+                                                <td><?= $d['barang'] ?></td>
+                                                <td><?= $d['totalOrder'] ?></td>
+                                                <td><?= $d['totalDiterima'] ?></td>
+                                                <td><?= $d['totalHarga'] ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                         <tr>
                                             <td colspan="6" style="text-align: right;">
                                                 Total
                                             </td>
-                                            <td><?= "Rp " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
+                                            <td style="text-align: center;">
+                                                <b><?= $detail['itemList']['totalOrder'] ?></b>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <b><?= $detail['itemList']['totalDiterima'] ?></b>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <b><?= $detail['itemList']['totalHarga'] ?></b>
+                                            </td>
                                         </tr>
                                     <?php else : ?>
                                         <tr>
-                                            <td colspan="7">
-                                                Barang tidak ada
+                                            <td colspan="6" style="text-align: right;">
+                                                <b> Total</b>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <b>0</b>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <b>0</b>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <b>Rp 0.0</b>
                                             </td>
                                         </tr>
                                     <?php endif; ?>
@@ -182,9 +217,35 @@
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
 <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+<?php if (!empty($detail)) : ?>
+    <?php if ($detail['pembayaranDetail']['type_bayar'] == "Bulanan") : ?>
+        <script>
+            $('.bulanan-form').show();
+            $('.harian-form').hide();
+            $('#bulan').val('');
+            $('#jenis_dokumen').val("KWITANSI TB");
+        </script>
+    <?php else : ?>
+        <script>
+            $('.harian-form').show();
+            $('.bulanan-form').hide();
+            $('#jenis_dokumen').val("LPB");
+        </script>
+    <?php endif; ?>
+    <script>
+        $('#tipe_pembayaran').val("<?= strtoupper($detail['pembayaranDetail']['type_bayar']) ?>");
+        $('#tipe_pembayaran').attr('disabled', true);
+    </script>
+<?php else : ?>
+    <script>
+        $('.bulanan-form,.harian-form').hide();
+    </script>
+<?php endif; ?>
 <script>
     $(document).ready(function() {
         const table = $('#dataTable');
+        var listPoNo = [];
+        var listPoID = [];
 
         var validator = $(".create-form").validate({
             rules: {
@@ -194,13 +255,13 @@
                 payment_date: {
                     required: true
                 },
-                nominal_faktur: {
-                    required: true
-                },
                 supplier_id: {
                     required: true
                 },
-                tanda_terima_supplier: {
+                tipe_pembayaran: {
+                    required: true
+                },
+                jenis_dokumen: {
                     required: true
                 },
                 nominal_pembayaran: {
@@ -223,8 +284,8 @@
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },
-                tanda_terima_supplier: {
-                    required: "Tanda terima supplier wajib diisi"
+                jenis_dokumen: {
+                    required: "Jenis dokumen wajib diisi"
                 },
                 nominal_pembayaran: {
                     required: "Nominal pembayaran wajib diisi"
@@ -261,48 +322,83 @@
             },
         });
 
-        $("#payment_date").datepicker({
+        $("#payment_date,#jatuh_tempo").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
         });
 
-        $('.bulanan-form,.harian-form').hide();
 
         $('#no_dokumen, #lpb').select2({
             placeholder: "",
             theme: "bootstrap-5"
         });
 
+        $('#bulan').change(function() {
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
+
+            var lpbID = $(this).val();
+            var supplierID = $('#supplier_id').val();
+            var formData = new FormData();
+            formData.append("supplierID", $('#supplier_id').val());
+            formData.append("bulan", $(this).val());
+            formData.append("tipeBayar", $('#tipe_pembayaran').val());
+
+            $.ajax({
+                url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.data.detail == 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: "List PO yang sudah diterima di warehouse tidak ditemukan",
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+
+                    drawTable(response.data);
+
+                }
+            });
+        });
+
         $('#lpb').change(function() {
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
 
-        });
+            var lpbID = $(this).val();
+            var supplierID = $('#supplier_id').val();
+            var formData = new FormData();
+            formData.append("supplierID", $('#supplier_id').val());
+            formData.append("lpbID", $(this).val());
+            formData.append("tipeBayar", $('#tipe_pembayaran').val());
 
-        $('#tipe_pembayaran').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        }).change(function() {
-            var tipeBayar = $(this).val();
-            if (tipeBayar == "BULANAN") {
-                $('.bulanan-form').show();
-                $('.harian-form').hide();
-                $('#jenis_dokumen').val("KWITANSI TB");
-            } else {
-                $('.harian-form').show();
-                $('.bulanan-form').hide();
-                $('#jenis_dokumen').val("LPB");
-                generateLPBNo();
-            }
-        });
+            $.ajax({
+                url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    drawTable(response.data);
 
-        $('#supplier_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        }).change(function(e) {
-            if ($('#tipe_pembayaran').val() == "HARIAN") {
-                generateLPBNo();
-            }
+                }
+            });
         });
 
         $(".btn-submit-form").click(function() {
@@ -314,56 +410,149 @@
 
             } else {
                 // CREATE
-                if ($(".create-form").valid()) {
+                // VALIDASI BARANG LIST
+                if (listPoID.length == 0) {
                     Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
+                        icon: 'warning',
+                        title: 'PO List Masih kosong',
                         confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const data = new FormData(document.querySelector(".create-form"));
-                            $.ajax({
-                                url: "<?= base_url("pembayaran-po-lokal-bp/create"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-po-lokal-bp/id/"); ?>` + response.id;
-                                            })
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        }
-                    })
+                    });
+                } else {
+                    if ($(".create-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                var formData = new FormData();
+                                formData.append("no_bukti_pembayaran", $('#no_bukti_pembayaran').val());
+                                formData.append("payment_date", $('#payment_date').val());
+                                formData.append("supplier_id", $('#supplier_id').val());
+                                formData.append("tipe_pembayaran", $('#tipe_pembayaran').val());
+                                formData.append("jenis_dokumen", $('#jenis_dokumen').val());
+                                formData.append("bulan", $('#bulan').val());
+                                formData.append("lpb", $('#lpb').val());
+                                formData.append("nominal_pembayaran", $('#nominal_pembayaran').val());
+                                formData.append("payment_method", $('#payment_method').val());
+                                formData.append("pembayaran_oleh", $('#pembayaran_oleh').val());
+                                formData.append("jatuh_tempo", $('#jatuh_tempo').val());
+                                formData.append("poIDList", JSON.stringify(listPoID));
+                                formData.append("poNoList", JSON.stringify(listPoNo));
+
+                                $.ajax({
+                                    url: "<?= base_url("pembayaran-po-lokal-bb/create"); ?>",
+                                    data: formData,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = `<?= base_url("pembayaran-po-lokal-bb/id/"); ?>` + response.id;
+                                                })
+                                        }
+                                    },
+                                });
+                            }
+                        })
+                    }
                 }
             }
         })
+
+        function drawTable(data) {
+            var no = 1;
+            const table = $('#dataTable');
+            table.find('tbody').empty();
+            // clear res
+            listPoID.length = 0;
+            listPoNo.length = 0;
+            $.each(data.detail, function(i, v) {
+                // push po id
+                listPoID.push({
+                    poID: v.poID
+                });
+                // push po no
+                listPoNo.push({
+                    poNo: v.poNo
+                });
+                var newRow = $('<tr>');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td style="text-align:center;">').text(v.tanggalLpb));
+                newRow.append($('<td style="text-align:center;">').text(v.lpbNo));
+                newRow.append($('<td style="text-align:center;">').text(v.tanggalPo));
+                newRow.append($('<td style="text-align:center;">').text(v.poNo));
+                newRow.append($('<td style="text-align:center;">').text(v.barang));
+                newRow.append($('<td style="text-align:center;">').text(v.totalOrder));
+                newRow.append($('<td style="text-align:center;">').text(v.totalDiterima));
+                newRow.append($('<td style="text-align:center;">').text(v.totalHarga));
+                table.find('tbody').append(newRow);
+            });
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align:right;" colspan="6"><b>Total</b></td>'));
+            newRow.append($('<td style="text-align:center;"><b>' + data.totalOrder + '</b></td>'));
+            newRow.append($('<td style="text-align:center;"><b>' + data.totalDiterima + '</b></td>'));
+            newRow.append($('<td style="text-align:center;"><b>' + data.totalHarga + '</b></td>'));
+            table.find('tbody').append(newRow);
+
+            $('#nominal_pembayaran').val(data.totalHarga);
+        }
+
+        $('#tipe_pembayaran').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        }).change(function() {
+            var tipeBayar = $(this).val();
+            if (tipeBayar == "BULANAN") {
+                $('.bulanan-form').show();
+                $('.harian-form').hide();
+                $('#bulan').val('');
+                $('#jenis_dokumen').val("KWITANSI TB");
+            } else {
+                $('.harian-form').show();
+                $('.bulanan-form').hide();
+                $('#jenis_dokumen').val("LPB");
+                generateLPBNo();
+            }
+            // clear res
+            listPoID.length = 0;
+            listPoNo.length = 0;
+            const table = $('#dataTable');
+            table.find('tbody').empty();
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align:right;" colspan="6"><b>Total</b></td>'));
+            newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
+            newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
+            newRow.append($('<td style="text-align:center;"><b>Rp 0.0</b></td>'));
+            table.find('tbody').append(newRow);
+        });
+
+        $('#supplier_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        }).change(function(e) {
+            if ($('#tipe_pembayaran').val() == "HARIAN") {
+                generateLPBNo();
+            } else {
+                $('#bulan').val("");
+            }
+        });
     });
 
     function generateLPBNo() {

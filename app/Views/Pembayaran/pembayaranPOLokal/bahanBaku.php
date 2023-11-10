@@ -9,6 +9,7 @@
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
+    <?= csrf_field() ?>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
@@ -39,7 +40,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th>No. Pembayaran</th>
-                                <th>No. Faktur</th>
+                                <th>Tipe Bayar</th>
                                 <th>Supplier</th>
                                 <th>Tanggal Jatuh Tempo</th>
                                 <th>Tanggal Pembayaran</th>
@@ -83,7 +84,7 @@
                 data.search = $(".search").val();
                 data.dueDate = $(".dueDate").val();
                 data.paymentDate = $(".paymentDate").val();
-                data.type_po = "Bahan Penolong";
+                data.type_po = "Bahan Baku";
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -108,7 +109,7 @@
                 className: "text-center"
             },
             {
-                data: "faktur_no",
+                data: "tipe_bayar",
                 className: "text-center"
             },
             {
@@ -139,8 +140,13 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     return `
+                    
+                    
                         <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -197,11 +203,53 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-po-lokal-bp/id/"); ?>${data.id}`);
+            location.replace(`<?= base_url("pembayaran-po-lokal-bb/id/"); ?>${data.id}`);
         });
     });
     const print = function(url) {
         window.open(url, "_blank");
+    }
+    const remove = function(id) {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Pembayaran Ini ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('id', id);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-lokal/delete"); ?>",
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                // update table
+                                table.ajax.reload();
+                            });
+                        }
+                    },
+                });
+            }
+        });
     }
 </script>
 <?= $this->endSection(); ?>

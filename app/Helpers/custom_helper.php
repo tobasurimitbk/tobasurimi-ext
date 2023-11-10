@@ -259,6 +259,11 @@ function repairDouble($nominal)
    return $angkaDesimal;
 }
 
+function toRupiah($nominal)
+{
+   return "Rp " . number_format($nominal, 2, ',', '.');
+}
+
 function getLastDay()
 {
    return date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));

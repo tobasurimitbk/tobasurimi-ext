@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pembayaran PO Lokal BP</title>
+    <title>Pembayaran PO Lokal BB</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +23,7 @@
 
         h6 {
             font-weight: normal;
-            font-size: 16px;
+            font-size: 13px;
             text-align: left;
             font-weight: bold;
             margin-top: 10px;
@@ -58,7 +58,7 @@
         UNIT <?= strtoupper($detail['company']['company']) ?>
     </div>
     <h5>
-        PEMBAYARAN PO BP
+        PEMBAYARAN PO BB
     </h5>
     <table align="center">
         <tbody>
@@ -78,9 +78,9 @@
                 <td><?= $detail['supplierDetail']['name'] ?></td>
             </tr>
             <tr>
-                <td>No Tanda Terima Supplier</td>
+                <td>Tipe Pembayaran</td>
                 <td>:</td>
-                <td><?= $detail['tandaTerimaSupplier']['faktur_no'] ?></td>
+                <td><?= strtoupper($detail['pembayaranDetail']['type_bayar']) ?></td>
             </tr>
             <tr>
                 <td>Tanggal Bayar</td>
@@ -116,34 +116,46 @@
 
     <table width="100%" border="1" id="dashed-border-table" style="margin-top:-20px">
         <thead>
-            <tr align="center">
-                <td style="width: 10px;">No</td>
-                <td>Tanggal LPB</td>
-                <td>No. LPB</td>
-                <td>Item Name</td>
-                <td>Qty</td>
-                <td>Unit</td>
-                <td>Total</td>
+            <tr>
+                <th style="text-align: center;">No</th>
+                <th style="text-align: center;">Tanggal LPB</th>
+                <th style="text-align: center;">No LPB</th>
+                <th style="text-align: center;">Tanggal PO</th>
+                <th style="text-align: center;">No PO</th>
+                <th style="text-align: center;">Barang</th>
+                <th style="text-align: center;">Total Order</th>
+                <th style="text-align: center;">Total Diterima</th>
+                <th style="text-align: center;">Total Harga</th>
             </tr>
         </thead>
         <tbody>
             <?php $no = 1; ?>
-            <?php foreach ($detail['itemLpbList'] as $d) : ?>
+            <?php foreach ($detail['itemList']['detail'] as $d) : ?>
                 <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= date('d/m/Y', strtotime($d['lpb_date'])) ?></td>
-                    <td><?= $d['lpb_no'] ?></td>
-                    <td><?= $d['item_name'] ?></td>
-                    <td><?= $d['qty'] ?></td>
-                    <td><?= $d['unit'] ?></td>
-                    <td><?= "Rp " . number_format($d['price'], 2, ',', '.')  ?></td>
+                    <td><?= $d['tanggalLpb'] ?></td>
+                    <td><?= $d['lpbNo'] ?></td>
+                    <td><?= $d['tanggalPo'] ?></td>
+                    <td><?= $d['poNo'] ?></td>
+                    <td><?= $d['barang'] ?></td>
+                    <td><?= $d['totalOrder'] ?></td>
+                    <td><?= $d['totalDiterima'] ?></td>
+                    <td><?= str_replace("Rp", "", $d['totalHarga'])  ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td colspan="6" style="text-align: right;">
                     Total
                 </td>
-                <td><?= "Rp " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
+                <td style="text-align: center;">
+                    <b><?= $detail['itemList']['totalOrder'] ?></b>
+                </td>
+                <td style="text-align: center;">
+                    <b><?= $detail['itemList']['totalDiterima'] ?></b>
+                </td>
+                <td style="text-align: center;">
+                    <b><?= str_replace("Rp", "", $detail['itemList']['totalHarga'])  ?></b>
+                </td>
             </tr>
         </tbody>
     </table>

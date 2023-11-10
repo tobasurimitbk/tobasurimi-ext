@@ -109,6 +109,7 @@ class TerimaFakturImport extends BaseController
             ->findAll();
 
         $data->item_total = $data->nominal_faktur + $data->potongan - $data->tambahan;
+        $data->supplierName = $supplierModel->where('id', $data->supplier_id)->first()['name'];
 
         $data = [
             "dataTerimaFaktur"  => $data,
