@@ -111,7 +111,7 @@
     </table>
 
     <h6>
-        Item Pembayaran
+        Data Pembelian Bahan Penolong
     </h6>
 
     <table width="100%" border="1" id="dashed-border-table" style="margin-top:-20px">

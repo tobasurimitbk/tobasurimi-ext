@@ -175,6 +175,14 @@ class PembayaranPOLokal extends BaseController
 
         $dataPembayaranPOLokal = [];
 
+        $typeBayar = [];
+        $type = $this->request->getGet('type_bayar');
+        if ($type == "All") {
+            $typeBayar = ['Bulanan', 'Harian'];
+        } else {
+            $typeBayar = [$type];
+        }
+
         $condition = [
             "local_po_payments.type_po"  => $this->request->getGet('type_po'),
             "local_po_payments.deletedAt" => null
@@ -185,7 +193,8 @@ class PembayaranPOLokal extends BaseController
             "sort"      => $this->request->getGet("sort"),
             "sortType"  => $this->request->getGet("sortType"),
             "dueDate" => $this->request->getGet('dueDate'),
-            "paymentDate" => $this->request->getGet('paymentDate')
+            "paymentDate" => $this->request->getGet('paymentDate'),
+            "typeBayar" => $typeBayar
         ];
 
         $limit = $this->request->getGet("length");

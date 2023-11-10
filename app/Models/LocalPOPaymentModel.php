@@ -85,12 +85,24 @@ class LocalPOPaymentModel extends Model
                       tanda_terima_faktur.faktur_no
                       ";
 
-        $supplierDataQry = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
-            ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payments.tanda_terima_faktur_id', 'left')
-            ->orderBy($sort, $sortType);
+        if ($condition['local_po_payments.type_po'] == "Bahan Baku") {
+            $supplierDataQry = $this->asObject()
+                ->select($selectQry)
+                ->where($condition)
+                ->whereIn('type_bayar', $addCondition['typeBayar'])
+                ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
+                ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payments.tanda_terima_faktur_id', 'left')
+                ->orderBy($sort, $sortType);
+        } else {
+            $supplierDataQry = $this->asObject()
+                ->select($selectQry)
+                ->where($condition)
+                ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
+                ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payments.tanda_terima_faktur_id', 'left')
+                ->orderBy($sort, $sortType);
+        }
+
+
 
         $totalData = $supplierDataQry->countAllResults(false);
 

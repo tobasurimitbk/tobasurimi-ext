@@ -30,6 +30,13 @@
                     </div>
                 </div>
                 <div class="col mb-3">
+                    <select class="form-select type_bayar" name="type_bayar" id="type_bayar" aria-label="Floating label select example">
+                        <option value="All">TIPE BAYAR : SEMUA</option>
+                        <option value="Harian">TIPE BAYAR : HARIAN</option>
+                        <option value="Bulanan">TIPE BAYAR : BULANAN</option>
+                    </select>
+                </div>
+                <div class="col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -85,6 +92,7 @@
                 data.dueDate = $(".dueDate").val();
                 data.paymentDate = $(".paymentDate").val();
                 data.type_po = "Bahan Baku";
+                data.type_bayar = $(".type_bayar").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -197,7 +205,7 @@
             table.ajax.reload();
         })
 
-        $(".dueDate, .paymentDate").change(function() {
+        $(".dueDate, .paymentDate, .type_bayar").change(function() {
             table.ajax.reload();
         })
 
