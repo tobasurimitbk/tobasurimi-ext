@@ -173,85 +173,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="row mb-1">
-                <div class="col-md-4">
-                    <label class="form-label font-weight-bold">Data Dokumen</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->aju_no : ""; ?>" type="text" class="form-control aju_no" name="aju_no" id="aju_no" placeholder="No. Invoice">
-                        <label for="floatingInput">No. AJU</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : "") : ""; ?>" type="text" class="form-control input-picker validation_date" id="validation_date" name="validation_date" placeholder="Tanggal Pendaftaran">
-                            <label for="floatingInput">Tanggal Pendaftaran</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_registration : ""; ?>" type="text" class="form-control no_registration" id="no_registration" name="no_registration" placeholder="No. Pendaftaran">
-                            <label for="floatingInput">No. Pendaftaran</label>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-                <!-- <div class="row mb-1">
-                <div class="col-md-4">
-                    <label class="form-label font-weight-bold">No. Surat Jalan</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->letter_no : ""; ?>" type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Surat Jalan">
-                        <label for="floatingInput">No. Surat Jalan</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->invoice_no : ""; ?>" type="text" class="form-control invoice_no" id="invoice_no" name="invoice_no" placeholder="No. Invoice">
-                        <label for="floatingInput">No. Invoice</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->total_weight : ""; ?>" type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
-                        <label for="floatingInput">Berat</label>
-                    </div>
-                </div>
-            </div> -->
-                <!-- <div class="row">
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->shipping_cost) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
-                        <label for="floatingInput">Biaya Ongkos Kirim</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->biaya_masuk) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Biaya Masuk">
-                        <label for="floatingInput">Biaya Masuk</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->ppnbm) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control ppnbm" id="ppnbm" name="ppnbm" placeholder="PPNBM">
-                        <label for="floatingInput">PPNBM</label>
-                    </div>
-                </div>
-            </div> -->
             </form>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
@@ -1744,7 +1665,7 @@
                 let checkKemasan = null;
 
                 checkKemasan = list_items.find(item => (
-                    item.packaging === ""
+                    item.packaging === null
                 ));
 
                 if (checkKemasan) {
@@ -1919,32 +1840,35 @@
                                 }
                                 // CREATE
                                 else {
+                                    let jml_masuk = 0;
                                     list_items.map(obj => {
-                                        update_list_items.push({
-                                            purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
-                                            barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            unit: obj.unit ? Number(obj.unit) : 0,
-                                            nama_barang_dok: obj.nama_barang_dokumen,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
-                                            qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
-                                            jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
-                                            harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                            harga_harian: obj.harga_harian ? Number(obj.harga_harian.replaceAll(",", "")) : 0,
-                                            harga_bulanan: obj.harga_bulanan ? Number(obj.harga_bulanan.replaceAll(",", "")) : 0,
-                                            sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
-                                            keterangan: obj.keterangan,
-                                            ppn: obj.ppn ? Number(obj.ppn) : 0,
-                                            pph: obj.pph ? Number(obj.pph) : 0,
-                                            packaging: obj.packaging,
-                                            packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
-                                        })
-
-                                        let jml_masuk = obj.jml_masuk ? Number(obj.jml_masuk) : 0;
-                                        if (jml_masuk === 0) {
-                                            validate_jml_masuk = true;
+                                        if (obj.jml_masuk > 0) {
+                                            update_list_items.push({
+                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                unit: obj.unit ? Number(obj.unit) : 0,
+                                                nama_barang_dok: obj.nama_barang_dokumen,
+                                                qty: obj.qty ? Number(obj.qty) : 0,
+                                                remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
+                                                qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
+                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                harga_harian: obj.harga_harian ? Number(obj.harga_harian.replaceAll(",", "")) : 0,
+                                                harga_bulanan: obj.harga_bulanan ? Number(obj.harga_bulanan.replaceAll(",", "")) : 0,
+                                                sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
+                                                keterangan: obj.keterangan,
+                                                ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                                pph: obj.pph ? Number(obj.pph) : 0,
+                                                packaging: obj.packaging,
+                                                packaging_qty: obj.packaging_qty ? Number(obj.packaging_qty) : 0,
+                                            })
+                                            jml_masuk += obj.jml_masuk;
                                         }
+                                        
                                     })
+                                    if (jml_masuk === 0) {
+                                        validate_jml_masuk = true;
+                                    }
 
                                     data.append("items", JSON.stringify(update_list_items))
 
@@ -2018,17 +1942,20 @@
 
             // hitung qty diterma
             let jmlhMasuk = $('.jml_masuk').val() ? Number($('.jml_masuk').val()) : 0;
-            $('.qty_diterima').val(jmlhMasuk);
+            // $('.qty_diterima').val(jmlhMasuk);
             // hitung sisa
             let jumlahOrder = $('.qty').val() ? Number($('.qty').val()) : 0;
             let diterima = $('.qty_diterima').val() ? Number($('.qty_diterima').val()) : 0;
 
-            if (diterima == 0) {
-                totalHarga = 0;
+            if (diterima != 0) {
+                $('.qty_diterima').val(diterima + jmlhMasuk);
+                $('.remaining_qty').val((jumlahOrder - diterima - jmlhMasuk));
+            } else {
+                $('.qty_diterima').val(jmlhMasuk);
+                $('.remaining_qty').val((jumlahOrder - jmlhMasuk));
             }
-
-            $('.remaining_qty').val((jumlahOrder - diterima));
             $(".nilai_sub_total").val(formatRupiah(totalHarga));
+
         })
 
         $(".nilai_sub_total").keyup(function() {

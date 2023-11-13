@@ -197,84 +197,6 @@ class PenerimaanBarangLokal extends BaseController
 
         foreach ($penerimaanBarangData['data'] as $data) {
             $multiple_po_no = json_decode($data->multiple_po_no);
-            // $status_bc = "WAITING";
-            // $condition = false;
-            // $conditionSecond = [];
-
-            // foreach($multiple_po_no as $item)
-            // {
-            //     if($data->tipe_bahan === "PENOLONG")
-            //     {
-            //         $check = $this->beaCukaiModel->checkPostingBeaCukaiByPONo($item, $this->this_company_id);
-
-            //         if($check)
-            //         {
-            //             $arr = [];
-            //             foreach($check as $secondItem)
-            //             {
-            //                 if($secondItem["tipe_bahan"] === "PENOLONG")
-            //                 {
-            //                     array_push($arr, $secondItem["po_no"]);
-            //                 }
-            //             }
-
-            //             if(strpos(implode($arr), $item))
-            //             {
-            //                 array_push($conditionSecond, true);
-            //             }
-            //             else
-            //             {
-            //                 array_push($conditionSecond, false);
-            //             }
-            //         }
-            //         else
-            //         {
-            //             array_push($conditionSecond, false);
-            //         }
-            //     }
-            //     if($data->tipe_bahan === "BAKU")
-            //     {
-            //         $check = $this->beaCukaiModel->checkPostingBeaCukai($this->this_company_id);
-
-            //         if($check)
-            //         {
-            //             $arr = [];
-            //             foreach($check as $secondItem)
-            //             {
-            //                 if($secondItem["tipe_bahan"] === "BAKU")
-            //                 {
-            //                     array_push($arr, implode(json_decode($secondItem["multiple_po_no"])));
-            //                 }
-            //             }
-
-            //             if(strpos(implode($arr), $item))
-            //             {
-            //                 array_push($conditionSecond, true);
-            //             }
-            //             else
-            //             {
-            //                 array_push($conditionSecond, false);
-            //             }
-            //         }
-            //         else
-            //         {
-            //             array_push($conditionSecond, false);
-            //         }
-            //     }
-            // }
-
-            // if(sizeof($conditionSecond) !== 0)
-            // {
-            //     if(!in_array(false, $conditionSecond))
-            //     {
-            //         $condition = true;
-            //     }
-            // }
-
-            // if($condition)
-            // {
-            //     $status_bc = "FINISH";
-            // }
 
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
@@ -757,21 +679,21 @@ class PenerimaanBarangLokal extends BaseController
                             return;
                         }
                     } elseif ($tipe_bahan === "PENOLONG") {
-                        // $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)
-                        //     ->set($payloadRemain)
-                        //     ->update();
+                        $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)
+                            ->set($payloadRemain)
+                            ->update();
 
-                        // if (!$responseDet) {
-                        //     $message =  'Gagal Ubah Remaining';
-                        //     $data = [
-                        //         "status"    => false,
-                        //         "message"   => $message,
-                        //         "payload"   => "",
-                        //         'token'     => csrf_hash()
-                        //     ];
-                        //     echo json_encode($data);
-                        //     return;
-                        // }
+                        if (!$responseDet) {
+                            $message =  'Gagal Ubah Remaining';
+                            $data = [
+                                "status"    => false,
+                                "message"   => $message,
+                                "payload"   => "",
+                                'token'     => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                            return;
+                        }
                     }
 
                     $spesifikasi = "";
@@ -900,29 +822,48 @@ class PenerimaanBarangLokal extends BaseController
             $id = $this->request->getVar("id");
 
             if (!empty($id)) {
-                $findPenerimaanBarang = $this->penerimaanBarangModel->find($id);
+                $findPenerimaanBarang = $this->penerimaanBarangModel->getWhere(['id' => $id])->getRow();
+
                 if ($findPenerimaanBarang) {
-                    // HAPUS DI PENERIMAAN BARANG DETAIL
-                    $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
-                    // SET JUMLAH DITERIMA DAN REMEANING DI PO JADI 0
-                    $poArr = json_decode($findPenerimaanBarang['multiple_po_id']);
-                    // SET 0
-                    foreach ($poArr as $p) {
-                        $this->amPurchaseOrderDetailModel->where('am_purchase_order_id', $p)->set('remaining_qty', 0)->set('qty_diterima', 0)->update();
+                    $poArr = json_decode($findPenerimaanBarang->multiple_po_id);
+                    $penerimaanBarangDetailModel = $this->penerimaanBarangDetailModel->getWhere(['penerimaan_barang_id' => $id])->getRow();
+                    if ($penerimaanBarangDetailModel) {
+                        foreach ($poArr as $p) {
+    
+                            // Assuming $p[0] is barang_id and $p[1] is am_purchase_order_id
+                            $purchaseOrderDetail = $this->amPurchaseOrderDetailModel
+                                ->where('barang_id', $penerimaanBarangDetailModel->barang_id)
+                                ->where('am_purchase_order_id', $p)
+                                ->first();
+                            
+
+    
+                            if ($purchaseOrderDetail) {
+                                $qty = isset($purchaseOrderDetail['qty']) ? $purchaseOrderDetail['qty'] : 0;
+                                // dd($qty);
+                                $this->amPurchaseOrderDetailModel
+                                    ->where('id', $purchaseOrderDetail['id'])
+                                    ->set('remaining_qty', $qty)
+                                    ->set('qty_diterima', 0)
+                                    ->update();
+                            }
+                        }
+                        $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
                     }
-                    $response =  $this->penerimaanBarangModel->delete($id);
+
+                    $response = $this->penerimaanBarangModel->delete($id);
                     if ($response) {
                         $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil dihapus",
+                            "status" => true,
+                            "message" => "Data Berhasil dihapus",
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
                     } else {
                         $message = 'Data Gagal Dihapus';
                         $data = [
-                            "status"            => false,
-                            "message"    => $message,
+                            "status" => false,
+                            "message" => $message,
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
