@@ -37,6 +37,11 @@ $routes->get('/logout', 'Setting\Auth::doLogout');
 
 $routes->get('/change-company', 'Setting\User::changeCompany');
 
+// 403 ROUTE
+$routes->get('/403', function () {
+    return view('errors/html/error_403');
+});
+
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
 
