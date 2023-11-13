@@ -57,6 +57,14 @@ class Divisi extends BaseController
         $search = $this->request->getVar('search');
         //$searchValue = $temp['value']; // Column index
 
+        if ($columnName == "jamKerja") {
+            $columnName = "jam_kerja.jenis";
+        }
+
+        if ($columnName == "totalBagian") {
+            $columnName = "jam_kerja.id";
+        }
+
         $values = [
             "company_id"    => $this->this_company_id,
             "search"        => $search

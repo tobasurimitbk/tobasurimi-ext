@@ -100,7 +100,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
-                                <th onclick="changeSort('jamKerja')" class="sort">Jam Kerja</th>
+                                <th onclick="changeSort('jam_kerja.jenis')" class="sort">Jam Kerja</th>
                                 <th class="sort">Total Bagian</th>
                                 <th class="sort" style="width: 100px;">Action</th>
                             </tr>
