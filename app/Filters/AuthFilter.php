@@ -16,42 +16,44 @@ class AuthFilter implements FilterInterface
             return redirect()->to("/")->with('error', "Invalid Credential");
         }
 
-        $metaDataModel = new MetadataModel();
+        if ($request->getMethod() !== 'post') {
+            $metaDataModel = new MetadataModel();
 
-        // EXCEPT ENDPOINT
-        $except = json_decode($metaDataModel->where('name', 'Route Hak Akses Except')->first()['value']);
+            // EXCEPT ENDPOINT
+            $except = json_decode($metaDataModel->where('name', 'Route Hak Akses Except')->first()['value']);
 
-        // VALIDASI HAK AKSES SESSION
-        $uri = service('uri');
-        $hakAkses = session()->get('login')->this_access;
-        $segment1 = $uri->getSegment(1);
+            // VALIDASI HAK AKSES SESSION
+            $uri = service('uri');
+            $hakAkses = session()->get('login')->this_access;
+            $segment1 = $uri->getSegment(1);
 
-        $allowedAccess = false;
+            $allowedAccess = false;
 
-        $uri = service('uri');
-        $hakAkses = session()->get('login')->this_access;
-        $segment1 = $uri->getSegment(1);
+            $uri = service('uri');
+            $hakAkses = session()->get('login')->this_access;
+            $segment1 = $uri->getSegment(1);
 
-        if (\in_array($segment1, $except)) {
-            $allowedAccess = true;
-        } else
-
-        if ($segment1 == "dashboard") {
-            $allowedAccess = true;
-        } else {
-            foreach ($hakAkses as $h) {
-                if (isset($h->child)) {
-                    foreach ($h->child as $c) {
-                        if ($c->url == '/' . $segment1) {
-                            $allowedAccess = true;
+            if (\in_array($segment1, $except)) {
+                $allowedAccess = true;
+            } else
+    
+            if ($segment1 == "dashboard") {
+                $allowedAccess = true;
+            } else {
+                foreach ($hakAkses as $h) {
+                    if (isset($h->child)) {
+                        foreach ($h->child as $c) {
+                            if ($c->url == '/' . $segment1) {
+                                $allowedAccess = true;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (!$allowedAccess) {
-            return redirect()->to("403")->with('error', "");
+            if (!$allowedAccess) {
+                return redirect()->to("403")->with('error', "");
+            }
         }
     }
 
