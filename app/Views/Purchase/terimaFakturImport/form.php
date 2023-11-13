@@ -75,18 +75,23 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataSupplier)) {
-                                    foreach ($dataSupplier as $supplier) {
-                                ?>
-                                        <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->supplier_id === $supplier->id ? "selected" : "") : ""; ?>><?= "$supplier->kode - $supplier->name"; ?></option>
-                                <?php
+                            <?php if (!empty($dataTerimaFaktur)) : ?>
+                                <input autocomplete="one-time-code" value="<?= $dataTerimaFaktur->supplierName ?? ""; ?>" type="text" class="form-control " placeholder="Nama Supplier " disabled readonly>
+                                <label for="floatingInput">Supplier</label>
+                            <?php else : ?>
+                                <select <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataSupplier)) {
+                                        foreach ($dataSupplier as $supplier) {
+                                    ?>
+                                            <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->supplier_id === $supplier->id ? "selected" : "") : ""; ?>><?= "$supplier->kode - $supplier->name"; ?></option>
+                                    <?php
+                                        }
                                     }
-                                }
-                                ?>
-                            </select>
+                                    ?>
+                                </select>
+                            <?php endif; ?>
                             <label for="floatingInput">Supplier</label>
                         </div>
                     </div>
@@ -94,7 +99,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="number" autocomplete="one-time-code" <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->nominal_faktur) : ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" placeholder="Nominal Faktur">
+                            <input type="<?= !empty($dataTerimaFaktur) ? "text" : "number"; ?>" autocomplete="one-time-code" <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur == null ? 0 : toRupiah($dataTerimaFaktur->nominal_faktur)) : ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" placeholder="Nominal Faktur">
                             <label for="floatingInput">Nominal Faktur</label>
                         </div>
                     </div>
@@ -197,7 +202,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <textarea autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
+                            <textarea style="height: 10px;" autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -256,7 +261,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea autocomplete="one-time-code" class="form-control information text-area-all" id="tax_note" name="tax_note" placeholder="Keterangan"></textarea>
+                            <textarea style="height: 10px;" autocomplete="one-time-code" class="form-control information text-area-all" id="tax_note" name="tax_note" placeholder="Keterangan"></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>

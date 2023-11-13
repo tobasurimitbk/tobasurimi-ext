@@ -101,6 +101,63 @@ class PembayaranPOLokal extends BaseController
         }
     }
 
+    public function createPembayaranPOLokalBBAction()
+    {
+        try {
+            $localPOPaymentModel = new LocalPOPaymentModel();
+            $penerimaanBarangModel = new PenerimaanBarangModel();
+
+            $poIDAmt = json_decode($this->request->getVar('poIDList'));
+            $poNOAmt = json_decode($this->request->getVar('poNoList'));
+
+            $poIDArr = [];
+            $poNoArr = [];
+
+            foreach ($poIDAmt as $p) {
+                \array_push($poIDArr, $p->poID);
+            }
+
+            foreach ($poNOAmt as $p) {
+                array_push($poNoArr, $p->poNo);
+            }
+
+            $resPoID =  str_replace('"', "", json_encode(array_values(array_unique($poIDArr))));
+            $resPoNo =  str_replace("\\", "", json_encode(array_values(array_unique($poNoArr))));
+            $resPoNo =  str_replace('"', "", json_encode(array_values(array_unique($poNoArr))));
+
+            $lpb = $penerimaanBarangModel->where('id', $this->request->getVar('lpb'))->first();
+
+            $id = $localPOPaymentModel->insert([
+                'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
+                'supplier_id' => $this->request->getVar('supplier_id'),
+                'due_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('jatuh_tempo')))),
+                'amount' => repairDouble($this->request->getVar('nominal_pembayaran')),
+                'payment_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                'payment_method' => $this->request->getVar('payment_method'),
+                'type_po' => "Bahan Baku",
+                'type_bayar' => ucfirst($this->request->getVar('tipe_pembayaran')),
+                'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
+                'multiple_po_no' => $resPoNo,
+                'multiple_po_id' => $resPoID,
+                'lpb_no' => $lpb == null ? null : $lpb['no_penerimaan_barang'],
+                'month' => $this->request->getVar('bulan')
+            ]);
+
+            return response()->setJSON([
+                'message' => "Kwitansi pembayaran lokal bahan baku berhasil dibuat",
+                'status' => true,
+                'token' => csrf_hash(),
+                'id' => $id
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => "terjadi kesalahan " . $e->getMessage() . $e->getLine(),
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
     // PEMBAYARAN BAHAN BAKU ATAU PENOLONG
     public function allPembayaranPOLokal()
     {
@@ -118,6 +175,14 @@ class PembayaranPOLokal extends BaseController
 
         $dataPembayaranPOLokal = [];
 
+        $typeBayar = [];
+        $type = $this->request->getGet('type_bayar');
+        if ($type == "All") {
+            $typeBayar = ['Bulanan', 'Harian'];
+        } else {
+            $typeBayar = [$type];
+        }
+
         $condition = [
             "local_po_payments.type_po"  => $this->request->getGet('type_po'),
             "local_po_payments.deletedAt" => null
@@ -128,7 +193,8 @@ class PembayaranPOLokal extends BaseController
             "sort"      => $this->request->getGet("sort"),
             "sortType"  => $this->request->getGet("sortType"),
             "dueDate" => $this->request->getGet('dueDate'),
-            "paymentDate" => $this->request->getGet('paymentDate')
+            "paymentDate" => $this->request->getGet('paymentDate'),
+            "typeBayar" => $typeBayar
         ];
 
         $limit = $this->request->getGet("length");
@@ -148,7 +214,8 @@ class PembayaranPOLokal extends BaseController
                 "due_date"          => $data->due_date,
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => $data->payment_method,
-                "amount"            => "Rp " . number_format($data->amount ?? 0, 0, ',', '.')
+                "amount"            => "Rp " . number_format($data->amount ?? 0, 0, ',', '.'),
+                "tipe_bayar"        => strtoupper($data->type_bayar)
             ]);
         }
 
@@ -183,11 +250,37 @@ class PembayaranPOLokal extends BaseController
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
     }
 
+    public function getPembayaranPOLokalBB($id)
+    {
+        $supplierModel = new SupplierModel();
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
+        $supplierList = $supplierModel->asObject()
+            ->where('deletedAt', null)
+            ->where('type', "BAHAN BAKU")
+            ->orderBy('name', "ASC")
+            ->findAll();
+
+        if ($localPOPaymentModel->where('id', $id)->first() == null) {
+            return redirect()->to('pembayaran-po-lokal-bb');
+        }
+
+        $data = [
+            "suppliers" => $supplierList,
+            "detail" => $localPOPaymentModel->getBB($id, $this->this_company_id)
+        ];
+
+        return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
+    }
     // PRINT PEMBAYARAN PO BP
     public function pembayaranPOLokalBPPrint($id)
     {
         $dompdf = new Dompdf();
         $localPOPaymentModel = new LocalPOPaymentModel();
+
+        if ($localPOPaymentModel->where('id', $id)->first() == null) {
+            return redirect()->to('pembayaran-po-lokal-bp');
+        }
 
         $data = [
             "detail" => $localPOPaymentModel->get($id)
@@ -205,6 +298,30 @@ class PembayaranPOLokal extends BaseController
         exit(0);
     }
 
+    public function pembayaranPOLokalBBPrint($id)
+    {
+        $dompdf = new Dompdf();
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
+        if ($localPOPaymentModel->where('id', $id)->first() == null) {
+            return redirect()->to('pembayaran-po-lokal-bb');
+        }
+
+        $data = [
+            "detail" => $localPOPaymentModel->getBB($id, $this->this_company_id)
+        ];
+
+        if ($data['detail'] == null) {
+            return redirect()->to('pembayaran-po-lokal-bb');
+        }
+
+        $dompdf->loadHtml(view('Pembayaran/pembayaranPOLokal/printBahanBaku', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Pembayaran PO Lokal Bahan Baku ", array("Attachment" => false));
+
+        exit(0);
+    }
 
     // BAHAN BAKU
     public function pembayaranPOLokalBB()
@@ -257,8 +374,30 @@ class PembayaranPOLokal extends BaseController
     public function getListBarangLPBNotPaidBB()
     {
         $supplierID = $this->request->getVar('supplierID');
-        $tipeBayar = $this->request->getVar('tipeBayar');
         $lpbID = $this->request->getVar('lpbID');
+        $month = $this->request->getVar('bulan');
+
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
+        if (!empty($lpbID)) {
+            // HARIAN
+            return response()->setJson([
+                'token' => csrf_hash(),
+                'data' => $localPOPaymentModel->getListPONotPaidByLPB(
+                    $lpbID,
+                    $supplierID
+                ),
+            ]);
+        } else {
+            // BULANAN (KWITANSI TB)
+            return response()->setJson([
+                'token' => csrf_hash(),
+                'data' => $localPOPaymentModel->getListPONotPaidByMonth(
+                    $supplierID,
+                    $month
+                )
+            ]);
+        }
     }
 
     public function generatePaymentNo()

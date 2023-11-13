@@ -8,13 +8,12 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            letter-spacing: 2px;
-            font-size: 10px;
+            font-size: 13px;
         }
 
 
         @page {
-            size: 5.51in 8.2in landscape;
+            size: 6.8in 13.2in landscape;
             margin: 29px;
             padding: 29px;
         }
@@ -31,7 +30,7 @@
         }
 
         .item-table tr th {
-            background-color: #F3EED9;
+            background-color: white;
         }
 
         .item-table tr th {
@@ -39,7 +38,7 @@
         }
 
         .mt-025 {
-            margin-top: 0.25rem;
+            margin-top: -20px;
         }
 
         .mt-050 {
@@ -145,14 +144,9 @@
                                 <td><?= $dataPOLokal->companyName ?></td>
                             </tr>
                             <tr>
-                                <td>No Faktur Pajak</td>
+                                <td>Catatan</td>
                                 <td>:</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Kode ACC</td>
-                                <td>:</td>
-                                <td>TSI</td>
+                                <td><?= $dataPOLokal->note ?></td>
                             </tr>
                         </table>
                     </div>
@@ -195,7 +189,7 @@
                 <!-- <th>Biaya Tambahan</th> -->
                 <!-- <th>PPN</th> -->
                 <!-- <th>PPH</th> -->
-                <th class="txt-left" style="padding-left: 5px; width: 70px;">QTY</th>
+                <th class="txt-left" style="padding-left: 5px; width: 120px;">QTY</th>
                 <th class="txt-left" style="padding-left: 5px; width: 120px;">KODE BARANG</th>
                 <th class="txt-left" style="padding-left: 5px;">NAMA BARANG</th>
                 <th class="txt-left" style="padding-left: 5px; width: 80px;">HARGA</th>
@@ -226,7 +220,7 @@
                     <td colspan="3">____________</td>
                 </tr>
                 <tr>
-                    <td style="width:630px">Total</td>
+                    <td style="width:1100px">Total</td>
                     <td style="width: 10px;">:</td>
                     <td> <?= $dataPOLokal->totalPrice ?></td>
                 </tr>
@@ -271,22 +265,22 @@
                 </tr>
                 <tr>
                     <th style="font-weight: normal;">
-                        <br><br><br> <br>
+                        <br><br>
                         (Warehouse) <br><br>
                     </th>
                     <th style="font-weight: normal;">
-                        <br><br><br><br>
+                        <br><br>
                         (Pembelian)
                     </th>
                     <th style="font-weight: normal;">
-                        <br><br><br><br>
+                        <br><br>
                         (Kabag Pembelian)
                     </th>
                     <th style="font-weight: normal;">
-                        <br><br><br><br>
+                        <br><br>
                         (Audit)
                     <th style="font-weight: normal;">
-                        <br><br><br><br>
+                        <br><br>
                         (Direktur)
                     </th>
                 </tr>

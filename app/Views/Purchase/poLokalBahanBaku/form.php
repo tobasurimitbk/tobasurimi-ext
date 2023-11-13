@@ -94,7 +94,7 @@
                                 <?php
                                 if (!empty($dataSupplier)) : ?>
                                     <?php foreach ($dataSupplier as $supplier) : ?>
-                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->name; ?></option>
+                                        <option <?= !empty($dataPOLokal) ? ($dataPOLokal->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= strtoupper($supplier->name); ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
@@ -546,9 +546,9 @@
                 let satuan = $(".spesifikasi option:selected").data("satuan") ? $(".spesifikasi option:selected").data("satuan") : "";
 
                 $(".bagian").val(Number(bagian)).change();
-                $(".harga").val(umum.replaceAll(",", ""));
-                $(".daily_price").val(harian.replaceAll(",", ""));
-                $(".monthly_price").val(bulanan.replaceAll(",", ""));
+                $(".harga").val(parseInt(umum.replaceAll(",", "")));
+                $(".daily_price").val(parseInt(harian.replaceAll(",", "")));
+                $(".monthly_price").val(parseInt(bulanan.replaceAll(",", "")));
                 $(".satuan").val(satuan).change();
                 $(".qty").val("");
                 $(".total").val("");
@@ -668,15 +668,15 @@
                 pph: {
                     required: true
                 },
-                subsidi_langsung: {
-                    required: true
-                },
-                cong_sebenarnya: {
-                    required: true
-                },
-                cong_batasan: {
-                    required: true
-                }
+                // subsidi_langsung: {
+                //     required: true
+                // },
+                // cong_sebenarnya: {
+                //     required: true
+                // },
+                // cong_batasan: {
+                //     required: true
+                // }
             },
             messages: {
                 po_date: {
@@ -697,15 +697,15 @@
                 pph: {
                     required: "PPH wajib diisi"
                 },
-                subsidi_langsung: {
-                    required: "Subsidi Langsung wajib diisi"
-                },
-                cong_sebenarnya: {
-                    required: "Cong Sebenarnya wajib diisi"
-                },
-                cong_batasan: {
-                    required: "Cong Batasan wajib diisi"
-                }
+                // subsidi_langsung: {
+                //     required: "Subsidi Langsung wajib diisi"
+                // },
+                // cong_sebenarnya: {
+                //     required: "Cong Sebenarnya wajib diisi"
+                // },
+                // cong_batasan: {
+                //     required: "Cong Batasan wajib diisi"
+                // }
             },
             errorElement: 'span',
             errorClass: 'text-danger',

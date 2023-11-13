@@ -88,16 +88,19 @@ class POLokalBahanPenolong extends BaseController
             $this->request->getVar('divisionID')
         );
 
-        $noPoNew =  $this->aMPurchaseOrderModel->get_no(
-            date('d'),
-            date('m'),
-            date('Y'),
-            $divisi[0]['divisi'],
-            date('y'),
-            $this->request->getPost("divisionID"),
-            getLastDay()
-        );
-
+        if ($this->request->getVar('poNo') != "AUTO GENERATE") {
+            $noPoNew = $this->request->getVar('poNo');
+        } else {
+            $noPoNew =  $this->aMPurchaseOrderModel->get_no(
+                date('d'),
+                date('m'),
+                date('Y'),
+                $divisi[0]['divisi'],
+                date('y'),
+                $this->request->getPost("divisionID"),
+                getLastDay()
+            );
+        }
         $dataAmPurchaseOrderData = [
             'po_no' => $noPoNew,
             'po_date' => formatDMYtoYMD($this->request->getVar('poDate')),

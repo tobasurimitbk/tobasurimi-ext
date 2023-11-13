@@ -78,7 +78,7 @@
                                 if (!empty($dataSupplier)) {
                                     foreach ($dataSupplier as $supplier) {
                                 ?>
-                                        <option value="<?= $supplier["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?>><?= $supplier["name"]; ?></option>
+                                        <option value="<?= $supplier["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?>><?= strtoupper($supplier["name"]); ?></option>
                                 <?php
                                     }
                                 }
@@ -336,7 +336,7 @@
                                         <td style="text-align:center;"><?= $details["keterangan"]; ?></td>
                                         <td style="text-align:center; <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'display: none' : '') : ''; ?>">
                                             <?php if ($dataPenerimaanBarang->status_post === "WAITING" && $details["status_penerimaan"] === "0") { ?>
-                                                <button data-packaging="<?= $details["packaging"]; ?>" data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" data-pph="<?= $pph; ?>" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= formatter($details["jml_masuk"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?= $details["keterangan"]; ?>" data-sub_total="<?= $details["sub_total"] ?  number_format($details["sub_total"], 2, '.', ',') : 0; ?>" data-harga="<?= $details["harga"] ?  number_format($details["harga"], 2, '.', ',') : 0; ?>" data-harga_harian="<?= $details["harga_harian"] ?  number_format($details["harga_harian"], 2, '.', ',') : 0; ?>" data-harga_bulanan="<?= $details["harga_bulanan"] ?  number_format($details["harga_bulanan"], 2, '.', ',') : 0; ?>" data-nama_barang_dokumen="<?= $details["nama_barang_dok"]; ?>" data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-satuan="<?= $details["nama_satuan"]; ?>" data-nama_barang="<?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?>" data-kode="<?= $details["kode_barang"]; ?>" data-purchase_order_details_id="<?= $details["purchase_order_details_id"]; ?>" data-id="<?= $details["id"]; ?>" data-row="<?= $no; ?>" data-diskon="<?= $details['disc'] ?>" data-tambahan="<?= $details['additional_cost'] ?>" class="edit-table-detail btn btn-warning posting-spp">
+                                                <button data-packaging="<?= $details["packaging"]; ?>" data-packaging_qty="<?= formatter($details["packaging_qty"], "STR_TO_FLOAT"); ?>" data-ppn="<?= $ppn; ?>" data-pph="<?= $pph; ?>" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= formatter($details["jml_masuk"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?= $details["keterangan"]; ?>" data-sub_total="<?= $details["sub_total"] ?  number_format($details["sub_total"], 2, '.', ',') : 0; ?>" data-harga="<?= $details["harga"] ?  number_format($details["harga"], 2, '.', ',') : 0; ?>" data-harga_harian="<?= $details["harga_harian"] ?  number_format($details["harga_harian"], 2, '.', ',') : 0; ?>" data-harga_bulanan="<?= $details["harga_bulanan"] ?  number_format($details["harga_bulanan"], 2, '.', ',') : 0; ?>" data-nama_barang_dokumen="<?= $details["nama_barang_dok"]; ?>" data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-satuan="<?= $details["nama_satuan"]; ?>" data-nama_barang="<?= $details["nama_barang"] . ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? " (" . $details["spesifikasi"] . ")" : ""); ?>" data-kode="<?= $details["kode_barang"]; ?>" data-purchase_order_details_id="<?= $details["purchase_order_details_id"]; ?>" data-id="<?= $details["id"]; ?>" data-row="<?= $no; ?>" data-diskon="<?= (array_key_exists('disc', $details)) ? $details['disc'] : 0  ?>" data-tambahan="<?= (array_key_exists('additional_cost', $details)) ?  $details['additional_cost'] : 0 ?>" class="edit-table-detail btn btn-warning posting-spp">
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                                 </button>
                                             <?php } ?>
@@ -447,7 +447,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row" id="formDiskonTambahan">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly autocomplete="one-time-code" type="text" class="form-control tambahan" id="tambahan" name="tambahan" placeholder="Tambahan">
@@ -489,13 +489,13 @@
                     <div class="row baku">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly type="number" class="form-control harga_barang_jasa_harian" name="harga_barang_jasa_harian" id="harga_barang_jasa_harian" placeholder="Harga Harian">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control harga_barang_jasa_harian" name="harga_barang_jasa_harian" id="harga_barang_jasa_harian" placeholder="Harga Harian">
                                 <label for="floatingInput">Harga Harian</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly type="number" class="form-control harga_barang_jasa_bulanan" name="harga_barang_jasa_bulanan" id="harga_barang_jasa_bulanan" placeholder="Harga Bulanan">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control harga_barang_jasa_bulanan" name="harga_barang_jasa_bulanan" id="harga_barang_jasa_bulanan" placeholder="Harga Bulanan">
                                 <label for="floatingInput">Harga Bulanan</label>
                             </div>
                         </div>
@@ -639,8 +639,16 @@
                 po_no: '<?= $details["po_no"]; ?>',
                 packaging: '<?= $details["packaging"]; ?>',
                 packaging_qty: Number(<?= $details["packaging_qty"] ? $details["packaging_qty"] : 0; ?>),
-                diskon: Number(<?= $details['disc'] ? $details['disc'] : 0; ?>),
-                tambahan: Number(<?= $details['additional_cost'] ? $details['additional_cost'] : 0;  ?>)
+                <?php if (array_key_exists("disc", $details)) : ?>
+                    diskon: Number(<?= $details['disc'] ? $details['disc'] : 0; ?>),
+                <?php else : ?>
+                    diskon: 0,
+                <?php endif ?>
+                <?php if (array_key_exists("additional_cost", $details)) : ?>
+                    tambahan: Number(<?= $details['additional_cost'] ? $details['additional_cost'] : 0; ?>),
+                <?php else : ?>
+                    tambahan: 0,
+                <?php endif ?>
             })
         <?php
         }
@@ -2760,16 +2768,19 @@
             $(".nilai_sub_total").attr("readonly", true)
             $(".harga_barang_jasa").attr("readonly", true)
             $(".baku").css("display", "")
-            $(".label-input-harga").text("Harga Umum")
+            $(".label-input-harga").text("Harga Umum");
+            $('#formDiskonTambahan').hide();
+
         } else {
             $(".nilai_sub_total").attr("readonly", false)
             $(".harga_barang_jasa").attr("readonly", false)
             $(".baku").css("display", "none")
             $(".label-input-harga").text("Harga Satuan")
+            $('.tambahan').val(formatRupiah(tambahan));
+            $('.diskon').val(diskon);
+            $('#formDiskonTambahan').show();
         }
 
-        $('.diskon').val(diskon);
-        $('.tambahan').val(formatRupiah(tambahan));
         $(".keterangan").val(keterangan)
         $(".barang_id").val(barang_id)
         $(".qty").val(qty)
@@ -2860,7 +2871,7 @@
                     $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
-                        $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
+                        $(".supplier_id").append(`<option value="${item.id}">${item.name.toUpperCase()}</option>`);
                     })
                     //$(".supplier_id").removeAttr("disabled");
 
@@ -2882,7 +2893,7 @@
                     $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
-                        $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
+                        $(".supplier_id").append(`<option value="${item.id}">${item.name.toUpperCase()}</option>`);
                     })
                     //$(".supplier_id").removeAttr("disabled");
 
@@ -2992,7 +3003,8 @@
     }
 
     function formatRupiah(angka) {
-        if (angka === null) {
+
+        if (angka === null || angka === undefined) {
             angka = 0;
         }
 
@@ -3005,6 +3017,7 @@
         var reverse = ribuan.toString().split('').reverse().join('');
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
         return "Rp. " + ribuanFormatted + ',' + desimal;
+
     }
 
     const print = function(url) {
