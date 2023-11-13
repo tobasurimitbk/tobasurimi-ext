@@ -146,6 +146,124 @@
             width: 100%;
             height: 90px;
         }
+
+
+
+        body {
+            font-size: 13px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        @page {
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .item-table {
+            border-collapse: collapse;
+            text-align: left;
+            width: 100%;
+        }
+
+        .item-table tr th {
+            border: 1px solid grey;
+        }
+
+        .item-table tr td {
+            border: 1px solid grey;
+        }
+
+        .mt-025 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-050 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
+        }
+
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        .border-collapse {
+            border-collapse: collapse;
+        }
+
+        .sign-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .sign-table td {
+            border: 1px solid;
+        }
+
+        /* .sign-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0rem;
+            width: 100%;
+        }
+
+        .sign-row>div {
+            width: 120px;
+            border-top: 1px solid;
+            margin-top: 2rem
+        } */
+
+        .txt-bold {
+            font-weight: 700;
+        }
+
+        .txt-center {
+            text-align: center;
+        }
+
+        .txt-left {
+            text-align: left;
+        }
+
+        .txt-right {
+            text-align: right;
+        }
+
+        .txt-top {
+            vertical-align: top;
+        }
+
+        .w-30 {
+            width: 30%;
+        }
+
+        .w-50 {
+            width: 50%;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .footer {
+            position: absolute;
+            /* bottom: 0; */
+            height: 90px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 25px;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -186,23 +304,25 @@
                     <tr>
                         <td><?= $detail->peti ?></td>
                         <td><?= $detail->nama_bagian ?></td>
-                        <td><?= $detail->spesifikasi ?></td>
+                        <td><?= $detail->note ?></td>
                         <td class="txt-right"><?= $detail->qty ?></td>
-                        <?php if($dataPO->pph === "None") { 
-                            $nilai_total_harian = $nilai_total_harian + ($detail->daily_price ? formatter(str_replace(",", "", $detail->daily_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"); 
-                            $nilai_total = $nilai_total + ($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");   
+                        <?php if ($dataPO->pph === "None") {
+                            $nilai_total_harian = $nilai_total_harian + ($detail->daily_price ? formatter(str_replace(",", "", $detail->daily_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");
+                            $nilai_total = $nilai_total + ($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
                             <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                        <?php } if($dataPO->pph === "Supplier") { 
-                            $nilai_total_harian = $nilai_total_harian + ($detail->daily_price ? formatter(str_replace(",", "", $detail->daily_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"); 
-                            $nilai_total = $nilai_total + ($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");  
+                        <?php }
+                        if ($dataPO->pph === "Supplier") {
+                            $nilai_total_harian = $nilai_total_harian + ($detail->daily_price ? formatter(str_replace(",", "", $detail->daily_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");
+                            $nilai_total = $nilai_total + ($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
                             <td class="txt-right"><?= number_format(formatter($detail->general_price, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                        <?php } if($dataPO->pph === "Company") {
-                            $nilai_total_harian = $nilai_total_harian + (((formatter($detail->daily_price, "STR_TO_FLOAT")) + (($detail->daily_price ? formatter(str_replace(",", "", $detail->daily_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));  
-                            $nilai_total = $nilai_total + (((formatter($detail->general_price, "STR_TO_FLOAT")) + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));    
+                        <?php }
+                        if ($dataPO->pph === "Company") {
+                            $nilai_total_harian = $nilai_total_harian + (((formatter($detail->daily_price, "STR_TO_FLOAT")) + (($detail->daily_price ? formatter(str_replace(",", "", $detail->daily_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));
+                            $nilai_total = $nilai_total + (((formatter($detail->general_price, "STR_TO_FLOAT")) + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));
                         ?>
                             <td class="txt-right"><?= number_format((formatter($detail->general_price, "STR_TO_FLOAT")) + (formatter($detail->general_price, "STR_TO_FLOAT") * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(((formatter($detail->general_price, "STR_TO_FLOAT")) + (($detail->general_price ? formatter(str_replace(",", "", $detail->general_price), "STR_TO_FLOAT") : 0) * $dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
@@ -217,27 +337,23 @@
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">PPH</td>
-                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                    <td class="txt-right"><?= number_format(($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td class="txt-right"><?= number_format(($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                    <td class="txt-right">0.00</td>
+                        <td class="txt-right">0.00</td>
                     <?php } ?>
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">DIBAYARKAN</td>
-                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                    <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                    <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                     <?php } ?>
                 </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer">
-                <tr>
-                    <td style="height: 30px;"></td>
-                    <td></td>
-                    <td></td>
-                </tr>
+
                 <tr>
                     <th>
                         <div class="sign-row">
@@ -297,19 +413,19 @@
                 <tr>
                     <td>PPh</td>
                     <td>Rp.</td>
-                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                    <td class="txt-right"><?= number_format(($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td class="txt-right"><?= number_format(($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                    <td class="txt-right">0.00</td>
+                        <td class="txt-right">0.00</td>
                     <?php } ?>
                 </tr>
                 <tr>
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
-                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                    <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                    <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                     <?php } ?>
                 </tr>
             </table>
@@ -362,19 +478,19 @@
                 <tr>
                     <td>PPh</td>
                     <td>Rp.</td>
-                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                    <td class="txt-right"><?= number_format(($nilai_total_harian * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td class="txt-right"><?= number_format(($nilai_total_harian * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                    <td class="txt-right">0.00</td>
+                        <td class="txt-right">0.00</td>
                     <?php } ?>
                 </tr>
                 <tr>
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
-                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                    <td class="txt-right"><?= number_format($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td class="txt-right"><?= number_format($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                    <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                     <?php } ?>
                 </tr>
             </table>
@@ -387,7 +503,7 @@
             </div>
         </div>
 
-        <div>
+        <div class=" <?= $dataPO->lpb == null ? '' : 'pagebreak' ?>">
             <table class="w-100">
                 <tr>
                     <td class="txt-underline txt-bold">KWITANSI TAMBAHAN</td>
@@ -427,11 +543,11 @@
                     <td></td>
                     <td></td>
                     <td>PPH</td>
-                    <?php if($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                    <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph), 2, '.', ',') ?></td>
-                    <?php } else { ?>
-                    <td>0.00</td>
-                    <?php } ?>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                        <?php } else { ?>
+                            <td>0.00</td>
+                        <?php } ?>
                 </tr>
                 <tr>
                     <td></td>
@@ -442,11 +558,6 @@
                 </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer">
-                <tr>
-                    <td style="height: 30px;"></td>
-                    <td></td>
-                    <td></td>
-                </tr>
                 <tr>
                     <th>
                         <div class="sign-row-second">
@@ -472,6 +583,114 @@
             </table>
         </div>
     <?php } ?>
+    <?php if ($dataPO->lpb != null) : ?>
+        <div>
+            <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
+            <table class="w-100 mt-050">
+                <tr>
+                    <td>
+                        <div><span class="txt-bold">No. LPB : <?= $dataPO->lpb->no_penerimaan_barang; ?></span></div>
+                    </td>
+                    <td>
+                        <div><span class="txt-bold">Supplier : <?= $dataPO->lpb->supplier_name; ?></span></div>
+                    </td>
+                    <td class="txt-right">
+                        <div><span class="txt-bold">Tipe: <?= $dataPO->lpb->tipe_bahan; ?></span></div>
+                    </td>
+                    <!-- <td class="txt-right">
+                    <div><span class="txt-bold">Jenis Dokumen:    <?php // $dataPO->lpb->aju_type_name; 
+                                                                    ?></span></div>
+                </td> -->
+                </tr>
+                <tr>
+                    <td>
+                        <div><span class="txt-bold">Tanggal : <?= $dataPO->lpb->createdAt ? date("d/m/Y", strtotime($dataPO->lpb->createdAt)) : ""; ?></span></div>
+                    </td>
+                    <td>
+                        <div><span class="txt-bold">No. PO &nbsp; : <?= implode(", ", json_decode($dataPO->lpb->multiple_po_no)); ?></span></div>
+                    </td>
+                    <td class="txt-right">
+                        <div><span class="txt-bold">Gudang: <?= $dataPO->lpb->warehouse_name; ?></span></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div><span class="txt-bold">Dokumen : <?= ($dataPO->lpb->bc_type == 0) ? "Non Pabean - 0" : $dataPO->lpb->bc_type ?></span></div>
+                    </td>
+                </tr>
+            </table>
+            <table class="item-table mt-050">
+                <tr>
+                    <th class="txt-left" style="padding-left: 5px; width: 30px;">No.</th>
+                    <th class="txt-left" style="padding-left: 5px; width: 100px;">Nama Barang</th>
+                    <th class="txt-left" style="padding-left: 5px; width: 40px;">Kemasan</th>
+                    <th class="txt-left" style="padding-left: 5px; width: 40px;">Qty</th>
+                    <th class="txt-left" style="padding-left: 5px; width: 30px;">Satuan</th>
+                    <th class="txt-left" style="padding-left: 5px; width: 60px;">@ Rp</th>
+                    <th class="txt-left" style="padding-left: 5px; width: 60px;">Jumlah</th>
+                    <th class="txt-left" style="<?= $dataPO->lpb->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px; width: 150px;" : "padding-left: 5px; width: 150px;"; ?>">No. SPP</th>
+                    <th class="txt-left" style="padding-left: 5px; width: 60px;">Keterangan</th>
+                </tr>
+
+                <?php
+                $no = 1;
+                $jml_masuk = 0;
+                $jml_order = 0;
+                $jml_harga = 0;
+                $jml_sub_total = 0;
+
+                foreach ($dataPO->lpbDetail as $detail) {
+                    $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_FLOAT");
+                    $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_FLOAT");
+                    $jml_harga = $jml_harga + (formatter($detail["harga"], "STR_TO_INT") + formatter($detail["harga_harian"], "STR_TO_INT") + formatter($detail["harga_bulanan"], "STR_TO_INT"));
+                    $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
+                ?>
+                    <tr>
+                        <td class="txt-center" style="padding-left: 5px;"><?= $no++; ?></td>
+                        <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_barang"] . ($dataPO->lpb->tipe_bahan === "BAKU" ? " (" . $detail["spesifikasi"] . ")" : ""); ?></td>
+                        <td class="txt-left" style="padding-left: 5px;"><?= $detail["packaging"] . "/" . $detail["packaging_qty"]; ?></td>
+                        <td class="txt-right" style="padding-left: 5px;"><?= $detail["jml_masuk"]; ?></td>
+                        <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
+                        <td class="txt-right" style="padding-left: 5px;"><?= number_format((formatter($detail["harga"], "STR_TO_FLOAT") + formatter($detail["harga_harian"], "STR_TO_INT") + formatter($detail["harga_bulanan"], "STR_TO_INT")), 2, '.', ','); ?></td>
+                        <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                        <td class="txt-left" style="<?= $dataPO->lpb->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px;" : "padding-left: 5px;"; ?>"><?= !empty($detail["spp_no"]) ? $detail["spp_no"] : ""; ?></td>
+                        <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
+                    </tr>
+                <?php } ?>
+                <tr>
+                    <td class="txt-left" style="padding-left: 5px" colspan="6"><b>TOTAL</b></td>
+                    <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
+                    <td style="<?= $dataPO->lpb->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px;" : "padding-left: 5px;"; ?>"></td>
+                    <td style="padding-left: 5px;"></td>
+                </tr>
+                <tr>
+                    <td class="txt-left" style="padding-left: 5px" colspan="6"><b>ONGKOS KIRIM</b></td>
+                    <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPO->lpb->shipping_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                    <td style="<?= $dataPO->lpb->tipe_bahan === "BAKU" ? "display: none; padding-left: 5px;" : "padding-left: 5px;"; ?>"></td>
+                    <td style="padding-left: 5px;"></td>
+                </tr>
+            </table>
+            <div class="header mt-050">
+                <table class="w-50 sign-table footer" style="padding-top: 0px; margin-top: 0px">
+                    <tr>
+                        <td>Diperiksa & Dibukukan</td>
+                        <td class="txt-center" style="width:100px;">Tgl</td>
+                        <td class="txt-center" style="width:100px;">Paraf</td>
+                    </tr>
+                    <tr>
+                        <td style="height: 40px;">Pembelian</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="height: 40px;">Accounting</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    <?php endif; ?>
 </body>
 
 </html>

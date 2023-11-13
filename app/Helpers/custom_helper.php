@@ -280,3 +280,26 @@ function formatDMYtoYMD($date)
    $dateObj = DateTime::createFromFormat('d/m/Y', $date);
    return $dateObj->format('Y-m-d');
 }
+
+function can($menuName, $childMenuName, $access = [])
+{
+   // access isinya = [c,r,u,d,p,a]
+   $hakAkses = session()->get('login')->this_access;
+   foreach ($hakAkses as $h) {
+      if ($h->menuName == $menuName) {
+         if (isset($h->child)) {
+            // ADA CHILD MENU
+            foreach ($h->child as $c) {
+               // CEK CHILD MENU NAME
+               if ($c->name == $childMenuName) {
+                  // CEK HAK AKSES
+                  if (array_intersect($c->access, $access)) {
+                     return true;
+                  }
+               }
+            }
+         }
+      }
+   }
+   return false;
+}

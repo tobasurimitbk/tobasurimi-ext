@@ -153,6 +153,7 @@ class PenerimaanBarangLokal extends BaseController
                 }
             }
         }
+
         // dd($dataPenerimaanBarangDetail);
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);

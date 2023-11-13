@@ -18,6 +18,7 @@ class RMPurchaseOrderModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'warehouse_id',
         'company_id',
         'bc_type',
         'po_no',
@@ -87,7 +88,7 @@ class RMPurchaseOrderModel extends Model
         $builder = $this->db->table('rm_purchase_orders');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 
@@ -228,7 +229,7 @@ class RMPurchaseOrderModel extends Model
         return $generatedPoNo;
     }
 
-    public function getPoBBLokalForSupplierReport($startDate,$finishDate,$supplier,$bahanBaku,$warehouse)
+    public function getPoBBLokalForSupplierReport($startDate, $finishDate, $supplier, $bahanBaku, $warehouse)
     {
         $selectQry = "
         suppliers.no_npwp AS supplierNpwp,
@@ -257,13 +258,13 @@ class RMPurchaseOrderModel extends Model
         ];
         if (!empty($bahanBaku)) {
             $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
-        }                  
+        }
         if (!empty($warehouse)) {
             $condition['penerimaan_barang.warehouse_id'] = $warehouse;
-        }                  
+        }
         if (!empty($supplier)) {
             $condition['rm_purchase_orders.supplier_id'] = $supplier;
-        }                  
+        }
 
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
@@ -283,7 +284,7 @@ class RMPurchaseOrderModel extends Model
         return $poBBLokalData;
     }
 
-    public function getPoBBLokalForAllSupplierReport($startDate,$finishDate)
+    public function getPoBBLokalForAllSupplierReport($startDate, $finishDate)
     {
         $selectQry = "
         suppliers.no_npwp AS supplierNpwp,
@@ -302,7 +303,7 @@ class RMPurchaseOrderModel extends Model
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
             'penerimaan_barang.tipe_bahan' => 'BAKU',
-        ];                
+        ];
 
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
@@ -322,7 +323,7 @@ class RMPurchaseOrderModel extends Model
         return $poBBLokalData;
     }
 
-    public function getPoBBLokalForSupplierReportRekap($startDate,$finishDate,$supplier,$bahanBaku,$warehouse)
+    public function getPoBBLokalForSupplierReportRekap($startDate, $finishDate, $supplier, $bahanBaku, $warehouse)
     {
         $selectQry = "
         suppliers.name AS supplierName, 
@@ -347,13 +348,13 @@ class RMPurchaseOrderModel extends Model
         ];
         if (!empty($bahanBaku)) {
             $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
-        }                  
+        }
         if (!empty($warehouse)) {
             $condition['penerimaan_barang.warehouse_id'] = $warehouse;
-        }                  
+        }
         if (!empty($supplier)) {
             $condition['rm_purchase_orders.supplier_id'] = $supplier;
-        }                  
+        }
 
         $poBBLokalData = $this->asObject()
             ->select($selectQry)

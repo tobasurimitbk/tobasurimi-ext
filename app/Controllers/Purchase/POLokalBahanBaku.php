@@ -13,7 +13,10 @@ use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
 use App\Models\SatuansModel;
 use App\Models\MetadataModel;
+use App\Models\PenerimaanBarangDetailModel;
+use App\Models\PenerimaanBarangModel;
 use App\Models\SupplierHargaModel;
+use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanBaku extends BaseController
@@ -30,7 +33,10 @@ class POLokalBahanBaku extends BaseController
     protected $BagianModel;
     protected $SatuansModel;
     protected $SupplierHargaModel;
+    protected $warehousesModel;
+    protected $penerimaanBarangModel;
     protected $dompdf;
+    protected $penerimaanBarangDetailModel;
 
     public function __construct()
     {
@@ -46,7 +52,10 @@ class POLokalBahanBaku extends BaseController
         $this->CompaniesModel = new CompaniesModel();
         $this->SatuansModel = new SatuansModel();
         $this->SupplierHargaModel = new SupplierHargaModel();
+        $this->warehousesModel = new WarehousesModel();
         $this->dompdf = new Dompdf();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
     }
 
     public function poLokalBahanBaku()
@@ -57,7 +66,7 @@ class POLokalBahanBaku extends BaseController
     public function createPOLokalBahanBaku()
     {
         //Get BC Type By Metadata
-        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
+        $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         //Get Company
         $dataCompany =  $this->CompaniesModel->getCompanies();
@@ -71,6 +80,8 @@ class POLokalBahanBaku extends BaseController
         // Get Satuan
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
 
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
@@ -81,7 +92,9 @@ class POLokalBahanBaku extends BaseController
             "dataSatuan"    => $dataSatuan,
             "dataBagian"    => $dataBagian,
             "dataSupplier"  => $dataSupplier,
-            "dataCompany"   => $dataCompany
+            "dataCompany"   => $dataCompany,
+            "dataWarehouse" => $dataWarehouse,
+
         ];
 
         return view('Purchase/poLokalBahanBaku/form', $data);
@@ -100,6 +113,8 @@ class POLokalBahanBaku extends BaseController
 
         // Get Satuan
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -110,7 +125,10 @@ class POLokalBahanBaku extends BaseController
             "dataSatuan"    => $dataSatuan,
             "dataBagian"    => $dataBagian,
             "dataCompany" => $dataCompany,
-            "dataSupplier" => $dataSupplier
+            "dataSupplier" => $dataSupplier,
+            "dataWarehouse" => $dataWarehouse,
+            "dataBCType"    => $dataBCType,
+
         ];
 
         $spesifikasi = [];
@@ -126,31 +144,33 @@ class POLokalBahanBaku extends BaseController
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
 
+        // dd($data["dataPOLokal"]);
+
         return view('Purchase/poLokalBahanBaku/form', $data);
     }
 
     public function allPOLokalBahanBaku()
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
         $condition = [];
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
         $poData = $this->RMPurchaseOrderModel->getPoBBList($condition, $addCondition, $limit, $offset);
 
         $dataPOLokal = [];
@@ -173,7 +193,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
+            "draw"              => intval($this->request->getVar("draw")),
             "recordsTotal"      => $poData['totalData'],
             "recordsFiltered"   => $poData['totalFilteredData'],
             "data"              => $dataPOLokal,
@@ -230,19 +250,20 @@ class POLokalBahanBaku extends BaseController
 
             if ($this->validate($rules)) {
                 $insertData = [
-                    "company_id" => $this->request->getPost("company_id"),
-                    "bc_type" => $this->request->getPost("bc_type"),
-                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
-                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "supplier_id" => $this->request->getPost("supplier_id"),
-                    "barang_id" => $this->request->getPost("barang_id"),
-                    "pph" => $this->request->getPost("pph"),
+                    "warehouse_id" => $this->request->getVar("warehouse_id"),
+                    "company_id" => $this->request->getVar("company_id"),
+                    "bc_type" => $this->request->getVar("bc_type"),
+                    "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
+                    "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
+                    "supplier_id" => $this->request->getVar("supplier_id"),
+                    "barang_id" => $this->request->getVar("barang_id"),
+                    "pph" => $this->request->getVar("pph"),
                     "is_posted" => false,
-                    "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
-                    "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
-                    "subsidi_langsung" => $this->request->getPost("subsidi_langsung") ? formatter($this->request->getPost("subsidi_langsung"), "STR_TO_INT") : 0,
+                    "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
+                    "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
+                    "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
                     "createdBy" => session()->get("login")->user_id,
-                    "items" =>  json_decode($this->request->getPost("items"))
+                    "items" =>  json_decode($this->request->getVar("items"))
                 ];
 
                 $totalPrice = 0;
@@ -339,22 +360,23 @@ class POLokalBahanBaku extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+                $id = $this->request->getVar("id");
 
                 $insertData = [
-                    "company_id" => $this->request->getPost("company_id"),
-                    "bc_type" => $this->request->getPost("bc_type"),
-                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
-                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "supplier_id" => $this->request->getPost("supplier_id"),
-                    "barang_id" => $this->request->getPost("barang_id"),
-                    "pph" => $this->request->getPost("pph"),
+                    "warehouse_id" => $this->request->getVar("warehouse_id"),
+                    "company_id" => $this->request->getVar("company_id"),
+                    "bc_type" => $this->request->getVar("bc_type"),
+                    "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
+                    "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
+                    "supplier_id" => $this->request->getVar("supplier_id"),
+                    "barang_id" => $this->request->getVar("barang_id"),
+                    "pph" => $this->request->getVar("pph"),
                     "is_posted" => false,
-                    "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
-                    "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
-                    "subsidi_langsung" => $this->request->getPost("subsidi_langsung") ? formatter($this->request->getPost("subsidi_langsung"), "STR_TO_INT") : 0,
+                    "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
+                    "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
+                    "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
                     "createdBy" => session()->get("login")->user_id,
-                    "items" =>  json_decode($this->request->getPost("items"))
+                    "items" =>  json_decode($this->request->getVar("items"))
                 ];
 
                 $totalPrice = 0;
@@ -379,7 +401,7 @@ class POLokalBahanBaku extends BaseController
 
                         $dataDetail = [
                             "id" => $value->id ?? null,
-                            "rm_purchase_order_id" => $this->request->getPost("id"),
+                            "rm_purchase_order_id" => $this->request->getVar("id"),
                             "supplier_harga_id" => $value->supplier_harga_id,
                             "satuan_id" => $value->satuan_id,
                             "bagian" => $value->bagian,
@@ -427,7 +449,7 @@ class POLokalBahanBaku extends BaseController
     public function closePOLokalBahanBaku()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = $this->request->getVar("id");
 
             $payload = [
                 "status_penerimaan" => true
@@ -466,12 +488,19 @@ class POLokalBahanBaku extends BaseController
     public function updateStatusPOLokalBahanBaku()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = $this->request->getVar("id");
 
             // po posting
             $payload = [
                 "is_posted" => "1"
             ];
+
+            $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
+
+            // cek if warehouse_id != null
+            if ($detail['warehouse_id'] != null) {
+                $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type']);
+            }
 
             if (!empty($id)) {
                 $this->RMPurchaseOrderModel->update($id, $payload);
@@ -506,7 +535,7 @@ class POLokalBahanBaku extends BaseController
     public function deletePOLokalBahanBaku()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = $this->request->getVar("id");
 
             if (empty($id)) {
                 $data = [
@@ -547,6 +576,8 @@ class POLokalBahanBaku extends BaseController
             $data = [];
             $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
             $dataPO->itemName = $dataPO->barangName;
+            $dataPO->lpb = null;
+            $dataPO->lpbDetail = null;
 
             if ($dataPO) {
                 $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
@@ -590,6 +621,15 @@ class POLokalBahanBaku extends BaseController
                 }
             }
 
+            $lpb = $this->penerimaanBarangModel->where('status_penerimaan', "LOKAL")->where('tipe_bahan', "BAKU")->like('multiple_po_id', $id)->first();
+
+            if ($lpb != null) {
+                $lpbDetail = $this->penerimaanBarangModel->getById($lpb['id']);
+                $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($lpb['id'], "BAKU", "LOKAL");
+                $dataPO->lpb = $lpbDetail;
+                $dataPO->lpbDetail = $dataPenerimaanBarangDetail;
+            }
+
             // dd($data);
 
             // load HTML content
@@ -612,7 +652,7 @@ class POLokalBahanBaku extends BaseController
 
     public function dropdownPOLokalBahanBaku()
     {
-        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
+        $id = formatter($this->request->getVar("id"), "STR_TO_INT");
 
         $dataPOLokal = $this->RMPurchaseOrderModel->getNoPenerimaanBarang($id, $this->this_company_id);
 
@@ -626,7 +666,7 @@ class POLokalBahanBaku extends BaseController
 
     public function dropdownBarangPOLokalBahanBaku()
     {
-        $id = $this->request->getGet("id");
+        $id = $this->request->getVar("id");
 
         $dataPOLokal = $this->RMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
