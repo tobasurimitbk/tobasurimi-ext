@@ -118,6 +118,7 @@
             url: "<?= base_url("/laporan-accounting/pembelian/all"); ?>",
             dataSrc: "data",
             data: function(data) {
+                console.log(data);
                 data.search = $(".search").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();

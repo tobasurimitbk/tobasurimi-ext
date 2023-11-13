@@ -828,6 +828,29 @@ $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filt
 //$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
 
 //api
+
+//Accounting
+//Module Account
+$routes->get('/account-module', 'Accounting\AccountModule\AccountModule::index', ['filter' => 'Auth']);
+$routes->get('/account-module/all', 'Accounting\AccountModule\AccountModule::allAccountModule', ['filter' => 'Auth']);
+$routes->get('/account-module/id/(:segment)', 'Accounting\AccountModule\AccountModule::getByIdAccountModule/$1', ['filter' => 'Auth']);
+$routes->post('/account-module/save', 'Accounting\AccountModule\AccountModule::saveAccountModule', ['filter' => 'Auth']);
+$routes->post('/account-module/update', 'Accounting\AccountModule\AccountModule::updateAccountModule', ['filter' => 'Auth']);
+$routes->post('/account-module/delete', 'Accounting\AccountModule\AccountModule::deleteAccountModule', ['filter' => 'Auth']);
+//Tipe Barang
+$routes->get('/tipe-barang', 'Accounting\Barang\TipeBarang::index', ['filter' => 'Auth']);
+$routes->get('/tipe-barang/all', 'Accounting\Barang\TipeBarang::allTipeBarang', ['filter' => 'Auth']);
+$routes->get('/tipe-barang/id/(:segment)', 'Accounting\Barang\TipeBarang::getByIdAccountModule/$1', ['filter' => 'Auth']);
+$routes->post('/tipe-barang/save', 'Accounting\Barang\TipeBarang::saveTipeBarang', ['filter' => 'Auth']);
+$routes->post('/tipe-barang/update', 'Accounting\Barang\TipeBarang::updateTipeBarang', ['filter' => 'Auth']);
+$routes->post('/tipe-barang/delete', 'Accounting\Barang\TipeBarang::deleteTipeBarang', ['filter' => 'Auth']);
+
+//Laporan
+//Accounting
+$routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/pembelian/all', 'Laporan\Accounting\Pembelian::allTransaksi', ['filter' => 'Auth']);
 /*
  * --------------------------------------------------------------------
  * Additional Routing

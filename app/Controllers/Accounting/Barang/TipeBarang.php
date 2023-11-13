@@ -41,7 +41,7 @@ class TipeBarang extends BaseController
         return view('Accounting/parentBarang/index', $data);
     }
 
-    public function create()
+    public function saveTipeBarang()
     {
         $parentBarangModel = new ParentBarangModel();
         $subAkunsModel = new Sub_AkunsModel();
@@ -74,7 +74,7 @@ class TipeBarang extends BaseController
         ]);
     }
     
-    public function update()
+    public function updateTipeBarang()
     {
         $parentBarangModel = new ParentBarangModel();
 
@@ -96,7 +96,7 @@ class TipeBarang extends BaseController
         ]);
     }
 
-    public function delete()
+    public function deleteTipeBarang()
     {
         $parentBarangModel = new ParentBarangModel();
         $id = $this->request->getVar('id');
@@ -125,7 +125,7 @@ class TipeBarang extends BaseController
         ]);
     }
 
-    public function all()
+    public function allTipeBarang()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
