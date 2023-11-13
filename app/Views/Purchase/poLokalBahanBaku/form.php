@@ -1,6 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -165,6 +170,39 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
                             <label for="floatingInput">Tambahan Langsung (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label font-weight-bold modal-sub-title" style="font-size: 14px;">Buatkan LPB Otomatis</label>
+                        <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input <?= !empty($dataPOLokal) ? ($dataPOLokal->warehouse_id == null ? "checked" : "") : 'checked' ?> class="form-check-input" type="checkbox" name="lpb_otomatis" id="lpb_otomatis">
+                                <label class="form-check-label" for="lpb_otomatis"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 form-lpb" style="height: 50px;">
+                            <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataWarehouse as $warehouse) : ?>
+                                    <option <?= !empty($dataPOLokal) ? ($dataPOLokal->warehouse_id == $warehouse['id'] ? 'checked' : "") : '' ?> value="<?= $warehouse["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->warehouse_id === $warehouse["id"] ? "selected" : "") : ""; ?>><?= $warehouse["warehouse_name"]; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Warehouse</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 form-lpb" style="height: 50px;">
+                            <select class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataBCType as $aju) : ?>
+                                    <option value="<?= $aju["id"]; ?>" <?= (!empty($dataPOLokal) ? ($aju["id"] === $dataPOLokal->bc_type ? "selected" : "") : ""); ?>><?= $aju["value"]; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -406,6 +444,29 @@
     </div>
 </section>
 
+<?php if (!empty($dataPOLokal)) : ?>
+    <?php if ($dataPOLokal->warehouse_id == null) : ?>
+        <script>
+            $('#lpb_otomatis').attr('checked', false);
+            $('.form-lpb').hide();
+        </script>
+    <?php else : ?>
+        <script>
+            $('#lpb_otomatis').attr('checked', true);
+        </script>
+    <?php endif ?>
+    <?php if ($dataPOLokal->is_posted === "1") : ?>
+        <script>
+            $('#warehouse_id').attr('disabled', true);
+            $('#bc_type').attr('disabled', true);
+            $('#lpb_otomatis').attr('disabled', true);
+        </script>
+    <?php endif; ?>
+
+<?php endif ?>
+
+
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let list_items = [];
@@ -567,11 +628,18 @@
     }
 
     $(document).ready(function() {
+        //
         $(".po_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
+        })
+
+        // WAREHOUSE
+        $('.warehouse_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
         })
 
         // BC Type
@@ -646,6 +714,21 @@
 
         $('.icon-po-date').click(function() {
             $(".po_date").focus();
+        });
+
+        $('#lpb_otomatis').click(function() {
+            var isChecked = $(this).prop('checked');
+            if (isChecked) {
+                $('.form-lpb').show();
+            } else {
+                $('#warehouse_id').val("");
+                $('#bc_type').val("");
+
+                $('#warehouse_id').change();
+                $('#bc_type').change();
+                $('.form-lpb').hide();
+            }
+
         });
 
         var validator = $(".create-form").validate({
@@ -930,12 +1013,26 @@
             } else {
                 // validate input
                 let validate_item = false;
+                let lpb_otomatis = true;
 
                 if (list_items.length === 0) {
                     validate_item = true;
                 }
 
-                if (validate_item) {
+                // validate if lpb otomatis
+                if ($('#lpb_otomatis').prop('checked')) {
+                    if ($('#warehouse_id').val() == "") {
+                        lpb_otomatis = false;
+                    }
+                }
+
+                if (!lpb_otomatis) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Lokasi warehouse wajib diisi",
+                        confirmButtonColor: '#4e73df',
+                    })
+                } else if (validate_item) {
                     Swal.fire({
                         icon: 'error',
                         title: "Barang Tidak Boleh Kosong",

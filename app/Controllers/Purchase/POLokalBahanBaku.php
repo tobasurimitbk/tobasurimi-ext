@@ -13,7 +13,10 @@ use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
 use App\Models\SatuansModel;
 use App\Models\MetadataModel;
+use App\Models\PenerimaanBarangDetailModel;
+use App\Models\PenerimaanBarangModel;
 use App\Models\SupplierHargaModel;
+use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanBaku extends BaseController
@@ -30,7 +33,10 @@ class POLokalBahanBaku extends BaseController
     protected $BagianModel;
     protected $SatuansModel;
     protected $SupplierHargaModel;
+    protected $warehousesModel;
+    protected $penerimaanBarangModel;
     protected $dompdf;
+    protected $penerimaanBarangDetailModel;
 
     public function __construct()
     {
@@ -46,7 +52,10 @@ class POLokalBahanBaku extends BaseController
         $this->CompaniesModel = new CompaniesModel();
         $this->SatuansModel = new SatuansModel();
         $this->SupplierHargaModel = new SupplierHargaModel();
+        $this->warehousesModel = new WarehousesModel();
         $this->dompdf = new Dompdf();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
     }
 
     public function poLokalBahanBaku()
@@ -57,7 +66,7 @@ class POLokalBahanBaku extends BaseController
     public function createPOLokalBahanBaku()
     {
         //Get BC Type By Metadata
-        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
+        $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         //Get Company
         $dataCompany =  $this->CompaniesModel->getCompanies();
@@ -71,6 +80,8 @@ class POLokalBahanBaku extends BaseController
         // Get Satuan
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
 
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
@@ -81,7 +92,9 @@ class POLokalBahanBaku extends BaseController
             "dataSatuan"    => $dataSatuan,
             "dataBagian"    => $dataBagian,
             "dataSupplier"  => $dataSupplier,
-            "dataCompany"   => $dataCompany
+            "dataCompany"   => $dataCompany,
+            "dataWarehouse" => $dataWarehouse,
+
         ];
 
         return view('Purchase/poLokalBahanBaku/form', $data);
@@ -100,6 +113,8 @@ class POLokalBahanBaku extends BaseController
 
         // Get Satuan
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -110,7 +125,10 @@ class POLokalBahanBaku extends BaseController
             "dataSatuan"    => $dataSatuan,
             "dataBagian"    => $dataBagian,
             "dataCompany" => $dataCompany,
-            "dataSupplier" => $dataSupplier
+            "dataSupplier" => $dataSupplier,
+            "dataWarehouse" => $dataWarehouse,
+            "dataBCType"    => $dataBCType,
+
         ];
 
         $spesifikasi = [];
@@ -125,6 +143,8 @@ class POLokalBahanBaku extends BaseController
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
+
+        // dd($data["dataPOLokal"]);
 
         return view('Purchase/poLokalBahanBaku/form', $data);
     }
@@ -230,6 +250,7 @@ class POLokalBahanBaku extends BaseController
 
             if ($this->validate($rules)) {
                 $insertData = [
+                    "warehouse_id" => $this->request->getVar("warehouse_id"),
                     "company_id" => $this->request->getVar("company_id"),
                     "bc_type" => $this->request->getVar("bc_type"),
                     "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
@@ -342,6 +363,7 @@ class POLokalBahanBaku extends BaseController
                 $id = $this->request->getVar("id");
 
                 $insertData = [
+                    "warehouse_id" => $this->request->getVar("warehouse_id"),
                     "company_id" => $this->request->getVar("company_id"),
                     "bc_type" => $this->request->getVar("bc_type"),
                     "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
@@ -473,6 +495,13 @@ class POLokalBahanBaku extends BaseController
                 "is_posted" => "1"
             ];
 
+            $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
+
+            // cek if warehouse_id != null
+            if ($detail['warehouse_id'] != null) {
+                $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type']);
+            }
+
             if (!empty($id)) {
                 $this->RMPurchaseOrderModel->update($id, $payload);
 
@@ -547,6 +576,8 @@ class POLokalBahanBaku extends BaseController
             $data = [];
             $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
             $dataPO->itemName = $dataPO->barangName;
+            $dataPO->lpb = null;
+            $dataPO->lpbDetail = null;
 
             if ($dataPO) {
                 $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
@@ -588,6 +619,15 @@ class POLokalBahanBaku extends BaseController
                     $data["dataPO"] = $dataPO;
                     $data["dataPODetail"] = $dataPODetail;
                 }
+            }
+
+            $lpb = $this->penerimaanBarangModel->like('multiple_po_id', $id)->first();
+
+            if ($lpb != null) {
+                $lpbDetail = $this->penerimaanBarangModel->getById($lpb['id']);
+                $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($lpb['id'], "BAKU", "LOKAL");
+                $dataPO->lpb = $lpbDetail;
+                $dataPO->lpbDetail = $dataPenerimaanBarangDetail;
             }
 
             // dd($data);

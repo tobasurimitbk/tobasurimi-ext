@@ -240,4 +240,70 @@ class PenerimaanBarangModel extends Model
 
         return $receiveDataQry;
     }
+
+    public function generateLpbBB($poID, $warehouseID, $dokumenBC)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $rmPurchaseOrder = new RMPurchaseOrderModel();
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $supplierHargaModel = new SupplierHargaModel();
+        $stockDetailModel = new StockDetailModel();
+
+        $rmDetail =  $rmPurchaseOrder->where('id', $poID)->first();
+        $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
+
+        // no lpb
+        $lastDay = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $no = $penerimaanBarangModel->get_no(date('m'), date('Y'), $lastDay);
+
+        $payloadPenerimaanBarang = [
+            "company_id" => $rmDetail['company_id'],
+            "no_penerimaan_barang" => $no,
+            "supplier_id" => $rmDetail['supplier_id'],
+            "warehouse_id" => $warehouseID,
+            "acceptance_type" => "SINGLE ORDER",
+            "multiple_po_id" => "[" . $rmDetail['id'] . "]",
+            "multiple_po_no" => '["' . $rmDetail['po_no'] . '"]',
+            "tipe_bahan" => "BAKU",
+            "bc_type" => $dokumenBC,
+            "status_post" => "FINISH",
+            "status_penerimaan" => "LOKAL",
+        ];
+
+        $lpbID = $penerimaanBarangModel->insert($payloadPenerimaanBarang);
+
+        foreach ($rmBarangDetail as $r) {
+            $barang = $supplierHargaModel->select('supplier_harga.bahan_baku_id, supplier_harga.spesifikasi, barang_master.barang_name')
+                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+                ->where('supplier_harga.id', $r['supplier_harga_id'])
+                ->first();
+
+            $penerimaanBarangDetailModel->insert([
+                'purchase_order_details_id' => $r['id'],
+                'penerimaan_barang_id' => $lpbID,
+                'harga' => $r['general_price'],
+                'harga_harian' => $r['daily_price'],
+                'harga_bulanan' => $r['monthly_price'],
+                'sub_total' => ($r['general_price'] +  $r['daily_price'] + $r['monthly_price']) * $r['qty'],
+                'keterangan' => $r['note'],
+                'barang_id' => $barang['bahan_baku_id'],
+                'qty' => $r['qty'],
+                'unit' => $r['satuan_id'],
+                'nama_barang_dok' => $barang['barang_name'] . " (" . $barang['spesifikasi'] . ")",
+                'jml_masuk' => $r['qty'],
+                'packaging' => "-",
+                'packaging_qty' => $r['qty']
+            ]);
+
+            $stockDetailModel->addOrReduceStock(
+                $barang['bahan_baku_id'],
+                $warehouseID,
+                'New',
+                $r['qty'],
+                'IN',
+                $barang['spesifikasi']
+            );
+        }
+    }
 }
