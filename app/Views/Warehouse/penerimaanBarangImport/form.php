@@ -821,7 +821,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.aju_document_type')
             .parent('div')
@@ -853,7 +853,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.warehouse_id')
             .parent('div')
@@ -880,7 +880,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.multiple_po_id')
             .parent('div')
@@ -912,7 +912,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.supplier_id')
             .parent('div')
@@ -941,7 +941,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.ppn')
             .parent('div')
@@ -970,7 +970,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.pph')
             .parent('div')

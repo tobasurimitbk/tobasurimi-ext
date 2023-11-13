@@ -10,10 +10,10 @@
                 Batal
             </a>
 
-            <?php if (!empty($data)): ?>
-            <a class="btn btn-warning btn-print float-right" href="<?= base_url("invoice-penjualan-lokal/print/{$data->id}"); ?>" target="_blank">
-                Print
-            </a>
+            <?php if (!empty($data)) : ?>
+                <a class="btn btn-warning btn-print float-right" href="<?= base_url("invoice-penjualan-lokal/print/{$data->id}"); ?>" target="_blank">
+                    Print
+                </a>
             <?php endif; ?>
 
             <button class="btn btn-show-form btn-save float-right btn-submit">
@@ -56,8 +56,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select" name="doc_id" id="doc_id">
                                 <option value=""></option>
-                                <?php foreach ($documentList ?? [] as $document): ?>
-                                <option value="<?= $document->id ?>" <?= $data->document_id == $document->id ? 'selected' : '' ?>><?= $document->doc_no ?></option>
+                                <?php foreach ($documentList ?? [] as $document) : ?>
+                                    <option value="<?= $document->id ?>" <?= $data->document_id == $document->id ? 'selected' : '' ?>><?= $document->doc_no ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nomor Dokumen</label>
@@ -93,8 +93,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via_id === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
-                                <?php foreach ($via as $payload): ?>
-                                <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via_id) ? ($payload->id === $data->ship_via_id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
+                                <?php foreach ($via as $payload) : ?>
+                                    <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via_id) ? ($payload->id === $data->ship_via_id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Ship Via (Opsional)</label>
@@ -186,7 +186,7 @@
                     </div>
                 </div>
 
-            </div>
+        </div>
         </form>
 
     </div>
@@ -206,12 +206,12 @@
     // Display the date on the webpage
     $(document).ready(function() {
 
-        <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) :?>
-            
+        <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) : ?>
+
             $('#taxTotal').html(<?= $data->ppn; ?>.toLocaleString());
             $('#itemSubTotal').html(<?= $data->dpp; ?>.toLocaleString());
             $('#grandTotal').html(<?= $data->total_invoice; ?>.toLocaleString());
-            <?php if (!empty($data->termasuk_pa) && ($data->termasuk_pa == 'true')) :?>
+            <?php if (!empty($data->termasuk_pa) && ($data->termasuk_pa == 'true')) : ?>
                 $('#includeTaxText').html('(Termasuk Pajak)');
             <?php endif; ?>
         <?php endif; ?>
@@ -226,37 +226,38 @@
             searching: false,
             ordering: false,
             columns: [{
-                data: "no",
-                className: "text-center",
-            },
-            {
-                data: "kode_barang",
-                className: "text-center"
-            }, 
-            {
-                data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: "qty",
-                className: "text-center"
-            },
-            {
-                data: "satuan",
-                className: "text-center"
-            },
-            {
-                data: "harga_barang",
-                className: "text-center"
-            },
-            {
-                data: "disc",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            }],
+                    data: "no",
+                    className: "text-center",
+                },
+                {
+                    data: "kode_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "qty",
+                    className: "text-center"
+                },
+                {
+                    data: "satuan",
+                    className: "text-center"
+                },
+                {
+                    data: "harga_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "disc",
+                    className: "text-center"
+                },
+                {
+                    data: "amount",
+                    className: "text-center"
+                }
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -315,7 +316,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.ship_via, #doc_type, #doc_id')
             .parent('div')
@@ -341,7 +342,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_customer')
             .parent('div')
@@ -368,7 +369,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_so')
             .parent('div')
@@ -395,7 +396,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_surat_jalan')
             .parent('div')
@@ -404,7 +405,7 @@
 
         function getDocumentList(docType) {
             table.clear();
-            
+
             $.ajax({
                 url: `<?= base_url('/invoice-penjualan-lokal/getDocNumber/'); ?>${docType}`,
                 method: "GET",
@@ -457,12 +458,12 @@
             });
         }
 
-        <?php if (!empty($documentData)): ?>
-        const itemList = <?= json_encode($documentData->itemList) ?>;
-        table.rows.add(itemList).draw(false);
-        // $('#itemSubTotal').html('<?= $documentData->dpp ?>');
-        // $('#taxTotal').html('<?= $documentData->tax ?>');
-        // $('#grandTotal').html('<?= $documentData->total ?>');
+        <?php if (!empty($documentData)) : ?>
+            const itemList = <?= json_encode($documentData->itemList) ?>;
+            table.rows.add(itemList).draw(false);
+            // $('#itemSubTotal').html('<?= $documentData->dpp ?>');
+            // $('#taxTotal').html('<?= $documentData->tax ?>');
+            // $('#grandTotal').html('<?= $documentData->total ?>');
         <?php endif; ?>
 
         const reCountTotal = () => {
@@ -486,7 +487,7 @@
                     dummyTax += (+obj.tax);
                 }
                 const taxAmt = itemAmt * (dummyTax / 100);
-                
+
                 if (taxStatus && !includeTax) {
                     taxTotal += taxAmt;
                     // taxTotalHtml += taxAmt;
@@ -495,27 +496,27 @@
                 }
                 taxTotalHtml += taxAmt;
             });
-            
+
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#taxTotal').html(taxTotalHtml.toLocaleString());
 
-            let grandTotal = 0; 
-            
+            let grandTotal = 0;
+
             if (taxStatus && includeTax) {
                 $('#includeTaxText').html('(Termasuk Pajak)');
                 grandTotal = itemSubTotal - discTotal;
             } else if (taxStatus && !includeTax) {
                 $('#includeTaxText').html('');
-                grandTotal = itemSubTotal  + taxTotalHtml - discTotal;
-            }else{
+                grandTotal = itemSubTotal + taxTotalHtml - discTotal;
+            } else {
                 $('#includeTaxText').html('');
                 grandTotal = itemSubTotal - discTotal;
             }
-            
+
             $('#grandTotal').html(grandTotal.toLocaleString());
         };
 
-        $('#tax_status').on('input change paste',function() {
+        $('#tax_status').on('input change paste', function() {
 
             if (!this.checked) {
                 $('#include_tax').prop('checked', false);
@@ -523,7 +524,7 @@
 
             reCountTotal();
         });
-        $('#include_tax').on('input change paste',function() {
+        $('#include_tax').on('input change paste', function() {
 
             const taxStatus = $('#tax_status').is(':checked');
 
@@ -835,7 +836,6 @@
             })
         }
     });
-
 </script>
 
 <?= $this->endSection(); ?>

@@ -146,7 +146,7 @@
             </div>
             <div class="modal-body">
                 <form class="laporan-form" id="laporan-form" role="form" method="POST" enctype="multipart/form-data">
-                <?= csrf_field() ?>
+                    <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -663,7 +663,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+        .css('margin-top', '22px')
 
     $('.form-select')
         .parent('div')
@@ -1204,138 +1204,138 @@
                 $(element).removeClass('select-class');
             },
         });
-            switch (val) {
-                case 'laporan-pendapatan-supplier':
-                    validator.settings.rules = {
-                        awal_date: {
-                            required: true
-                        },
-                        akhir_date: {
-                            required: true
-                        }
-                    };
-                    validator.settings.messages = {
-                        awal_date: {
-                            required: "Tanggal Awal wajib diisi"
-                        },
-                        akhir_date: {
-                            required: "Tanggal Akhir wajib diisi"
-                        }
-                    };
-                    break;
-                case 'laporan-rincian-per-barang':
-                    validator.settings.rules = {
-                        awal_date_per_barang: {
-                            required: true
-                        },
-                        akhir_date_per_barang: {
-                            required: true
-                        }
-                    };
-                    validator.settings.messages = {
-                        awal_date_per_barang: {
-                            required: "Tanggal Awal wajib diisi"
-                        },
-                        akhir_date_per_barang: {
-                            required: "Tanggal Akhir wajib diisi"
-                        }
-                    };
-                    break;
-                case 'laporan-rekap-all-supplier':
-                    validator.settings.rules = {
-                        awal_date_all_supplier: {
-                            required: true
-                        },
-                        akhir_date_all_supplier: {
-                            required: true
-                        }
-                    };
-                    validator.settings.messages = {
-                        awal_date_all_supplier: {
-                            required: "Tanggal Awal wajib diisi"
-                        },
-                        akhir_date_all_supplier: {
-                            required: "Tanggal Akhir wajib diisi"
-                        }
-                    };
-                    break;
-                case 'laporan-rekap-per-supplier':
-                    validator.settings.rules = {
-                        awal_date_per_supplier: {
-                            required: true
-                        },
-                        akhir_date_per_supplier: {
-                            required: true
-                        },
-                        supplier_id_per_supplier: {
-                            required: true
-                        }
-                    };
-                    validator.settings.messages = {
-                        awal_date_per_supplier: {
-                            required: "Tanggal Awal wajib diisi"
-                        },
-                        akhir_date_per_supplier: {
-                            required: "Tanggal Akhir wajib diisi"
-                        },
-                        supplier_id_per_supplier: {
-                            required: "Supplier wajib diisi"
-                        }
-                    };
-                    break;
-                case 'laporan-rekap-all-barang':
-                    validator.settings.rules = {
-                        awal_date_rekap_all_barang: {
-                            required: true
-                        },
-                        akhir_date_rekap_all_barang: {
-                            required: true
-                        }
-                    };
-                    validator.settings.messages = {
-                        awal_date_rekap_all_barang: {
-                            required: "Tanggal Awal wajib diisi"
-                        },
-                        akhir_date_rekap_all_barang: {
-                            required: "Tanggal Akhir wajib diisi"
-                        }
-                    };
-                    break;
-                case 'laporan-rekap-per-barang':
-                    validator.settings.rules = {
-                        awal_date_rekap_per_barang: {
-                            required: true
-                        },
-                        akhir_date_rekap_per_barang: {
-                            required: true
-                        },
-                        barang_id_rekap_per_barang: {
-                            required: true
-                        },
-                        warehouse_id_rekap_per_barang: {
-                            required: true
-                        }
-                    };
-                    validator.settings.messages = {
-                        awal_date_rekap_per_barang: {
-                            required: "Tanggal Awal wajib diisi"
-                        },
-                        akhir_date_rekap_per_barang: {
-                            required: "Tanggal Akhir wajib diisi"
-                        },
-                        barang_id_rekap_per_barang: {
-                            required: "Barang wajib diisi"
-                        },
-                        warehouse_id_rekap_per_barang: {
-                            required: "Warehouse wajib diisi"
-                        }
-                    };
-                    
-                    break;
-                case 'laporan-bukti-penerimaaan-barang':
-                    
-                    break;
-            }
+        switch (val) {
+            case 'laporan-pendapatan-supplier':
+                validator.settings.rules = {
+                    awal_date: {
+                        required: true
+                    },
+                    akhir_date: {
+                        required: true
+                    }
+                };
+                validator.settings.messages = {
+                    awal_date: {
+                        required: "Tanggal Awal wajib diisi"
+                    },
+                    akhir_date: {
+                        required: "Tanggal Akhir wajib diisi"
+                    }
+                };
+                break;
+            case 'laporan-rincian-per-barang':
+                validator.settings.rules = {
+                    awal_date_per_barang: {
+                        required: true
+                    },
+                    akhir_date_per_barang: {
+                        required: true
+                    }
+                };
+                validator.settings.messages = {
+                    awal_date_per_barang: {
+                        required: "Tanggal Awal wajib diisi"
+                    },
+                    akhir_date_per_barang: {
+                        required: "Tanggal Akhir wajib diisi"
+                    }
+                };
+                break;
+            case 'laporan-rekap-all-supplier':
+                validator.settings.rules = {
+                    awal_date_all_supplier: {
+                        required: true
+                    },
+                    akhir_date_all_supplier: {
+                        required: true
+                    }
+                };
+                validator.settings.messages = {
+                    awal_date_all_supplier: {
+                        required: "Tanggal Awal wajib diisi"
+                    },
+                    akhir_date_all_supplier: {
+                        required: "Tanggal Akhir wajib diisi"
+                    }
+                };
+                break;
+            case 'laporan-rekap-per-supplier':
+                validator.settings.rules = {
+                    awal_date_per_supplier: {
+                        required: true
+                    },
+                    akhir_date_per_supplier: {
+                        required: true
+                    },
+                    supplier_id_per_supplier: {
+                        required: true
+                    }
+                };
+                validator.settings.messages = {
+                    awal_date_per_supplier: {
+                        required: "Tanggal Awal wajib diisi"
+                    },
+                    akhir_date_per_supplier: {
+                        required: "Tanggal Akhir wajib diisi"
+                    },
+                    supplier_id_per_supplier: {
+                        required: "Supplier wajib diisi"
+                    }
+                };
+                break;
+            case 'laporan-rekap-all-barang':
+                validator.settings.rules = {
+                    awal_date_rekap_all_barang: {
+                        required: true
+                    },
+                    akhir_date_rekap_all_barang: {
+                        required: true
+                    }
+                };
+                validator.settings.messages = {
+                    awal_date_rekap_all_barang: {
+                        required: "Tanggal Awal wajib diisi"
+                    },
+                    akhir_date_rekap_all_barang: {
+                        required: "Tanggal Akhir wajib diisi"
+                    }
+                };
+                break;
+            case 'laporan-rekap-per-barang':
+                validator.settings.rules = {
+                    awal_date_rekap_per_barang: {
+                        required: true
+                    },
+                    akhir_date_rekap_per_barang: {
+                        required: true
+                    },
+                    barang_id_rekap_per_barang: {
+                        required: true
+                    },
+                    warehouse_id_rekap_per_barang: {
+                        required: true
+                    }
+                };
+                validator.settings.messages = {
+                    awal_date_rekap_per_barang: {
+                        required: "Tanggal Awal wajib diisi"
+                    },
+                    akhir_date_rekap_per_barang: {
+                        required: "Tanggal Akhir wajib diisi"
+                    },
+                    barang_id_rekap_per_barang: {
+                        required: "Barang wajib diisi"
+                    },
+                    warehouse_id_rekap_per_barang: {
+                        required: "Warehouse wajib diisi"
+                    }
+                };
+
+                break;
+            case 'laporan-bukti-penerimaaan-barang':
+
+                break;
+        }
         if ($(".laporan-form").valid()) {
             form.target = '_blank';
             form.action = newAction;

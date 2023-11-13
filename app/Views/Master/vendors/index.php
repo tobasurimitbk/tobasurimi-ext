@@ -469,7 +469,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".province_id")
             .parent('div')
@@ -497,7 +497,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".province_parent_id")
             .parent('div')
@@ -525,7 +525,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".city_id")
             .parent('div')
@@ -553,7 +553,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.city_parent_id')
             .parent('div')
@@ -581,7 +581,7 @@
         //     .children('span')
         //     .children('span')
         //     .children('span')
-        //     .css('margin-top', '22px').css('margin-left', '-7px');
+        //     .css('margin-top', '22px')
 
         // $('.ap_id')
         //     .parent('div')
@@ -609,7 +609,7 @@
         //     .children('span')
         //     .children('span')
         //     .children('span')
-        //     .css('margin-top', '22px').css('margin-left', '-7px');
+        //     .css('margin-top', '22px')
 
         // $('.ar_id')
         //     .parent('div')

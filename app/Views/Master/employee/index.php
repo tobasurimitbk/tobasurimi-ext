@@ -486,7 +486,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.province_id')
             .parent('div')
@@ -507,7 +507,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.city_id')
             .parent('div')
@@ -528,7 +528,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.religion_id')
             .parent('div')
@@ -549,7 +549,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.marriage_id')
             .parent('div')
@@ -570,7 +570,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.jabatan_id')
             .parent('div')
@@ -590,7 +590,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.pendidikan')
             .parent('div')
@@ -610,7 +610,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".tunjangan_id")
             .parent('div')

@@ -508,7 +508,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+        .css('margin-top', '22px')
 
     $("select[name='parent_type_id']")
         .parent('div')
@@ -534,7 +534,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+        .css('margin-top', '22px')
 
     $("select[name='satuan_id']")
         .parent('div')
@@ -546,6 +546,7 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
+
     function formatRupiah(angka) {
         angka = angka.replace(/\./g, ',');
         angka = angka.replace(/[^\d,]/g, '');

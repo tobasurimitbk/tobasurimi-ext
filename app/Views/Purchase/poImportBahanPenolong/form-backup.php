@@ -230,7 +230,7 @@
                             $total_harga_barang = 0;
                             $total_qty = 0;
                             $total_harga = 0;
-                            
+
                             if (!empty($dataPOImport)) {
                                 foreach ($dataPOImportDetail as $details) {
                                     $total_harga_barang = $total_harga_barang + ($details["price"] ? formatter($details["price"], "CURR_TO_INT") : 0);
@@ -532,7 +532,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.purchase_request_id')
             .parent('div')
@@ -559,7 +559,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.supplier_id')
             .parent('div')
@@ -586,7 +586,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.currency')
             .parent('div')
@@ -616,7 +616,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.kode_barang')
             .parent('div')
@@ -644,7 +644,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.satuan')
             .parent('div')
@@ -978,8 +978,7 @@
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
 
-                if(barang_id)
-                {
+                if (barang_id) {
                     $.ajax({
                         url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
                         method: "GET",
@@ -1976,7 +1975,7 @@
     const addBarang = function(url) {
         window.open(url, "_blank");
     }
-    
+
     const print = function(url) {
         window.open(url, "_blank");
     }

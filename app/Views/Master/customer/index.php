@@ -127,6 +127,11 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select sales_id" name="sales_id" id="sales_id">
                                     <option value=""></option>
+                                    <?php foreach ($sales as $s) : ?>
+                                        <option value="<?= $s['id'] ?>">
+                                            <?= strtoupper($s['name']) . " (NIP. " . $s['nip'] . ")" ?>
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Sales (Opsional)</label>
                             </div>
@@ -289,13 +294,13 @@
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".sales_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+        // $(".sales_id")
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('margin-top', '22px')
 
         $(".sales_id")
             .parent('div')
@@ -323,7 +328,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".termin")
             .parent('div')
@@ -351,7 +356,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".currency")
             .parent('div')
@@ -379,7 +384,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".tipe_pelanggan")
             .parent('div')
@@ -407,7 +412,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".province_parent_id")
             .parent('div')
@@ -435,7 +440,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.city_parent_id')
             .parent('div')
@@ -533,23 +538,23 @@
 
             $(".delete-form").css('display', 'none');
 
-            $.ajax({
-                url: `<?= base_url("employee-division/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    division: 'SALES'
-                },
-                dataType: "json",
-                success: function(result) {
-                    $(".sales_id").empty()
-                    $(".sales_id").append(`<option value=""></option>`)
-                    result.data.forEach(function(item) {
-                        $(".sales_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
-                    })
+            // $.ajax({
+            //     url: `<?= base_url("employee-division/dropdown"); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         division: 'SALES'
+            //     },
+            //     dataType: "json",
+            //     success: function(result) {
+            //         $(".sales_id").empty()
+            //         $(".sales_id").append(`<option value=""></option>`)
+            //         result.data.forEach(function(item) {
+            //             $(".sales_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+            //         })
 
-                    $(".sales_id").val("").change();
-                }
-            })
+            //         $(".sales_id").val("").change();
+            //     }
+            // })
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -631,7 +636,7 @@
                         $(".phone").val(res?.data?.phone);
 
                         $(".contact_person").val(res?.data?.contact_person);
-                        $(".sales").val(res?.data?.sales);
+                        $(".sales_id").val(res?.data?.sales_id).change();
                         $(".email").val(res?.data?.email);
                         $(".parent_postal_code").val(res?.data?.postal_code);
                         $(".province_parent_id").val(res?.data?.province_id).change();
@@ -643,23 +648,23 @@
                         validator.resetForm();
                         validator.reset();
 
-                        $.ajax({
-                            url: `<?= base_url("employee-division/dropdown"); ?>`,
-                            method: "GET",
-                            data: {
-                                division: 'SALES'
-                            },
-                            dataType: "json",
-                            success: function(result) {
-                                $(".sales_id").empty()
-                                $(".sales_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".sales_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
-                                })
+                        // $.ajax({
+                        //     url: `<?= base_url("employee-division/dropdown"); ?>`,
+                        //     method: "GET",
+                        //     data: {
+                        //         division: 'SALES'
+                        //     },
+                        //     dataType: "json",
+                        //     success: function(result) {
+                        //         $(".sales_id").empty()
+                        //         $(".sales_id").append(`<option value=""></option>`)
+                        //         result.data.forEach(function(item) {
+                        //             $(".sales_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+                        //         })
 
-                                $(".sales_id").val(res?.data?.sales_id).change();
-                            }
-                        })
+                        //         $(".sales_id").val(res?.data?.sales_id).change();
+                        //     }
+                        // })
 
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,

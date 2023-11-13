@@ -11,10 +11,10 @@
                 Batal
             </a>
 
-            <?php if (!empty($data)): ?>
-            <a class="btn btn-warning btn-print float-right" href="<?= base_url("surat-jalan/print/{$data->id}"); ?>" target="_blank">
-                Print
-            </a>
+            <?php if (!empty($data)) : ?>
+                <a class="btn btn-warning btn-print float-right" href="<?= base_url("surat-jalan/print/{$data->id}"); ?>" target="_blank">
+                    Print
+                </a>
             <?php endif; ?>
 
             <button class="btn btn-show-form btn-save float-right btn-submit">
@@ -30,7 +30,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                        <!-- <input type="text" name="" id="" value="<?= !empty($dataSJ) ? $dataSJ : ''; ?>"> -->
+                            <!-- <input type="text" name="" id="" value="<?= !empty($dataSJ) ? $dataSJ : ''; ?>"> -->
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php
@@ -153,7 +153,7 @@
                         </table>
                     </div>
                 </div>
-            </div>
+        </div>
         </form>
     </div>
     </div>
@@ -175,37 +175,38 @@
             searching: false,
             ordering: false,
             columns: [{
-                data: "no",
-                className: "text-center",
-            },
-            {
-                data: "kode_barang",
-                className: "text-center"
-            }, 
-            {
-                data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: "qty",
-                className: "text-center"
-            },
-            {
-                data: "satuan",
-                className: "text-center"
-            },
-            {
-                data: "harga_barang",
-                className: "text-center"
-            },
-            {
-                data: "disc",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            }],
+                    data: "no",
+                    className: "text-center",
+                },
+                {
+                    data: "kode_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "qty",
+                    className: "text-center"
+                },
+                {
+                    data: "satuan",
+                    className: "text-center"
+                },
+                {
+                    data: "harga_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "disc",
+                    className: "text-center"
+                },
+                {
+                    data: "amount",
+                    className: "text-center"
+                }
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -240,7 +241,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_customer')
             .parent('div')
@@ -267,7 +268,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_so')
             .parent('div')
@@ -315,7 +316,7 @@
             }
         });
 
-        $(".id_so").change(function () {
+        $(".id_so").change(function() {
 
             $.ajax({
                 url: `<?= base_url('/order-form-lokal/getItemList'); ?>`,
@@ -332,9 +333,9 @@
             })
         });
 
-        <?php if (!empty($data)): ?>
-        const itemList = <?= json_encode($data->itemList); ?>;
-        table.rows.add(itemList).draw(false);
+        <?php if (!empty($data)) : ?>
+            const itemList = <?= json_encode($data->itemList); ?>;
+            table.rows.add(itemList).draw(false);
         <?php endif; ?>
 
     })

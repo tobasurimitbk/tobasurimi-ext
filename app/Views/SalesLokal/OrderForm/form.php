@@ -94,17 +94,17 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select company" name="company" id="company" >
+                            <select class="form-select company" name="company" id="company">
                                 <option value=""></option>
-                                    <?php
-                                        if (!empty($companies)) {
-                                            foreach ($companies as $c) {
-                                    ?>
-                                        <option value="<?= $c->id; ?>" <?= !empty($data) ? ($data->id_company === $c->id ? "selected" : "") : ""; ?> ><?= $c->company; ?></option>
-                                    <?php
-                                            }
-                                        }
-                                    ?>
+                                <?php
+                                if (!empty($companies)) {
+                                    foreach ($companies as $c) {
+                                ?>
+                                        <option value="<?= $c->id; ?>" <?= !empty($data) ? ($data->id_company === $c->id ? "selected" : "") : ""; ?>><?= $c->company; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
                             </select>
                             <label for="floatingInput">Company</label>
                         </div>
@@ -515,32 +515,32 @@
             const termin = $(this).find(':selected').data('termin');
             const salesName = $(this).find(':selected').data('salesname');
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan');
-    
+
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
             $('#termin').val(decodeURIComponent(termin));
             $('#sales_name').val(decodeURIComponent(salesName));
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
         });
-        
+
         $("#hidden_tipe_pelanggan").on('input change keyup paste', function() {
             // if ($(".hidden_tipe_pelanggan").val()) {
 
-                
-                let tipePelanggan = $("#hidden_tipe_pelanggan").val();
-                console.log(tipePelanggan);
-                // console.log(idCustomer);
-                $.ajax({
-                    url: "<?= base_url('/order-form-lokal/getmetaData'); ?>" + "/" + tipePelanggan,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
 
-                        // console.log(res.dataWarehouse)
-                        res.dataMetaData.forEach(function(item) {
-                            $(".tipe_pelanggan").val(item.value);
-                        })
-                    }
-                })
+            let tipePelanggan = $("#hidden_tipe_pelanggan").val();
+            console.log(tipePelanggan);
+            // console.log(idCustomer);
+            $.ajax({
+                url: "<?= base_url('/order-form-lokal/getmetaData'); ?>" + "/" + tipePelanggan,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+
+                    // console.log(res.dataWarehouse)
+                    res.dataMetaData.forEach(function(item) {
+                        $(".tipe_pelanggan").val(item.value);
+                    })
+                }
+            })
             // }
         });
 
@@ -558,7 +558,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_customer')
             .parent('div')
@@ -588,7 +588,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.warehouse')
             .parent('div')
@@ -617,7 +617,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_barang')
             .parent('div')
@@ -729,7 +729,7 @@
                 let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
                 let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
                 // let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : "";
-                
+
                 // let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
@@ -738,7 +738,7 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".warehouse").empty();                                                                                                                 
+                        $(".warehouse").empty();
                         //bug di penjualan lokal
                         // $(".warehouse").append(`<option value=""></option>`);
 
@@ -751,26 +751,26 @@
                 })
 
                 $(".nama_barang").val(nama);
-                $(".warehouse").on('change',function() {
+                $(".warehouse").on('change', function() {
                     let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
                     let warehouseId = $(this).val();
-                    $(".stok").val("");                                                                                                                 
-                        $.ajax({
-                            url: "<?= base_url('/order-form-lokal/stok'); ?>" + "/" + idBarang + "/" + warehouseId,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(res) {
-                                //bug di penjualan lokal
-                                // $(".warehouse").append(`<option value=""></option>`);
+                    $(".stok").val("");
+                    $.ajax({
+                        url: "<?= base_url('/order-form-lokal/stok'); ?>" + "/" + idBarang + "/" + warehouseId,
+                        method: "GET",
+                        dataType: "json",
+                        success: function(res) {
+                            //bug di penjualan lokal
+                            // $(".warehouse").append(`<option value=""></option>`);
 
-                                // console.log(res.dataWarehouse)
-                                if (res.dataDetailStock.length > 0) {
-                                    // You can set the value of .stok based on the selected warehouse here
-                                    let selectedWarehouse = res.dataDetailStock; // Assuming you want the first item in the response
-                                    $(".stok").val(res.dataDetailStock);
-                                }
+                            // console.log(res.dataWarehouse)
+                            if (res.dataDetailStock.length > 0) {
+                                // You can set the value of .stok based on the selected warehouse here
+                                let selectedWarehouse = res.dataDetailStock; // Assuming you want the first item in the response
+                                $(".stok").val(res.dataDetailStock);
                             }
-                        })
+                        }
+                    })
                 });
                 $(".satuan").val(satuan);
             } else {
@@ -810,7 +810,7 @@
 
             validator_detail.resetForm();
             validator_detail.reset();
-            
+
             console.log(nama_barang);
             console.log(tipe_pelanggan);
 
@@ -1126,8 +1126,7 @@
 
             } else {
                 // update detail
-                if (row_detail) {
-                } else {
+                if (row_detail) {} else {
                     if ($(".detail-form").valid()) {
                         Swal.fire({
                             icon: 'question',
@@ -1316,30 +1315,30 @@
 
     // Company
     $('.company').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-        })
+        placeholder: "",
+        theme: "bootstrap-5",
+    })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.company')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    //CSS SELECT2 FLOATING LABEL
+    $('.company')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-        $('.company')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.company')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px')
 
-        $('.company')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    $('.company')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
     // change data model jika sudah ada datanya di pilih
 </script>

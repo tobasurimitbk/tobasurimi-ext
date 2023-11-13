@@ -27,12 +27,12 @@
                     </button>
                 <?php } ?>
 
-                <?php if ($dataPOLokal->is_posted === "1") { 
+                <?php if ($dataPOLokal->is_posted === "1") {
                     if ($dataPOLokal->status_penerimaan === "0") { ?>
-                    <button class="btn btn-hapus close-parent float-right">
-                        Close PO
-                    </button>
-                <?php } 
+                        <button class="btn btn-hapus close-parent float-right">
+                            Close PO
+                        </button>
+                <?php }
                 } ?>
 
             <?php } ?>
@@ -230,7 +230,7 @@
                             $total_harga = 0;
                             $total_qty_diterima = 0;
                             $total_remaining_qty = 0;
-                            
+
                             if (!empty($dataPOLokal)) {
                                 foreach ($dataPOLokal->am_purchase_order_details as $details) {
                                     $total_harga_barang = $total_harga_barang + ($details->price ? formatter(str_replace(",", "", $details->price), "STR_TO_FLOAT") : 0);
@@ -549,7 +549,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.form-select')
             .parent('div')
@@ -693,7 +693,10 @@
                                 tag_html += item.satuanName;
                                 tag_html += "</td>";
                                 tag_html += `<td>Rp `;
-                                tag_html += Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += Number(item.price).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += Number(item.qty);
@@ -705,7 +708,10 @@
                                 // tag_html += 0;
                                 // tag_html += "</td>";
                                 tag_html += `<td>Rp `;
-                                tag_html += Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += Number(item.totalPrice).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += 0;
@@ -739,11 +745,17 @@
                                     nama_barang: item.barangName,
                                     nama_satuan: item.satuanName,
                                     satuan: item.unit,
-                                    harga: Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    harga: Number(item.price).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
                                     disc: "",
                                     additional_cost: "",
                                     qty: Number(item.qty),
-                                    total: Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    total: Number(item.totalPrice).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
                                     ppn: "",
                                     nilai_ppn: "",
                                     pph: "",
@@ -1032,7 +1044,10 @@
                             tag_html += disc ? disc : 0;
                             tag_html += "</td>";
                             tag_html += `<td>`;
-                            tag_html += additional_cost ? ("Rp " + Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : "Rp 0.00";
+                            tag_html += additional_cost ? ("Rp " + Number(additional_cost).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })) : "Rp 0.00";
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.keterangan;
@@ -1053,7 +1068,10 @@
 
                             new_list_items.push({
                                 ...item,
-                                additional_cost: Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                additional_cost: Number(additional_cost).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }),
                                 disc: disc,
                                 ppn: ppn,
                                 pph: pph,
@@ -1417,7 +1435,7 @@
                 $(".harga").val(harga.replaceAll(",", ""))
                 $(".qty").val(qty)
                 $(".total").val(total.replaceAll(",", ""))
-                
+
                 $(".ppn").val(ppn)
                 $(".pph").val(pph)
                 $(".additional_cost").val(additional_cost.replaceAll(",", ""))

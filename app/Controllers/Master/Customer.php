@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 use App\Models\ProvincesModel;
 use App\Models\CustomerModel;
 use App\Models\BanksModel;
+use App\Models\EmployeesModel;
 use App\Models\ListAddressesModel;
 use App\Models\SalesOrderModel;
 use App\Models\SalesOrderInvoiceModel;
@@ -20,6 +21,7 @@ class Customer extends BaseController
     protected $BanksModel;
     protected $ListAddressesModel;
     protected $SalesOrderModel;
+    protected $employessModel;
     private $soInvModel;
 
     public function __construct()
@@ -32,6 +34,7 @@ class Customer extends BaseController
         $this->ListAddressesModel = new ListAddressesModel();
         $this->SalesOrderModel = new SalesOrderModel();
         $this->soInvModel = new SalesOrderInvoiceModel();
+        $this->employessModel = new EmployeesModel();
     }
 
     public function customer()
@@ -39,13 +42,13 @@ class Customer extends BaseController
         //Get Provinces
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
+        $dataSales = $this->employessModel->getEmployeeSales();
 
         $data = [
             "dataProvinces" => $dataProvinces,
             "dataBanks" => $dataBanks,
+            "sales" => $dataSales
         ];
-
-
 
         return view('Master/customer/index', $data);
     }

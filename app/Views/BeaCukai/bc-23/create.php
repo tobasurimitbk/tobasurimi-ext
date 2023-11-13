@@ -14,10 +14,10 @@
                 Batal
             </a>
             <button class="btn btn-show-form btn-save float-right btn-submit-barang">
-                Simpan 
+                Simpan
             </button>
         </div>
-    </div>    
+    </div>
     <div class="card">
         <div class="card-body">
             <form class="create-form form-barang" role="form" method="POST" enctype="multipart/form-data">
@@ -44,7 +44,7 @@
                                 <option data-namakategori="" data-codekategori="" data-codedokumen="" value="">
                                     - Kategori -
                                 </option>
-                                <?php foreach ($kategoriBarang as $k) : 
+                                <?php foreach ($kategoriBarang as $k) :
                                     $split_kode = json_decode($k['description']);
                                     $kode_kategori_barang = $split_kode[1];
                                     $kode_dokumen = $split_kode[0];
@@ -104,24 +104,24 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-23"); ?>">
                 Batal
             </a>
-            <?php if(!empty($dataBC)){ 
-                if($dataBC->status_posting === "Belum Posting"){ 
-            ?> 
-            <button class="btn btn-hapus delete-parent float-right">
-                Hapus
-            </button>
-            <button class="btn btn-success posting-spp float-right">
-                Posting
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan 
-            </button>
-            <?php }
-            } else { ?> 
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan 
-            </button>
-            <?php } ?> 
+            <?php if (!empty($dataBC)) {
+                if ($dataBC->status_posting === "Belum Posting") {
+            ?>
+                    <button class="btn btn-hapus delete-parent float-right">
+                        Hapus
+                    </button>
+                    <button class="btn btn-success posting-spp float-right">
+                        Posting
+                    </button>
+                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                        Simpan
+                    </button>
+                <?php }
+            } else { ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                    Simpan
+                </button>
+            <?php } ?>
         </div>
     </div>
     <div class="card">
@@ -150,7 +150,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisDokumenBC" name="jenisDokumenBC" id="jenisDokumenBC" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select jenisDokumenBC" name="jenisDokumenBC" id="jenisDokumenBC" aria-label="Floating label select example">
                                 <option value="">
                                     - Jenis Dokumen -
                                 </option>
@@ -166,7 +166,7 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select noDokumenBC" name="noDokumenBC" id="noDokumenBC" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select noDokumenBC" name="noDokumenBC" id="noDokumenBC" aria-label="Floating label select example">
                                 <option data-type="" value="">
                                     - No Dokumen -
                                 </option>
@@ -209,7 +209,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select kppbcBongkar" name="kppbcBongkar" id="kppbcBongkar" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select kppbcBongkar" name="kppbcBongkar" id="kppbcBongkar" aria-label="Floating label select example">
                                 <option value="">
                                     - Kantor KPPBC Bongkar -
                                 </option>
@@ -224,7 +224,7 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select kppbcPengawas" name="kppbcPengawas" id="kppbcPengawas" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select kppbcPengawas" name="kppbcPengawas" id="kppbcPengawas" aria-label="Floating label select example">
                                 <option value="">
                                     - Kantor KPPBC Pengawas -
                                 </option>
@@ -239,7 +239,7 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select kodeTujuanTpb" name="kodeTujuanTpb" id="kodeTujuanTpb" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select kodeTujuanTpb" name="kodeTujuanTpb" id="kodeTujuanTpb" aria-label="Floating label select example">
                                 <option value="">
                                     - PILIH TUJUAN -
                                 </option>
@@ -259,7 +259,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select namaSupplier" name="namaSupplier" id="namaSupplier" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select namaSupplier" name="namaSupplier" id="namaSupplier" aria-label="Floating label select example">
                                 <option value="">
                                     - Pilih Nama Supplier -
                                 </option>
@@ -274,13 +274,13 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->country_name . ' (' . $dataBC->country_code . ')' : '' ?>" autocomplete="one-time-code" readonly name="negara" type="text" placeholder="Negara Supplier" class="form-control negara target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->country_name . ' (' . $dataBC->country_code . ')' : '' ?>" autocomplete="one-time-code" readonly name="negara" type="text" placeholder="Negara Supplier" class="form-control negara target input-picker">
                             <label for="floatingInput">Negara</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3">
-                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> name="alamat" class="form-control alamat text-area-all" readonly><?= (!empty($dataBC)) ? $dataBC->supplier_address : '' ?></textarea>
+                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> name="alamat" class="form-control alamat text-area-all" readonly><?= (!empty($dataBC)) ? $dataBC->supplier_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
@@ -291,7 +291,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisIdentitasImportir" id="jenisIdentitasImportir" name="jenisIdentitasImportir" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select jenisIdentitasImportir" id="jenisIdentitasImportir" name="jenisIdentitasImportir" aria-label="Floating label select example">
                                 <option value="">
                                     - Pilih Jenis Identitas -
                                 </option>
@@ -306,25 +306,25 @@
                     </div>
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_identitas : '' ?>" autocomplete="one-time-code" name="identitasImportir" type="text" placeholder="Identitas" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_identitas : '' ?>" autocomplete="one-time-code" name="identitasImportir" type="text" placeholder="Identitas" class="form-control target input-picker">
                             <label for="floatingInput">Identitas</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Importir" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Importir" class="form-control target input-picker">
                             <label for="floatingInput">Nama Importir</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->tpb_no : '' ?>" autocomplete="one-time-code" name="noIzinTPBImportir" type="text" placeholder="No Izin TPB" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->tpb_no : '' ?>" autocomplete="one-time-code" name="noIzinTPBImportir" type="text" placeholder="No Izin TPB" class="form-control target input-picker">
                             <label for="floatingInput">No Izin TPB</label>
                         </div>
                     </div>
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisAPIImportir" id="jenisAPIImportir" name="jenisAPIImportir" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select jenisAPIImportir" id="jenisAPIImportir" name="jenisAPIImportir" aria-label="Floating label select example">
                                 <option value="">
                                     - Pilih Jenis API -
                                 </option>
@@ -339,13 +339,13 @@
                     </div>
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="APIImportir" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="APIImportir" class="form-control target input-picker">
                             <label for="floatingInput">API</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> name="alamatImportir" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->importir_address : '' ?></textarea>
+                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> name="alamatImportir" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->importir_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
@@ -358,10 +358,10 @@
                 </label>
                 <div class="form-control border-0 custom-toggle-switch">
                     <div class="form-check form-switch form-switch-lg">
-                        <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'checked' : '') : '' ?> class="form-check-input" type="checkbox" name="switchPemilikBarang" id="switchPemilikBarang">
+                        <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'checked' : '') : '' ?> class="form-check-input" type="checkbox" name="switchPemilikBarang" id="switchPemilikBarang">
                         <label class="form-check-label" for="switchPemilikBarang"></label>
                     </div>
-                </div>           
+                </div>
                 <div class="row mt-2">
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -424,31 +424,31 @@
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_npwp : '' ?>" autocomplete="one-time-code" name="PpjkNpwp" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_npwp : '' ?>" autocomplete="one-time-code" name="PpjkNpwp" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
                             <label for="floatingInput">NPWP (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_name : '' ?>" autocomplete="one-time-code" name="PpjkNama" type="text" placeholder="Nama (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_name : '' ?>" autocomplete="one-time-code" name="PpjkNama" type="text" placeholder="Nama (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Nama (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->ppjk_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->ppjk_date)) : "") : '' ?>" autocomplete="one-time-code" name="PpjkTanggal" type="text" placeholder="Tanggal PPJK (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->ppjk_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->ppjk_date)) : "") : '' ?>" autocomplete="one-time-code" name="PpjkTanggal" type="text" placeholder="Tanggal PPJK (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal PPJK (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_no : '' ?>" autocomplete="one-time-code" name="PpjkNo" type="text" placeholder="No PPJK (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_no : '' ?>" autocomplete="one-time-code" name="PpjkNo" type="text" placeholder="No PPJK (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No PPJK (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3">
-                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> name="PpjkAlamat" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->ppjk_address : '' ?></textarea>
+                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> name="PpjkAlamat" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->ppjk_address : '' ?></textarea>
                             <label for="floatingInput">Alamat (Opsional)</label>
                         </div>
                     </div>
@@ -459,7 +459,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select caraPengangkutan" name="caraPengangkutan" id="caraPengangkutan" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select caraPengangkutan" name="caraPengangkutan" id="caraPengangkutan" aria-label="Floating label select example">
                                 <option value="">
                                     - Cara Pengangkutan -
                                 </option>
@@ -474,7 +474,7 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pengangkutan_sarana : '' ?>" autocomplete="one-time-code" name="namaSaranaPengangkut" type="text" placeholder="Nama Sarana Pengangkut" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pengangkutan_sarana : '' ?>" autocomplete="one-time-code" name="namaSaranaPengangkut" type="text" placeholder="Nama Sarana Pengangkut" class="form-control target input-picker">
                             <label for="floatingInput">Nama Sarana Pengangkut</label>
                         </div>
                     </div>
@@ -482,13 +482,13 @@
                         <div class="row">
                             <div class="col-sm">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->voy_no : '' ?>" autocomplete="one-time-code" name="noVoyFlight" type="text" placeholder="No Voy/Flight" class="form-control target input-picker">
+                                    <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->voy_no : '' ?>" autocomplete="one-time-code" name="noVoyFlight" type="text" placeholder="No Voy/Flight" class="form-control target input-picker">
                                     <label for="floatingInput">No Voy / Flight</label>
                                 </div>
                             </div>
                             <div class="col-sm">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select pengangkutanNegara" id="pengangkutanNegara" name="pengangkutanNegara" aria-label="Floating label select example">
+                                    <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select pengangkutanNegara" id="pengangkutanNegara" name="pengangkutanNegara" aria-label="Floating label select example">
                                         <option value="">
                                             - Pilih Negara -
                                         </option>
@@ -505,19 +505,19 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Pelabuhan Muat" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Pelabuhan Muat" class="form-control target input-picker">
                             <label for="floatingInput">Pelabuhan Muat</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Pelabuhan Transit" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Pelabuhan Transit" class="form-control target input-picker">
                             <label for="floatingInput">Pelabuhan Transit</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Pelabuhan Bongkar" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Pelabuhan Bongkar" class="form-control target input-picker">
                             <label for="floatingInput">Pelabuhan Bongkar</label>
                         </div>
                     </div>
@@ -528,7 +528,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select noInvoice" id="noInvoice" name="noInvoice" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select noInvoice" id="noInvoice" name="noInvoice" aria-label="Floating label select example">
                                 <option value="" data-date="">
                                     - Pilih Nomor Invoice -
                                 </option>
@@ -543,67 +543,67 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
                             <label for="floatingInput">Tanggal Invoice</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_no : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="Nomor Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_no : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="Nomor Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Nomor Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_code : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_code : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Kode Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->lc_no : '' ?>" autocomplete="one-time-code" name="noLc" type="text" placeholder="No LC (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->lc_no : '' ?>" autocomplete="one-time-code" name="noLc" type="text" placeholder="No LC (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No LC (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->lc_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->lc_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->lc_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->lc_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal LC (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bl_no : '' ?>" autocomplete="one-time-code" name="noBl" type="text" placeholder="No B/L (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bl_no : '' ?>" autocomplete="one-time-code" name="noBl" type="text" placeholder="No B/L (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No B/L (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bl_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bl_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bl_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bl_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B/L (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_no : '' ?>" autocomplete="one-time-code" name="noBc" type="text" placeholder="No B.C 1.1" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_no : '' ?>" autocomplete="one-time-code" name="noBc" type="text" placeholder="No B.C 1.1" class="form-control target input-picker">
                             <label for="floatingInput">No B.C 1.1</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bc_11_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bc_11_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bc_11_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bc_11_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B.C 1.1</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_zip : '' ?>" autocomplete="one-time-code" name="kodePos" type="text" placeholder="Kode Pos" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_zip : '' ?>" autocomplete="one-time-code" name="kodePos" type="text" placeholder="Kode Pos" class="form-control target input-picker">
                             <label for="floatingInput">Kode Pos</label>
                         </div>
                     </div>
@@ -635,33 +635,33 @@
                             </tr>
                         </thead>
                         <tbody class="body-dokumen-table" id="body-dokumen-table" style="cursor: pointer;">
-                            <?php if(!empty($dataBCDokumenDetail)){ 
-                                $row_dokumen = 0; 
-                                foreach($dataBCDokumenDetail as $item){    
+                            <?php if (!empty($dataBCDokumenDetail)) {
+                                $row_dokumen = 0;
+                                foreach ($dataBCDokumenDetail as $item) {
                                     $row_dokumen = $row_dokumen + 1;
-                                    if($dataBC->status_posting === "Belum Posting"){
-                                ?>
+                                    if ($dataBC->status_posting === "Belum Posting") {
+                            ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $row_dokumen; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item["description"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item["value"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item["no_dokumen"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <button onclick='deleteRowDokumen(<?= $row_dokumen; ?>)'>X</button>
-                                        </td>
+                                            <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>" data-row="<?= $row_dokumen; ?>">
+                                                <?= $row_dokumen; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>" data-row="<?= $row_dokumen; ?>">
+                                                <?= $item["description"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>" data-row="<?= $row_dokumen; ?>">
+                                                <?= $item["value"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>" data-row="<?= $row_dokumen; ?>">
+                                                <?= $item["no_dokumen"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>" data-row="<?= $row_dokumen; ?>">
+                                                <?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <button onclick='deleteRowDokumen(<?= $row_dokumen; ?>)'>X</button>
+                                            </td>
                                         </tr>
-                                <?php } else {?>
+                                    <?php } else { ?>
                                         <tr>
                                             <td style="text-align: center;"><?= $row_dokumen; ?></td>
                                             <td style="text-align: center;"><?= $item["description"]; ?></td>
@@ -670,8 +670,8 @@
                                             <td style="text-align: center;"><?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?></td>
                                             <td></td>
                                         </tr>
-                                <?php }
-                                } 
+                            <?php }
+                                }
                             } ?>
                         </tbody>
                     </table>
@@ -684,7 +684,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-12">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penimbunan : '' ?>" autocomplete="one-time-code" name="tempatPenimbunan" type="text" placeholder="Tempat Penimbunan" class="tempatPenimbunan form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penimbunan : '' ?>" autocomplete="one-time-code" name="tempatPenimbunan" type="text" placeholder="Tempat Penimbunan" class="tempatPenimbunan form-control target input-picker">
                             <label for="floatingInput">Tempat Penimbunan</label>
                         </div>
                     </div>
@@ -695,13 +695,13 @@
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select valuta" id="valuta" name="valuta" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> class="form-select valuta" id="valuta" name="valuta" aria-label="Floating label select example">
                                 <option value="">
                                     - Pilih Valuta -
                                 </option>
                                 <?php foreach ($valuta as $v) : ?>
                                     <option <?= (!empty($dataBC)) ? ($dataBC->valuta === $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>">
-                                        - <?= $v['value'] ?> - <?= $v['description'] ?> - 
+                                        - <?= $v['value'] ?> - <?= $v['description'] ?> -
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -710,37 +710,37 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->ndpbm, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="npdpbm" type="number" placeholder="NDPBM" class="npdpbm form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->ndpbm, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="npdpbm" type="number" placeholder="NDPBM" class="npdpbm form-control target input-picker">
                             <label for="floatingInput">NDPBM</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->fob, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="fob" type="number" placeholder="FOB" class="fob form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->fob, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="fob" type="number" placeholder="FOB" class="fob form-control target input-picker">
                             <label for="floatingInput">FOB</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->freight, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="freight" type="number" placeholder="Freight" class="freight form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->freight, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="freight" type="number" placeholder="Freight" class="freight form-control target input-picker">
                             <label for="floatingInput">Freight</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->asuransi_type, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="tipeAsuransi" type="number" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->asuransi_type, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="tipeAsuransi" type="number" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
                             <label for="floatingInput">Asuransi Luar Negeri / Dalam Negeri</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_value, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCif" type="number" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_value, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCif" type="number" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
                             <label for="floatingInput">Nilai CIF</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_price, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCifRupiah" type="number" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_price, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCifRupiah" type="number" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
                             <label for="floatingInput">Nilai CIF Rupiah</label>
                         </div>
                     </div>
@@ -772,33 +772,33 @@
                             </tr>
                         </thead>
                         <tbody class="body-kontainer-table" id="body-kontainer-table" style="cursor: pointer;">
-                            <?php if(!empty($dataBCKontainerDetail)){ 
-                                $row_kontainer = 0; 
-                                foreach($dataBCKontainerDetail as $item){    
+                            <?php if (!empty($dataBCKontainerDetail)) {
+                                $row_kontainer = 0;
+                                foreach ($dataBCKontainerDetail as $item) {
                                     $row_kontainer = $row_kontainer + 1;
-                                    if($dataBC->status_posting === "Belum Posting"){
-                                ?>
+                                    if ($dataBC->status_posting === "Belum Posting") {
+                            ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $row_kontainer; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item["jenis_description"] . "-" . $item["jenis_value"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item["ukuran_description"] . "-" . $item["ukuran_value"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item["tipe_description"] . "-" . $item["tipe_value"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item["keterangan"]; ?>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <button onclick='deleteRowKontainer(<?= $row_kontainer; ?>)'>X</button>
-                                        </td>
+                                            <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>" data-row="<?= $row_kontainer; ?>">
+                                                <?= $row_kontainer; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>" data-row="<?= $row_kontainer; ?>">
+                                                <?= $item["jenis_description"] . "-" . $item["jenis_value"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>" data-row="<?= $row_kontainer; ?>">
+                                                <?= $item["ukuran_description"] . "-" . $item["ukuran_value"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>" data-row="<?= $row_kontainer; ?>">
+                                                <?= $item["tipe_description"] . "-" . $item["tipe_value"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>" data-row="<?= $row_kontainer; ?>">
+                                                <?= $item["keterangan"]; ?>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <button onclick='deleteRowKontainer(<?= $row_kontainer; ?>)'>X</button>
+                                            </td>
                                         </tr>
-                                <?php } else {?>
+                                    <?php } else { ?>
                                         <tr>
                                             <td style="text-align: center;"><?= $row_kontainer; ?></td>
                                             <td style="text-align: center;"><?= $item["jenis_description"] . "-" . $item["jenis_value"]; ?></td>
@@ -807,8 +807,8 @@
                                             <td style="text-align: center;"><?= $item["keterangan"]; ?></td>
                                             <td></td>
                                         </tr>
-                                <?php }
-                                } 
+                            <?php }
+                                }
                             } ?>
                         </tbody>
                     </table>
@@ -840,33 +840,33 @@
                             </tr>
                         </thead>
                         <tbody class="body-kemasan-table" id="body-kemasan-table" style="cursor: pointer;">
-                            <?php if(!empty($dataBCKemasanDetail)){ 
-                                $row_kemasan = 0; 
-                                foreach($dataBCKemasanDetail as $item){    
+                            <?php if (!empty($dataBCKemasanDetail)) {
+                                $row_kemasan = 0;
+                                foreach ($dataBCKemasanDetail as $item) {
                                     $row_kemasan = $row_kemasan + 1;
-                                    if($dataBC->status_posting === "Belum Posting"){
-                                ?>
+                                    if ($dataBC->status_posting === "Belum Posting") {
+                            ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $row_kemasan; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $item["description"] . "-" . $item["value"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $item["uraian"]; ?>
-                                        </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $item["merk"]; ?>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <button onclick='deleteRowKemasan(<?= $row_kemasan; ?>)'>X</button>
-                                        </td>
+                                            <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                                <?= $row_kemasan; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                                <?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                                <?= $item["description"] . "-" . $item["value"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                                <?= $item["uraian"]; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                                <?= $item["merk"]; ?>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <button onclick='deleteRowKemasan(<?= $row_kemasan; ?>)'>X</button>
+                                            </td>
                                         </tr>
-                                <?php } else {?>
+                                    <?php } else { ?>
                                         <tr>
                                             <td style="text-align: center;"><?= $row_kemasan; ?></td>
                                             <td style="text-align: center;"><?= $item["jumlah"]; ?></td>
@@ -875,8 +875,8 @@
                                             <td style="text-align: center;"><?= $item["merk"]; ?></td>
                                             <td></td>
                                         </tr>
-                                <?php }
-                                } 
+                            <?php }
+                                }
                             } ?>
                         </tbody>
                     </table>
@@ -889,13 +889,13 @@
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->bruto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="bruto" type="number" placeholder="Bruto (Kg)" class="bruto form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->bruto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="bruto" type="number" placeholder="Bruto (Kg)" class="bruto form-control target input-picker">
                             <label for="floatingInput">Bruto (Kg)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->netto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="netto" type="number" placeholder="Netto (Kg)" class="netto form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->netto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="netto" type="number" placeholder="Netto (Kg)" class="netto form-control target input-picker">
                             <label for="floatingInput">Netto (Kg)</label>
                         </div>
                     </div>
@@ -921,45 +921,45 @@
                             </tr>
                         </thead>
                         <tbody class="body-barang-table" id="body-barang-table" style="cursor: pointer;">
-                        <?php if(!empty($dataBCBarangDetail)){ 
-                            $row_barang = 0; 
-                            foreach($dataBCBarangDetail as $item){    
-                                $row_barang = $row_barang + 1;
-                                $kode_kategori = json_decode($item['code']);
-                                if($dataBC->status_posting === "Belum Posting"){
+                            <?php if (!empty($dataBCBarangDetail)) {
+                                $row_barang = 0;
+                                foreach ($dataBCBarangDetail as $item) {
+                                    $row_barang = $row_barang + 1;
+                                    $kode_kategori = json_decode($item['code']);
+                                    if ($dataBC->status_posting === "Belum Posting") {
                             ?>
-                                    <tr>
-                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
-                                        <?= $row_barang; ?>
-                                    </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
-                                        <?= $item['kode_barang']; ?>
-                                    </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
-                                        <?= $item['nama_barang']; ?>
-                                    </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
-                                        <?= $item['kode_hs']; ?>
-                                    </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
-                                        <?= $kode_kategori[1] . " - " . $item['nama_kategori_barang']; ?>
-                                    </td>
-                                    <td style="text-align: center;">
-                                        <button onclick="deleteRowBarang(<?= $row_barang; ?>)">X</button>
-                                    </td>
-                                    </tr>
-                            <?php } else {?>
-                                    <tr>
-                                        <td style="text-align: center;"><?= $row_barang; ?></td>
-                                        <td style="text-align: center;"><?= $item['kode_barang']; ?></td>
-                                        <td style="text-align: center;"><?= $item['nama_barang']; ?></td>
-                                        <td style="text-align: center;"><?= $item['kode_hs']; ?></td>
-                                        <td style="text-align: center;"><?= $kode_kategori[0] . " - " . $item['nama_kategori']; ?></td>
-                                        <td></td>
-                                    </tr>
+                                        <tr>
+                                            <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                                <?= $row_barang; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                                <?= $item['kode_barang']; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                                <?= $item['nama_barang']; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                                <?= $item['kode_hs']; ?>
+                                            </td>
+                                            <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                                <?= $kode_kategori[1] . " - " . $item['nama_kategori_barang']; ?>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <button onclick="deleteRowBarang(<?= $row_barang; ?>)">X</button>
+                                            </td>
+                                        </tr>
+                                    <?php } else { ?>
+                                        <tr>
+                                            <td style="text-align: center;"><?= $row_barang; ?></td>
+                                            <td style="text-align: center;"><?= $item['kode_barang']; ?></td>
+                                            <td style="text-align: center;"><?= $item['nama_barang']; ?></td>
+                                            <td style="text-align: center;"><?= $item['kode_hs']; ?></td>
+                                            <td style="text-align: center;"><?= $kode_kategori[0] . " - " . $item['nama_kategori']; ?></td>
+                                            <td></td>
+                                        </tr>
                             <?php }
-                            } 
-                        } ?>
+                                }
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -977,7 +977,7 @@
                             </tr>
                         </thead>
                         <tbody class="body-pungutan-table" id="body-pungutan-table" style="cursor: pointer;">
-                        
+
                         </tbody>
                         <tfoot class="foot-pungutan-table" id="foot-pungutan-table">
                             <tr>
@@ -994,7 +994,7 @@
             <label class="form-label font-weight-bold lable-title mt-2">
                 Pengesahan
             </label>
-            <br/>
+            <br />
             <label class="form-label mt-2">
                 Dengan ini saya menyatakan bertanggung jawab atas kebenaran hal-hal yang diberitahukan dalam pemberitahuan pabean ini.
             </label>
@@ -1002,25 +1002,25 @@
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->tempat : '' ?>" autocomplete="one-time-code" name="tempat" type="text" placeholder="Tempat" class="tempat form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->tempat : '' ?>" autocomplete="one-time-code" name="tempat" type="text" placeholder="Tempat" class="tempat form-control target input-picker">
                             <label for="floatingInput">Tempat</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal)) : "") : '' ?>" autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="tanggal form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal)) : "") : '' ?>" autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="tanggal form-control target input-picker">
                             <label for="floatingInput">Tanggal</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemberitahu : '' ?>" autocomplete="one-time-code" name="pemberitahu" type="text" placeholder="Pemberitahu" class="pemberitahu form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemberitahu : '' ?>" autocomplete="one-time-code" name="pemberitahu" type="text" placeholder="Pemberitahu" class="pemberitahu form-control target input-picker">
                             <label for="floatingInput">Pemberitahu</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->jabatan : '' ?>" autocomplete="one-time-code" name="jabatan" type="text" placeholder="Jabatan" class="jabatan form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->jabatan : '' ?>" autocomplete="one-time-code" name="jabatan" type="text" placeholder="Jabatan" class="jabatan form-control target input-picker">
                             <label for="floatingInput">Jabatan</label>
                         </div>
                     </div>
@@ -1244,9 +1244,9 @@
     let row_kemasan = 0;
     let row_barang = 0;
 
-    <?php if(!empty($dataBCDokumenDetail)){
-        foreach($dataBCDokumenDetail as $item){
-    ?> 
+    <?php if (!empty($dataBCDokumenDetail)) {
+        foreach ($dataBCDokumenDetail as $item) {
+    ?>
             row_dokumen = row_dokumen + 1;
             list_dokumen.push({
                 "row": row_dokumen,
@@ -1257,12 +1257,12 @@
                 "tanggal": '<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : "" ?>',
                 "keterangan": '<?= $item["note"] ?>',
             });
-    <?php } 
+    <?php }
     } ?>
 
-    <?php if(!empty($dataBCKontainerDetail)){
-        foreach($dataBCKontainerDetail as $item){
-    ?> 
+    <?php if (!empty($dataBCKontainerDetail)) {
+        foreach ($dataBCKontainerDetail as $item) {
+    ?>
             row_kontainer = row_kontainer + 1;
             list_kontainer.push({
                 "row": row_kontainer,
@@ -1278,12 +1278,12 @@
                 "tipe_number": '<?= $item["tipe_description"] ?>',
                 "keterangan": '<?= $item["keterangan"] ?>',
             });
-    <?php } 
+    <?php }
     } ?>
 
-    <?php if(!empty($dataBCKemasanDetail)){
-        foreach($dataBCKemasanDetail as $item){
-    ?> 
+    <?php if (!empty($dataBCKemasanDetail)) {
+        foreach ($dataBCKemasanDetail as $item) {
+    ?>
             row_kemasan = row_kemasan + 1;
             list_kemasan.push({
                 "row": row_kemasan,
@@ -1295,12 +1295,12 @@
                 "uraian": '<?= $item["uraian"] ?>',
                 "merk": '<?= $item["merk"] ?>'
             });
-    <?php } 
+    <?php }
     } ?>
 
-    <?php if(!empty($dataBCBarangDetail)){
-        foreach($dataBCBarangDetail as $item){
-        $separate_kode = json_decode($item['code']);
+    <?php if (!empty($dataBCBarangDetail)) {
+        foreach ($dataBCBarangDetail as $item) {
+            $separate_kode = json_decode($item['code']);
     ?>
             row_barang = row_barang + 1;
             list_barang.push({
@@ -1317,7 +1317,7 @@
                 "merk": '<?= $item['merk'] ?>',
                 "tipe": '<?= $item['tipe'] ?>',
             });
-    <?php } 
+    <?php }
     } ?>
 
     var validator = $(".form-add-bc").validate({
@@ -1509,8 +1509,8 @@
         },
     });
 
-    <?php if(!empty($dataBC)){
-        if($dataBC->pemilik_barang === 0){
+    <?php if (!empty($dataBC)) {
+        if ($dataBC->pemilik_barang === 0) {
     ?>
             $('.jenisIdentitasPemilikBarang').rules('add', {
                 required: true
@@ -1530,7 +1530,8 @@
             $('.APIPemilikBarang').rules('add', {
                 required: true
             });
-    <?php }} else { ?>
+        <?php }
+    } else { ?>
         $('.jenisIdentitasPemilikBarang').rules('add', {
             required: true
         });
@@ -2064,7 +2065,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+        .css('margin-top', '22px')
 
     $('.form-select')
         .parent('div')
@@ -2134,8 +2135,7 @@
         })
         list_barang = [];
 
-        if($(".jenisDokumenBC option:selected").val())
-        {
+        if ($(".jenisDokumenBC option:selected").val()) {
             $.ajax({
                 url: `<?= base_url("po-bea-cukai/dropdown"); ?>`,
                 method: "GET",
@@ -2170,11 +2170,9 @@
             list_delete_barang.push(item);
         })
         list_barang = [];
-        
-        if($(".noDokumenBC option:selected").val())
-        {
-            if($(".dokumenType").val() === "BAHAN BAKU LOKAL")
-            {
+
+        if ($(".noDokumenBC option:selected").val()) {
+            if ($(".dokumenType").val() === "BAHAN BAKU LOKAL") {
                 $.ajax({
                     url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
                     method: "GET",
@@ -2186,8 +2184,7 @@
                         let tag_html = "";
                         res.data.forEach(function(item) {
                             // barang yang sudah diterima yang muncul
-                            if(item.remaining_qty != "0")
-                            {
+                            if (item.remaining_qty != "0") {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
                                 tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
@@ -2231,8 +2228,7 @@
                     }
                 })
             }
-            if($(".dokumenType").val() === "BAHAN BAKU IMPORT")
-            {
+            if ($(".dokumenType").val() === "BAHAN BAKU IMPORT") {
                 $.ajax({
                     url: `<?= base_url("po-import-bahan-baku/multi/dropdown"); ?>`,
                     method: "GET",
@@ -2244,8 +2240,7 @@
                         let tag_html = "";
                         res.data.forEach(function(item) {
                             // barang yang sudah diterima yang muncul
-                            if(item.remaining_qty != "0")
-                            {
+                            if (item.remaining_qty != "0") {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
                                 tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
@@ -2289,8 +2284,7 @@
                     }
                 })
             }
-            if($(".dokumenType").val() === "BAHAN PENOLONG LOKAL") 
-            {
+            if ($(".dokumenType").val() === "BAHAN PENOLONG LOKAL") {
                 $.ajax({
                     url: `<?= base_url("po-lokal-bahan-penolong/multi/dropdown"); ?>`,
                     method: "GET",
@@ -2302,8 +2296,7 @@
                         let tag_html = "";
                         res.data.forEach(function(item) {
                             // barang yang sudah diterima yang muncul
-                            if(item.remaining_qty != "0")
-                            {
+                            if (item.remaining_qty != "0") {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
                                 tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
@@ -2347,8 +2340,7 @@
                     }
                 })
             }
-            if($(".dokumenType").val() === "BAHAN PENOLONG IMPORT")
-            {
+            if ($(".dokumenType").val() === "BAHAN PENOLONG IMPORT") {
                 $.ajax({
                     url: `<?= base_url("po-import-bahan-penolong/multi/dropdown"); ?>`,
                     method: "GET",
@@ -2360,8 +2352,7 @@
                         let tag_html = "";
                         res.data.forEach(function(item) {
                             // barang yang sudah diterima yang muncul
-                            if(item.remaining_qty != "0")
-                            {
+                            if (item.remaining_qty != "0") {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
                                 tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
@@ -2560,7 +2551,7 @@
         let kodedokumen = $(".itemKategoriBarang option:selected").attr("data-codedokumen");
         let merk = $(".itemMerk").val()
         let tipe = $(".itemTipe").val()
-        
+
         if ($(".form-barang").valid()) {
             Swal.fire({
                 icon: 'question',
@@ -2582,8 +2573,7 @@
 
                     list_barang.map(item => {
                         row_barang = row_barang + 1;
-                        if(Number($(".itemIdBarang").val()) === item.row)
-                        {
+                        if (Number($(".itemIdBarang").val()) === item.row) {
                             new_item.push({
                                 "row": row_barang,
                                 "id": item.id,
@@ -2596,7 +2586,7 @@
                                 "kode_kategori": kodekategori,
                                 "nama_kategori": namakategori,
                                 "merk": merk,
-                                "tipe": tipe 
+                                "tipe": tipe
                             });
 
                             tag_html += "<tr>";
@@ -2619,9 +2609,7 @@
                             tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                             tag_html += `</td>`;
                             tag_html += "</tr>";
-                        }
-                        else
-                        {
+                        } else {
                             tag_html += "<tr>";
                             tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += row_barang;
@@ -2658,43 +2646,33 @@
     })
 
     $('.btn-submit-parent').click(function() {
-        if(list_dokumen.length === 0)
-        {
+        if (list_dokumen.length === 0) {
             Swal.fire({
                 icon: 'error',
                 title: "List Dokumen Tidak Boleh Kosong",
                 confirmButtonColor: '#4e73df',
             })
-        }
-        else
-        {
-            if(list_barang.length === 0)
-            {
+        } else {
+            if (list_barang.length === 0) {
                 Swal.fire({
                     icon: 'error',
                     title: "Barang Tidak Boleh Kosong",
                     confirmButtonColor: '#4e73df',
                 })
-            }
-            else
-            {
+            } else {
                 let status_barang = false;
                 list_barang.map((item) => {
-                    if(item.kategori === "")
-                    {
+                    if (item.kategori === "") {
                         status_barang = true;
                     }
                 })
-                if(status_barang)
-                {
+                if (status_barang) {
                     Swal.fire({
                         icon: 'error',
                         title: "Harap lengkapi data barang",
                         confirmButtonColor: '#4e73df',
                     })
-                }
-                else
-                {
+                } else {
                     if ($(".form-add-bc").valid() && $(".form-add-second").valid()) {
                         if ($(".form-add-third").valid() && $(".form-add-four").valid()) {
                             Swal.fire({
@@ -2884,8 +2862,7 @@
                                     data.append("data_barang", JSON.stringify(update_list_items));
 
                                     // update
-                                    if($(".id").val())
-                                    {
+                                    if ($(".id").val()) {
                                         $.ajax({
                                             url: "<?= base_url("bea-cukai-bc-23/update"); ?>",
                                             data: data,
@@ -2929,8 +2906,7 @@
                                         });
                                     }
                                     // create
-                                    else
-                                    {
+                                    else {
                                         $.ajax({
                                             url: "<?= base_url("bea-cukai-bc-23/save"); ?>",
                                             data: data,
@@ -3005,8 +2981,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // update detail
-                    if(row_detail)
-                    {
+                    if (row_detail) {
                         let new_list_items = [];
                         let tag_html = "";
                         row_dokumen = 0;
@@ -3044,9 +3019,7 @@
                                     "tanggal": tanggal,
                                     "keterangan": keterangan
                                 })
-                            }
-                            else
-                            {
+                            } else {
                                 tag_html += `<tr>`;
                                 tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += row_dokumen;
@@ -3079,8 +3052,7 @@
                         $(".dokumenModal").modal("hide");
                     }
                     // create detail
-                    else
-                    {
+                    else {
                         row_dokumen = row_dokumen + 1;
 
                         list_dokumen.push({
@@ -3094,7 +3066,7 @@
                         })
 
                         let tag_html = "";
-                        
+
                         tag_html += `<tr>`;
                         tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += row_dokumen;
@@ -3151,8 +3123,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // update detail
-                    if(row_detail)
-                    {
+                    if (row_detail) {
                         let new_list_items = [];
                         let tag_html = "";
                         row_kontainer = 0;
@@ -3196,9 +3167,7 @@
                                     "nama_tipe": namatipe,
                                     "tipe_number": tipenumber
                                 })
-                            }
-                            else
-                            {
+                            } else {
                                 tag_html += `<tr>`;
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
                                 tag_html += row_kontainer;
@@ -3231,8 +3200,7 @@
                         $(".kontainerModal").modal("hide");
                     }
                     // create detail
-                    else
-                    {
+                    else {
                         row_kontainer = row_kontainer + 1;
 
                         list_kontainer.push({
@@ -3252,7 +3220,7 @@
                         })
 
                         let tag_html = "";
-                        
+
                         tag_html += `<tr>`;
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
                         tag_html += row_kontainer;
@@ -3305,8 +3273,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // update detail
-                    if(row_detail)
-                    {
+                    if (row_detail) {
                         let new_list_items = [];
                         let tag_html = "";
                         row_kemasan = 0;
@@ -3345,9 +3312,7 @@
                                     "jenis_kemasan": jeniskemasan,
                                     "kemasan_number": kemasannumber
                                 })
-                            }
-                            else
-                            {
+                            } else {
                                 tag_html += `<tr>`;
                                 tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                                 tag_html += row_kemasan;
@@ -3380,8 +3345,7 @@
                         $(".kemasanModal").modal("hide");
                     }
                     // create detail
-                    else
-                    {
+                    else {
                         row_kemasan = row_kemasan + 1;
 
                         list_kemasan.push({
@@ -3396,7 +3360,7 @@
                         })
 
                         let tag_html = "";
-                        
+
                         tag_html += `<tr>`;
                         tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                         tag_html += row_kemasan;
@@ -3427,34 +3391,27 @@
     })
 
     $(".kodeDokumen").change(function() {
-        if($(".kodeDokumen option:selected").val())
-        {
+        if ($(".kodeDokumen option:selected").val()) {
             let jenis = $(".kodeDokumen option:selected").attr("data-name");
             $(".jenisDokumen").val(jenis);
-        }
-        else
-        {
+        } else {
             $(".jenisDokumen").val('');
         }
     })
 
     // get invoice date by selected no invoice
     $(".noInvoice").change(function() {
-        if($(".noInvoice option:selected").val())
-        {
-            let date =  $(".noInvoice option:selected").attr("data-date");
+        if ($(".noInvoice option:selected").val()) {
+            let date = $(".noInvoice option:selected").attr("data-date");
             $(".tanggalInvoice").val(date);
-        }
-        else
-        {
+        } else {
             $(".tanggalInvoice").val('');
         }
     })
 
     // get country and address supplier
     $(".namaSupplier").change(function() {
-        if($(".namaSupplier option:selected").val())
-        {
+        if ($(".namaSupplier option:selected").val()) {
             $.ajax({
                 url: `<?= base_url("supplier/ajax"); ?>`,
                 method: "GET",
@@ -3466,17 +3423,13 @@
                     if (res.status) {
                         $(".negara").val(res?.data?.country_name + " (" + res?.data?.country_code + ")");
                         $(".alamat").val(res?.data?.address);
-                    }
-                    else
-                    {
+                    } else {
                         $(".negara").val('');
                         $(".alamat").val('');
                     }
                 }
             })
-        }
-        else
-        {
+        } else {
             $(".negara").val('');
             $(".alamat").val('');
         }
@@ -3527,15 +3480,14 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({...item,
+                        new_list_items.push({
+                            ...item,
                             row: row_dokumen
                         });
-                    }
-                    else
-                    {
-                        if(item.id)
-                        {
-                            list_delete_dokumen.push({...item,
+                    } else {
+                        if (item.id) {
+                            list_delete_dokumen.push({
+                                ...item,
                                 isDeleted: true
                             });
                         }
@@ -3594,15 +3546,14 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({...item,
+                        new_list_items.push({
+                            ...item,
                             row: row_kontainer
                         });
-                    }
-                    else
-                    {
-                        if(item.id)
-                        {
-                            list_delete_kontainer.push({...item,
+                    } else {
+                        if (item.id) {
+                            list_delete_kontainer.push({
+                                ...item,
                                 isDeleted: true
                             });
                         }
@@ -3661,15 +3612,14 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({...item,
+                        new_list_items.push({
+                            ...item,
                             row: row_kemasan
                         })
-                    }
-                    else
-                    {
-                        if(item.id)
-                        {
-                            list_delete_kemasan.push({...item,
+                    } else {
+                        if (item.id) {
+                            list_delete_kemasan.push({
+                                ...item,
                                 isDeleted: true
                             });
                         }
@@ -3732,12 +3682,10 @@
                             ...item,
                             "row": row_barang
                         })
-                    }
-                    else
-                    {
-                        if(item.id)
-                        {
-                            list_delete_barang.push({...item,
+                    } else {
+                        if (item.id) {
+                            list_delete_barang.push({
+                                ...item,
                                 isDeleted: true
                             });
                         }
@@ -3801,12 +3749,10 @@
                             ...item,
                             "row": row_dokumen
                         })
-                    }
-                    else
-                    {
-                        if(item.id)
-                        {
-                            list_delete_dokumen.push({...item,
+                    } else {
+                        if (item.id) {
+                            list_delete_dokumen.push({
+                                ...item,
                                 isDeleted: true
                             });
                         }
@@ -3866,15 +3812,14 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({...item,
+                        new_list_items.push({
+                            ...item,
                             row: row_kontainer
                         });
-                    }
-                    else
-                    {
-                        if(item.id)
-                        {
-                            list_delete_kontainer.push({...item,
+                    } else {
+                        if (item.id) {
+                            list_delete_kontainer.push({
+                                ...item,
                                 isDeleted: true
                             });
                         }
@@ -3921,7 +3866,7 @@
                         tag_html += item.jumlah;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
-                        tag_html += item.kemasan_number + "-" +item.jenis_kemasan;
+                        tag_html += item.kemasan_number + "-" + item.jenis_kemasan;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += item.uraian;
@@ -3934,15 +3879,14 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push.push({...item,
+                        new_list_items.push.push({
+                            ...item,
                             row: row_kemasan
                         });
-                    }
-                    else
-                    {
-                        if(item.id)
-                        {
-                            list_delete_kemasan.push({...item,
+                    } else {
+                        if (item.id) {
+                            list_delete_kemasan.push({
+                                ...item,
                                 isDeleted: true
                             });
                         }

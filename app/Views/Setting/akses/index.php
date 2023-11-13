@@ -3,22 +3,22 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Manajemen Hak Akses</h1>
-    <button class="btn btn-show-form btn-save float-right" id="submit-btn" onclick="submitForm()" disabled>
-        Simpan
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <form class="create-form form-manajemen-hak-akses" role="form" method="POST" enctype="multipart/form-data">
-            <?= csrf_field() ?>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-floating mb-0 f-m-3" style="height: 50px;">
-                        <select class="form-control company_id" name="company_id" id="company_id" onchange="setChanges()">
-                            <option value=""></option>
-                            <?php
+    <div class="section-header">
+        <h1>Manajemen Hak Akses</h1>
+        <button class="btn btn-show-form btn-save float-right" id="submit-btn" onclick="submitForm()" disabled>
+            Simpan
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="create-form form-manajemen-hak-akses" role="form" method="POST" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-floating mb-0 f-m-3" style="height: 50px;">
+                            <select class="form-control company_id" name="company_id" id="company_id" onchange="setChanges()">
+                                <option value=""></option>
+                                <?php
                                 if (!empty($dataCompany)) {
                                     foreach ($dataCompany as $company) {
                                 ?>
@@ -26,56 +26,56 @@
                                 <?php
                                     }
                                 }
-                            ?>
-                        </select>
-                        <label for="floatingInput">Company</label>
+                                ?>
+                            </select>
+                            <label for="floatingInput">Company</label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-0" style="height: 50px;">
-                        <select class="form-control role_id" name="role_id" id="role_id" onchange="setChanges()">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataRole)) {
-                                foreach ($dataRole as $role) {
-                            ?>
-                                <option value="<?= $role["id"]; ?>"><?= $role["name"]; ?></option>
-                            <?php
+                    <div class="col-md-3">
+                        <div class="form-floating mb-0" style="height: 50px;">
+                            <select class="form-control role_id" name="role_id" id="role_id" onchange="setChanges()">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataRole)) {
+                                    foreach ($dataRole as $role) {
+                                ?>
+                                        <option value="<?= $role["id"]; ?>"><?= $role["name"]; ?></option>
+                                <?php
+                                    }
                                 }
-                            }
-                            ?>
-                        </select>
-                        <label for="floatingInput">Role</label>
+                                ?>
+                            </select>
+                            <label for="floatingInput">Role</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="table-responsive view_access mt-3" id="view_access" name="view_access" style="display: none">
-                <table style="overflow-x: scroll;" class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th style="width: 200px;">Menu</th>
-                            <th class="text-center" width="60">Create</th>
-                            <th class="text-center" width="60">Read</th>
-                            <th class="text-center" width="60">Update</th>
-                            <th class="text-center" width="60">Delete</th>
-                            <th class="text-center" width="60">Print</th>
-                            <th class="text-center" width="60">Approval</th>
-                            <th class="text-center" width="60">All</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-akses" id="body-akses">
+                <div class="table-responsive view_access mt-3" id="view_access" name="view_access" style="display: none">
+                    <table style="overflow-x: scroll;" class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="width: 200px;">Menu</th>
+                                <th class="text-center" width="60">Create</th>
+                                <th class="text-center" width="60">Read</th>
+                                <th class="text-center" width="60">Update</th>
+                                <th class="text-center" width="60">Delete</th>
+                                <th class="text-center" width="60">Print</th>
+                                <th class="text-center" width="60">Approval</th>
+                                <th class="text-center" width="60">All</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-akses" id="body-akses">
 
-                    </tbody>
-                </table>
-            </div>
-        </form>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 </section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    
+
     $(document).ready(function() {
         $('.company_id').select2({
             placeholder: "",
@@ -85,24 +85,24 @@
         })
 
         $('.company_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $('.company_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px')
 
         $('.company_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $('.role_id').select2({
             placeholder: "",
@@ -112,24 +112,24 @@
         })
 
         $(".role_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".role_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px')
 
         $(".role_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
     })
 
     const setChanges = function() {
@@ -143,7 +143,7 @@
                 url: "<?= base_url("akses/id"); ?>",
                 method: "GET",
                 data: {
-                    role_id: $(".role_id").val(), 
+                    role_id: $(".role_id").val(),
                     company_id: $(".company_id").val()
                 },
                 dataType: "json",
@@ -227,17 +227,14 @@
         console.log(id)
         let checked = document.getElementById(id).checked;
 
-        if(checked === true)
-        {
+        if (checked === true) {
             document.getElementById("create_" + id).checked = true;
             document.getElementById("read_" + id).checked = true;
             document.getElementById("update_" + id).checked = true;
             document.getElementById("delete_" + id).checked = true;
             document.getElementById("print_" + id).checked = true;
             document.getElementById("approve_" + id).checked = true;
-        }
-        else
-        {
+        } else {
             document.getElementById("create_" + id).checked = false;
             document.getElementById("read_" + id).checked = false;
             document.getElementById("update_" + id).checked = false;
@@ -276,8 +273,7 @@
                     contentType: false,
                     success: function(response) {
                         csrf.val(response.token);
-                        if(response.refresh)
-                        {
+                        if (response.refresh) {
                             Swal.fire({
                                 icon: 'success',
                                 title: response.message,
@@ -285,9 +281,7 @@
                             }).then(() => {
                                 window.location.href = `<?= base_url("akses"); ?>`;
                             })
-                        }
-                        else
-                        {
+                        } else {
                             if (response.status) {
                                 document.getElementById('submit-btn').setAttribute("disabled", "disabled");
                                 $(".body-akses").empty();
@@ -296,7 +290,7 @@
                                 $(".company_id").val('').trigger('change');
 
                                 stopLoading()
-                                
+
                                 Swal.fire({
                                     icon: 'success',
                                     title: response.message,

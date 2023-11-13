@@ -33,8 +33,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->customer_id === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
-                                <?php foreach ($dataCustomers ?? [] as $customer): ?>
-                                <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                <?php foreach ($dataCustomers ?? [] as $customer) : ?>
+                                    <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Customer</label>
@@ -59,8 +59,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_inv" name="id_inv" id="id_inv" <?= !empty($data) ? ($data->sales_order_inv_id === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
-                                <?php if (!empty($invData)): ?>
-                                <option value="<?= $invData->id ?>" selected><?= $invData->no_faktur ?></option>
+                                <?php if (!empty($invData)) : ?>
+                                    <option value="<?= $invData->id ?>" selected><?= $invData->no_faktur ?></option>
                                 <?php endif; ?>
                             </select>
                             <label for="floatingInput">SO</label>
@@ -103,35 +103,35 @@
                 </div>
 
                 <!-- list barang -->
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-12">
-                        <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No.</th>
-                                <th>Kode Barang</th>
-                                <th>Nama Barang</th>
-                                <th>Qty</th>
-                                <th>Satuan</th>
-                                <th>Harga Satuan</th>
-                                <th>Discount (%)</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                        </tbody>
-                    </table>
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Kode Barang</th>
+                                    <th>Nama Barang</th>
+                                    <th>Qty</th>
+                                    <th>Satuan</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Discount (%)</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            </div>
+        </div>
         </form>
     </div>
     </div>
@@ -153,40 +153,41 @@
             searching: false,
             ordering: false,
             columns: [{
-                data: "no",
-                className: "text-center",
-            },
-            {
-                data: "kode_barang",
-                className: "text-center"
-            }, 
-            {
-                data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: `<?= empty($data) ? "qty" : "returnQty" ?>`,
-                className: "text-center",
-                render: function(data, type, row) {
-                    return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${data}">`
+                    data: "no",
+                    className: "text-center",
+                },
+                {
+                    data: "kode_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_barang",
+                    className: "text-center"
+                },
+                {
+                    data: `<?= empty($data) ? "qty" : "returnQty" ?>`,
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${data}">`
+                    }
+                },
+                {
+                    data: "satuan",
+                    className: "text-center"
+                },
+                {
+                    data: "harga_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "disc",
+                    className: "text-center"
+                },
+                {
+                    data: "amount",
+                    className: "text-center"
                 }
-            },
-            {
-                data: "satuan",
-                className: "text-center"
-            },
-            {
-                data: "harga_barang",
-                className: "text-center"
-            },
-            {
-                data: "disc",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            }],
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -221,7 +222,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_customer')
             .parent('div')
@@ -248,7 +249,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.id_inv')
             .parent('div')
@@ -279,7 +280,7 @@
                         $(".id_inv").prepend(`<option value=""></option>`);
 
                         $('#customerAddress').val(res.address);
-                        
+
                         res.invList.forEach(function(item) {
                             $(".id_inv").append(`<option  value="${item.id}">${item.no_faktur}</option>`);
                         });
@@ -295,7 +296,7 @@
             }
         });
 
-        $(".id_inv").change(function () {
+        $(".id_inv").change(function() {
             const id = $(this).val();
 
             $.ajax({
@@ -330,13 +331,13 @@
 
                         const id = $(".id").val();
                         let data = new FormData(document.querySelector(".create-form"));
-                        const dataTab = table.rows().every( function ( rowIdx ) {
-                            const inputVal = $( this.node() ).first().find('input').val();
+                        const dataTab = table.rows().every(function(rowIdx) {
+                            const inputVal = $(this.node()).first().find('input').val();
                             const rowData = table.row(rowIdx).data();
                             rowData.returnQty = inputVal;
 
                             table.row(rowIdx).data(rowData);
-                        } );
+                        });
                         const newTableData = table.rows().data().toArray();
                         data.append('returnedItems', JSON.stringify(newTableData));
 
@@ -433,9 +434,9 @@
             }
         });
 
-        <?php if (!empty($data)): ?>
-        const itemList = <?= json_encode($data->itemList); ?>;
-        table.rows.add(itemList).draw(false);
+        <?php if (!empty($data)) : ?>
+            const itemList = <?= json_encode($data->itemList); ?>;
+            table.rows.add(itemList).draw(false);
         <?php endif; ?>
 
     })

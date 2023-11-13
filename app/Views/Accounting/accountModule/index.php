@@ -299,7 +299,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".province_id")
             .parent('div')
@@ -327,7 +327,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".akun_ap_id")
             .parent('div')
@@ -355,7 +355,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $(".city_id")
             .parent('div')
@@ -383,7 +383,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px')
 
         $('.akun_ar_id')
             .parent('div')
@@ -762,7 +762,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+        .css('margin-top', '22px')
 
     $(".module")
         .parent('div')
