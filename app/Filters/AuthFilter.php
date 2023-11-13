@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Models\MetadataModel;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Filters\FilterInterface;
@@ -15,6 +16,11 @@ class AuthFilter implements FilterInterface
             return redirect()->to("/")->with('error', "Invalid Credential");
         }
 
+        $metaDataModel = new MetadataModel();
+
+        // EXCEPT ENDPOINT
+        $except = json_decode($metaDataModel->where('name', 'Route Hak Akses Except')->first()['value']);
+
         // VALIDASI HAK AKSES SESSION
         $uri = service('uri');
         $hakAkses = session()->get('login')->this_access;
@@ -25,6 +31,10 @@ class AuthFilter implements FilterInterface
         $uri = service('uri');
         $hakAkses = session()->get('login')->this_access;
         $segment1 = $uri->getSegment(1);
+
+        if (\in_array($segment1, $except)) {
+            $allowedAccess = true;
+        } else
 
         if ($segment1 == "dashboard") {
             $allowedAccess = true;
