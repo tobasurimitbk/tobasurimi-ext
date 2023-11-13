@@ -621,7 +621,7 @@ class POLokalBahanBaku extends BaseController
                 }
             }
 
-            $lpb = $this->penerimaanBarangModel->like('multiple_po_id', $id)->first();
+            $lpb = $this->penerimaanBarangModel->where('status_penerimaan', "LOKAL")->where('tipe_bahan', "BAKU")->like('multiple_po_id', $id)->first();
 
             if ($lpb != null) {
                 $lpbDetail = $this->penerimaanBarangModel->getById($lpb['id']);

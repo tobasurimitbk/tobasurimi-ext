@@ -503,7 +503,7 @@
             </div>
         </div>
 
-        <div class="pagebreak">
+        <div class=" <?= $dataPO->lpb == null ? '' : 'pagebreak' ?>">
             <table class="w-100">
                 <tr>
                     <td class="txt-underline txt-bold">KWITANSI TAMBAHAN</td>

@@ -296,6 +296,12 @@ class PenerimaanBarangModel extends Model
                 'packaging_qty' => $r['qty']
             ]);
 
+            // UPDATE QTY DITERIMA
+            $rmPurchaseOrderDetailModel->update($r['id'], [
+                'qty_diterima' => $r['qty'],
+                'remaining_qty' => 0
+            ]);
+
             $stockDetailModel->addOrReduceStock(
                 $barang['bahan_baku_id'],
                 $warehouseID,
