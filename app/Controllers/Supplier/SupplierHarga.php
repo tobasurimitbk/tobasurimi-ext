@@ -69,65 +69,11 @@ class SupplierHarga extends BaseController
     public function saveSupplierHarga()
     {
         try {
-            $list_item = json_decode($this->request->getPost("list_item"));
-            $list_delete = json_decode($this->request->getPost("list_delete"));
-
-            // $data = [
-            //     "status"    => false,
-            //     "message"   => json_encode($list_item),
-            //     "payload"   => json_encode($list_item),
-            //     'token'     => csrf_hash()
-            // ];
-            // echo json_encode($data);
-            // return;
-
-            // for create and update
-            foreach($list_item as $item)
-            {
-                $insertData = [
-                    "supplier_id"      => $this->request->getPost("supplier_id"),
-                    "bahan_baku_id"    => $item->bahan_baku_id,
-                    "bagian_id"        => $item->bagian_id,
-                    "spesifikasi"      => $item->spesifikasi,
-                    "harga_umum"       => formatter($item->harga_umum, "CURR_TO_FLOAT"),
-                    "harga_harian"     => formatter($item->harga_harian, "CURR_TO_FLOAT"),
-                    "harga_bulanan"    => formatter($item->harga_bulanan, "CURR_TO_FLOAT")
-                ];
-
-                // update
-                if($item->id) {
-                    $insert = $this->SupplierHargaModel->update($item->id, $insertData);
-
-                    if (!$insert) {
-                        $data = [
-                            "status"    => false,
-                            "message"   => 'Data Gagal Disimpan!',
-                            "payload"   => json_encode($insertData),
-                            'token'     => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                        return;
-                    }
-                }
-                // create
-                else {
-                    $insert = $this->SupplierHargaModel->insert($insertData);
-                    if (!$insert) {
-                        $data = [
-                            "status"    => false,
-                            "message"   => 'Data Gagal Disimpan!',
-                            "payload"   => json_encode($insertData),
-                            'token'     => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                        return;
-                    }
-                }
-            }
+            $list_item = json_decode($this->request->getVar("list_item"));
+            $list_delete = json_decode($this->request->getVar("list_delete"));
 
             // for delete
-            foreach($list_delete as $item)
-            {
+            foreach ($list_delete as $item) {
                 $id = $item->id;
 
                 if (empty($id)) {
@@ -141,6 +87,42 @@ class SupplierHarga extends BaseController
                 }
 
                 $this->SupplierHargaModel->delete($id);
+            }
+
+            // for create and update
+            foreach ($list_item as $item) {
+                $insertData = [
+                    "supplier_id"      => $this->request->getVar("supplier_id"),
+                    "bahan_baku_id"    => $item->bahan_baku_id,
+                    "bagian_id"        => $item->bagian_id,
+                    "spesifikasi"      => $item->spesifikasi,
+                    "harga_umum"       => formatter($item->harga_umum, "CURR_TO_FLOAT"),
+                    "harga_harian"     => formatter($item->harga_harian, "CURR_TO_FLOAT"),
+                    "harga_bulanan"    => formatter($item->harga_bulanan, "CURR_TO_FLOAT")
+                ];
+
+                $uniqueCheck = $this->SupplierHargaModel->supplierHargaUnique(
+                    $item->bagian_id,
+                    $this->request->getVar("supplier_id"),
+                    $item->bahan_baku_id,
+                    $item->spesifikasi,
+                    formatter($item->harga_umum, "CURR_TO_FLOAT"),
+                    formatter($item->harga_harian, "CURR_TO_FLOAT"),
+                    formatter($item->harga_bulanan, "CURR_TO_FLOAT")
+                );
+
+                // update
+                if ($item->id) {
+                    if ($uniqueCheck) {
+                        $this->SupplierHargaModel->update($item->id, $insertData);
+                    }
+                }
+                // create
+                else {
+                    if ($uniqueCheck) {
+                        $this->SupplierHargaModel->insert($insertData);
+                    }
+                }
             }
 
             $data = [
@@ -168,14 +150,11 @@ class SupplierHarga extends BaseController
 
         $find = $this->SupplierHargaModel->getBySupplierId($id);
 
-        if($find)
-        {
+        if ($find) {
             return json_encode([
                 "data" => $find
             ]);
-        }
-        else
-        {
+        } else {
             return json_encode([
                 "data" => []
             ]);
@@ -233,14 +212,11 @@ class SupplierHarga extends BaseController
 
         $find = $this->SupplierHargaModel->getByBarangandSupplier($barang_id, $supplier_id);
 
-        if($find)
-        {
+        if ($find) {
             return json_encode([
                 "data" => $find
             ]);
-        }
-        else
-        {
+        } else {
             return json_encode([
                 "data" => []
             ]);

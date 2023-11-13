@@ -9,10 +9,10 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("supplier-bahan-baku"); ?>">
                 Batal
             </a>
-            <?php if(!empty($dataSupplier)){ ?>
-            <button class="btn btn-show-form btn-save float-right btn-submit-harga">
-                Simpan
-            </button>
+            <?php if (!empty($dataSupplier)) { ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-harga">
+                    Simpan
+                </button>
             <?php } ?>
         </div>
     </div>
@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row"> 
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesfikasi" name="spesifikasi" placeholder="Spesifikasi">
@@ -107,14 +107,14 @@
                             <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                         </button>
                         <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="setHarga()">
-                            Reset
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Reset
                         </button>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10">No</th>
@@ -128,43 +128,43 @@
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
-                        <?php 
-                            $no = 0;    
-                            foreach($dataSupplierHarga as $item){ 
+                            <?php
+                            $no = 0;
+                            foreach ($dataSupplierHarga as $item) {
                                 $no = $no + 1;
-                        ?>
-                            <tr>
-                                <td>
-                                    <?= $no; ?>
-                                </td>
-                                <td>
-                                    <?= $item["barang_name"]; ?>
-                                </td>
-                                <td>
-                                    <?= $item["nama_bagian"]; ?>
-                                </td>
-                                <td>
-                                    <?= $item["spesifikasi"]; ?>
-                                </td>
-                                <td>
-                                    <?= "Rp " . number_format(formatter($item["harga_umum"], "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                </td>
-                                <td>
-                                    <?= "Rp " . number_format(formatter($item["harga_harian"], "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                </td>
-                                <td>
-                                    <?= "Rp " . number_format(formatter($item["harga_bulanan"], "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                </td>
-                                <td>
-                                    <button onclick="editHarga('<?= $no; ?>')" class="btn btn-warning posting-spp">
-                                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <button onclick="deleteHarga('<?= $no; ?>')" class="btn btn-danger">
-                                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php } ?>
+                            ?>
+                                <tr>
+                                    <td>
+                                        <?= $no; ?>
+                                    </td>
+                                    <td>
+                                        <?= $item["barang_name"]; ?>
+                                    </td>
+                                    <td>
+                                        <?= $item["nama_bagian"]; ?>
+                                    </td>
+                                    <td>
+                                        <?= $item["spesifikasi"]; ?>
+                                    </td>
+                                    <td>
+                                        <?= "Rp " . number_format(formatter($item["harga_umum"], "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                    </td>
+                                    <td>
+                                        <?= "Rp " . number_format(formatter($item["harga_harian"], "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                    </td>
+                                    <td>
+                                        <?= "Rp " . number_format(formatter($item["harga_bulanan"], "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                    </td>
+                                    <td>
+                                        <button onclick="editHarga('<?= $no; ?>')" class="btn btn-warning posting-spp">
+                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                        <button onclick="deleteHarga('<?= $no; ?>')" class="btn btn-danger">
+                                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
@@ -179,26 +179,35 @@
     let list_delete = [];
     var row = 0;
 
-    <?php if($dataSupplierHarga){ 
-        $no = 1;    
-        foreach($dataSupplierHarga as $item){  
+    <?php if ($dataSupplierHarga) {
+        $no = 1;
+        foreach ($dataSupplierHarga as $item) {
     ?>
-        row = row + 1;
+            row = row + 1;
 
-        list_item.push({
-            row: Number(row),
-            id: Number('<?= $item["id"]?>'),
-            bahan_baku_id: Number('<?= $item["bahan_baku_id"]?>'),
-            bagian_id: Number('<?= $item["bagian_ids"]?>'),
-            barang_name: '<?= $item["barang_name"]?>',
-            bagian_name: '<?= $item["nama_bagian"]?>',
-            spesifikasi: '<?= $item["spesifikasi"]?>',
-            harga_umum: Number('<?= $item["harga_umum"] ? $item["harga_umum"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            harga_harian: Number('<?= $item["harga_harian"] ? $item["harga_harian"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            harga_bulanan: Number('<?= $item["harga_bulanan"] ? $item["harga_bulanan"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        })
-    <?php } 
-        }
+            list_item.push({
+                row: Number(row),
+                id: Number('<?= $item["id"] ?>'),
+                bahan_baku_id: Number('<?= $item["bahan_baku_id"] ?>'),
+                bagian_id: Number('<?= $item["bagian_ids"] ?>'),
+                barang_name: '<?= $item["barang_name"] ?>',
+                bagian_name: '<?= $item["nama_bagian"] ?>',
+                spesifikasi: '<?= $item["spesifikasi"] ?>',
+                harga_umum: Number('<?= $item["harga_umum"] ? $item["harga_umum"] : 0; ?>').toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }),
+                harga_harian: Number('<?= $item["harga_harian"] ? $item["harga_harian"] : 0; ?>').toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }),
+                harga_bulanan: Number('<?= $item["harga_bulanan"] ? $item["harga_bulanan"] : 0; ?>').toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })
+            })
+    <?php }
+    }
     ?>
 
     $('.dataTable').DataTable({
@@ -212,8 +221,8 @@
             defaultContent: '-',
             targets: '_all'
         }],
-        "initComplete": function (settings, json) {  
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         language: {
             emptyTable: "Belum Ada Data Harga"
@@ -315,16 +324,13 @@
     });
 
     $(".btn-submit-harga").click(function() {
-        if(list_item.length === 0)
-        {
+        if (list_item.length === 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Data Wajib Diisi!',
                 confirmButtonColor: '#4e73df',
             })
-        }
-        else
-        {
+        } else {
             Swal.fire({
                 icon: 'question',
                 title: 'Simpan Data?',
@@ -361,7 +367,7 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 }).then(() => {
-                                    window.location.href = "<?= base_url("supplier-bahan-baku"); ?>";
+                                    location.reload();
                                 })
                             } else {
                                 stopLoading()
@@ -403,7 +409,7 @@
         $(".bahan_baku").removeAttr("disabled")
         $(".spesifikasi").removeAttr("disabled")
         $(".bagian").removeAttr("disabled")
-        
+
     }
 
     const setHarga = function() {
@@ -424,8 +430,7 @@
 
         if ($(".harga-form").valid()) {
             // update
-            if(row_detail)
-            {
+            if (row_detail) {
                 Swal.fire({
                     icon: 'question',
                     title: 'Yakin akan mengubah data?',
@@ -445,8 +450,7 @@
 
                         list_item.map(item => {
                             row = row + 1;
-                            if(item.row === Number(row_detail))
-                            {
+                            if (item.row === Number(row_detail)) {
                                 tag_html += `<tr>`;
                                 tag_html += "<td>";
                                 tag_html += row;
@@ -461,13 +465,22 @@
                                 tag_html += spesifikasi;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += "Rp " + Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += "Rp " + Number(harga_umum).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += "Rp " + Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += "Rp " + Number(harga_harian).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += "Rp " + Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += "Rp " + Number(harga_bulanan).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
@@ -483,13 +496,20 @@
                                     ...item,
                                     row: row,
                                     id: id_supplier_harga,
-                                    harga_umum: Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                    harga_harian: Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                    harga_bulanan: Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                    harga_umum: Number(harga_umum).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
+                                    harga_harian: Number(harga_harian).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }),
+                                    harga_bulanan: Number(harga_bulanan).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })
                                 })
-                            }
-                            else
-                            {
+                            } else {
                                 tag_html += `<tr>`;
                                 tag_html += "<td>";
                                 tag_html += row;
@@ -536,23 +556,19 @@
                 })
             }
             // create
-            else
-            {
+            else {
                 // check if bahan baku, spesifikasi already exist
                 let view_exist = list_item.find(item => (
                     item.spesifikasi === spesifikasi && item.bahan_baku_id === bahan_baku_id
                 ))
 
-                if(view_exist)
-                {
+                if (view_exist) {
                     Swal.fire({
                         icon: 'error',
                         title: "Bahan Baku, spesifikasi tidak boleh sama",
                         confirmButtonColor: '#4e73df',
                     })
-                }
-                else
-                {
+                } else {
                     Swal.fire({
                         icon: 'question',
                         title: 'Yakin akan menambahkan data?',
@@ -618,13 +634,22 @@
                             tag_html += spesifikasi;
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += "Rp " + Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            tag_html += "Rp " + Number(harga_umum).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += "Rp " + Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            tag_html += "Rp " + Number(harga_harian).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += "Rp " + Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            tag_html += "Rp " + Number(harga_bulanan).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
                             tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
@@ -645,9 +670,18 @@
                                 bagian_id: bagian_id,
                                 barang_name: barang_name,
                                 spesifikasi: spesifikasi,
-                                harga_umum: Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                harga_harian: Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                                harga_bulanan: Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                harga_umum: Number(harga_umum).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }),
+                                harga_harian: Number(harga_harian).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }),
+                                harga_bulanan: Number(harga_bulanan).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
                             })
 
                             reset()
@@ -679,7 +713,7 @@
         $(".spesifikasi").val(current_row?.spesifikasi);
     }
 
-    const hilangTitikdanKoma = function(nilai){
+    const hilangTitikdanKoma = function(nilai) {
         // Menghilangkan titik
         inputText = nilai.replaceAll(",", "");
 
@@ -712,15 +746,11 @@
                 $(".body-detail-table").empty()
 
                 list_item.map(item => {
-                    if(item.row === Number(nilai_row))
-                    {
-                        if(item.id)
-                        {
+                    if (item.row === Number(nilai_row)) {
+                        if (item.id) {
                             list_delete.push(item)
                         }
-                    }
-                    else
-                    {
+                    } else {
                         row = row + 1;
 
                         tag_html += `<tr>`;
