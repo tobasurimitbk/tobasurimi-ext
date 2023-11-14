@@ -175,10 +175,10 @@ class SupplierModel extends Model
             $lastIncrement = intval($asd[0]) + 1;
             $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
 
-            $invNumber = $paddedNumber . $numberTemplate;
+            $invNumber =  $numberTemplate . "-" . $paddedNumber;
         } else {
 
-            $invNumber = '001' . $numberTemplate;
+            $invNumber = $numberTemplate . '-' . '001';
         }
 
         return $invNumber;

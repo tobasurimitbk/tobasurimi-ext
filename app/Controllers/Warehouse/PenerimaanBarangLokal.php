@@ -162,16 +162,16 @@ class PenerimaanBarangLokal extends BaseController
     public function allPenerimaanBarangLokal()
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sorttype" => $this->request->getGet("sortType"),
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
             "statuspenerimaan" => "LOKAL",
-            "status" => $this->request->getGet("status"),
-            // "status_bc" => $this->request->getGet("status_bc"),
-            "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "status" => $this->request->getVar("status"),
+            // "status_bc" => $this->request->getVar("status_bc"),
+            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $condition = [
@@ -180,16 +180,16 @@ class PenerimaanBarangLokal extends BaseController
         ];
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "status" => $this->request->getGet("status"),
-            "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "status" => $this->request->getVar("status"),
+            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
         $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, $limit, $offset);
 
         $dataPenerimaanBarang = [];
@@ -217,7 +217,7 @@ class PenerimaanBarangLokal extends BaseController
 
         // filter status bc
         // $no = 1;
-        // if($this->request->getGet("status_bc") === "waiting")
+        // if($this->request->getVar("status_bc") === "waiting")
         // {
         //     $newDataPenerimaanBarang = [];
         //     foreach($dataPenerimaanBarang as $item)
@@ -243,7 +243,7 @@ class PenerimaanBarangLokal extends BaseController
         //     $dataPenerimaanBarang = $newDataPenerimaanBarang;
         // }
 
-        // if($this->request->getGet("status_bc") === "finish")
+        // if($this->request->getVar("status_bc") === "finish")
         // {
         //     $newDataPenerimaanBarang = [];
         //     foreach($dataPenerimaanBarang as $item)
@@ -270,7 +270,7 @@ class PenerimaanBarangLokal extends BaseController
         // }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
+            "draw"              => intval($this->request->getVar("draw")),
             "recordsTotal"      => $penerimaanBarangData['totalData'],
             "recordsFiltered"   => $penerimaanBarangData['totalFilteredData'],
             "data"              => $dataPenerimaanBarang,
@@ -830,15 +830,15 @@ class PenerimaanBarangLokal extends BaseController
                     $penerimaanBarangDetailModel = $this->penerimaanBarangDetailModel->getWhere(['penerimaan_barang_id' => $id])->getRow();
                     if ($penerimaanBarangDetailModel) {
                         foreach ($poArr as $p) {
-    
+
                             // Assuming $p[0] is barang_id and $p[1] is am_purchase_order_id
                             $purchaseOrderDetail = $this->amPurchaseOrderDetailModel
                                 ->where('barang_id', $penerimaanBarangDetailModel->barang_id)
                                 ->where('am_purchase_order_id', $p)
                                 ->first();
-                            
 
-    
+
+
                             if ($purchaseOrderDetail) {
                                 $qty = isset($purchaseOrderDetail['qty']) ? $purchaseOrderDetail['qty'] : 0;
                                 // dd($qty);
@@ -898,8 +898,8 @@ class PenerimaanBarangLokal extends BaseController
 
     public function exportTable()
     {
-        // $dateStart = $this->request->getGet("dateStart") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "-";
-        // $dateEnd = $this->request->getGet("dateEnd") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "-";
+        // $dateStart = $this->request->getVar("dateStart") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "-";
+        // $dateEnd = $this->request->getVar("dateEnd") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "-";
 
         // $spreadsheet = new Spreadsheet();
         // // tulis header/nama kolom 
@@ -935,13 +935,13 @@ class PenerimaanBarangLokal extends BaseController
         //             ->setCellValue('I5', 'Tanggal');
 
         // $addCondition = [
-        //     "search"            => $this->request->getGet("search"),
-        //     "status"            => $this->request->getGet("status"),
+        //     "search"            => $this->request->getVar("search"),
+        //     "status"            => $this->request->getVar("status"),
         //     "statuspenerimaan"  => "LOKAL",
-        //     "sort"              => $this->request->getGet("sort"),
-        //     "sortType"          => $this->request->getGet("sortType"),
-        //     "startdate"         => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-        //     "lastdate"          => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        //     "sort"              => $this->request->getVar("sort"),
+        //     "sortType"          => $this->request->getVar("sortType"),
+        //     "startdate"         => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+        //     "lastdate"          => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         // ];
 
         // $condition = [
@@ -1101,9 +1101,9 @@ class PenerimaanBarangLokal extends BaseController
     public function dropdownPenerimaanBarangLokal()
     {
         $payload = [
-            "idsupplier" => $this->request->getGet("id"),
+            "idsupplier" => $this->request->getVar("id"),
             "statuspenerimaan" => "LOKAL",
-            "tipebahan" => $this->request->getGet("tipe")
+            "tipebahan" => $this->request->getVar("tipe")
         ];
 
         $dataPenerimaanBarang = [];
@@ -1125,11 +1125,11 @@ class PenerimaanBarangLokal extends BaseController
     public function getReceivedItemsBySupplier($supplierId)
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
             "idCompany"     => $this->this_company_id,
             "kategori"      => "LOKAL",
             // "type"          => "BAHAN BAKU"
@@ -1141,12 +1141,12 @@ class PenerimaanBarangLokal extends BaseController
             // "penerimaan_barang.tipe_bahan"              => "BAKU",
             // "penerimaan_barang_detail.summarized_qty <" => 'penerimaan_barang_detail.qty'
 
-            // "search"                                => $this->request->getGet("search"),
-            // "sort"                                  => $this->request->getGet("sort"),
-            // "sortType"                              => $this->request->getGet("sortType")
+            // "search"                                => $this->request->getVar("search"),
+            // "sort"                                  => $this->request->getVar("sort"),
+            // "sortType"                              => $this->request->getVar("sortType")
         ];
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
 
         $itemData = $this->penerimaanBarangModel
             ->getReceivedItemsBySupplier($supplierId, $condition, $limit, $offset);
@@ -1170,7 +1170,7 @@ class PenerimaanBarangLokal extends BaseController
         }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
+            "draw"              => intval($this->request->getVar("draw")),
             "recordsTotal"      => $itemData['totalData'],
             "recordsFiltered"   => $itemData['totalFilteredData'],
             "data"              => $receivedData,

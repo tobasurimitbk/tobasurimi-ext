@@ -267,7 +267,7 @@ class PenerimaanBarangModel extends Model
             "multiple_po_no" => '["' . $rmDetail['po_no'] . '"]',
             "tipe_bahan" => "BAKU",
             "bc_type" => $dokumenBC,
-            "status_post" => "FINISH",
+            "status_post" => "WAITING",
             "status_penerimaan" => "LOKAL",
         ];
 

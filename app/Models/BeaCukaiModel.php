@@ -16,6 +16,7 @@ class BeaCukaiModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'penerimaan_barang_id',
         'company_id',
         'type',
         'status',
@@ -143,11 +144,11 @@ class BeaCukaiModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'ajuNo'            => 'bea_cukai.aju_no',
-            'registrationNo'   => 'bea_cukai.registration_no',
-            'registrationDate' => 'bea_cukai.registration_date',
-            'tujuanTPBName'    => 'metadata.value',
-            'statusPosting'    => 'bea_cukai.status_posting',
+            'penerimaan_barang.no_penerimaan_barang' => 'penerimaan_barang.no_penerimaan_barang',
+            'penerimaan_barang.warehouse_id' => 'penerimaan_barang.warehouse_id',
+            'bea_cukai.aju_no' => 'bea_cukai.aju_no',
+            'bea_cukai.registration_no' => 'bea_cukai.registration_no',
+            'bea_cukai.registration_date'    => 'bea_cukai.registration_date',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -155,13 +156,15 @@ class BeaCukaiModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "bea_cukai.*, 
-            metadata.value AS tujuan_tpb_name";
+            penerimaan_barang.no_penerimaan_barang,
+            penerimaan_barang.multiple_po_no,
+            warehouses.warehouse_name";
 
         $bcDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('metadata', 'bea_cukai.tujuan_tpb = metadata.id', 'left')
-            ->groupBy(('bea_cukai.id'))
+            ->join('penerimaan_barang', 'penerimaan_barang.id = bea_cukai.penerimaan_barang_id', 'right')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $bcDataQry->countAllResults(false);
@@ -171,7 +174,13 @@ class BeaCukaiModel extends Model
         }
         if ($addCondition['search']) {
             $bcDataQry
-                ->like('aju_no', $addCondition['search']);
+                ->like('penerimaan_barang.lpb_no', $addCondition['search'])
+                ->orLike('penerimaan_barang.multiple_po_no', $addCondition['search'])
+                ->orLike('warehouses.warehouse_name', $addCondition['search'])
+                ->orLike('aju_no', $addCondition['search'])
+                ->orLike('registration_no', $addCondition['search'])
+                ->orLike('registration_date', $addCondition['search'])
+                ->orLike('status_posting', $addCondition['search']);
         }
         if ($addCondition['search']) {
             $bcDataQry->groupEnd();

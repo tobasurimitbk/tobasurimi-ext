@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Controllers\BeaCukai;
+
+use App\Controllers\BaseController;
+use App\Models\BeaCukaiModel;
+
+// META DATA -> jenis_dok_aju
+// BC 2.3 -> 48
+// BC 2.5 -> 49
+// BC 2.6.1 -> 50
+// BC 2.6.2 -> 51
+// BC 2.7 -> 52
+// BC 4.0 -> 53
+// BC 4.1 -> 54
+class BC23 extends BaseController
+{
+    protected $this_company_id;
+
+    public function __construct()
+    {
+        $this->this_company_id = session()->get("login")->this_company_id;
+    }
+
+    public function index()
+    {
+        return \view('BeaCukai/bc-23/index');
+    }
+
+    public function all()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 2.3"
+        ];
+
+        $condition = [
+            "penerimaan_barang.company_id"  => $this->this_company_id,
+            "penerimaan_barang.deletedAt" => null,
+            "penerimaan_barang.bc_type" => 48
+        ];
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType")
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $beaCukaiModel = new BeaCukaiModel();
+
+        $beaCukaiData = $beaCukaiModel->getList($condition, $addCondition, $limit, $offset);
+
+        $dataBeaCukai = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiData['data'] as $data) {
+            $status = $data->status_posting == null ? "BELUM DIBUAT" : strtoupper($data->status_post);
+            array_push($dataBeaCukai, [
+                "no"                    => $no++,
+                "id"                    => $data->id,
+                "lpb_no"                => $data->no_penerimaan_barang,
+                "po_no"                 => implode(', ', str_replace(['[', ']', '"'], '', json_decode($data->multiple_po_no, true))),
+                "warehouse_name"        => $data->warehouse_name,
+                "aju_no"                => $data->aju_no ?? "-",
+                "no_registration"       => $data->no_registration ?? "-",
+                "validation_date"       => $data->validation_date ?? "-" ? "-" : date('d/M/Y', strtotime($data->validation_date)),
+                "status"                => $status
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $beaCukaiData['totalData'],
+            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
+            "data"              => $dataBeaCukai,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+}

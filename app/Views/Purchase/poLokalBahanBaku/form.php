@@ -122,7 +122,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Bahan Baku</label>
+                            <label for="floatingInput">Barang Bahan Baku</label>
                         </div>
                     </div>
                     <div class="col-md-4">
