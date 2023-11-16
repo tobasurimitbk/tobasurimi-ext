@@ -1930,8 +1930,8 @@
             }
         })
 
-        $(".harga_barang_jasa, .jml_masuk").keyup(function() {
-            let qty = $(".jml_masuk").val() !== null ? Number($(".jml_masuk").val()) : 0;
+        $(".harga_barang_jasa, .jml_masuk, .qty_diterima").on('keyup', (function() {
+            let qty = $(".qty").val() !== null ? Number($(".qty").val()) : 0;
             let harga = $(".harga_barang_jasa").val() !== null ? Number(formatCurrency($(".harga_barang_jasa").val())) : 0;
             let harga_harian = $(".harga_barang_jasa_harian").val() !== null ? Number(formatCurrency($(".harga_barang_jasa_harian").val())) : 0;
             let harga_bulanan = $(".harga_barang_jasa_bulanan").val() !== null ? Number(formatCurrency($(".harga_barang_jasa_bulanan").val())) : 0;
@@ -1947,16 +1947,33 @@
             let jumlahOrder = $('.qty').val() ? Number($('.qty').val()) : 0;
             let diterima = $('.qty_diterima').val() ? Number($('.qty_diterima').val()) : 0;
 
+            if (diterima > qty) {
+                $('.qty_diterima').val(qty);
+                $('.remaining_qty').val(0);
+            } else
             if (diterima != 0) {
-                $('.qty_diterima').val(diterima + jmlhMasuk);
-                $('.remaining_qty').val((jumlahOrder - diterima - jmlhMasuk));
+                console.log(diterima, jmlhMasuk, qty);
+                if (diterima > qty) {
+                    $('.qty_diterima').val(qty);
+                    $('.remaining_qty').val(0);
+                } else {
+                    $('.qty_diterima').val(diterima + jmlhMasuk - qty);
+                    $('.remaining_qty').val((jumlahOrder - diterima - jmlhMasuk - qty));
+                }
+
             } else {
-                $('.qty_diterima').val(jmlhMasuk);
-                $('.remaining_qty').val((jumlahOrder - jmlhMasuk));
+                if (diterima > qty) {
+                    $('.qty_diterima').val(qty);
+                    $('.remaining_qty').val(0);
+                } else {
+                    $('.qty_diterima').val(jmlhMasuk);
+                    $('.remaining_qty').val((jumlahOrder - jmlhMasuk));
+                }
+
             }
             $(".nilai_sub_total").val(formatRupiah(totalHarga));
 
-        })
+        }));
 
         $(".nilai_sub_total").keyup(function() {
             let qty = $(".jml_masuk").val() !== "" ? Number($(".jml_masuk").val()) : 0;
