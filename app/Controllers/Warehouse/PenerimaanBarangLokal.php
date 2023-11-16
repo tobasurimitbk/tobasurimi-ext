@@ -17,6 +17,7 @@ use App\Models\WarehousesModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
 use App\Models\BeaCukaiModel;
+use App\Models\SupplierHargaModel;
 // use PhpOffice\PhpSpreadsheet\Spreadsheet;
 // use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -40,6 +41,7 @@ class PenerimaanBarangLokal extends BaseController
     protected $satuanModel;
     private $stockDetailModel;
     protected $beaCukaiModel;
+    protected $supplierHargaModel;
 
     protected $dompdf;
 
@@ -60,6 +62,7 @@ class PenerimaanBarangLokal extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->beaCukaiModel = new BeaCukaiModel();
+        $this->supplierHargaModel = new SupplierHargaModel();
 
         $this->dompdf = new Dompdf();
     }
@@ -832,21 +835,39 @@ class PenerimaanBarangLokal extends BaseController
                         foreach ($poArr as $p) {
 
                             // Assuming $p[0] is barang_id and $p[1] is am_purchase_order_id
-                            $purchaseOrderDetail = $this->amPurchaseOrderDetailModel
+                            // BAHAN PENOLONG
+                            $purchaseOrderDetailAM = $this->amPurchaseOrderDetailModel
                                 ->where('barang_id', $penerimaanBarangDetailModel->barang_id)
                                 ->where('am_purchase_order_id', $p)
                                 ->first();
 
-
-
-                            if ($purchaseOrderDetail) {
-                                $qty = isset($purchaseOrderDetail['qty']) ? $purchaseOrderDetail['qty'] : 0;
+                            if ($purchaseOrderDetailAM) {
+                                $qty = isset($purchaseOrderDetailAM['qty']) ? $purchaseOrderDetailAM['qty'] : 0;
                                 // dd($qty);
                                 $this->amPurchaseOrderDetailModel
-                                    ->where('id', $purchaseOrderDetail['id'])
+                                    ->where('id', $purchaseOrderDetailAM['id'])
                                     ->set('remaining_qty', $qty)
                                     ->set('qty_diterima', 0)
                                     ->update();
+                            }
+
+                            $supplierHarga = $this->supplierHargaModel->where('bahan_baku_id', $penerimaanBarangDetailModel->barang_id)->first();
+
+                            if ($supplierHarga) {
+                                $purchaseOrderDetailRM = $this->rmPurchaseOrderDetailModel
+                                    ->where('supplier_harga_id', $supplierHarga['id'])
+                                    ->where('rm_purchase_order_id', $p)
+                                    ->first();
+
+                                if ($purchaseOrderDetailRM) {
+                                    $qty = isset($purchaseOrderDetailRM['qty']) ? $purchaseOrderDetailRM['qty'] : 0;
+                                    // dd($qty);
+                                    $this->rmPurchaseOrderDetailModel
+                                        ->where('id', $purchaseOrderDetailRM['id'])
+                                        ->set('remaining_qty', $qty)
+                                        ->set('qty_diterima', 0)
+                                        ->update();
+                                }
                             }
                         }
                         $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
