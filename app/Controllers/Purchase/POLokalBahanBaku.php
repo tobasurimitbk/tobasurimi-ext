@@ -498,7 +498,7 @@ class POLokalBahanBaku extends BaseController
             $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
 
             // cek if warehouse_id != null
-            if ($detail['warehouse_id'] != null) {
+            if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
                 $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type']);
             }
 

@@ -445,7 +445,7 @@
 </section>
 
 <?php if (!empty($dataPOLokal)) : ?>
-    <?php if ($dataPOLokal->warehouse_id == null) : ?>
+    <?php if ($dataPOLokal->warehouse_id == 0) : ?>
         <script>
             $('#lpb_otomatis').attr('checked', false);
             $('.form-lpb').hide();
