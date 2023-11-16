@@ -1947,30 +1947,33 @@
             let jumlahOrder = $('.qty').val() ? Number($('.qty').val()) : 0;
             let diterima = $('.qty_diterima').val() ? Number($('.qty_diterima').val()) : 0;
 
-            if (diterima > qty) {
-                $('.qty_diterima').val(qty);
-                $('.remaining_qty').val(0);
-            } else
-            if (diterima != 0) {
-                console.log(diterima, jmlhMasuk, qty);
-                if (diterima > qty) {
-                    $('.qty_diterima').val(qty);
-                    $('.remaining_qty').val(0);
-                } else {
-                    $('.qty_diterima').val(diterima + jmlhMasuk - qty);
-                    $('.remaining_qty').val((jumlahOrder - diterima - jmlhMasuk - qty));
-                }
-
+            if (jmlhMasuk == 0) {
+                $('.qty_diterima').val(0);
+                $('.remaining_qty').val(qty);
             } else {
-                if (diterima > qty) {
-                    $('.qty_diterima').val(qty);
-                    $('.remaining_qty').val(0);
-                } else {
-                    $('.qty_diterima').val(jmlhMasuk);
-                    $('.remaining_qty').val((jumlahOrder - jmlhMasuk));
-                }
+                if (diterima != 0) {
+                    console.log(diterima, jmlhMasuk, qty);
+                    if (diterima > qty) {
+                        $('.qty_diterima').val(0);
+                        $('.remaining_qty').val(qty);
+                    } else {
+                        $('.qty_diterima').val(diterima + jmlhMasuk);
+                        $('.remaining_qty').val((jumlahOrder - diterima - jmlhMasuk));
+                    }
 
+                } else {
+                    if (diterima > qty) {
+                        $('.qty_diterima').val(0);
+                        $('.remaining_qty').val(qty);
+                    } else {
+                        $('.qty_diterima').val(jmlhMasuk);
+                        $('.remaining_qty').val((jumlahOrder - jmlhMasuk));
+                    }
+
+                }
             }
+
+
             $(".nilai_sub_total").val(formatRupiah(totalHarga));
 
         }));
