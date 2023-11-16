@@ -677,4 +677,12 @@ class POLokalBahanBaku extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function dropdownWarehouse()
+    {
+        $res = $this->warehousesModel->get_by_company_id($this->request->getVar('company_id'));
+        return response()->setJSON([
+            'data' => $res
+        ]);
+    }
 }

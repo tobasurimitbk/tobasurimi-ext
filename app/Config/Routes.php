@@ -233,6 +233,7 @@ $routes->post('/po-lokal-bahan-baku/update-status', 'Purchase\POLokalBahanBaku::
 $routes->post('/po-lokal-bahan-baku/close-po', 'Purchase\POLokalBahanBaku::closePOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/delete', 'Purchase\POLokalBahanBaku::deletePOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/print/(:segment)', 'Purchase\POLokalBahanBaku::print/$1', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/dropdown/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);
@@ -634,8 +635,8 @@ $routes->get('/po-bea-cukai/dropdown', 'BeaCukai\BeaCukaiController::dropdownBea
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC23::index');
     $routes->get('all', 'BeaCukai\BC23::all');
-    $routes->get('create', 'BeaCukai\BeaCukaiController::bc23CreateFormView');
-    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc23GetByIdFormView/$1');
+    $routes->get('id/(:segment)', 'BeaCukai\BC23::create/$1');
+    // $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc23GetByIdFormView/$1');
     $routes->post('save', 'BeaCukai\BeaCukaiController::bc23SaveForm');
     $routes->post('update', 'BeaCukai\BeaCukaiController::bc23UpdateForm');
     $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');

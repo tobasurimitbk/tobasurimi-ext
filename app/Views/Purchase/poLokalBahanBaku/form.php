@@ -133,7 +133,7 @@
                                 if (!empty($dataCompany)) {
                                     foreach ($dataCompany as $company) {
                                 ?>
-                                        <option value="<?= $company["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->company_id === $company["id"] ? "selected" : "") : ""; ?>><?= $company["company"]; ?></option>
+                                        <option value="<?= $company["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->company_id === $company["id"] ? "selected" : "") : ""; ?>><?= strtoupper($company["company"]); ?></option>
                                 <?php
                                     }
                                 }
@@ -640,7 +640,7 @@
         $('.warehouse_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
-        })
+        });
 
         // BC Type
         $('.bc_type').select2({
@@ -652,7 +652,36 @@
         $('.company_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
-        })
+        }).change(function() {
+            $.ajax({
+                url: "<?= base_url("po-lokal-bahan-baku/dropdown/warehouse"); ?>",
+                data: {
+                    company_id: $(this).val()
+                },
+                method: "GET",
+                success: function(response) {
+                    var employeeSelect = $("select[name='warehouse_id']");
+                    employeeSelect.empty();
+
+                    var emptyOption = $("<option></option>")
+                        .attr("value", "")
+                        .text("Pilih Warehouse");
+
+                    employeeSelect.append(emptyOption);
+
+                    $.each(response.data, function(index, data) {
+                        var option = $("<option data-nip=" + data.id + "></option>")
+                            .attr("value", data.id)
+                            .text(data.warehouse_name.toUpperCase());
+                        employeeSelect.append(option);
+                    });
+
+                },
+                onError: function(response) {
+                    alert("ERROR")
+                }
+            });
+        });
 
         // PURCHASE REQUEST ID
         $('.purchase_request_id').select2({
