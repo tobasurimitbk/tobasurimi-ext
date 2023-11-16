@@ -29,7 +29,7 @@
                                 <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -145,7 +145,16 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return '-';
+                    return `
+                        <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <a href="<?= base_url('bea-cukai-bc-23/id/') ?>${row.lpb_id}" class="btn btn-primary delete-parent">
+                                <i class="fa-solid fa-pen fa-sm"></i>
+                            </a>
+                        </div>
+                    `;
 
                 }
             }

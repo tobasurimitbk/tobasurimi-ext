@@ -555,7 +555,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.purchase_request_id')
             .parent('div')
@@ -582,7 +582,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.supplier_id')
             .parent('div')
@@ -609,7 +609,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.currency')
             .parent('div')

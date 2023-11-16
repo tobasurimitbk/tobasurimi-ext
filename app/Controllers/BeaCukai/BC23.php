@@ -4,6 +4,8 @@ namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Models\BeaCukaiModel;
+use App\Models\PenerimaanBarangDetailModel;
+use App\Models\PenerimaanBarangModel;
 
 // META DATA -> jenis_dok_aju
 // BC 2.3 -> 48
@@ -66,6 +68,7 @@ class BC23 extends BaseController
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
+                "lpb_id"                => $data->lpb_id,
                 "lpb_no"                => $data->no_penerimaan_barang,
                 "po_no"                 => implode(', ', str_replace(['[', ']', '"'], '', json_decode($data->multiple_po_no, true))),
                 "warehouse_name"        => $data->warehouse_name,
@@ -85,5 +88,26 @@ class BC23 extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function create($id)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+
+        $lpb = $penerimaanBarangModel->getById($id);
+
+        if ($lpb == null) {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'lpb' => $penerimaanBarangModel->getById($id),
+            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $lpb->tipe_bahan, $lpb->status_penerimaan)
+        ];
+
+        dd($data['lpbDetail']);
+
+        return \view('BeaCukai/bc-23/form', $data);
     }
 }

@@ -156,6 +156,7 @@ class BeaCukaiModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "bea_cukai.*, 
+            penerimaan_barang.id AS lpb_id,
             penerimaan_barang.no_penerimaan_barang,
             penerimaan_barang.multiple_po_no,
             warehouses.warehouse_name";

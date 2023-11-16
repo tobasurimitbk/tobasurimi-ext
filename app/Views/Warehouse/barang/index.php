@@ -405,7 +405,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".supplier_id")
             .parent('div')
@@ -434,7 +434,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".parent_id")
             .parent('div')
@@ -462,7 +462,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".satuan_id")
             .parent('div')
@@ -490,7 +490,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.satuan_hs')
             .parent('div')
@@ -519,7 +519,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.ap_id')
             .parent('div')
@@ -548,7 +548,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.ar_id')
             .parent('div')
@@ -577,7 +577,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.hs_id')
             .parent('div')

@@ -452,7 +452,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.company_id')
             .parent('div')
@@ -479,7 +479,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.divisi_id')
             .parent('div')
@@ -509,7 +509,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.kode_barang')
             .parent('div')
@@ -537,7 +537,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.satuan')
             .parent('div')

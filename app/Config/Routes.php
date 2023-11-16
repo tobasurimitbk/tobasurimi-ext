@@ -394,10 +394,12 @@ $routes->post('/surat-jalan/update', 'SalesLokal\SuratJalan::update', ['filter' 
 $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/print/(:num)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
 
-// Retur
-$routes->get('/retur', 'SalesLokal\Retur::index', ['filter' => 'Auth']);
+// Retur Pembelian
+$routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);
+$routes->get('/retur-barang/create', 'Purchase\ReturPembelian::create', ['filter' => 'Auth']);
+$routes->get('/retur-barang/generate-new-no', 'Purchase\ReturPembelian::generateNo', ['filter' => 'Auth']);
+
 $routes->get('/retur/(:num)', 'SalesLokal\Retur::getById/$1', ['filter' => 'Auth']);
-$routes->get('/retur/create', 'SalesLokal\Retur::createView', ['filter' => 'Auth']);
 $routes->get('/retur/all', 'SalesLokal\Retur::all', ['filter' => 'Auth']);
 $routes->post('/retur/save', 'SalesLokal\Retur::save', ['filter' => 'Auth']);
 $routes->post('/retur/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);

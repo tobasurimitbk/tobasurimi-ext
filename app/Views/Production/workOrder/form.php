@@ -110,7 +110,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.barang_id')
             .parent('div')
@@ -136,7 +136,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.satuan_id')
             .parent('div')

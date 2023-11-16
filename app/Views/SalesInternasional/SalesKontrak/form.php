@@ -487,7 +487,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.customer_id')
             .parent('div')
@@ -524,7 +524,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.id_barang')
             .parent('div')
@@ -552,7 +552,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.warehouse')
             .parent('div')
@@ -580,7 +580,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.satuan')
             .parent('div')

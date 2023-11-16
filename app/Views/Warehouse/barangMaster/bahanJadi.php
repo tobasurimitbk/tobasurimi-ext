@@ -504,7 +504,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
     $("select[name='parent_type_id']")
         .parent('div')
@@ -530,7 +530,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
     $("select[name='satuan_id']")
         .parent('div')

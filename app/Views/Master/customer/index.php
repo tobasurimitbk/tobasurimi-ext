@@ -300,7 +300,7 @@
         //     .children('span')
         //     .children('span')
         //     .children('span')
-        //     .css('margin-top', '22px')
+        //     .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".sales_id")
             .parent('div')
@@ -328,7 +328,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".termin")
             .parent('div')
@@ -356,7 +356,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".currency")
             .parent('div')
@@ -384,7 +384,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".tipe_pelanggan")
             .parent('div')
@@ -412,7 +412,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".province_parent_id")
             .parent('div')
@@ -440,7 +440,7 @@
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.city_parent_id')
             .parent('div')
