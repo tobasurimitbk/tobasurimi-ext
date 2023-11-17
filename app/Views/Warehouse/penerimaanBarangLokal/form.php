@@ -1947,32 +1947,33 @@
             let jumlahOrder = $('.qty').val() ? Number($('.qty').val()) : 0;
             let diterima = $('.qty_diterima').val() ? Number($('.qty_diterima').val()) : 0;
 
-            if (jmlhMasuk == 0) {
-                $('.qty_diterima').val(0);
-                $('.remaining_qty').val(qty);
-            } else {
-                if (diterima != 0) {
-                    console.log(diterima, jmlhMasuk, qty);
-                    if (diterima > qty) {
-                        $('.qty_diterima').val(0);
-                        $('.remaining_qty').val(qty);
-                    } else {
-                        $('.qty_diterima').val(diterima + jmlhMasuk);
-                        $('.remaining_qty').val((jumlahOrder - diterima - jmlhMasuk));
-                    }
+            var attRes = [];
+            $('.edit-table-detail').each(function() {
+                var element = $(this);
+                var attributes = {};
 
-                } else {
-                    if (diterima > qty) {
-                        $('.qty_diterima').val(0);
-                        $('.remaining_qty').val(qty);
-                    } else {
-                        $('.qty_diterima').val(jmlhMasuk);
-                        $('.remaining_qty').val((jumlahOrder - jmlhMasuk));
-                    }
+                $.each(this.attributes, function() {
+                    var key = this.name.replace('data-', '');
+                    attributes[key] = this.value;
+                });
 
+                attRes.push(attributes);
+            });
+
+            $.each(attRes, function(i, v) {
+                if (v.kode === $('.kode_barang').val()) {
+                    jumlahOrder = Number(v.qty);
+                    diterima = Number(v.qty_diterima);
                 }
-            }
+            });
 
+            if (diterima != 0) {
+                $('.qty_diterima').val(diterima + jmlhMasuk);
+                $('.remaining_qty').val((jumlahOrder - diterima - jmlhMasuk));
+            } else {
+                $('.qty_diterima').val(jmlhMasuk);
+                $('.remaining_qty').val((jumlahOrder - jmlhMasuk));
+            }
 
             $(".nilai_sub_total").val(formatRupiah(totalHarga));
 
