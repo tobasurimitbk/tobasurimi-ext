@@ -96,7 +96,7 @@
                                 if (!empty($dataCompany)) {
                                     foreach ($dataCompany as $company) {
                                 ?>
-                                        <option value="<?= $company["id"]; ?>" <?= !empty($dataPOImport) ? ($dataPOImport->company_id === $company["id"] ? "selected" : "") : ""; ?>><?= $company["company"]; ?></option>
+                                        <option value="<?= $company["id"]; ?>" <?= !empty($dataPOImport) ? ($dataPOImport->company_id === $company["id"] ? "selected" : "") : ""; ?>><?= strtoupper($company["company"]); ?></option>
                                 <?php
                                     }
                                 }
@@ -111,15 +111,6 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataDivisi)) {
-                                    foreach ($dataDivisi as $divisi) {
-                                ?>
-                                        <option value="<?= $divisi->id; ?>" <?= !empty($dataPOImport) ? ($dataPOImport->divisi_id === $divisi->id ? "selected" : "") : ""; ?>><?= $divisi->divisi; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
                             </select>
                             <label for="floatingInput">Departemen</label>
                         </div>
@@ -620,10 +611,46 @@
         })
 
         // COMPANY
-        $('.company_id').select2({
+        $('#company_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
-        })
+        }).change(function() {
+            drawDivision($(this).val());
+        });
+
+        <?php if (!empty($dataPOImport)) : ?>
+            drawDivision("<?= $dataPOImport->company_id ?>");
+        <?php endif; ?>
+
+        function drawDivision(companyID) {
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
+
+            var formData = new FormData();
+            formData.append("companyID", companyID);
+            $.ajax({
+                url: "<?= base_url("po-import-bahan-baku/find-divisi"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $("#divisi_id").empty();
+                    $("#divisi_id").append(`<option value=""></option>`);
+                    response.data.forEach(function(item) {
+                        $("#divisi_id").append(`<option  value="${item.id}">${item.divisi}</option>`);
+                    });
+                    <?php if (!empty($dataPOImport)) : ?>
+                        $('#divisi_id').val("<?= $dataPOImport->divisi_id ?>").change();
+                    <?php endif; ?>
+                }
+            });
+        }
 
         // DIVISI
         $('.divisi_id').select2({

@@ -86,7 +86,7 @@
                             <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($company as $c) : ?>
-                                    <option <?= !empty($poDetail) ? (($poDetail['company_id'] == $c['id']) ? 'selected' : '') : '' ?> value="<?= $c['id'] ?>"><?= $c['company'] ?></option>
+                                    <option <?= !empty($poDetail) ? (($poDetail['company_id'] == $c['id']) ? 'selected' : '') : '' ?> value="<?= $c['id'] ?>"><?= strtoupper($c['company']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Company</label>
