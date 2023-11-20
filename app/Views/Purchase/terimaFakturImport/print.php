@@ -14,7 +14,8 @@
             border-collapse: collapse;
         }
 
-        .bank-table th, .bank-table td {
+        .bank-table th,
+        .bank-table td {
             border: 1px solid;
         }
 
@@ -162,31 +163,31 @@
             <tr>
                 <td><?= $lpbNo ?></td>
                 <td><?= $itemName ?></td>
-                <td class="txt-right">RP. <?= $itemTotal ?></td>
+                <td class="txt-right"><?= toRupiah($itemTotal) ?></td>
                 <td></td>
             </tr>
             <tr>
                 <td></td>
                 <td>POTONGAN</td>
-                <td class="txt-right">RP. <?= $potongan ?></td>
+                <td class="txt-right"><?= toRupiah($potongan) ?></td>
                 <td></td>
             </tr>
             <tr>
                 <td></td>
                 <td>TAMBAHAN</td>
-                <td class="txt-right">RP. <?= $tambahan ?></td>
+                <td class="txt-right"><?= toRupiah($tambahan) ?></td>
                 <td></td>
             </tr>
             <tr>
                 <td></td>
                 <td><?= $taxList ?></td>
-                <td class="txt-right">RP. <?= $taxTotal ?></td>
+                <td class="txt-right"><?= toRupiah($taxTotal) ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th></th>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right">RP. <?= $total ?></th>
+                <th class="txt-right"><?= toRupiah($total) ?></th>
                 <th></th>
             </tr>
         </table>
@@ -294,16 +295,16 @@
                 <th class="txt-right">JUMLAH</th>
                 <th class="txt-left">NO. PERKIRAAN</th>
             </tr>
-            <?php if (!empty($taxReturnList)): ?>
-            <tr>
-                <td><?= $taxReturnList ?></td>
-                <td class="txt-right"><?= $taxReturnTotal ?></td>
-                <td></td>
-            </tr>
+            <?php if (!empty($taxReturnList)) : ?>
+                <tr>
+                    <td><?= $taxReturnList ?></td>
+                    <td class="txt-right"><?= $taxReturnTotal ?></td>
+                    <td></td>
+                </tr>
             <?php endif; ?>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right">RP. <?= $taxReturnTotal ?></th>
+                <th class="txt-right"><?= $taxReturnTotal ?></th>
                 <th></th>
             </tr>
         </table>
