@@ -196,7 +196,7 @@ class SupplierModel extends Model
             'YEAR(rm_purchase_orders.po_date)' => $year,
             'rm_purchase_orders.supplier_id' => $supplierID,
             'rm_purchase_orders.is_posted' => 1,
-            'rm_purchase_orders.status_penerimaan' => 1,
+            // 'rm_purchase_orders.status_penerimaan' => 1,
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
         ];
