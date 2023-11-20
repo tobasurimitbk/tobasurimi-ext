@@ -141,7 +141,7 @@
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub. " " .$subs->nama_sub) ?></option>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Akun Kas</label>
@@ -152,10 +152,10 @@
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub. " " .$subs->nama_sub) ?></option>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Akun Selisih</label>
+                            <label for="floatingInput" style="z-index: 1;">Akun Selisih (Opsional)</label>
                         </div>
                     </div>
                 </div>
