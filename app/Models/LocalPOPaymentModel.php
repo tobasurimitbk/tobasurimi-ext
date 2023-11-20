@@ -30,6 +30,8 @@ class LocalPOPaymentModel extends Model
         'multiple_po_id',
         'month',
         'lpb_no',
+        'akun_kas',
+        'akun_selisih',
         'deletedAt'
     ];
 
@@ -176,6 +178,7 @@ class LocalPOPaymentModel extends Model
         $supplierHargaModel = new SupplierHargaModel();
         $supplierModel = new SupplierModel();
         $companyModel = new CompaniesModel();
+        $res = [];
 
         $result = [
             'pembayaranDetail' => null,
@@ -229,6 +232,8 @@ class LocalPOPaymentModel extends Model
                 'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
                 'totalOrder' => $rm['qty'],
                 'totalDiterima' => $rm['qty_diterima'],
+                'akun_kas' => $rm['akun_kas'],
+                'akun_selisih' => $rm['akun_selisih'],
                 'totalHarga' => toRupiah($harga)
             ];
         }

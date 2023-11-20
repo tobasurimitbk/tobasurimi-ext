@@ -12,6 +12,7 @@ use App\Models\LocalPOInvSumDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\TandaTerimaFakturDetailModel;
 use App\Models\TandaTerimaFakturModel;
+use App\Models\Sub_AkunsModel;
 use Dompdf\Dompdf;
 use Exception;
 
@@ -19,11 +20,13 @@ class PembayaranPOLokal extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $Sub_AkunsModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->Sub_AkunsModel = new Sub_AkunsModel();
     }
 
     public function pembayaranPOLokalBP()
@@ -34,15 +37,21 @@ class PembayaranPOLokal extends BaseController
     public function createPembayaranPOLokalBP()
     {
         $supplierModel = new SupplierModel();
+        $Sub_AkunsModel = new Sub_AkunsModel();
 
         $supplierList = $supplierModel->asObject()
             ->where('deletedAt', null)
             ->where('type', "BAHAN PENOLONG")
             ->orderBy('name', "ASC")
             ->findAll();
+        
+        $subAkunsModel = $Sub_AkunsModel->asObject()
+            ->where('deletedAt', null)
+            ->findAll();
 
         $data = [
-            "suppliers" => $supplierList
+            "suppliers" => $supplierList,
+            "subsAkuns" => $subAkunsModel
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
@@ -83,7 +92,9 @@ class PembayaranPOLokal extends BaseController
                 'payment_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
                 'payment_method' => $this->request->getVar('payment_method'),
                 'type_po' => "Bahan Penolong",
-                'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh')
+                'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
+                'akun_kas' => $this->request->getVar('akun_kas'),
+                'akun_selisih' => $this->request->getVar('akun_selisih'),
             ]);
 
             return response()->setJSON([
@@ -140,7 +151,10 @@ class PembayaranPOLokal extends BaseController
                 'multiple_po_no' => $resPoNo,
                 'multiple_po_id' => $resPoID,
                 'lpb_no' => $lpb == null ? null : $lpb['no_penerimaan_barang'],
-                'month' => $this->request->getVar('bulan')
+                'month' => $this->request->getVar('bulan'),
+                'akun_kas' => $this->request->getVar('akun_kas'),
+                'akun_selisih' => $this->request->getVar('akun_selisih'),
+
             ]);
 
             return response()->setJSON([
@@ -235,16 +249,24 @@ class PembayaranPOLokal extends BaseController
     {
         $supplierModel = new SupplierModel();
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $Sub_AkunsModel = new Sub_AkunsModel();
 
         $supplierList = $supplierModel->asObject()
             ->where('deletedAt', null)
             ->where('type', "BAHAN PENOLONG")
             ->orderBy('name', "ASC")
             ->findAll();
+        
+        
+        $subAkunsModel = $Sub_AkunsModel->asObject()
+                ->where('deletedAt', null)
+                ->findAll();
+    
 
         $data = [
             "suppliers" => $supplierList,
-            "detail" => $localPOPaymentModel->get($id)
+            "detail" => $localPOPaymentModel->get($id),
+            "subsAkuns" => $subAkunsModel
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
@@ -254,11 +276,17 @@ class PembayaranPOLokal extends BaseController
     {
         $supplierModel = new SupplierModel();
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $Sub_AkunsModel = new Sub_AkunsModel();
 
         $supplierList = $supplierModel->asObject()
             ->where('deletedAt', null)
             ->where('type', "BAHAN BAKU")
             ->orderBy('name', "ASC")
+            ->findAll();
+        
+        
+        $subAkunsModel = $Sub_AkunsModel->asObject()
+            ->where('deletedAt', null)
             ->findAll();
 
         if ($localPOPaymentModel->where('id', $id)->first() == null) {
@@ -267,7 +295,8 @@ class PembayaranPOLokal extends BaseController
 
         $data = [
             "suppliers" => $supplierList,
-            "detail" => $localPOPaymentModel->getBB($id, $this->this_company_id)
+            "detail" => $localPOPaymentModel->getBB($id, $this->this_company_id),
+            "subsAkuns" => $subAkunsModel
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
@@ -332,15 +361,23 @@ class PembayaranPOLokal extends BaseController
     public function createPembayaranPOLokalBB()
     {
         $supplierModel = new SupplierModel();
+        $Sub_AkunsModel = new Sub_AkunsModel();
 
         $supplierList = $supplierModel->asObject()
             ->where('deletedAt', null)
             ->where('type', "BAHAN BAKU")
             ->orderBy('name', "ASC")
             ->findAll();
+        
+        $subAkunsModel = $Sub_AkunsModel->asObject()
+            ->where('deletedAt', null)
+            ->findAll();
+
+        
 
         $data = [
-            "suppliers" => $supplierList
+            "suppliers" => $supplierList,
+            "subsAkuns" => $subAkunsModel
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);

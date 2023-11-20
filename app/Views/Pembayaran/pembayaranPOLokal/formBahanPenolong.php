@@ -105,6 +105,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub. " " .$subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Akun Kas</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub. " " .$subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Akun Selisih</label>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="col-subtitle-modal mt-3">
                     <div class="row">
@@ -196,6 +220,9 @@
                 },
                 payment_method: {
                     required: true
+                },
+                akun_kas: {
+                    required: true
                 }
             },
             messages: {
@@ -219,6 +246,9 @@
                 },
                 payment_method: {
                     required: "Metode pembayaran wajib diisi"
+                },
+                akun_kas: {
+                    required: "Akun kas wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -251,7 +281,12 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
-        })
+        });
+
+        $('#akun_kas, #akun_selisih').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        });
 
         $('#tanda_terima_supplier').select2({
             placeholder: "",
