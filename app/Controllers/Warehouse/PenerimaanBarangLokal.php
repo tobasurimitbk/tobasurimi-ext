@@ -553,19 +553,19 @@ class PenerimaanBarangLokal extends BaseController
             }
 
             // automate close po check item by check ech po number
-            foreach ($multiple_po_id as $item) {
-                if ($tipe_bahan === "BAKU") {
-                    $this->rmPurchaseOrderModel
-                        ->where('id', $item)
-                        ->set('status_penerimaan', 1)
-                        ->update();
-                } elseif ($tipe_bahan === "PENOLONG") {
-                    $this->amPurchaseOrderModel
-                        ->where('id', $item)
-                        ->set('status_penerimaan', 1)
-                        ->update();
-                }
-            }
+            // foreach ($multiple_po_id as $item) {
+            //     if ($tipe_bahan === "BAKU") {
+            //         $this->rmPurchaseOrderModel
+            //             ->where('id', $item)
+            //             ->set('status_penerimaan', 1)
+            //             ->update();
+            //     } elseif ($tipe_bahan === "PENOLONG") {
+            //         $this->amPurchaseOrderModel
+            //             ->where('id', $item)
+            //             ->set('status_penerimaan', 1)
+            //             ->update();
+            //     }
+            // }
 
             $response = $this->penerimaanBarangModel
                 ->where(['id' => $id])
