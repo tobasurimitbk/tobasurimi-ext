@@ -64,11 +64,11 @@ class POImportBahanBaku extends BaseController
         $dataShipment = $this->metadataModel->get_by_name('Shipment');
 
         //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
+        $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
 
         //Get Valuta By Metadata
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
-        
+
         $data = [
             "dataBCType" => $dataBCType,
             "today" => date("d/m/Y"),
@@ -101,7 +101,7 @@ class POImportBahanBaku extends BaseController
 
         //Get Valuta By Metadata
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
-        
+
         $data = [
             "dataBCType" => $dataBCType,
             "today" => date("d/m/Y"),
@@ -118,8 +118,7 @@ class POImportBahanBaku extends BaseController
 
             $dataPOImportDetail = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
-            if($dataPOImportDetail)
-            {
+            if ($dataPOImportDetail) {
                 $data["dataPOImportDetail"] = $dataPOImportDetail;
             }
 
@@ -194,7 +193,7 @@ class POImportBahanBaku extends BaseController
 
     public function savePOImportBahanBaku()
     {
-        try{
+        try {
             $rules = [
                 "po_no" => [
                     "rules" => "required",
@@ -261,7 +260,7 @@ class POImportBahanBaku extends BaseController
                     'errors' => [
                         'required' => 'ATTN tidak boleh kosong'
                     ]
-                ]    
+                ]
             ];
 
             if (!$this->validate($rules)) {
@@ -281,7 +280,7 @@ class POImportBahanBaku extends BaseController
                 $divisi = $find->divisi;
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
                 $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $divisi, date('y'), $divisi_id, $last_day);
-                
+
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
                     "bc_type" => $this->request->getPost("bc_type"),
@@ -316,18 +315,16 @@ class POImportBahanBaku extends BaseController
                 //     'token' => csrf_hash()
                 // ];
                 // return json_encode($data);
-                
+
                 $response =  $this->rmImportPOModel->insert($payload);
 
                 if ($response) {
-                    foreach($items as $data)
-                    {
+                    foreach ($items as $data) {
                         $detailPayload = [];
 
                         $barang_id = $data->item_id;
                         // buat barang baru jika id kosong
-                        if(!$barang_id)
-                        {
+                        if (!$barang_id) {
                             // $payloadBarang = [
                             //     "company_id" => $this->this_company_id,
                             //     "kode_barang" => $data->item_code,
@@ -342,7 +339,7 @@ class POImportBahanBaku extends BaseController
                             //     "status" => "Aktif",
                             //     "spek" => "[]"
                             // ];
-            
+
                             // $responseBarang =  $this->barangModel->insert($payloadBarang);
 
                             // $barang_id = $responseBarang;
@@ -382,7 +379,7 @@ class POImportBahanBaku extends BaseController
 
                         $responseDetail = $this->rmImportPODetailModel->insert($detailPayload);
 
-                        if(!$responseDetail) {
+                        if (!$responseDetail) {
                             $message =  'Data Gagal Disimpan';
                             $data = [
                                 "status"            => false,
@@ -415,9 +412,7 @@ class POImportBahanBaku extends BaseController
                     echo json_encode($data);
                 }
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -430,7 +425,7 @@ class POImportBahanBaku extends BaseController
 
     public function updatePOImportBahanBaku()
     {
-        try{
+        try {
             $rules = [
                 "po_no" => [
                     "rules" => "required",
@@ -514,12 +509,10 @@ class POImportBahanBaku extends BaseController
                 $response = $this->rmImportPOModel->where($condition)->set($payload)->update();
 
                 if ($response) {
-                    foreach($items as $data)
-                    {
+                    foreach ($items as $data) {
                         $barang_id = $data->item_id;
                         // buat barang baru jika id kosong
-                        if(!$barang_id)
-                        {
+                        if (!$barang_id) {
                             // $payloadBarang = [
                             //     "company_id" => $this->this_company_id,
                             //     "kode_barang" => $data->item_code,
@@ -534,7 +527,7 @@ class POImportBahanBaku extends BaseController
                             //     "status" => "Aktif",
                             //     "spek" => "[]"
                             // ];
-            
+
                             // $responseBarang =  $this->barangModel->insert($payloadBarang);
 
                             // $barang_id = $responseBarang;
@@ -575,11 +568,10 @@ class POImportBahanBaku extends BaseController
                         // echo json_encode($data);
 
                         // kalau hapus
-                        if($data->isDeleted)
-                        {
+                        if ($data->isDeleted) {
                             $responseDetail = $this->rmImportPODetailModel->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -592,16 +584,15 @@ class POImportBahanBaku extends BaseController
                             }
                         }
 
-                         // kalau update
-                        if($data->id)
-                        {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'id' => $data->id
                             ];
 
                             $responseDetail = $this->rmImportPODetailModel->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Disimpan';
                                 $data = [
                                     "status"            => false,
@@ -615,11 +606,10 @@ class POImportBahanBaku extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->rmImportPODetailModel->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -632,7 +622,7 @@ class POImportBahanBaku extends BaseController
                             }
                         }
                     }
-                    
+
                     $data = [
                         "id" => "",
                         "status"            => true,
@@ -652,10 +642,8 @@ class POImportBahanBaku extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
-        }
-        catch(\Exception $e)
-        {
+            }
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -668,7 +656,7 @@ class POImportBahanBaku extends BaseController
 
     public function updateStatusPOImportBahanBaku()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             // po posting
@@ -676,7 +664,7 @@ class POImportBahanBaku extends BaseController
             $payload = [
                 "is_posted" => 1
             ];
-            
+
             $condition = [
                 'id' => $id
             ];
@@ -701,9 +689,7 @@ class POImportBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -716,13 +702,13 @@ class POImportBahanBaku extends BaseController
 
     public function closePOImportBahanBaku()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
-            
+
             $payload = [
                 "status_penerimaan" => 1
             ];
-            
+
             $condition = [
                 'id' => $id
             ];
@@ -747,9 +733,7 @@ class POImportBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -762,7 +746,7 @@ class POImportBahanBaku extends BaseController
 
     public function deletePOImportBahanBaku()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -801,9 +785,7 @@ class POImportBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -814,21 +796,18 @@ class POImportBahanBaku extends BaseController
         return;
     }
 
-    public function print($id = null) 
+    public function print($id = null)
     {
-        if($id)
-        {
+        if ($id) {
             $filename = "PO Import Bahan Baku";
 
             $data = [];
             $dataPO = $this->rmImportPOModel->getPOById($id);
 
-            if($dataPO)
-            {
+            if ($dataPO) {
                 $dataPODetail = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
-                if($dataPODetail)
-                {
+                if ($dataPODetail) {
                     $data["dataPO"] = $dataPO;
                     $data["dataPODetail"] = $dataPODetail;
                 }
