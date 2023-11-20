@@ -10,6 +10,8 @@ use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
 use App\Models\BeaCukaiModel;
+use App\Models\CompaniesModel;
+use App\Models\DivisisModel;
 use Dompdf\Dompdf;
 
 class POImportBahanPenolong extends BaseController
@@ -62,7 +64,7 @@ class POImportBahanPenolong extends BaseController
 
         //Get Shipment By Metadata
         $dataShipment = $this->metadataModel->get_by_name('Shipment');
-        
+
         $data = [
             "dataBCType" => $dataBCType,
             "today" => date("d/m/Y"),
@@ -91,7 +93,7 @@ class POImportBahanPenolong extends BaseController
 
         //Get Shipment By Metadata
         $dataShipment = $this->metadataModel->get_by_name('Shipment');
-        
+
         $data = [
             "dataBCType" => $dataBCType,
             "today" => date("d/m/Y"),
@@ -102,18 +104,27 @@ class POImportBahanPenolong extends BaseController
         ];
 
         if (!empty($id)) {
+            $sppModel = new SppModel();
+            $companyModel = new CompaniesModel();
+            $divisiModel = new DivisisModel();
+
             $dataPOImport = $this->amPurchaseOrderModel->getPOById($id);
+            $sppFirst = $sppModel->where('id', $dataPOImport->purchase_request_id)->first();
+            $companyFirst = $companyModel->where('id', $sppFirst['company_id'])->first();
+            $divisiFirst = $divisiModel->where('id', $sppFirst['divisi_id'])->first();
+
+            $dataPOImport->spp_no = ($sppFirst == null) ? '-' : $sppFirst['spp_no'];
+            $dataPOImport->companyName = $companyFirst['company'];
+            $dataPOImport->divisiName = $divisiFirst['divisi'];
+            $dataPOImport->divisi_id = $divisiFirst['id'];
+
             $data["dataPOImport"] = $dataPOImport;
 
             $dataPOImportDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
-            if($dataPOImportDetail)
-            {
+            if ($dataPOImportDetail) {
                 $data["dataPOImportDetail"] = $dataPOImportDetail;
             }
-
-            // var_dump($dataPOImport);
-            // die;
         }
 
         return view('Purchase/poImportBahanPenolong/form', $data);
@@ -184,7 +195,7 @@ class POImportBahanPenolong extends BaseController
 
     public function savePOImportBahanPenolong()
     {
-        try{
+        try {
             $rules = [
                 "purchase_request_id" => [
                     "rules" => "required",
@@ -277,7 +288,7 @@ class POImportBahanPenolong extends BaseController
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
                 $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $divisi, date('y'), $divisi_id, $last_day);
                 $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
-                
+
                 $payload = [
                     "purchase_request_id" => $purchase_request_id,
                     "bc_type" => $this->request->getPost("bc_type"),
@@ -308,8 +319,7 @@ class POImportBahanPenolong extends BaseController
                 // spp number cannot be used again
                 $responsespp = $this->sppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
 
-                if(!$responsespp)
-                {
+                if (!$responsespp) {
                     $data = [
                         "status"            => false,
                         "message"    => "No. SPP gagal di close",
@@ -319,18 +329,16 @@ class POImportBahanPenolong extends BaseController
                     echo json_encode($data);
                     return;
                 }
-                
+
                 $response =  $this->amPurchaseOrderModel->insert($payload);
 
                 if ($response) {
-                    foreach($items as $data)
-                    {
+                    foreach ($items as $data) {
                         $detailPayload = [];
 
                         $barang_id = $data->item_id;
                         // buat barang baru jika id kosong
-                        if(!$barang_id)
-                        {
+                        if (!$barang_id) {
                             // $payloadBarang = [
                             //     "company_id" => $this->this_company_id,
                             //     "kode_barang" => $data->item_code,
@@ -345,7 +353,7 @@ class POImportBahanPenolong extends BaseController
                             //     "status" => "Aktif",
                             //     "spek" => "[]"
                             // ];
-            
+
                             // $responseBarang =  $this->barangModel->insert($payloadBarang);
 
                             // $barang_id = $responseBarang;
@@ -365,7 +373,7 @@ class POImportBahanPenolong extends BaseController
                         $detailPayload = [
                             'am_purchase_order_id' => $response,
                             'purchase_request_detail_id' => $data->purchase_request_detail_id,
-                            'barang_id' =>$barang_id,
+                            'barang_id' => $barang_id,
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
@@ -386,7 +394,7 @@ class POImportBahanPenolong extends BaseController
 
                         $responseDetail = $this->amPurchaseOrderDetailModel->insert($detailPayload);
 
-                        if(!$responseDetail) {
+                        if (!$responseDetail) {
                             $message =  'Data Gagal Disimpan';
                             $data = [
                                 "status"            => false,
@@ -419,9 +427,7 @@ class POImportBahanPenolong extends BaseController
                     echo json_encode($data);
                 }
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -434,7 +440,7 @@ class POImportBahanPenolong extends BaseController
 
     public function updatePOImportBahanPenolong()
     {
-        try{
+        try {
             $rules = [
                 "po_no" => [
                     "rules" => "required",
@@ -562,12 +568,10 @@ class POImportBahanPenolong extends BaseController
                 $response = $this->amPurchaseOrderModel->where($condition)->set($payload)->update();
 
                 if ($response) {
-                    foreach($items as $data)
-                    {
+                    foreach ($items as $data) {
                         $barang_id = $data->item_id;
                         // buat barang baru jika id kosong
-                        if(!$barang_id)
-                        {
+                        if (!$barang_id) {
                             // $payloadBarang = [
                             //     "company_id" => $this->this_company_id,
                             //     "kode_barang" => $data->item_code,
@@ -582,7 +586,7 @@ class POImportBahanPenolong extends BaseController
                             //     "status" => "Aktif",
                             //     "spek" => "[]"
                             // ];
-            
+
                             // $responseBarang =  $this->barangModel->insert($payloadBarang);
 
                             // $barang_id = $responseBarang;
@@ -624,11 +628,10 @@ class POImportBahanPenolong extends BaseController
                         // echo json_encode($data);
 
                         // kalau hapus
-                        if($data->isDeleted)
-                        {
+                        if ($data->isDeleted) {
                             $responseDetail = $this->amPurchaseOrderDetailModel->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -641,16 +644,15 @@ class POImportBahanPenolong extends BaseController
                             }
                         }
 
-                         // kalau update
-                        if($data->id)
-                        {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'id' => $data->id
                             ];
 
                             $responseDetail = $this->amPurchaseOrderDetailModel->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Disimpan';
                                 $data = [
                                     "status"            => false,
@@ -664,11 +666,10 @@ class POImportBahanPenolong extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->amPurchaseOrderDetailModel->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -681,7 +682,7 @@ class POImportBahanPenolong extends BaseController
                             }
                         }
                     }
-                    
+
                     $data = [
                         "id" => "",
                         "status"            => true,
@@ -701,10 +702,8 @@ class POImportBahanPenolong extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
-        }
-        catch(\Exception $e)
-        {
+            }
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -717,15 +716,14 @@ class POImportBahanPenolong extends BaseController
 
     public function updateStatusPOImportBahanPenolong()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
             $spp = $this->request->getPost("spp");
 
             // spp close
             $responsespp = $this->sppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
 
-            if(!$responsespp)
-            {
+            if (!$responsespp) {
                 $data = [
                     "status"            => false,
                     "message"    => "Gagal close SPP",
@@ -741,7 +739,7 @@ class POImportBahanPenolong extends BaseController
             $payload = [
                 "is_posted" => 1
             ];
-            
+
             $condition = [
                 'id' => $id
             ];
@@ -766,9 +764,7 @@ class POImportBahanPenolong extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -781,13 +777,13 @@ class POImportBahanPenolong extends BaseController
 
     public function closePOImportBahanPenolong()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             $payload = [
                 "status_penerimaan" => 1
             ];
-            
+
             $condition = [
                 'id' => $id
             ];
@@ -812,9 +808,7 @@ class POImportBahanPenolong extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -827,7 +821,7 @@ class POImportBahanPenolong extends BaseController
 
     public function deletePOImportBahanPenolong()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -880,9 +874,7 @@ class POImportBahanPenolong extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -893,21 +885,32 @@ class POImportBahanPenolong extends BaseController
         return;
     }
 
-    public function print($id = null) 
+    public function print($id = null)
     {
-        if($id)
-        {
+        if ($id) {
             $filename = "PO Import Bahan Penolong";
 
             $data = [];
             $dataPO = $this->amPurchaseOrderModel->getPOById($id);
 
-            if($dataPO)
-            {
+            if ($dataPO) {
                 $dataPODetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
-                if($dataPODetail)
-                {
+                if ($dataPODetail) {
+                    $sppModel = new SppModel();
+                    $companyModel = new CompaniesModel();
+                    $divisiModel = new DivisisModel();
+
+                    $dataPOImport = $this->amPurchaseOrderModel->getPOById($id);
+                    $sppFirst = $sppModel->where('id', $dataPOImport->purchase_request_id)->first();
+                    $companyFirst = $companyModel->where('id', $sppFirst['company_id'])->first();
+                    $divisiFirst = $divisiModel->where('id', $sppFirst['divisi_id'])->first();
+
+                    $dataPO->spp_no = ($sppFirst == null) ? '-' : $sppFirst['spp_no'];
+                    $dataPO->companyName = $companyFirst['company'];
+                    $dataPO->divisiName = $divisiFirst['divisi'];
+                    $dataPO->divisi_id = $divisiFirst['id'];
+
                     $data["dataPO"] = $dataPO;
                     $data["dataPODetail"] = $dataPODetail;
                 }
