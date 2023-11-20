@@ -398,6 +398,7 @@ $routes->get('/surat-jalan/print/(:num)', 'SalesLokal\SuratJalan::printSJ/$1', [
 $routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);
 $routes->get('/retur-barang/create', 'Purchase\ReturPembelian::create', ['filter' => 'Auth']);
 $routes->get('/retur-barang/generate-new-no', 'Purchase\ReturPembelian::generateNo', ['filter' => 'Auth']);
+$routes->get('/retur-barang/generate-penerimaan-barang', 'Purchase\ReturPembelian::getPenerimaanBarangList', ['filter' => 'Auth']);
 
 $routes->get('/retur/(:num)', 'SalesLokal\Retur::getById/$1', ['filter' => 'Auth']);
 $routes->get('/retur/all', 'SalesLokal\Retur::all', ['filter' => 'Auth']);

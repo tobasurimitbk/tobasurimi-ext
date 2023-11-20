@@ -47,6 +47,38 @@ class ReturAmPoModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function getPenerimaanBarangList($supplierID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+
+        $conditionAmPurchaseOrder = [
+            'am_purchase_orders.deletedAt' => null,
+            'am_purchase_orders.po_type' => "Lokal",
+            'am_purchase_orders.supplier_id' => $supplierID
+        ];
+
+        $poArr = [];
+        $amPOList = $amPurchaseOrderModel->where($conditionAmPurchaseOrder)->findAll();
+        foreach ($amPOList as $a) {
+            array_push($poArr, $a['id']);
+        }
+
+        $lpbArr = [];
+
+        foreach ($poArr as $a) {
+            $lpbList = $penerimaanBarangModel->like('multiple_po_id', $a)->first();
+            if ($lpbList != null) {
+                $lpbArr[] = [
+                    'id' => $lpbList['id'],
+                    'no_penerimaan_barang' => $lpbList['no_penerimaan_barang']
+                ];
+            }
+        }
+
+        return  $lpbArr;
+    }
+
     public function generateNoRetur()
     {
         $romanNumb = [

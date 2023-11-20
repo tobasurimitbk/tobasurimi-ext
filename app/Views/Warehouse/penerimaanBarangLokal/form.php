@@ -1815,7 +1815,7 @@
                                                         confirmButtonColor: '#4e73df',
                                                     })
                                                     .then(() => {
-                                                        window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
+                                                        location.reload();
                                                     })
                                             } else {
                                                 Swal.fire({
@@ -1842,7 +1842,7 @@
                                 else {
                                     let jml_masuk = 0;
                                     list_items.map(obj => {
-                                        if (obj.jml_masuk > 0) {
+                                        if (obj.sub_total !== "0.00") {
                                             update_list_items.push({
                                                 purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
                                                 barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
@@ -1959,9 +1959,9 @@
 
                 attRes.push(attributes);
             });
-
+            console.log(attRes);
             $.each(attRes, function(i, v) {
-                if (v.kode === $('.kode_barang').val()) {
+                if (v.kode === $('.kode_barang').val() && v.nama_barang === $('.nama_barang').val()) {
                     jumlahOrder = Number(v.qty);
                     diterima = Number(v.qty_diterima);
                 }

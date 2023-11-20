@@ -38,7 +38,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" id="" readonly name="" value="BAHAN PENOLONG">
+                                <input autocomplete="one-time-code" type="text" class="form-control" id="" readonly name="" value="BAHAN PENOLONG LOKAL">
                                 <label for="floatingInput">Tipe Bahan</label>
                             </div>
                         </div>
@@ -127,7 +127,30 @@
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true
-    });
+    }).on('chage', (function() {
+
+    }));
+
+    $('#supplier_id').change(function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: `<?= base_url("retur-barang/generate-penerimaan-barang"); ?>`,
+            method: "GET",
+            data: {
+                supplierID: $(this).val()
+            },
+            dataType: "json",
+            success: function(res) {
+                console.log(res);
+                $("#penerimaan_barang_id").empty();
+                $("#penerimaan_barang_id").append(`<option value=""></option>`);
+                res.data.forEach(function(item) {
+                    $("#penerimaan_barang_id").append(`<option  value="${item.id}">${item.no_penerimaan_barang}</option>`);
+                });
+            }
+        })
+    })
+
 
     $('.form-select')
         .parent('div')

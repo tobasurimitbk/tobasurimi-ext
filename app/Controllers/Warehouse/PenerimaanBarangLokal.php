@@ -157,7 +157,6 @@ class PenerimaanBarangLokal extends BaseController
             }
         }
 
-        // dd($dataPenerimaanBarangDetail);
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);
     }
@@ -178,8 +177,10 @@ class PenerimaanBarangLokal extends BaseController
         ];
 
         $condition = [
-            "penerimaan_barang.company_id"        => $this->this_company_id,
-            "status_penerimaan" => "LOKAL"
+            "penerimaan_barang.company_id" => $this->this_company_id,
+            "status_penerimaan" => "LOKAL",
+            "penerimaan_barang.deletedAt" => null,
+            "penerimaan_barang_detail.deletedAt" => null
         ];
 
         $addCondition = [
@@ -209,75 +210,18 @@ class PenerimaanBarangLokal extends BaseController
                 "warehouse_name"        => $data->warehouse_name,
                 "tipe_bahan"            => $data->tipe_bahan,
                 "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->createdAt)) : "",
-                // "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
                 "multiple_po_no"        => json_decode($data->multiple_po_no),
                 "status_post"           => $data->status_post,
-                // "status_bc"             => $status_bc
             ]);
         }
-
-        // filter status bc
-        // $no = 1;
-        // if($this->request->getVar("status_bc") === "waiting")
-        // {
-        //     $newDataPenerimaanBarang = [];
-        //     foreach($dataPenerimaanBarang as $item)
-        //     {
-        //         if($item["status_bc"] === "WAITING")
-        //         {
-        //             array_push($newDataPenerimaanBarang, [
-        //                 "no"                    => $no++,
-        //                 "id"                    => $item["id"],
-        //                 "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
-        //                 "warehouse_name"        => $item["warehouse_name"],
-        //                 "tipe_bahan"            => $item["tipe_bahan"],
-        //                 "createdAt"             => $item["createdAt"],
-        //                 "supplier_name"         => $item["supplier_name"],
-        //                 "itemCount"             => $item["itemCount"],
-        //                 "multiple_po_no"        => $item["multiple_po_no"],
-        //                 "status_post"           => $item["status_post"],
-        //                 "status_bc"             => $item["status_bc"]
-        //             ]);
-        //         }
-        //     }  
-        //     $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
-        //     $dataPenerimaanBarang = $newDataPenerimaanBarang;
-        // }
-
-        // if($this->request->getVar("status_bc") === "finish")
-        // {
-        //     $newDataPenerimaanBarang = [];
-        //     foreach($dataPenerimaanBarang as $item)
-        //     {
-        //         if($item["status_bc"] === "FINISH")
-        //         {
-        //             array_push($newDataPenerimaanBarang, [
-        //                 "no"                    => $no++,
-        //                 "id"                    => $item["id"],
-        //                 "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
-        //                 "warehouse_name"        => $item["warehouse_name"],
-        //                 "tipe_bahan"            => $item["tipe_bahan"],
-        //                 "createdAt"             => $item["createdAt"],
-        //                 "supplier_name"         => $item["supplier_name"],
-        //                 "itemCount"             => $item["itemCount"],
-        //                 "multiple_po_no"        => $item["multiple_po_no"],
-        //                 "status_post"           => $item["status_post"],
-        //                 "status_bc"             => $item["status_bc"]
-        //             ]);
-        //         }
-        //     }  
-        //     $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
-        //     $dataPenerimaanBarang = $newDataPenerimaanBarang;
-        // }
 
         $data = [
             "draw"              => intval($this->request->getVar("draw")),
             "recordsTotal"      => $penerimaanBarangData['totalData'],
             "recordsFiltered"   => $penerimaanBarangData['totalFilteredData'],
             "data"              => $dataPenerimaanBarang,
-            // "response" => $response,
             "payload"           => $payload
         ];
 
@@ -329,8 +273,6 @@ class PenerimaanBarangLokal extends BaseController
 
             if ($this->validate($rules)) {
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
-                $status_post = $this->request->getVar("status_post");
                 $tipe_bahan = $this->request->getVar("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getVar("multiple_po_id")), "ARR_TO_INT");
 
@@ -376,15 +318,23 @@ class PenerimaanBarangLokal extends BaseController
 
                     if ($tipe_bahan == "PENOLONG") {
                         // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
+                        $amDetail =  $this->amPurchaseOrderDetailModel->where('id', $data->purchase_order_details_id)->first();
+                        $qtyDiterimaLast = ($amDetail == null) ? 0 : $amDetail['qty_diterima'];
+                        $qtyRemainingLast = ($amDetail == null) ? 0 : $amDetail['remaining_qty'];
+
                         $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
-                            'remaining_qty' => ($data->qty - $data->jml_masuk),
-                            'qty_diterima' => $data->jml_masuk
+                            'remaining_qty' => ($data->qty - $data->jml_masuk - $qtyDiterimaLast),
+                            'qty_diterima' => $data->jml_masuk + $qtyDiterimaLast
                         ]);
                     } else {
                         // BAKU
+                        $rmDetail = $this->rmPurchaseOrderDetailModel->where('id', $data->purchase_order_details_id)->first();
+                        $qtyDiterimaLast = ($rmDetail == null) ? 0 : $rmDetail['qty_diterima'];
+                        $qtyRemainingLast = ($rmDetail == null) ? 0 : $rmDetail['remaining_qty'];
+
                         $this->rmPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
-                            'remaining_qty' => ($data->qty - $data->jml_masuk),
-                            'qty_diterima' => $data->jml_masuk
+                            'remaining_qty' => ($data->qty - $data->jml_masuk - $qtyDiterimaLast),
+                            'qty_diterima' => $data->jml_masuk + $qtyDiterimaLast
                         ]);
                     }
                 }
@@ -392,7 +342,6 @@ class PenerimaanBarangLokal extends BaseController
                 $this->penerimaanBarangDetailModel->insertBatch($detailPayload);
 
                 $this->penerimaanBarangModel->db->transComplete();
-
 
                 $data = [
                     "id"        => $response,
@@ -417,205 +366,144 @@ class PenerimaanBarangLokal extends BaseController
 
     public function updatePenerimaanBarangLokal()
     {
-        try {
-            $rules = [
-                "no_penerimaan_barang" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. Penerimaan Barang tidak boleh kosong'
-                    ]
-                ],
-                "supplier_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Supplier tidak boleh kosong'
-                    ]
-                ],
-                "warehouse_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Warehouse tidak boleh kosong'
-                    ]
-                ],
-                "tipe_bahan" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tipe Bahan tidak boleh kosong'
-                    ]
+        $rules = [
+            "no_penerimaan_barang" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'No. Penerimaan Barang tidak boleh kosong'
                 ]
-            ];
+            ],
+            "supplier_id" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Supplier tidak boleh kosong'
+                ]
+            ],
+            "warehouse_id" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Warehouse tidak boleh kosong'
+                ]
+            ],
+            "tipe_bahan" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Tipe Bahan tidak boleh kosong'
+                ]
+            ]
+        ];
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            // return response()->setJSON([
-            //     'all' => $_POST,
-            //     'test' => json_decode($this->request->getVar("items")),
-            //     'token' => csrf_hash()
-            // ]);
-
-            if ($this->validate($rules)) {
-                $id = $this->request->getVar("id");
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
-                $tipe_bahan = $this->request->getVar("tipe_bahan");
-                $multiple_po_id = formatter(json_decode($this->request->getVar("multiple_po_id")), "ARR_TO_INT");
-
-                $payload = [
-                    "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => $this->request->getVar("no_penerimaan_barang"),
-                    "supplier_id" => formatter($this->request->getVar("supplier_id"), "STR_TO_INT"),
-                    "warehouse_id" => formatter($this->request->getVar("warehouse_id"), "STR_TO_INT"),
-                    "acceptance_type" => $this->request->getVar("acceptance_type"),
-                    "multiple_po_id" => json_encode($multiple_po_id),
-                    "multiple_po_no" => $this->request->getVar("multiple_po_no"),
-                    "bc_type" => $this->request->getVar('aju_document_type'),
-                    "tipe_bahan" => $tipe_bahan
-                ];
-
-                $items = json_decode($this->request->getVar("items"));
-
-                $condition = [
-                    'id' => $id
-                ];
-
-                $response = $this->penerimaanBarangModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    foreach ($items as $data) {
-                        $detailPayload = [];
-
-                        $detailPayload = [
-                            'purchase_order_details_id' => $data->purchase_order_details_id,
-                            'penerimaan_barang_id' => $id,
-                            'harga' => $data->harga,
-                            'harga_harian' => $data->harga_harian,
-                            'harga_bulanan' => $data->harga_bulanan,
-                            'sub_total' => $data->sub_total,
-                            'keterangan' => $data->keterangan,
-                            'barang_id' => $data->barang_id,
-                            'qty' => $data->qty,
-                            'unit' => $data->unit,
-                            'nama_barang_dok' => $data->nama_barang_dok,
-                            'jml_masuk' => $data->jml_masuk,
-                            'packaging' => $data->packaging,
-                            'packaging_qty' => $data->packaging_qty
-                        ];
-
-                        if ($tipe_bahan == "PENOLONG") {
-                            // UPDATE remaining_qty (sisa stok) di table am_purchase_order_detail
-                            $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
-                                'remaining_qty' => ($data->qty - $data->jml_masuk),
-                                'qty_diterima' => $data->jml_masuk
-                            ]);
-                        } else {
-                            // BAKU
-                            $this->rmPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
-                                'remaining_qty' => ($data->qty - $data->jml_masuk),
-                                'qty_diterima' => $data->jml_masuk
-                            ]);
-                        }
-
-                        $conditionDetail = [
-                            'purchase_order_details_id' => $data->id
-                        ];
-
-                        $responseDetail = $this->penerimaanBarangDetailModel->where($conditionDetail)->set($detailPayload)->update();
-
-                        // kalau hapus
-                        if ($data->is_delete) {
-                            $responseDetail = $this->penerimaanBarangDetailModel->delete($data->id);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Dihapus';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-
-                        // kalau update
-                        if ($data->id) {
-                            $conditionDetail = [
-                                'id' => $data->id
-                            ];
-
-                            $responseDetail = $this->penerimaanBarangDetailModel->where($conditionDetail)->set($detailPayload)->update();
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Disimpan';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-
-                        // kalau create
-                        else {
-                            // $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Diubah';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-                    }
-
-                    $data = [
-                        "id" => "",
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
+        if (!$this->validate($rules)) {
+            $errorList = $this->validator->getErrors();
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
             ];
-            echo json_encode($data);
+            return response()->setJson($data);
         }
-        return;
+
+        $id = $this->request->getVar("id");
+        $tipe_bahan = $this->request->getVar("tipe_bahan");
+        $multiple_po_id = formatter(json_decode($this->request->getVar("multiple_po_id")), "ARR_TO_INT");
+
+        $payload = [
+            "company_id" => $this->this_company_id,
+            "no_penerimaan_barang" => $this->request->getVar("no_penerimaan_barang"),
+            "supplier_id" => formatter($this->request->getVar("supplier_id"), "STR_TO_INT"),
+            "warehouse_id" => formatter($this->request->getVar("warehouse_id"), "STR_TO_INT"),
+            "acceptance_type" => $this->request->getVar("acceptance_type"),
+            "multiple_po_id" => json_encode($multiple_po_id),
+            "multiple_po_no" => $this->request->getVar("multiple_po_no"),
+            "bc_type" => $this->request->getVar('aju_document_type'),
+            "tipe_bahan" => $tipe_bahan
+        ];
+
+        $items = json_decode($this->request->getVar("items"));
+        $response = $this->penerimaanBarangModel->update($id, $payload);
+
+        foreach ($items as $data) {
+            $detailPayload = [
+                'purchase_order_details_id' => $data->purchase_order_details_id,
+                'penerimaan_barang_id' => $id,
+                'harga' => $data->harga,
+                'harga_harian' => $data->harga_harian,
+                'harga_bulanan' => $data->harga_bulanan,
+                'sub_total' => $data->sub_total,
+                'keterangan' => $data->keterangan,
+                'barang_id' => $data->barang_id,
+                'qty' => $data->qty,
+                'unit' => $data->unit,
+                'nama_barang_dok' => $data->nama_barang_dok,
+                'jml_masuk' => $data->qty_diterima - $data->jml_masuk,
+                'packaging' => $data->packaging,
+                'packaging_qty' => $data->packaging_qty
+            ];
+
+            $conditionDetail = [
+                'purchase_order_details_id' => $data->purchase_order_details_id,
+                'penerimaan_barang_id' => $id,
+                'penerimaan_barang_detail.deletedAt' => null
+            ];
+
+            $this->penerimaanBarangDetailModel->set($detailPayload)->where($conditionDetail)->update();
+
+            if ($tipe_bahan == "PENOLONG") {
+                $conditionDetail = [
+                    'purchase_order_details_id' => $data->purchase_order_details_id,
+                    'penerimaan_barang_id' => $id,
+                    'penerimaan_barang_detail.deletedAt' => null
+                ];
+
+                $selectQry = "
+                            SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk
+                        ";
+                $amDetail =  $this->penerimaanBarangDetailModel
+                    ->select($selectQry)
+                    ->where($conditionDetail)
+                    ->groupBy(['penerimaan_barang_id', 'purchase_order_details_id'])
+                    ->first();
+
+                $this->amPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                    'remaining_qty' => $data->qty -  $amDetail['jmlMasuk'],
+                    'qty_diterima' => $amDetail['jmlMasuk'],
+                ]);
+            } else {
+                $conditionDetail = [
+                    'purchase_order_details_id' => $data->purchase_order_details_id,
+                    'penerimaan_barang_id' => $id,
+                    'penerimaan_barang_detail.deletedAt' => null
+                ];
+
+                $selectQry = "
+                            SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk
+                        ";
+                $rmDetail =  $this->penerimaanBarangDetailModel
+                    ->select($selectQry)
+                    ->where($conditionDetail)
+                    ->groupBy(['penerimaan_barang_id', 'purchase_order_details_id'])
+                    ->first();
+
+                // return response()->setJson([
+                //     'emDetail' => $rmDetail,
+                //     'list' => $items
+                // ]);
+
+                $this->rmPurchaseOrderDetailModel->update($data->purchase_order_details_id, [
+                    'remaining_qty' =>  $data->qty - $rmDetail['jmlMasuk'],
+                    'qty_diterima' =>  $rmDetail['jmlMasuk']
+                ]);
+            }
+        }
+
+
+        return response()->setJson([
+            "status" => true,
+            "message" => "Penerimaan barang berhasil diupdate",
+            "payload" => $payload,
+            "response" => $response,
+            'token' => csrf_hash()
+        ]);
     }
 
     public function updateStatusPenerimaanBarangLokal()
@@ -638,67 +526,19 @@ class PenerimaanBarangLokal extends BaseController
 
             $multiple_po_id = json_decode($dataPenerimaanBarang->multiple_po_id);
             $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
-
             $detail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
-
             $this->penerimaanBarangModel->db->transException(true)->transStart();
 
             foreach ($detail as $item) {
                 // check po already closed or not
                 if ($item["status_penerimaan"] === "0") {
                     $jml_masuk = $item["jml_masuk"] ? formatter($item["jml_masuk"], "STR_TO_FLOAT") : 0;
-                    $qty_diterima = $item["qty_diterima"] ? formatter($item["qty_diterima"], "STR_TO_FLOAT") : 0;
-                    $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_FLOAT") : 0;
                     $barang_id = $item["barang_id"] ? formatter($item["barang_id"], "STR_TO_INT") : 0;
                     $purchase_order_details_id = $item["purchase_order_details_id"] ? formatter($item["purchase_order_details_id"], "STR_TO_INT") : 0;
 
                     // kemasan
                     $packaging = $item["packaging"] ? formatter($item["packaging"], "STR_TO_INT") : 0;
                     $packaging_qty = $item["packaging_qty"] ? formatter($item["packaging_qty"], "STR_TO_FLOAT") : 0;
-
-                    $conditionRemain = [
-                        'id' => $purchase_order_details_id
-                    ];
-
-                    $payloadRemain = [
-                        'qty_diterima' => $qty_diterima + $jml_masuk,
-                        'remaining_qty' => $remaining_qty - $jml_masuk
-                    ];
-
-                    // UPDATE REMAINING QTY AND JML DITERIMA
-                    if ($tipe_bahan === "BAKU") {
-                        $responseDet = $this->rmPurchaseOrderDetailModel->where($conditionRemain)
-                            ->set($payloadRemain)
-                            ->update();
-
-                        if (!$responseDet) {
-                            $message =  'Gagal Ubah Remaining';
-                            $data = [
-                                "status"    => false,
-                                "message"   => $message,
-                                "payload"   => "",
-                                'token'     => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
-                        }
-                    } elseif ($tipe_bahan === "PENOLONG") {
-                        $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)
-                            ->set($payloadRemain)
-                            ->update();
-
-                        if (!$responseDet) {
-                            $message =  'Gagal Ubah Remaining';
-                            $data = [
-                                "status"    => false,
-                                "message"   => $message,
-                                "payload"   => "",
-                                'token'     => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
-                        }
-                    }
 
                     $spesifikasi = "";
                     if ($tipe_bahan === "BAKU") {
@@ -707,81 +547,23 @@ class PenerimaanBarangLokal extends BaseController
                             $spesifikasi = $find_baku->spesifikasi;
                         }
                     }
-                    // add stock detail barang
                     $this->stockDetailModel->addOrReduceStock($barang_id, $dataPenerimaanBarang->warehouse_id, 'New', $jml_masuk, 'IN', $spesifikasi);
-
-                    // add stock detail barang kemasan
                     $this->stockDetailModel->addOrReduceStock($packaging, $dataPenerimaanBarang->warehouse_id, 'Scrap', $packaging_qty, 'OUT', '');
                 }
             }
 
             // automate close po check item by check ech po number
             foreach ($multiple_po_id as $item) {
-                $check_close = true;
-
                 if ($tipe_bahan === "BAKU") {
-                    $responseDetail = $this->rmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($item);
-
-                    if ($responseDetail) {
-                        foreach ($responseDetail as $itemDetail) {
-                            // check if each item must 0 remaining qty to close
-                            if ($itemDetail["remaining_qty"] !== "0.00") {
-                                $check_close = false;
-                            }
-                        }
-
-                        if ($check_close) {
-
-                            $responseStatusPenerimaan = $this->rmPurchaseOrderModel
-                                ->where('id', $item)
-                                ->set('status_penerimaan', 1)
-                                ->update();
-
-                            if (!$responseStatusPenerimaan) {
-                                $message =  'Gagal Ubah Status Penerimaan';
-                                $data = [
-                                    "status"    => false,
-                                    "message"   => $message,
-                                    "payload"   => "",
-                                    'token'     => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-                    }
+                    $this->rmPurchaseOrderModel
+                        ->where('id', $item)
+                        ->set('status_penerimaan', 1)
+                        ->update();
                 } elseif ($tipe_bahan === "PENOLONG") {
-                    $responseDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($item);
-
-                    if ($responseDetail) {
-
-                        foreach ($responseDetail as $itemDetail) {
-                            // check if each item must 0 remaining qty to close
-                            if ($itemDetail["remaining_qty"] !== "0.00") {
-                                $check_close = false;
-                            }
-                        }
-
-                        if ($check_close) {
-
-                            $responseStatusPenerimaan = $this->amPurchaseOrderModel
-                                ->where('id', $item)
-                                ->set('status_penerimaan', 1)
-                                ->update();
-
-                            if (!$responseStatusPenerimaan) {
-                                $message =  'Gagal Ubah Status Penerimaan';
-                                $data = [
-                                    "status"    => false,
-                                    "message"   => $message,
-                                    "payload"   => "",
-                                    'token'     => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-                    }
+                    $this->amPurchaseOrderModel
+                        ->where('id', $item)
+                        ->set('status_penerimaan', 1)
+                        ->update();
                 }
             }
 
@@ -822,256 +604,75 @@ class PenerimaanBarangLokal extends BaseController
 
     public function deletePenerimaanBarangLokal()
     {
-        try {
-            $id = $this->request->getVar("id");
+        $id = $this->request->getVar("id");
 
-            if (!empty($id)) {
-                $findPenerimaanBarang = $this->penerimaanBarangModel->getWhere(['id' => $id])->getRow();
+        $penerimaanBarangFirst = $this->penerimaanBarangModel->where('id', $id)->first();
+        if ($penerimaanBarangFirst) {
+            $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+            $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+            $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
 
-                if ($findPenerimaanBarang) {
-                    $poArr = json_decode($findPenerimaanBarang->multiple_po_id);
-                    $penerimaanBarangDetailModel = $this->penerimaanBarangDetailModel->getWhere(['penerimaan_barang_id' => $id])->getRow();
-                    if ($penerimaanBarangDetailModel) {
-                        foreach ($poArr as $p) {
+            $poArr = json_decode($penerimaanBarangFirst['multiple_po_id']);
 
-                            // Assuming $p[0] is barang_id and $p[1] is am_purchase_order_id
-                            // BAHAN PENOLONG
-                            $purchaseOrderDetailAM = $this->amPurchaseOrderDetailModel
-                                ->where('barang_id', $penerimaanBarangDetailModel->barang_id)
-                                ->where('am_purchase_order_id', $p)
-                                ->first();
+            foreach ($poArr as $p) {
 
-                            if ($purchaseOrderDetailAM) {
-                                $qty = isset($purchaseOrderDetailAM['qty']) ? $purchaseOrderDetailAM['qty'] : 0;
-                                // dd($qty);
-                                $this->amPurchaseOrderDetailModel
-                                    ->where('id', $purchaseOrderDetailAM['id'])
-                                    ->set('remaining_qty', $qty)
-                                    ->set('qty_diterima', 0)
-                                    ->update();
-                            }
-
-                            $supplierHarga = $this->supplierHargaModel->where('bahan_baku_id', $penerimaanBarangDetailModel->barang_id)->first();
-
-                            if ($supplierHarga) {
-                                $purchaseOrderDetailRM = $this->rmPurchaseOrderDetailModel
-                                    ->where('supplier_harga_id', $supplierHarga['id'])
-                                    ->where('rm_purchase_order_id', $p)
-                                    ->first();
-
-                                if ($purchaseOrderDetailRM) {
-                                    $qty = isset($purchaseOrderDetailRM['qty']) ? $purchaseOrderDetailRM['qty'] : 0;
-                                    // dd($qty);
-                                    $this->rmPurchaseOrderDetailModel
-                                        ->where('id', $purchaseOrderDetailRM['id'])
-                                        ->set('remaining_qty', $qty)
-                                        ->set('qty_diterima', 0)
-                                        ->update();
-                                }
-                            }
+                if ($penerimaanBarangFirst['tipe_bahan'] == "PENOLONG") {
+                    // PENOLONG
+                    $amList = $amPurchaseOrderDetailModel->where('am_purchase_order_id', $p)->where('deletedAt', null)->findAll();
+                    // GET QTY TOTAL IS DELETED
+                    foreach ($amList as $a) {
+                        $conditionDetail = [
+                            'purchase_order_details_id' => $a['id'],
+                            'penerimaan_barang_id' => $id,
+                            'penerimaan_barang_detail.deletedAt' => null
+                        ];
+                        // get qty masuk di lpb
+                        $penerimaanBarangDetailFirst = $penerimaanBarangDetailModel->where($conditionDetail)->first();
+                        if ($penerimaanBarangDetailFirst != null) {
+                            // update remaining
+                            $this->amPurchaseOrderDetailModel
+                                ->where('id', $penerimaanBarangDetailFirst['purchase_order_details_id'])
+                                ->set('remaining_qty', $a['remaining_qty'] + $penerimaanBarangDetailFirst['jml_masuk'])
+                                ->set('qty_diterima', $a['qty_diterima'] - $penerimaanBarangDetailFirst['jml_masuk'])
+                                ->update();
                         }
-                        $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
-                    }
-
-                    $response = $this->penerimaanBarangModel->delete($id);
-                    if ($response) {
-                        $data = [
-                            "status" => true,
-                            "message" => "Data Berhasil dihapus",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Dihapus';
-                        $data = [
-                            "status" => false,
-                            "message" => $message,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
                     }
                 } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Tidak Ditemukan",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                    // BAKU
+                    $rmList = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $p)->where('deletedAt', null)->findAll();
+                    // GET QTY TOTAL IS DELETED
+                    foreach ($rmList as $r) {
+                        $conditionDetail = [
+                            'purchase_order_details_id' => $r['id'],
+                            'penerimaan_barang_id' => $id,
+                            'penerimaan_barang_detail.deletedAt' => null
+                        ];
+                        // get qty masuk di lpb
+                        $penerimaanBarangDetailFirst = $penerimaanBarangDetailModel->where($conditionDetail)->first();
+
+                        if ($penerimaanBarangDetailFirst != null) {
+                            // update remaining
+                            $this->rmPurchaseOrderDetailModel
+                                ->where('id', $penerimaanBarangDetailFirst['purchase_order_details_id'])
+                                ->set('remaining_qty', $r['remaining_qty'] + $penerimaanBarangDetailFirst['jml_masuk'])
+                                ->set('qty_diterima', $r['qty_diterima'] - $penerimaanBarangDetailFirst['jml_masuk'])
+                                ->update();
+                        }
+                    }
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
             }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
         }
-        return;
+        $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
+        $this->penerimaanBarangModel->delete($id);
+        $data = [
+            "status" => true,
+            "message" => "Data Berhasil dihapus",
+            'token' => csrf_hash()
+        ];
+
+        return response()->setJSON($data);
     }
 
-    public function exportTable()
-    {
-        // $dateStart = $this->request->getVar("dateStart") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "-";
-        // $dateEnd = $this->request->getVar("dateEnd") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "-";
-
-        // $spreadsheet = new Spreadsheet();
-        // // tulis header/nama kolom 
-        // $spreadsheet->setActiveSheetIndex(0)
-        //             ->setCellValue('A1', 'Laporan Penerimaan Barang Lokal');
-
-        // $spreadsheet->setActiveSheetIndex(0)
-        //             ->setCellValue('A3', 'Tanggal')
-        //             ->setCellValue('B3', ':')
-        //             ->setCellValue('C3', $dateStart . " S/D " . $dateEnd);
-
-        // $spreadsheet->setActiveSheetIndex(0)
-        //             ->setCellValue('A4', 'No.')
-        //             ->setCellValue('B4', 'Dok. Penerimaan')
-        //             ->setCellValue('F4', 'Divisi')
-        //             ->setCellValue('G4', 'Gudang')
-        //             ->setCellValue('H4', 'Invoice')
-        //             ->setCellValue('J4', 'Supplier')
-        //             ->setCellValue('K4', 'kode Barang')
-        //             ->setCellValue('L4', 'Nama Barang')
-        //             ->setCellValue('M4', 'Satuan')
-        //             ->setCellValue('N4', 'Jumlah')
-        //             ->setCellValue('O4', 'Nilai')
-        //             ->setCellValue('P4', 'Keterangan')
-        //             ->setCellValue('Q4', 'Keterangan 2');
-
-        // $spreadsheet->setActiveSheetIndex(0)
-        //             ->setCellValue('B5', 'Nomor PR')
-        //             ->setCellValue('C5', 'Nomor PO')
-        //             ->setCellValue('D5', 'Nomor')
-        //             ->setCellValue('E5', 'Tanggal')
-        //             ->setCellValue('H5', 'Nomor')
-        //             ->setCellValue('I5', 'Tanggal');
-
-        // $addCondition = [
-        //     "search"            => $this->request->getVar("search"),
-        //     "status"            => $this->request->getVar("status"),
-        //     "statuspenerimaan"  => "LOKAL",
-        //     "sort"              => $this->request->getVar("sort"),
-        //     "sortType"          => $this->request->getVar("sortType"),
-        //     "startdate"         => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-        //     "lastdate"          => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-        // ];
-
-        // $condition = [
-        //     "status_penerimaan" => "LOKAL"
-        // ];
-
-        // $penerimaanBarangData = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailList($condition, $addCondition, 100000000, 0);
-
-        // $no = 1;
-        // $column = 6;
-
-        // // var_dump($penerimaanBarangData);
-        // // die;
-
-        // // tulis data mobil ke cell
-        // foreach($penerimaanBarangData['data'] as $data) {
-        //     $tipe_bahan = $data->tipe_bahan;
-        //     $dataLokalDetail = "";
-        //     if($tipe_bahan === "BAKU")
-        //     {
-        //         $dataLokalDetail = $this->rmPurchaseOrderDetailModel->getPurchaseOrderDetailById($data->purchase_order_details_id);
-        //     }
-
-        //     if($tipe_bahan === "PENOLONG")
-        //     {
-        //         $dataLokalDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailById($data->purchase_order_details_id);
-        //     }
-
-        //     $spreadsheet->setActiveSheetIndex(0)
-        //                 ->setCellValue('A' . $column, $no++)
-        //                 ->setCellValue('B' . $column, $dataLokalDetail ? $dataLokalDetail->spp_no : "")
-        //                 ->setCellValue('C' . $column, $dataLokalDetail ? $dataLokalDetail->po_no : "")
-        //                 ->setCellValue('D' . $column, $data->no_penerimaan_barang)
-        //                 ->setCellValue('E' . $column, $data->validation_date)
-        //                 ->setCellValue('F' . $column, '')
-        //                 ->setCellValue('G' . $column, $data->warehouse_name)
-        //                 ->setCellValue('H' . $column, '0')
-        //                 ->setCellValue('I' . $column, date("Y-m-d", strtotime($data->createdAt)))
-        //                 ->setCellValue('J' . $column, $data->supplier_name)
-        //                 ->setCellValue('K' . $column, $data->kode_barang)
-        //                 ->setCellValue('L' . $column, $data->nama_barang)
-        //                 ->setCellValue('M' . $column, $data->kode_satuan)
-        //                 ->setCellValue('N' . $column, $data->jml_masuk)
-        //                 ->setCellValue('O' . $column, '')
-        //                 ->setCellValue('P' . $column, '')
-        //                 ->setCellValue('Q' . $column, '');
-
-        //     $spreadsheet->getActiveSheet()->getStyle('A' . $column)->getAlignment()->setHorizontal('center');
-        //     $spreadsheet->getActiveSheet()->getStyle('E' . $column)->getAlignment()->setHorizontal('center');
-        //     $spreadsheet->getActiveSheet()->getStyle('G' . $column)->getAlignment()->setHorizontal('left');
-
-        //     $column++;
-        // }
-
-        // $spreadsheet->setActiveSheetIndex(0)
-        //             ->setCellValue('N' . $column, 'Total')
-        //             ->setCellValue('O' . $column, '');
-
-        // $spreadsheet->getActiveSheet()->getStyle('N' . $column . ':' . 'O' . $column)->getFont()->setBold(true);
-
-        // $spreadsheet->getActiveSheet()->getStyle('A4:Q4')->getFont()->setBold(true);
-        // $spreadsheet->getActiveSheet()->getStyle('A5:Q5')->getFont()->setBold(true);
-
-        // $spreadsheet->getActiveSheet()->MergeCells('A4:A5');
-        // $spreadsheet->getActiveSheet()->MergeCells('B4:E4');
-        // $spreadsheet->getActiveSheet()->MergeCells('F4:F5');
-        // $spreadsheet->getActiveSheet()->MergeCells('G4:G5');
-        // $spreadsheet->getActiveSheet()->MergeCells('H4:I4');
-        // $spreadsheet->getActiveSheet()->MergeCells('J4:J5');
-        // $spreadsheet->getActiveSheet()->MergeCells('K4:K5');
-        // $spreadsheet->getActiveSheet()->MergeCells('L4:L5');
-        // $spreadsheet->getActiveSheet()->MergeCells('M4:M5');
-        // $spreadsheet->getActiveSheet()->MergeCells('N4:N5');
-        // $spreadsheet->getActiveSheet()->MergeCells('O4:O5');
-        // $spreadsheet->getActiveSheet()->MergeCells('P4:P5');
-        // $spreadsheet->getActiveSheet()->MergeCells('Q4:Q5');
-
-        // $spreadsheet->getActiveSheet()->getStyle('A4:A5')->getAlignment()->setVertical('center')->setHorizontal('right');
-        // $spreadsheet->getActiveSheet()->getStyle('B4:E4')->getAlignment()->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('F4:F5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('G4:G5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('H4:I4')->getAlignment()->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('J4:J5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('K4:K5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('L4:L5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('M4:M5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('N4:N5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('O4:O5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('P4:P5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('Q4:Q5')->getAlignment()->setVertical('center')->setHorizontal('center');
-
-        // $spreadsheet->getActiveSheet()->getStyle('B5:E5')->getAlignment()->setHorizontal('center');
-        // $spreadsheet->getActiveSheet()->getStyle('H5:I5')->getAlignment()->setHorizontal('center');
-
-        // foreach (range('B', 'Q') as $letra) {  
-        //     $spreadsheet->getActiveSheet()->getColumnDimension($letra)->setAutoSize(true);
-        // }
-
-        // // tulis dalam format .xlsx
-        // $writer = new Xlsx($spreadsheet);
-        // $fileName = 'Penerimaan Barang Lokal';
-
-        // // Redirect hasil generate xlsx ke web client
-        // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        // header('Content-Disposition: attachment;filename='.$fileName.'.xlsx');
-        // header('Cache-Control: max-age=0');
-
-        // $writer->save('php://output');
-    }
 
     public function print($id = null)
     {

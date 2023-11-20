@@ -34,6 +34,16 @@ class ReturPembelian extends BaseController
         return view('Purchase/returPembelian/form', $data);
     }
 
+    public function getPenerimaanBarangList()
+    {
+        $returAmPoModel = new ReturAmPoModel();
+        $supplierID = $this->request->getVar('supplierID');
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'data' => $returAmPoModel->getPenerimaanBarangList($supplierID)
+        ]);
+    }
+
     public function generateNo()
     {
         $returAmPoModel = new ReturAmPoModel();
