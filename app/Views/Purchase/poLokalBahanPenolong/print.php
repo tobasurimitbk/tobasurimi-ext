@@ -152,12 +152,15 @@
                     </div>
 
                 </td>
-                <td>
-                    <h4>No. PO : <?= $dataPOLokal->po_no ?></h4>
-                </td>
+
             </tr>
         </table>
-        <table style=" margin-top:-40px;float:right; width:50%" border="0">
+        <table style=" margin-top:-80px;float:right; width:50%" border="0">
+            <tr>
+                <td style="width: 80px; text-align: left;">Nomor PO</td>
+                <td style="width: 0px;">:</td>
+                <td style="text-align:left;"> <?= $dataPOLokal->po_no ?></td>
+            </tr>
             <tr>
                 <td style="width: 80px; text-align: left;">Kepada Yth</td>
                 <td style="width: 0px;">:</td>
