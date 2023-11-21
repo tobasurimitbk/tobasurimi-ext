@@ -1961,7 +1961,7 @@
             });
             console.log(attRes);
             $.each(attRes, function(i, v) {
-                if (v.kode === $('.kode_barang').val() && v.nama_barang === $('.nama_barang').val()) {
+                if (v.kode === $('.kode_barang').val() && v.nama_barang === $('.nama_barang').val() && v.purchase_order_details_id === $(".purchase_order_details_id").val()) {
                     jumlahOrder = Number(v.qty);
                     diterima = Number(v.qty_diterima);
                 }
