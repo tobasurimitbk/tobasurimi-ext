@@ -1083,7 +1083,7 @@
         var desimal = parts[1] || '00';
         var reverse = ribuan.toString().split('').reverse().join('');
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return "Rp. " + ribuanFormatted + ',' + desimal;
+        return ribuanFormatted + ',' + desimal;
     }
 </script>
 <?php if (!empty($dataPOImport)) : ?>
