@@ -7,11 +7,13 @@ use App\Models\BarangModel;
 use App\Models\MetadataModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\BarangMasterModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
 use App\Models\BeaCukaiModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
+use App\Models\SatuansModel;
 use Dompdf\Dompdf;
 
 class POImportBahanPenolong extends BaseController
@@ -26,6 +28,10 @@ class POImportBahanPenolong extends BaseController
     protected $sppModel;
     protected $supplierModel;
     protected $beaCukaiModel;
+    protected $companyModel;
+    protected $barangMasterModel;
+    protected $satuanModel;
+    protected $divisionModel;
     protected $dompdf;
 
     public function __construct()
@@ -40,6 +46,10 @@ class POImportBahanPenolong extends BaseController
         $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
         $this->beaCukaiModel = new BeaCukaiModel();
+        $this->companyModel = new CompaniesModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->satuanModel = new SatuansModel();
+        $this->divisionModel = new DivisisModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -50,28 +60,14 @@ class POImportBahanPenolong extends BaseController
 
     public function createPOImportBahanPenolong()
     {
-        //Get BC Type By Metadata
-        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
-
-        //Get SPP Number
-        $dataSPP = $this->sppModel->getNoSPP("Import");
-
-        //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
-
-        //Get Valuta By Metadata
-        $dataValuta = $this->metadataModel->get_by_name('Valuta');
-
-        //Get Shipment By Metadata
-        $dataShipment = $this->metadataModel->get_by_name('Shipment');
-
         $data = [
-            "dataBCType" => $dataBCType,
+            "company" => $this->companyModel->getCompanies(),
             "today" => date("d/m/Y"),
-            "dataSPP" => $dataSPP,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta,
-            "dataShipment" => $dataShipment
+            "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
+            "barang" => $this->barangMasterModel->getBarangByType("bahan_penolong"),
+            "satuan" => $this->satuanModel->getSatuanAll(),
+            "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
+            "dataShipment" => $this->metadataModel->get_by_name('Shipment')
         ];
 
         return view('Purchase/poImportBahanPenolong/form', $data);
@@ -79,53 +75,17 @@ class POImportBahanPenolong extends BaseController
 
     public function getByIdPOImportBahanPenolong($id = null)
     {
-        //Get BC Type By Metadata
-        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
-
-        //Get SPP Number
-        $dataSPP = $this->sppModel->getNoSPP("Bahan Penolong Import");
-
-        //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
-
-        //Get Valuta By Metadata
-        $dataValuta = $this->metadataModel->get_by_name('Valuta');
-
-        //Get Shipment By Metadata
-        $dataShipment = $this->metadataModel->get_by_name('Shipment');
-
         $data = [
-            "dataBCType" => $dataBCType,
+            "company" => $this->companyModel->getCompanies(),
             "today" => date("d/m/Y"),
-            "dataSPP" => $dataSPP,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta,
-            "dataShipment" => $dataShipment
+            "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
+            "barang" => $this->barangMasterModel->getBarangByType("bahan_penolong"),
+            "satuan" => $this->satuanModel->getSatuanAll(),
+            "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
+            "dataShipment" => $this->metadataModel->get_by_name('Shipment'),
+            "dataPOImport" => $this->amPurchaseOrderModel->getPOById($id),
+            "dataPOImportDetail" => $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id)
         ];
-
-        if (!empty($id)) {
-            $sppModel = new SppModel();
-            $companyModel = new CompaniesModel();
-            $divisiModel = new DivisisModel();
-
-            $dataPOImport = $this->amPurchaseOrderModel->getPOById($id);
-            $sppFirst = $sppModel->where('id', $dataPOImport->purchase_request_id)->first();
-            $companyFirst = $companyModel->where('id', $sppFirst['company_id'])->first();
-            $divisiFirst = $divisiModel->where('id', $sppFirst['divisi_id'])->first();
-
-            $dataPOImport->spp_no = ($sppFirst == null) ? '-' : $sppFirst['spp_no'];
-            $dataPOImport->companyName = $companyFirst['company'];
-            $dataPOImport->divisiName = $divisiFirst['divisi'];
-            $dataPOImport->divisi_id = $divisiFirst['id'];
-
-            $data["dataPOImport"] = $dataPOImport;
-
-            $dataPOImportDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
-
-            if ($dataPOImportDetail) {
-                $data["dataPOImportDetail"] = $dataPOImportDetail;
-            }
-        }
 
         return view('Purchase/poImportBahanPenolong/form', $data);
     }
@@ -133,14 +93,13 @@ class POImportBahanPenolong extends BaseController
     public function allPOImportBahanPenolong()
     {
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            // "requestStatus" => $this->request->getGet("status"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "pageSize" => $this->request->getVar("length"),
+            "currentPage" => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "dateStart" => $this->request->getVar("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd" => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $condition = [
@@ -148,15 +107,15 @@ class POImportBahanPenolong extends BaseController
         ];
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "dateStart" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
         $poImportData = $this->amPurchaseOrderModel->getPOList($condition, $addCondition, $limit, $offset);
 
         $dataPOImport = [];
@@ -168,10 +127,9 @@ class POImportBahanPenolong extends BaseController
                 "no"            => $no++,
                 "id"            => $data->id,
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
-                "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
-                "supplierName"  => $data->supplierName,
-                "companyName"  => $data->companyName,
+                "supplierName"  => strtoupper($data->supplierName),
+                "companyName"  => strtoupper($data->companyName),
                 "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "currencyName"  => $data->currencyName,
                 "itemCount"     => $data->itemCount,
@@ -181,765 +139,187 @@ class POImportBahanPenolong extends BaseController
         }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
+            "draw"              => intval($this->request->getVar("draw")),
             "recordsTotal"      => $poImportData['totalData'],
             "recordsFiltered"   => $poImportData['totalFilteredData'],
             "data"              => $dataPOImport,
-            // "response" => $response,
             "payload"           => $payload
         ];
 
-        echo json_encode($data);
-        return;
+        return response()->setJson($data);
     }
 
     public function savePOImportBahanPenolong()
     {
-        try {
-            $rules = [
-                "purchase_request_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. SPP tidak boleh kosong'
-                    ]
-                ],
-                "po_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. PO tidak boleh kosong'
-                    ]
-                ],
-                "po_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal tidak boleh kosong'
-                    ]
-                ],
-                "payment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal Pembayaran tidak boleh kosong'
-                    ]
-                ],
-                "supplier_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Supplier tidak boleh kosong'
-                    ]
-                ],
-                "payment_term" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Termin Pembayaran tidak boleh kosong'
-                    ]
-                ],
-                "currency" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Valas tidak boleh kosong'
-                    ]
-                ],
-                "port_origin" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Port Of Origin tidak boleh kosong'
-                    ]
-                ],
-                "port_destination" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Port Of Destination tidak boleh kosong'
-                    ]
-                ],
-                "shipment" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Shipment tidak boleh kosong'
-                    ]
-                ],
-                "latest_shipment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Latest Shipment Date tidak boleh kosong'
-                    ]
-                ],
-                "attn" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'ATTN tidak boleh kosong'
-                    ]
-                ]
-            ];
+        $divisi = $this->divisionModel->get_by_id(
+            $this->request->getVar('divisionID')
+        );
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($this->validate($rules)) {
-                $divisi_id = formatter($this->request->getPost("divisi_id"), "STR_TO_INT");
-                $divisi = $this->request->getPost("divisi");
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $divisi, date('y'), $divisi_id, $last_day);
-                $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
-
-                $payload = [
-                    "purchase_request_id" => $purchase_request_id,
-                    "bc_type" => $this->request->getPost("bc_type"),
-                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
-                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "po_type" => "Import",
-                    "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "total" => $this->request->getPost("total"),
-                    "payment_term" => $this->request->getPost("payment_term"),
-                    "note" => $this->request->getPost("note"),
-                    "createdBy" => $this->user_id,
-                    "is_posted" => 0,
-
-                    "shipper" => $this->request->getPost("shipper"),
-                    "consigne" => $this->request->getPost("consigne"),
-                    "port_origin" => $this->request->getPost("port_origin"),
-                    "port_destination" => $this->request->getPost("port_destination"),
-                    "location_transaction" => $this->request->getPost("location_transaction"),
-                    "shipment" => $this->request->getPost("shipment"),
-                    "latest_shipment_date" => $this->request->getPost("latest_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("latest_shipment_date")))) : "",
-                    "attn" => $this->request->getPost("attn")
-                ];
-
-                $items = json_decode($this->request->getPost("items"));
-
-                // spp number cannot be used again
-                $responsespp = $this->sppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
-
-                if (!$responsespp) {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "No. SPP gagal di close",
-                        "payload"   => "",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                    return;
-                }
-
-                $response =  $this->amPurchaseOrderModel->insert($payload);
-
-                if ($response) {
-                    foreach ($items as $data) {
-                        $detailPayload = [];
-
-                        $barang_id = $data->item_id;
-                        // buat barang baru jika id kosong
-                        if (!$barang_id) {
-                            // $payloadBarang = [
-                            //     "company_id" => $this->this_company_id,
-                            //     "kode_barang" => $data->item_code,
-                            //     "nama_barang" => $data->item_name,
-                            //     "harga_barang" => $data->price,
-                            //     "satuan_id" => $data->unit,
-                            //     "kategori_id" => 26,
-                            //     "hs_id" => 1,
-                            //     "ap_id" => 1,
-                            //     "ar_id" => 1,
-                            //     "stok" => 0,
-                            //     "status" => "Aktif",
-                            //     "spek" => "[]"
-                            // ];
-
-                            // $responseBarang =  $this->barangModel->insert($payloadBarang);
-
-                            // $barang_id = $responseBarang;
-
-                            // if(!$responseBarang) {
-                            //     $message =  'Data Gagal Disimpan';
-                            //     $data = [
-                            //         "status"            => false,
-                            //         "message"    => $message,
-                            //         "payload"   => $payload,
-                            //         'token' => csrf_hash()
-                            //     ];
-                            //     echo json_encode($data);
-                            // }
-                        }
-
-                        $detailPayload = [
-                            'am_purchase_order_id' => $response,
-                            'purchase_request_detail_id' => $data->purchase_request_detail_id,
-                            'barang_id' => $barang_id,
-                            'note' => $data->note,
-                            'unit' => $data->unit,
-                            'qty' => $data->qty,
-                            'remaining_qty' => $data->qty,
-                            'qty_diterima' => 0,
-                            'price' => $data->price,
-                            'disc' => $data->disc,
-                            'additional_cost' => $data->additional_cost
-                        ];
-
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
-
-                        $responseDetail = $this->amPurchaseOrderDetailModel->insert($detailPayload);
-
-                        if (!$responseDetail) {
-                            $message =  'Data Gagal Disimpan';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
-                        }
-                    }
-
-                    $data = [
-                        "id" => $response,
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        if ($this->request->getVar('poNo') != "AUTO GENERATE") {
+            $noPoNew = $this->request->getVar('poNo');
+        } else {
+            $noPoNew =  $this->amPurchaseOrderModel->get_no(
+                date('d'),
+                date('m'),
+                date('Y'),
+                $divisi[0]['divisi'],
+                date('y'),
+                $this->request->getPost("divisionID"),
+                getLastDay()
+            );
         }
-        return;
+
+        // create new po
+        $poID = $this->amPurchaseOrderModel->insert([
+            'company_id' => $this->request->getVar('companyID'),
+            'division_id' => $this->request->getVar('divisionID'),
+            'po_no' => $noPoNew,
+            'po_date' => $this->request->getPost("poDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("poDate")))) : "",
+            'po_type' => "Import",
+            'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
+            'supplier_id' => $this->request->getVar('supplierID'),
+            'total' => $this->request->getVar('total'),
+            'payment_term' => $this->request->getVar('paymentTerm'),
+            'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
+            'note' => $this->request->getVar('note'),
+            'shipper' => $this->request->getVar('shipper'),
+            'consigne' => $this->request->getVar('consigne'),
+            'port_origin' => $this->request->getVar('portOrigin'),
+            'port_destination' => $this->request->getVar('portDestination'),
+            'location_transaction' => $this->request->getVar('locationTransaction'),
+            'shipment' => $this->request->getVar('shipment'),
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate'),
+            'attn' => $this->request->getVar('attn'),
+            'createdBy' => session()->get("login")->user_id
+        ]);
+
+        $barang = json_decode($this->request->getVar("listBarang"));
+
+        foreach ($barang as $b) {
+
+            $this->amPurchaseOrderDetailModel->insert([
+                'am_purchase_order_id' => $poID,
+                'barang_id' => $b->barang_id,
+                'unit' => $b->satuan_id,
+                'qty' => $b->qty,
+                'price' => $b->harga_satuan,
+                'disc' => $b->diskon,
+                'additional_cost' => $b->biaya_tambahan,
+                'remaining_qty' => $b->qty,
+                'total' => repairDouble($b->total),
+            ]);
+        }
+
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Data PO Import BP Berhasil Disimpan",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function updatePOImportBahanPenolong()
     {
-        try {
-            $rules = [
-                "po_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. PO tidak boleh kosong'
-                    ]
-                ],
-                "po_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal tidak boleh kosong'
-                    ]
-                ],
-                "payment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal Pembayaran tidak boleh kosong'
-                    ]
-                ],
-                "supplier_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Supplier tidak boleh kosong'
-                    ]
-                ],
-                "payment_term" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Termin Pembayaran tidak boleh kosong'
-                    ]
-                ],
-                "currency" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Valas tidak boleh kosong'
-                    ]
-                ],
-                "port_origin" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Port Of Origin tidak boleh kosong'
-                    ]
-                ],
-                "port_destination" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Port Of Destination tidak boleh kosong'
-                    ]
-                ],
-                "shipment" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Shipment tidak boleh kosong'
-                    ]
-                ],
-                "latest_shipment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Latest Shipment Date tidak boleh kosong'
-                    ]
-                ],
-                "attn" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'ATTN tidak boleh kosong'
-                    ]
-                ]
-            ];
+        $id = $this->request->getPost("id");
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
+        $this->amPurchaseOrderModel->update($id, [
+            'company_id' => $this->request->getVar('companyID'),
+            'division_id' => $this->request->getVar('divisionID'),
+            'po_type' => "Import",
+            'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
+            'supplier_id' => $this->request->getVar('supplierID'),
+            'total' => $this->request->getVar('total'),
+            'payment_term' => $this->request->getVar('paymentTerm'),
+            'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
+            'note' => $this->request->getVar('note'),
+            'shipper' => $this->request->getVar('shipper'),
+            'consigne' => $this->request->getVar('consigne'),
+            'port_origin' => $this->request->getVar('portOrigin'),
+            'port_destination' => $this->request->getVar('portDestination'),
+            'location_transaction' => $this->request->getVar('locationTransaction'),
+            'shipment' => $this->request->getVar('shipment'),
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate'),
+            'attn' => $this->request->getVar('attn'),
+        ]);
 
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $divisi_id = formatter($this->request->getPost("divisi_id"), "STR_TO_INT");
-                $divisi = $this->request->getPost("divisi");
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $divisi, date('y'), $divisi_id, $last_day);
+        // Delete First
+        $this->amPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
+        // Insert Again
+        $barang = json_decode($this->request->getVar("listBarang"));
 
-                $payload = [
-                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
-                    "bc_type" => $this->request->getPost("bc_type"),
-                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "po_type" => "Import",
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "payment_term" => $this->request->getPost("payment_term"),
-                    "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                    "note" => $this->request->getPost("note"),
-                    "createdBy" => $this->user_id,
-                    "total" => $this->request->getPost("total"),
+        foreach ($barang as $b) {
 
-                    "shipper" => $this->request->getPost("shipper"),
-                    "consigne" => $this->request->getPost("consigne"),
-                    "port_origin" => $this->request->getPost("port_origin"),
-                    "port_destination" => $this->request->getPost("port_destination"),
-                    "location_transaction" => $this->request->getPost("location_transaction"),
-                    "shipment" => $this->request->getPost("shipment"),
-                    "latest_shipment_date" => $this->request->getPost("latest_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("latest_shipment_date")))) : "",
-                    "attn" => $this->request->getPost("attn")
-                ];
-
-                $items = json_decode($this->request->getPost("items"));
-
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
-
-                $condition = [
-                    'id' => $id
-                ];
-
-                $response = $this->amPurchaseOrderModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    foreach ($items as $data) {
-                        $barang_id = $data->item_id;
-                        // buat barang baru jika id kosong
-                        if (!$barang_id) {
-                            // $payloadBarang = [
-                            //     "company_id" => $this->this_company_id,
-                            //     "kode_barang" => $data->item_code,
-                            //     "nama_barang" => $data->item_name,
-                            //     "harga_barang" => $data->price,
-                            //     "satuan_id" => $data->unit,
-                            //     "kategori_id" => 26,
-                            //     "hs_id" => 1,
-                            //     "ap_id" => 1,
-                            //     "ar_id" => 1,
-                            //     "stok" => 0,
-                            //     "status" => "Aktif",
-                            //     "spek" => "[]"
-                            // ];
-
-                            // $responseBarang =  $this->barangModel->insert($payloadBarang);
-
-                            // $barang_id = $responseBarang;
-
-                            // if(!$responseBarang) {
-                            //     $message =  'Data Gagal Disimpan';
-                            //     $data = [
-                            //         "status"            => false,
-                            //         "message"    => $message,
-                            //         "payload"   => $payload,
-                            //         'token' => csrf_hash()
-                            //     ];
-                            //     echo json_encode($data);
-                            // }
-                        }
-
-                        $detailPayload = [];
-
-                        $detailPayload = [
-                            'am_purchase_order_id' => $id,
-                            // 'barang_id' =>$barang_id,
-                            // 'spec' => $data->spec,
-                            // 'note' => $data->note,
-                            // 'unit' => $data->unit,
-                            // 'qty' => $data->qty,
-                            // 'remaining_qty' => $data->qty,
-                            // 'qty_diterima' => 0,
-                            // 'price' => $data->price,
-                            'disc' => $data->disc,
-                            'additional_cost' => $data->additional_cost
-                        ];
-
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
-
-                        // kalau hapus
-                        if ($data->isDeleted) {
-                            $responseDetail = $this->amPurchaseOrderDetailModel->delete($data->id);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Dihapus';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-
-                        // kalau update
-                        if ($data->id) {
-                            $conditionDetail = [
-                                'id' => $data->id
-                            ];
-
-                            $responseDetail = $this->amPurchaseOrderDetailModel->where($conditionDetail)->set($detailPayload)->update();
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Disimpan';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-
-                        // kalau create
-                        else {
-                            $responseDetail = $this->amPurchaseOrderDetailModel->insert($detailPayload);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Diubah';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-                    }
-
-                    $data = [
-                        "id" => "",
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            $this->amPurchaseOrderDetailModel->insert([
+                'am_purchase_order_id' => $id,
+                'barang_id' => $b->barang_id,
+                'unit' => $b->satuan_id,
+                'qty' => $b->qty,
+                'price' => $b->harga_satuan,
+                'disc' => $b->diskon,
+                'additional_cost' => $b->biaya_tambahan,
+                'remaining_qty' => $b->qty,
+                'total' => repairDouble($b->total),
+            ]);
         }
-        return;
+
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Data PO Import BP Berhasil Diupdate",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function updateStatusPOImportBahanPenolong()
     {
-        try {
-            $id = $this->request->getPost("id");
-            $spp = $this->request->getPost("spp");
-
-            // spp close
-            $responsespp = $this->sppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
-
-            if (!$responsespp) {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Gagal close SPP",
-                    "payload"   => "",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            // po posting
-
-            $payload = [
-                "is_posted" => 1
-            ];
-
-            $condition = [
-                'id' => $id
-            ];
-
-            $response = $this->amPurchaseOrderModel->where($condition)->set($payload)->update();
-
-            if ($response) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diposting",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = 'Data Gagal Diposting';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $this->amPurchaseOrderModel->update($this->request->getVar('id'), ['is_posted' => 1]);
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Data PO Import BP Berhasil Diposting",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function closePOImportBahanPenolong()
     {
-        try {
-            $id = $this->request->getPost("id");
-
-            $payload = [
-                "status_penerimaan" => 1
-            ];
-
-            $condition = [
-                'id' => $id
-            ];
-
-            $response = $this->amPurchaseOrderModel->where($condition)->set($payload)->update();
-
-            if ($response) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "PO Berhasil di Close",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = 'PO Gagal di Close';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $this->amPurchaseOrderModel->update($this->request->getVar('id'), ['status_penerimaan' => 1]);
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Close PO Berhasil",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function deletePOImportBahanPenolong()
     {
-        try {
-            $id = $this->request->getPost("id");
-
-            if (!empty($id)) {
-                $findBarang = $this->amPurchaseOrderModel->find($id);
-
-                // spp return to waiting when deleted
-                $responsespp = $this->sppModel->where(['id' => $findBarang->purchase_request_id])->set(['request_status' => 'waiting'])->update();
-
-                if (empty($responsespp)) {
-                    $data = [
-                        "status"     => false,
-                        "message"    => "Data Gagal Dihapus",
-                        'token'      => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                    return;
-                }
-
-                if ($findBarang) {
-                    $response =  $this->amPurchaseOrderModel->delete($id);
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil dihapus",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Dihapus';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Tidak Ditemukan",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $id = $this->request->getPost("id");
+        $this->amPurchaseOrderModel->delete($id);
+        $this->amPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
+        return response()->setJSON([
+            "status" => true,
+            "message" => "PO Berhasil Dihapus",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function print($id = null)
     {
-        if ($id) {
-            $filename = "PO Import Bahan Penolong";
+        $filename = "PO Import Bahan Penolong";
 
-            $data = [];
-            $dataPO = $this->amPurchaseOrderModel->getPOById($id);
+        $data = [
+            "dataPO" => $this->amPurchaseOrderModel->getPOById($id),
+            "dataPODetail" => $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id)
+        ];
 
-            if ($dataPO) {
-                $dataPODetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
-                if ($dataPODetail) {
-                    $sppModel = new SppModel();
-                    $companyModel = new CompaniesModel();
-                    $divisiModel = new DivisisModel();
-
-                    $dataPOImport = $this->amPurchaseOrderModel->getPOById($id);
-                    $sppFirst = $sppModel->where('id', $dataPOImport->purchase_request_id)->first();
-                    $companyFirst = $companyModel->where('id', $sppFirst['company_id'])->first();
-                    $divisiFirst = $divisiModel->where('id', $sppFirst['divisi_id'])->first();
-
-                    $dataPO->spp_no = ($sppFirst == null) ? '-' : $sppFirst['spp_no'];
-                    $dataPO->companyName = $companyFirst['company'];
-                    $dataPO->divisiName = $divisiFirst['divisi'];
-                    $dataPO->divisi_id = $divisiFirst['id'];
-
-                    $data["dataPO"] = $dataPO;
-                    $data["dataPODetail"] = $dataPODetail;
-                }
-            }
-
-            // var_dump($dataPODetail);
-            // die;
-
-            // load HTML content
-            $this->dompdf->loadHtml(view('Purchase/poImportBahanPenolong/print', $data));
-
-            // (optional) setup the paper size and orientation
-            $this->dompdf->setPaper('A4', 'portrait');
-
-            // render html as PDF
-            $this->dompdf->render();
-
-            // output the generated pdf
-            $this->dompdf->stream($filename, array("Attachment" => false));
-
-            exit(0);
-
-            // return view('Purchase/poImportBahanPenolong/print', $data);
-        }
+        $this->dompdf->loadHtml(view('Purchase/poImportBahanPenolong/print', $data));
+        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->render();
+        $this->dompdf->stream($filename, array("Attachment" => false));
+        exit(0);
     }
 
     public function dropdownPOImportBahanPenolong()
     {
-        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
+        $id = formatter($this->request->getVar("id"), "STR_TO_INT");
 
         $dataPOImport = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Import", $id);
 
@@ -953,7 +333,7 @@ class POImportBahanPenolong extends BaseController
 
     public function dropdownBarangPOImportBahanPenolong()
     {
-        $id = $this->request->getGet("id");
+        $id = $this->request->getVar("id");
 
         $dataPOImport = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
@@ -976,7 +356,6 @@ class POImportBahanPenolong extends BaseController
 
         $selectQry = "am_purchase_orders.*,
                       metadata.value AS currency";
-        // $dataPOImport = $this->rmImportPOModel->getNoPenerimaanBarang($id, $this->this_company_id);
         $dataPOImport = $this->amPurchaseOrderModel->asObject()
             ->select($selectQry)
             ->where($condition)

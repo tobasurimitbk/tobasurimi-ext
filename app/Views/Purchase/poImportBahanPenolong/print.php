@@ -145,20 +145,20 @@
                 <td>
                     Date: <?= date("d-m-Y", strtotime($dataPO->po_date)) ?>
                 </td>
-                <td>
-                    SPP Number: <?= $dataPO->spp_no ?>
-                </td>
-                <td class="txt-right">
+                <!-- <td colspan="2">
                     <div>NPMWP: <span class="txt-bold"><?= $dataPO->supplierNPWP ?></span></div>
+                </td> -->
+                <td colspan="2">
+                    Location: <?= strtoupper($dataPO->companyName) ?>
                 </td>
             </tr>
             <tr>
                 <td>
-                    Department: <?= $dataPO->divisiName ?>
+                    Department: <?= strtoupper($dataPO->divisiName) ?>
                 </td>
-                <td colspan="2">
+                <!-- <td colspan="2">
                     Location: <?= $dataPO->companyName ?>
-                </td>
+                </td> -->
             </tr>
         </table>
         <div class="mt-025 txt-bold" style="margin-bottom: 3px;">Please send us the following items below:</div>
@@ -175,17 +175,19 @@
             $no = 1;
             $totalPrice = 0;
             $totalDisc = 0;
+            $diskonTotal = 0;
 
             foreach ($dataPODetail as $detail) {
-                $totalWithAdditional = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
+                $totalDisc =  (formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT")) * ((float)$detail["disc"] / 100);
+                $totalWithAdditional = (formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT") - $totalDisc) +  formatter($detail["additional_cost"], "CURR_TO_INT");
                 $totalPrice += $totalWithAdditional;
-                $totalDisc += $totalWithAdditional * (float)$detail["disc"] / 100;
+                $diskonTotal += $totalDisc;
             ?>
                 <tr>
-                    <td style="padding-left: 5px;"><?= $detail["qty"] . " " . $detail["nama_satuan"] ?></b></td>
+                    <td style="padding-left: 5px;"><?= $detail["qty"] . " " . strtoupper($detail["nama_satuan"]) ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail["kode_barang"] ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail["nama_barang"] ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= $detail["price"] ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= number_format(formatter(($detail["price"]), "STR_TO_FLOAT"), 2, '.', ',')  ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail["disc"] ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= number_format(formatter($totalWithAdditional, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                 </tr>
@@ -197,13 +199,13 @@
                     Currency: <span class="txt-bold"><?= $dataPO->currencyName ?></span>
                 </div>
                 <div class="mt-025">
-                    Sub Total: <span class="txt-bold"><?= number_format(formatter($totalPrice, "STR_TO_FLOAT"), 2, '.', ',') ?></span>
+                    Sub Total: <span class="txt-bold"><?= number_format(formatter($totalPrice + $diskonTotal, "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
                 <div class="mt-025">
-                    Discount: <span class="txt-bold"><?= $totalDisc ?></span>
+                    Discount: <span class="txt-bold"><?= number_format(formatter(($diskonTotal), "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
                 <div class="mt-025">
-                    Grand Total: <span class="txt-bold"><?= number_format(formatter(($totalPrice - $totalDisc), "STR_TO_FLOAT"), 2, '.', ',') ?></span>
+                    Grand Total: <span class="txt-bold"><?= number_format(formatter(($totalPrice), "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
             </div>
         </div>

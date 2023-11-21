@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah PO Import Bahan Penolong</h1>
+        <h1 class="title-name">Tambah PO Import BP</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-penolong"); ?>">
                 Batal
@@ -60,7 +60,6 @@
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOImport) ? $dataPOImport->id : ""; ?>" />
-                <input autocomplete="one-time-code" type="hidden" class="spp" name="spp" id="spp" value="<?= !empty($dataPOImport) ? $dataPOImport->purchase_request_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -77,81 +76,55 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <?php if (!empty($dataPOImport)) { ?>
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
-                                <label for="floatingInput">No. SPP</label>
-                            </div>
-                        <?php } else { ?>
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select purchase_request_id" id="purchase_request_id" name="purchase_request_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataSPP)) {
-                                        foreach ($dataSPP as $spp) {
-                                    ?>
-                                            <option value="<?= $spp["id"]; ?>"><?= $spp["spp_no"]; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">No. SPP</label>
-                            </div>
-                        <?php } ?>
-                    </div>
-                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOImport) ? $dataPOImport->po_no : ""; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? 'readonly' : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOImport) ? $dataPOImport->po_no : ""; ?>">
                                     <label for="floatingInput">No. PO</label>
                                 </div>
-                                <div style="<?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style=" <?= !empty($dataPOImport) ? 'display:none' : ''; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($company as $c) : ?>
+                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->company_id == $c['id'] ? 'selected' : '') : '' ?> value="<?= $c['id'] ?>"><?= strtoupper($c['company']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Company</label>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" readonly type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->companyName : ""; ?>" class="form-control company" placeholder="Company">
-                            <label for="floatingInput">Company</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->divisi_id : ""; ?>" class="form-control divisi_id" id="divisi_id" name="divisi_id">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->divisiName : ""; ?>" readonly="true" class="form-control divisi" id="divisi" name="divisi" placeholder="Divisi">
-                            <label for="floatingInput">Departemen</label>
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select division_id" id="division_id" name="division_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Departemen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataSupplier)) {
-                                    foreach ($dataSupplier as $supplier) {
-                                ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= strtoupper($supplier["name"]); ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                <?php foreach ($dataSupplier as $supplier) : ?>
+                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= strtoupper($supplier["name"]); ?></option>
+                                <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Supplier</label>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Supplier</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran" value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "")  : ""; ?>">
+                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran" value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "")  : ""; ?>">
                                     <label for="floatingInput">Tanggal Pembayaran</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -160,21 +133,17 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataValuta)) {
-                                    foreach ($dataValuta as $valuta) {
-                                ?>
-                                        <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) === formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                <?php foreach ($dataValuta as $valuta) : ?>
+                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) === formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                <?php endforeach ?>
                             </select>
-                            <label for="floatingInput">Valas</label>
+                            <label for="floatingInput" style="z-index: 1;">Valas</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -226,15 +195,9 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select shipment" id="shipment" name="shipment" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataShipment)) {
-                                    foreach ($dataShipment as $shipment) {
-                                ?>
-                                        <option <?= !empty($dataPOImport) ? (($dataPOImport->shipment ? formatter($dataPOImport->shipment, "STR_TO_INT") : 0) === formatter($shipment["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $shipment["id"]; ?>"><?= $shipment["value"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                <?php foreach ($dataShipment as $shipment) : ?>
+                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->shipment ? formatter($dataPOImport->shipment, "STR_TO_INT") : 0) === formatter($shipment["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $shipment["id"]; ?>"><?= $shipment["value"]; ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Shipment</label>
                         </div>
@@ -273,6 +236,21 @@
                     <div class="col-md-6">
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                     </div>
+                    <div class="col-md-6">
+                        <?php if (!empty($dataPOImport)) : ?>
+                            <?php if ($dataPOImport->is_posted) : ?>
+
+                            <?php else : ?>
+                                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            <?php endif; ?>
+                        <?php else : ?>
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -280,87 +258,31 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <!-- <th>Kode</th> -->
-                                <th>Nama</th>
+                                <th>No</th>
+                                <th>Kode</th>
+                                <th>Barang</th>
                                 <th>Satuan</th>
                                 <th>Harga</th>
                                 <th>QTY</th>
-                                <!-- <th>Sisa Penerimaan</th>
-                                <th>Jumlah Diterima</th> -->
-                                <th>Total</th>
                                 <th>Disc (%)</th>
                                 <th>Tambahan</th>
-                                <th style="<?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
-                                <!-- <th>Keterangan</th> -->
+                                <th>Total</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                            <?php
-                            $no = 1;
-                            $total_harga_barang = 0;
-                            $total_qty = 0;
-                            $total_harga = 0;
-                            $total_qty_diterima = 0;
-                            $total_remaining_qty = 0;
 
-                            if (!empty($dataPOImport)) {
-                                foreach ($dataPOImportDetail as $details) {
-                                    $total_harga_barang = $total_harga_barang + ($details["price"] ? formatter($details["price"], "CURR_TO_INT") : 0);
-                                    $total_qty = $total_qty + ($details["qty"] ? formatter($details["qty"], "STR_TO_FLOAT") : 0);
-                                    $total_qty_diterima = $total_qty_diterima + ($details["qty_diterima"] ? formatter($details["qty_diterima"], "STR_TO_FLOAT") : 0);
-                                    $total_remaining_qty = $total_remaining_qty + ($details["remaining_qty"] ? formatter($details["remaining_qty"], "STR_TO_FLOAT") : 0);
-                                    $total_harga = $total_harga + ($details["price"] && $details["qty"] ? (formatter($details["totalPriceWithoutAdditional"], "CURR_TO_INT")) : 0);
-                            ?>
-                                    <tr>
-                                        <?php if ($dataPOImport->is_posted === "0") { ?>
-                                            <td><?= $no; ?></td>
-                                            <!-- <td><?= $details["kode_barang"]; ?></td> -->
-                                            <td><?= $details["nama_barang"]; ?></td>
-                                            <td><?= $details["nama_satuan"]; ?></td>
-                                            <td><?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details["qty"], "STR_TO_FLOAT"); ?></td>
-                                            <!-- <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td> -->
-                                            <td><?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details["disc"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td>
-                                                <button data-nama_satuan="<?= $details["nama_satuan"]; ?>" data-total="<?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
-                                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                                </button>
-                                            </td>
-                                        <?php } else { ?>
-
-                                            <td><?= $no; ?></td>
-                                            <!-- <td><?= $details["kode_barang"]; ?></td> -->
-                                            <td><?= $details["nama_barang"]; ?></td>
-                                            <td><?= $details["nama_satuan"]; ?></td>
-                                            <td><?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details["qty"], "STR_TO_FLOAT"); ?></td>
-                                            <!-- <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td> -->
-                                            <td><?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details["disc"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                        <?php } ?>
-                                    </tr>
-                            <?php
-                                    $no++;
-                                }
-                            } ?>
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="2"></td>
+                                <td colspan="3"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b><?= number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td><b><?= $total_qty; ?></b></td>
-                                <!-- <td><b><?= $total_remaining_qty; ?></b></td>
-                                <td><b><?= $total_qty_diterima; ?></b></td> -->
-                                <td><b><?= number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td colspan="2"></td>
-                                <td style="<?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
+                                <td><b>0.00</b></td>
+                                <td><b>0</b></td>
+                                <td><b>0</b></td>
+                                <td><b>0.00</b></td>
+                                <td><b>0.00</b></td>
+                                <td></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -375,32 +297,31 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
-                <!-- <button type="button" onclick="addBarang('<?= base_url("barang"); ?>')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button> -->
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <input autocomplete="one-time-code" type="hidden" class="barang_id" name="barang_id" id="barang_id" />
                     <div class="row">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Barang</h5>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" type="text" class="form-control kode" name="kode" id="kode" placeholder="Kode Barang" />
-                                <label for="floatingInput">Kode Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
-                                <label for="floatingInput">Nama Barang</label>
+                                <input type="hidden" name="barang_update_id" id="barang_update_id" class="barang_update_id">
+                                <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($barang as $s) : ?>
+                                        <option data-satuan_id="<?= $s['satuan_id'] ?>" data-nama_barang="<?= strtoupper($s['barang_name']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['id'] ?>">
+                                            <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Barang</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                    <div class="row mt-0">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Harga</h5>
                         </div>
@@ -408,13 +329,20 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" type="text" class="form-control nama_satuan" name="nama_satuan" id="nama_satuan" placeholder="Satuan">
+                                <select disabled class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($satuan as $s) : ?>
+                                        <option data-nama_satuan="<?= strtoupper($s['nama_satuan']) ?>" value="<?= $s['id'] ?>">
+                                            <?= strtoupper($s['nama_satuan']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                                 <label for="floatingInput">Satuan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                                 <label for="floatingInput">Qty</label>
                             </div>
                         </div>
@@ -422,21 +350,21 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
+                                <input autocomplete="one-time-code" type="number" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan">
                                 <label for="floatingInput">Harga Satuan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control disc" name="disc" id="disc" placeholder="Discount (%) (Opsional)">
-                                <label for="floatingInput">Discount (%) (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control diskon" name="diskon" value="0" id="diskon" placeholder="Discount (%) (Opsional)">
+                                <label for="floatingInput">Diskon (%)</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" class="form-control additional_cost" name="additional_cost" id="additional_cost" placeholder="Biaya Tambahan (Opsional)">
+                                <input autocomplete="one-time-code" type="number" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan (Opsional)">
                                 <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                             </div>
                         </div>
@@ -459,1029 +387,89 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let list_items = [];
-    var row = 0;
-    var total_harga_barang = 0;
-    var total_qty = 0;
-    var total_remaining_qty = 0;
-    var total_qty_diterima = 0;
-    var total_harga = 0;
-    var priceEdit = 0;
-    var totalPriceEdit = 0;
-
-    <?php if (!empty($dataPOImportDetail)) {
-        foreach ($dataPOImportDetail as $details) {
-    ?>
-
-            priceEdit = Number('<?= $details["price"] ? $details["price"] : 0; ?>'.replaceAll(",", ""));
-            totalPriceEdit = Number('<?= $details["totalPriceWithoutAdditional"] ? $details["totalPriceWithoutAdditional"] : 0; ?>'.replaceAll(",", ""));
-            row = row + 1;
-
-            total_harga_barang = total_harga_barang + priceEdit;
-            total_qty = total_qty + Number('<?= $details["qty"] ? $details["qty"] : 0; ?>');
-            total_remaining_qty = total_remaining_qty + Number('<?= $details["remaining_qty"]; ?>');
-            total_qty_diterima = total_qty_diterima + Number('<?= $details["qty_diterima"]; ?>');
-            total_harga = total_harga + totalPriceEdit;
-
-            list_items.push({
-                id: <?= $details["id"]; ?>,
-                purchase_request_detail_id: <?= $details["purchase_request_detail_id"]; ?>,
-                row: row,
-                barang_id: '<?= $details["barang_id"]; ?>',
-                kode_barang: '<?= $details["kode_barang"]; ?>',
-                nama_barang: '<?= $details["nama_barang"]; ?>',
-                nama_satuan: '<?= $details["nama_satuan"]; ?>',
-                satuan: <?= $details["id_satuan"]; ?>,
-                harga: '<?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                qty: Number('<?= $details["qty"] ? $details["qty"] : 0; ?>'),
-                total: '<?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                keterangan: '<?= $details["note"]; ?>',
-                additional_cost: '<?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                disc: Number('<?= $details["disc"]; ?>'),
-                remaining_qty: Number('<?= $details["remaining_qty"]; ?>'),
-                qty_diterima: Number('<?= $details["qty_diterima"]; ?>'),
-            })
-        <?php
-        }
-        ?>
-    <?php
-    } ?>
-
-    $(document).ready(function() {
-        $(".po_date").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $(".payment_date").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $(".latest_shipment_date").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        // BC Type
-        $('.bc_type').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
-        // PURCHASE REQUEST ID
-        $('.purchase_request_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.purchase_request_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.purchase_request_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.purchase_request_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // SUPPLIER
-        $('.supplier_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.supplier_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.supplier_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.supplier_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // FOREIGN EXHANGE
-        $('.currency').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.currency')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.currency')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.currency')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        $('.icon-po-date').click(function() {
-            $(".po_date").focus();
-        });
-
-        $('.icon-payment-date').click(function() {
-            $(".payment_date").focus();
-        });
-
-        $('.icon-latest-shipment-date').click(function() {
-            $(".latest_shipment_date").focus();
-        });
-
-        var validator = $(".create-form").validate({
-            rules: {
-                po_no: {
-                    required: true
-                },
-                purchase_request_id: {
-                    required: true
-                },
-                po_date: {
-                    required: true
-                },
-                payment_date: {
-                    required: true
-                },
-                supplier_id: {
-                    required: true
-                },
-                currency: {
-                    required: true
-                },
-                port_origin: {
-                    required: true
-                },
-                port_destination: {
-                    required: true
-                },
-                shipment: {
-                    required: true
-                },
-                latest_shipment_date: {
-                    required: true
-                },
-                attn: {
-                    required: true
-                }
+    const csrf = $(`[name="${csrfToken}"]`);
+    // init barang list
+    var listBarang = [];
+    var totalHargaSatuan = 0;
+    var totalQty = 0;
+    var totalDiskon = 0;
+    var totalTambahan = 0;
+    var totalHarga = 0;
+    // init select2
+    $('#company_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5"
+    }).change(function() {
+        var companyID = $(this).val();
+        var formData = new FormData();
+        formData.append("companyID", companyID);
+        $.ajax({
+            url: "<?= base_url("po-import-bahan-penolong/find-divisi"); ?>",
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
             },
-            messages: {
-                po_no: {
-                    required: "No. PO wajib diisi"
-                },
-                purchase_request_id: {
-                    required: "No. SPP wajib diisi"
-                },
-                po_date: {
-                    required: "Tanggal Dibuat wajib diisi"
-                },
-                payment_date: {
-                    required: "Tanggal Pembayaran wajib diisi"
-                },
-                supplier_id: {
-                    required: "Supplier wajib diisi"
-                },
-                currency: {
-                    required: "Valas wajib diisi"
-                },
-                port_origin: {
-                    required: "Port Of Origin wajib diisi"
-                },
-                port_destination: {
-                    required: "Port Of Destination wajib diisi"
-                },
-                shipment: {
-                    required: "Shipment wajib diisi"
-                },
-                latest_shipment_date: {
-                    required: "Latest Shipment Date wajib diisi"
-                },
-                attn: {
-                    required: "ATTN wajib diisi"
-                }
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-
-        $(".btn-hide-detail").click(function() {
-            $(".detail-modal").modal("hide")
-        })
-
-        $(".disc").keyup(function() {
-            if ($(".disc").val()) {
-                if ($(".disc").val() > 100) {
-                    $(".disc").val(100)
-                }
-                if ($(".disc").val() < 0) {
-                    $(".disc").val();
-                }
-            } else {
-                $(".disc").val();
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                $("#division_id").empty();
+                $("#division_id").append(`<option value=""></option>`);
+                response.data.forEach(function(item) {
+                    $("#division_id").append(`<option  value="${item.id}">${item.divisi}</option>`);
+                });
+                <?php if (!empty($dataPOImport)) : ?>
+                    $('#division_id').val("<?= $dataPOImport->divisi_id ?>").change();
+                <?php endif; ?>
             }
-        })
+        });
+    });
+    $('#division_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5"
+    }).change(function() {
 
-        // $(".supplier_id").change(function() {
-        //     if ($(".supplier_id option:selected").val()) {
-        //         let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
-        //         $(".supplier").val(name);
-        //     } else {
-        //         $(".supplier").val("");
-        //     }
-        // })
+    });
 
-        $(".purchase_request_id").change(function() {
-            if ($(".purchase_request_id option:selected").val()) {
-                $.ajax({
-                    url: `<?= base_url("spp/ajax"); ?>`,
-                    method: "GET",
-                    data: {
-                        id: $(".purchase_request_id option:selected").val()
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        if (res.status) {
-                            $(".divisi_id").val(res?.data?.divisi_id)
-                            $(".divisi").val(res?.data?.divisiName)
-                            $(".company").val(res?.data?.companyName)
+    $('#supplier_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5"
+    }).change(function() {
 
-                            let new_list_items = []
-                            let tag_html = "";
-                            let tag_total = "";
+    });
 
-                            list_items = [];
-                            total_harga_barang = 0;
-                            total_qty = 0;
-                            total_harga = 0;
+    $('#currency').select2({
+        placeholder: "",
+        theme: "bootstrap-5"
+    }).change(function() {
 
-                            row = 0;
+    });
 
-                            $(".body-detail-table").empty()
-                            console.log(res.detail)
+    $('#barang_id').select2({
+        placeholder: "Pilih Bahan Penolong",
+        theme: "bootstrap-5"
+    }).change(function() {
+        $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
+    });
 
-                            res?.detail.map(item => {
-                                tag_html += `<tr>`;
-                                tag_html += `<td>`;
-                                tag_html += row + 1;
-                                tag_html += "</td>";
-                                // tag_html += `<td>`;
-                                // tag_html += item.kodeBarang;
-                                // tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += item.barangName;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += item.satuanName;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += Number(item.price).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                });
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += item.qty ? Number(item.qty) : 0;
-                                tag_html += "</td>";
-                                // tag_html += `<td>`;
-                                // tag_html += 0;
-                                // tag_html += "</td>";
-                                // tag_html += `<td>`;
-                                // tag_html += 0;
-                                // tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += Number(item.totalPrice).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                });
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += 0.00;
-                                tag_html += "</td>";
-                                tag_html += "<td>";
-                                tag_html += `
-                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.satuanName}" data-total="${Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-harga="${Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-qty="${Number(item.qty)}" data-keterangan="${item.note}" data-id="" data-row="${row + 1}">
-                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                </button>`;
-                                tag_html += "</td>";
-                                tag_html += "</tr>";
+    $("#payment_date,#latest_shipment_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+    $("#division_id,#supplier_id,#currency,#barang_id,#company_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-                                list_items.push({
-                                    id: "",
-                                    purchase_request_detail_id: item.id ? Number(item.id) : 0,
-                                    row: row + 1,
-                                    barang_id: item.barang_id ? Number(item.barang_id) : 0,
-                                    kode_barang: item.kodeBarang,
-                                    nama_barang: item.barangName,
-                                    nama_satuan: item.satuanName,
-                                    satuan: item.unit ? Number(item.unit) : 0,
-                                    harga: Number(item.price).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }),
-                                    disc: "",
-                                    additional_cost: "",
-                                    qty: item.qty ? Number(item.qty) : 0,
-                                    total: Number(item.totalPrice).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }),
-                                    keterangan: item.note,
-                                    remaining_qty: 0,
-                                    qty_diterima: 0
-                                });
-
-                                row = row + 1;
-
-                                total_harga_barang = total_harga_barang + Number(item.price.replaceAll(",", ""));
-                                total_qty = total_qty + Number(item.qty);
-                                total_harga = total_harga + Number(item.totalPrice.replaceAll(",", ""));
-                            })
-
-                            $(".body-detail-table").append(tag_html)
-
-                            $(".foot-detail-table").empty()
-
-                            tag_total += `<tr>`;
-                            tag_total += "<td colspan='2'>";
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += "<b>TOTAL</b>";
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_qty}</b>`;
-                            tag_total += "</td>";
-                            // tag_total += "<td>";
-                            // tag_total += `<b>${total_remaining_qty}</b>`;
-                            // tag_total += "</td>";
-                            // tag_total += "<td>";
-                            // tag_total += `<b>${total_qty_diterima}</b>`;
-                            // tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                            tag_total += "</td>";
-                            tag_total += "<td colspan='3'>";
-                            tag_total += "</td>";
-                            tag_total += "</tr>";
-
-                            $(".foot-detail-table").append(tag_total);
-                        } else {
-                            $(".divisi_id").val()
-                            $(".divisi").val()
-
-                            list_items = []
-
-                            row = 0;
-
-                            let tag_total = "";
-
-                            $(".body-detail-table").empty()
-
-                            $(".foot-detail-table").empty()
-
-                            tag_total += `<tr>`;
-                            tag_total += "<td colspan='2'>";
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += "<b>TOTAL</b>";
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>0</b>`;
-                            tag_total += "</td>";
-                            // tag_total += "<td>";
-                            // tag_total += `<b>0</b>`;
-                            // tag_total += "</td>";
-                            // tag_total += "<td>";
-                            // tag_total += `<b>0</b>`;
-                            // tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>0</b>`;
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>0</b>`;
-                            tag_total += "</td>";
-                            tag_total += "<td colspan='3'>";
-                            tag_total += "</td>";
-                            tag_total += "</tr>";
-
-                            $(".foot-detail-table").append(tag_total);
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: res.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    }
-                })
-            } else {
-
-            }
-        })
-
-        // close
-        $(".close-parent").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan Close PO?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Close',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $(".id").val();
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("po-import-bahan-penolong/close-po"); ?>",
-                        data: {
-                            id: id
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>";
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Dihapus, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
-
-        // delete
-        $(".delete-parent").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $(".id").val();
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("po-import-bahan-penolong/delete"); ?>",
-                        data: {
-                            id: id
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>"
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Dihapus, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
-
-        $(".btn-submit-detail").click(function() {
-            let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
-            let additional_cost = $(".additional_cost").val()
-            let disc = $(".disc").val()
-
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let new_list_items = []
-                    let tag_html = "";
-                    let tag_total = "";
-
-                    row = 0;
-
-                    $(".body-detail-table").empty()
-
-                    total_harga_barang = 0;
-                    total_qty = 0;
-                    total_harga = 0;
-
-                    list_items.map(item => {
-                        if (item.row == row_detail) {
-                            tag_html += `<tr>`;
-                            tag_html += `<td>`;
-                            tag_html += row + 1;
-                            tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.kode_barang;
-                            // tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.nama_barang;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.nama_satuan;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.harga;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.qty;
-                            tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.remaining_qty;
-                            // tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.qty_diterima;
-                            // tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.total;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += disc ? disc : 0;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += additional_cost ? Number(additional_cost).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            }) : 0;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += `
-                            <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-total="${item.total}" data-additional_cost="${Number(additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-disc="${disc}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button>`;
-                            tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.keterangan;
-                            // tag_html += "</td>";
-                            tag_html += "</tr>";
-
-                            new_list_items.push({
-                                ...item,
-                                additional_cost: Number(additional_cost).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                }),
-                                disc: disc
-                            });
-
-                            row = row + 1;
-                        } else {
-                            tag_html += `<tr>`;
-                            tag_html += `<td>`;
-                            tag_html += row + 1;
-                            tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.kode_barang;
-                            // tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.nama_barang;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.nama_satuan;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.harga;
-                            tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.remaining_qty;
-                            // tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.qty_diterima;
-                            // tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.qty;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.total;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.disc ? item.disc : 0;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.additional_cost ? item.additional_cost : 0;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += `
-                            <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-total="${item.total}" data-additional_cost="${item.additional_cost}" data-disc="${item.disc}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button>`;
-                            tag_html += "</td>";
-                            // tag_html += `<td>`;
-                            // tag_html += item.keterangan;
-                            // tag_html += "</td>";
-                            tag_html += "</tr>";
-
-                            new_list_items.push(item);
-
-                            row = row + 1;
-                        }
-                    })
-
-                    list_items = [];
-
-                    list_items = new_list_items;
-
-                    $(".body-detail-table").append(tag_html)
-
-                    $(".detail-modal").modal("hide")
-                }
-            })
-        })
-
-        $(".posting-po").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di Posting?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Posting',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let spp = $(".spp").val();
-                    $.ajax({
-                        url: "<?= base_url("po-import-bahan-penolong/update-status"); ?>",
-                        data: {
-                            id: $(".id").val(),
-                            spp: spp
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>";
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Diubah, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-
-        })
-
-        $(".btn-submit-parent").click(function() {
-            $(".detail-modal").modal("hide")
-
-            // CHECK IF NO BARANG
-            if (list_items.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Barang Tidak Boleh Kosong",
-                    confirmButtonColor: '#4e73df',
-                })
-            } else {
-                if ($(".create-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            setLoading()
-                            let data = new FormData(document.querySelector(".create-form"));
-                            var total = 0;
-
-                            let update_list_items = [];
-
-                            list_items.map(obj => {
-                                total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
-                                if (obj.id) {
-                                    update_list_items.push({
-                                        id: obj.id ? Number(obj.id) : 0,
-                                        purchase_request_detail_id: obj.purchase_request_detail_id ? Number(obj.purchase_request_detail_id) : 0,
-                                        item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                        item_code: obj.kode_barang,
-                                        item_name: obj.nama_barang,
-                                        qty: obj.qty ? Number(obj.qty) : 0,
-                                        unit: obj.satuan ? Number(obj.satuan) : 0,
-                                        price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan,
-                                        disc: obj.disc ? Number(obj.disc) : 0,
-                                        additional_cost: obj.additional_cost ? Number(obj.additional_cost.replaceAll(",", "")) : 0,
-                                        isDeleted: false
-                                    })
-                                } else {
-                                    update_list_items.push({
-                                        id: "",
-                                        purchase_request_detail_id: obj.purchase_request_detail_id ? Number(obj.purchase_request_detail_id) : 0,
-                                        item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                        item_code: obj.kode_barang,
-                                        item_name: obj.nama_barang,
-                                        qty: obj.qty ? Number(obj.qty) : 0,
-                                        unit: obj.satuan ? Number(obj.satuan) : 0,
-                                        price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan,
-                                        disc: obj.disc ? Number(obj.disc) : 0,
-                                        additional_cost: obj.additional_cost ? Number(obj.additional_cost.replaceAll(",", "")) : 0,
-                                        isDeleted: false
-                                    })
-                                }
-                            })
-
-                            data.append("total", total)
-
-                            data.append("items", JSON.stringify(update_list_items))
-
-                            let id = $(".id").val();
-                            // UPDATE
-                            if (id) {
-                                $.ajax({
-                                    url: "<?= base_url("po-import-bahan-penolong/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>";
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Diubah, coba Lagi',
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                });
-                            }
-                            // CREATE
-                            else {
-                                $.ajax({
-                                    url: "<?= base_url("po-import-bahan-penolong/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>";
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                });
-                            }
-                        }
-                    })
-                }
-            }
-        })
-    })
-
-    $(document).on('click', '.edit-table-detail', function(evt) {
-        $(".title-detail-name").text("Update")
-        $(".delete-detail").css('display', '');
-        let additional_cost = $(this).data('additional_cost')
-        let total = $(this).data('total')
-        let disc = $(this).data('disc')
-
-        let barang_id = $(this).data('barang_id')
-        let kode_barang = $(this).data('kode_barang')
-        let nama_barang = $(this).data('nama_barang')
-        let nama_satuan = $(this).data('nama_satuan')
-        let satuan = $(this).data('satuan')
-        let harga = $(this).data('harga')
-        let qty = $(this).data('qty')
-        // let keterangan = $(this).data('keterangan')
-        let rowid = $(this).data('row')
-        let id = $(this).data('id')
-
-        $(".id_detail").val(rowid)
-        $(".kode").val(kode_barang)
-        // $(".keterangan").val(keterangan)
-
-        $(".barang_id").val(barang_id)
-        $(".nama_barang").val(nama_barang)
-        $(".nama_satuan").val(nama_satuan)
-
-        $(".harga").val(harga.replaceAll(",", ""))
-        $(".qty").val(qty)
-        $(".total").val(total.replaceAll(",", ""))
-
-        $(".additional_cost").val(additional_cost.replaceAll(",", ""))
-        $(".disc").val(disc)
-
-        $(".detail-modal").modal("show");
-    })
-
-    const addBarang = function(url) {
-        window.open(url, "_blank");
-    }
-
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
-
-    const changeStatus = function() {
+    function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
-
         if (value) {
             $(".po_no").attr("readonly", true);
             $(".po_no").val("AUTO GENERATE");
@@ -1490,5 +478,771 @@
             $(".po_no").val("");
         }
     }
+    // tambah barang
+    $('.btn-add').click(function() {
+        $('.title-detail-name').text('Tambah ');
+        $('.detail-modal').show();
+        resetForm();
+    });
+    // close modal
+    $('.btn-hide-detail').click(function() {
+        $('.detail-modal').hide();
+    });
+    // HARGA SATUAN DAN QTY CHANE
+    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
+        var hargaSatuan = parseInt($('#harga_satuan').val()) || 0;
+        var qty = parseInt($('#qty').val()) || 1;
+        var biayaTambahan = parseInt($('#biaya_tambahan').val()) || 0;
+        var diskon = parseInt($('#diskon').val()) || 0;
+        var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
+
+        var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
+        $('#total').val(formatRupiah(total));
+    });
+
+    // VALIDATOR DETAIL
+    var validatorBarang = $(".detail-form").validate({
+        rules: {
+            barang_id: {
+                required: true
+            },
+            satuan_id: {
+                required: true
+            },
+            qty: {
+                required: true
+            },
+            harga_satuan: {
+                required: true
+            },
+            diskon: {
+                required: true,
+            },
+            total: {
+                required: true,
+            }
+        },
+        messages: {
+            barang_id: {
+                required: "Pilih Bahan penolong"
+            },
+            satuan_id: {
+                required: "Satuan wajib diisi"
+            },
+            qty: {
+                required: "Kuantitas barang wajib diisi"
+            },
+            harga_satuan: {
+                required: "Harga Satuan wajib diisi"
+            },
+            diskon: {
+                required: "Diskon wajib diisi (beri angka 0 jika tidak ada diskon)"
+            },
+            total: {
+                required: "Total biaya wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+    // VALIDATOR PO
+    var validatorPO = $(".create-form").validate({
+        rules: {
+            po_date: {
+                required: true
+            },
+            po_no: {
+                required: true
+            },
+            company_id: {
+                required: true
+            },
+            division_id: {
+                required: true
+            },
+            supplier_id: {
+                required: true,
+            },
+            payment_date: {
+                required: true,
+            },
+            currency: {
+                required: true
+            },
+            port_origin: {
+                required: true
+            },
+            port_destination: {
+                required: true
+            },
+            shipment: {
+                required: true
+            },
+            latest_shipment_date: {
+                required: true
+            },
+            attn: {
+                required: true
+            }
+        },
+        messages: {
+            po_date: {
+                required: "Tanggal PO Dibuat wajib diisi"
+            },
+            po_no: {
+                required: "Nomor PO wajib diisi"
+            },
+            company_id: {
+                required: "Pilih unit company"
+            },
+            division_id: {
+                required: "Pilih departemen"
+            },
+            supplier_id: {
+                required: "Pilih supplier"
+            },
+            payment_date: {
+                required: "Tanggal pembayaran wajib diisi"
+            },
+            currency: {
+                required: "Pilih mata uang"
+            },
+            port_origin: {
+                required: "Port of origin wajib diisi"
+            },
+            port_destination: {
+                required: "Port of destination wajib diisi"
+            },
+            shipment: {
+                required: "Pilih jalur pengiriman"
+            },
+            latest_shipment_date: {
+                required: "Waktu pengiriman wajib diisi"
+            },
+            attn: {
+                required: "ATTN wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('.btn-submit-parent').click(function() {
+        if ($('.create-form').valid()) {
+            if (listBarang.length == 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Barang masih kosong',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true,
+                    confirmButtonText: 'Oke',
+                })
+            } else {
+                var id = $('#id').val();
+                if (id) {
+                    // UPDATE
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Update Data ?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var id = $('#id').val();
+                            // required form
+                            var poDate = $('#po_date').val();
+                            var poNo = $('#po_no').val();
+                            var companyID = $('#company_id').val();
+                            var divisionID = $('#division_id').val();
+                            var supplierID = $('#supplier_id').val();
+                            var paymentDate = $('#payment_date').val();
+                            var currency = $('#currency').val();
+                            var portOrigin = $('#port_origin').val();
+                            var portDestination = $('#port_destination').val();
+                            var shipment = $('#shipment').val();
+                            var latestShipmentDate = $('#latest_shipment_date').val();
+                            var attn = $('#attn').val();
+                            // optional form
+                            var paymentTerm = $('#payment_term').val();
+                            var shipper = $('#shipper').val();
+                            var consigne = $('#consigne').val();
+                            var locationTransaction = $('#location_transaction').val();
+                            var note = $('#note').val();
+                            // append
+                            var formData = new FormData();
+                            formData.append("id", id);
+                            formData.append("poDate", poDate);
+                            formData.append("poNo", poNo);
+                            formData.append("companyID", companyID);
+                            formData.append("divisionID", divisionID);
+                            formData.append("supplierID", supplierID);
+                            formData.append("paymentDate", paymentDate);
+                            formData.append("currency", currency);
+                            formData.append("portOrigin", portOrigin);
+                            formData.append("portDestination", portDestination);
+                            formData.append("shipment", shipment);
+                            formData.append("latestShipmentDate", latestShipmentDate);
+                            formData.append("attn", attn);
+                            formData.append("paymentTerm", paymentTerm);
+                            formData.append("shipper", shipper);
+                            formData.append("consigne", consigne);
+                            formData.append("locationTransaction", locationTransaction);
+                            formData.append("note", note);
+                            formData.append("total", totalHarga);
+                            formData.append("listBarang", JSON.stringify(listBarang));
+
+                            $.ajax({
+                                url: "<?= base_url("po-import-bahan-penolong/update"); ?>",
+                                data: formData,
+                                method: "POST",
+                                dataType: "json",
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    if (response.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
+                                        }).then((result) => {
+                                            location.reload();
+                                        })
+                                    }
+
+                                }
+                            });
+                        }
+                    })
+                } else {
+                    // CREATE
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data ?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // required form
+                            var poDate = $('#po_date').val();
+                            var poNo = $('#po_no').val();
+                            var companyID = $('#company_id').val();
+                            var divisionID = $('#division_id').val();
+                            var supplierID = $('#supplier_id').val();
+                            var paymentDate = $('#payment_date').val();
+                            var currency = $('#currency').val();
+                            var portOrigin = $('#port_origin').val();
+                            var portDestination = $('#port_destination').val();
+                            var shipment = $('#shipment').val();
+                            var latestShipmentDate = $('#latest_shipment_date').val();
+                            var attn = $('#attn').val();
+                            // optional form
+                            var paymentTerm = $('#payment_term').val();
+                            var shipper = $('#shipper').val();
+                            var consigne = $('#consigne').val();
+                            var locationTransaction = $('#location_transaction').val();
+                            var note = $('#note').val();
+                            // append
+                            var formData = new FormData();
+                            formData.append("poDate", poDate);
+                            formData.append("poNo", poNo);
+                            formData.append("companyID", companyID);
+                            formData.append("divisionID", divisionID);
+                            formData.append("supplierID", supplierID);
+                            formData.append("paymentDate", paymentDate);
+                            formData.append("currency", currency);
+                            formData.append("portOrigin", portOrigin);
+                            formData.append("portDestination", portDestination);
+                            formData.append("shipment", shipment);
+                            formData.append("latestShipmentDate", latestShipmentDate);
+                            formData.append("attn", attn);
+                            formData.append("paymentTerm", paymentTerm);
+                            formData.append("shipper", shipper);
+                            formData.append("consigne", consigne);
+                            formData.append("locationTransaction", locationTransaction);
+                            formData.append("note", note);
+                            formData.append("total", totalHarga);
+                            formData.append("listBarang", JSON.stringify(listBarang));
+
+                            $.ajax({
+                                url: "<?= base_url("po-import-bahan-penolong/save"); ?>",
+                                data: formData,
+                                method: "POST",
+                                dataType: "json",
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    if (response.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
+                                        }).then((result) => {
+                                            window.location.href = "<?= base_url('po-import-bahan-penolong') ?>"
+                                        })
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+    $('.btn-submit-detail').click(function() {
+        if ($('.detail-form').valid()) {
+            var barang_update_id = $('#barang_update_id').val();
+            if (barang_update_id != "") {
+                // UPDATE
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Update barang ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var indexToRemove = -1;
+                        for (var i = 0; i < listBarang.length; i++) {
+                            if (listBarang[i].barang_id === barang_update_id) {
+                                indexToRemove = i;
+                                break;
+                            }
+                        }
+                        if (indexToRemove !== -1) {
+                            listBarang.splice(indexToRemove, 1);
+                            insertList();
+                            resetForm();
+                            $('.detail-modal').hide();
+                        }
+                    }
+                });
+            } else {
+                // TAMBAH
+                var isAdd = false;
+                for (var i = 0; i < listBarang.length; i++) {
+                    if (listBarang[i].barang_id === $('#barang_id').val()) {
+                        indexToRemove = i;
+                        isAdd = true;
+                        break;
+                    }
+                }
+                if (isAdd) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Barang Sudah Ada',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true,
+                        confirmButtonText: 'Oke',
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Tambah barang ?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            insertList();
+                            $('.detail-modal').hide();
+                        }
+                    })
+                }
+
+            }
+
+        }
+    });
+
+    function insertList() {
+        listBarang.push({
+            barang_id: $('#barang_id').val(),
+            kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
+            nama_barang: $('#barang_id').find("option:selected").data("nama_barang"),
+            satuan_id: $('#satuan_id').val(),
+            nama_satuan: $('#satuan_id').find("option:selected").data("nama_satuan"),
+            qty: $('#qty').val(),
+            diskon: $('#diskon').val(),
+            harga_satuan: $('#harga_satuan').val() || 0,
+            biaya_tambahan: $('#biaya_tambahan').val() || 0,
+            total: $('#total').val(),
+        });
+        $(".detail-form input, .detail-form select").val("");
+        $(".barang_id").val("").change();
+        $(".diskon").val('0');
+        // reset update flag
+        $('#barang_update_id').val("")
+        drawTabel(listBarang);
+    }
+
+    function drawTabel(listBarang) {
+        const table = $('#dataTable');
+        var no = 1;
+        table.find('tbody').empty();
+        totalHargaSatuan = 0;
+        totalQty = 0;
+        totalDiskon = 0;
+        totalTambahan = 0;
+        totalHarga = 0;
+        console.log(listBarang);
+        $.each(listBarang, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align:center;">').text(no++));
+            newRow.append($('<td>').text(v.kode_barang));
+            newRow.append($('<td>').text(v.nama_barang));
+            newRow.append($('<td>').text(v.nama_satuan));
+            newRow.append($('<td>').text(formatRupiah(v.harga_satuan)));
+            newRow.append($('<td>').text(v.qty));
+            newRow.append($('<td>').text(v.diskon));
+            newRow.append($('<td>').text(formatRupiah(v.biaya_tambahan)));
+            newRow.append($('<td>').text(v.total));
+            <?php if (!empty($dataPOImport)) : ?>
+                <?php if ($dataPOImport->is_posted) : ?>
+                    newRow.append($('<td>').html(
+                        `
+                        -
+                    `
+                    ));
+                <?php else : ?>
+                    newRow.append($('<td>').html(
+                        `
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.barang_id}')">
+                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        </button><button class="btn btn-danger" onclick="deleteRow('${v.barang_id}')">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    `
+                    ));
+                <?php endif ?>
+            <?php else : ?>
+                newRow.append($('<td>').html(
+                    `
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.barang_id}')">
+                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        </button><button class="btn btn-danger" onclick="deleteRow('${v.barang_id}')">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    `
+                ));
+            <?php endif; ?>
+            table.find('tbody').append(newRow);
+            totalHargaSatuan += parseInt(v.harga_satuan);
+            totalQty += parseInt(v.qty);
+            totalDiskon += parseInt(v.diskon);
+            totalTambahan += parseInt(v.biaya_tambahan);
+            totalHarga += parseInt(formatCurrency(v.total));
+        });
+        table.find('tfoot').empty();
+        var newRow = $('<tr>');
+        newRow.append($('<td style="text-align:right;" colspan="4"><b>TOTAL</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHargaSatuan) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + totalQty + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + totalDiskon + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalTambahan) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHarga) + '</b></td>'));
+        newRow.append($('<td></td>'));
+        table.find('tfoot').append(newRow);
+    }
+
+    function deleteRow(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Barang ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var indexToRemove = -1;
+                for (var i = 0; i < listBarang.length; i++) {
+                    if (listBarang[i].barang_id === id) {
+                        indexToRemove = i;
+                        break;
+                    }
+                }
+                if (indexToRemove !== -1) {
+                    listBarang.splice(indexToRemove, 1);
+                }
+                drawTabel(listBarang);
+                resetForm();
+            }
+        })
+
+    }
+
+    function detailRow(id) {
+        var item = null;
+        for (var i = 0; i < listBarang.length; i++) {
+            if (listBarang[i].barang_id === id) {
+                item = listBarang[i];
+                break;
+            }
+        }
+        $('#barang_id, #barang_update_id').val(item.barang_id).change();
+        $('#harga_satuan').val(item.harga_satuan);
+        $('#qty').val(item.qty);
+        $('#diskon').val(item.diskon);
+        $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? "" : item.biaya_tambahan).val();
+        $('#biaya_tambahan').change();
+        $('#total').val(item.total);
+        $('#barang_id').attr('disabled', true);
+
+        $('.title-detail-name').text('Update ');
+        $('.detail-modal').show();
+
+    }
+
+    function resetForm() {
+        $('#barang_id').attr('disabled', false);
+        $(".detail-form input, .detail-form select").val("");
+        $(".barang_id").val("").change();
+        $(".diskon").val('0');
+    }
+
+    function formatCurrency(str) {
+        var strs = str.replace(/,..$/, '');
+        return strs.replace(/[^0-9]/g, '');
+    }
+
+    function formatRupiah(angka) {
+        if (angka === null) {
+            angka = 0;
+        }
+
+        angka = angka.toString();
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var desimal = parts[1] || '00';
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return "Rp. " + ribuanFormatted + ',' + desimal;
+    }
 </script>
+<?php if (!empty($dataPOImport)) : ?>
+    <script>
+        $('#company_id').change();
+        <?php foreach ($dataPOImportDetail as $d) : ?>
+            listBarang.push({
+                barang_id: "<?= $d['barang_id'] ?>",
+                kode_barang: "<?= $d['kode_barang'] ?>",
+                nama_barang: <?= json_encode($d['nama_barang']) ?>,
+                satuan_id: <?= $d['unit'] ?>,
+                nama_satuan: "<?= $d['nama_satuan'] ?>",
+                qty: <?= $d['qty'] ?>,
+                diskon: <?= $d['disc'] ?>,
+                harga_satuan: <?= $d['price'] ?>,
+                biaya_tambahan: <?= $d['additional_cost'] ?>,
+                total: formatRupiah("<?= (($d['price'] * $d['qty']) - (($d['disc'] / 100) * ($d['price'] * $d['qty']))) + $d['additional_cost'] ?>"),
+            });
+        <?php endforeach; ?>
+        drawTabel(listBarang);
+
+        // HAPUS
+        $('.delete-parent').click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan hapus PO ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData();
+                    var id = $('#id').val();
+                    formData.append("id", id);
+                    $.ajax({
+                        url: "<?= base_url("po-import-bahan-penolong/delete"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                }).then((result) => {
+                                    window.location.href = "<?= base_url('po-import-bahan-penolong') ?>"
+                                })
+                            }
+
+                        }
+                    });
+                }
+            })
+        });
+
+        //POSTING
+        $('.posting-po').click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan posting PO ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData();
+                    var id = $('#id').val();
+                    formData.append("id", id);
+                    $.ajax({
+                        url: "<?= base_url("po-import-bahan-penolong/update-status"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                }).then((result) => {
+                                    location.reload();
+                                })
+                            }
+
+                        }
+                    });
+                }
+            })
+        });
+
+        // CLOSE PO
+        $('.close-parent').click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan close PO ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData();
+                    var id = $('#id').val();
+                    formData.append("id", id);
+                    $.ajax({
+                        url: "<?= base_url("po-import-bahan-penolong/close-po"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                }).then((result) => {
+                                    location.reload();
+                                })
+                            }
+
+                        }
+                    });
+                }
+            })
+        });
+
+        function print(url) {
+            window.open(url, "_blank");
+        }
+    </script>
+<?php endif; ?>
 <?= $this->endSection(); ?>

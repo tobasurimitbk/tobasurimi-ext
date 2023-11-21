@@ -29,7 +29,8 @@ class AMPurchaseOrderDetailModel extends Model
         'ppn',
         'pph',
         'remaining_qty',
-        'qty_diterima'
+        'qty_diterima',
+        'total'
     ];
 
     // Dates

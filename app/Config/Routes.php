@@ -272,6 +272,7 @@ $routes->post('/po-import-bahan-penolong/update', 'Purchase\POImportBahanPenolon
 $routes->post('/po-import-bahan-penolong/update-status', 'Purchase\POImportBahanPenolong::updateStatusPOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-penolong/close-po', 'Purchase\POImportBahanPenolong::closePOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolong::deletePOImportBahanPenolong', ['filter' => 'Auth']);
+$routes->post('/po-import-bahan-penolong/find-divisi', 'Purchase\POLokalBahanPenolong::getDivisionByCompany', ['filter' => 'Auth']);
 
 // TERIMA FAKTUR LOKAL
 $routes->get('/terima-faktur-import/getBySupplier/(:num)', 'Purchase\TerimaFakturImport::getBySupplierId/$1', ['filter' => 'Auth']);
