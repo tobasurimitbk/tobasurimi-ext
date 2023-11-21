@@ -146,7 +146,7 @@
                                 if (!empty($dataWarehouse)) {
                                     foreach ($dataWarehouse as $warehouse) {
                                 ?>
-                                        <option value="<?= $warehouse["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->warehouse_id === $warehouse["id"] ? "selected" : "") : ""; ?>><?= $warehouse["warehouse_name"]; ?></option>
+                                        <option value="<?= $warehouse["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->warehouse_id === $warehouse["id"] ? "selected" : "") : ""; ?>><?= strtoupper($warehouse["warehouse_name"]); ?></option>
                                 <?php
                                     }
                                 }
@@ -808,7 +808,11 @@
         $('.warehouse_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-        })
+        }).change(function() {
+            $(".no_penerimaan_barang").attr("readonly", false);
+            $("#auto_generate").prop("checked", false);
+            $(".no_penerimaan_barang").val("");
+        });
 
         //CSS SELECT2 FLOATING LABEL
         $('.warehouse_id')
@@ -2656,9 +2660,23 @@
             $.ajax({
                 url: `<?= base_url("penerimaan-barang-lokal/generate"); ?>`,
                 method: "GET",
+                data: {
+                    warehouseID: $('#warehouse_id').val()
+                },
                 dataType: "json",
                 success: function(res) {
-                    $(".no_penerimaan_barang").val(res?.data);
+                    if (res.status) {
+                        $(".no_penerimaan_barang").val(res?.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $(".no_penerimaan_barang").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $(".no_penerimaan_barang").val("");
+                    }
                 }
             })
         } else {

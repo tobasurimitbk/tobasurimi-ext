@@ -139,33 +139,37 @@ class PenerimaanBarangModel extends Model
         return $sppData;
     }
 
-    public function get_no($bln, $thn, $last_day)
+    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouseID)
     {
-        $lastStr =  $thn . '/' . $bln;
+        $lastStr =  \convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
         $builder->orderBy('no_penerimaan_barang', 'desc');
+        $builder->where('penerimaan_barang.warehouse_id', $warehouseID);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_penerimaan_barang', $lastStr);
         $query = $builder->get();
 
-        $kode = 'LPB';
+        $kode = 'LPB/' . $warehouseKode;
 
         $lastPenerimaan = '1';
+
         if ($query->getResultArray()) {
             foreach ($query->getResultArray() as $string) {
                 $explode = explode('/', $string['no_penerimaan_barang']);
                 $number = intval($explode[1]);
+
                 if ($number > $lastPenerimaan) {
                     $lastPenerimaan = $number;
                 }
             }
             $lastPenerimaan = $lastPenerimaan + 1;
-        };
+        }
 
-        $generatedNo = $kode . '/' . $lastPenerimaan . '/' . $lastStr;
+        $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
+        $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
 
         return $generatedNo;
     }
@@ -254,8 +258,10 @@ class PenerimaanBarangModel extends Model
         $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
 
         // no lpb
+        $warehouseModel = new WarehousesModel();
+        $warehouse = $warehouseModel->where('id', $warehouseID)->first();
         $lastDay = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $no = $penerimaanBarangModel->get_no(date('m'), date('Y'), $lastDay);
+        $no = $penerimaanBarangModel->get_no(date('m'), date('Y'), $lastDay, $warehouse['code_warehouse'], $warehouseID);
 
         $payloadPenerimaanBarang = [
             "company_id" => $rmDetail['company_id'],

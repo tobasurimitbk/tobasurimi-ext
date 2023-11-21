@@ -303,3 +303,13 @@ function can($menuName, $childMenuName, $access = [])
    }
    return false;
 }
+
+function convertBulanToAngkaRomawi($bulanInteger)
+{
+   $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+   if ($bulanInteger >= 1 && $bulanInteger <= 12) {
+      return $romawi[$bulanInteger];
+   } else {
+      return "Bulan tidak valid";
+   }
+}
