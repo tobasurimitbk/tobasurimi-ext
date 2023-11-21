@@ -286,6 +286,7 @@ class PenerimaanBarangLokal extends BaseController
                     "multiple_po_no" => $this->request->getVar("multiple_po_no"),
                     "tipe_bahan" => $tipe_bahan,
                     "bc_type" => $this->request->getVar('aju_document_type'),
+                    "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "LOKAL",
                 ];
@@ -416,6 +417,7 @@ class PenerimaanBarangLokal extends BaseController
             "multiple_po_id" => json_encode($multiple_po_id),
             "multiple_po_no" => $this->request->getVar("multiple_po_no"),
             "bc_type" => $this->request->getVar('aju_document_type'),
+            "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
             "tipe_bahan" => $tipe_bahan
         ];
 
@@ -689,34 +691,22 @@ class PenerimaanBarangLokal extends BaseController
                 if ($status_penerimaan === "LOKAL") {
                     $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
 
-                    // var_dump($dataPenerimaanBarang);
-                    // die;
-
                     if ($dataPenerimaanBarangDetail) {
                         $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
                         $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
-
-                        // var_dump(json_decode($dataPenerimaanBarang->multiple_po_no));
-                        // die;
+                        $kemasan = [];
+                        foreach ($dataPenerimaanBarangDetail as $d) {
+                            $kemasan[] = $d['packaging'];
+                        }
+                        $data["dataKemasan"] = array_unique($kemasan);
                     }
                 }
             }
-
-            // load HTML content
             $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangLokal/print', $data));
-
-            // (optional) setup the paper size and orientation
             $this->dompdf->setPaper('A4', 'portrait');
-
-            // render html as PDF
             $this->dompdf->render();
-
-            // output the generated pdf
             $this->dompdf->stream($filename, array("Attachment" => false));
-
             exit(0);
-
-            // return view('Warehouse/penerimaanBarangLokal/print', $data);
         }
     }
 
@@ -807,23 +797,36 @@ class PenerimaanBarangLokal extends BaseController
     public function generatePenerimaanBarang()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
-        if ($no) {
-            $data = [
-                "status"  => true,
-                "data"  => $no
-            ];
-            echo json_encode($data);
-        } else {
-            $message = 'Gagal Auto Generate';
-            $data = [
-                "status" => false,
-                "message"  => $message
-            ];
-            echo json_encode($data);
-        }
+        $warehouseID = $this->request->getVar('warehouseID');
 
-        return;
+        if (empty($warehouseID)) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Pilih lokasi warehouse dahulu"
+            ]);
+        } else {
+            $warehouseModel = new WarehousesModel();
+            $warehouse = $warehouseModel->where('id', $warehouseID)->first();
+
+            $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day, $warehouse['code_warehouse'], $warehouseID);
+
+            if ($no) {
+                $data = [
+                    "status"  => true,
+                    "data"  => $no
+                ];
+                echo json_encode($data);
+            } else {
+                $message = 'Gagal Auto Generate';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+
+            return;
+        }
     }
 
     public function getReceivedNoBySupplier($supplierId)

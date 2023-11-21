@@ -434,6 +434,7 @@ class PenerimaanBarangImport extends BaseController
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
                     "tipe_bahan" => $tipe_bahan,
                     "bc_type" => $this->request->getVar('aju_document_type'),
+                    "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "IMPORT",
                 ];
@@ -567,6 +568,7 @@ class PenerimaanBarangImport extends BaseController
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
                     "tipe_bahan" => $tipe_bahan,
                     "bc_type" => $this->request->getVar('aju_document_type'),
+                    "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
@@ -1134,23 +1136,36 @@ class PenerimaanBarangImport extends BaseController
     public function generatePenerimaanBarang()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
-        if ($no) {
-            $data = [
-                "status"  => true,
-                "data"  => $no
-            ];
-            echo json_encode($data);
-        } else {
-            $message = 'Gagal Auto Generate';
-            $data = [
-                "status" => false,
-                "message"  => $message
-            ];
-            echo json_encode($data);
-        }
+        $warehouseID = $this->request->getVar('warehouseID');
 
-        return;
+        if (empty($warehouseID)) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Pilih lokasi warehouse dahulu"
+            ]);
+        } else {
+            $warehouseModel = new WarehousesModel();
+            $warehouse = $warehouseModel->where('id', $warehouseID)->first();
+
+            $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day, $warehouse['code_warehouse'], $warehouseID);
+
+            if ($no) {
+                $data = [
+                    "status"  => true,
+                    "data"  => $no
+                ];
+                echo json_encode($data);
+            } else {
+                $message = 'Gagal Auto Generate';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+
+            return;
+        }
     }
 
     public function getReceivedItemsBySupplier($supplierId)

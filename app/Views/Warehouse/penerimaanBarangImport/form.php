@@ -146,7 +146,7 @@
                                 if (!empty($dataWarehouse)) {
                                     foreach ($dataWarehouse as $warehouse) {
                                 ?>
-                                        <option value="<?= $warehouse["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->warehouse_id === $warehouse["id"] ? "selected" : "") : ""; ?>><?= $warehouse["warehouse_name"]; ?></option>
+                                        <option value="<?= $warehouse["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->warehouse_id === $warehouse["id"] ? "selected" : "") : ""; ?>><?= strtoupper($warehouse["warehouse_name"]); ?></option>
                                 <?php
                                     }
                                 }
@@ -155,6 +155,14 @@
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_surat_jalan : ""; ?>" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="Nomor Surat Jalan">
+                            <label for="floatingInput">Nomor Surat Jalan (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
@@ -837,7 +845,11 @@
         $('.warehouse_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-        })
+        }).change(function() {
+            $(".no_penerimaan_barang").attr("readonly", false);
+            $("#auto_generate").prop("checked", false);
+            $(".no_penerimaan_barang").val("");
+        });
 
         //CSS SELECT2 FLOATING LABEL
         $('.warehouse_id')
@@ -2240,9 +2252,23 @@
             $.ajax({
                 url: `<?= base_url("penerimaan-barang-import/generate"); ?>`,
                 method: "GET",
+                data: {
+                    warehouseID: $('#warehouse_id').val()
+                },
                 dataType: "json",
                 success: function(res) {
-                    $(".no_penerimaan_barang").val(res?.data);
+                    if (res.status) {
+                        $(".no_penerimaan_barang").val(res?.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $(".no_penerimaan_barang").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $(".no_penerimaan_barang").val("");
+                    }
                 }
             })
         } else {

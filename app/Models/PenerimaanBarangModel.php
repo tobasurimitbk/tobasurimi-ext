@@ -32,7 +32,8 @@ class PenerimaanBarangModel extends Model
         'deletedAt',
         'tipe_bahan',
         'status_post',
-        'status_penerimaan'
+        'status_penerimaan',
+        'no_surat_jalan'
     ];
 
     // Dates
