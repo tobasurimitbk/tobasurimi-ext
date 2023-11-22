@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" minlength="18" maxlength="18" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" minlength="6" maxlength="18" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
                                 <label for="floatingInput">NIP </label>
                             </div>
                         </div>
@@ -621,7 +621,7 @@
             rules: {
                 nip: {
                     required: true,
-                    minlength: 18,
+                    minlength: 6,
                     maxlength: 18
                 },
                 nik: {
@@ -657,8 +657,8 @@
             messages: {
                 nip: {
                     required: "NIP wajib diisi",
-                    minlength: "NIK Minimal 18 Digit",
-                    maxlength: "NIK Maksimal 18 Digit"
+                    minlength: "NIP Minimal 6 Digit",
+                    maxlength: "NIP Maksimal 18 Digit"
                 },
                 nik: {
                     minlength: "NIK Minimal 16 Digit",
