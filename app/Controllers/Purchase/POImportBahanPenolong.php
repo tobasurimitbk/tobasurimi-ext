@@ -188,7 +188,7 @@ class POImportBahanPenolong extends BaseController
             'port_destination' => $this->request->getVar('portDestination'),
             'location_transaction' => $this->request->getVar('locationTransaction'),
             'shipment' => $this->request->getVar('shipment'),
-            'latest_shipment_date' => $this->request->getVar('latestShipmentDate'),
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate')  ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("latestShipmentDate")))) : "",
             'attn' => $this->request->getVar('attn'),
             'createdBy' => session()->get("login")->user_id
         ]);
@@ -237,7 +237,7 @@ class POImportBahanPenolong extends BaseController
             'port_destination' => $this->request->getVar('portDestination'),
             'location_transaction' => $this->request->getVar('locationTransaction'),
             'shipment' => $this->request->getVar('shipment'),
-            'latest_shipment_date' => $this->request->getVar('latestShipmentDate'),
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate')  ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("latestShipmentDate")))) : "",
             'attn' => $this->request->getVar('attn'),
         ]);
 

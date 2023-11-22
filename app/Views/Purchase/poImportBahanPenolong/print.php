@@ -143,22 +143,13 @@
             </tr>
             <tr>
                 <td>
-                    Date: <?= date("d-m-Y", strtotime($dataPO->po_date)) ?>
-                </td>
-                <!-- <td colspan="2">
-                    <div>NPMWP: <span class="txt-bold"><?= $dataPO->supplierNPWP ?></span></div>
-                </td> -->
-                <td colspan="2">
-                    Location: <?= strtoupper($dataPO->companyName) ?>
+                    DATE <?= date("d-m-Y", strtotime($dataPO->po_date)) ?>
                 </td>
             </tr>
             <tr>
                 <td>
-                    Department: <?= strtoupper($dataPO->divisiName) ?>
+                    DEPARTMENT <?= strtoupper($dataPO->divisiName) ?> / <?= strtoupper($dataPO->companyName) ?>
                 </td>
-                <!-- <td colspan="2">
-                    Location: <?= $dataPO->companyName ?>
-                </td> -->
             </tr>
         </table>
         <div class="mt-025 txt-bold" style="margin-bottom: 3px;">Please send us the following items below:</div>
@@ -176,6 +167,7 @@
             $totalPrice = 0;
             $totalDisc = 0;
             $diskonTotal = 0;
+            $totalWithAdditional = 0;
 
             foreach ($dataPODetail as $detail) {
                 $totalDisc =  (formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT")) * ((float)$detail["disc"] / 100);
@@ -185,8 +177,8 @@
             ?>
                 <tr>
                     <td style="padding-left: 5px;"><?= $detail["qty"] . " " . strtoupper($detail["nama_satuan"]) ?></b></td>
-                    <td style="padding-left: 5px;"><?= $detail["kode_barang"] ?></b></td>
-                    <td style="padding-left: 5px;"><?= $detail["nama_barang"] ?></b></td>
+                    <td style="padding-left: 5px;"><?= strtoupper($detail["kode_barang"]) ?></b></td>
+                    <td style="padding-left: 5px;"><?= strtoupper($detail["nama_barang"]) ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= number_format(formatter(($detail["price"]), "STR_TO_FLOAT"), 2, '.', ',')  ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail["disc"] ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= number_format(formatter($totalWithAdditional, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>

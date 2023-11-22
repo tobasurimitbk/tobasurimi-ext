@@ -14,8 +14,10 @@ class RMImportPODetailModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'rm_import_po_id', 'barang_id', 'item_desc', 'spec', 'note', 'unit', 'qty', 'price',
-    'disc', 'additional_cost', 'ppn', 'pph', 'remaining_qty', 'qty_diterima'];
+    protected $allowedFields    = [
+        'id', 'rm_import_po_id', 'barang_id', 'note', 'unit', 'qty', 'price',
+        'disc', 'additional_cost', 'remaining_qty', 'qty_diterima'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -49,15 +51,15 @@ class RMImportPODetailModel extends Model
         ];
 
         $builder = $this->db->table('rm_import_po_details')
-        ->select("rm_import_po_details.*, rm_import_pos.po_no,
+            ->select("rm_import_po_details.*, rm_import_pos.po_no,
         FORMAT(CEILING(rm_import_po_details.qty) * CEILING(rm_import_po_details.price) + CEILING(rm_import_po_details.additional_cost), 'N', 'en-us') AS totalPrice,
         rm_import_pos.status_penerimaan, barang_master.barang_name as nama_barang, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan")
-        ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
-        ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
-        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left');
+            ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 
@@ -69,15 +71,15 @@ class RMImportPODetailModel extends Model
         ];
 
         $builder = $this->db->table('rm_import_po_details')
-        ->select("rm_import_po_details.*, rm_import_pos.po_no,
+            ->select("rm_import_po_details.*, rm_import_pos.po_no,
         FORMAT(CEILING(rm_import_po_details.qty) * CEILING(rm_import_po_details.price) + CEILING(rm_import_po_details.additional_cost), 'N', 'en-us') AS totalPrice,
         rm_import_pos.status_penerimaan, barang_master.barang_name as nama_barang, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan")
-        ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
-        ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
-        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left');
+            ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getRow();
     }
 }

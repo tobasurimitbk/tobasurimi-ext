@@ -143,21 +143,12 @@
             </tr>
             <tr>
                 <td>
-                    Date: <?= date("d-m-Y", strtotime($dataPO->po_date)) ?>
-                </td>
-                <td>
-
-                </td>
-                <td class="txt-right">
-                    <div>NPMWP: <span class="txt-bold"><?= $dataPO->supplierNPWP ?></span></div>
+                    DATE <?= date("d-m-Y", strtotime($dataPO->po_date)) ?>
                 </td>
             </tr>
             <tr>
                 <td>
-                    Department: <?= $dataPO->divisiName ?>
-                </td>
-                <td colspan="2">
-                    Location: <?= $dataPO->companyName ?>
+                    DEPARTMENT <?= strtoupper($dataPO->divisiName) ?> / <?= strtoupper($dataPO->companyName) ?>
                 </td>
             </tr>
         </table>
@@ -175,19 +166,22 @@
             $no = 1;
             $totalPrice = 0;
             $totalDisc = 0;
+            $diskonTotal = 0;
+            $totalWithAdditional = 0;
 
             foreach ($dataPODetail as $detail) {
-                $totalPriceWithAdditional = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
-                $totalPrice += $totalPriceWithAdditional;
-                $totalDisc += $totalPriceWithAdditional * (float)$detail["disc"] / 100;
+                $totalDisc =  (formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT")) * ((float)$detail["disc"] / 100);
+                $totalWithAdditional = (formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT") - $totalDisc) +  formatter($detail["additional_cost"], "CURR_TO_INT");
+                $totalPrice += $totalWithAdditional;
+                $diskonTotal += $totalDisc;
             ?>
                 <tr>
                     <td style="padding-left: 5px;"><?= $detail["qty"] . " " . $detail["nama_satuan"] ?></b></td>
-                    <td style="padding-left: 5px;"><?= $detail["kode_barang"] ?></b></td>
-                    <td style="padding-left: 5px;"><?= $detail["nama_barang"] . " " . $detail["spec"] ?></b></td>
+                    <td style="padding-left: 5px;"><?= strtoupper($detail["kode_barang"]) ?></b></td>
+                    <td style="padding-left: 5px;"><?= strtoupper($detail["nama_barang"]) ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= number_format(formatter($detail["price"], "STR_TO_INT"), 2, '.', ',') ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail["disc"] ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= number_format($totalPriceWithAdditional, 2, '.', ','); ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= number_format($totalWithAdditional, 2, '.', ','); ?></b></td>
                 </tr>
             <?php } ?>
         </table>
@@ -197,13 +191,13 @@
                     Currency: <span class="txt-bold"><?= $dataPO->currencyName ?></span>
                 </div>
                 <div class="mt-025">
-                    Sub Total: <span class="txt-bold"><?= number_format($totalPrice, 2, '.', ',') ?></span>
+                    Sub Total: <span class="txt-bold"><?= number_format(formatter($totalPrice + $diskonTotal, "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
                 <div class="mt-025">
-                    Discount: <span class="txt-bold"><?= $totalDisc ?></span>
+                    Discount: <span class="txt-bold"><?= number_format(formatter(($diskonTotal), "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
                 <div class="mt-025">
-                    Grand Total: <span class="txt-bold"><?= number_format(($totalPrice - $totalDisc), 2, '.', ',') ?></span>
+                    Grand Total: <span class="txt-bold"><?= number_format(formatter(($totalPrice), "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
             </div>
         </div>

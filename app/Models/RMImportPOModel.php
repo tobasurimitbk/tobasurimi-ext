@@ -14,9 +14,11 @@ class RMImportPOModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'company_id', 'bc_type', 'po_no', 'po_date', 'payment_date', 'divisi_id',
-    'currency', 'supplier_id', 'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin', 
-    'port_destination', 'location_transaction', 'shipment', 'latest_shipment_date', 'attn', 'is_posted', 'createdBy', 'status_penerimaan'];
+    protected $allowedFields    = [
+        'id', 'company_id', 'supplier_id', 'division_id', 'po_no', 'po_date', 'payment_date',
+        'currency',  'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin',
+        'port_destination', 'location_transaction', 'shipment', 'latest_shipment_date', 'attn', 'createdBy', 'status_penerimaan', 'is_posted',
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -96,7 +98,7 @@ class RMImportPOModel extends Model
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $poDataQry->groupEnd();
         }
-        
+
         $totalFilteredData = $poDataQry->countAllResults(false);
         $data = $poDataQry->findAll($limit, $offset);
 
@@ -124,7 +126,7 @@ class RMImportPOModel extends Model
 
         $sppData = $this->asObject()
             ->select($selectQry)
-            ->join('divisis', 'divisis.id = rm_import_pos.divisi_id', 'left')
+            ->join('divisis', 'divisis.id = rm_import_pos.division_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
             ->join('users', 'users.id = rm_import_pos.createdBy', 'left')
             ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
@@ -147,7 +149,7 @@ class RMImportPOModel extends Model
         $builder = $this->db->table('rm_import_pos');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 
@@ -163,7 +165,7 @@ class RMImportPOModel extends Model
         $builder = $this->db->table('rm_import_pos');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 
@@ -174,9 +176,9 @@ class RMImportPOModel extends Model
         $builder = $this->db->table('rm_import_pos');
         $builder->select('po_no');
         $builder->orderBy('po_no', 'desc')
-        ->where('divisi_id', $divisi_id)
-        ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-        ->where('createdAt <=', $last_day . " 23:59:59");
+            ->where('divisi_id', $divisi_id)
+            ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
+            ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
         $query = $builder->get();
 

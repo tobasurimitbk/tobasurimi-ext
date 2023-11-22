@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah PO Import BP</h1>
+        <h1 class="title-name">Tambah PO Import Bahan Penolong</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-penolong"); ?>">
                 Batal
@@ -397,7 +397,7 @@
     var totalHarga = 0;
     // init select2
     $('#company_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Unit Company",
         theme: "bootstrap-5"
     }).change(function() {
         var companyID = $(this).val();
@@ -427,21 +427,21 @@
         });
     });
     $('#division_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5"
     }).change(function() {
 
     });
 
     $('#supplier_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Supplier",
         theme: "bootstrap-5"
     }).change(function() {
 
     });
 
     $('#currency').select2({
-        placeholder: "",
+        placeholder: "Pilih mata uang",
         theme: "bootstrap-5"
     }).change(function() {
 
@@ -950,7 +950,7 @@
         console.log(listBarang);
         $.each(listBarang, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align:center;">').text(no++));
+            newRow.append($('<td>').text(no++));
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.nama_satuan));

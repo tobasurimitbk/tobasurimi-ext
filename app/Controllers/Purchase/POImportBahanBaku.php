@@ -3,6 +3,7 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterModel;
 use App\Models\BarangModel;
 use App\Models\CompaniesModel;
 use App\Models\MetadataModel;
@@ -11,6 +12,7 @@ use App\Models\RMImportPODetailModel;
 use App\Models\SupplierModel;
 use App\Models\BeaCukaiModel;
 use App\Models\DivisisModel;
+use App\Models\SatuansModel;
 use Dompdf\Dompdf;
 
 class POImportBahanBaku extends BaseController
@@ -18,14 +20,16 @@ class POImportBahanBaku extends BaseController
     protected $token;
     protected $this_company_id;
     protected $user_id;
-    protected $companiesModel;
-    protected $barangModel;
+    protected $companyModel;
     protected $metadataModel;
     protected $rmImportPOModel;
     protected $rmImportPODetailModel;
     protected $supplierModel;
     protected $beaCukaiModel;
     protected $divisisModel;
+    protected $barangMasterModel;
+    protected $satuanModel;
+
     protected $dompdf;
 
     public function __construct()
@@ -33,14 +37,15 @@ class POImportBahanBaku extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->user_id = session()->get("login")->user_id;
-        $this->companiesModel = new CompaniesModel();
-        $this->barangModel = new BarangModel();
+        $this->companyModel = new CompaniesModel();
         $this->metadataModel = new MetadataModel();
         $this->rmImportPOModel = new RMImportPOModel();
         $this->rmImportPODetailModel = new RMImportPODetailModel();
         $this->supplierModel = new SupplierModel();
         $this->beaCukaiModel = new BeaCukaiModel();
         $this->divisisModel = new DivisisModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->satuanModel = new SatuansModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -51,32 +56,14 @@ class POImportBahanBaku extends BaseController
 
     public function createPOImportBahanBaku()
     {
-        //Get BC Type By Metadata
-        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
-
-        //Get Divisi
-        $dataDivisi = $this->divisisModel->asObject()->findAll();
-
-        //Get Company
-        $dataCompany =  $this->companiesModel->getCompanies();
-
-        //Get Shipment By Metadata
-        $dataShipment = $this->metadataModel->get_by_name('Shipment');
-
-        //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
-
-        //Get Valuta By Metadata
-        $dataValuta = $this->metadataModel->get_by_name('Valuta');
-
         $data = [
-            "dataBCType" => $dataBCType,
+            "dataCompany" => $this->companyModel->getCompanies(),
             "today" => date("d/m/Y"),
-            "dataDivisi" => $dataDivisi,
-            "dataCompany" => $dataCompany,
-            "dataShipment" => $dataShipment,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
+            "barang" => $this->barangMasterModel->getBarangByType("bahan_baku"),
+            "satuan" => $this->satuanModel->getSatuanAll(),
+            "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
+            "dataShipment" => $this->metadataModel->get_by_name('Shipment')
         ];
 
         return view('Purchase/poImportBahanBaku/form', $data);
@@ -84,47 +71,17 @@ class POImportBahanBaku extends BaseController
 
     public function getByIdPOImportBahanBaku($id = null)
     {
-        //Get BC Type By Metadata
-        $dataBCType = $this->metadataModel->get_by_name('Bea Cukai');
-
-        //Get Divisi
-        $dataDivisi = $this->divisisModel->asObject()->findAll();
-
-        //Get Company
-        $dataCompany =  $this->companiesModel->getCompanies();
-
-        //Get Shipment By Metadata
-        $dataShipment = $this->metadataModel->get_by_name('Shipment');
-
-        //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
-
-        //Get Valuta By Metadata
-        $dataValuta = $this->metadataModel->get_by_name('Valuta');
-
         $data = [
-            "dataBCType" => $dataBCType,
+            "dataCompany" => $this->companyModel->getCompanies(),
             "today" => date("d/m/Y"),
-            "dataDivisi" => $dataDivisi,
-            "dataCompany" => $dataCompany,
-            "dataShipment" => $dataShipment,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
+            "barang" => $this->barangMasterModel->getBarangByType("bahan_baku"),
+            "satuan" => $this->satuanModel->getSatuanAll(),
+            "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
+            "dataShipment" => $this->metadataModel->get_by_name('Shipment'),
+            "dataPOImport" => $this->rmImportPOModel->getPOById($id),
+            "dataPOImportDetail" => $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id)
         ];
-
-        if (!empty($id)) {
-            $dataPOImport = $this->rmImportPOModel->getPOById($id);
-            $data["dataPOImport"] = $dataPOImport;
-
-            $dataPOImportDetail = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
-
-            if ($dataPOImportDetail) {
-                $data["dataPOImportDetail"] = $dataPOImportDetail;
-            }
-
-            // var_dump($dataPOImport);
-            // die;
-        }
 
         return view('Purchase/poImportBahanBaku/form', $data);
     }
@@ -132,30 +89,29 @@ class POImportBahanBaku extends BaseController
     public function allPOImportBahanBaku()
     {
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            // "requestStatus" => $this->request->getGet("status"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "pageSize" => $this->request->getVar("length"),
+            "currentPage" => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "dateStart" => $this->request->getVar("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd" => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $condition = [
-            "rm_import_pos.company_id"        => $this->this_company_id
+            "rm_import_pos.company_id" => $this->this_company_id
         ];
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "dateStart" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
         $poImportData = $this->rmImportPOModel->getPOList($condition, $addCondition, $limit, $offset);
 
         $dataPOImport = [];
@@ -179,7 +135,7 @@ class POImportBahanBaku extends BaseController
         }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
+            "draw"              => intval($this->request->getVar("draw")),
             "recordsTotal"      => $poImportData['totalData'],
             "recordsFiltered"   => $poImportData['totalFilteredData'],
             "data"              => $dataPOImport,
@@ -193,607 +149,153 @@ class POImportBahanBaku extends BaseController
 
     public function savePOImportBahanBaku()
     {
-        try {
-            $rules = [
-                "po_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. PO tidak boleh kosong'
-                    ]
-                ],
-                "po_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal tidak boleh kosong'
-                    ]
-                ],
-                "payment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal Pembayaran tidak boleh kosong'
-                    ]
-                ],
-                "supplier_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Supplier tidak boleh kosong'
-                    ]
-                ],
-                "payment_term" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Termin Pembayaran tidak boleh kosong'
-                    ]
-                ],
-                "currency" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Valas tidak boleh kosong'
-                    ]
-                ],
-                "port_origin" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Port Of Origin tidak boleh kosong'
-                    ]
-                ],
-                "port_destination" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Port Of Destination tidak boleh kosong'
-                    ]
-                ],
-                "shipment" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Shipment tidak boleh kosong'
-                    ]
-                ],
-                "latest_shipment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Latest Shipment Date tidak boleh kosong'
-                    ]
-                ],
-                "attn" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'ATTN tidak boleh kosong'
-                    ]
-                ]
-            ];
+        $divisi = $this->divisisModel->get_by_id(
+            $this->request->getVar('divisionID')
+        );
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($this->validate($rules)) {
-                $divisi_id = formatter($this->request->getPost("divisi_id"), "STR_TO_INT");
-                $find = $this->divisisModel->asObject()->find($divisi_id);
-                $divisi = $find->divisi;
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $divisi, date('y'), $divisi_id, $last_day);
-
-                $payload = [
-                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                    "bc_type" => $this->request->getPost("bc_type"),
-                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
-                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "divisi_id" => $divisi_id,
-                    "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "total" => $this->request->getPost("total"),
-                    "payment_term" => $this->request->getPost("payment_term"),
-                    "note" => $this->request->getPost("note"),
-                    "createdBy" => $this->user_id,
-                    "is_posted" => 0,
-
-                    "shipper" => $this->request->getPost("shipper"),
-                    "consigne" => $this->request->getPost("consigne"),
-                    "port_origin" => $this->request->getPost("port_origin"),
-                    "port_destination" => $this->request->getPost("port_destination"),
-                    "location_transaction" => $this->request->getPost("location_transaction"),
-                    "shipment" => $this->request->getPost("shipment"),
-                    "latest_shipment_date" => $this->request->getPost("latest_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("latest_shipment_date")))) : "",
-                    "attn" => $this->request->getPost("attn")
-                ];
-
-                $items = json_decode($this->request->getPost("items"));
-
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => json_encode($items),
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // return json_encode($data);
-
-                $response =  $this->rmImportPOModel->insert($payload);
-
-                if ($response) {
-                    foreach ($items as $data) {
-                        $detailPayload = [];
-
-                        $barang_id = $data->item_id;
-                        // buat barang baru jika id kosong
-                        if (!$barang_id) {
-                            // $payloadBarang = [
-                            //     "company_id" => $this->this_company_id,
-                            //     "kode_barang" => $data->item_code,
-                            //     "nama_barang" => $data->item_name,
-                            //     "harga_barang" => $data->price,
-                            //     "satuan_id" => $data->unit,
-                            //     "kategori_id" => 26,
-                            //     "hs_id" => 1,
-                            //     "ap_id" => 1,
-                            //     "ar_id" => 1,
-                            //     "stok" => 0,
-                            //     "status" => "Aktif",
-                            //     "spek" => "[]"
-                            // ];
-
-                            // $responseBarang =  $this->barangModel->insert($payloadBarang);
-
-                            // $barang_id = $responseBarang;
-
-                            // if(!$responseBarang) {
-                            //     $message =  'Data Gagal Disimpan';
-                            //     $data = [
-                            //         "status"            => false,
-                            //         "message"    => $message,
-                            //         "payload"   => $payload,
-                            //         'token' => csrf_hash()
-                            //     ];
-                            //     echo json_encode($data);
-                            // }
-                        }
-
-                        $detailPayload = [
-                            'rm_import_po_id' => $response,
-                            'barang_id' => $barang_id,
-                            'note' => $data->note,
-                            'unit' => $data->unit,
-                            'qty' => $data->qty,
-                            'remaining_qty' => $data->qty,
-                            'qty_diterima' => 0,
-                            'price' => $data->price,
-                            'disc' => $data->disc,
-                            'additional_cost' => $data->additional_cost
-                        ];
-
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
-
-                        $responseDetail = $this->rmImportPODetailModel->insert($detailPayload);
-
-                        if (!$responseDetail) {
-                            $message =  'Data Gagal Disimpan';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
-                        }
-                    }
-
-                    $data = [
-                        "id" => $response,
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        if ($this->request->getVar('poNo') != "AUTO GENERATE") {
+            $noPoNew = $this->request->getVar('poNo');
+        } else {
+            $noPoNew =  $this->rmImportPOModel->get_no(
+                date('d'),
+                date('m'),
+                date('Y'),
+                $divisi[0]['divisi'],
+                date('y'),
+                $this->request->getPost("divisionID"),
+                getLastDay()
+            );
         }
-        return;
+
+        // create new po
+        $poID = $this->rmImportPOModel->insert([
+            'company_id' => $this->request->getVar('companyID'),
+            'division_id' => $this->request->getVar('divisionID'),
+            'po_no' => $noPoNew,
+            'po_date' => $this->request->getPost("poDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("poDate")))) : "",
+            'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
+            'supplier_id' => $this->request->getVar('supplierID'),
+            'total' => $this->request->getVar('total'),
+            'payment_term' => $this->request->getVar('paymentTerm'),
+            'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
+            'note' => $this->request->getVar('note'),
+            'shipper' => $this->request->getVar('shipper'),
+            'consigne' => $this->request->getVar('consigne'),
+            'port_origin' => $this->request->getVar('portOrigin'),
+            'port_destination' => $this->request->getVar('portDestination'),
+            'location_transaction' => $this->request->getVar('locationTransaction'),
+            'shipment' => $this->request->getVar('shipment'),
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate')  ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("latestShipmentDate")))) : "",
+            'attn' => $this->request->getVar('attn'),
+            'createdBy' => session()->get("login")->user_id
+        ]);
+
+        $barang = json_decode($this->request->getVar("listBarang"));
+
+        foreach ($barang as $b) {
+
+            $this->rmImportPODetailModel->insert([
+                'rm_import_po_id' => $poID,
+                'barang_id' => $b->barang_id,
+                'unit' => $b->satuan_id,
+                'qty' => $b->qty,
+                'price' => $b->harga_satuan,
+                'disc' => $b->diskon,
+                'additional_cost' => $b->biaya_tambahan,
+                'remaining_qty' => $b->qty,
+                'note' => $b->keterangan,
+                'total' => repairDouble($b->total),
+            ]);
+        }
+
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Data PO Import BB Berhasil Disimpan",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function updatePOImportBahanBaku()
     {
-        try {
-            $rules = [
-                "po_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. PO tidak boleh kosong'
-                    ]
-                ],
-                "po_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal tidak boleh kosong'
-                    ]
-                ],
-                "supplier_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Supplier tidak boleh kosong'
-                    ]
-                ],
-                "payment_term" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Termin Pembayaran tidak boleh kosong'
-                    ]
-                ],
-                "currency" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Valas tidak boleh kosong'
-                    ]
-                ]
-            ];
+        $id = $this->request->getPost("id");
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
+        $this->rmImportPOModel->update($id, [
+            'company_id' => $this->request->getVar('companyID'),
+            'division_id' => $this->request->getVar('divisionID'),
+            'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
+            'supplier_id' => $this->request->getVar('supplierID'),
+            'total' => $this->request->getVar('total'),
+            'payment_term' => $this->request->getVar('paymentTerm'),
+            'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
+            'note' => $this->request->getVar('note'),
+            'shipper' => $this->request->getVar('shipper'),
+            'consigne' => $this->request->getVar('consigne'),
+            'port_origin' => $this->request->getVar('portOrigin'),
+            'port_destination' => $this->request->getVar('portDestination'),
+            'location_transaction' => $this->request->getVar('locationTransaction'),
+            'shipment' => $this->request->getVar('shipment'),
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate')  ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("latestShipmentDate")))) : "",
+            'attn' => $this->request->getVar('attn'),
+        ]);
 
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $divisi_id = formatter($this->request->getPost("divisi_id"), "STR_TO_INT");
-                $find = $this->divisisModel->asObject()->find($divisi_id);
-                $divisi_name = $find->divisi;
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $divisi_name, date('y'), $divisi_id, $last_day);
+        // Delete First
+        $this->rmImportPODetailModel->where('rm_import_po_id', $id)->delete();
+        // Insert Again
+        $barang = json_decode($this->request->getVar("listBarang"));
 
-                $payload = [
-                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                    "bc_type" => $this->request->getPost("bc_type"),
-                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
-                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "divisi_id" => $divisi_id,
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "payment_term" => $this->request->getPost("payment_term"),
-                    "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                    "note" => $this->request->getPost("note"),
-                    "createdBy" => $this->user_id,
-                    "total" => $this->request->getPost("total")
-                ];
+        foreach ($barang as $b) {
 
-                $items = json_decode($this->request->getPost("items"));
-
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
-
-                $condition = [
-                    'id' => $id
-                ];
-
-                $response = $this->rmImportPOModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    foreach ($items as $data) {
-                        $barang_id = $data->item_id;
-                        // buat barang baru jika id kosong
-                        if (!$barang_id) {
-                            // $payloadBarang = [
-                            //     "company_id" => $this->this_company_id,
-                            //     "kode_barang" => $data->item_code,
-                            //     "nama_barang" => $data->item_name,
-                            //     "harga_barang" => $data->price,
-                            //     "satuan_id" => $data->unit,
-                            //     "kategori_id" => 26,
-                            //     "hs_id" => 1,
-                            //     "ap_id" => 1,
-                            //     "ar_id" => 1,
-                            //     "stok" => 0,
-                            //     "status" => "Aktif",
-                            //     "spek" => "[]"
-                            // ];
-
-                            // $responseBarang =  $this->barangModel->insert($payloadBarang);
-
-                            // $barang_id = $responseBarang;
-
-                            // if(!$responseBarang) {
-                            //     $message =  'Data Gagal Disimpan';
-                            //     $data = [
-                            //         "status"            => false,
-                            //         "message"    => $message,
-                            //         "payload"   => $payload,
-                            //         'token' => csrf_hash()
-                            //     ];
-                            //     echo json_encode($data);
-                            // }
-                        }
-
-                        $detailPayload = [];
-
-                        $detailPayload = [
-                            'rm_import_po_id' => $id,
-                            'barang_id' => $barang_id,
-                            'note' => $data->note,
-                            'unit' => $data->unit,
-                            'qty' => $data->qty,
-                            'remaining_qty' => $data->qty,
-                            'qty_diterima' => 0,
-                            'price' => $data->price,
-                            'disc' => $data->disc,
-                            'additional_cost' => $data->additional_cost
-                        ];
-
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
-
-                        // kalau hapus
-                        if ($data->isDeleted) {
-                            $responseDetail = $this->rmImportPODetailModel->delete($data->id);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Dihapus';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-
-                        // kalau update
-                        if ($data->id) {
-                            $conditionDetail = [
-                                'id' => $data->id
-                            ];
-
-                            $responseDetail = $this->rmImportPODetailModel->where($conditionDetail)->set($detailPayload)->update();
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Disimpan';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-
-                        // kalau create
-                        else {
-                            $responseDetail = $this->rmImportPODetailModel->insert($detailPayload);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Diubah';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-                    }
-
-                    $data = [
-                        "id" => "",
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            $this->rmImportPODetailModel->insert([
+                'rm_import_po_id' => $id,
+                'barang_id' => $b->barang_id,
+                'unit' => $b->satuan_id,
+                'qty' => $b->qty,
+                'price' => $b->harga_satuan,
+                'disc' => $b->diskon,
+                'additional_cost' => $b->biaya_tambahan,
+                'remaining_qty' => $b->qty,
+                'note' => $b->keterangan,
+                'total' => repairDouble($b->total),
+            ]);
         }
-        return;
+
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Data PO Import BB Berhasil Diupdate",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function updateStatusPOImportBahanBaku()
     {
-        try {
-            $id = $this->request->getPost("id");
-
-            // po posting
-
-            $payload = [
-                "is_posted" => 1
-            ];
-
-            $condition = [
-                'id' => $id
-            ];
-
-            $response = $this->rmImportPOModel->where($condition)->set($payload)->update();
-
-            if ($response) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diposting",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = 'Data Gagal Diposting';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $this->rmImportPOModel->update($this->request->getVar('id'), ['is_posted' => 1]);
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Data PO Import BB Berhasil Diposting",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function closePOImportBahanBaku()
     {
-        try {
-            $id = $this->request->getPost("id");
-
-            $payload = [
-                "status_penerimaan" => 1
-            ];
-
-            $condition = [
-                'id' => $id
-            ];
-
-            $response = $this->rmImportPOModel->where($condition)->set($payload)->update();
-
-            if ($response) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "PO Berhasil di Close",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = 'PO Gagal di Close';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $this->rmImportPOModel->update($this->request->getVar('id'), ['status_penerimaan' => 1]);
+        return response()->setJSON([
+            "status" => true,
+            "message" => "Close PO Berhasil",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function deletePOImportBahanBaku()
     {
-        try {
-            $id = $this->request->getPost("id");
-
-            if (!empty($id)) {
-                $findBarang = $this->rmImportPOModel->find($id);
-                if ($findBarang) {
-                    $response =  $this->rmImportPOModel->delete($id);
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil dihapus",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Dihapus';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Tidak Ditemukan",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $id = $this->request->getPost("id");
+        $this->rmImportPOModel->delete($id);
+        $this->rmImportPODetailModel->where('rm_import_po_id', $id)->delete();
+        return response()->setJSON([
+            "status" => true,
+            "message" => "PO Berhasil Dihapus",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function print($id = null)
@@ -812,31 +314,17 @@ class POImportBahanBaku extends BaseController
                     $data["dataPODetail"] = $dataPODetail;
                 }
             }
-
-            // var_dump($dataPODetail);
-            // die;
-
-            // load HTML content
             $this->dompdf->loadHtml(view('Purchase/poImportBahanBaku/print', $data));
-
-            // (optional) setup the paper size and orientation
             $this->dompdf->setPaper('A4', 'portrait');
-
-            // render html as PDF
             $this->dompdf->render();
-
-            // output the generated pdf
             $this->dompdf->stream($filename, array("Attachment" => false));
-
             exit(0);
-
-            // return view('Purchase/poImportBahanBaku/print', $data);
         }
     }
 
     public function dropdownPOImportBahanBaku()
     {
-        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
+        $id = formatter($this->request->getVar("id"), "STR_TO_INT");
 
         $dataPOImport = $this->rmImportPOModel->getNoPenerimaanBarang($id, $this->this_company_id);
 
@@ -874,7 +362,7 @@ class POImportBahanBaku extends BaseController
 
     public function dropdownBarangPOImportBahanBaku()
     {
-        $id = $this->request->getGet("id");
+        $id = $this->request->getVar("id");
 
         $dataPOImport = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
