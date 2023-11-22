@@ -176,7 +176,7 @@ class RMImportPOModel extends Model
         $builder = $this->db->table('rm_import_pos');
         $builder->select('po_no');
         $builder->orderBy('po_no', 'desc')
-            ->where('divisi_id', $divisi_id)
+            ->where('division_id', $divisi_id)
             ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
