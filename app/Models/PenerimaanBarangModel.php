@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use CodeIgniter\Database\RawSql;
 use CodeIgniter\Model;
-use PhpParser\Node\Expr\Cast\Object_;
 
 class PenerimaanBarangModel extends Model
 {
@@ -20,20 +18,21 @@ class PenerimaanBarangModel extends Model
         'id',
         'company_id',
         'supplier_id',
-        'bc_type',
         'warehouse_id',
+        'bc_type',
         'no_penerimaan_barang',
         'acceptance_type',
         'multiple_po_id',
         'multiple_po_no',
-        'is_summarized',
+        'status_penerimaan',
+        'status_post',
+        'tipe_bahan',
+        'kemasan',
+        'jumlah_kemasan',
+        'no_surat_jalan',
         'createdAt',
         'updatedAt',
         'deletedAt',
-        'tipe_bahan',
-        'status_post',
-        'status_penerimaan',
-        'no_surat_jalan'
     ];
 
     // Dates
@@ -142,7 +141,7 @@ class PenerimaanBarangModel extends Model
 
     public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouseID)
     {
-        $lastStr =  \convertBulanToAngkaRomawi($bln) . '/' . $thn;
+        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
@@ -157,16 +156,16 @@ class PenerimaanBarangModel extends Model
 
         $lastPenerimaan = '1';
 
-        if ($query->getResultArray()) {
+        if (!empty($query->getResultArray())) {
             foreach ($query->getResultArray() as $string) {
                 $explode = explode('/', $string['no_penerimaan_barang']);
-                $number = intval($explode[1]);
+                $number = intval($explode[2]);
 
                 if ($number > $lastPenerimaan) {
                     $lastPenerimaan = $number;
                 }
             }
-            $lastPenerimaan = $lastPenerimaan + 1;
+            $lastPenerimaan++;
         }
 
         $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);

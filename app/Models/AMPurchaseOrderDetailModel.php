@@ -165,4 +165,99 @@ class AMPurchaseOrderDetailModel extends Model
 
         return $query->getRow();
     }
+
+    public function getListLPBBahanPenolong($amPurchaseOrderID, $penerimaanBarangID = null)
+    {
+        $res = [];
+        $condition = [
+            'am_purchase_orders.deletedAt' => null,
+            'am_purchase_order_details.deletedAt' => null
+        ];
+
+        $selectQry = "
+            am_purchase_orders.po_no,
+            am_purchase_order_details.*,
+            barang_master.barang_name AS nama_barang,
+            barang_master.kode_barang,
+            satuans.kode_satuan
+        ";
+
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+
+        $barangs = $amPurchaseOrderModel
+            ->select($selectQry)
+            ->where($condition)
+            ->whereIn('am_purchase_orders.id', $amPurchaseOrderID)
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->findAll();
+
+
+        $jmlOrderTotal = 0;
+        $jmlDiterimaInTotal = 0;
+        $jmlDiterimaTotal = 0;
+        $sisaDiterimaTotal = 0;
+        $hargaPerBarangTotal = 0;
+        $subTotal = 0;
+
+        foreach ($barangs as $b) {
+
+            $allLPB = $penerimaanBarangDetailModel
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->where('purchase_order_id', $b['am_purchase_order_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('deletedAt', null)
+                ->groupBy('purchase_order_id', 'purchase_order_details_id')
+                ->findAll();
+
+            $jmlMasukAll = 0;
+            foreach ($allLPB as $a) {
+                $jmlMasukAll = $a['jmlMasuk'];
+            }
+
+            $firstLPB =  $penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangID)
+                ->where('purchase_order_id', $b['am_purchase_order_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('deletedAt', null)
+                ->first();
+
+            $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
+            $sisaDiterima = $b['qty'] - $jmlMasukAll;
+
+            $res[] = [
+                'am_purchase_order_details_id' => $b['id'],
+                'am_purchase_order_id' => $b['am_purchase_order_id'],
+                'kode_barang' => $b['kode_barang'],
+                'nama_barang' => $b['nama_barang'],
+                'po_no' => $b['po_no'],
+                'satuan' => $b['kode_satuan'],
+                'jml_order' => $b['qty'],
+                'jml_diterima_lpb' => $inLPB,
+                'jml_diterima_total' => $jmlMasukAll,
+                'sisa_total' => $sisaDiterima,
+                'harga' => $b['total'],
+                'sub_total' => ($inLPB * $b['total']),
+                'keterangan' => $b['note']
+            ];
+
+            $jmlOrderTotal += $b['qty'];
+            $jmlDiterimaInTotal += $inLPB;
+            $jmlDiterimaTotal +=   $jmlMasukAll;
+            $sisaDiterimaTotal += $sisaDiterima;
+            $hargaPerBarangTotal += $b['total'];
+            $subTotal += ($inLPB * $b['total']);
+        }
+
+        return [
+            'result' => $res,
+            'jml_order_total' => $jmlOrderTotal,
+            'jml_diterima_in_total' => $jmlDiterimaInTotal,
+            'jml_diterima_total' => $jmlDiterimaTotal,
+            'sisa_diterima_total' => $sisaDiterimaTotal,
+            'harga_per_barang_total' => $hargaPerBarangTotal,
+            'sub_total' => $subTotal
+        ];
+    }
 }

@@ -76,7 +76,7 @@ class PenerimaanBarangImport extends BaseController
         $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
+        $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
 
         //Get Warehouse
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
@@ -1139,9 +1139,10 @@ class PenerimaanBarangImport extends BaseController
         $warehouseID = $this->request->getVar('warehouseID');
 
         if (empty($warehouseID)) {
+            $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day, "", $warehouseID);
             return response()->setJSON([
-                'status' => false,
-                'message' => "Pilih lokasi warehouse dahulu"
+                'status' => true,
+                'data' => $no
             ]);
         } else {
             $warehouseModel = new WarehousesModel();

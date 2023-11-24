@@ -153,8 +153,11 @@ class SupplierModel extends Model
         $builder->where($arrCondition);
         $builder->orderBy('suppliers.name', "ASC");
         $query = $builder->get();
-
-        return $query->getResultArray();
+        $results = $query->getResultArray();
+        foreach ($results as &$result) {
+            $result['name'] = strtoupper($result['name']);
+        }
+        return $results;
     }
 
     public function generateSupplierCode($type): string

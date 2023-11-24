@@ -16,6 +16,7 @@ class PenerimaanBarangDetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'purchase_order_id',
         'purchase_order_details_id',
         'penerimaan_barang_id',
         'harga',
@@ -239,5 +240,17 @@ class PenerimaanBarangDetailModel extends Model
         }
 
         return $query->getResultArray();
+    }
+
+    public function getPenerimaanBarangPenolongDetail($id)
+    {
+        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, am_purchase_orders.po_no, am_purchase_order_details.note as keterangan')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id')
+            ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id')
+            ->where('penerimaan_barang_detail.penerimaan_barang_id', $id)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->findAll();
     }
 }

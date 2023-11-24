@@ -846,9 +846,25 @@
             placeholder: "",
             theme: "bootstrap-5",
         }).change(function() {
-            $(".no_penerimaan_barang").attr("readonly", false);
-            $("#auto_generate").prop("checked", false);
-            $(".no_penerimaan_barang").val("");
+            // $(".no_penerimaan_barang").attr("readonly", false);
+            // $("#auto_generate").prop("checked", false);
+            // $(".no_penerimaan_barang").val("");
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                $.ajax({
+                    url: `<?= base_url("penerimaan-barang-import/generate"); ?>`,
+                    method: "GET",
+                    data: {
+                        warehouseID: $(this).val()
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        if (res.status) {
+                            $(".no_penerimaan_barang").val(res?.data);
+                        }
+                    }
+                })
+            }
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -2245,10 +2261,8 @@
 
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
-
         if (value) {
             $(".no_penerimaan_barang").attr("readonly", true);
-
             $.ajax({
                 url: `<?= base_url("penerimaan-barang-import/generate"); ?>`,
                 method: "GET",
