@@ -77,6 +77,7 @@ class AMPurchaseOrderDetailModel extends Model
             taxppn.tax_value as ppnValue, 
             taxpph.tax_value as pphValue, 
             satuans.id as id_satuan, 
+            satuans.kode_satuan,
             satuans.nama_satuan";
 
         $builder = $this->db->table('am_purchase_order_details')

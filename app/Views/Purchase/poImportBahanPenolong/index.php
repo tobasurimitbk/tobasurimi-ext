@@ -171,7 +171,7 @@
                         if (status_penerimaan !== "CLOSED") {
                             return `
                             <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-penolong/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <button onclick="closePO(${id})" class="btn btn-danger delete-parent">

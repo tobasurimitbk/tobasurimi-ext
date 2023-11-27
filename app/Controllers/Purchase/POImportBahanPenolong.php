@@ -310,6 +310,14 @@ class POImportBahanPenolong extends BaseController
             "dataPODetail" => $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id)
         ];
 
+        $data["valuta"] =  $this->metadataModel->where('id', $data['dataPO']->currency)->first()['description'];
+        $data["shipmentPO"] =  $this->metadataModel->where('name', 'Shipment PO')->first()['value'];
+        $data["shipmentName"] = $this->metadataModel->where('id', $data['dataPO']->shipment)->first()['value'];
+        $data["telpKantor"] = $this->metadataModel->where('name', 'Telp Kantor')->first()['value'];
+        $data["faxKantor"] = $this->metadataModel->where('name', 'Fax Kantor')->first()['value'];
+        $data["attnKantor"] = $this->metadataModel->where('name', 'Attn Kantor')->first()['value'];
+        $data["company"] = $this->companyModel->where('id', $data['dataPO']->company_id)->first();
+        $data["alamatKantor"] = $this->metadataModel->where('name', "Alamat Kantor")->first();
 
         $this->dompdf->loadHtml(view('Purchase/poImportBahanPenolong/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');

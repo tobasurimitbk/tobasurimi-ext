@@ -214,6 +214,7 @@ class AMPurchaseOrderModel extends Model
         suppliers.address AS supplierAddress,
         suppliers.phone AS supplierPhone,
         suppliers.no_npwp AS supplierNPWP,
+        suppliers.fax AS supplierFax,
         users.name AS createdByName,
         companies.company as companyName,
         metadata.value as currencyName,

@@ -311,7 +311,15 @@ class POImportBahanBaku extends BaseController
                 $dataPODetail = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
                 if ($dataPODetail) {
+                    $data["valuta"] =  $this->metadataModel->where('id', $dataPO->currency)->first()['description'];
+                    $data["shipmentPO"] =  $this->metadataModel->where('name', 'Shipment PO')->first()['value'];
+                    $data["shipmentName"] = $this->metadataModel->where('id', $dataPO->shipment)->first()['value'];
+                    $data["telpKantor"] = $this->metadataModel->where('name', 'Telp Kantor')->first()['value'];
+                    $data["faxKantor"] = $this->metadataModel->where('name', 'Fax Kantor')->first()['value'];
+                    $data["attnKantor"] = $this->metadataModel->where('name', 'Attn Kantor')->first()['value'];
                     $data["dataPO"] = $dataPO;
+                    $data["company"] = $this->companyModel->where('id', $dataPO->company_id)->first();
+                    $data["alamatKantor"] = $this->metadataModel->where('name', "Alamat Kantor")->first();
                     $data["dataPODetail"] = $dataPODetail;
                 }
             }

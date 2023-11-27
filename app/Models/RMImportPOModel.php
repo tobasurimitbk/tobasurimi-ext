@@ -118,6 +118,7 @@ class RMImportPOModel extends Model
         suppliers.name AS supplierName,
         suppliers.address AS supplierAddress,
         suppliers.phone AS supplierPhone,
+        suppliers.fax AS supplierFax,
         suppliers.no_npwp AS supplierNPWP,
         users.name AS createdByName,
         companies.company as companyName,
