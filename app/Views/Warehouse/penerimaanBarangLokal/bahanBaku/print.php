@@ -112,7 +112,7 @@
 </head>
 
 <body>
-    <?php if (!empty($dataPenerimaanBarang)) { ?>
+    <?php if (!empty($dataPenerimaanBarang)) : ?>
         <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
         <table class="w-100 mt-050">
             <tr>
@@ -134,12 +134,16 @@
                     <div><span class="txt-bold">Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
                 </td>
                 <td class="txt-right">
-                    <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
+                    <div><span class="txt-bold">Jumlah Kemasan : <?= $dataPenerimaanBarang->jumlah_kemasan; ?></span></div>
                 </td>
+
             </tr>
             <tr>
                 <td>
                     <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == 0) ? "Non Pabean - 0" : $dataPenerimaanBarang->bc_type ?></span></div>
+                </td>
+                <td>
+                    <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
                 </td>
             </tr>
         </table>
@@ -200,7 +204,7 @@
                     <td></td>
                 </tr>
             </table>
-        <?php } ?>
+        <?php endif; ?>
 </body>
 
 </html>
