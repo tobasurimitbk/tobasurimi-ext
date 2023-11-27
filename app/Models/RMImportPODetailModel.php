@@ -16,7 +16,7 @@ class RMImportPODetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id', 'rm_import_po_id', 'barang_id', 'note', 'unit', 'qty', 'price',
-        'disc', 'additional_cost', 'remaining_qty', 'qty_diterima'
+        'disc', 'additional_cost', 'remaining_qty', 'qty_diterima', 'total'
     ];
 
     // Dates
@@ -81,5 +81,100 @@ class RMImportPODetailModel extends Model
         $query = $builder->get();
 
         return $query->getRow();
+    }
+
+    public function getListLPBBahanBaku($rmImportPoID, $penerimaanBarangID = null)
+    {
+        $res = [];
+        $condition = [
+            'rm_import_pos.deletedAt' => null,
+            'rm_import_po_details.deletedAt' => null
+        ];
+
+        $selectQry = "
+            rm_import_pos.po_no,
+            rm_import_po_details.*,
+            barang_master.barang_name AS nama_barang,
+            barang_master.kode_barang,
+            satuans.kode_satuan
+        ";
+
+        $rmImportPoModel = new RMImportPOModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+
+        $barangs = $rmImportPoModel
+            ->select($selectQry)
+            ->where($condition)
+            ->whereIn('rm_import_pos.id', $rmImportPoID)
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+            ->findAll();
+
+
+        $jmlOrderTotal = 0;
+        $jmlDiterimaInTotal = 0;
+        $jmlDiterimaTotal = 0;
+        $sisaDiterimaTotal = 0;
+        $hargaPerBarangTotal = 0;
+        $subTotal = 0;
+
+        foreach ($barangs as $b) {
+
+            $allLPB = $penerimaanBarangDetailModel
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->where('purchase_order_id', $b['rm_import_po_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('deletedAt', null)
+                ->groupBy('purchase_order_id', 'purchase_order_details_id')
+                ->findAll();
+
+            $jmlMasukAll = 0;
+            foreach ($allLPB as $a) {
+                $jmlMasukAll = $a['jmlMasuk'];
+            }
+
+            $firstLPB =  $penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangID)
+                ->where('purchase_order_id', $b['rm_import_po_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('deletedAt', null)
+                ->first();
+
+            $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
+            $sisaDiterima = $b['qty'] - $jmlMasukAll;
+
+            $res[] = [
+                'rm_import_po_details_id' => $b['id'],
+                'rm_import_po_id' => $b['rm_import_po_id'],
+                'kode_barang' => $b['kode_barang'],
+                'nama_barang' => $b['nama_barang'],
+                'po_no' => $b['po_no'],
+                'satuan' => $b['kode_satuan'],
+                'jml_order' => $b['qty'],
+                'jml_diterima_lpb' => $inLPB,
+                'jml_diterima_total' => $jmlMasukAll,
+                'sisa_total' => $sisaDiterima,
+                'harga' => $b['total'],
+                'sub_total' => ($inLPB * $b['total']),
+                'keterangan' => $b['note']
+            ];
+
+            $jmlOrderTotal += $b['qty'];
+            $jmlDiterimaInTotal += $inLPB;
+            $jmlDiterimaTotal +=   $jmlMasukAll;
+            $sisaDiterimaTotal += $sisaDiterima;
+            $hargaPerBarangTotal += $b['total'];
+            $subTotal += ($inLPB * $b['total']);
+        }
+
+        return [
+            'result' => $res,
+            'jml_order_total' => $jmlOrderTotal,
+            'jml_diterima_in_total' => $jmlDiterimaInTotal,
+            'jml_diterima_total' => $jmlDiterimaTotal,
+            'sisa_diterima_total' => $sisaDiterimaTotal,
+            'harga_per_barang_total' => $hargaPerBarangTotal,
+            'sub_total' => $subTotal
+        ];
     }
 }

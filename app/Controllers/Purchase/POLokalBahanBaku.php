@@ -160,7 +160,10 @@ class POLokalBahanBaku extends BaseController
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-        $condition = [];
+        $condition = [
+            'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_order_details.deletedAt' => null
+        ];
 
         $addCondition = [
             "search"        => $this->request->getVar("search"),

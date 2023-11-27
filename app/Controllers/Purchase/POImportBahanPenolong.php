@@ -103,7 +103,8 @@ class POImportBahanPenolong extends BaseController
         ];
 
         $condition = [
-            "am_purchase_orders.po_type"        => "Import"
+            "am_purchase_orders.po_type"        => "Import",
+            "am_purchase_order_details.deletedAt" => null
         ];
 
         $addCondition = [
