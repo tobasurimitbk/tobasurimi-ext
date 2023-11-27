@@ -253,4 +253,17 @@ class PenerimaanBarangDetailModel extends Model
             ->where('penerimaan_barang_detail.deletedAt', null)
             ->findAll();
     }
+
+    public function getPenerimaanBarangBakuDetail($id)
+    {
+        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, rm_purchase_orders.po_no, rm_purchase_order_details.note as keterangan, supplier_harga.spesifikasi')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id')
+            ->where('penerimaan_barang_detail.penerimaan_barang_id', $id)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->findAll();
+    }
 }

@@ -617,6 +617,20 @@ $routes->get('/penerimaan-barang-lokal-bp/print/(:segment)', 'Warehouse\Penerima
 $routes->post('/penerimaan-barang-lokal-bp/delete', 'Warehouse\PenerimaanBarangLokalBP::delete', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bp/posting', 'Warehouse\PenerimaanBarangLokalBP::posting', ['filter' => 'Auth']);
 
+// PENERIMAAN BARANG LOKAL BB
+$routes->get('/penerimaan-barang-lokal-bb', 'Warehouse\PenerimaanBarangLokalBB::index', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/all', 'Warehouse\PenerimaanBarangLokalBB::all', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/create', 'Warehouse\PenerimaanBarangLokalBB::create', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/generate-po-no', 'Warehouse\PenerimaanBarangLokalBP::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/get-po', 'Purchase\POLokalBahanBaku::dropdownPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/list-barang', 'Warehouse\PenerimaanBarangLokalBB::listBarangLPB', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bb/insert', 'Warehouse\PenerimaanBarangLokalBB::createAction', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/id/(:segment)', 'Warehouse\PenerimaanBarangLokalBB::update/$1', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bb/update', 'Warehouse\PenerimaanBarangLokalBB::updateAction', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/print/(:segment)', 'Warehouse\PenerimaanBarangLokalBB::print/$1', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bb/delete', 'Warehouse\PenerimaanBarangLokalBB::delete', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bb/posting', 'Warehouse\PenerimaanBarangLokalBB::posting', ['filter' => 'Auth']);
+
 
 // PENERIMAAN BARANG LOKAL 
 // $routes->get('/penerimaan-barang-lokal', 'Warehouse\PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
