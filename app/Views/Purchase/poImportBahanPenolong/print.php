@@ -92,7 +92,7 @@
         <tr>
             <td style="width: 400px;">
                 <?= $dataPO->supplierName ?>, <br>
-                <?= $dataPO->supplierAddress ?>
+                <?= $dataPO->supplierAddress == '' ? '-<br>-' : $dataPO->supplierAddress ?>
             </td>
             <td>
                 <div style="margin-top: -22px;">
