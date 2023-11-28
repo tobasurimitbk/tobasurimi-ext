@@ -59,7 +59,59 @@
         </div>
     </div>
 </section>
+<div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historiModalLabel">Histori Penerimaan Barang</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control po_no" name="po_no" id="po_no">
+                            <label for="floatingInput">Nomor PO</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control supplier_name" name="supplier_name" id="supplier_name">
+                            <label for="floatingInput">Supplier</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
+                            <label for="floatingInput">Nomor LPB</label>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered" style="width: 100%;" id="tableHistori">
+                    <thead>
+                        <tr>
+                            <td style="width: 10px;">No</td>
+                            <td style="text-align: center;">Kode Barang</td>
+                            <td style="text-align: center;">Nama Barang</td>
+                            <td style="text-align: center;">Qty Order</td>
+                            <td style="text-align: center;">Diterima</td>
+                            <td style="text-align: center;">Sisa</td>
+                        </tr>
+                    </thead>
+                    <tbody>
 
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "id";
@@ -172,20 +224,26 @@
                         if (status_penerimaan !== "CLOSED") {
                             return `
                                 <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                                <button onclick="closePO(${id})" class="btn btn-danger delete-parent">
-                                    <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
-                                </button>
+                                    <button onclick="displayHistory(${id})" class="btn btn-success posting-spp">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button onclick="closePO(${id})" class="btn btn-danger delete-parent">
+                                        <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             `
                         } else {
                             return `
                                 <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
+                                    <button onclick="displayHistory(${id})" class="btn btn-success posting-spp">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             `
                         }
@@ -422,6 +480,37 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    function displayHistory(id) {
+        console.log(id);
+        $.ajax({
+            url: "<?= base_url("po-import-bahan-baku/histori-lpb"); ?>",
+            data: {
+                id: id
+            },
+            method: "GET",
+            success: function(response) {
+                $('#po_no').val(response.po_detail.po_no);
+                $('#supplier_name').val(response.po_detail.supplierName);
+                $('#lpb_no').val(response.lpb_no);
+                const table = $('#tableHistori');
+                var no = 1;
+                table.find('tbody').empty();
+                $.each(response.list_barang, function(i, v) {
+                    var newRow = $('<tr>');
+                    newRow.append($('<td style="text-align:center;">').text(no++));
+                    newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
+                    newRow.append($('<td style="text-align:center;">').text(v.nama_barang));
+                    newRow.append($('<td style="text-align:center;">').text(v.qty));
+                    newRow.append($('<td style="text-align:center;">').text(v.diterima));
+                    newRow.append($('<td style="text-align:center;">').text(v.sisa));
+                    table.find('tbody').append(newRow);
+                });
+                $('#historiModal').modal('show');
+
+            },
+        });
     }
 </script>
 <?= $this->endSection(); ?>

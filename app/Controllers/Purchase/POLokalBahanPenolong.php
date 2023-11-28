@@ -13,6 +13,7 @@ use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\BeaCukaiModel;
 use App\Models\CompaniesModel;
+use App\Models\PenerimaanBarangModel;
 use App\Models\SatuansModel;
 use App\Models\TaxModel;
 use Dompdf\Dompdf;
@@ -32,6 +33,7 @@ class POLokalBahanPenolong extends BaseController
     protected $companyModel;
     protected $barangMasterModel;
     protected $satuanModel;
+    protected $penerimaanBarangModel;
     protected $taxModel;
 
     public function __construct()
@@ -50,6 +52,7 @@ class POLokalBahanPenolong extends BaseController
         $this->barangMasterModel = new BarangMasterModel();
         $this->satuanModel = new SatuansModel();
         $this->taxModel = new TaxModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
     }
 
     public function poLokalBahanPenolong()
@@ -407,6 +410,37 @@ class POLokalBahanPenolong extends BaseController
 
             exit(0);
         }
+    }
+
+    public function dropdownHistoriPenerimaanBarang()
+    {
+        $id = $this->request->getVar('id');
+        $listBarang = $this->aMPurchaseOrderDetailModel
+            ->select('am_purchase_order_details.qty_diterima AS diterima, am_purchase_order_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, am_purchase_order_details.qty')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->where('am_purchase_order_details.am_purchase_order_id', $id)
+            ->where('am_purchase_order_details.deletedAt', null)
+            ->findAll();
+
+        $poDetail = $this->aMPurchaseOrderModel->select('am_purchase_orders.po_no, suppliers.name AS supplierName')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->where('am_purchase_orders.id', $id)
+            ->where('am_purchase_orders.deletedAt', null)
+            ->first();
+
+        $lpbDetail = $this->penerimaanBarangModel->like('multiple_po_id', $id)->where('deletedAt', null)->findAll();
+
+        $lpbNo = [];
+        foreach ($lpbDetail as $l) {
+            $lpbNo[] = $l['no_penerimaan_barang'];
+        }
+
+        return response()->setJSON([
+            'lpb_no' => count($lpbNo) == 0 ? "BELUM ADA LPB" : str_replace(['[', ']', '"', "\\"], '', json_encode($lpbNo)),
+            'po_detail' => $poDetail,
+            'list_barang' => $listBarang,
+            'token' => csrf_hash()
+        ]);
     }
 
     public function dropdownPOLokalBahanPenolong()

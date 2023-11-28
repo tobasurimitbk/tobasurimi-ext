@@ -4,7 +4,6 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
-use App\Models\BarangModel;
 use App\Models\CompaniesModel;
 use App\Models\MetadataModel;
 use App\Models\RMImportPOModel;
@@ -12,6 +11,7 @@ use App\Models\RMImportPODetailModel;
 use App\Models\SupplierModel;
 use App\Models\BeaCukaiModel;
 use App\Models\DivisisModel;
+use App\Models\PenerimaanBarangModel;
 use App\Models\SatuansModel;
 use Dompdf\Dompdf;
 
@@ -29,7 +29,7 @@ class POImportBahanBaku extends BaseController
     protected $divisisModel;
     protected $barangMasterModel;
     protected $satuanModel;
-
+    protected $penerimaanBarangModel;
     protected $dompdf;
 
     public function __construct()
@@ -46,6 +46,7 @@ class POImportBahanBaku extends BaseController
         $this->divisisModel = new DivisisModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->satuanModel = new SatuansModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -381,5 +382,36 @@ class POImportBahanBaku extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function dropdownHistoriPenerimaanBarang()
+    {
+        $id = $this->request->getVar('id');
+        $listBarang = $this->rmImportPODetailModel
+            ->select('rm_import_po_details.qty_diterima AS diterima, rm_import_po_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, rm_import_po_details.qty')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id')
+            ->where('rm_import_po_details.rm_import_po_id', $id)
+            ->where('rm_import_po_details.deletedAt', null)
+            ->findAll();
+
+        $poDetail = $this->rmImportPOModel->select('rm_import_pos.po_no, suppliers.name AS supplierName')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
+            ->where('rm_import_pos.id', $id)
+            ->where('rm_import_pos.deletedAt', null)
+            ->first();
+
+        $lpbDetail = $this->penerimaanBarangModel->like('multiple_po_id', $id)->where('deletedAt', null)->findAll();
+
+        $lpbNo = [];
+        foreach ($lpbDetail as $l) {
+            $lpbNo[] = $l['no_penerimaan_barang'];
+        }
+
+        return response()->setJSON([
+            'lpb_no' => count($lpbNo) == 0 ? "BELUM ADA LPB" : str_replace(['[', ']', '"', "\\"], '', json_encode($lpbNo)),
+            'po_detail' => $poDetail,
+            'list_barang' => $listBarang,
+            'token' => csrf_hash()
+        ]);
     }
 }

@@ -248,6 +248,7 @@ $routes->post('/po-lokal-bahan-penolong/close-po', 'Purchase\POLokalBahanPenolon
 $routes->post('/po-lokal-bahan-penolong/delete', 'Purchase\POLokalBahanPenolong::deletePOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/print/(:segment)', 'Purchase\POLokalBahanPenolong::print/$1', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-penolong/find-divisi', 'Purchase\POLokalBahanPenolong::getDivisionByCompany', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-penolong/histori-lpb', 'Purchase\POLokalBahanPenolong::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO IMPORT
 $routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);
@@ -261,6 +262,7 @@ $routes->post('/po-import-bahan-baku/update-status', 'Purchase\POImportBahanBaku
 $routes->post('/po-import-bahan-baku/close-po', 'Purchase\POImportBahanBaku::closePOImportBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-baku/delete', 'Purchase\POImportBahanBaku::deletePOImportBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-baku/find-divisi', 'Purchase\POLokalBahanPenolong::getDivisionByCompany', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/histori-lpb', 'Purchase\POImportBahanBaku::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-import-bahan-penolong', 'Purchase\POImportBahanPenolong::poImportBahanPenolong', ['filter' => 'Auth']);
@@ -274,6 +276,7 @@ $routes->post('/po-import-bahan-penolong/update-status', 'Purchase\POImportBahan
 $routes->post('/po-import-bahan-penolong/close-po', 'Purchase\POImportBahanPenolong::closePOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolong::deletePOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-penolong/find-divisi', 'Purchase\POLokalBahanPenolong::getDivisionByCompany', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/histori-lpb', 'Purchase\POImportBahanPenolong::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
 
 // TERIMA FAKTUR LOKAL
 $routes->get('/terima-faktur-import/getBySupplier/(:num)', 'Purchase\TerimaFakturImport::getBySupplierId/$1', ['filter' => 'Auth']);

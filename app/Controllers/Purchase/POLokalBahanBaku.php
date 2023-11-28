@@ -666,7 +666,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         return response()->setJSON([
-            'lpb_no' => str_replace(['[', ']', '"', "\\"], '', json_encode($lpbNo)),
+            'lpb_no' => count($lpbNo) == 0 ? "BELUM ADA LPB" : str_replace(['[', ']', '"', "\\"], '', json_encode($lpbNo)),
             'po_detail' => $poDetail,
             'list_barang' => $listBarang,
             'token' => csrf_hash()
