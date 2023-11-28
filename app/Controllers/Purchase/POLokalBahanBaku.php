@@ -633,24 +633,44 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->lpbDetail = $dataPenerimaanBarangDetail;
             }
 
-            // dd($data);
-
-            // load HTML content
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print', $data));
-
-            // (optional) setup the paper size and orientation
             $this->dompdf->setPaper('A4', 'portrait');
-
-            // render html as PDF
             $this->dompdf->render();
-
-            // output the generated pdf
             $this->dompdf->stream($filename, array("Attachment" => false));
-
             exit(0);
-
-            // return view('Purchase/poImportBahanPenolong/print', $data);
         }
+    }
+
+    public function dropdownHistoriPenerimaanBarang()
+    {
+        $id = $this->request->getVar('id');
+        $listBarang = $this->RMPurchaseOrderDetailModel
+            ->select('rm_purchase_order_details.qty_diterima AS diterima, rm_purchase_order_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, rm_purchase_order_details.qty')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id')
+            ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+            ->where('rm_purchase_order_details.rm_purchase_order_id', $id)
+            ->where('rm_purchase_order_details.deletedAt', null)
+            ->findAll();
+
+        $poDetail = $this->RMPurchaseOrderModel->select('rm_purchase_orders.po_no, suppliers.name AS supplierName')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id')
+            ->where('rm_purchase_orders.id', $id)
+            ->where('rm_purchase_orders.deletedAt', null)
+            ->first();
+
+        $lpbDetail = $this->penerimaanBarangModel->like('multiple_po_id', $id)->where('deletedAt', null)->findAll();
+
+        $lpbNo = [];
+        foreach ($lpbDetail as $l) {
+            $lpbNo[] = $l['no_penerimaan_barang'];
+        }
+
+        return response()->setJSON([
+            'lpb_no' => str_replace(['[', ']', '"', "\\"], '', json_encode($lpbNo)),
+            'po_detail' => $poDetail,
+            'list_barang' => $listBarang,
+            'token' => csrf_hash()
+        ]);
     }
 
     public function dropdownPOLokalBahanBaku()

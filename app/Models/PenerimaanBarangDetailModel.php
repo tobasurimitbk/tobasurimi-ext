@@ -31,9 +31,9 @@ class PenerimaanBarangDetailModel extends Model
         'unit',
         'nama_barang_dok',
         'jml_masuk',
-        'packaging',
-        'packaging_qty',
-        'summarized_qty',
+        // 'packaging',
+        // 'packaging_qty',
+        // 'summarized_qty',
         'createdAt',
         'updatedAt',
         'deletedAt'

@@ -298,8 +298,8 @@ class PenerimaanBarangModel extends Model
                 'unit' => $r['satuan_id'],
                 'nama_barang_dok' => $barang['barang_name'] . " (" . $barang['spesifikasi'] . ")",
                 'jml_masuk' => $r['qty'],
-                'packaging' => "-",
-                'packaging_qty' => $r['qty']
+                // 'packaging' => "-",
+                // 'packaging_qty' => $r['qty']
             ]);
 
             // UPDATE QTY DITERIMA
