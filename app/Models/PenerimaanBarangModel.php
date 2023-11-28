@@ -269,8 +269,8 @@ class PenerimaanBarangModel extends Model
             "supplier_id" => $rmDetail['supplier_id'],
             "warehouse_id" => $warehouseID,
             "acceptance_type" => "SINGLE ORDER",
-            "multiple_po_id" => "[" . $rmDetail['id'] . "]",
-            "multiple_po_no" => '["' . $rmDetail['po_no'] . '"]',
+            "multiple_po_id" => '"[\\"' . $rmDetail['id'] . '\\"]"',
+            "multiple_po_no" => '"[\\"' . $rmDetail['po_no'] . '\\"]"',
             "tipe_bahan" => "BAKU",
             "bc_type" => $dokumenBC,
             "status_post" => "WAITING",
@@ -286,6 +286,7 @@ class PenerimaanBarangModel extends Model
                 ->first();
 
             $penerimaanBarangDetailModel->insert([
+                'purchase_order_id' => $r['rm_purchase_order_id'],
                 'purchase_order_details_id' => $r['id'],
                 'penerimaan_barang_id' => $lpbID,
                 'harga' => $r['general_price'],
