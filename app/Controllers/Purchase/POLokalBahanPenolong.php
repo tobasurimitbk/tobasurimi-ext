@@ -388,28 +388,22 @@ class POLokalBahanPenolong extends BaseController
                 $dataBPLokal->totalPo = number_format(formatter(($totalTambahan + $totalPrice - $totalDisc + $totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->keterangan = implode(",", array_unique($keterangan));
                 $dataBPLokal->jatuhTempoHari = \totalDayInRange($dataBPLokal->po_date, $dataBPLokal->payment_date);
-                // $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
-
                 $data["dataPOLokal"] = $dataBPLokal;
                 $data["dataPOLokal"]->am_purchase_order_details = $dataBPLokalDetail;
             }
-
-            // return view('Purchase/poLokalBahanPenolong/print', $data);
-
-            // load HTML content
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanPenolong/print', $data));
-
-            // (optional) setup the paper size and orientation
             $this->dompdf->setPaper('A4', 'landscape');
-
-            // render html as PDF
             $this->dompdf->render();
-
-            // output the generated pdf
             $this->dompdf->stream($filename, array("Attachment" => false));
-
             exit(0);
         }
+    }
+
+    public function getHistoriHarga()
+    {
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($this->request->getVar('id'), "Lokal", $this->this_company_id);
+        return response()->setJSON(['res' => $res]);
     }
 
     public function dropdownHistoriPenerimaanBarang()

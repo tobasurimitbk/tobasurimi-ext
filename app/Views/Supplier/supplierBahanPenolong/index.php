@@ -124,43 +124,6 @@
     </div>
 </div>
 
-<div class="modal harga-modal" id="harga_modal">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">History Bahan Baku</h5>
-            </div>
-            <div class="modal-body">
-                <div class="row justify-content-end mb-3">
-                    <div class="col-md-3">
-                        <input autocomplete="one-time-code" class="form-control search-harga form-out-search" placeholder="Cari Nama Barang" value="" />
-                    </div>
-                </div>
-                <div class="table-responsive mt-3 mb-3">
-                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi secondDataTable" width="100%" cellspacing="0" id="secondDataTable">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th width="10">No</th>
-                                <th>Tanggal</th>
-                                <th>Barang</th>
-                                <th>Warehouse</th>
-                                <th>QTY</th>
-                                <th>satuan</th>
-                                <th>Harga</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-hide-harga btn-discard mr-2">Batal</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -187,7 +150,6 @@
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
                                 <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -293,19 +255,6 @@
         }, {
             data: "address",
             className: "text-center"
-        }, {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                return `
-                    <button class="btn btn-success" onclick="History(${id})" style="box-shadow: none !important;">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                    </a>
-                `
-            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -638,10 +587,6 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
-    }
-
-    let History = function(id) {
-        $(".harga-modal").modal("show")
     }
 </script>
 

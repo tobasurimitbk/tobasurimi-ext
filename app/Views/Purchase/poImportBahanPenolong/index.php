@@ -82,22 +82,22 @@
                             <label for="floatingInput">Supplier</label>
                         </div>
                     </div>
-                    <div class="col-sm-12">
+                    <!-- <div class="col-sm-12">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
                             <label for="floatingInput">Nomor LPB</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
-                <table class="table table-bordered" style="width: 100%;" id="tableHistori">
+                <table class="table table-inside table-borderd nowrap table-hover-tobasurimi dataTable2" style="width: 100%;" id="tableHistori">
                     <thead>
                         <tr>
-                            <td style="width: 10px;">No</td>
-                            <td style="text-align: center;">Kode Barang</td>
-                            <td style="text-align: center;">Nama Barang</td>
-                            <td style="text-align: center;">Qty Order</td>
-                            <td style="text-align: center;">Diterima</td>
-                            <td style="text-align: center;">Sisa</td>
+                            <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Kode Barang</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Nama Barang</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Qty Order</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Diterima</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Sisa</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -263,6 +263,23 @@
                 next: '<i class="fa fa-angle-right"></i>'
             }
         }
+    });
+
+    $('.dataTable2').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: false,
+        serverSide: false,
+        ordering: true,
+        order: [],
+        fixedHeader: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
     });
     $(document).ready(function() {
         $(".dateStart").datepicker({

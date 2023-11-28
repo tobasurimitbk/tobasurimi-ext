@@ -249,6 +249,7 @@ $routes->post('/po-lokal-bahan-penolong/delete', 'Purchase\POLokalBahanPenolong:
 $routes->get('/po-lokal-bahan-penolong/print/(:segment)', 'Purchase\POLokalBahanPenolong::print/$1', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-penolong/find-divisi', 'Purchase\POLokalBahanPenolong::getDivisionByCompany', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/histori-lpb', 'Purchase\POLokalBahanPenolong::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-penolong/histori-harga', 'Purchase\POLokalBahanPenolong::getHistoriHarga', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO IMPORT
 $routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);

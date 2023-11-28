@@ -360,6 +360,21 @@
     }).change(function() {
         $('#nama_barang').val($(this).find("option:selected").data("nama_barang"));
         $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
+
+        $.ajax({
+            url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
+            data: {
+                id: $('#barang_id').val()
+            },
+            method: "GET",
+            success: function(response) {
+                if (response.hargaTerakhir !== "-") {
+                    $('#harga_satuan').val(formatCurrency(response.res.hargaTerakhir));
+                } else {
+                    $('#harga_satuan').val(formatCurrency('0'));
+                }
+            },
+        });
     });
 
     $("#po_date,#payment_date").datepicker({
