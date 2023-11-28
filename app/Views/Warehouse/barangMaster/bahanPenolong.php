@@ -25,8 +25,10 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('satuan')" class="sort">Satuan</th>
-                                <th class="sort">Harga Terakhir</th>
-                                <th class="sort">Supplier Terakhir</th>
+                                <th>Harga Terakhir (Lokal)</th>
+                                <th>Supplier Terakhir (Lokal)</th>
+                                <th>Harga Terakhir (Import)</th>
+                                <th>Supplier Terakhir (Import)</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
@@ -116,10 +118,88 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historiModalLabel">Histori Purchase Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="pembelianLokal-tab" data-toggle="tab" href="#pembelianLokal" role="tab" aria-controls="pembelianLokal" aria-selected="true">Purchase Order Lokal</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pembelianImport-tab" data-toggle="tab" href="#pembelianImport" role="tab" aria-controls="pembelianImport" aria-selected="false">Purchase Order Import</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="pembelianLokal" role="tabpanel" aria-labelledby="pembelianLokal">
+                        <div class="row justify-content-end">
+                            <div class="col-md-3">
+                                <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Nomor PO" value="" type="text" class="form-control form-control-lg search-po-lokal">
+                            </div>
+                        </div>
+                        <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoLokal" id="tablePoLokal" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')" class="sort">No PO</th>
+                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
+                                    <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
+                                    <th scope="col" onclick="changeShortPoLokal('barang_master.barang_name')" class="sort">Barang</th>
+                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="pembelianImport" role="tabpanel" aria-labelledby="pembelianImport">
+                        <div class="row justify-content-end">
+                            <div class="col-md-3">
+                                <input autocomplete="one-time-code" style="height: 40px;" value="" placeholder="Cari Nomor PO" type="text" class="form-control form-control-lg search-po-import">
+                            </div>
+                        </div>
+                        <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoImport" id="tablePoImport" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_no')" class="sort">No PO</th>
+                                    <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_date')" class="sort">Tanggal</th>
+                                    <th scope="col" onclick="changeShortPoImport('suppliers.name')" class="sort">Supplier</th>
+                                    <th scope="col" onclick="changeShortPoImport('barang_master.barang_name')" class="sort">Barang</th>
+                                    <th scope="col" onclick="changeShortPoImport('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     let sort = "nomor";
     let sortType = "desc";
+    let id_barang = "";
+    let sortTypePoLokal = "desc";
+    let sortTypePoImport = "desc";
+    let sortPoLokal = "am_purchase_orders.id";
+    let sortPoImport = "am_purchase_orders.id";
+    let tablePoImport = null;
+    let tablePoLokal = null;
+
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -175,23 +255,31 @@
                     className: "text-center",
                 },
                 {
-                    data: "harga_terakhir",
+                    data: "harga_terakhir_lokal",
                     className: "text-center",
                 },
                 {
-                    data: "supplier_terakhir",
+                    data: "supplier_terakhir_lokal",
+                    className: "text-center",
+                },
+                {
+                    data: "harga_terakhir_import",
+                    className: "text-center",
+                },
+                {
+                    data: "supplier_terakhir_import",
                     className: "text-center",
                 },
                 {
                     data: "id",
-                    className: "text-center",
+                    className: "text-center actions",
                     searchable: false,
                     sortable: false,
                     render: function(data, type, row) {
                         return `
-                        <div class="mt-0">
-                            <button onclick="alert('Belum Tersedia')" class="btn btn-success posting-spp">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        <div class="mt-0 actions">
+                            <button onclick="displayHistory(${row.id})" class="btn btn-success posting-spp actions">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
                             </button>
                         </div>
                     `
@@ -475,7 +563,157 @@
                 }
             })
         });
+
+        tablePoLokal = $('#tablePoLokal').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [2, 'desc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("barang-bahan-penolong/histori"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.id = id_barang;
+                    data.search = $(".search-po-lokal").val();
+                    data.sort = sortPoImport;
+                    data.sortType = sortTypePoLokal;
+                    data.po_type = "Lokal";
+                }
+            },
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.tablePoLokal').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "po_no",
+                className: "text-center"
+            }, {
+                data: "po_date",
+                className: "text-center"
+            }, {
+                data: "nama_supplier",
+                className: "text-center"
+            }, {
+                data: "nama_barang",
+                className: "text-center"
+            }, {
+                data: "price",
+                className: "text-center"
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        tablePoImport = $('#tablePoImport').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [2, 'desc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("barang-bahan-penolong/histori"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.id = id_barang;
+                    data.po_type = "Import";
+                    data.search = $(".search-po-import").val();
+                    data.sort = sortPoImport;
+                    data.sortType = sortTypePoImport;
+                }
+            },
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.tablePoLokal').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "po_no",
+                className: "text-center"
+            }, {
+                data: "po_date",
+                className: "text-center"
+            }, {
+                data: "nama_supplier",
+                className: "text-center"
+            }, {
+                data: "nama_barang",
+                className: "text-center"
+            }, {
+                data: "price",
+                className: "text-center"
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        $(".search-po-import").keyup(function() {
+            tablePoImport.ajax.reload();
+        })
+
+        $(".search-po-lokal").keyup(function() {
+            tablePoLokal.ajax.reload();
+        })
+
     });
+
+    function displayHistory(id) {
+        id_barang = id;
+        $('.search-po-lokal').val();
+        $('.search-po-import').val();
+        tablePoLokal.ajax.reload();
+        tablePoImport.ajax.reload();
+        $('#historiModal').modal('show');
+    }
 
     function generateNewCode() {
         let csrfToken = '<?= csrf_token() ?>';
@@ -501,6 +739,24 @@
         } else {
             $("input[name='kode_barang']").attr("readonly", false);
             $("input[name='kode_barang']").val("");
+        }
+    }
+
+    function changeShortPoImport(val) {
+        if (sortPoImport !== val) {
+            sortTypePoImport = "asc";
+            sortPoImport = val;
+        } else {
+            sortTypePoImport = sortTypePoImport === "asc" ? "desc" : "asc";
+        }
+    }
+
+    function changeShortPoLokal(val) {
+        if (sortPoLokal !== val) {
+            sortTypePoLokal = "asc";
+            sortPoLokal = val;
+        } else {
+            sortTypePoLokal = sortTypePoLokal === "asc" ? "desc" : "asc";
         }
     }
 </script>

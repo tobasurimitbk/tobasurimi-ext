@@ -26,7 +26,6 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('satuan')" class="sort">Satuan</th>
-                                <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -173,21 +172,6 @@
                     data: "satuan",
                     className: "text-center",
                 },
-                {
-                    data: "id",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false,
-                    render: function(data, type, row) {
-                        return `
-                        <div class="mt-0">
-                            <button onclick="alert('Belum Tersedia')" class="btn btn-success posting-spp">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            </button>
-                        </div>
-                    `
-                    }
-                }
 
             ],
             columnDefs: [{
@@ -304,10 +288,11 @@
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
-                    $('select[name="satuan_id"]').val(formatRupiah(res.data.satuan_id));
+                    $('select[name="satuan_id"]').val(res.data.satuan_id).change();
                     $('input[name="barang_name"]').val(res.data.barang_name);
                     $('input[name="minimum_stock"]').val(res.data.minimum_stock).change();
                     $('input[name="id"]').val(res.data.id);
+                    $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
 
                     $('.add-modal').modal('show');
                 }

@@ -24,7 +24,6 @@
                                 <th onclick="changeSort('barang_master.kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_master.barang_name')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('satuans.nama_satuan')" class="sort">Satuan</th>
-                                <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -153,21 +152,6 @@
                     data: "satuan",
                     className: "text-center",
                 },
-                {
-                    data: "id",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false,
-                    render: function(data, type, row) {
-                        return `
-                        <div class="mt-0">
-                            <button onclick="alert('Belum Tersedia')" class="btn btn-success posting-spp">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            </button>
-                        </div>
-                    `
-                    }
-                }
 
             ],
             columnDefs: [{

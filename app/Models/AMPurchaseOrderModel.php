@@ -308,4 +308,99 @@ class AMPurchaseOrderModel extends Model
 
         return $generatedNo;
     }
+
+    public function historiHargaPOBahanPenolong($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'am_purchase_orders.po_no' => 'am_purchase_orders.po_no',
+            'am_purchase_orders.po_date' => 'am_purchase_orders.po_date',
+            'suppliers.name'  => 'suppliers.name',
+            'barang_master.barang_name' => 'barang_master.barang_name',
+            'am_purchase_order_details.price' => 'am_purchase_order_details.price',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'am_purchase_orders.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            barang_master.barang_name as nama_barang, 
+            am_purchase_orders.po_no,
+            am_purchase_orders.po_date,
+            suppliers.name as nama_supplier,
+            am_purchase_order_details.price
+        ";
+
+        $poDataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $poDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $poDataQry->countAllResults(false);
+        $data = $poDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function historiHargaPOBahanPenolongFirst($barangID, $poType, $companyID)
+    {
+        $condition = [
+            "am_purchase_orders.company_id"  => $companyID,
+            "am_purchase_order_details.barang_id" => $barangID,
+            "am_purchase_orders.deletedAt" => NULL,
+            "am_purchase_order_details.deletedAt" => NULL,
+            "am_purchase_orders.po_type" => $poType
+        ];
+
+        $selectQry = "
+            barang_master.barang_name as nama_barang, 
+            am_purchase_orders.po_no,
+            am_purchase_orders.po_date,
+            suppliers.name as nama_supplier,
+            am_purchase_order_details.price
+        ";
+
+        $res = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->first();
+
+        if ($res == null) {
+            return [
+                'hargaTerakhir' => '-',
+                'supplierTerakhir' => '-'
+            ];
+        } else {
+            return [
+                'hargaTerakhir' => number_format($res['price'], 2, ',', '.'),
+                'supplierTerakhir' => $res['nama_supplier']
+            ];
+        }
+    }
 }

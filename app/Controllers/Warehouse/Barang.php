@@ -3,6 +3,8 @@
 namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
+use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
 use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
@@ -86,7 +88,7 @@ class Barang extends BaseController
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
-            'minimum_stock' => str_replace('.','',$this->request->getVar('minimum_stock')),
+            'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);
 
         return response()->setJSON([
@@ -108,7 +110,7 @@ class Barang extends BaseController
             'parent_type' => $this->request->getVar('parent_type'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
-            'minimum_stock' => str_replace('.','',$this->request->getVar('minimum_stock')),
+            'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);
 
         return response()->setJSON([
@@ -168,6 +170,7 @@ class Barang extends BaseController
         ];
 
         $barangMasterModel = new BarangMasterModel();
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
@@ -179,6 +182,8 @@ class Barang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
+            $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "Lokal", $this->this_company_id);
+            $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "Import", $this->this_company_id);
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data['id'],
@@ -186,9 +191,10 @@ class Barang extends BaseController
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => $data['barang_name'],
                 "satuan"                => $data['satuan'],
-                // "stok"                  => $data['stok'],
-                "harga_terakhir"        => "Rp. 0.00", // belum selesai (khusus master data bahan penolong)
-                "supplier_terakhir"     => "-" // belum selesai (khusus master data bahan penolong)
+                "harga_terakhir_lokal"   => $lokalDetail['hargaTerakhir'],
+                "supplier_terakhir_lokal" => $lokalDetail['supplierTerakhir'],
+                "harga_terakhir_import" => $importDetail['hargaTerakhir'],
+                "supplier_terakhir_import" => $importDetail['supplierTerakhir']
             ]);
         }
 
@@ -251,6 +257,61 @@ class Barang extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+    }
+
+    public function historiHargaPOBahanPenolong()
+    {
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+        ];
+
+        $condition = [
+            "am_purchase_orders.company_id"  => $this->this_company_id,
+            "am_purchase_order_details.barang_id" => $this->request->getVar('id'),
+            "am_purchase_orders.deletedAt" => NULL,
+            "am_purchase_order_details.deletedAt" => NULL,
+            "am_purchase_orders.po_type" => $this->request->getVar('po_type')
+        ];
+
+        $addCondition = [
+            'search' => $this->request->getGet('search'),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType")
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolong($condition, $addCondition, $limit, $offset);
+
+        $rdata = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        foreach ($res['data'] as $data) {
+            array_push($rdata, [
+                "no"                    => $no++,
+                "po_no"                 => $data['po_no'],
+                "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
+                "nama_supplier"         => $data['nama_supplier'],
+                "nama_barang"           => $data['nama_barang'],
+                "price"                 => number_format($data['price'], 2, ',', '.'),
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $res['totalData'],
+            "recordsFiltered"   => $res['totalFilteredData'],
+            "data"              => $rdata,
+            "payload"           => $payload,
+        ];
+
+        return response()->setJSON($data);
     }
 
     public function dropdownBarangType()

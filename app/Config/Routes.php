@@ -564,6 +564,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->post('generate-new-code', 'Warehouse\Barang::generateNewCode');
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
+$routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);
 
 // $routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
 //     $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');
