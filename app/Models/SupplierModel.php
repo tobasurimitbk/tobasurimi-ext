@@ -168,14 +168,14 @@ class SupplierModel extends Model
         $numberTemplate = "$type";
 
         $lastData = $this->asObject()
-            ->like('kode', $numberTemplate, 'before')
+            ->like('kode', $numberTemplate . '-')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
 
         if (!empty($lastData)) {
-            $asd = explode('/', $lastData->kode);
-            $lastIncrement = intval($asd[0]) + 1;
+            $asd = explode('-', $lastData->kode);
+            $lastIncrement = intval($asd[1]) + 1;
             $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
 
             $invNumber =  $numberTemplate . "-" . $paddedNumber;
