@@ -84,7 +84,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -92,7 +92,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -110,8 +110,8 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('valas')" class="sort">Valas</th>
                                 <th onclick="changeSort('nilai_kurs')" class="sort">Nilai Kurs</th>
-                                <th onclick="changeSort('start_date')" class="sort">Tanggal Mulai</th>
-                                <th onclick="changeSort('end_date')" class="sort">Tanggal Akhir</th>
+                                <th class="sort">Tanggal Mulai</th>
+                                <th class="sort">Tanggal Akhir</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -149,6 +149,8 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                console.log($(".dateStart").val());
+                console.log($(".dateEnd").val());
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
@@ -180,11 +182,13 @@
             },
             {
                 data: "start_date",
-                className: "text-center"
+                className: "text-center",
+                orderable: false,
             },
             {
                 data: "end_date",
-                className: "text-center"
+                className: "text-center",
+                orderable: false,
             }
         ],
         columnDefs: [{

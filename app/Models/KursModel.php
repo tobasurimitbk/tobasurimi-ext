@@ -82,11 +82,11 @@ class KursModel extends Model
         }
 
         if ($addCondition['dateStart']) {
-            $dataQry->where('kurs.start_date <=', $addCondition['dateStart']);
+            $dataQry->where('kurs.start_date >=', $addCondition['dateStart']);
         }
 
         if ($addCondition['dateEnd']) {
-            $dataQry->where('kurs.end_date >=', $addCondition['dateEnd']);
+            $dataQry->where('kurs.end_date <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
@@ -120,22 +120,19 @@ class KursModel extends Model
     {
         $selectQry = "kurs.*";
 
-        if($id)
-        {
+        if ($id) {
             $data = $this->select($selectQry)
-            ->where('id !=', $id)
-            ->where('metadata_id', $metadata_id)
-            ->where('end_date >=', $end_date)
-            ->where('deletedAt', NULL)       
-            ->countAllResults();
-        }
-        else
-        {
+                ->where('id !=', $id)
+                ->where('metadata_id', $metadata_id)
+                ->where('end_date >=', $end_date)
+                ->where('deletedAt', NULL)
+                ->countAllResults();
+        } else {
             $data = $this->select($selectQry)
-            ->where('metadata_id', $metadata_id)
-            ->where('end_date >=', $end_date)
-            ->where('deletedAt', NULL)       
-            ->countAllResults();
+                ->where('metadata_id', $metadata_id)
+                ->where('end_date >=', $end_date)
+                ->where('deletedAt', NULL)
+                ->countAllResults();
         }
 
         return $data;

@@ -35,8 +35,8 @@ class Kurs extends BaseController
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
             // "requestStatus" => $this->request->getGet("status"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
         $condition = [];
@@ -81,6 +81,7 @@ class Kurs extends BaseController
 
         echo json_encode($data);
         return;
+        print_r($addCondition);
     }
 
     public function save()
