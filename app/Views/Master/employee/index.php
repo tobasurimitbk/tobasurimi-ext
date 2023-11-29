@@ -712,12 +712,20 @@
             },
         });
 
+        var today = new Date();
+
+        // Kurangkan satu hari dari tanggal hari ini
+        var yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        // Inisialisasi datepicker dengan batas tanggal
         $(".dob").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
-            autoclose: true
-        })
+            autoclose: true,
+            endDate: yesterday
+        });
 
         $(".join_date").datepicker({
             todayHighlight: true,
