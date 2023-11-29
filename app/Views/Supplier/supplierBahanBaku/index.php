@@ -620,6 +620,16 @@
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).change(function() {
+        let selectedOption = $(this).val();
+        // console.log(selectedOption);
+        if (selectedOption != "ID") {
+            $('#province_parent_id').prop('disabled', true);
+            $('#city_parent_id').prop('disabled', true);
+        } else {
+            $('#province_parent_id').prop('disabled', false);
+            $('#city_parent_id').prop('disabled', false);
+        }
     });
 
     $('.supplier_id').select2({
@@ -635,18 +645,6 @@
     $('.warehouse_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
-    });
-
-    $('.country_code').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    });
-
-    $('.country_code').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
     });
 
     //CSS SELECT2 FLOATING LABEL
