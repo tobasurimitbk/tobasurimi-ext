@@ -885,7 +885,7 @@
         $(".btn-show-form-laporan").click(function() {
             $(".laporan-modal").show();
             $(".col-md-12 > div[class^='laporan-']").hide();
-            $(".modal-footer .btn-submit-form").hide();
+            // $(".modal-footer .btn-submit-form").hide();
             // $('.laporan-rincian-per-barang').hide();
 
         })
