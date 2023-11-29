@@ -332,6 +332,9 @@ class PenerimaanBarangLokalBB extends BaseController
 
         $penerimaanBarangFirst = $this->penerimaanBarangModel->where('id', $id)->first();
         $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+
+        $test = $this->penerimaanBarangModel->autoClosePO($id);
+
         foreach ($penerimaanBarangList as $b) {
             $this->stockDetailModel->addOrReduceStock(
                 $b['barang_id'],

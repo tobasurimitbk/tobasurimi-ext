@@ -830,7 +830,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("penerimaan-barang-lokal-bp/posting"); ?>",
+                        url: "<?= base_url("penerimaan-barang-lokal-bb/posting"); ?>",
                         data: {
                             id: $('.id').val()
                         },
@@ -869,7 +869,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("penerimaan-barang-lokal-bp/delete"); ?>",
+                        url: "<?= base_url("penerimaan-barang-lokal-bb/delete"); ?>",
                         data: {
                             id: $('.id').val()
                         },
@@ -885,7 +885,7 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 }).then((result) => {
-                                    window.location.href = "<?= base_url('penerimaan-barang-lokal-bp') ?>"
+                                    window.location.href = "<?= base_url('penerimaan-barang-lokal-bb') ?>"
                                 });
                             }
                         },
