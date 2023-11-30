@@ -612,7 +612,7 @@ class POLokalBahanBaku extends BaseController
                     $dataPO->nilai_pph = 1.00 - 0.005;
                     $dataPO->nilai_pph2 = 0.005;
                 } else {
-                    $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
+                    $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
                     $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
                 }
 
