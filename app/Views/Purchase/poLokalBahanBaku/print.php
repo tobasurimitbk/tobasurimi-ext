@@ -311,11 +311,11 @@
                         <td><?= $detail->note ?></td>
                         <td class="txt-right"><?= $detail->qty ?></td>
                         <?php if ($dataPO->pph === "None") {
-                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price / ($dataPO->nilai_pph)));
-                            $nilai_total = $nilai_total + (($detail->general_price / ($dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));
+                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price));
+                            $nilai_total = $nilai_total + (($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"));
                         ?>
-                            <td class="txt-right"><?= number_format(($detail->general_price / ($dataPO->nilai_pph)), 2, '.', ',') ?></td>
-                            <td class="txt-right"><?= number_format(($detail->general_price / ($dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right"><?= number_format(($detail->general_price), 2, '.', ',') ?></td>
+                            <td class="txt-right"><?= number_format(($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php }
                         if ($dataPO->pph === "Supplier") {
                             $nilai_total_harian = $nilai_total_harian + (($detail->daily_price));
@@ -477,13 +477,13 @@
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
-                    <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT") * $dataPO->totalQty, 2, '.', ',') ?></td>
                 </tr>
                 <tr>
                     <td>PPh</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format(($nilai_total_harian * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(($nilai_total_harian * $dataPO->nilai_pph2) * $dataPO->totalQty, 2, '.', ',') ?></td>
                     <?php } else { ?>
                         <td class="txt-right">0.00</td>
                     <?php } ?>
@@ -492,9 +492,9 @@
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2)) * $dataPO->totalQty, 2, '.', ',') ?></td>
                     <?php } else { ?>
-                        <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT") * $dataPO->totalQty, 2, '.', ',') ?></td>
                     <?php } ?>
                 </tr>
             </table>
