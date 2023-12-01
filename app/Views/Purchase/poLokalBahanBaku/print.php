@@ -311,21 +311,21 @@
                         <td><?= $detail->note ?></td>
                         <td class="txt-right"><?= $detail->qty ?></td>
                         <?php if ($dataPO->pph === "None") {
-                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price));
+                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT"));
                             $nilai_total = $nilai_total + (($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"));
                         ?>
                             <td class="txt-right"><?= number_format(($detail->general_price), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php }
                         if ($dataPO->pph === "Supplier") {
-                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price));
+                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT"));
                             $nilai_total = $nilai_total + (($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"));
                         ?>
                             <td class="txt-right"><?= number_format(($detail->general_price), 2, '.', ',') ?></td>
                             <td class="txt-right"><?= number_format(($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php }
                         if ($dataPO->pph === "Company") {
-                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price / ($dataPO->nilai_pph)));
+                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price / ($dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT")));
                             $nilai_total = $nilai_total + (($detail->general_price / ($dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));
                         ?>
                             <td class="txt-right"><?= number_format(($detail->general_price / ($dataPO->nilai_pph)), 2, '.', ',') ?></td>
@@ -464,7 +464,7 @@
                 <tr>
                     <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;"><?= terbilang(formatter(($nilai_total_harian * $dataPO->totalQty), "STR_TO_FLOAT")) ?></td>
+                    <td style="vertical-align: top;"><?= terbilang(formatter(($nilai_total_harian), "STR_TO_FLOAT")) ?></td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
@@ -477,13 +477,13 @@
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
-                    <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT") * $dataPO->totalQty, 2, '.', ',') ?></td>
+                    <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
                 <tr>
                     <td>PPh</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format(($nilai_total_harian * $dataPO->nilai_pph2) * $dataPO->totalQty, 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(($nilai_total_harian * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
                     <?php } else { ?>
                         <td class="txt-right">0.00</td>
                     <?php } ?>
@@ -492,9 +492,9 @@
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2)) * $dataPO->totalQty, 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2)), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                        <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT") * $dataPO->totalQty, 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                     <?php } ?>
                 </tr>
             </table>
@@ -548,7 +548,7 @@
                     <td></td>
                     <td>PPH</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                        <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
                         <?php } else { ?>
                             <td>0.00</td>
                         <?php } ?>
@@ -558,7 +558,11 @@
                     <td></td>
                     <td></td>
                     <td>DIBAYARKAN</td>
-                    <td><?= number_format($dataPO->subsidi_langsung, 2, '.', ',') ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td><?= number_format(($dataPO->totalTambahan) - ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                    <?php } else { ?>
+                        <td><?= number_format(($dataPO->totalTambahan), 2, '.', ',') ?></td>
+                    <?php } ?>
                 </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer">
