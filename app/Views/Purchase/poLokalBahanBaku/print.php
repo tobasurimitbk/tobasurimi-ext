@@ -464,7 +464,7 @@
                 <tr>
                     <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;"><?= terbilang(formatter(($nilai_total_harian), "STR_TO_FLOAT")) ?></td>
+                    <td style="vertical-align: top;"><?= terbilang(formatter(($nilai_total_harian * $dataPO->totalQty), "STR_TO_FLOAT")) ?></td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
