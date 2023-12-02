@@ -821,8 +821,8 @@ class TerimaFakturImport extends BaseController
         $data['taxList'] = implode(', ', $taxList);
         $data['taxReturnList'] = implode(', ', $taxReturnList);
         $data["itemTotal"] = $itemTotal;
-        $data["potongan"] = $dataInv->potongan;
-        $data["tambahan"] = $dataInv->tambahan;
+        $data["potongan"] = $dataInv->tambahan;
+        $data["tambahan"] = $dataInv->potongan;
         $data['total'] = $total;
         $data['taxTotal'] = $taxTotal;
         $data['taxReturnTotal'] = $taxReturnTotal;
