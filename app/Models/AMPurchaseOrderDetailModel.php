@@ -227,6 +227,9 @@ class AMPurchaseOrderDetailModel extends Model
             $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
             $sisaDiterima = $b['qty'] - $jmlMasukAll;
 
+            $diskonHarga = ($b['disc'] / 100) * ($b['price']);
+            $harga = ($b['price'] - $diskonHarga) + $b['additional_cost'];
+
             $res[] = [
                 'am_purchase_order_details_id' => $b['id'],
                 'am_purchase_order_id' => $b['am_purchase_order_id'],
@@ -238,8 +241,8 @@ class AMPurchaseOrderDetailModel extends Model
                 'jml_diterima_lpb' => $inLPB,
                 'jml_diterima_total' => $jmlMasukAll,
                 'sisa_total' => $sisaDiterima,
-                'harga' => $b['total'],
-                'sub_total' => ($inLPB * $b['total']),
+                'harga' => $harga,
+                'sub_total' => ($inLPB * $harga),
                 'keterangan' => $b['note']
             ];
 
@@ -247,8 +250,8 @@ class AMPurchaseOrderDetailModel extends Model
             $jmlDiterimaInTotal += $inLPB;
             $jmlDiterimaTotal +=   $jmlMasukAll;
             $sisaDiterimaTotal += $sisaDiterima;
-            $hargaPerBarangTotal += $b['total'];
-            $subTotal += ($inLPB * $b['total']);
+            $hargaPerBarangTotal += $harga;
+            $subTotal += ($inLPB * $harga);
         }
 
         return [

@@ -143,6 +143,9 @@ class RMImportPODetailModel extends Model
             $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
             $sisaDiterima = $b['qty'] - $jmlMasukAll;
 
+            $diskonHarga = ($b['disc'] / 100) * ($b['price']);
+            $harga = ($b['price'] - $diskonHarga) + $b['additional_cost'];
+
             $res[] = [
                 'rm_import_po_details_id' => $b['id'],
                 'rm_import_po_id' => $b['rm_import_po_id'],
@@ -154,8 +157,8 @@ class RMImportPODetailModel extends Model
                 'jml_diterima_lpb' => $inLPB,
                 'jml_diterima_total' => $jmlMasukAll,
                 'sisa_total' => $sisaDiterima,
-                'harga' => $b['total'],
-                'sub_total' => ($inLPB * $b['total']),
+                'harga' => $harga,
+                'sub_total' => ($inLPB * $harga),
                 'keterangan' => $b['note']
             ];
 
@@ -163,8 +166,8 @@ class RMImportPODetailModel extends Model
             $jmlDiterimaInTotal += $inLPB;
             $jmlDiterimaTotal +=   $jmlMasukAll;
             $sisaDiterimaTotal += $sisaDiterima;
-            $hargaPerBarangTotal += $b['total'];
-            $subTotal += ($inLPB * $b['total']);
+            $hargaPerBarangTotal += $harga;
+            $subTotal += ($inLPB * $harga);
         }
 
         return [
