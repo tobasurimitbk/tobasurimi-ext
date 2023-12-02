@@ -194,7 +194,7 @@ class LocalPOPaymentModel extends Model
             ->first();
 
         $rmDetail = $rmPurchaseOrderDetailModel
-            ->whereIn('rm_purchase_order_details.rm_purchase_order_id', \json_decode(\json_decode($result['pembayaranDetail']['multiple_po_id'])))
+            ->whereIn('rm_purchase_order_details.rm_purchase_order_id', json_decode($result['pembayaranDetail']['multiple_po_id']))
             ->where('rm_purchase_order_details.deletedAt', null)
             ->findAll();
 
@@ -232,8 +232,8 @@ class LocalPOPaymentModel extends Model
                 'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
                 'totalOrder' => $rm['qty'],
                 'totalDiterima' => $rm['qty_diterima'],
-                'akun_kas' => $rm['akun_kas'],
-                'akun_selisih' => $rm['akun_selisih'],
+                'akun_kas' => "-",
+                'akun_selisih' => "-",
                 'totalHarga' => toRupiah($harga)
             ];
         }
