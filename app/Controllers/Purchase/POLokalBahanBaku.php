@@ -65,21 +65,11 @@ class POLokalBahanBaku extends BaseController
 
     public function createPOLokalBahanBaku()
     {
-        //Get BC Type By Metadata
-        $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
-
-        //Get Company
+        $dataBCType = $this->metadataModel->getBCUsedPembelianLokalBB();
         $dataCompany =  $this->CompaniesModel->getCompanies();
-
-        //Get Supplier
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
-
-        // Get Bagian
         $dataBagian = $this->BagianModel->where('deletedAt', null)->findAll();
-
-        // Get Satuan
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
-
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
@@ -102,16 +92,9 @@ class POLokalBahanBaku extends BaseController
 
     public function getByIdPOLokalBahanBaku($id = null)
     {
-        //Get Company
         $dataCompany =  $this->CompaniesModel->getCompanies();
-
-        //Get Supplier
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
-
-        // Get Bagian
         $dataBagian = $this->BagianModel->where('deletedAt', null)->findAll();
-
-        // Get Satuan
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
@@ -143,8 +126,6 @@ class POLokalBahanBaku extends BaseController
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
-
-        // dd($data["dataPOLokal"]);
 
         return view('Purchase/poLokalBahanBaku/form', $data);
     }
@@ -266,6 +247,7 @@ class POLokalBahanBaku extends BaseController
                     "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
                     "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
                     "createdBy" => session()->get("login")->user_id,
+                    "tanggal_penerimaan_lpb" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
                     "items" =>  json_decode($this->request->getVar("items"))
                 ];
 
@@ -379,6 +361,7 @@ class POLokalBahanBaku extends BaseController
                     "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
                     "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
                     "createdBy" => session()->get("login")->user_id,
+                    "tanggal_penerimaan_lpb" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
                     "items" =>  json_decode($this->request->getVar("items"))
                 ];
 
@@ -502,7 +485,7 @@ class POLokalBahanBaku extends BaseController
 
             // cek if warehouse_id != null
             if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
-                $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type']);
+                $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['tanggal_penerimaan_lpb']);
             }
 
             if (!empty($id)) {

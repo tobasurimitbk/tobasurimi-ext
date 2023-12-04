@@ -100,4 +100,9 @@ class MetadataModel extends Model
         return $this->asObject()
             ->where('name', $name)->findAll();
     }
+
+    public function getBCUsedPembelianLokalBB()
+    {
+        return $this->asArray()->where('name', 'jenis_dok_aju')->where('description', 'po_lokal_bb')->findAll();
+    }
 }

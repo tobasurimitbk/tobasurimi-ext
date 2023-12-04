@@ -154,6 +154,7 @@ class PenerimaanBarangLokalBB extends BaseController
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+            "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
             "tipe_bahan" => "BAKU",
             "status_post" => "WAITING",
             "status_penerimaan" => "LOKAL",
@@ -234,6 +235,7 @@ class PenerimaanBarangLokalBB extends BaseController
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+            "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
         ]);
 
         // delete first in penerimaan_barang_detail

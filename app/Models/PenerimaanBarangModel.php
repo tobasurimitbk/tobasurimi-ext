@@ -19,6 +19,7 @@ class PenerimaanBarangModel extends Model
         'company_id',
         'supplier_id',
         'warehouse_id',
+        'tanggal',
         'bc_type',
         'no_penerimaan_barang',
         'acceptance_type',
@@ -245,7 +246,7 @@ class PenerimaanBarangModel extends Model
         return $receiveDataQry;
     }
 
-    public function generateLpbBB($poID, $warehouseID, $dokumenBC)
+    public function generateLpbBB($poID, $warehouseID, $dokumenBC, $tanggalPenerimaanLPB)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
@@ -275,6 +276,7 @@ class PenerimaanBarangModel extends Model
             "bc_type" => $dokumenBC,
             "status_post" => "FINISH",
             "status_penerimaan" => "LOKAL",
+            "tanggal" => $tanggalPenerimaanLPB
         ];
 
         $lpbID = $penerimaanBarangModel->insert($payloadPenerimaanBarang);

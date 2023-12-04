@@ -123,6 +123,17 @@
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                                <label for="floatingInput">Tanggal Barang Diterima</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -165,8 +176,8 @@
                                 <td style="text-align: center;"><b>0</b></td>
                                 <td style="text-align: center;"><b>0</b></td>
                                 <td style="text-align: center;"><b>0</b></td>
-                                <td style="text-align: center;"><b>Rp 0.0</b></td>
-                                <td style="text-align: center;"><b>Rp 0.0</b></td>
+                                <td style="text-align: center;"><b>0.0</b></td>
+                                <td style="text-align: center;"><b>0.0</b></td>
                                 <td style="text-align: center;"><b></b></td>
                                 <td style="text-align: center;"></td>
                             </tr>
@@ -294,6 +305,13 @@
     const csrfToken = '<?= csrf_token() ?>';
     var listData = [];
     var listFromDatabase = [];
+
+    $(".tanggal_penerimaan_lpb").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
 
     // SELECT2
     $('.multiple_po_id').select2({
@@ -448,6 +466,9 @@
             },
             warehouse_id: {
                 required: true
+            },
+            tanggal_penerimaan_lpb: {
+                required: true
             }
         },
         messages: {
@@ -459,6 +480,9 @@
             },
             warehouse_id: {
                 required: "Warehouse wajib diisi"
+            },
+            tanggal_penerimaan_lpb: {
+                required: "Tanggal barang diterima wajib diisi"
             }
         },
         errorElement: 'span',
@@ -615,7 +639,7 @@
                     item = listData.result[i];
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
-                    $('.sub_total').val('Rp ' +
+                    $('.sub_total').val('' +
                         formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now);
                     $('.sisa_total').val(sisa_total_now);
@@ -631,7 +655,7 @@
                     item = listData.result[i];
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = item.jml_order - jml_diterima_total_now;
-                    $('.sub_total').val('Rp ' +
+                    $('.sub_total').val('' +
                         formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now);
                     $('.sisa_total').val(sisa_total_now);
@@ -693,8 +717,8 @@
         newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal + '</b></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal + '</b></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + sisaTotal + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>Rp ' + formatRupiah(parseInt(listData.harga_per_barang_total) || 0) + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>Rp ' + formatRupiah(parseInt(subTotal) || 0) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(listData.harga_per_barang_total) || 0) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal) || 0) + '</b></td>'));
         newRow.append($('<td></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
@@ -724,8 +748,8 @@
         $('.jml_diterima_total').val(item.jml_diterima_total);
         $('.sisa_total').val(item.sisa_total);
         $('.nama_barang_dokumen').val(item.nama_barang);
-        $('.harga_satuan').val("Rp " + formatRupiah(Number(item.harga) || 0));
-        $('.sub_total').val("Rp " + formatRupiah(Number(item.sub_total) || 0));
+        $('.harga_satuan').val("" + formatRupiah(Number(item.harga) || 0));
+        $('.sub_total').val("" + formatRupiah(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
     }
 
