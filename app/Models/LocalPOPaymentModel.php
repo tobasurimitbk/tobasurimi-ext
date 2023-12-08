@@ -194,7 +194,7 @@ class LocalPOPaymentModel extends Model
             ->first();
 
         $rmDetail = $rmPurchaseOrderDetailModel
-            ->whereIn('rm_purchase_order_details.rm_purchase_order_id', \json_decode($result['pembayaranDetail']['multiple_po_id']))
+            ->whereIn('rm_purchase_order_details.rm_purchase_order_id', json_decode($result['pembayaranDetail']['multiple_po_id']))
             ->where('rm_purchase_order_details.deletedAt', null)
             ->findAll();
 
@@ -232,8 +232,8 @@ class LocalPOPaymentModel extends Model
                 'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
                 'totalOrder' => $rm['qty'],
                 'totalDiterima' => $rm['qty_diterima'],
-                'akun_kas' => $rm['akun_kas'],
-                'akun_selisih' => $rm['akun_selisih'],
+                'akun_kas' => "-",
+                'akun_selisih' => "-",
                 'totalHarga' => toRupiah($harga)
             ];
         }
@@ -282,7 +282,7 @@ class LocalPOPaymentModel extends Model
         $poAll = [];
 
         foreach ($lpb as $l) {
-            $poarr = json_decode($l['multiple_po_id']);
+            $poarr = \json_decode(json_decode($l['multiple_po_id']));
             foreach ($poarr as $p) {
                 $poAll[] = $p;
             }
@@ -298,7 +298,7 @@ class LocalPOPaymentModel extends Model
         $payLpbLatest = $localPaymentModel->where($conditionLocalPay)->findAll();
 
         foreach ($payLpbLatest as $p) {
-            foreach (json_decode($p['multiple_po_id']) as $pm) {
+            foreach (json_decode(\json_decode($p['multiple_po_id'])) as $pm) {
                 array_push($poIsPay, $pm);
             }
         }
@@ -382,7 +382,7 @@ class LocalPOPaymentModel extends Model
         ];
 
         $lpb = $penerimaanBarangModel->where($conditionLpb)->first();
-        $poAll = json_decode($lpb['multiple_po_id']);
+        $poAll = json_decode(\json_decode($lpb['multiple_po_id']));
 
         $conditionLocalPay = [
             'deletedAt' => null,
@@ -394,7 +394,7 @@ class LocalPOPaymentModel extends Model
         $payLpbLatest = $localPaymentModel->where($conditionLocalPay)->findAll();
 
         foreach ($payLpbLatest as $p) {
-            foreach (json_decode($p['multiple_po_id']) as $pm) {
+            foreach (json_decode(json_decode($p['multiple_po_id'])) as $pm) {
                 array_push($poIsPay, $pm);
             }
         }
@@ -462,7 +462,7 @@ class LocalPOPaymentModel extends Model
         $poPayed = static::summaryArrPOIsPayed($supplierID, "Bahan Baku");
 
         foreach ($lpbList as $l) {
-            $poID = array_diff(json_decode($l['multiple_po_id']), $poPayed['po_id']);
+            $poID = array_diff(json_decode(json_decode($l['multiple_po_id'])), $poPayed['po_id']);
             // $poNo = array_diff(json_decode($l['multiple_po_no']), $poPayed['po_no']);
             if (count($poID) != 0) {
                 $resLPB[] = [
@@ -492,7 +492,7 @@ class LocalPOPaymentModel extends Model
         $noPoArr = [];
 
         foreach ($paymentList as $pl) {
-            foreach (json_decode($pl['multiple_po_id']) as $id) {
+            foreach (json_decode(\json_decode($pl['multiple_po_id'])) as $id) {
                 $lpbIDArr[] = $id;
             }
             // foreach (json_decode($pl['multiple_po_no']) as $po) {

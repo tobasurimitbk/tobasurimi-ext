@@ -156,6 +156,7 @@ class RMPurchaseOrderDetailModel extends Model
         $hargaHarianTotal = 0;
         $hargaBulananTotal = 0;
         $hargaUmumTotal = 0;
+        $hargaSumTotal = 0;
         $subTotal = 0;
 
         foreach ($barangs as $b) {
@@ -196,6 +197,7 @@ class RMPurchaseOrderDetailModel extends Model
                 'harga_umum' => $b['general_price'],
                 'harga_harian' => $b['daily_price'],
                 'harga_bulanan' => $b['monthly_price'],
+                'harga_sum' => ($b['general_price'] + $b['daily_price'] + $b['monthly_price']),
                 'sub_total' => ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price'])),
                 'keterangan' => $b['note']
             ];
@@ -207,6 +209,7 @@ class RMPurchaseOrderDetailModel extends Model
             $hargaHarianTotal += $b['daily_price'];
             $hargaBulananTotal += $b['monthly_price'];
             $hargaUmumTotal += $b['general_price'];
+            $hargaSumTotal +=  ($b['general_price'] + $b['daily_price'] + $b['monthly_price']);
             $subTotal += ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price']));
         }
 
@@ -219,6 +222,7 @@ class RMPurchaseOrderDetailModel extends Model
             'harga_umum_total' => $hargaUmumTotal,
             'harga_harian_total' => $hargaHarianTotal,
             'harga_bulanan_total' => $hargaBulananTotal,
+            'harga_sum_total' => $hargaSumTotal,
             'sub_total' => $subTotal
         ];
     }

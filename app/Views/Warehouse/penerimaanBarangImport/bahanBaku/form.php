@@ -123,6 +123,17 @@
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : date('d/m/Y', strtotime(date('Y-m-d'))); ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                                <label for="floatingInput">Tanggal Barang Diterima</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -295,6 +306,13 @@
     var listData = [];
     var listFromDatabase = [];
 
+    $(".tanggal_penerimaan_lpb").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
     // SELECT2
     $('.multiple_po_id').select2({
         placeholder: "Pilih Nomor PO",
@@ -448,6 +466,9 @@
             },
             warehouse_id: {
                 required: true
+            },
+            tanggal_penerimaan_lpb: {
+                required: true
             }
         },
         messages: {
@@ -459,6 +480,9 @@
             },
             warehouse_id: {
                 required: "Warehouse wajib diisi"
+            },
+            tanggal_penerimaan_lpb: {
+                required: "Tanggal barang diterima wajib diisi"
             }
         },
         errorElement: 'span',

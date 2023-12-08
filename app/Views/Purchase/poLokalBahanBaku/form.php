@@ -206,6 +206,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="row form-lpb">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ?  date('d/m/Y', strtotime($dataPOLokal->tanggal_penerimaan_lpb)) : ""; ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                                <label for="floatingInput">Tanggal Barang Diterima</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </form>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
@@ -460,6 +474,7 @@
             $('#warehouse_id').attr('disabled', true);
             $('#bc_type').attr('disabled', true);
             $('#lpb_otomatis').attr('disabled', true);
+            $('#tanggal_penerimaan_lpb').attr('disabled', true);
         </script>
     <?php endif; ?>
 
@@ -629,7 +644,7 @@
 
     $(document).ready(function() {
         //
-        $(".po_date").datepicker({
+        $(".po_date, .tanggal_penerimaan_lpb").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -1035,7 +1050,7 @@
             // CHECK IF NO BARANG
             if (list_items.length === 0) {
                 Swal.fire({
-                    icon: 'error',
+                    icon: 'warning',
                     title: "Barang Tidak Boleh Kosong",
                     confirmButtonColor: '#4e73df',
                 })
@@ -1043,6 +1058,7 @@
                 // validate input
                 let validate_item = false;
                 let lpb_otomatis = true;
+                let tanggal_diterima = true;
 
                 if (list_items.length === 0) {
                     validate_item = true;
@@ -1053,17 +1069,26 @@
                     if ($('#warehouse_id').val() == "") {
                         lpb_otomatis = false;
                     }
+                    if ($('#tanggal_penerimaan_lpb').val() == "") {
+                        tanggal_diterima = false;
+                    }
                 }
 
                 if (!lpb_otomatis) {
                     Swal.fire({
-                        icon: 'error',
+                        icon: 'warning',
                         title: "Lokasi warehouse wajib diisi",
+                        confirmButtonColor: '#4e73df',
+                    })
+                } else if (!tanggal_diterima) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: "Tanggal barang diterima wajib diisi",
                         confirmButtonColor: '#4e73df',
                     })
                 } else if (validate_item) {
                     Swal.fire({
-                        icon: 'error',
+                        icon: 'warning',
                         title: "Barang Tidak Boleh Kosong",
                         confirmButtonColor: '#4e73df',
                     })
@@ -1160,8 +1185,7 @@
                                                         confirmButtonColor: '#4e73df',
                                                     })
                                                     .then(() => {
-                                                        window.open('<?= base_url("po-lokal-bahan-baku/print") ?>/' + id, "_blank")
-                                                        window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
+                                                        location.reload();
                                                     })
                                             } else {
                                                 Swal.fire({

@@ -281,7 +281,17 @@ $routes->get('/po-import-bahan-penolong/histori-lpb', 'Purchase\POImportBahanPen
 
 // TANDA TERIMA FAKTUR LOKAL BB
 $routes->get('/tanda-terima-faktur-lokal-bp', 'Purchase\TandaTerimaSupBB::index');
+$routes->get('/tanda-terima-faktur-lokal-bp/all', 'Purchase\TandaTerimaSupBB::all');
 $routes->get('/tanda-terima-faktur-lokal-bp/create', 'Purchase\TandaTerimaSupBB::create');
+$routes->get('/tanda-terima-faktur-lokal-bp/id/(:num)', 'Purchase\TandaTerimaSupBB::update/$1');
+$routes->get('/tanda-terima-faktur-lokal-bp/print/(:num)', 'Purchase\TandaTerimaSupBB::print/$1');
+$routes->get('/tanda-terima-faktur-lokal-bp/generate-tanda-terima-no', 'Purchase\TandaTerimaSupBB::generateTandaTerimaFakturNumber');
+$routes->get('/tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang', 'Purchase\TandaTerimaSupBB::listPenerimaanBarang');
+$routes->post('/tanda-terima-faktur-lokal-bp/create', 'Purchase\TandaTerimaSupBB::createAction');
+$routes->post('/tanda-terima-faktur-lokal-bp/update', 'Purchase\TandaTerimaSupBB::updateAction');
+$routes->post('/tanda-terima-faktur-lokal-bp/delete', 'Purchase\TandaTerimaSupBB::delete');
+$routes->post('/tanda-terima-faktur-lokal-bp/delete/daftar-penerimaan', 'Purchase\TandaTerimaSupBB::deleteDetailTandaTerimaFaktur');
+
 
 // TERIMA FAKTUR LOKAL
 $routes->get('/terima-faktur-import/getBySupplier/(:num)', 'Purchase\TerimaFakturImport::getBySupplierId/$1', ['filter' => 'Auth']);

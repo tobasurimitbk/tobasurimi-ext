@@ -23,7 +23,8 @@ class TandaTerimaFakturDetailModel extends Model
         'item_name',
         'unit',
         'qty',
-        'price'
+        'price',
+        'price_single'
     ];
 
     // Dates
@@ -59,5 +60,34 @@ class TandaTerimaFakturDetailModel extends Model
         $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
         $res = $tandaTerimaFakturDetailModel->where($condition)->findAll();
         return $res;
+    }
+
+    public function getDetail($tandaTerimaFakturID)
+    {
+        $condition = [
+            'tanda_terima_faktur_detail.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'tanda_terima_faktur_detail.deletedAt' => null
+        ];
+        $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
+        $data = $tandaTerimaFakturDetailModel->where($condition)->findAll();
+        $result = [];
+
+        foreach ($data as $d) {
+            $result[] = [
+                'penerimaan_barang_detail_id' => $d['penerimaan_barang_detail_id'],
+                'po_no' => $d['po_no'],
+                'tanggal' => date('d/m/Y', strtotime($d['lpb_date'])),
+                'no_penerimaan_barang' => $d['lpb_no'],
+                'nama_barang_dok' => $d['item_name'],
+                'qty_lpb' => 0,
+                'qty_retur' => 0,
+                'qty_telah_diterima' => 0,
+                'qty_akan_diterima' => $d['qty'],
+                'kode_satuan' => $d['unit'],
+                'harga' => $d['price_single']
+            ];
+        }
+
+        return $result;
     }
 }

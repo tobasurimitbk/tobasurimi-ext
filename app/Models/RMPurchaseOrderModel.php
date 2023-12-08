@@ -32,7 +32,8 @@ class RMPurchaseOrderModel extends Model
         'total',
         'is_posted',
         'createdBy',
-        'status_penerimaan'
+        'status_penerimaan',
+        'tanggal_penerimaan_lpb'
     ];
 
     // Dates

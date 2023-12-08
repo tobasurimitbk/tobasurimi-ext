@@ -171,6 +171,7 @@ class PenerimaanBarangImportBP extends BaseController
             "tipe_bahan" => "PENOLONG",
             "status_post" => "WAITING",
             "status_penerimaan" => "IMPORT",
+            "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
         ]);
 
         foreach (json_decode($barangs) as $b) {
@@ -242,6 +243,7 @@ class PenerimaanBarangImportBP extends BaseController
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+            "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
         ]);
 
         // delete first in penerimaan_barang_detail
