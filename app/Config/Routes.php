@@ -910,6 +910,9 @@ $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filt
 //api
 
 //Accounting
+//Jurnal
+$routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 'Auth']);
+$routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
 //Module Account
 $routes->get('/account-module', 'Accounting\AccountModule\AccountModule::index', ['filter' => 'Auth']);
 $routes->get('/account-module/all', 'Accounting\AccountModule\AccountModule::allAccountModule', ['filter' => 'Auth']);

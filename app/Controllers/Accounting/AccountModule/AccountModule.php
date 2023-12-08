@@ -294,49 +294,4 @@ class AccountModule extends BaseController
             return;
         }
     }
-
-    // public function dropdownSupplier()
-    // {
-    //     $supplierTipeModel = new SupplierTipeModel();
-    //     $dataSupplier = $supplierTModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
-
-    //     $data = [
-    //         "data" => $dataSupplier
-    //     ];
-
-    //     echo json_encode($data);
-    //     return;
-    // }
-
-    // public function supplierAjax()
-    // {
-    //     $supplierModel = new SupplierModel();
-    //     $id = $this->request->getGet("id");
-
-    //     if (!empty($id)) {
-    //         $response = $supplierModel->getSupplierById($id);
-    //         if ($response) {
-    //             $data = [
-    //                 "status"  => true,
-    //                 "data"  => $response
-    //             ];
-    //             echo json_encode($data);
-    //         } else {
-    //             $message = 'Data Gagal Ditemukan';
-    //             $data = [
-    //                 "status" => false,
-    //                 "message"  => $message
-    //             ];
-    //             echo json_encode($data);
-    //         }
-    //     } else {
-    //         $data = [
-    //             "status"            => false,
-    //             "message"    => "Tidak Ada Id"
-    //         ];
-    //         echo json_encode($data);
-    //     }
-
-    //     return;
-    // }
 }
