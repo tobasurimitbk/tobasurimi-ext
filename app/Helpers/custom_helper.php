@@ -313,3 +313,18 @@ function convertBulanToAngkaRomawi($bulanInteger)
       return "Bulan tidak valid";
    }
 }
+
+function encrypt($str)
+{
+   $encrypter = \Config\Services::encrypter();
+   $encrypted = $encrypter->encrypt($str);
+   return bin2hex($encrypted);
+}
+
+function decrypt($hashed)
+{
+   $hashed = hex2bin($hashed);
+   $encrypter = \Config\Services::encrypter();
+   $decrypted = $encrypter->decrypt($hashed);
+   return $decrypted;
+}
