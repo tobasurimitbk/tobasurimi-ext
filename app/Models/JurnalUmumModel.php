@@ -51,29 +51,11 @@ class JurnalUmumModel extends Model
 
     public function insertJurnal($data)
     {
-        // $data = [
-        //     'id_transaksi' => ,
-        //     'id_coa' =>,
-        //     'tanggal_jurnal' => ,
-        //     'debit' => ,
-        //     'kredit' => ,
-        //     'keterangan' => ,
-        //     'id_inputer' => ,
-        // ];
         return $this->insert($data);
     }
 
     public function insertJurnalBatch($data)
     {
-        // $data = [
-        //     'id_transaksi' => ,
-        //     'id_coa' =>,
-        //     'tanggal_jurnal' => ,
-        //     'debit' => ,
-        //     'kredit' => ,
-        //     'keterangan' => ,
-        //     'id_inputer' => ,
-        // ];
         return $this->insertBatch($data);
     }
 }
