@@ -54,7 +54,7 @@
                                         if (!empty($subAkuns)) {
                                             foreach ($subAkuns as $sub_ar) {
                                         ?>
-                                                <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                                <option value="<?= $sub_ar->hexid; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
                                         <?php
                                             }
                                         }
