@@ -84,10 +84,18 @@ class Sub_AkunsModel extends Model
 
     public function getAPAR($company_id)
     {
-        $arrCondition = [
-            'deletedAt' => null,
-            'company_id' => $company_id
-        ];
+
+        if ($company_id != "") {
+            $arrCondition = [
+                'deletedAt' => null,
+                'company_id' => $company_id
+            ];
+        } else {
+            $arrCondition = [
+                'deletedAt' => null
+            ];
+        }
+
 
         $builder = $this->db->table('sub_akuns');
         $builder->where($arrCondition);
