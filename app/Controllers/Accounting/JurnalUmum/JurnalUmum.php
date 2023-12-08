@@ -28,7 +28,7 @@ class JurnalUmum extends BaseController
         $Sub_AkunsModel = new Sub_AkunsModel();
 
         $accountModuleData = $accountModuleModel->asObject()->findAll();
-        $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
+        $subAkunsModel = $Sub_AkunsModel->getAPAR("");
 
         $data = [
             "dataAccountModule" => $accountModuleData,
