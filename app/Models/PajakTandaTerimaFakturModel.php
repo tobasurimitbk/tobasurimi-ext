@@ -47,4 +47,19 @@ class PajakTandaTerimaFakturModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getTaxDetail($taxStatus, $tandaTerimaFakturID)
+    {
+        $taxRes = $this->asArray()->where('tanda_terima_faktur_id', $tandaTerimaFakturID)->where('tax_status', $taxStatus)->where('deletedAt', null)->findAll();
+        $taxType = [];
+        $taxAmt = 0;
+        foreach ($taxRes as $t) {
+            $taxType[] = $t['tax_type'];
+            $taxAmt += $t['tax_amt'];
+        }
+        return [
+            'taxType' => count($taxType) == 0 ? '-' : implode(',', $taxType),
+            'taxAmt' => $taxAmt
+        ];
+    }
 }

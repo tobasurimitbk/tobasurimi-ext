@@ -37,14 +37,14 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th>No. Pembayaran</th>
-                                <th>No. Faktur</th>
-                                <th>Supplier</th>
-                                <th>Tanggal Jatuh Tempo</th>
-                                <th>Tanggal Pembayaran</th>
-                                <th>Metode Pembayaran</th>
-                                <th>Jumlah</th>
+                                <th>No</th>
+                                <th onclick="changeSort('payment_no')">No. Pembayaran</th>
+                                <th onclick="changeSort('tanda_terima_faktur.faktur_no')">No. Faktur</th>
+                                <th onclick="changeSort('suppliers.name')">Supplier</th>
+                                <th onclick="changeSort('due_date')">Tanggal Jatuh Tempo</th>
+                                <th onclick="changeSort('payment_date')">Tanggal Pembayaran</th>
+                                <th onclick="changeSort('payment_method')">Metode Pembayaran</th>
+                                <th onclick="changeSort('amount')">Jumlah</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -248,6 +248,14 @@
                 });
             }
         });
+    }
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
     }
 </script>
 <?= $this->endSection(); ?>
