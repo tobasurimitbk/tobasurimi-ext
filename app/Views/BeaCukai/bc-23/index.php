@@ -233,6 +233,11 @@
         }
     });
 
+    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        const data = table.row(this).data();
+        location.replace(`<?= base_url("bea-cukai-bc-23/id"); ?>/${data.lpb_id}`);
+    })
+
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

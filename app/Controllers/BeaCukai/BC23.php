@@ -70,8 +70,8 @@ class BC23 extends BaseController
             $status = $data->status_posting == null ? "BELUM DIBUAT" : strtoupper($data->status_post);
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
-                "id"                    => $data->id,
-                "lpb_id"                => $data->lpb_id,
+                "id"                    => encrypt($data->id),
+                "lpb_id"                => encrypt($data->lpb_id),
                 "lpb_no"                => $data->no_penerimaan_barang,
                 "lpb_date"              => date('d/m/Y', strtotime($data->lpb_date)),
                 "po_no"                 => implode(', ', str_replace(['[', ']', '"'], '', json_decode(json_decode($data->multiple_po_no, true)))),
@@ -100,6 +100,8 @@ class BC23 extends BaseController
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
 
+        $id = decrypt($id);
+
         $lpb = $penerimaanBarangModel->getById($id);
 
         if ($lpb == null) {
@@ -110,8 +112,6 @@ class BC23 extends BaseController
             'lpb' => $penerimaanBarangModel->getById($id),
             'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $lpb->tipe_bahan, $lpb->status_penerimaan)
         ];
-
-        dd($data['lpbDetail']);
 
         return \view('BeaCukai/bc-23/form', $data);
     }
