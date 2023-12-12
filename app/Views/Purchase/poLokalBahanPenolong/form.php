@@ -290,7 +290,7 @@
                                     <b>TOTAL</b>
                                 </td>
                                 <td style="text-align: center;">
-                                    <b>Rp 0.00</b>
+                                    <b>0.00</b>
                                 </td>
                                 <td></td>
                             </tr>
@@ -353,6 +353,14 @@
     }).change(function() {
 
     });
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
     $('#barang_id').select2({
         placeholder: "",
@@ -906,7 +914,7 @@
         var desimal = parts[1] || '00';
         var reverse = ribuan.toString().split('').reverse().join('');
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return "Rp. " + ribuanFormatted + ',' + desimal;
+        return "" + ribuanFormatted + ',' + desimal;
     }
 </script>
 <!-- Edit Script -->

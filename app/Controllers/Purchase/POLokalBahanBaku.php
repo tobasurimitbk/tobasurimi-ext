@@ -247,7 +247,6 @@ class POLokalBahanBaku extends BaseController
                     "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
                     "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
                     "createdBy" => session()->get("login")->user_id,
-                    "tanggal_penerimaan_lpb" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
                     "items" =>  json_decode($this->request->getVar("items"))
                 ];
 
@@ -361,7 +360,6 @@ class POLokalBahanBaku extends BaseController
                     "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
                     "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
                     "createdBy" => session()->get("login")->user_id,
-                    "tanggal_penerimaan_lpb" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
                     "items" =>  json_decode($this->request->getVar("items"))
                 ];
 
@@ -485,7 +483,7 @@ class POLokalBahanBaku extends BaseController
 
             // cek if warehouse_id != null
             if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
-                $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['tanggal_penerimaan_lpb']);
+                $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
             }
 
             if (!empty($id)) {
