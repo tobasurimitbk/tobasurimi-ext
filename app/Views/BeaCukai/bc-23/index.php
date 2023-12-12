@@ -8,9 +8,41 @@
     <div class="card">
         <?= csrf_field() ?>
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
+            <div class="row justify-content-start row-col-spp">
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Dokumen BC 2.3" value="" />
+                    <?= csrf_field() ?>
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal LPB">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal LPB">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <select name="status_bc" class="form-select status_bc" id="status_bc">
+                        <option value="WAITING">STATUS BC : WAITING</option>
+                        <option value="FINISH">STATUS BC : FINISH</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <select name="status_bc" class="form-select status_bc" id="jenis_po">
+                        <option value="SEMUA">JENIS PO : SEMUA</option>
+                        <option value="LOKAL BB">JENIS PO : LOKAL BB</option>
+                        <option value="LOKAL BP">JENIS PO : LOKAL BP</option>
+                        <option value="IMPORT BB">JENIS PO : IMPORT BB</option>
+                        <option value="IMPORT BP">JENIS PO : IMPORT BP</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control no_registrasi search form-out-search" placeholder="Cari Nomor Registrasi" value="" />
                 </div>
             </div>
             <div class="row">
@@ -19,9 +51,11 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No.</th>
+                                <th style="text-align: center;">Jenis PO</th>
                                 <th onclick="" class="sort" style="text-align: center;">No LPB</th>
                                 <th onclick="" style="text-align: center;">No PO</th>
                                 <th onclick="" class="sort" style="text-align: center;">Warehouse</th>
+                                <th onclick="" class="sort" style="text-align: center;">Tanggal LPB</th>
                                 <th onclick="" class="sort" style="text-align: center;">No Aju</th>
                                 <th onclick="" class="sort" style="text-align: center;">No Daftar</th>
                                 <th onclick="" class="sort" style="text-align: center;">Tanggal Daftar</th>
@@ -29,7 +63,7 @@
                                 <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table">
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
                         </tbody>
                     </table>
@@ -63,7 +97,10 @@
             url: "<?= base_url("bea-cukai-bc-23/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $('.search').val();
+                data.dateStart = $('.dateStart').val();
+                data.dateFinish = $('.dateEnd').val();
+                data.noRegistrasi = $('.no_registrasi').val();
+                data.status = $('.status_bc').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -84,6 +121,12 @@
                 width: "5%"
             },
             {
+                data: "jenis_po",
+                className: "text-center",
+                sortable: false,
+                width: "10%"
+            },
+            {
                 data: "lpb_no",
                 className: "text-center"
             },
@@ -95,6 +138,10 @@
             },
             {
                 data: "warehouse_name",
+                className: "text-center"
+            },
+            {
+                data: "lpb_date",
                 className: "text-center"
             },
             {
@@ -145,16 +192,27 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `
-                        <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="" style="box-shadow: none !important;">
+                    let htmlRes = '';
+
+                    if (row.status == "BELUM DIBUAT") {
+                        htmlRes += `
+                            -
+                        `;
+                    } else {
+                        if (row.status == "BELUM POSTING") {
+                            htmlRes += `
+                            <button  class="btn btn-success posting-spp">
+                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                            </button>`
+                        } else {
+                            htmlRes += `
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-lokal-bahan-penolong/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <a href="<?= base_url('bea-cukai-bc-23/id/') ?>${row.lpb_id}" class="btn btn-primary delete-parent">
-                                <i class="fa-solid fa-pen fa-sm"></i>
-                            </a>
-                        </div>
-                    `;
+                            </button>`
+                        }
+                    }
+
+                    return htmlRes;
 
                 }
             }

@@ -44,12 +44,15 @@ class BC23 extends BaseController
         $condition = [
             "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang.bc_type" => 48
+            "penerimaan_barang.bc_type" => 48 // bc 23
         ];
         $addCondition = [
-            "search"    => $this->request->getGet("search"),
-            "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType")
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "noRegistrasi" => $this->request->getGet("noRegistrasi"),
+            "dateStart" => $this->request->getGet("dateStart"),
+            "dateFinish" => $this->request->getGet("dateFinish"),
+            "status" => $this->request->getGet('status')
         ];
 
         $limit = $this->request->getGet("length");
@@ -70,8 +73,10 @@ class BC23 extends BaseController
                 "id"                    => $data->id,
                 "lpb_id"                => $data->lpb_id,
                 "lpb_no"                => $data->no_penerimaan_barang,
-                "po_no"                 => implode(', ', str_replace(['[', ']', '"'], '', json_decode($data->multiple_po_no, true))),
-                "warehouse_name"        => $data->warehouse_name,
+                "lpb_date"              => date('d/m/Y', strtotime($data->lpb_date)),
+                "po_no"                 => implode(', ', str_replace(['[', ']', '"'], '', json_decode(json_decode($data->multiple_po_no, true)))),
+                "jenis_po"              => $data->status_penerimaan . " " . ($data->tipe_bahan == "PENOLONG" ? "BP" : "BB"),
+                "warehouse_name"        => strtoupper($data->warehouse_name),
                 "aju_no"                => $data->aju_no ?? "-",
                 "no_registration"       => $data->no_registration ?? "-",
                 "validation_date"       => $data->validation_date ?? "-" ? "-" : date('d/M/Y', strtotime($data->validation_date)),
