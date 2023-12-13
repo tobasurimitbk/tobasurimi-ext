@@ -28,7 +28,7 @@
 
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
+                    <table class="table nowrap table-hover" id="myTable" width="100%" cellspacing="0">
                         <?php
                         function format_ribuan($nilai)
                         {
@@ -133,9 +133,6 @@
 
 <script>
     $(document).ready(function() {
-        $('#myTable').DataTable({
-            "ordering": false // Ini untuk menonaktifkan fungsi pengurutan
-        });
         $(".dateStart").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
