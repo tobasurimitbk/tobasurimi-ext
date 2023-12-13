@@ -186,6 +186,10 @@ label {
   line-height: 34px;
 }
 
+.collapse.in {
+  display: table-row !important;
+}
+
 @media (max-width: 575.98px) {
   .lead {
     font-size: 17px;

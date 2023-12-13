@@ -835,7 +835,7 @@ class Account extends BaseController
                 $data = [
                     "status"            => false,
                     "message"    => $message,
-                    "payload"   => $payload,
+                    "payload"   => "",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);

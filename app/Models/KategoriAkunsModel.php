@@ -61,4 +61,26 @@ class KategoriAkunsModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getAPAR($company_id)
+    {
+
+        if ($company_id != "") {
+            $arrCondition = [
+                'deletedAt' => null,
+                'company_id' => $company_id
+            ];
+        } else {
+            $arrCondition = [
+                'deletedAt' => null
+            ];
+        }
+
+
+        $builder = $this->db->table('kategori_akuns');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResult();
+    }
 }

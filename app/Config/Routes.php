@@ -944,6 +944,12 @@ $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['fi
 $routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/all', 'Laporan\Accounting\Pembelian::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 /*
  * --------------------------------------------------------------------
  * Additional Routing

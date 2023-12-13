@@ -58,4 +58,15 @@ class JurnalUmumModel extends Model
     {
         return $this->insertBatch($data);
     }
+
+    public function getDataJurnal($where)
+    {
+        $where['deletedAt'] = null;
+
+        $builder = $this->db->table('jurnal_umum');
+        $builder->where($where);
+        $query = $builder->get();
+
+        return $query->getResult();
+    }
 }
