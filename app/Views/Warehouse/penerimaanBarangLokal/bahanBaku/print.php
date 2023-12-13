@@ -128,7 +128,7 @@
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->createdAt ? date("d/m/Y", strtotime($dataPenerimaanBarang->createdAt)) : ""; ?></span></div>
+                    <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->tanggal ? date("d/m/Y", strtotime($dataPenerimaanBarang->tanggal)) : ""; ?></span></div>
                 </td>
                 <td>
                     <div><span class="txt-bold">Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>

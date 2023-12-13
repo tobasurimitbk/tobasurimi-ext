@@ -316,15 +316,21 @@ function convertBulanToAngkaRomawi($bulanInteger)
 
 function encrypt($str)
 {
-   $encrypter = \Config\Services::encrypter();
-   $encrypted = $encrypter->encrypt($str);
-   return bin2hex($encrypted);
+   $secret_key = 'Tobasunami';
+   $secret_iv = 'MedanJ@kartHa';
+   $encrypt_method = "AES-256-CBC";
+   $key = hash('sha256', $secret_key);
+   $iv = substr(hash('sha256', $secret_iv), 0, 16);
+   return base64_encode(openssl_encrypt($str, $encrypt_method, $key, 0, $iv));
 }
 
 function decrypt($hashed)
 {
-   $hashed = hex2bin($hashed);
-   $encrypter = \Config\Services::encrypter();
-   $decrypted = $encrypter->decrypt($hashed);
-   return $decrypted;
+   $secret_key = 'Tobasunami';
+   $secret_iv = 'MedanJ@kartHa';
+   $encrypt_method = "AES-256-CBC";
+   $key = hash('sha256', $secret_key);
+   $iv = substr(hash('sha256', $secret_iv), 0, 16);
+   $decrypt =  openssl_decrypt(base64_decode($hashed), $encrypt_method, $key, 0, $iv);
+   return $decrypt == false ? 0 : $decrypt;
 }

@@ -206,20 +206,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="row form-lpb">
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ?  date('d/m/Y', strtotime($dataPOLokal->tanggal_penerimaan_lpb)) : ""; ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
-                                <label for="floatingInput">Tanggal Barang Diterima</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </form>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
@@ -409,13 +395,13 @@
                                             <?= $details->nama_satuan; ?>
                                         </td>
                                         <td>
-                                            Rp <?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                            <?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
                                         </td>
                                         <td>
-                                            Rp <?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                            <?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
                                         </td>
                                         <td>
-                                            Rp <?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
+                                            <?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
                                         </td>
                                         <td>
                                             <?= formatter($details->qty, "STR_TO_FLOAT"); ?>
@@ -443,9 +429,9 @@
                             <tr>
                                 <td colspan="3"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td><b><?= "Rp " . number_format(formatter($total_harian, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td><b><?= "Rp " . number_format(formatter($total_bulanan, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
+                                <td><b><?= "" . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
+                                <td><b><?= "" . number_format(formatter($total_harian, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
+                                <td><b><?= "" . number_format(formatter($total_bulanan, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
                                 <td colspan="2"></td>
                                 <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
@@ -474,7 +460,6 @@
             $('#warehouse_id').attr('disabled', true);
             $('#bc_type').attr('disabled', true);
             $('#lpb_otomatis').attr('disabled', true);
-            $('#tanggal_penerimaan_lpb').attr('disabled', true);
         </script>
     <?php endif; ?>
 
@@ -644,7 +629,7 @@
 
     $(document).ready(function() {
         //
-        $(".po_date, .tanggal_penerimaan_lpb").datepicker({
+        $(".po_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -906,13 +891,13 @@
             tag_total += "<b>TOTAL</b>";
             tag_total += "</td>";
             tag_total += "<td>";
-            tag_total += `<b>${"Rp " + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+            tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
             tag_total += "</td>";
             tag_total += "<td>";
-            tag_total += `<b>${"Rp " + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+            tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
             tag_total += "</td>";
             tag_total += "<td>";
-            tag_total += `<b>${"Rp " + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+            tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
             tag_total += "</td>";
             tag_total += "<td>";
             tag_total += `<b>${total_qty}</b>`;
@@ -959,13 +944,13 @@
             tag_total += "<b>TOTAL</b>";
             tag_total += "</td>";
             tag_total += "<td>";
-            tag_total += `<b>${"Rp " + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+            tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
             tag_total += "</td>";
             tag_total += "<td>";
-            tag_total += `<b>${"Rp " + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+            tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
             tag_total += "</td>";
             tag_total += "<td>";
-            tag_total += `<b>${"Rp " + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+            tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
             tag_total += "</td>";
             tag_total += "<td>";
             tag_total += `<b>${total_qty}</b>`;
@@ -1069,21 +1054,12 @@
                     if ($('#warehouse_id').val() == "") {
                         lpb_otomatis = false;
                     }
-                    if ($('#tanggal_penerimaan_lpb').val() == "") {
-                        tanggal_diterima = false;
-                    }
                 }
 
                 if (!lpb_otomatis) {
                     Swal.fire({
                         icon: 'warning',
                         title: "Lokasi warehouse wajib diisi",
-                        confirmButtonColor: '#4e73df',
-                    })
-                } else if (!tanggal_diterima) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: "Tanggal barang diterima wajib diisi",
                         confirmButtonColor: '#4e73df',
                     })
                 } else if (validate_item) {
@@ -1473,19 +1449,19 @@
                                         tag_html += satuanName;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
+                                        tag_html += "" + Number(harga).toLocaleString(undefined, {
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(daily_price).toLocaleString(undefined, {
+                                        tag_html += "" + Number(daily_price).toLocaleString(undefined, {
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         });
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(monthly_price).toLocaleString(undefined, {
+                                        tag_html += "" + Number(monthly_price).toLocaleString(undefined, {
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         });
@@ -1562,13 +1538,13 @@
                                         tag_html += item.satuanName;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + item.harga;
+                                        tag_html += "" + item.harga;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + item.daily_price;
+                                        tag_html += "" + item.daily_price;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += "Rp " + item.monthly_price;
+                                        tag_html += "" + item.monthly_price;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += item.qty;
@@ -1616,13 +1592,13 @@
                                 tag_total += "<b>TOTAL</b>";
                                 tag_total += "</td>";
                                 tag_total += "<td>";
-                                tag_total += `<b>${"Rp " + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td>";
-                                tag_total += `<b>${"Rp " + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td>";
-                                tag_total += `<b>${"Rp " + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td>";
                                 tag_total += `<b>${total_qty}</b>`;
@@ -1691,19 +1667,19 @@
                                     tag_html += satuanName;
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
+                                    tag_html += "" + Number(harga).toLocaleString(undefined, {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2
                                     });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += "Rp " + Number(daily_price).toLocaleString(undefined, {
+                                    tag_html += "" + Number(daily_price).toLocaleString(undefined, {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2
                                     });
                                     tag_html += "</td>";
                                     tag_html += `<td>`;
-                                    tag_html += "Rp " + Number(monthly_price).toLocaleString(undefined, {
+                                    tag_html += "" + Number(monthly_price).toLocaleString(undefined, {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2
                                     });
@@ -1738,13 +1714,13 @@
                                     tag_total += "<b>TOTAL</b>";
                                     tag_total += "</td>";
                                     tag_total += "<td>";
-                                    tag_total += `<b>${"Rp " + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                    tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                     tag_total += "</td>";
                                     tag_total += "<td>";
-                                    tag_total += `<b>${"Rp " + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                    tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                     tag_total += "</td>";
                                     tag_total += "<td>";
-                                    tag_total += `<b>${"Rp " + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                    tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                     tag_total += "</td>";
                                     tag_total += "<td>";
                                     tag_total += `<b>${total_qty}</b>`;
@@ -1810,13 +1786,13 @@
                         tag_html += item.satuanName;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += "Rp " + item.harga;
+                        tag_html += "" + item.harga;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += "Rp " + item.daily_price;
+                        tag_html += "" + item.daily_price;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += "Rp " + item.monthly_price;
+                        tag_html += "" + item.monthly_price;
                         tag_html += "</td>";
                         tag_html += `<td>`;
                         tag_html += item.qty;
@@ -1872,13 +1848,13 @@
                 tag_total += "<b>TOTAL</b>";
                 tag_total += "</td>";
                 tag_total += "<td>";
-                tag_total += `<b>${"Rp " + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
-                tag_total += `<b>${"Rp " + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
-                tag_total += `<b>${"Rp " + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_qty}</b>`;

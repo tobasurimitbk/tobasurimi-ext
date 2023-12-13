@@ -44,12 +44,15 @@ class BC23 extends BaseController
         $condition = [
             "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang.bc_type" => 48
+            "penerimaan_barang.bc_type" => 48 // bc 23
         ];
         $addCondition = [
-            "search"    => $this->request->getGet("search"),
-            "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType")
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "noRegistrasi" => $this->request->getGet("noRegistrasi"),
+            "dateStart" => $this->request->getGet("dateStart"),
+            "dateFinish" => $this->request->getGet("dateFinish"),
+            "status" => $this->request->getGet('status')
         ];
 
         $limit = $this->request->getGet("length");
@@ -67,11 +70,13 @@ class BC23 extends BaseController
             $status = $data->status_posting == null ? "BELUM DIBUAT" : strtoupper($data->status_post);
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
-                "id"                    => $data->id,
-                "lpb_id"                => $data->lpb_id,
+                "id"                    => encrypt($data->id),
+                "lpb_id"                => encrypt($data->lpb_id),
                 "lpb_no"                => $data->no_penerimaan_barang,
-                "po_no"                 => implode(', ', str_replace(['[', ']', '"'], '', json_decode($data->multiple_po_no, true))),
-                "warehouse_name"        => $data->warehouse_name,
+                "lpb_date"              => date('d/m/Y', strtotime($data->lpb_date)),
+                "po_no"                 => implode(', ', str_replace(['[', ']', '"'], '', json_decode(json_decode($data->multiple_po_no, true)))),
+                "jenis_po"              => $data->status_penerimaan . " " . ($data->tipe_bahan == "PENOLONG" ? "BP" : "BB"),
+                "warehouse_name"        => strtoupper($data->warehouse_name),
                 "aju_no"                => $data->aju_no ?? "-",
                 "no_registration"       => $data->no_registration ?? "-",
                 "validation_date"       => $data->validation_date ?? "-" ? "-" : date('d/M/Y', strtotime($data->validation_date)),
@@ -95,6 +100,8 @@ class BC23 extends BaseController
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
 
+        $id = decrypt($id);
+
         $lpb = $penerimaanBarangModel->getById($id);
 
         if ($lpb == null) {
@@ -105,8 +112,6 @@ class BC23 extends BaseController
             'lpb' => $penerimaanBarangModel->getById($id),
             'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $lpb->tipe_bahan, $lpb->status_penerimaan)
         ];
-
-        dd($data['lpbDetail']);
 
         return \view('BeaCukai/bc-23/form', $data);
     }

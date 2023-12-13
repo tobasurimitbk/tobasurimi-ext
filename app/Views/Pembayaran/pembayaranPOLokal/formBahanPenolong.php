@@ -53,7 +53,7 @@
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($suppliers as $supplier) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier->id ? 'selected' : '') : '' ?> value="<?= $supplier->id ?>"><?= $supplier->name ?></option>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier->id ? 'selected' : '') : '' ?> value="<?= $supplier->id ?>"><?= strtoupper($supplier->name) ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
@@ -76,7 +76,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" onkeyup="this.value = formatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly <?= !empty($detail) ? 'disabled value="' . "Rp " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  . '"' : '' ?>>
+                            <input autocomplete="one-time-code" onkeyup="this.value = formatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly <?= !empty($detail) ? 'disabled value="' . " " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  . '"' : '' ?>>
                             <label for="floatingInput">Nominal Pembayaran</label>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
+                            <input <?= !empty($detail) ? 'disabled' : '' ?> name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
@@ -163,14 +163,44 @@
                                                 <td><?= $d['item_name'] ?></td>
                                                 <td><?= $d['qty'] ?></td>
                                                 <td><?= $d['unit'] ?></td>
-                                                <td><?= "Rp " . number_format($d['price'], 2, ',', '.')  ?></td>
+                                                <td><?= " " . number_format($d['price'], 2, ',', '.')  ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                         <tr>
                                             <td colspan="6" style="text-align: right;">
-                                                Total
+                                                Tambahan
                                             </td>
-                                            <td><?= "Rp " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
+                                            <td><?= " " . number_format($detail['tandaTerimaSupplier']['tambahan'], 2, ',', '.')  ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right;">
+                                                Potongan
+                                            </td>
+                                            <td><?= " " . number_format($detail['tandaTerimaSupplier']['potongan'], 2, ',', '.')  ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right;">
+                                                Setelah Tambahan dan Potongan
+                                            </td>
+                                            <td><?= " " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right;">
+                                                Pajak Dipungut Negara (<?= $tax_dipungut_negara['taxType'] ?>)
+                                            </td>
+                                            <td><?= " " . number_format($tax_dipungut_negara['taxAmt'], 2, ',', '.')  ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right;">
+                                                Pajak Dikembalikan Lagi (<?= $tax_dikembalikan_lagi['taxType'] ?>)
+                                            </td>
+                                            <td><?= " " . number_format($tax_dikembalikan_lagi['taxAmt'], 2, ',', '.')  ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right;">
+                                                Sub Total
+                                            </td>
+                                            <td><?= " " . number_format(($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']), 2, ',', '.')  ?></td>
                                         </tr>
                                     <?php else : ?>
                                         <tr>
@@ -253,7 +283,7 @@
             },
             errorElement: 'span',
             errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
+            errolacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("multiple_po_id")) {
                     element = $(".select2-selection--multiple").parent();
@@ -301,7 +331,8 @@
                     // detail append
                     var detail = res.detail;
                     var dateSplit = detail.jatuh_tempo.split('-');
-                    $('.nominal_pembayaran').val(formatRupiah(detail.nominal_faktur));
+                    var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt);
+                    $('.nominal_pembayaran').val(formatRupiah(subTotal));
                     $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
                     $('.tanda_terima_faktur_id').val(detail.id);
                     // list append
@@ -319,10 +350,30 @@
                         newRow.append($('<td>').text(formatRupiah(v.price)));
                         table.find('tbody').append(newRow);
                     });
-                    var newRow = $('<tr>');
-                    newRow.append($('<td style="text-align:right;" colspan="6">').text('Total'));
-                    newRow.append($('<td>').text(formatRupiah(detail.nominal_faktur)));
-                    table.find('tbody').append(newRow);
+                    var newRow1 = $('<tr>');
+                    newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
+                    newRow1.append($('<td>').text(formatRupiah(detail.tambahan)));
+                    table.find('tbody').append(newRow1);
+                    var newRow2 = $('<tr>');
+                    newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
+                    newRow2.append($('<td>').text(formatRupiah(detail.potongan)));
+                    table.find('tbody').append(newRow2);
+                    var newRow3 = $('<tr>');
+                    newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
+                    newRow3.append($('<td>').text(formatRupiah(detail.nominal_faktur)));
+                    table.find('tbody').append(newRow3);
+                    var newRow4 = $('<tr>');
+                    newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
+                    newRow4.append($('<td>').text(formatRupiah(res.tax_dipungut_negara.taxAmt)));
+                    table.find('tbody').append(newRow4);
+                    var newRow5 = $('<tr>');
+                    newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
+                    newRow5.append($('<td>').text(formatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
+                    table.find('tbody').append(newRow5);
+                    var newRow6 = $('<tr>');
+                    newRow6.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
+                    newRow6.append($('<td>').text(formatRupiah(subTotal)));
+                    table.find('tbody').append(newRow6);
                 }
             })
         });
@@ -465,7 +516,7 @@
         var desimal = parts[1] || '00';
         var reverse = ribuan.toString().split('').reverse().join('');
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return "Rp. " + ribuanFormatted + ',' + desimal;
+        return "" + ribuanFormatted + ',' + desimal;
     }
 </script>
 

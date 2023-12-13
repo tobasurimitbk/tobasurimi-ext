@@ -145,17 +145,20 @@ class BeaCukaiModel extends Model
     {
         $availableSort = [
             'penerimaan_barang.no_penerimaan_barang' => 'penerimaan_barang.no_penerimaan_barang',
-            'penerimaan_barang.warehouse_id' => 'penerimaan_barang.warehouse_id',
-            'bea_cukai.aju_no' => 'bea_cukai.aju_no',
-            'bea_cukai.registration_no' => 'bea_cukai.registration_no',
-            'bea_cukai.registration_date'    => 'bea_cukai.registration_date',
+            'penerimaan_barang.warehouse_id'         => 'penerimaan_barang.warehouse_id',
+            'bea_cukai.aju_no'                       => 'bea_cukai.aju_no',
+            'bea_cukai.registration_no'              => 'bea_cukai.registration_no',
+            'bea_cukai.registration_date'            => 'bea_cukai.registration_date',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bea_cukai.updatedAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "bea_cukai.*, 
+        $selectQry = "bea_cukai.*,
+            penerimaan_barang.tanggal AS lpb_date,
+            penerimaan_barang.status_penerimaan,
+            penerimaan_barang.tipe_bahan,
             penerimaan_barang.id AS lpb_id,
             penerimaan_barang.no_penerimaan_barang,
             penerimaan_barang.multiple_po_no,
@@ -170,20 +173,44 @@ class BeaCukaiModel extends Model
 
         $totalData = $bcDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['noRegistrasi'] || ($addCondition['status'] && empty($addCondition['dateStart']) && empty($addCondition['dateFinish']))) {
             $bcDataQry->groupStart();
         }
-        if ($addCondition['search']) {
-            $bcDataQry
-                ->like('penerimaan_barang.lpb_no', $addCondition['search'])
-                ->orLike('penerimaan_barang.multiple_po_no', $addCondition['search'])
-                ->orLike('warehouses.warehouse_name', $addCondition['search'])
-                ->orLike('aju_no', $addCondition['search'])
-                ->orLike('registration_no', $addCondition['search'])
-                ->orLike('registration_date', $addCondition['search'])
-                ->orLike('status_posting', $addCondition['search']);
+
+
+        if ($addCondition['status']) {
+            if ($addCondition['status'] == "WAITING") {
+                $bcDataQry->where('bea_cukai.id IS NULL');
+            } else {
+                $bcDataQry->where('bea_cukai.id IS NOT NULL');
+            }
         }
-        if ($addCondition['search']) {
+
+        if ($addCondition['noRegistrasi']) {
+            $bcDataQry->orLike('registration_no', $addCondition['search']);
+        }
+
+        if ($addCondition['noRegistrasi'] || ($addCondition['status'] && empty($addCondition['dateStart']) && empty($addCondition['dateFinish']))) {
+            $bcDataQry->groupEnd();
+        }
+
+        if ($addCondition['dateStart'] && $addCondition['dateFinish']) {
+            $bcDataQry->groupStart();
+
+            if ($addCondition['status'] == "WAITING") {
+                $bcDataQry->where('bea_cukai.id', 'IS NULL');
+            } else {
+                $bcDataQry->where('bea_cukai.id IS NOT NULL');
+            }
+
+            if ($addCondition['dateStart']) {
+                $bcDataQry->where('lpb_date >=', $addCondition['dateStart']);
+            }
+
+            if ($addCondition['dateFinish']) {
+                $bcDataQry->where('lpb_date <=', $addCondition['dateFinish']);
+            }
+
             $bcDataQry->groupEnd();
         }
 
@@ -193,9 +220,10 @@ class BeaCukaiModel extends Model
         return [
             'data'              => $data,
             'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData
+            'totalFilteredData' => $totalFilteredData,
         ];
     }
+
 
     public function getById($id)
     {

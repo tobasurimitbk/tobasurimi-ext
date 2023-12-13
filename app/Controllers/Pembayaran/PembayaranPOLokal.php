@@ -9,6 +9,7 @@ use App\Models\LocalPOPaymentModel;
 use App\Models\LocalPOPaymentDetailModel;
 use App\Models\LocalPOInvSummaryModel;
 use App\Models\LocalPOInvSumDetailModel;
+use App\Models\PajakTandaTerimaFakturModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\TandaTerimaFakturDetailModel;
 use App\Models\TandaTerimaFakturModel;
@@ -44,7 +45,7 @@ class PembayaranPOLokal extends BaseController
             ->where('type', "BAHAN PENOLONG")
             ->orderBy('name', "ASC")
             ->findAll();
-        
+
         $subAkunsModel = $Sub_AkunsModel->asObject()
             ->where('deletedAt', null)
             ->findAll();
@@ -71,10 +72,13 @@ class PembayaranPOLokal extends BaseController
     {
         $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+        $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
 
         return response()->setJSON([
             'detail' => $tandaTerimaFakturModel->getByID($tandaTerimaFakturID),
-            'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID)
+            'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID),
+            'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID),
+            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID)
         ]);
     }
 
@@ -228,7 +232,7 @@ class PembayaranPOLokal extends BaseController
                 "due_date"          => $data->due_date,
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => $data->payment_method,
-                "amount"            => "Rp " . number_format($data->amount ?? 0, 0, ',', '.'),
+                "amount"            =>  number_format($data->amount ?? 0, 0, ',', '.'),
                 "tipe_bayar"        => strtoupper($data->type_bayar)
             ]);
         }
@@ -250,23 +254,27 @@ class PembayaranPOLokal extends BaseController
         $supplierModel = new SupplierModel();
         $localPOPaymentModel = new LocalPOPaymentModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
+        $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
 
         $supplierList = $supplierModel->asObject()
             ->where('deletedAt', null)
             ->where('type', "BAHAN PENOLONG")
             ->orderBy('name', "ASC")
             ->findAll();
-        
-        
+
+
         $subAkunsModel = $Sub_AkunsModel->asObject()
-                ->where('deletedAt', null)
-                ->findAll();
-    
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $detail = $localPOPaymentModel->get($id);
 
         $data = [
             "suppliers" => $supplierList,
             "detail" => $localPOPaymentModel->get($id),
-            "subsAkuns" => $subAkunsModel
+            "subsAkuns" => $subAkunsModel,
+            'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $detail['tandaTerimaSupplier']['id']),
+            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $detail['tandaTerimaSupplier']['id'])
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
@@ -283,8 +291,8 @@ class PembayaranPOLokal extends BaseController
             ->where('type', "BAHAN BAKU")
             ->orderBy('name', "ASC")
             ->findAll();
-        
-        
+
+
         $subAkunsModel = $Sub_AkunsModel->asObject()
             ->where('deletedAt', null)
             ->findAll();
@@ -306,13 +314,17 @@ class PembayaranPOLokal extends BaseController
     {
         $dompdf = new Dompdf();
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
 
         if ($localPOPaymentModel->where('id', $id)->first() == null) {
             return redirect()->to('pembayaran-po-lokal-bp');
         }
 
+        $detail = $localPOPaymentModel->get($id);
         $data = [
-            "detail" => $localPOPaymentModel->get($id)
+            "detail" => $localPOPaymentModel->get($id),
+            'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $detail['tandaTerimaSupplier']['id']),
+            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $detail['tandaTerimaSupplier']['id'])
         ];
 
         if ($data['detail'] == null) {
@@ -368,12 +380,12 @@ class PembayaranPOLokal extends BaseController
             ->where('type', "BAHAN BAKU")
             ->orderBy('name', "ASC")
             ->findAll();
-        
+
         $subAkunsModel = $Sub_AkunsModel->asObject()
             ->where('deletedAt', null)
             ->findAll();
 
-        
+
 
         $data = [
             "suppliers" => $supplierList,

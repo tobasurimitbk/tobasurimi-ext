@@ -14,9 +14,8 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-23"); ?>">
                 Batal
             </a>
-            <?php if (!empty($dataBC)) {
-                if ($dataBC->status_posting === "Belum Posting") {
-            ?>
+            <?php if (!empty($dataBC)) : ?>
+                <?php if ($dataBC->status_posting === "Belum Posting") : ?>
                     <button class="btn btn-hapus delete-parent float-right">
                         Hapus
                     </button>
@@ -26,12 +25,12 @@
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
-                <?php }
-            } else { ?>
+                <?php endif; ?>
+            <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
                 </button>
-            <?php } ?>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -50,8 +49,8 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= implode(', ', str_replace(['[', ']', '"'], '', json_decode($lpb->multiple_po_no, true))) ?>" readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker">
-                            <label for="floatingInput">Nomor PO</label>
+                            <input value="<?= $lpb->tanggal ?>" autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker">
+                            <label for="floatingInput">Tanggal Penerimaan</label>
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -75,8 +74,8 @@
                                     <?php $no = 1; ?>
                                     <?php foreach ($lpbDetail as $l) : ?>
                                         <tr>
-                                            <td><?= $l['po_no']; ?></td>
-                                            <td><?= $l['kode_barangw']; ?></td>
+                                            <td></td>
+                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>

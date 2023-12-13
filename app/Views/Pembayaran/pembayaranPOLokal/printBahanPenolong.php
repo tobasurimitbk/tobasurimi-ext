@@ -95,7 +95,7 @@
             <tr>
                 <td>Nominal Pembayaran</td>
                 <td>:</td>
-                <td>Rp. <?= number_format($detail['pembayaranDetail']['amount'] ?? 0, 2, ',', '.')  ?></td>
+                <td><?= number_format($detail['pembayaranDetail']['amount'] ?? 0, 2, ',', '.')  ?></td>
             </tr>
             <tr>
                 <td>Metode Pembayaran</td>
@@ -120,7 +120,7 @@
                 <td style="width: 10px;">No</td>
                 <td>Tanggal LPB</td>
                 <td>No. LPB</td>
-                <td>Item Name</td>
+                <td>Barang</td>
                 <td>Qty</td>
                 <td>Unit</td>
                 <td>Total</td>
@@ -136,14 +136,44 @@
                     <td><?= $d['item_name'] ?></td>
                     <td><?= $d['qty'] ?></td>
                     <td><?= $d['unit'] ?></td>
-                    <td><?= "Rp " . number_format($d['price'], 2, ',', '.')  ?></td>
+                    <td><?= number_format($d['price'], 2, ',', '.')  ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td colspan="6" style="text-align: right;">
-                    Total
+                    Tambahan
                 </td>
-                <td><?= "Rp " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
+                <td><?= " " . number_format($detail['tandaTerimaSupplier']['tambahan'], 2, ',', '.')  ?></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Potongan
+                </td>
+                <td><?= " " . number_format($detail['tandaTerimaSupplier']['potongan'], 2, ',', '.')  ?></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Setelah Tambahan dan Potongan
+                </td>
+                <td><?= " " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Pajak Dipungut Negara (<?= $tax_dipungut_negara['taxType'] ?>)
+                </td>
+                <td><?= " " . number_format($tax_dipungut_negara['taxAmt'], 2, ',', '.')  ?></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Pajak Dikembalikan Lagi (<?= $tax_dikembalikan_lagi['taxType'] ?>)
+                </td>
+                <td><?= " " . number_format($tax_dikembalikan_lagi['taxAmt'], 2, ',', '.')  ?></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Sub Total
+                </td>
+                <td><?= " " . number_format(($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']), 2, ',', '.')  ?></td>
             </tr>
         </tbody>
     </table>
