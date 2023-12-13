@@ -394,7 +394,7 @@ class LocalPOPaymentModel extends Model
         $payLpbLatest = $localPaymentModel->where($conditionLocalPay)->findAll();
 
         foreach ($payLpbLatest as $p) {
-            foreach (json_decode(json_decode($p['multiple_po_id'])) as $pm) {
+            foreach (json_decode($p['multiple_po_id']) as $pm) {
                 array_push($poIsPay, $pm);
             }
         }
@@ -492,7 +492,7 @@ class LocalPOPaymentModel extends Model
         $noPoArr = [];
 
         foreach ($paymentList as $pl) {
-            foreach (json_decode(\json_decode($pl['multiple_po_id'])) as $id) {
+            foreach (json_decode($pl['multiple_po_id']) as $id) {
                 $lpbIDArr[] = $id;
             }
             // foreach (json_decode($pl['multiple_po_no']) as $po) {
