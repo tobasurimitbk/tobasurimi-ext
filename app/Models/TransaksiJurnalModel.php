@@ -21,6 +21,7 @@ class TransaksiJurnalModel extends Model
         'total_debit',
         'total_kredit',
         'metode_input',
+        'type_transaksi',
     ];
 
     // Dates
@@ -71,9 +72,18 @@ class TransaksiJurnalModel extends Model
         }
     }
 
-    public function getNoTransaksiLast()
+    public function getNoTransaksiLast($type)
     {
-        $transaksi_format = "TRN-";
+        if ($type == "penjualan") {
+            $transaksi_format = "SI-";
+        } else if ($type == "pembelian") {
+            $transaksi_format = "PI-";
+        } else if ($type == "penerimaan") {
+            $transaksi_format = "RP-";
+        } else {
+            $transaksi_format = "EXP-";
+        }
+
         $query = $this->select('no_transaksi')
             ->like('no_transaksi', $transaksi_format)
             ->orderBy('id', 'DESC')

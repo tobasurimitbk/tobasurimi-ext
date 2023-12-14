@@ -85,6 +85,15 @@
                                 $totalkredit = 0;
                                 foreach ($dataJurnalUmum as $JurnalUmumData) :
                                     if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
+                                        if ($JurnalUmumData->type_transaksi == "penjualan") {
+                                            $transaksi_format = "Sales Invoice";
+                                        } else if ($JurnalUmumData->type_transaksi == "pembelian") {
+                                            $transaksi_format = "Purchase Invoice";
+                                        } else if ($JurnalUmumData->type_transaksi == "penerimaan") {
+                                            $transaksi_format = "Receive Payment";
+                                        } else {
+                                            $transaksi_format = "Expense";
+                                        }
                                         if ($JurnalUmumData->debit == 0) {
                                             $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
                                         } else {
@@ -95,9 +104,9 @@
                                     ?>
                                         <tr class="collapse_<?= $HeaderAkunData->id; ?> collapse out">
                                             <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
-                                            <td>Transaksi</td>
+                                            <td><?= $transaksi_format; ?></td>
                                             <td><?= $JurnalUmumData->no_transaksi; ?></td>
-                                            <td>Deskripsi</td>
+                                            <td><?= $JurnalUmumData->keterangan; ?></td>
                                             <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
                                             <td><?= format_ribuan($JurnalUmumData->kredit); ?></td>
                                             <td><?= format_ribuan($saldo); ?></td>

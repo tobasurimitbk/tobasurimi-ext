@@ -29,9 +29,21 @@
         <?php endif; ?>
         <div class="card">
             <div class="card-body">
-                <div class="form-group col-sm-2">
-                    <label class="col-form-label">Tanggal Transaksi</label>
-                    <input type="date" name="tgl_transaksi" class="form-control" required="">
+                <div class="row">
+                    <div class="form-group col-sm-2">
+                        <label class="col-form-label">Tanggal Transaksi</label>
+                        <input type="date" name="tgl_transaksi" class="form-control" required="">
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <label class="col-form-label">Type Transaksi</label>
+                        <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" required="">
+                            <option value="" data-code=""></option>
+                            <option value="penjualan" data-code="">Penjualan</option>
+                            <option value="pembelian" data-code="">Pembelian</option>
+                            <option value="penerimaan" data-code="">Penerimaan</option>
+                            <option value="biaya" data-code="">Biaya</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">

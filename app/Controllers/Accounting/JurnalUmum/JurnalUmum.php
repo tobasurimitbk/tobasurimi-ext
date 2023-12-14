@@ -80,13 +80,14 @@ class JurnalUmum extends BaseController
                 }
             }
 
-            $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast();
+            $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($this->request->getPost('type_transaksi'));
             $dataTransaksiJurnal = [
                 'no_transaksi' => $no_transaksi_jurnal,
                 'tanggal_transaksi' => $this->request->getPost('tgl_transaksi'),
                 'total_debit' => $total_debit,
                 'total_kredit' => $total_credit,
                 'metode_input' => 'manual',
+                'type_transaksi' => $this->request->getPost('type_transaksi'),
             ];
             $this->jurnalUmumModel->insertJurnalBatch($result);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
