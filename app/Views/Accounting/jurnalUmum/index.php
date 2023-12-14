@@ -102,6 +102,11 @@
 </section>
 
 <script>
+    $("#akun_coa_1").select2({
+        placeholder: "Pilih Akun",
+        theme: "bootstrap-5"
+    });
+
     function getItems() {
         var inputs = document.getElementsByClassName('yy'),
             result = document.getElementById('jumlahDebet'),
@@ -164,9 +169,10 @@
                         var newID = "akun_coa_" + rowCount;
                         console.log(newID);
                         akunCoaSelect.id = newID;
-                        akunCoaSelect.value = "";
+                        akunCoaSelect.value = ""; // Destroy the existing Select2 instance
+                        $("#" + newID).next(".select2-container").remove();
 
-                        $(akunCoaSelect).select2({
+                        $("#" + newID).select2({
                             placeholder: "Pilih Akun",
                             theme: "bootstrap-5"
                         });
@@ -182,29 +188,36 @@
         try {
             var table = document.getElementById(tableID);
             var rowCount = table.rows.length;
+
+            // Variable to track whether any checkbox is checked
+            var isChecked = false;
+
             for (var i = 0; i < rowCount; i++) {
                 var row = table.rows[i];
                 var chkbox = row.cells[0].childNodes[0];
+
                 if (null != chkbox && true == chkbox.checked) {
-                    if (rowCount <= 1) {
-                        alert("Tidak dapat menghapus semua baris.");
-                        break;
-                    }
+                    isChecked = true;
                     table.deleteRow(i);
                     rowCount--;
                     i--;
-                } else {
-                    // Remove the last row
-                    table.deleteRow(rowCount - 1);
-                    rowCount--;
                 }
             }
+
+            // If no checkbox is checked, remove the last row
+            if (!isChecked && rowCount > 1) {
+                table.deleteRow(rowCount - 1);
+                rowCount--;
+            }
+
+            // Recalculate the totals after deletion
             getItems();
             getItems2();
         } catch (e) {
             alert(e);
         }
     }
+
 
     function formatRupiah(angka) {
         angka = angka.replace(/\./g, ',');
