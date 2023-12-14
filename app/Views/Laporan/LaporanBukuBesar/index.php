@@ -10,7 +10,7 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-12">
-                    <form method="post" action="<?= base_url('/laporan-accounting/labarugi') ?>">
+                    <form method="post" action="<?= base_url('/laporan-accounting/bukubesar') ?>">
                         <?= csrf_field(); ?>
                         <div class="row">
                             <div class="col-md-3 mb-3">
@@ -23,7 +23,7 @@
                             </div>
                             <div class="col-md-3 mb-3">
                                 <div class="input-group">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir" value="<?= $dateEnd; ?>">
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                     </div>
@@ -174,7 +174,7 @@
 
         // Set nilai awal dateStart pada saat dokumen siap (document ready)
         $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
-        $(".dateEnd").datepicker("setDate", new Date(currentDate));
+        // $(".dateEnd").datepicker("setDate", new Date(currentDate));
         $(".clickable").click(function(e) {
             e.preventDefault();
             var targetClass = $(this).data('target');

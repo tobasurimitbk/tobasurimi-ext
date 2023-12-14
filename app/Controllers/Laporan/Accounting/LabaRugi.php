@@ -33,17 +33,18 @@ class LabaRugi extends BaseController
     }
     public function index()
     {
-        if ($this->request->getPost('cariTanggal') != "" && $this->request->getPost('dateStart') != "" && $this->request->getPost('dateEnd') != "") {
-            $dateStart = $this->request->getPost('dateStart');
-            $dateEnd = $this->request->getPost('dateEnd');
+        $dateStart = $this->request->getPost('dateStart');
+        $dateEnd = $this->request->getPost('dateEnd');
+
+        if ($this->request->getPost('cariTanggal') != "" && $dateStart != "" && $dateEnd != "") {
             $condition = [
-                'tanggal_jurnal >=' => date('Y-m-t', strtotime($dateStart)),
-                'tanggal_jurnal <=' => date('Y-m-t', strtotime($dateEnd))
+                'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
+                'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
             ];
         } else {
             $condition = [
                 'tanggal_jurnal >=' => date('Y-m-01'),
-                'tanggal_jurnal <=' => date('Y-m-t')
+                'tanggal_jurnal <=' => date('Y-m-d')
             ];
         }
 
@@ -67,6 +68,7 @@ class LabaRugi extends BaseController
             "dataHeaderAkun" => $dataHeaderAkun,
             "dataSubAkuns" => $dataSubAkun,
             "dataJurnalUmum" => $dataJurnalUmum,
+            "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
         ];
         return view('Laporan/LaporanLabaRugi/index', $data);
     }

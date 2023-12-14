@@ -33,16 +33,17 @@ class Neraca extends BaseController
     }
     public function index()
     {
-        if ($this->request->getPost('cariTanggal') != "" && $this->request->getPost('dateStart') != "") {
-            $tanggalPilihan = $this->request->getPost('dateStart');
+        $dateStart = $this->request->getPost('dateStart');
+
+        if ($this->request->getPost('cariTanggal') != "" && $dateStart != "") {
             $condition = [
-                'tanggal_jurnal >=' => date('Y-m-01', strtotime($tanggalPilihan)),
-                'tanggal_jurnal <=' => date('Y-m-t', strtotime($tanggalPilihan))
+                'tanggal_jurnal >=' => date('Y-m-01', strtotime(str_replace('/', '-', $dateStart))),
+                'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
             ];
         } else {
             $condition = [
                 'tanggal_jurnal >=' => date('Y-m-01'),
-                'tanggal_jurnal <=' => date('Y-m-t')
+                'tanggal_jurnal <=' => date('Y-m-d')
             ];
         }
 
