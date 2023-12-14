@@ -65,7 +65,7 @@
                                 $total_kredit += $jurnalUmumData->kredit;
                             ?>
                                 <tr>
-                                    <td colspan="2"><?= $jurnalUmumData->nama_sub; ?></td>
+                                    <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
                                     <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumData->tanggal_jurnal)); ?></td>
                                     <td><?= format_ribuan($jurnalUmumData->debit); ?></td>
                                     <td><?= format_ribuan($jurnalUmumData->kredit); ?></td>

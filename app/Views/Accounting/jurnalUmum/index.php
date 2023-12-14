@@ -30,11 +30,11 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group col-sm-2">
+                    <div class="form-group col-sm-3">
                         <label class="col-form-label">Tanggal Transaksi</label>
-                        <input type="date" name="tgl_transaksi" class="form-control" required="">
+                        <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi" placeholder="Pilih Tanggal">
                     </div>
-                    <div class="form-group col-sm-2">
+                    <div class="form-group col-sm-3">
                         <label class="col-form-label">Type Transaksi</label>
                         <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" required="">
                             <option value="" data-code=""></option>
@@ -107,6 +107,13 @@
         theme: "bootstrap-5"
     });
 
+    $(".tgl_transaksi").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
     function getItems() {
         var inputs = document.getElementsByClassName('yy'),
             result = document.getElementById('jumlahDebet'),
@@ -143,7 +150,7 @@
         var row = table.insertRow();
         var colCount = table.rows[0].cells.length;
         var counter = 1;
-        console.log(row);
+        // console.log(row);
         rowCount++;
         for (var i = 0; i < colCount; i++) {
             var newcell = row.insertCell(i);
@@ -167,7 +174,7 @@
                     case "SELECT":
                         var akunCoaSelect = newcell.children[i2];
                         var newID = "akun_coa_" + rowCount;
-                        console.log(newID);
+                        // console.log(newID);
                         akunCoaSelect.id = newID;
                         akunCoaSelect.value = ""; // Destroy the existing Select2 instance
                         $("#" + newID).next(".select2-container").remove();
