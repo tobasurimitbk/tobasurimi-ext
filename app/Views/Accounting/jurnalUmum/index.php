@@ -42,6 +42,7 @@
                             <option value="pembelian" data-code="">Pembelian</option>
                             <option value="penerimaan" data-code="">Penerimaan</option>
                             <option value="biaya" data-code="">Biaya</option>
+                            <option value="saldoawal" data-code="">Saldo Awal</option>
                         </select>
                     </div>
                 </div>

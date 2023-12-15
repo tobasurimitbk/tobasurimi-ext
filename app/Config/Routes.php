@@ -952,6 +952,8 @@ $routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::ind
 $routes->post('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo::index', ['filter' => 'Auth']);
 /*
  * --------------------------------------------------------------------
  * Additional Routing

@@ -80,8 +80,10 @@ class TransaksiJurnalModel extends Model
             $transaksi_format = "PI-";
         } else if ($type == "penerimaan") {
             $transaksi_format = "RP-";
-        } else {
+        } else if ($type == "biaya") {
             $transaksi_format = "EXP-";
+        } else {
+            $transaksi_format = "SA-";
         }
 
         $query = $this->select('no_transaksi')

@@ -4,13 +4,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Buku Besar</h1>
+        <h1>Neraca Saldo</h1>
     </div>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-12">
-                    <form method="post" action="<?= base_url('/laporan-accounting/bukubesar') ?>">
+                    <form method="post" action="<?= base_url('/laporan-accounting/neracasaldo') ?>">
                         <?= csrf_field(); ?>
                         <div class="row">
                             <div class="col-md-3 mb-3">
@@ -44,92 +44,91 @@
                     <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th>Nama Akun / Tanggal</th>
-                                <th>Transaksi</th>
-                                <th>No.</th>
-                                <th>Deskripsi</th>
-                                <th>Debit</th>
-                                <th>Kredit</th>
-                                <th>Saldo</th>
+                                <th colspan="2" rowspan="2">Daftar Akun</th>
+                                <th colspan="2" style="text-align: center;">Saldo Awal</th>
+                                <th colspan="2" style="text-align: center;">Pergerakan</th>
+                                <th colspan="2" style="text-align: center;">Saldo Akhir</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: center;">Debit</th>
+                                <th style="text-align: center;">Kredit</th>
+                                <th style="text-align: center;">Debit</th>
+                                <th style="text-align: center;">Kredit</th>
+                                <th style="text-align: center;">Debit</th>
+                                <th style="text-align: center;">Kredit</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             function format_ribuan($nilai)
                             {
-                                $nilais = "";
-                                if ($nilai < 0) {
-                                    $nilaiFloat = floatval($nilai);
-                                    $nilais = '(' . number_format(abs($nilaiFloat), 2, ',', '.') . ')';
-                                } else {
-                                    $nilaiFloat = floatval($nilai);
-                                    $nilais = number_format($nilaiFloat, 2, ',', '.');
-                                }
-                                return $nilais;
+                                $nilaiFloat = floatval($nilai);
+                                return "Rp " . number_format($nilaiFloat, 2, ',', '.');
                             }
-                            // kelompok
-                            foreach ($dataHeaderAkun as $HeaderAkunData) :
+                            // kategori
+                            $total_debit_awal  = 0;
+                            $total_kredit_awal = 0;
+                            $total_debit_pergerakan  = 0;
+                            $total_kredit_pergerakan = 0;
+                            $total_debit_akhir  = 0;
+                            $total_kredit_akhir = 0;
+                            foreach ($dataMetadata as $MetaData) :
                                 foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-                                    if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
+                                    if ($MetaData->id == $JurnalUmumDataGroup->kategori_id) :
                             ?>
-                                        <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= $HeaderAkunData->id; ?>" aria-expanded="false">
-                                            <td colspan="7"><i class="fas fa-chevron-down"></i><?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
+                                        <tr>
+                                            <td colspan="8"><?= $MetaData->value; ?></td>
                                         </tr>
-
                                     <?php
                                     endif;
                                 endforeach;
-                                $saldo = 0;
-                                $totalsaldo = 0;
-                                $totaldebit = 0;
-                                $totalkredit = 0;
-                                foreach ($dataJurnalUmum as $JurnalUmumData) :
-                                    if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
-                                        if ($JurnalUmumData->type_transaksi == "penjualan") {
-                                            $transaksi_format = "Sales Invoice";
-                                        } else if ($JurnalUmumData->type_transaksi == "pembelian") {
-                                            $transaksi_format = "Purchase Invoice";
-                                        } else if ($JurnalUmumData->type_transaksi == "penerimaan") {
-                                            $transaksi_format = "Receive Payment";
-                                        } else if ($type == "biaya") {
-                                            $transaksi_format = "Expense";
-                                        } else {
-                                            $transaksi_format = "Saldo Awal";
-                                        }
-                                        if ($JurnalUmumData->debit == 0) {
-                                            $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
-                                        } else {
-                                            $saldo = $saldo + $JurnalUmumData->debit;
-                                        }
-                                        $totaldebit += $JurnalUmumData->debit;
-                                        $totalkredit += $JurnalUmumData->kredit;
+                                foreach ($dataJurnalUmum as $jurnalUmumData) :
+                                    $saldoawaldebit = 0;
+                                    $saldoawalkredit = 0;
+                                    $saldodebit = 0;
+                                    $saldokredit = 0;
                                     ?>
-                                        <tr class="collapse_<?= $HeaderAkunData->id; ?> collapse out">
-                                            <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
-                                            <td><?= $transaksi_format; ?></td>
-                                            <td><?= $JurnalUmumData->no_transaksi; ?></td>
-                                            <td><?= $JurnalUmumData->keterangan; ?></td>
-                                            <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
-                                            <td><?= format_ribuan($JurnalUmumData->kredit); ?></td>
-                                            <td><?= format_ribuan($saldo); ?></td>
-                                        </tr>
                                     <?php
-                                    endif;
-                                endforeach;
-                                foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-                                    if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
+                                    if ($MetaData->id == $jurnalUmumData->kategori_id) :
+                                        if ($jurnalUmumData->type_transaksi == 'saldoawal') {
+                                            $saldoawaldebit  += $jurnalUmumData->debit;
+                                            $saldoawalkredit += $jurnalUmumData->kredit;
+                                        } else {
+                                            $saldodebit += $jurnalUmumData->debit;
+                                            $saldokredit += $jurnalUmumData->kredit;
+                                        }
+                                        $total_debit_awal += $saldoawaldebit;
+                                        $total_kredit_awal += $saldoawalkredit;
+                                        $total_debit_pergerakan += $saldodebit;
+                                        $total_kredit_pergerakan += $saldokredit;
+                                        $total_debit_akhir = $total_debit_awal + $total_debit_pergerakan;
+                                        $total_kredit_akhir = $total_kredit_awal + $total_kredit_pergerakan;
                                     ?>
                                         <tr>
-                                            <td colspan="4" style="text-align: right;">Total <?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
-                                            <td><?= format_ribuan($totaldebit); ?></td>
-                                            <td><?= format_ribuan($totalkredit); ?></td>
-                                            <td><?= format_ribuan($totaldebit - $totalkredit); ?></td>
+                                            <td><?= $jurnalUmumData->no_sub; ?></td>
+                                            <td><?= $jurnalUmumData->nama_sub; ?></td>
+                                            <td style="text-align: right;"><?= format_ribuan($saldoawaldebit); ?></td>
+                                            <td style="text-align: right;"><?= format_ribuan($saldoawalkredit); ?></td>
+                                            <td style="text-align: right;"><?= format_ribuan($saldodebit); ?></td>
+                                            <td style="text-align: right;"><?= format_ribuan($saldokredit); ?></td>
+                                            <td style="text-align: right;"><?= format_ribuan($saldoawaldebit + $saldodebit); ?></td>
+                                            <td style="text-align: right;"><?= format_ribuan($saldoawalkredit + $saldokredit); ?></td>
                                         </tr>
                             <?php
                                     endif;
-                                endforeach; // akhir kelompok 
-                            endforeach; // akhir kelompok 
+                                endforeach;
+                            endforeach;
+                            // akhir sub akun
                             ?>
+                            <tr>
+                                <td colspan="2"><strong>Total Transaksi</strong></td>
+                                <td style="text-align: right;"><?= format_ribuan($total_debit_awal); ?></td>
+                                <td style="text-align: right;"><?= format_ribuan($total_kredit_awal); ?></td>
+                                <td style="text-align: right;"><?= format_ribuan($total_debit_pergerakan); ?></td>
+                                <td style="text-align: right;"><?= format_ribuan($total_kredit_pergerakan); ?></td>
+                                <td style="text-align: right;"><?= format_ribuan($total_debit_akhir); ?></td>
+                                <td style="text-align: right;"><?= format_ribuan($total_kredit_akhir); ?></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
