@@ -8,12 +8,14 @@ use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
 use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
+use App\Models\DivisisModel;
 use Exception;
 
 class Barang extends BaseController
 {
     protected $this_company_id;
     private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap;
+    protected $encrypter;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class Barang extends BaseController
         $this->kodeBahanPenolong = "BP";
         $this->kodeBahanJadi = "BJ";
         $this->kodeBahanScrap = "BS";
+        $this->encrypter = \Config\Services::encrypter();
     }
 
     public function bahanBakuView()
@@ -54,9 +57,16 @@ class Barang extends BaseController
     {
         $parentBarangModel = new ParentBarangModel();
         $satuanModel = new SatuansModel();
+        $divisisModel = new DivisisModel();
+        $divisisModelData = $divisisModel->asObject()->where('deletedAt', null)->findAll();
+
+        foreach ($divisisModelData as $val) {
+            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
+        }
         $data = [
             'type' => "bahan_jadi",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_jadi")->where('deletedAt', null)->findAll(),
+            'divisi' => $divisisModelData,
             'satuanBarang' => $satuanModel->findAll()
         ];
 
@@ -85,10 +95,13 @@ class Barang extends BaseController
             'company_id' => $this->this_company_id,
             'satuan_id' => $this->request->getVar('satuan_id'),
             'parent_type_id' => $this->request->getVar('parent_type_id'),
+            'divisi_id' => $this->request->getVar('divisi_id') ? $this->encrypter->decrypt(hex2bin($this->request->getVar('divisi_id'))) : null,
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
+            'harga_pokok' => $this->request->getVar('harga_pokok') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_pokok'))) : 0,
+            'harga_jual' => $this->request->getVar('harga_jual') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_jual'))) : 0,
         ]);
 
         return response()->setJSON([
@@ -107,10 +120,13 @@ class Barang extends BaseController
         $barangModel->update($id, [
             'company_id' => $this->this_company_id,
             'satuan_id' => $this->request->getVar('satuan_id'),
-            'parent_type' => $this->request->getVar('parent_type'),
+            'parent_type_id' => $this->request->getVar('parent_type_id'),
+            'divisi_id' => $this->request->getVar('divisi_id') ? $this->encrypter->decrypt(hex2bin($this->request->getVar('divisi_id'))) : null,
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
+            'harga_pokok' => $this->request->getVar('harga_pokok') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_pokok'))) : 0,
+            'harga_jual' => $this->request->getVar('harga_jual') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_jual'))) : 0,
         ]);
 
         return response()->setJSON([

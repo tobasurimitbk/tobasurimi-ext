@@ -102,6 +102,31 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select" name="divisi_id" id="divisi_id">
+                                    <option value=""></option>
+                                    <?php foreach ($divisi as $d) : ?>
+                                        <option value="<?= $d->hexid; ?>"><?= $d->divisi; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Department</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+                                <label for="floatingInput">Harga Pokok</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control" name="harga_jual" id="harga_jual" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+                                <label for="floatingInput">Harga Jual</label>
+                            </div>
+                        </div>
+                    </div>
 
                 </form>
             </div>
@@ -501,6 +526,32 @@
         dropdownParent: $(".add-modal .modal-content")
     });
 
+    //styling Pilih Department
+    $("select[name='divisi_id']")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+    $("select[name='divisi_id']")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+    $("select[name='divisi_id']")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+    $("select[name='divisi_id']").select2({
+        placeholder: "Pilih Department",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $(".add-modal .modal-content")
+    });
+    //end styling Pilih Department
+
     $("select[name='satuan_id']")
         .parent('div')
         .children('span')
@@ -526,6 +577,17 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
+
+    function formatRupiah(angka) {
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var desimal = parts[1] || '00';
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return 'Rp. ' + ribuanFormatted + ',' + desimal;
+    }
 </script>
 
 <?= $this->endSection(); ?>
