@@ -91,7 +91,7 @@
                                             $transaksi_format = "Purchase Invoice";
                                         } else if ($JurnalUmumData->type_transaksi == "penerimaan") {
                                             $transaksi_format = "Receive Payment";
-                                        } else if ($type == "biaya") {
+                                        } else if ($JurnalUmumData->type_transaksi == "biaya") {
                                             $transaksi_format = "Expense";
                                         } else {
                                             $transaksi_format = "Saldo Awal";
