@@ -79,12 +79,10 @@ class BeaCukaiController extends BaseController
     {
         $dropdownDokumen = [];
 
-        if($this->request->getGet("jenis_dokumen") === "No PO")
-        {
-             //Get PO Bahan Baku BC
+        if ($this->request->getGet("jenis_dokumen") === "No PO") {
+            //Get PO Bahan Baku BC
             $bbLokal = $this->modelRMPurchaseOrder->getNoPOBeaCukai($this->this_company_id);
-            foreach($bbLokal as $x)
-            {
+            foreach ($bbLokal as $x) {
                 array_push($dropdownDokumen, [
                     "id" => $x["id"],
                     "po_no" => $x["po_no"],
@@ -94,21 +92,17 @@ class BeaCukaiController extends BaseController
 
             $bbImport = $this->modelRMImportPO->getNoPOBeaCukai($this->this_company_id);
 
-            foreach($bbImport as $x)
-            {
+            foreach ($bbImport as $x) {
                 array_push($dropdownDokumen, [
                     "id" => $x["id"],
                     "po_no" => $x["po_no"],
                     "type" => "BAHAN BAKU IMPORT"
                 ]);
             }
-        }
-        else
-        {
+        } else {
             //Get PO Bahan Penolong BC
             $bpLokal = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Lokal', $this->this_company_id);
-            foreach($bpLokal as $x)
-            {
+            foreach ($bpLokal as $x) {
                 array_push($dropdownDokumen, [
                     "id" => $x["id"],
                     "po_no" => $x["po_no"],
@@ -117,8 +111,7 @@ class BeaCukaiController extends BaseController
             }
 
             $bpImport = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Import', $this->this_company_id);
-            foreach($bpImport as $x)
-            {
+            foreach ($bpImport as $x) {
                 array_push($dropdownDokumen, [
                     "id" => $x["id"],
                     "po_no" => $x["po_no"],
@@ -194,7 +187,7 @@ class BeaCukaiController extends BaseController
             'supplier' => $this->modelSupplier->asObject()->findAll(),
             'country' => $this->modelCountry->asObject()->findAll()
         ];
-        return view('BeaCukai/bc-23/create', $data);
+        return view('BeaCukai/bc-23/create-backup', $data);
     }
 
     public function bc23GetByIdFormView($id)
@@ -256,29 +249,25 @@ class BeaCukaiController extends BaseController
 
             $dataBCBarangDetail = $this->modelBeaCukaiBarang->getByBeaCukaiId($id);
 
-            if($dataBCBarangDetail)
-            {
+            if ($dataBCBarangDetail) {
                 $data["dataBCBarangDetail"] = $dataBCBarangDetail;
             }
 
             $dataBCDokumenDetail = $this->modelBeaCukaiDokumen->getByBeaCukaiId($id);
 
-            if($dataBCDokumenDetail)
-            {
+            if ($dataBCDokumenDetail) {
                 $data["dataBCDokumenDetail"] = $dataBCDokumenDetail;
             }
 
             $dataBCKemasanDetail = $this->modelBeaCukaiKemasan->getByBeaCukaiId($id);
 
-            if($dataBCKemasanDetail)
-            {
+            if ($dataBCKemasanDetail) {
                 $data["dataBCKemasanDetail"] = $dataBCKemasanDetail;
             }
 
             $dataBCKontainerDetail = $this->modelBeaCukaiKontainer->getByBeaCukaiId($id);
 
-            if($dataBCKontainerDetail)
-            {
+            if ($dataBCKontainerDetail) {
                 $data["dataBCKontainerDetail"] = $dataBCKontainerDetail;
             }
 
@@ -286,12 +275,10 @@ class BeaCukaiController extends BaseController
             // die;
 
             $dropdownDokumen = [];
-            if($dataBC->jenis_dokumen === "No PO")
-            {
+            if ($dataBC->jenis_dokumen === "No PO") {
                 //Get PO Bahan Baku BC
                 $bbLokal = $this->modelRMPurchaseOrder->getNoPOBeaCukai($this->this_company_id);
-                foreach($bbLokal as $x)
-                {
+                foreach ($bbLokal as $x) {
                     array_push($dropdownDokumen, [
                         "id" => $x["id"],
                         "po_no" => $x["po_no"],
@@ -301,8 +288,7 @@ class BeaCukaiController extends BaseController
 
                 $bbImport = $this->modelRMImportPO->getNoPOBeaCukai($this->this_company_id);
 
-                foreach($bbImport as $x)
-                {
+                foreach ($bbImport as $x) {
                     array_push($dropdownDokumen, [
                         "id" => $x["id"],
                         "po_no" => $x["po_no"],
@@ -311,12 +297,10 @@ class BeaCukaiController extends BaseController
                 }
             }
 
-            if($dataBC->jenis_dokumen === "No SJ")
-            {
+            if ($dataBC->jenis_dokumen === "No SJ") {
                 //Get PO Bahan Penolong BC
                 $bpLokal = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Lokal', $this->this_company_id);
-                foreach($bpLokal as $x)
-                {
+                foreach ($bpLokal as $x) {
                     array_push($dropdownDokumen, [
                         "id" => $x["id"],
                         "po_no" => $x["po_no"],
@@ -325,8 +309,7 @@ class BeaCukaiController extends BaseController
                 }
 
                 $bpImport = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Import', $this->this_company_id);
-                foreach($bpImport as $x)
-                {
+                foreach ($bpImport as $x) {
                     array_push($dropdownDokumen, [
                         "id" => $x["id"],
                         "po_no" => $x["po_no"],
@@ -337,12 +320,11 @@ class BeaCukaiController extends BaseController
 
             $data["dropdownDokumen"] = $dropdownDokumen;
 
-            if($dataBC->type !== "BC 2.3")
-            {
+            if ($dataBC->type !== "BC 2.3") {
                 return view('BeaCukai/bc-23/index');
             }
         }
-        
+
         return view('BeaCukai/bc-23/create', $data);
     }
 
@@ -503,7 +485,7 @@ class BeaCukaiController extends BaseController
                 "pemilik_barang_jenis_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisIdentitasImportir") : $this->request->getPost("jenisIdentitasPemilikBarang"),
                 "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
-                "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
+                "pemilik_barang_address" => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
 
                 "ppjk_npwp"             => $this->request->getPost("PpjkNpwp"),
@@ -517,8 +499,8 @@ class BeaCukaiController extends BaseController
                 "voy_no"                => $this->request->getPost("noVoyFlight"),
                 "pengangkutan_country"  => $this->request->getPost("pengangkutanNegara"),
                 "kode_pelabuhan_muat"   => $this->request->getPost("pelabuhanMuat"),
-                "kode_pelabuhan_transit"=> $this->request->getPost("pelabuhanTransit"),
-                "kode_pelabuhan_bongkar"=> $this->request->getPost("pelabuhanBongkar"),
+                "kode_pelabuhan_transit" => $this->request->getPost("pelabuhanTransit"),
+                "kode_pelabuhan_bongkar" => $this->request->getPost("pelabuhanBongkar"),
 
                 "invoice_id"            => $this->request->getPost("noInvoice"),
                 "invoice_date"          => $this->request->getPost("tanggalInvoice") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalInvoice")))) : "",
@@ -542,7 +524,7 @@ class BeaCukaiController extends BaseController
                 "asuransi_type"         => $this->request->getPost("tipeAsuransi"),
                 "cif_value"             => $this->request->getPost("nilaiCif"),
                 "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
-                
+
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),
                 "item_count"            => $this->request->getPost("jumlahBarang"),
@@ -552,9 +534,9 @@ class BeaCukaiController extends BaseController
                 "pemberitahu"           => $this->request->getPost("pemberitahu"),
                 "jabatan"               => $this->request->getPost("jabatan")
             ];
-            
+
             $insert =  $this->modelBeaCukai->insert($payload);
-            
+
             $data_barang = json_decode($this->request->getPost("data_barang"));
             $data_kemasan = json_decode($this->request->getPost("data_kemasan"));
             $data_kontainer = json_decode($this->request->getPost("data_kontainer"));
@@ -571,8 +553,7 @@ class BeaCukaiController extends BaseController
                 return;
             }
 
-            foreach($data_barang as $data)
-            {
+            foreach ($data_barang as $data) {
                 $detailPayload = [];
 
                 $detailPayload = [
@@ -585,7 +566,7 @@ class BeaCukaiController extends BaseController
 
                 $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
 
-                if(!$responseDetail) {
+                if (!$responseDetail) {
                     $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
@@ -598,8 +579,7 @@ class BeaCukaiController extends BaseController
                 }
             }
 
-            foreach($data_kemasan as $data)
-            {
+            foreach ($data_kemasan as $data) {
                 $detailPayload = [];
 
                 $detailPayload = [
@@ -612,7 +592,7 @@ class BeaCukaiController extends BaseController
 
                 $responseDetail = $this->modelBeaCukaiKemasan->insert($detailPayload);
 
-                if(!$responseDetail) {
+                if (!$responseDetail) {
                     $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
@@ -625,8 +605,7 @@ class BeaCukaiController extends BaseController
                 }
             }
 
-            foreach($data_kontainer as $data)
-            {
+            foreach ($data_kontainer as $data) {
                 $detailPayload = [];
 
                 $detailPayload = [
@@ -639,7 +618,7 @@ class BeaCukaiController extends BaseController
 
                 $responseDetail = $this->modelBeaCukaiKontainer->insert($detailPayload);
 
-                if(!$responseDetail) {
+                if (!$responseDetail) {
                     $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
@@ -652,8 +631,7 @@ class BeaCukaiController extends BaseController
                 }
             }
 
-            foreach($data_dokumen as $data)
-            {
+            foreach ($data_dokumen as $data) {
                 $detailPayload = [];
 
                 $detailPayload = [
@@ -666,7 +644,7 @@ class BeaCukaiController extends BaseController
 
                 $responseDetail = $this->modelBeaCukaiDokumen->insert($detailPayload);
 
-                if(!$responseDetail) {
+                if (!$responseDetail) {
                     $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
@@ -849,7 +827,7 @@ class BeaCukaiController extends BaseController
                 "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
                 "pemilik_barang_jenis_api"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisAPIImportir") : $this->request->getPost("jenisAPIPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
-                "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
+                "pemilik_barang_address" => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
 
                 "ppjk_npwp"             => $this->request->getPost("PpjkNpwp"),
@@ -863,8 +841,8 @@ class BeaCukaiController extends BaseController
                 "voy_no"                => $this->request->getPost("noVoyFlight"),
                 "pengangkutan_country"  => $this->request->getPost("pengangkutanNegara"),
                 "kode_pelabuhan_muat"   => $this->request->getPost("pelabuhanMuat"),
-                "kode_pelabuhan_transit"=> $this->request->getPost("pelabuhanTransit"),
-                "kode_pelabuhan_bongkar"=> $this->request->getPost("pelabuhanBongkar"),
+                "kode_pelabuhan_transit" => $this->request->getPost("pelabuhanTransit"),
+                "kode_pelabuhan_bongkar" => $this->request->getPost("pelabuhanBongkar"),
 
                 "invoice_id"            => $this->request->getPost("noInvoice"),
                 "invoice_date"          => $this->request->getPost("tanggalInvoice") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalInvoice")))) : "",
@@ -888,7 +866,7 @@ class BeaCukaiController extends BaseController
                 "asuransi_type"         => $this->request->getPost("tipeAsuransi"),
                 "cif_value"             => $this->request->getPost("nilaiCif"),
                 "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
-                
+
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),
                 "item_count"            => $this->request->getPost("jumlahBarang"),
@@ -898,7 +876,7 @@ class BeaCukaiController extends BaseController
                 "pemberitahu"           => $this->request->getPost("pemberitahu"),
                 "jabatan"               => $this->request->getPost("jabatan")
             ];
-            
+
             $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();
 
             $data_barang = json_decode($this->request->getPost("data_barang"));
@@ -907,8 +885,7 @@ class BeaCukaiController extends BaseController
             $data_dokumen = json_decode($this->request->getPost("data_dokumen"));
 
             if ($insert) {
-                foreach($data_barang as $data)
-                {
+                foreach ($data_barang as $data) {
                     $detailPayload = [];
 
                     $detailPayload = [
@@ -920,13 +897,11 @@ class BeaCukaiController extends BaseController
                     ];
 
                     // kalau hapus dan ada id
-                    if($data->isDeleted === true)
-                    {
-                        if($data->id)
-                        {
+                    if ($data->isDeleted === true) {
+                        if ($data->id) {
                             $responseDetail = $this->modelBeaCukaiBarang->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -938,19 +913,16 @@ class BeaCukaiController extends BaseController
                                 return;
                             }
                         }
-                    }
-                    else
-                    {
-                         // kalau update
-                        if($data->id)
-                        {
+                    } else {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'id' => $data->id
                             ];
 
                             $responseDetail = $this->modelBeaCukaiBarang->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Disimpan';
                                 $data = [
                                     "status"            => false,
@@ -964,11 +936,10 @@ class BeaCukaiController extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -983,8 +954,7 @@ class BeaCukaiController extends BaseController
                     }
                 }
 
-                foreach($data_kemasan as $data)
-                {
+                foreach ($data_kemasan as $data) {
                     $detailPayload = [];
 
                     $detailPayload = [
@@ -996,13 +966,11 @@ class BeaCukaiController extends BaseController
                     ];
 
                     // kalau hapus dan ada id
-                    if($data->isDeleted === true)
-                    {
-                        if($data->id)
-                        {
+                    if ($data->isDeleted === true) {
+                        if ($data->id) {
                             $responseDetail = $this->modelBeaCukaiKemasan->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -1014,19 +982,16 @@ class BeaCukaiController extends BaseController
                                 return;
                             }
                         }
-                    }
-                    else
-                    {
-                         // kalau update
-                        if($data->id)
-                        {
+                    } else {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'id' => $data->id
                             ];
 
                             $responseDetail = $this->modelBeaCukaiKemasan->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Disimpan';
                                 $data = [
                                     "status"            => false,
@@ -1040,11 +1005,10 @@ class BeaCukaiController extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->modelBeaCukaiKemasan->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -1059,8 +1023,7 @@ class BeaCukaiController extends BaseController
                     }
                 }
 
-                foreach($data_kontainer as $data)
-                {
+                foreach ($data_kontainer as $data) {
                     $detailPayload = [];
 
                     $detailPayload = [
@@ -1072,13 +1035,11 @@ class BeaCukaiController extends BaseController
                     ];
 
                     // kalau hapus dan ada id
-                    if($data->isDeleted === true)
-                    {
-                        if($data->id)
-                        {
+                    if ($data->isDeleted === true) {
+                        if ($data->id) {
                             $responseDetail = $this->modelBeaCukaiKontainer->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -1090,19 +1051,16 @@ class BeaCukaiController extends BaseController
                                 return;
                             }
                         }
-                    }
-                    else
-                    {
-                         // kalau update
-                        if($data->id)
-                        {
+                    } else {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'id' => $data->id
                             ];
 
                             $responseDetail = $this->modelBeaCukaiKontainer->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Disimpan';
                                 $data = [
                                     "status"            => false,
@@ -1116,11 +1074,10 @@ class BeaCukaiController extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->modelBeaCukaiKontainer->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -1135,8 +1092,7 @@ class BeaCukaiController extends BaseController
                     }
                 }
 
-                foreach($data_dokumen as $data)
-                {
+                foreach ($data_dokumen as $data) {
                     $detailPayload = [];
 
                     $detailPayload = [
@@ -1148,13 +1104,11 @@ class BeaCukaiController extends BaseController
                     ];
 
                     // kalau hapus dan ada id
-                    if($data->isDeleted === true)
-                    {
-                        if($data->id)
-                        {
+                    if ($data->isDeleted === true) {
+                        if ($data->id) {
                             $responseDetail = $this->modelBeaCukaiDokumen->delete($data->id);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Dihapus';
                                 $data = [
                                     "status"            => false,
@@ -1166,19 +1120,16 @@ class BeaCukaiController extends BaseController
                                 return;
                             }
                         }
-                    }
-                    else
-                    {
-                         // kalau update
-                        if($data->id)
-                        {
+                    } else {
+                        // kalau update
+                        if ($data->id) {
                             $conditionDetail = [
                                 'id' => $data->id
                             ];
 
                             $responseDetail = $this->modelBeaCukaiDokumen->where($conditionDetail)->set($detailPayload)->update();
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Disimpan';
                                 $data = [
                                     "status"            => false,
@@ -1192,11 +1143,10 @@ class BeaCukaiController extends BaseController
                         }
 
                         // kalau create
-                        else
-                        {
+                        else {
                             $responseDetail = $this->modelBeaCukaiDokumen->insert($detailPayload);
 
-                            if(!$responseDetail) {
+                            if (!$responseDetail) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -1219,9 +1169,7 @@ class BeaCukaiController extends BaseController
                 ];
                 echo json_encode($data);
                 return;
-            }
-            else
-            {
+            } else {
                 $data = [
                     "status"    => false,
                     "message"   => 'Data Gagal Disimpan!',
@@ -1385,12 +1333,11 @@ class BeaCukaiController extends BaseController
             $dataBC = $this->modelBeaCukai->getById($id);
             $data["dataBC"] = $dataBC;
 
-            if($dataBC->type !== "BC 2.5")
-            {
+            if ($dataBC->type !== "BC 2.5") {
                 return view('BeaCukai/bc-25/index');
             }
         }
-        
+
         return view('BeaCukai/bc-25/create', $data);
     }
 
@@ -1529,7 +1476,7 @@ class BeaCukaiController extends BaseController
                 "pemilik_barang_jenis_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisIdentitasImportir") : $this->request->getPost("jenisIdentitasPemilikBarang"),
                 "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
-                "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
+                "pemilik_barang_address" => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
 
                 "penerima_barang_npwp"  => $this->request->getPost("npwpPenerimaBarang"),
@@ -1543,9 +1490,9 @@ class BeaCukaiController extends BaseController
                 "no_packing_list"       => $this->request->getPost("noPackingList"),
                 "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
                 "no_kontrak"            => $this->request->getPost("noKontrak"),
-                "tanggal_kontrak"       => $this->request->getPost("tanggalKontrak") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalKontrak")))) : "",  
+                "tanggal_kontrak"       => $this->request->getPost("tanggalKontrak") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalKontrak")))) : "",
                 "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
-                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",
                 "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
 
                 "valuta"                => $this->request->getPost("valuta"),
@@ -1553,7 +1500,7 @@ class BeaCukaiController extends BaseController
                 "cif_value"             => $this->request->getPost("nilaiCif"),
                 "harga_penyerahan"      => $this->request->getPost("hargaPenyerahan"),
                 "pengangkutan"          => $this->request->getPost("caraPengangkutan"),
-                
+
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),
                 "item_count"            => $this->request->getPost("jumlahBarang"),
@@ -1570,7 +1517,7 @@ class BeaCukaiController extends BaseController
                 "data_kontainer"        => $this->request->getPost("data_kontainer"),
                 "data_kemasan"          => $this->request->getPost("data_kemasan")
             ];
-            
+
             $insert =  $this->modelBeaCukai->insert($payload);
 
             if (!$insert) {
@@ -1740,7 +1687,7 @@ class BeaCukaiController extends BaseController
                 "pemilik_barang_jenis_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisIdentitasImportir") : $this->request->getPost("jenisIdentitasPemilikBarang"),
                 "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
-                "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
+                "pemilik_barang_address" => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
 
                 "penerima_barang_npwp"  => $this->request->getPost("npwpPenerimaBarang"),
@@ -1754,9 +1701,9 @@ class BeaCukaiController extends BaseController
                 "no_packing_list"       => $this->request->getPost("noPackingList"),
                 "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
                 "no_kontrak"            => $this->request->getPost("noKontrak"),
-                "tanggal_kontrak"       => $this->request->getPost("tanggalKontrak") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalKontrak")))) : "",  
+                "tanggal_kontrak"       => $this->request->getPost("tanggalKontrak") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalKontrak")))) : "",
                 "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
-                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",
                 "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
 
                 "valuta"                => $this->request->getPost("valuta"),
@@ -1764,7 +1711,7 @@ class BeaCukaiController extends BaseController
                 "cif_value"             => $this->request->getPost("nilaiCif"),
                 "harga_penyerahan"      => $this->request->getPost("hargaPenyerahan"),
                 "pengangkutan"          => $this->request->getPost("caraPengangkutan"),
-                
+
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),
                 "item_count"            => $this->request->getPost("jumlahBarang"),
@@ -1781,7 +1728,7 @@ class BeaCukaiController extends BaseController
                 "data_kontainer"        => $this->request->getPost("data_kontainer"),
                 "data_kemasan"          => $this->request->getPost("data_kemasan")
             ];
-            
+
             $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();
 
             if (!$insert) {
@@ -1933,12 +1880,11 @@ class BeaCukaiController extends BaseController
             $dataBC = $this->modelBeaCukai->getById($id);
             $data["dataBC"] = $dataBC;
 
-            if($dataBC->type !== "BC 2.6.1")
-            {
+            if ($dataBC->type !== "BC 2.6.1") {
                 return view('BeaCukai/bc-261/index');
             }
         }
-        
+
         return view('BeaCukai/bc-261/create', $data);
     }
 
@@ -2061,7 +2007,7 @@ class BeaCukaiController extends BaseController
                 "no_packing_list"       => $this->request->getPost("noPackingList"),
                 "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
                 "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
-                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",
                 "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
 
                 "valuta"                => $this->request->getPost("valuta"),
@@ -2070,7 +2016,7 @@ class BeaCukaiController extends BaseController
                 "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
 
                 "pengangkutan"          => $this->request->getPost("caraPengangkutan"),
-                
+
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),
                 "item_count"            => $this->request->getPost("jumlahBarang"),
@@ -2085,7 +2031,7 @@ class BeaCukaiController extends BaseController
                 "data_kemasan"          => $this->request->getPost("data_kemasan"),
                 "data_jaminan"          => $this->request->getPost("data_jaminan")
             ];
-            
+
             $insert =  $this->modelBeaCukai->insert($payload);
 
             if (!$insert) {
@@ -2239,7 +2185,7 @@ class BeaCukaiController extends BaseController
                 "no_packing_list"       => $this->request->getPost("noPackingList"),
                 "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
                 "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
-                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",
                 "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
 
                 "valuta"                => $this->request->getPost("valuta"),
@@ -2248,7 +2194,7 @@ class BeaCukaiController extends BaseController
                 "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
 
                 "pengangkutan"          => $this->request->getPost("caraPengangkutan"),
-                
+
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),
                 "item_count"            => $this->request->getPost("jumlahBarang"),
@@ -2263,7 +2209,7 @@ class BeaCukaiController extends BaseController
                 "data_kemasan"          => $this->request->getPost("data_kemasan"),
                 "data_jaminan"          => $this->request->getPost("data_jaminan")
             ];
-            
+
             $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();
 
             if (!$insert) {

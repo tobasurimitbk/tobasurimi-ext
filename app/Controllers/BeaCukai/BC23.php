@@ -4,6 +4,9 @@ namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Models\BeaCukaiModel;
+use App\Models\CountryModel;
+use App\Models\KantorBeaCukaiModel;
+use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 
@@ -99,6 +102,9 @@ class BC23 extends BaseController
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $metaDataModel = new MetadataModel();
+        $countryModel = new CountryModel();
+        $kantorBeaCukaiModel = new KantorBeaCukaiModel();
 
         $id = decrypt($id);
 
@@ -108,11 +114,58 @@ class BC23 extends BaseController
             return redirect()->to('bea-cukai-bc-23');
         }
 
+
         $data = [
+            // data helper passing in form select
+            'kodeFasilitasTarif' => $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->findAll(),
+            'kodeJenisTarif' => $metaDataModel->where('name', "Kode Jenis Tarif BC")->findAll(),
+            'kodeAsalBahanBaku' => $metaDataModel->where('name', "Kode Asal Bahan Baku BC")->findAll(),
+            'kodeSatuanBarang' => $metaDataModel->where('name', "Kode Satuan BC")->orderBy('value', "ASC")->findAll(),
+            'kodePerhitungan' => $metaDataModel->where('name', 'Kode Perhitungan BC')->orderBy('value', "ASC")->findAll(),
+            'kodeNegaraAsal' => $countryModel->findAll(),
+            'kodeJenisKemasan' => $metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
+            'kodeKategoriBarang' => $metaDataModel->where('name', 'Kategori Barang BC')->orderBy('description', "ASC")->findAll(),
+            'kodeDokumen' => $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->findAll(),
+            'kodeAsuransi' => $metaDataModel->where('name', "Kode Asuransi BC")->findAll(),
+            'kodeIncoterm' => $metaDataModel->where('name', "Kode Incoterm BC")->findAll(),
+            'kodeKantor' => $kantorBeaCukaiModel->findAll(),
+            'kodeTujunTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
+            'kodeTutupPu' => $metaDataModel->where('name', "Kode Tutup Pu BC")->findAll(),
+            'kodeValuta' => $metaDataModel->where('name', "Valuta")->findAll(),
+            'kodeJenisAPI' => $metaDataModel->where('name', "Jenis API")->findAll(),
+            'kodeKenaPajak' => $metaDataModel->where('name', "Kode Kena Pajak BC")->findAll(),
+            'kodeJenisIdentas' => $metaDataModel->where('name', "Jenis Identitas")->findAll(),
+            'kodeTipeKontainer' => $metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
+            'kodeUkuranKontainer' => $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
+            'kodeJenisKontainer' => $metaDataModel->where('name', "Jenis Kontainer")->findAll(),
+
+            // data detail
             'lpb' => $penerimaanBarangModel->getById($id),
             'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $lpb->tipe_bahan, $lpb->status_penerimaan)
         ];
 
-        return \view('BeaCukai/bc-23/form', $data);
+
+        // dd($data['lpbDetail']);
+
+        return view('BeaCukai/bc-23/form', $data);
+    }
+
+    public function getKodeSatuanBarang()
+    {
+        $metaDataModel = new MetadataModel();
+        $page = $this->request->getVar('page');
+        $limit = 5;
+        $offset = ($page - 1) * $limit;
+
+        $data = $metaDataModel->getKodeSatuanBarang($limit, $offset);
+
+        $response = [
+            'results' => $data,
+            'pagination' => [
+                'more' => count($data) == $limit
+            ]
+        ];
+
+        return $this->response->setJSON($response);
     }
 }

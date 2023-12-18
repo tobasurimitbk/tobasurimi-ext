@@ -716,6 +716,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC23::index');
     $routes->get('all', 'BeaCukai\BC23::all');
     $routes->get('id/(:segment)', 'BeaCukai\BC23::create/$1');
+    $routes->get('satuan-barang', 'BeaCukai\BC23::getKodeSatuanBarang');
     // $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc23GetByIdFormView/$1');
     $routes->post('save', 'BeaCukai\BeaCukaiController::bc23SaveForm');
     $routes->post('update', 'BeaCukai\BeaCukaiController::bc23UpdateForm');
