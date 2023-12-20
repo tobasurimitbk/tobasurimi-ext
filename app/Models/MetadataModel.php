@@ -117,4 +117,13 @@ class MetadataModel extends Model
         }
         return $data;
     }
+
+    public function bcMetaDataHelper($name, $value = null, $description = null)
+    {
+        if ($value == null) {
+            return $this->where('name', $name)->where('description', $description)->first();
+        } else {
+            return $this->where('name', $name)->where('value', $value)->first();
+        }
+    }
 }

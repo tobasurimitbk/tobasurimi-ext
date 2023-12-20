@@ -17,8 +17,8 @@
             <a class="btn btn-hide-form btn-discard float-right detail-barang-form-view" id="btn-batal-detail-barang-form-view" href="#">
                 Batal
             </a>
-            <?php if (!empty($dataBC)) : ?>
-                <?php if ($dataBC->status_posting === "Belum Posting") : ?>
+            <?php if (!empty($bc23Detail)) : ?>
+                <?php if ($bc23Detail['status_posting'] === "Belum Posting") : ?>
                     <button class="btn btn-hapus delete-parent float-right">
                         Hapus
                     </button>
@@ -30,7 +30,7 @@
                     </button>
                 <?php endif; ?>
             <?php else : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view">
+                <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
                     Simpan
                 </button>
             <?php endif; ?>
@@ -43,418 +43,438 @@
     <div class="root-form-view">
         <div class="card">
             <div class="card-body">
-                <label class="form-label font-weight-bold lable-title mt-3">
-                    Informasi Barang
-                </label>
-                <?= csrf_field() ?>
-                <div class="row mt-2">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= $lpb->no_penerimaan_barang ?>" readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control no_lpb" id="no_lpb">
-                            <label>Nomor LPB</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= $lpb->status_penerimaan ?> <?= $lpb->tipe_bahan == "BAKU" ? "BB" : "BP" ?>" readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control no_lpb" id="no_lpb">
-                            <label>Jenis PO</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="input-group input-group-password">
+                <?php if (!empty($bc23Detail)) : ?>
+                    <table width="100%" class="mb-3">
+                        <tbody>
+                            <tr style="color: black;">
+                                <td width="150px"><b>Nomor BC 2.3</b></td>
+                                <td width="10px">:</td>
+                                <td><?= $bc23Detail['bc_no_lokal'] ?></td>
+                            </tr>
+                            <tr style="color: black; height: 20px;">
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr style="color: black;">
+                                <td width="150px"><b>Status Dokumen</b></td>
+                                <td width="30px">:</td>
+                                <td><?= $bc23Detail['status_posting'] ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                <?php endif; ?>
+                <form class="form-root">
+                    <label class="form-label font-weight-bold lable-title mt-3">
+                        Informasi Barang
+                    </label>
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="id" class="id" id="id" value="<?= !empty($bc23Detail) ? $bc23Detail['id'] : '' ?>">
+                    <input type="hidden" name="penerimaan_barang_id" class="penerimaan_barang_id" id="penerimaan_barang_id" value="<?= $lpb->id ?>">
+                    <div class="row mt-2">
+                        <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input value="<?= date('d/m/Y', strtotime($lpb->tanggal)) ?>" autocomplete="one-time-code" type="text" placeholder="" class="form-control tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb">
-                                <label>Tanggal Penerimaan</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                <input value="<?= $lpb->no_penerimaan_barang ?>" readonly autocomplete="one-time-code" type="text" disabled placeholder="" class="form-control">
+                                <label>Nomor LPB</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-lpb" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th style="text-align: center;width:10px;">No</th>
-                                        <th style="text-align: center;">No PO</th>
-                                        <th style="text-align: center;">Kode Barang</th>
-                                        <th style="text-align: center;">Nama Barang</th>
-                                        <th style="text-align: center;">Jmlh Diterima</th>
-                                        <th style="text-align: center;">Harga</th>
-                                        <th style="text-align: center;">Status </th>
-                                        <th style="text-align: center;">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $no = 1; ?>
-                                    <?php foreach ($lpbDetail as $l) : ?>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input value="<?= $lpb->status_penerimaan ?> <?= $lpb->tipe_bahan == "BAKU" ? "BB" : "BP" ?>" readonly disabled autocomplete="one-time-code" type="text" placeholder="" class="form-control">
+                                <label>Jenis PO</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input value="<?= date('d/m/Y', strtotime($lpb->tanggal)) ?>" autocomplete="one-time-code" type="text" placeholder="" name="tanggal_penerimaan_lpb" class="form-control tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb">
+                                    <label>Tanggal Penerimaan</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-lpb" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
                                         <tr>
-                                            <td style="text-align: center;"><?= $no++; ?></td>
-                                            <td style="text-align: center;"><?= $l['po_no'] ?></td>
-                                            <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
-                                            <td style="text-align: center;"><?= $l['nama_barang_dok'] ?></td>
-                                            <td style="text-align: center;"><?= $l['jml_masuk'] ?></td>
-                                            <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['sub_total'])) ?></td>
-                                            <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['id']) ?>">
-                                                <span class="badge badge-danger">
-                                                    DOKUMEN BELUM DIISI
-                                                </span>
-                                            </td>
-                                            <td style="text-align: center;">
-                                                <button type="button" data-id="<?= encrypt($l['id']) ?>" class="btn btn-warning btn-edit-dokumen-barang">
-                                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                                </button>
-                                            </td>
+                                            <th style="text-align: center;width:10px;">No</th>
+                                            <th style="text-align: center;">No PO</th>
+                                            <th style="text-align: center;">Kode Barang</th>
+                                            <th style="text-align: center;">Nama Barang</th>
+                                            <th style="text-align: center;">Jmlh Diterima</th>
+                                            <th style="text-align: center;">Harga</th>
+                                            <th style="text-align: center;">Status </th>
+                                            <th style="text-align: center;">Action</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php $no = 1; ?>
+                                        <?php foreach ($lpbDetail as $l) : ?>
+                                            <tr>
+                                                <td style="text-align: center;"><?= $no++; ?></td>
+                                                <td style="text-align: center;"><?= $l['po_no'] ?></td>
+                                                <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
+                                                <td style="text-align: center;"><?= $l['nama_barang_dok'] ?></td>
+                                                <td style="text-align: center;"><?= $l['jml_masuk'] ?></td>
+                                                <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['sub_total'])) ?></td>
+                                                <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['id']) ?>">
+                                                    <span class="badge badge-danger">
+                                                        DOKUMEN BELUM DIISI
+                                                    </span>
+                                                </td>
+                                                <td style="text-align: center;">
+                                                    <button type="button" data-id="<?= encrypt($l['id']) ?>" class="btn btn-warning btn-edit-dokumen-barang">
+                                                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <label class="form-label font-weight-bold lable-title mt-3 mb-2">
-                    Informasi Dokumen
-                </label>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input id="root_asal_data" value="Host to Host: S" name="root_asal_data" type="text" readonly class="root_asal_data form-control" placeholder="">
-                            <label>Asal Pengiriman</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_asuransi" name="root_asuransi" type="number" class="form-control root_asuransi" placeholder="">
-                            <label>Asuransi</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control root_bruto" name="root_bruto" id="root_bruto" placeholder="">
-                            <label>Bruto</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input id="root_cif" name="root_cif" type="number" class="root_cif form-control" placeholder="">
-                            <label>CIF</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_fob" name="root_fob" type="number" class="form-control root_fob" placeholder="">
-                            <label>FOB</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control root_freight" name="root_freight" id="root_freight" placeholder="">
-                            <label>Freight</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input id="root_harga_penyerahan" name="root_harga_penyerahan" type="number" class="root_harga_penyerahan form-control" placeholder="">
-                            <label>Harga Penyerahan</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_jabatan_pengusaha_ttd" name="root_jabatan_pengusaha_ttd" type="text" class="form-control root_jabatan_pengusaha_ttd" placeholder="">
-                            <label>Jabatan Pengusaha TPB</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control root_jumlah_kontainer" name="root_jumlah_kontainer" id="root_jumlah_kontainer" placeholder="">
-                            <label>Jumlah Kontainer</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_asuransi" id="root_kode_asuransi" name="root_kode_asuransi" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeAsuransi as $k) : ?>
-                                    <option value="<?= encrypt($k['value']) ?>">
-                                        <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Kode Asuransi</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_kode_dokumen" name="root_kode_dokumen" readonly value="23" type="text" class="form-control root_kode_dokumen" placeholder="">
-                            <label>Kode Dokumen</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_incoterm" id="root_kode_incoterm" name="root_kode_incoterm" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeIncoterm as $k) : ?>
-                                    <option value="<?= encrypt($k['value']) ?>">
-                                        <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Kode Incoterm</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_kantor" id="root_kode_kantor" name="root_kode_kantor" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeKantor as $k) : ?>
-                                    <option value="<?= encrypt($k['kode']) ?>">
-                                        <?= strtoupper($k['kode']) . " ( " . strtoupper($k['kantor_name']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Kode Kantor</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_kantor_bongkar" id="root_kode_kantor_bongkar" name="root_kode_kantor_bongkar" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeKantor as $k) : ?>
-                                    <option value="<?= encrypt($k['kode']) ?>">
-                                        <?= strtoupper($k['kode']) . " ( " . strtoupper($k['kantor_name']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Kode Kantor Bongkar</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_kode_pelabuhan_bongkar" name="root_kode_pelabuhan_bongkar" type="text" class="form-control root_kode_pelabuhan_bongkar" placeholder="">
-                            <label>Kode Pelabuhan Bongkar</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_kode_pelabuhan_bongkar" name="root_kode_pelabuhan_bongkar" type="text" class="form-control root_kode_pelabuhan_bongkar" placeholder="">
-                            <label>Kode Pelabuhan Bongkar</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_kode_pelabuhan_muat" name="root_kode_pelabuhan_muat" type="text" class="form-control root_kode_pelabuhan_muat" placeholder="">
-                            <label>Kode Pelabuhan Muat</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_kode_pelabuhan_transit" name="root_kode_pelabuhan_muat" type="text" class="form-control root_kode_pelabuhan_muat" placeholder="">
-                            <label>Kode Pelabuhan Transit</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_kode_tps" name="root_kode_tps" type="text" class="form-control root_kode_tps" placeholder="">
-                            <label>Kode TPS</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_tujuan_tpb" id="root_kode_tujuan_tpb" name="root_kode_tujuan_tpb" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeTujunTpb as $k) : ?>
-                                    <option value="<?= encrypt($k['description']) ?>">
-                                        <?= strtoupper($k['description']) . " ( " . strtoupper($k['value']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Kode Tujuan TPB</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_tutup_pu" id="root_kode_tutup_pu" name="root_kode_tutup_pu" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeTutupPu as $k) : ?>
-                                    <option value="<?= encrypt($k['value']) ?>">
-                                        <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Kode Tutup PU</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_valuta" id="root_kode_valuta" name="root_kode_valuta" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeValuta as $k) : ?>
-                                    <option value="<?= encrypt($k['value']) ?>">
-                                        <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Kode Valuta</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_kota_ttd" name="root_kota_ttd" type="text" class="form-control root_kota_ttd" placeholder="">
-                            <label>Kota Pembuatan Dokumen BC 2.3</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_nama_ttd" name="root_nama_ttd" type="text" class="form-control root_nama_ttd" placeholder="">
-                            <label>Nama Pengguna Pembuat Dokumen BC 2.3</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_ndpbm" name="root_ndpbm" type="number" class="form-control root_ndpbm" placeholder="">
-                            <label>NDPBM</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_netto" name="root_netto" type="number" class="form-control root_netto" placeholder="">
-                            <label>Netto</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_nik" id="root_nik" name="root_nik" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeJenisAPI as $k) : ?>
-                                    <option value="<?= encrypt($k['value']) ?>">
-                                        <?= strtoupper($k['description']) . " ( " . strtoupper($k['value']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">NIK (Jenis API)</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_nilai_barang" name="root_nilai_barang" type="number" class="form-control root_nilai_barang" placeholder="">
-                            <label>Nilai Barang</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_no_aju" name="root_no_aju" type="text" maxlength="26" class="form-control root_no_aju" placeholder="">
-                            <label>Nomor Aju</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_no_bc_11" name="root_no_bc_11" type="text" maxlength="6" class="form-control root_no_bc_11" placeholder="">
-                            <label>Nomor BC 1.1</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_pos_bc_11" name="root_pos_bc_11" type="text" maxlength="4" class="form-control root_pos_bc_11" placeholder="">
-                            <label>Pos BC 1.1</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_seri" name="root_seri" type="number" class="form-control root_seri" placeholder="">
-                            <label>Seri</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_sub_pos_bc_11" maxlength="8" name="root_sub_pos_bc_11" type="number" class="form-control root_sub_pos_bc_11" placeholder="">
-                            <label>Sub Pos BC 1.1</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="input-group input-group-password">
+                    <label class="form-label font-weight-bold lable-title mt-3 mb-2">
+                        Informasi Dokumen
+                    </label>
+
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="root_tanggal_bc_11" type="text" placeholder="" class="form-control root_tanggal_bc_11" id="root_tanggal_bc_11">
-                                <label>Tanggal BC 1.1</label>
+                                <input id="root_asal_data" value="Host to Host: S" name="root_asal_data" type="text" readonly class="root_asal_data form-control" placeholder="">
+                                <label>Asal Pengiriman</label>
                             </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_asuransi" name="root_asuransi" type="number" class="form-control root_asuransi" placeholder="">
+                                <label>Asuransi</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control root_bruto" name="root_bruto" id="root_bruto" placeholder="">
+                                <label>Bruto</label>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="input-group input-group-password">
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="root_tanggal_tiba" type="text" placeholder="" class="form-control root_tanggal_tiba" id="root_tanggal_tiba">
-                                <label>Tanggal Perkiraan Tiba</label>
+                                <input id="root_cif" name="root_cif" type="number" class="root_cif form-control" placeholder="">
+                                <label>CIF</label>
                             </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_fob" name="root_fob" type="number" class="form-control root_fob" placeholder="">
+                                <label>FOB</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control root_freight" name="root_freight" id="root_freight" placeholder="">
+                                <label>Freight</label>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="input-group input-group-password">
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="root_tanggal_ttd" type="text" placeholder="" class="form-control root_tanggal_ttd" id="root_tanggal_ttd">
-                                <label>Tanggal Penanda-Tanganan Dokumen</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                <input id="root_harga_penyerahan" name="root_harga_penyerahan" type="number" class="root_harga_penyerahan form-control" placeholder="">
+                                <label>Harga Penyerahan</label>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_biaya_tambahan" maxlength="24" name="root_biaya_tambahan" type="number" class="form-control root_biaya_tambahan" placeholder="">
-                            <label>Biaya Tambahan</label>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_jabatan_pengusaha_ttd" name="root_jabatan_pengusaha_ttd" type="text" class="form-control root_jabatan_pengusaha_ttd" placeholder="">
+                                <label>Jabatan Pengusaha TPB</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control root_jumlah_kontainer" name="root_jumlah_kontainer" id="root_jumlah_kontainer" placeholder="">
+                                <label>Jumlah Kontainer</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3">
-                            <input id="root_biaya_pengurang" maxlength="24" name="root_biaya_pengurang" type="number" class="form-control root_biaya_pengurang" placeholder="">
-                            <label>Biaya Pengurang</label>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_asuransi" id="root_kode_asuransi" name="root_kode_asuransi" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeAsuransi as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Asuransi</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_kode_dokumen" name="root_kode_dokumen" readonly value="23" type="text" class="form-control root_kode_dokumen" placeholder="">
+                                <label>Kode Dokumen</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_incoterm" id="root_kode_incoterm" name="root_kode_incoterm" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeIncoterm as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Incoterm</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select root_kode_kena_pajak" id="root_kode_kena_pajak" name="root_kode_kena_pajak" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($kodeKenaPajak as $k) : ?>
-                                    <option value="<?= encrypt($k['value']) ?>">
-                                        <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label style="z-index: 1;">Kode Kena Pajak</label>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_kantor" id="root_kode_kantor" name="root_kode_kantor" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeKantor as $k) : ?>
+                                        <option value="<?= encrypt($k['kode']) ?>">
+                                            <?= strtoupper($k['kode']) . " ( " . strtoupper($k['kantor_name']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Kantor</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_kantor_bongkar" id="root_kode_kantor_bongkar" name="root_kode_kantor_bongkar" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeKantor as $k) : ?>
+                                        <option value="<?= encrypt($k['kode']) ?>">
+                                            <?= strtoupper($k['kode']) . " ( " . strtoupper($k['kantor_name']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Kantor Bongkar</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_kode_pelabuhan_bongkar" name="root_kode_pelabuhan_bongkar" type="text" class="form-control root_kode_pelabuhan_bongkar" placeholder="">
+                                <label>Kode Pelabuhan Bongkar</label>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_kode_pelabuhan_muat" name="root_kode_pelabuhan_muat" type="text" class="form-control root_kode_pelabuhan_muat" placeholder="">
+                                <label>Kode Pelabuhan Muat</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_kode_pelabuhan_transit" name="root_kode_pelabuhan_muat" type="text" class="form-control root_kode_pelabuhan_muat" placeholder="">
+                                <label>Kode Pelabuhan Transit</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_kode_tps" name="root_kode_tps" type="text" class="form-control root_kode_tps" placeholder="">
+                                <label>Kode TPS</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_tujuan_tpb" id="root_kode_tujuan_tpb" name="root_kode_tujuan_tpb" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeTujunTpb as $k) : ?>
+                                        <option value="<?= encrypt($k['description']) ?>">
+                                            <?= strtoupper($k['description']) . " ( " . strtoupper($k['value']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Tujuan TPB</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_tutup_pu" id="root_kode_tutup_pu" name="root_kode_tutup_pu" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeTutupPu as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Tutup PU</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_valuta" id="root_kode_valuta" name="root_kode_valuta" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeValuta as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Valuta</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_kota_ttd" name="root_kota_ttd" type="text" class="form-control root_kota_ttd" placeholder="">
+                                <label>Kota Pembuatan Dokumen BC 2.3</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_nama_ttd" name="root_nama_ttd" type="text" class="form-control root_nama_ttd" placeholder="">
+                                <label>Nama Pengguna Pembuat Dokumen BC 2.3</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_ndpbm" name="root_ndpbm" type="number" class="form-control root_ndpbm" placeholder="">
+                                <label>NDPBM</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_netto" name="root_netto" type="number" class="form-control root_netto" placeholder="">
+                                <label>Netto</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_nik" id="root_nik" name="root_nik" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeJenisAPI as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['description']) . " ( " . strtoupper($k['value']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">NIK (Jenis API)</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_nilai_barang" name="root_nilai_barang" type="number" class="form-control root_nilai_barang" placeholder="">
+                                <label>Nilai Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_no_aju" name="root_no_aju" type="text" maxlength="26" class="form-control root_no_aju" placeholder="">
+                                <label>Nomor Aju</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_no_bc_11" name="root_no_bc_11" type="text" maxlength="6" class="form-control root_no_bc_11" placeholder="">
+                                <label>Nomor BC 1.1</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_pos_bc_11" name="root_pos_bc_11" type="text" maxlength="4" class="form-control root_pos_bc_11" placeholder="">
+                                <label>Pos BC 1.1</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_seri" name="root_seri" type="number" class="form-control root_seri" placeholder="">
+                                <label>Seri</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_sub_pos_bc_11" maxlength="8" name="root_sub_pos_bc_11" type="number" class="form-control root_sub_pos_bc_11" placeholder="">
+                                <label>Sub Pos BC 1.1</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" name="root_tanggal_bc_11" type="text" placeholder="" class="form-control root_tanggal_bc_11" id="root_tanggal_bc_11">
+                                    <label>Tanggal BC 1.1</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" name="root_tanggal_tiba" type="text" placeholder="" class="form-control root_tanggal_tiba" id="root_tanggal_tiba">
+                                    <label>Tanggal Perkiraan Tiba</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" name="root_tanggal_ttd" type="text" placeholder="" class="form-control root_tanggal_ttd" id="root_tanggal_ttd">
+                                    <label>Tanggal Penanda-Tanganan Dokumen</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_biaya_tambahan" maxlength="24" name="root_biaya_tambahan" type="number" class="form-control root_biaya_tambahan" placeholder="">
+                                <label>Biaya Tambahan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="root_biaya_pengurang" maxlength="24" name="root_biaya_pengurang" type="number" class="form-control root_biaya_pengurang" placeholder="">
+                                <label>Biaya Pengurang</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select root_kode_kena_pajak" id="root_kode_kena_pajak" name="root_kode_kena_pajak" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeKenaPajak as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Kode Kena Pajak (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
                 <label class="form-label font-weight-bold lable-title mt-3 mb-2">
                     Informasi Entitas
                 </label>
@@ -643,7 +663,7 @@
                     </table>
                 </div>
                 <label class="form-label font-weight-bold lable-title mt-3 mb-2">
-                    Informasi Kontainer
+                    Informasi Kontainer (Opsional)
                 </label>
                 <form class="form-informasi-kontainer">
                     <div class="row">
@@ -783,7 +803,7 @@
                                     </button>
                                 </div>
                                 <div class="col-sm">
-                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="" class="btn btn-add btn-block float-right btn-reset-informasi-dokumen-pelengkap">
+                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiDokumenPelengkap()" class="btn btn-add btn-block float-right btn-reset-informasi-dokumen-pelengkap">
                                         <i class="fa-solid fa-rotate-right mr-1"></i> Reset
                                     </button>
                                 </div>
@@ -799,6 +819,86 @@
                                 <th style="text-align: center;">Nomor Dokumen</th>
                                 <th style="text-align: center;">Seri Dokumen</th>
                                 <th style="text-align: center;">Tanggal Dokumen</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <label class="form-label font-weight-bold lable-title mt-3 mb-2">
+                    Informasi Pengangkut
+                </label>
+                <form class="form-informasi-pengangkut">
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="pengangkut_kode_bendera" name="pengangkut_kode_bendera" type="text" class="form-control pengangkut_kode_bendera" placeholder="">
+                                <label>Kode Bendera</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="pengangkut_nama_sarana_pengangkut" name="pengangkut_nama_sarana_pengangkut" type="text" class="form-control pengangkut_nama_sarana_pengangkut" placeholder="">
+                                <label>Nama Sarana Pengangkut</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="pengangkut_nomor_pengangkut" name="pengangkut_nomor_pengangkut" type="text" class="form-control pengangkut_nomor_pengangkut" placeholder="">
+                                <label>Nomor Pengangkut (Voy Flight)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select pengangkut_kode_cara_angkut" id="pengangkut_kode_cara_angkut" name="pengangkut_kode_cara_angkut" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodePengangkutan as $k) : ?>
+                                        <option value="<?= encrypt($k['description']) ?>">
+                                            <?= $k['description'] . " ( " . strtoupper($k['value']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Cara Pengangkutan</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="pengangkut_seri_pengangkut" name="pengangkut_seri_pengangkut" type="number" class="form-control pengangkut_seri_pengangkut" placeholder="">
+                                <label>Seri Data Pengangkut</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="row" style="float: right; margin-bottom:5px;">
+                                <div class="col-sm" style="margin-right: -20px;">
+                                    <button type="button" class="btn btn-add btn-block float-right btn-submit-informasi-pengangkut" style="float: right;">
+                                        <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
+                                    </button>
+                                </div>
+                                <div class="col-sm">
+                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiPengangkut()" class="btn btn-add btn-block float-right btn-reset-informasi-pengangkut">
+                                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-pengangkut" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center; width:10px;">No</th>
+                                <th style="text-align: center;">Kode Bendera</th>
+                                <th style="text-align: center;">Nama Pengangkut</th>
+                                <th style="text-align: center;">Nomor Pengangkut</th>
+                                <th style="text-align: center;">Cara Angkut</th>
+                                <th style="text-align: center;">Seri Pengangkut</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -1280,8 +1380,12 @@
 
 
 <script>
+    // CSRF
+    const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
     // DECLARE VARIABLE
     var listBarang = [];
+    var listInformasiPengangkut = [];
     var listInformasiDokumenPelengkap = [];
     var listInformasiKontainer = [];
     var listInformasiEntitas = [];
@@ -1387,7 +1491,7 @@
         theme: "bootstrap-5",
     });
     $('#root_kode_kena_pajak').select2({
-        placeholder: "Pilih Kode Kena Pajak",
+        placeholder: "Pilih Kode Kena Pajak (Opsional)",
         theme: "bootstrap-5",
     });
     // ENTITAS
@@ -1411,6 +1515,11 @@
     });
     $('#kontainer_kode_tipe_kontainer').select2({
         placeholder: "Pilih Kode Tipe Kontainer",
+        theme: "bootstrap-5",
+    });
+    // PENGANGKUT
+    $('#pengangkut_kode_cara_angkut').select2({
+        placeholder: "Pilih Cara Pengangkutan",
         theme: "bootstrap-5",
     });
     // DOKUMEN BARANG
@@ -1669,7 +1778,34 @@
     });
 
     // TABEL INFORMASI DOKUMEN PELENGKAP
-    var tableListInformasiKontainer = $('.table-list-informasi-dokumen-pelengkap').DataTable({
+    var tableListDokumenPelengkap = $('.table-list-informasi-dokumen-pelengkap').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        lengthChange: true,
+        info: false,
+        paging: false,
+        searching: false,
+        ordering: false,
+        order: [],
+        fixedHeader: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    // TABEL INFORMASI PENGANGKUT
+    var tableListInformasiPengangkut = $('.table-list-informasi-pengangkut').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         lengthChange: true,
         info: false,
@@ -1735,6 +1871,306 @@
 
     });
     // ACTION
+    // VALIDATOR ROOT FORM
+    var validatorRootForm = $('.form-root').validate({
+        rules: {
+            tanggal_penerimaan_lpb: {
+                required: true
+            },
+            root_asuransi: {
+                required: true
+            },
+            root_bruto: {
+                required: true
+            },
+            root_cif: {
+                required: true
+            },
+            root_fob: {
+                required: true
+            },
+            root_freight: {
+                required: true
+            },
+            root_harga_penyerahan: {
+                required: true
+            },
+            root_jabatan_pengusaha_ttd: {
+                required: true
+            },
+            root_jumlah_kontainer: {
+                required: true
+            },
+            root_kode_asuransi: {
+                required: true
+            },
+            root_kode_dokumen: {
+                required: true
+            },
+            root_kode_incoterm: {
+                required: true
+            },
+            root_kode_kantor: {
+                required: true
+            },
+            root_kode_kantor_bongkar: {
+                required: true
+            },
+            root_kode_pelabuhan_bongkar: {
+                required: true
+            },
+            root_kode_pelabuhan_muat: {
+                required: true
+            },
+            root_kode_pelabuhan_transit: {
+                required: true
+            },
+            root_kode_tps: {
+                required: true
+            },
+            root_kode_tujuan_tpb: {
+                required: true
+            },
+            root_kode_tutup_pu: {
+                required: true
+            },
+            root_kode_valuta: {
+                required: true
+            },
+            root_kota_ttd: {
+                required: true
+            },
+            root_ndpbm: {
+                required: true
+            },
+            root_netto: {
+                required: true
+            },
+            root_nik: {
+                required: true
+            },
+            root_nilai_barang: {
+                required: true
+            },
+            root_no_aju: {
+                required: true
+            },
+            root_no_bc_11: {
+                required: true
+            },
+            root_pos_bc_11: {
+                required: true
+            },
+            root_seri: {
+                required: true
+            },
+            root_sub_pos_bc_11: {
+                required: true
+            },
+            root_tanggal_bc_11: {
+                required: true
+            },
+            root_tanggal_tiba: {
+                required: true
+            },
+            root_tanggal_ttd: {
+                required: true
+            },
+            root_biaya_tambahan: {
+                required: true
+            },
+            root_biaya_pengurang: {
+                required: true
+            },
+        },
+        messages: {
+            tanggal_penerimaan_lpb: {
+                required: "Tanggal penerimaan wajib diisi"
+            },
+            root_asuransi: {
+                required: "Asurnasi wajib diisi"
+            },
+            root_bruto: {
+                required: "Bruto wajib diisi"
+            },
+            root_cif: {
+                required: "Cif wajib diisi"
+            },
+            root_fob: {
+                required: "Fob wajib diisi"
+            },
+            root_freight: {
+                required: "Freight wajib diisi"
+            },
+            root_harga_penyerahan: {
+                required: "Harga penyerahan wajib diisi"
+            },
+            root_jabatan_pengusaha_ttd: {
+                required: "Jabatan wajib diisi"
+            },
+            root_jumlah_kontainer: {
+                required: "Jumlah kontainer wajib diisi"
+            },
+            root_kode_asuransi: {
+                required: "Pilih kode asuransi"
+            },
+            root_kode_dokumen: {
+                required: "Kode dokumen wajib diisi"
+            },
+            root_kode_incoterm: {
+                required: "Pilih kode incoterm"
+            },
+            root_kode_kantor: {
+                required: "Pilih kode kantor"
+            },
+            root_kode_kantor_bongkar: {
+                required: "Pilih kode kantor bongkar"
+            },
+            root_kode_pelabuhan_bongkar: {
+                required: "Kode pelabuhan bongkar wajib diisi"
+            },
+            root_kode_pelabuhan_muat: {
+                required: "Kode pelabuhan muat wajib diisi"
+            },
+            root_kode_pelabuhan_transit: {
+                required: "Kode pelabuhan transit wajib diisi"
+            },
+            root_kode_tps: {
+                required: "Kode TPS wajib diisi"
+            },
+            root_kode_tujuan_tpb: {
+                required: "Pilih kode tujuan TPB"
+            },
+            root_kode_tutup_pu: {
+                required: "Pilh kode tutup Pu"
+            },
+            root_kode_valuta: {
+                required: "Pilih kode valuta"
+            },
+            root_kota_ttd: {
+                required: "Kota pembuatan dokumen wajib diisi"
+            },
+            root_ndpbm: {
+                required: "Ndpbm wajib diisi"
+            },
+            root_netto: {
+                required: "Netto wajib diisi"
+            },
+            root_nik: {
+                required: "Pilih angka pengenal importir"
+            },
+            root_nilai_barang: {
+                required: "Nilai barang wajib diisi"
+            },
+            root_no_aju: {
+                required: "Nomor aju wajib diisi"
+            },
+            root_no_bc_11: {
+                required: "Nomor BC 1.1 wajib diisi"
+            },
+            root_pos_bc_11: {
+                required: "Pos BC 1.1 wajib diisi"
+            },
+            root_seri: {
+                required: "Seri wajib diisi"
+            },
+            root_sub_pos_bc_11: {
+                required: "Sub Pos BC 1.1 wajib diisi"
+            },
+            root_tanggal_bc_11: {
+                required: "Tanggal BC 1.1 wajib diisi"
+            },
+            root_tanggal_tiba: {
+                required: "Tanggal perkiraan tiba wajib diisi"
+            },
+            root_tanggal_ttd: {
+                required: "Tanggal penanda tanganan dokumen wajib diisi"
+            },
+            root_biaya_tambahan: {
+                required: "Biaya tambahan wajib diisi"
+            },
+            root_biaya_pengurang: {
+                required: "Biaya pengurang wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+    // VALIDATOR INFORMASI DOKUMEN PENGANGKUT
+    var validatorInformasiPengangkut = $(".form-informasi-pengangkut").validate({
+        rules: {
+            pengangkut_kode_bendera: {
+                required: true
+            },
+            pengangkut_nama_sarana_pengangkut: {
+                required: true
+            },
+            pengangkut_nomor_pengangkut: {
+                required: true
+            },
+            pengangkut_kode_cara_angkut: {
+                required: true
+            },
+            pengangkut_seri_pengangkut: {
+                required: true
+            },
+        },
+        messages: {
+            pengangkut_kode_bendera: {
+                required: "Kode bendera wajib diisi"
+            },
+            pengangkut_nama_sarana_pengangkut: {
+                required: "Nama sarana pengangkut wajib diisi"
+            },
+            pengangkut_nomor_pengangkut: {
+                required: "Nomor pengangkut wajib diisi"
+            },
+            pengangkut_kode_cara_angkut: {
+                required: "Pilih kode cara angkut"
+            },
+            pengangkut_seri_pengangkut: {
+                required: "Seri data pengangkut wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
     // VALIDATOR INFORMASI DOKUMEN PELENGKAP
     var validatorInformasiDokumenPelengkap = $(".form-dokumen-pelengkap").validate({
         rules: {
@@ -1757,6 +2193,9 @@
             },
             dokumen_pelengkap_nomor_dokumen: {
                 required: "Nomor dokumen wajib diisi"
+            },
+            dokumen_pelengkap_seri_dokumen: {
+                required: "Seri dokumen wajib diisi"
             },
             dokumen_pelengkap_tanggal_dokumen: {
                 required: "Tanggal dokumen wajib diisi"
@@ -2327,7 +2766,6 @@
                         nilai_fasilitas: $('#nilai_fasilitas').val(),
                         nilai_sudah_dilunasi: $('#nilai_sudah_dilunasi').val(),
                         barang_tarif_seri_barang: $('#barang_tarif_seri_barang').val(),
-                        barang_tarif_seri_barang_text: $('#barang_tarif_seri_barang').find('option:selected').text(),
                         tarif_bm: $('#tarif_bm').val(),
                         tarif_fasilitas: $('#tarif_fasilitas').val()
                     };
@@ -2541,6 +2979,176 @@
                     resetFormInformasiKontainer();
                 }
             });
+        }
+    });
+    // SIMPAN INFORMASI DOKUMEN PELENGKAP
+    $('.btn-submit-informasi-dokumen-pelengkap').click(function() {
+        if ($('.form-dokumen-pelengkap').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Dokumen Pelengkap ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    listInformasiDokumenPelengkap.push({
+                        id: getID(),
+                        dokumen_pelengkap_kode_dokumen: $('#dokumen_pelengkap_kode_dokumen').val(),
+                        dokumen_pelengkap_nomor_dokumen: $('#dokumen_pelengkap_nomor_dokumen').val(),
+                        dokumen_pelengkap_seri_dokumen: $('#dokumen_pelengkap_seri_dokumen').val(),
+                        dokumen_pelengkap_tanggal_dokumen: $('#dokumen_pelengkap_tanggal_dokumen').val()
+                    });
+                    displayTableInformasiDokumenPelengkap();
+                    resetFormInformasiDokumenPelengkap();
+                }
+            })
+        }
+    });
+    // SIMPAN INFORMASI PENGANGKUT
+    $('.btn-submit-informasi-pengangkut').click(function() {
+        if ($('.form-informasi-pengangkut').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Informasi Pengangkut ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    listInformasiPengangkut.push({
+                        id: getID(),
+                        pengangkut_kode_bendera: $('#pengangkut_kode_bendera').val(),
+                        pengangkut_nama_sarana_pengangkut: $('#pengangkut_nama_sarana_pengangkut').val(),
+                        pengangkut_nomor_pengangkut: $('#pengangkut_nomor_pengangkut').val(),
+                        pengangkut_kode_cara_angkut: $('#pengangkut_kode_cara_angkut').val(),
+                        pengangkut_kode_cara_angkut_text: $('#pengangkut_kode_cara_angkut').find('option:selected').text(),
+                        pengangkut_seri_pengangkut: $('#pengangkut_seri_pengangkut').val()
+                    });
+                    displayTableInformasiPengangkut();
+                    resetFormInformasiPengangkut();
+
+                }
+            })
+        }
+    });
+    // SIMPAN DOKUMEN BC 2.23
+    $('.btn-submit-root-form-view').click(function() {
+        if ($('.form-root').valid()) {
+            // CEK APAKAH SEMUA INFORMASI BARANG (DETAIL) SUDAH DIISI SEMUA
+            var validationDetailInfoBarang = true;
+            $.each(listBarang, function(i, v) {
+                if (v.detail_barang_dok.barangTarif.length === 0) {
+                    validationDetailInfoBarang = false;
+                }
+            });
+            if (!validationDetailInfoBarang) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Ada dokumen barang yang belum diisi!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (listInformasiEntitas.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Informasi entitas masih kosong!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (listInformasiKemasan.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Informasi kemasan masih kosong!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (listInformasiDokumenPelengkap.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Informasi dokumen pelengkap masih kosong!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (listInformasiPengangkut.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Informasi dokumen pengangkut masih kosong!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Dokumen BC 2.3 ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var formData = new FormData(document.querySelector(".form-root"));
+                        formData.append('barang', JSON.stringify(listBarang));
+                        formData.append('entitas', JSON.stringify(listInformasiEntitas));
+                        formData.append('kemasan', JSON.stringify(listInformasiKemasan));
+                        formData.append('kontainer', JSON.stringify(listInformasiKontainer));
+                        formData.append('dokumen', JSON.stringify(listInformasiDokumenPelengkap));
+                        formData.append('pengangkut', JSON.stringify(listInformasiPengangkut));
+                        var id = $('#id').val();
+                        if (id) {
+                            // UPDATE
+                        } else {
+                            // INSERT
+                            $.ajax({
+                                url: "<?= base_url("bea-cukai-bc-23/create"); ?>",
+                                data: formData,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status === true) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                console.log(response);
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                console.log(response);
+                                            }
+                                        });
+                                    }
+                                },
+                            });
+                        }
+                    }
+                });
+            }
+
         }
     });
 
@@ -2761,6 +3369,7 @@
         tableListInformasiKemasan.draw();
     }
 
+    // DATA TABEL INFORMASI KONTAINER
     function displayTableInformasiKontainer() {
         if ($.fn.DataTable.isDataTable('.table-list-informasi-kontainer')) {
             $('.table-list-informasi-kontainer').DataTable().clear().draw();
@@ -2812,6 +3421,166 @@
             }
         });
         tableListInformasiKontainer.draw();
+    }
+
+    // DATA TABEL INFORMASI DOKUMEN PELENGKAP
+    function displayTableInformasiDokumenPelengkap() {
+        if ($.fn.DataTable.isDataTable('.table-list-informasi-dokumen-pelengkap')) {
+            $('.table-list-informasi-dokumen-pelengkap').DataTable().clear().draw();
+            tableListDokumenPelengkap.destroy();
+        }
+        const table = $('.table-list-informasi-dokumen-pelengkap');
+        const tbody = table.find('tbody');
+        var no = 1;
+
+        $.each(listInformasiDokumenPelengkap, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').text(no++));
+            newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_nomor_dokumen));
+            newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_seri_dokumen));
+            newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_tanggal_dokumen));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowInformasiDokumenPelengkap('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+            ));
+            table.find('tbody').append(newRow);
+        });
+
+        tableListDokumenPelengkap = $('.table-list-informasi-dokumen-pelengkap').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            lengthChange: true,
+            info: false,
+            paging: false,
+            searching: false,
+            ordering: false,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+        tableListDokumenPelengkap.draw();
+    }
+
+    // DATA TABEL INFORMASI PENGANGKUT
+    function displayTableInformasiPengangkut() {
+        if ($.fn.DataTable.isDataTable('.table-list-informasi-pengangkut')) {
+            $('.table-list-informasi-pengangkut').DataTable().clear().draw();
+            tableListInformasiPengangkut.destroy();
+        }
+        const table = $('.table-list-informasi-pengangkut');
+        const tbody = table.find('tbody');
+        var no = 1;
+
+        $.each(listInformasiPengangkut, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').text(no++));
+            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_kode_bendera));
+            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_nama_sarana_pengangkut));
+            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_nomor_pengangkut));
+            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_kode_cara_angkut_text));
+            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_seri_pengangkut));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowInformasiPengangkut('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+            ));
+            table.find('tbody').append(newRow);
+        });
+
+        tableListInformasiPengangkut = $('.table-list-informasi-pengangkut').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            lengthChange: true,
+            info: false,
+            paging: false,
+            searching: false,
+            ordering: false,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+        tableListInformasiPengangkut.draw();
+    }
+
+    // DELETE ROW INFORMASI PENGANGKUT
+    function deleteRowInformasiPengangkut(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Informasi Pengangkut ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var indexToRemove = -1;
+                $.each(listInformasiPengangkut, function(i, v) {
+                    if (v.id === id) {
+                        indexToRemove = i;
+                    }
+                });
+                if (indexToRemove !== -1) {
+                    listInformasiPengangkut.splice(indexToRemove, 1);
+                }
+                displayTableInformasiPengangkut()
+            }
+        })
+    }
+
+    // DELETE ROW DETAIL INFORMASI DOKUMEN PELENGKAP
+    function deleteRowInformasiDokumenPelengkap(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Informasi Dokumen Pelengkap ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var indexToRemove = -1;
+                $.each(listInformasiDokumenPelengkap, function(i, v) {
+                    if (v.id === id) {
+                        indexToRemove = i;
+                    }
+                });
+                if (indexToRemove !== -1) {
+                    listInformasiDokumenPelengkap.splice(indexToRemove, 1);
+                }
+                displayTableInformasiDokumenPelengkap()
+            }
+        })
     }
 
     // DELETE ROW DETAIL INFORMASI KONTAINER
@@ -2992,6 +3761,20 @@
         if (targetElement.length > 0) {
             targetElement.html('<span class="badge badge-success">DOKUMEN SUDAH DIISI</span>');
         }
+    }
+
+    function resetFormInformasiPengangkut() {
+        $('#pengangkut_kode_bendera').val('');
+        $('#pengangkut_nama_sarana_pengangkut').val('');
+        $('#pengangkut_nomor_pengangkut').val('');
+        $('#pengangkut_kode_cara_angkut').val(null).change();
+        $('#pengangkut_seri_pengangkut').val('');
+    }
+
+    function resetFormInformasiDokumenPelengkap() {
+        $('#dokumen_pelengkap_nomor_dokumen').val('');
+        $('#dokumen_pelengkap_seri_dokumen').val('');
+        $('#dokumen_pelengkap_tanggal_dokumen').val('');
     }
 
     function resetFormInformasiKontainer() {

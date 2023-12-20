@@ -145,4 +145,9 @@ class BarangMasterModel extends Model
 
         return $data;
     }
+
+    public function getBarang($barangID)
+    {
+        return $this->where('id', $barangID)->first();
+    }
 }
