@@ -12,7 +12,7 @@ class BC23KontainerModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = false;
     protected $allowedFields    = [];
 
@@ -48,7 +48,7 @@ class BC23KontainerModel extends Model
         foreach ($this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll() as $r) {
             $kodeJenisKontainer = $metaDataModel->bcMetaDataHelper("Jenis Kontainer", null, $r['kode_jenis_kontainer']);
             $kodeTipeKontainer = $metaDataModel->bcMetaDataHelper("Kode Tipe Kontainer BC", $r['kode_tipe_kontainer'], null);
-            $kodeUkuranKontainer = $metaDataModel->bcMetaDataHelper("Kode Tipe Kontainer BC", $r['kode_ukuran_kontainer'], null);
+            $kodeUkuranKontainer = $metaDataModel->bcMetaDataHelper("Kode Ukuran Kontainer BC", $r['kode_ukuran_kontainer'], null);
             $result[] = [
                 'id' => $r['id'],
                 'kontainer_kode_jenis_kontainer' => encrypt($r['kode_jenis_kontainer']),

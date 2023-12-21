@@ -12,7 +12,7 @@ class BC23Model extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = false;
     protected $allowedFields    = [];
 
@@ -70,7 +70,7 @@ class BC23Model extends Model
 
         $totalData = $bcDataQry->countAllResults(false);
 
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['noBC23'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
+        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['noBC23'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
             $bcDataQry->groupStart();
         }
 
@@ -108,7 +108,15 @@ class BC23Model extends Model
             $bcDataQry->like('bc_no_lokal', $addCondition['noBC23']);
         }
 
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['noBC23'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
+        if ($addCondition['noPenerimaanBarang']) {
+            $bcDataQry->like('no_penerimaan_barang', $addCondition['noPenerimaanBarang']);
+        }
+
+        if ($addCondition['noAju']) {
+            $bcDataQry->like('no_aju', $addCondition['noAju']);
+        }
+
+        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['noBC23'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
             $bcDataQry->groupEnd();
         }
 

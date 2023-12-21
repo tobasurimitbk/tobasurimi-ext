@@ -45,6 +45,12 @@
                 <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noBC23 search form-out-search" placeholder="Cari Nomor BC 2.3" value="" />
                 </div>
+                <div class="col-md-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control noPenerimaanBarang search form-out-search" placeholder="Cari Nomor LPB" value="" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.3" value="" />
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -75,6 +81,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
     let sort = "bea_cukai.id";
     let sortType = "desc";
 
@@ -101,6 +108,8 @@
                 data.noBC23 = $('.noBC23').val();
                 data.statusLPB = $('.statusLPB').val();
                 data.statusBC = $('.statusBC').val();
+                data.noPenerimaanBarang = $('.noPenerimaanBarang').val();
+                data.noAju = $('.noAju').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -191,12 +200,17 @@
                     } else {
                         if (row.status == "BELUM POSTING") {
                             htmlRes += `
-                            <button  class="btn btn-success posting-spp">
+                            <button onclick="postingAction('${row.id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>`
+                            </button>
+                            <button onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                            `
+
                         } else {
                             htmlRes += `
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-lokal-bahan-penolong/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button class="btn btn-warning btn-print" onclick="alert('Hello')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>`
                         }
@@ -237,7 +251,7 @@
         table.ajax.reload();
     });
 
-    $('.noBC23').keyup(function() {
+    $('.noBC23, .noPenerimaanBarang, .noAju').keyup(function() {
         table.ajax.reload();
     });
 
@@ -259,7 +273,117 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
-        table.ajax.reload();
+    }
+
+    function deleteAction(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Dokumen BC 2.3 ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append("id", id);
+                $.ajax({
+                    url: `<?= base_url("bea-cukai-bc-23/delete"); ?>`,
+                    method: "POST",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            csrf.val(res.token);
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                table.ajax.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    table.ajax.reload();
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    function postingAction(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting BC 2.3 ke aplikasi Ceisa Bea Cukai ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append("id", id);
+                $.ajax({
+                    url: `<?= base_url("bea-cukai-bc-23/posting"); ?>`,
+                    method: "POST",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            csrf.val(res.token);
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    table.ajax.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    table.ajax.reload();
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+        })
+
     }
 </script>
 <?= $this->endSection(); ?>

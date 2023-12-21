@@ -57,6 +57,7 @@ class BC23 extends BaseController
         $condition = [
             "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => null,
+            "penerimaan_barang.bc_type" => 48
         ];
 
 
@@ -67,7 +68,9 @@ class BC23 extends BaseController
             "statusLPB" => $this->request->getGet("statusLPB"),
             "noBC23" => $this->request->getGet("noBC23"),
             "mulaiTanggalBC23" => $this->request->getGet("mulaiTanggalBC23"),
-            "selesaiTanggalBC23" => $this->request->getGet('selesaiTanggalBC23')
+            "selesaiTanggalBC23" => $this->request->getGet('selesaiTanggalBC23'),
+            "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
+            "noAju" => $this->request->getGet('noAju')
         ];
 
         $limit = $this->request->getGet("length");
@@ -200,13 +203,15 @@ class BC23 extends BaseController
             'kodeUkuranKontainer' => $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
             'kodeJenisKontainer' => $metaDataModel->where('name', "Jenis Kontainer")->findAll(),
             'kodePengangkutan' => $metaDataModel->where('name', "Pengangkutan")->findAll(),
+            'kodeSatuanBarang' => $metaDataModel->getKodeSatuanBarang(10, 0),
 
             // data detail
             'lpb' => $penerimaanBarangModel->getById($id),
             'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $lpb->tipe_bahan, $lpb->status_penerimaan),
             'bc23Detail' => $bc23Detail,
-            'bc23Json' => $bc23Model->writeJsonUpdate($id)
+            'bc23Json' => $bc23Model->writeJsonUpdate($bc23ID)
         ];
+
 
         return view('BeaCukai/bc-23/form', $data);
     }
@@ -276,6 +281,7 @@ class BC23 extends BaseController
                 'kode_kena_pajak' => decrypt($this->request->getVar('root_kode_kena_pajak')),
                 'kode_pelabuhan_bongkar' => $this->request->getVar('root_kode_pelabuhan_bongkar'),
                 'kode_pelabuhan_muat' => $this->request->getVar('root_kode_pelabuhan_muat'),
+                'kode_pelabuhan_transit' => $this->request->getVar('root_kode_pelabuhan_transit'),
                 'kode_tps' => $this->request->getVar('root_kode_tps'),
                 'kode_tujuan_tpb' => decrypt($this->request->getVar('root_kode_tujuan_tpb')),
                 'kode_tutup_pu' => decrypt($this->request->getVar('root_kode_tutup_pu')),
@@ -441,25 +447,16 @@ class BC23 extends BaseController
             return response()->setJSON([
                 'message' => "Dokumen BC 2.3 berhasil dibuat",
                 'id' => encrypt($bc23ID),
+                'penerimaan_barang_id' => encrypt($this->request->getVar('penerimaan_barang_id')),
                 'status' => true,
                 'token' => csrf_hash()
             ]);
         } catch (Exception $e) {
-            $helper = [
-                '$_POST' => $_POST,
-                'barang' => json_decode($_POST['barang']),
-                'dokumen' => json_decode($_POST['dokumen']),
-                'entitas' => json_decode($_POST['entitas']),
-                'kemasan' => json_decode($_POST['kemasan']),
-                'kontainer' => json_decode($_POST['kontainer']),
-                'pengangkut' => json_decode($_POST['pengangkut']),
-            ];
             return response()->setJSON([
                 'message' => "Terjadi kesalahan di sisi server",
                 'token' => csrf_hash(),
                 'error' => $e->getMessage(),
                 'status' => false,
-                'helper' => $helper
             ]);
         }
     }
@@ -586,6 +583,7 @@ class BC23 extends BaseController
                 'kode_kena_pajak' => decrypt($this->request->getVar('root_kode_kena_pajak')),
                 'kode_pelabuhan_bongkar' => $this->request->getVar('root_kode_pelabuhan_bongkar'),
                 'kode_pelabuhan_muat' => $this->request->getVar('root_kode_pelabuhan_muat'),
+                'kode_pelabuhan_transit' => $this->request->getVar('root_kode_pelabuhan_transit'),
                 'kode_tps' => $this->request->getVar('root_kode_tps'),
                 'kode_tujuan_tpb' => decrypt($this->request->getVar('root_kode_tujuan_tpb')),
                 'kode_tutup_pu' => decrypt($this->request->getVar('root_kode_tutup_pu')),
@@ -779,7 +777,7 @@ class BC23 extends BaseController
             return response()->setJSON([
                 'message' => "Terjadi kesalahan di sisi server",
                 'token' => csrf_hash(),
-                'error' => $e->getMessage(),
+                'error' => $e->getTrace(),
                 'status' => false,
             ]);
         }
@@ -802,5 +800,20 @@ class BC23 extends BaseController
         ];
 
         return $this->response->setJSON($response);
+    }
+
+    public function generateNomorAju()
+    {
+        $kodeKantor = $this->request->getVar('kode_kantor');
+        $kodeDokumenBC23 = '23';
+        $kodeUniqPerusahaan = generateUniqueCode(6);
+        $tanggalAju = date('Ymd');
+        $sequenceNoUrutPengajuan = generateUniqueCode(6);
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'noAju' => decrypt($kodeKantor) . '-' . $kodeDokumenBC23 . '-' . $kodeUniqPerusahaan . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan
+        ]);
     }
 }

@@ -19,24 +19,37 @@
             </a>
             <?php if (!empty($bc23Detail)) : ?>
                 <?php if ($bc23Detail['status_posting'] === "Belum Posting") : ?>
-                    <button class="btn btn-hapus delete-parent float-right">
+                    <button onclick="deleteAction()" class="btn btn-hapus delete-parent float-right root-form-view">
                         Hapus
                     </button>
-                    <button class="btn btn-success posting-spp float-right">
+                    <button onclick="postingAction()" class="btn btn-success posting-bc-23 float-right root-form-view">
                         Posting
                     </button>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view">
+                    <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
                         Simpan
+                    </button>
+                <?php else : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="alert('Hello')">
+                        Print
                     </button>
                 <?php endif; ?>
             <?php else : ?>
+
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
                     Simpan
                 </button>
             <?php endif; ?>
-            <button class="btn btn-show-form btn-save float-right detail-barang-form-view btn-simpan-detail-barang-form-view">
-                Simpan
-            </button>
+            <?php if (!empty($bc23Detail)) : ?>
+                <?php if ($bc23Detail['status_posting'] != "Sudah Posting") : ?>
+                    <button class="btn btn-show-form btn-save float-right detail-barang-form-view btn-simpan-detail-barang-form-view">
+                        Simpan
+                    </button>
+                <?php endif; ?>
+            <?php else : ?>
+                <button class="btn btn-show-form btn-save float-right detail-barang-form-view btn-simpan-detail-barang-form-view">
+                    Simpan
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -55,6 +68,14 @@
                                 <td colspan="3"></td>
                             </tr>
                             <tr style="color: black;">
+                                <td width="150px"><b>Nomor Aju</b></td>
+                                <td width="30px">:</td>
+                                <td><?= $bc23Detail['no_aju'] ?></td>
+                            </tr>
+                            <tr style="color: black; height: 20px;">
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr style="color: black;">
                                 <td width="150px"><b>Status Dokumen</b></td>
                                 <td width="30px">:</td>
                                 <td><?= $bc23Detail['status_posting'] ?></td>
@@ -68,8 +89,8 @@
                         Informasi Barang
                     </label>
                     <?= csrf_field() ?>
-                    <input type="hidden" name="id" class="id" id="id" value="<?= !empty($bc23Detail) ? $bc23Detail['id'] : '' ?>">
-                    <input type="hidden" name="penerimaan_barang_id" class="penerimaan_barang_id" id="penerimaan_barang_id" value="<?= $lpb->id ?>">
+                    <input type="hidden" name="id" class="id" id="id" value="<?= !empty($bc23Detail) ? encrypt($bc23Detail['id']) : '' ?>">
+                    <input type="hidden" name="penerimaan_barang_id" class="penerimaan_barang_id" id="penerimaan_barang_id" value="<?= encrypt($lpb->id) ?>">
                     <div class="row mt-2">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -86,7 +107,7 @@
                         <div class="col-sm-4 mt-1">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= date('d/m/Y', strtotime($lpb->tanggal)) ?>" autocomplete="one-time-code" type="text" placeholder="" name="tanggal_penerimaan_lpb" class="form-control tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb">
+                                    <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> value="<?= date('d/m/Y', strtotime($lpb->tanggal)) ?>" autocomplete="one-time-code" type="text" placeholder="" name="tanggal_penerimaan_lpb" class="form-control tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb">
                                     <label>Tanggal Penerimaan</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -112,6 +133,7 @@
                                     <tbody>
                                         <?php $no = 1; ?>
                                         <?php foreach ($lpbDetail as $l) : ?>
+                                            <?php $sudahDiisi = false; ?>
                                             <tr>
                                                 <td style="text-align: center;"><?= $no++; ?></td>
                                                 <td style="text-align: center;"><?= $l['po_no'] ?></td>
@@ -120,9 +142,27 @@
                                                 <td style="text-align: center;"><?= $l['jml_masuk'] ?></td>
                                                 <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['sub_total'])) ?></td>
                                                 <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['id']) ?>">
-                                                    <span class="badge badge-danger">
-                                                        DOKUMEN BELUM DIISI
-                                                    </span>
+                                                    <?php if (!empty($bc23Detail)) : ?>
+                                                        <?php foreach ($bc23Json['detailBarangDok'] as $bj) : ?>
+                                                            <?php if ($bj['penerimaan_barang_detail_id'] == encrypt($l['id'])) : ?>
+                                                                <span class="badge badge-success">
+                                                                    DOKUMEN SUDAH DIISI
+                                                                </span>
+                                                                <?php $sudahDiisi = true; ?>
+                                                                <?php break; ?>
+                                                            <?php endif; ?>
+
+                                                        <?php endforeach; ?>
+                                                        <?php if (!$sudahDiisi) : ?>
+                                                            <span class="badge badge-danger">
+                                                                DOKUMEN BELUM DIISI
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    <?php else : ?>
+                                                        <span class="badge badge-danger">
+                                                            DOKUMEN BELUM DIISI
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td style="text-align: center;">
                                                     <button type="button" data-id="<?= encrypt($l['id']) ?>" class="btn btn-warning btn-edit-dokumen-barang">
@@ -150,13 +190,13 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_asuransi" name="root_asuransi" type="number" class="form-control root_asuransi" placeholder="">
+                                <input id="root_asuransi" <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['asuransi'] : '' ?>" name="root_asuransi" type="number" class="form-control root_asuransi" placeholder="">
                                 <label>Asuransi</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control root_bruto" name="root_bruto" id="root_bruto" placeholder="">
+                                <input type="number" <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['bruto'] : '' ?>" class="form-control root_bruto" name="root_bruto" id="root_bruto" placeholder="">
                                 <label>Bruto</label>
                             </div>
                         </div>
@@ -164,19 +204,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="root_cif" name="root_cif" type="number" class="root_cif form-control" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['cif'] : '' ?>" id="root_cif" name="root_cif" type="number" class="root_cif form-control" placeholder="">
                                 <label>CIF</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_fob" name="root_fob" type="number" class="form-control root_fob" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['fob'] : '' ?>" id="root_fob" name="root_fob" type="number" class="form-control root_fob" placeholder="">
                                 <label>FOB</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control root_freight" name="root_freight" id="root_freight" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['freight'] : '' ?>" type="number" class="form-control root_freight" name="root_freight" id="root_freight" placeholder="">
                                 <label>Freight</label>
                             </div>
                         </div>
@@ -184,19 +224,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="root_harga_penyerahan" name="root_harga_penyerahan" type="number" class="root_harga_penyerahan form-control" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['harga_penyerahan'] : '' ?>" id="root_harga_penyerahan" name="root_harga_penyerahan" type="number" class="root_harga_penyerahan form-control" placeholder="">
                                 <label>Harga Penyerahan</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_jabatan_pengusaha_ttd" name="root_jabatan_pengusaha_ttd" type="text" class="form-control root_jabatan_pengusaha_ttd" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['jabatan_pengusaha_ttd'] : '' ?>" id="root_jabatan_pengusaha_ttd" name="root_jabatan_pengusaha_ttd" type="text" class="form-control root_jabatan_pengusaha_ttd" placeholder="">
                                 <label>Jabatan Pengusaha TPB</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control root_jumlah_kontainer" name="root_jumlah_kontainer" id="root_jumlah_kontainer" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'readonly' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['jumlah_kontainer'] : '' ?>" type="number" class="form-control root_jumlah_kontainer" name="root_jumlah_kontainer" id="root_jumlah_kontainer" placeholder="">
                                 <label>Jumlah Kontainer</label>
                             </div>
                         </div>
@@ -204,10 +244,10 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_asuransi" id="root_kode_asuransi" name="root_kode_asuransi" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_asuransi" id="root_kode_asuransi" name="root_kode_asuransi" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeAsuransi as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_asuransi']) == encrypt($k['value']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['value']) ?>">
                                             <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -223,10 +263,10 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_incoterm" id="root_kode_incoterm" name="root_kode_incoterm" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_incoterm" id="root_kode_incoterm" name="root_kode_incoterm" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeIncoterm as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_incoterm']) == encrypt($k['value']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['value']) ?>">
                                             <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -238,10 +278,10 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_kantor" id="root_kode_kantor" name="root_kode_kantor" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_kantor" id="root_kode_kantor" name="root_kode_kantor" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeKantor as $k) : ?>
-                                        <option value="<?= encrypt($k['kode']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_kantor']) == encrypt($k['kode']) ? 'selected' : '') : ''   ?> value="<?= encrypt($k['kode']) ?>">
                                             <?= strtoupper($k['kode']) . " ( " . strtoupper($k['kantor_name']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -251,10 +291,10 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_kantor_bongkar" id="root_kode_kantor_bongkar" name="root_kode_kantor_bongkar" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_kantor_bongkar" id="root_kode_kantor_bongkar" name="root_kode_kantor_bongkar" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeKantor as $k) : ?>
-                                        <option value="<?= encrypt($k['kode']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_kantor_bongkar']) == encrypt($k['kode']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['kode']) ?>">
                                             <?= strtoupper($k['kode']) . " ( " . strtoupper($k['kantor_name']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -264,7 +304,7 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_kode_pelabuhan_bongkar" name="root_kode_pelabuhan_bongkar" type="text" class="form-control root_kode_pelabuhan_bongkar" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['kode_pelabuhan_bongkar'] : '' ?>" id="root_kode_pelabuhan_bongkar" name="root_kode_pelabuhan_bongkar" type="text" class="form-control root_kode_pelabuhan_bongkar" placeholder="">
                                 <label>Kode Pelabuhan Bongkar</label>
                             </div>
                         </div>
@@ -272,19 +312,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_kode_pelabuhan_muat" name="root_kode_pelabuhan_muat" type="text" class="form-control root_kode_pelabuhan_muat" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['kode_pelabuhan_muat'] : '' ?>" id="root_kode_pelabuhan_muat" name="root_kode_pelabuhan_muat" type="text" class="form-control root_kode_pelabuhan_muat" placeholder="">
                                 <label>Kode Pelabuhan Muat</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_kode_pelabuhan_transit" name="root_kode_pelabuhan_muat" type="text" class="form-control root_kode_pelabuhan_muat" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['kode_pelabuhan_transit'] : '' ?>" id="root_kode_pelabuhan_transit" name="root_kode_pelabuhan_transit" type="text" class="form-control root_kode_pelabuhan_transit" placeholder="">
                                 <label>Kode Pelabuhan Transit</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_kode_tps" name="root_kode_tps" type="text" class="form-control root_kode_tps" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['kode_tps'] : '' ?>" id="root_kode_tps" name="root_kode_tps" type="text" class="form-control root_kode_tps" placeholder="">
                                 <label>Kode TPS</label>
                             </div>
                         </div>
@@ -292,10 +332,10 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_tujuan_tpb" id="root_kode_tujuan_tpb" name="root_kode_tujuan_tpb" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_tujuan_tpb" id="root_kode_tujuan_tpb" name="root_kode_tujuan_tpb" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeTujunTpb as $k) : ?>
-                                        <option value="<?= encrypt($k['description']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_tujuan_tpb']) == encrypt($k['description']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['description']) ?>">
                                             <?= strtoupper($k['description']) . " ( " . strtoupper($k['value']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -305,10 +345,10 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_tutup_pu" id="root_kode_tutup_pu" name="root_kode_tutup_pu" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_tutup_pu" id="root_kode_tutup_pu" name="root_kode_tutup_pu" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeTutupPu as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_tutup_pu']) == encrypt($k['value']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['value']) ?>">
                                             <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -318,10 +358,10 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_valuta" id="root_kode_valuta" name="root_kode_valuta" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_valuta" id="root_kode_valuta" name="root_kode_valuta" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeValuta as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_valuta']) == encrypt($k['value']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['value']) ?>">
                                             <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -333,19 +373,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_kota_ttd" name="root_kota_ttd" type="text" class="form-control root_kota_ttd" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['kota_ttd'] : '' ?>" id="root_kota_ttd" name="root_kota_ttd" type="text" class="form-control root_kota_ttd" placeholder="">
                                 <label>Kota Pembuatan Dokumen BC 2.3</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_nama_ttd" name="root_nama_ttd" type="text" class="form-control root_nama_ttd" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['nama_ttd'] : '' ?>" id="root_nama_ttd" name="root_nama_ttd" type="text" class="form-control root_nama_ttd" placeholder="">
                                 <label>Nama Pengguna Pembuat Dokumen BC 2.3</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_ndpbm" name="root_ndpbm" type="number" class="form-control root_ndpbm" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['ndpbm'] : '' ?>" id="root_ndpbm" name="root_ndpbm" type="number" class="form-control root_ndpbm" placeholder="">
                                 <label>NDPBM</label>
                             </div>
                         </div>
@@ -353,16 +393,16 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_netto" name="root_netto" type="number" class="form-control root_netto" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['netto'] : '' ?>" id="root_netto" name="root_netto" type="number" class="form-control root_netto" placeholder="">
                                 <label>Netto</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_nik" id="root_nik" name="root_nik" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_nik" id="root_nik" name="root_nik" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeJenisAPI as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['nik']) == encrypt($k['value']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['value']) ?>">
                                             <?= strtoupper($k['description']) . " ( " . strtoupper($k['value']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -372,7 +412,7 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_nilai_barang" name="root_nilai_barang" type="number" class="form-control root_nilai_barang" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['nilai_barang'] : '' ?>" id="root_nilai_barang" name="root_nilai_barang" type="number" class="form-control root_nilai_barang" placeholder="">
                                 <label>Nilai Barang</label>
                             </div>
                         </div>
@@ -380,19 +420,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_no_aju" name="root_no_aju" type="text" maxlength="26" class="form-control root_no_aju" placeholder="">
+                                <input readonly value="<?= !empty($bc23Detail) ? $bc23Detail['no_aju'] : '' ?>" id="root_no_aju" name="root_no_aju" type="text" class="form-control root_no_aju" placeholder="">
                                 <label>Nomor Aju</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_no_bc_11" name="root_no_bc_11" type="text" maxlength="6" class="form-control root_no_bc_11" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['no_bc_11'] : '' ?>" id="root_no_bc_11" name="root_no_bc_11" type="text" maxlength="6" class="form-control root_no_bc_11" placeholder="">
                                 <label>Nomor BC 1.1</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_pos_bc_11" name="root_pos_bc_11" type="text" maxlength="4" class="form-control root_pos_bc_11" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['pos_bc_11'] : '' ?>" id="root_pos_bc_11" name="root_pos_bc_11" type="text" maxlength="4" class="form-control root_pos_bc_11" placeholder="">
                                 <label>Pos BC 1.1</label>
                             </div>
                         </div>
@@ -400,20 +440,20 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_seri" name="root_seri" type="number" class="form-control root_seri" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['seri'] : '' ?>" id="root_seri" name="root_seri" type="number" class="form-control root_seri" placeholder="">
                                 <label>Seri</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_sub_pos_bc_11" maxlength="8" name="root_sub_pos_bc_11" type="number" class="form-control root_sub_pos_bc_11" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['sub_pos_bc_11'] : '' ?>" id="root_sub_pos_bc_11" maxlength="8" name="root_sub_pos_bc_11" type="number" class="form-control root_sub_pos_bc_11" placeholder="">
                                 <label>Sub Pos BC 1.1</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" name="root_tanggal_bc_11" type="text" placeholder="" class="form-control root_tanggal_bc_11" id="root_tanggal_bc_11">
+                                    <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? date('d/m/Y', strtotime($bc23Detail['tanggal_bc_11'])) : '' ?>" autocomplete="one-time-code" name="root_tanggal_bc_11" type="text" placeholder="" class="form-control root_tanggal_bc_11" id="root_tanggal_bc_11">
                                     <label>Tanggal BC 1.1</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -426,7 +466,7 @@
                         <div class="col-sm-4 mt-1">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" name="root_tanggal_tiba" type="text" placeholder="" class="form-control root_tanggal_tiba" id="root_tanggal_tiba">
+                                    <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? date('d/m/Y', strtotime($bc23Detail['tanggal_tiba'])) : '' ?>" autocomplete="one-time-code" name="root_tanggal_tiba" type="text" placeholder="" class="form-control root_tanggal_tiba" id="root_tanggal_tiba">
                                     <label>Tanggal Perkiraan Tiba</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -437,7 +477,7 @@
                         <div class="col-sm-4 mt-1">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" name="root_tanggal_ttd" type="text" placeholder="" class="form-control root_tanggal_ttd" id="root_tanggal_ttd">
+                                    <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? date('d/m/Y', strtotime($bc23Detail['tanggal_ttd'])) : '' ?>" autocomplete="one-time-code" name="root_tanggal_ttd" type="text" placeholder="" class="form-control root_tanggal_ttd" id="root_tanggal_ttd">
                                     <label>Tanggal Penanda-Tanganan Dokumen</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -447,7 +487,7 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_biaya_tambahan" maxlength="24" name="root_biaya_tambahan" type="number" class="form-control root_biaya_tambahan" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['biaya_tambahan'] : '' ?>" id="root_biaya_tambahan" maxlength="24" name="root_biaya_tambahan" type="number" class="form-control root_biaya_tambahan" placeholder="">
                                 <label>Biaya Tambahan</label>
                             </div>
                         </div>
@@ -455,16 +495,16 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="root_biaya_pengurang" maxlength="24" name="root_biaya_pengurang" type="number" class="form-control root_biaya_pengurang" placeholder="">
+                                <input <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc23Detail) ? $bc23Detail['biaya_pengurang'] : '' ?>" id="root_biaya_pengurang" maxlength="24" name="root_biaya_pengurang" type="number" class="form-control root_biaya_pengurang" placeholder="">
                                 <label>Biaya Pengurang</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select root_kode_kena_pajak" id="root_kode_kena_pajak" name="root_kode_kena_pajak" aria-label="Floating label select example">
+                                <select <?= !empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select root_kode_kena_pajak" id="root_kode_kena_pajak" name="root_kode_kena_pajak" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeKenaPajak as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
+                                        <option <?= !empty($bc23Detail) ? (encrypt($bc23Detail['kode_kena_pajak']) == encrypt($k['value']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['value']) ?>">
                                             <?= strtoupper($k['value']) . " ( " . strtoupper($k['description']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -943,19 +983,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="asuransi" name="asuransi" type="number" class="asuransi form-control" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="asuransi" name="asuransi" type="number" class="asuransi form-control" placeholder="">
                                 <label>Nilai Asuransi</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="harga_cif" name="harga_cif" type="number" class="harga_cif form-control" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_cif" name="harga_cif" type="number" class="harga_cif form-control" placeholder="">
                                 <label>Harga Cif</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="diskon" name="diskon" readonly type="text" class="diskon form-control" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="diskon" name="diskon" readonly type="text" class="diskon form-control" placeholder="">
                                 <label>Diskon</label>
                             </div>
                         </div>
@@ -963,19 +1003,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="fob" name="fob" type="number" class="fob form-control" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="fob" name="fob" type="number" class="fob form-control" placeholder="">
                                 <label>Free On Board</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="freight" name="freight" type="number" class="form-control freight" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="freight" name="freight" type="number" class="form-control freight" placeholder="">
                                 <label>Freight</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input type="text" name="harga_ekspor" class="form-control" id="harga_ekspor" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> type="text" name="harga_ekspor" class="form-control" id="harga_ekspor" placeholder="">
                                 <label>Harga Ekspor</label>
                             </div>
                         </div>
@@ -983,19 +1023,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="harga_penyerahan_barang" name="harga_penyerahan_barang" type="number" class="harga_penyerahan_barang form-control" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_penyerahan_barang" name="harga_penyerahan_barang" type="number" class="harga_penyerahan_barang form-control" placeholder="">
                                 <label>Harga Penyerahan Barang</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_satuan_barang" readonly name="harga_satuan_barang" type="text" class="form-control harga_satuan_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_satuan_barang" readonly name="harga_satuan_barang" type="text" class="form-control harga_satuan_barang" placeholder="">
                                 <label>Harga Satuan Barang</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control isi_per_kemasan" name="isi_per_kemasan" id="isi_per_kemasan" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> type="text" class="form-control isi_per_kemasan" name="isi_per_kemasan" id="isi_per_kemasan" placeholder="">
                                 <label>Isi Per Kemasan</label>
                             </div>
                         </div>
@@ -1003,19 +1043,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="jumlah_kemasan" name="jumlah_kemasan" type="number" class="jumlah_kemasan form-control" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="jumlah_kemasan" name="jumlah_kemasan" type="number" class="jumlah_kemasan form-control" placeholder="">
                                 <label>Jumlah Kemasan</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="jumlah_satuan" name="jumlah_satuan" type="number" class="form-control jumlah_satuan" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="jumlah_satuan" name="jumlah_satuan" type="number" class="form-control jumlah_satuan" placeholder="">
                                 <label>Jumlah Satuan</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="kode_barang" readonly name="kode_barang" type="text" class="form-control kode_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="kode_barang" readonly name="kode_barang" type="text" class="form-control kode_barang" placeholder="">
                                 <label>Kode Barang</label>
                             </div>
                         </div>
@@ -1023,7 +1063,7 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_dokumen" id="kode_dokumen" name="kode_dokumen" aria-label="Floating label select example">
+                                <select <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_dokumen" id="kode_dokumen" name="kode_dokumen" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeDokumen as $k) : ?>
                                         <option value="<?= encrypt($k['description']) ?>">
@@ -1036,7 +1076,7 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_kategori_barang" id="kode_kategori_barang" name="kode_kategori_barang" aria-label="Floating label select example">
+                                <select <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_kategori_barang" id="kode_kategori_barang" name="kode_kategori_barang" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeKategoriBarang as $k) : ?>
                                         <option value="<?= encrypt(str_replace(']', '', explode(',', $k['description'])[1])) ?>">
@@ -1049,7 +1089,7 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_jenis_kemasan" id="kode_jenis_kemasan" name="kode_jenis_kemasan" aria-label="Floating label select example">
+                                <select <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_jenis_kemasan" id="kode_jenis_kemasan" name="kode_jenis_kemasan" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeJenisKemasan as $k) : ?>
                                         <option value="<?= encrypt($k['description']) ?>">
@@ -1064,7 +1104,7 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_negara_asal" id="kode_negara_asal" name="kode_negara_asal" aria-label="Floating label select example">
+                                <select <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_negara_asal" id="kode_negara_asal" name="kode_negara_asal" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeNegaraAsal as $k) : ?>
                                         <option value="<?= encrypt($k['code']) ?>">
@@ -1077,7 +1117,7 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_perhitungan" id="kode_perhitungan" name="kode_perhitungan" aria-label="Floating label select example">
+                                <select <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_perhitungan" id="kode_perhitungan" name="kode_perhitungan" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodePerhitungan as $k) : ?>
                                         <option value="<?= encrypt($k['value']) ?>">
@@ -1090,8 +1130,15 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_satuan_barang" id="kode_satuan_barang" name="kode_satuan_barang" aria-label="Floating label select example">
+                                <select <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_satuan_barang" id="kode_satuan_barang" name="kode_satuan_barang" aria-label="Floating label select example">
                                     <option value=""></option>
+                                    <?php if (!empty($bc23Detail)) : ?>
+                                        <?php foreach ($kodeSatuanBarang as $k) : ?>
+                                            <option value="<?= $k['id'] ?>">
+                                                <?= $k['text'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </select>
                                 <label style="z-index: 1;">Kode Satuan Barang</label>
                             </div>
@@ -1100,19 +1147,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="merk_barang" name="merk_barang" type="text" class="form-control merk_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="merk_barang" name="merk_barang" type="text" class="form-control merk_barang" placeholder="">
                                 <label>Merk Barang</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="netto" name="netto" type="number" class="form-control netto" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="netto" name="netto" type="number" class="form-control netto" placeholder="">
                                 <label>Netto</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="nilai_barang" name="nilai_barang" type="number" class="form-control nilai_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="nilai_barang" name="nilai_barang" type="number" class="form-control nilai_barang" placeholder="">
                                 <label>Nilai Barang</label>
                             </div>
                         </div>
@@ -1120,19 +1167,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="nilai_tambah" name="nilai_tambah" type="text" class="form-control nilai_tambah" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="nilai_tambah" name="nilai_tambah" type="text" class="form-control nilai_tambah" placeholder="">
                                 <label>Nilai Tambah</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="pos_tarif" name="pos_tarif" type="text" class="form-control pos_tarif" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="pos_tarif" name="pos_tarif" type="text" class="form-control pos_tarif" placeholder="">
                                 <label>Pos Tarif</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="seri_barang" name="seri_barang" type="number" class="form-control seri_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="seri_barang" name="seri_barang" type="number" class="form-control seri_barang" placeholder="">
                                 <label>Seri Barang</label>
                             </div>
                         </div>
@@ -1140,19 +1187,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="spesifikasi_lain" name="spesifikasi_lain" type="text" class="form-control spesifikasi_lain" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="spesifikasi_lain" name="spesifikasi_lain" type="text" class="form-control spesifikasi_lain" placeholder="">
                                 <label>Spesifikasi Lain</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="tipe_barang" name="tipe_barang" type="text" class="form-control tipe_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="tipe_barang" name="tipe_barang" type="text" class="form-control tipe_barang" placeholder="">
                                 <label>Tipe Barang</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="ukuran_barang" name="ukuran_barang" type="text" class="form-control ukuran_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="ukuran_barang" name="ukuran_barang" type="text" class="form-control ukuran_barang" placeholder="">
                                 <label>Ukuran Barang</label>
                             </div>
                         </div>
@@ -1160,19 +1207,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="ndpm" name="ndpm" type="number" class="form-control ndpm" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="ndpm" name="ndpm" type="number" class="form-control ndpm" placeholder="">
                                 <label>NDPM</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="cif_rupiah" name="cif_rupiah" type="number" class="form-control cif_rupiah" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="cif_rupiah" name="cif_rupiah" type="number" class="form-control cif_rupiah" placeholder="">
                                 <label>Cif Rupiah</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_perolehan_barang" name="harga_perolehan_barang" type="text" class="form-control harga_perolehan_barang" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_perolehan_barang" name="harga_perolehan_barang" type="text" class="form-control harga_perolehan_barang" placeholder="">
                                 <label>Harga Perolehan Barang</label>
                             </div>
                         </div>
@@ -1180,7 +1227,7 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_asal_bahan_baku" id="kode_asal_bahan_baku" name="kode_asal_bahan_baku" aria-label="Floating label select example">
+                                <select <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_asal_bahan_baku" id="kode_asal_bahan_baku" name="kode_asal_bahan_baku" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeAsalBahanBaku as $k) : ?>
                                         <option value="<?= encrypt($k['value']) ?>">
@@ -1193,7 +1240,7 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="uraian" name="uraian" type="text" class="form-control uraian" placeholder="">
+                                <input <?= (!empty($bc23Detail) ? ($bc23Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="uraian" name="uraian" type="text" class="form-control uraian" placeholder="">
                                 <label>Uraian</label>
                             </div>
                         </div>
@@ -1392,56 +1439,280 @@
     var listInformasiKemasan = [];
     var selectedDetailBarang = null;
     // INSERT LIST BARANG (FROM SERVER)
-    <?php foreach ($lpbDetail as $ld) : ?>
-        listBarang.push({
-            id: "<?= encrypt($ld['id']) ?>",
-            purchase_order_id: "<?= encrypt($ld['purchase_order_id']) ?>",
-            purchase_order_details_id: "<?= encrypt($ld['purchase_order_details_id']) ?>",
-            penerimaan_barang_id: "<?= encrypt($ld['penerimaan_barang_id']) ?>",
-            nama_barang_dok: "<?= str_replace('"', '',  $ld['nama_barang_dok']) ?>",
-            jml_masuk: "<?= $ld['jml_masuk'] ?>",
-            po_no: "<?= $ld['po_no'] ?>",
-            harga_satuan_barang: "<?= ($ld['harga'] + $ld['harga_harian'] + $ld['harga_bulanan']) ?>",
-            diskon: "<?= empty($ld['disc']) ? 0 : $ld['disc'] ?>",
-            kode_barang: "<?= $ld['kode_barang'] ?>",
-            detail_barang_dok: {
-                asuransi: '',
-                harga_cif: '',
-                diskon: '',
-                fob: '',
-                freight: '',
-                harga_ekspor: '',
-                harga_penyerahan_barang: '',
-                harga_satuan_barang: '',
-                isi_per_kemasan: '',
-                jumlah_kemasan: '',
-                jumlah_satuan: '',
-                kode_barang: '',
-                kode_dokumen: '',
-                kode_kategori_barang: '',
-                kode_jenis_kemasan: '',
-                kode_negara_asal: '',
-                kode_perhitungan: '',
-                kode_satuan_barang: '',
-                merk_barang: '',
-                netto: '',
-                nilai_barang: '',
-                nilai_tambah: '',
-                pos_tarif: '',
-                seri_barang: '',
-                spesifikasi_lain: '',
-                tipe_barang: '',
-                ukuran_barang: '',
-                ndpm: '',
-                cif_rupiah: '',
-                harga_perolehan_barang: '',
-                kode_asal_bahan_baku: '',
-                uraian: '',
-                barangTarif: [],
-                barangDokumen: [],
-            },
-        });
-    <?php endforeach; ?>
+    <?php if (empty($bc23Detail)) : ?>
+        // INSERT
+        <?php foreach ($lpbDetail as $ld) : ?>
+            listBarang.push({
+                id: "<?= encrypt($ld['id']) ?>",
+                purchase_order_id: "<?= encrypt($ld['purchase_order_id']) ?>",
+                purchase_order_details_id: "<?= encrypt($ld['purchase_order_details_id']) ?>",
+                penerimaan_barang_id: "<?= encrypt($ld['penerimaan_barang_id']) ?>",
+                nama_barang_dok: "<?= str_replace('"', '',  $ld['nama_barang_dok']) ?>",
+                jml_masuk: "<?= $ld['jml_masuk'] ?>",
+                po_no: "<?= $ld['po_no'] ?>",
+                harga_satuan_barang: "<?= ($ld['harga'] + $ld['harga_harian'] + $ld['harga_bulanan']) ?>",
+                diskon: "<?= empty($ld['disc']) ? 0 : $ld['disc'] ?>",
+                kode_barang: "<?= $ld['kode_barang'] ?>",
+                detail_barang_dok: {
+                    asuransi: '',
+                    harga_cif: '',
+                    diskon: '',
+                    fob: '',
+                    freight: '',
+                    harga_ekspor: '',
+                    harga_penyerahan_barang: '',
+                    harga_satuan_barang: '',
+                    isi_per_kemasan: '',
+                    jumlah_kemasan: '',
+                    jumlah_satuan: '',
+                    kode_barang: '',
+                    kode_dokumen: '',
+                    kode_kategori_barang: '',
+                    kode_jenis_kemasan: '',
+                    kode_negara_asal: '',
+                    kode_perhitungan: '',
+                    kode_satuan_barang: '',
+                    merk_barang: '',
+                    netto: '',
+                    nilai_barang: '',
+                    nilai_tambah: '',
+                    pos_tarif: '',
+                    seri_barang: '',
+                    spesifikasi_lain: '',
+                    tipe_barang: '',
+                    ukuran_barang: '',
+                    ndpm: '',
+                    cif_rupiah: '',
+                    harga_perolehan_barang: '',
+                    kode_asal_bahan_baku: '',
+                    uraian: '',
+                    barangTarif: [],
+                    barangDokumen: [],
+                },
+            });
+        <?php endforeach; ?>
+    <?php else : ?>
+        // HIDE FORM
+        <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?>
+            // Root Form
+            $('.form-informasi-entitas').hide();
+            $('.form-informasi-kemasan').hide();
+            $('.form-informasi-kontainer').hide();
+            $('.form-dokumen-pelengkap').hide();
+            $('.form-informasi-pengangkut').hide();
+            // Detail Barang
+            $('.form-barang-tarif').hide();
+            $('.form-barang-dokumen').hide();
+        <?php endif; ?>
+        // UPDATE
+        <?php foreach ($lpbDetail as $ld) : ?>
+            <?php $sudahDiisi = false; ?>
+            <?php foreach ($bc23Json['detailBarangDok'] as $bj) : ?>
+                <?php if ($bj['penerimaan_barang_detail_id'] == encrypt($ld['id'])) : ?>
+                    // ADA BARANG DOK
+                    listBarang.push({
+                        id: "<?= encrypt($ld['id']) ?>",
+                        purchase_order_id: "<?= encrypt($ld['purchase_order_id']) ?>",
+                        purchase_order_details_id: "<?= encrypt($ld['purchase_order_details_id']) ?>",
+                        penerimaan_barang_id: "<?= encrypt($ld['penerimaan_barang_id']) ?>",
+                        nama_barang_dok: "<?= str_replace('"', '',  $ld['nama_barang_dok']) ?>",
+                        jml_masuk: "<?= $ld['jml_masuk'] ?>",
+                        po_no: "<?= $ld['po_no'] ?>",
+                        harga_satuan_barang: "<?= ($ld['harga'] + $ld['harga_harian'] + $ld['harga_bulanan']) ?>",
+                        diskon: "<?= empty($ld['disc']) ? 0 : $ld['disc'] ?>",
+                        kode_barang: "<?= $ld['kode_barang'] ?>",
+                        detail_barang_dok: {
+                            asuransi: "<?= $bj['asuransi'] ?>",
+                            harga_cif: "<?= $bj['cif_rupiah'] ?>",
+                            diskon: "<?= $bj['diskon'] ?>",
+                            fob: "<?= $bj['fob'] ?>",
+                            freight: "<?= $bj['freight'] ?>",
+                            harga_ekspor: "<?= $bj['harga_ekspor'] ?>",
+                            harga_penyerahan_barang: "<?= $bj['harga_penyerahan_barang'] ?>",
+                            harga_satuan_barang: "<?= $bj['harga_satuan_barang'] ?>",
+                            isi_per_kemasan: "<?= $bj['isi_per_kemasan'] ?>",
+                            jumlah_kemasan: "<?= $bj['jumlah_kemasan'] ?>",
+                            jumlah_satuan: "<?= $bj['jumlah_satuan'] ?>",
+                            kode_barang: "<?= $bj['kode_barang'] ?>",
+                            kode_dokumen: "<?= $bj['kode_dokumen'] ?>",
+                            kode_kategori_barang: "<?= $bj['kode_kategori_barang'] ?>",
+                            kode_jenis_kemasan: "<?= $bj['kode_jenis_kemasan'] ?>",
+                            kode_negara_asal: "<?= $bj['kode_negara_asal'] ?>",
+                            kode_perhitungan: "<?= $bj['kode_perhitungan'] ?>",
+                            kode_satuan_barang: "<?= $bj['kode_satuan_barang'] ?>",
+                            merk_barang: "<?= $bj['merk_barang'] ?>",
+                            netto: "<?= $bj['netto'] ?>",
+                            nilai_barang: "<?= $bj['nilai_barang'] ?>",
+                            nilai_tambah: "<?= $bj['nilai_tambah'] ?>",
+                            pos_tarif: "<?= $bj['pos_tarif'] ?>",
+                            seri_barang: "<?= $bj['seri_barang'] ?>",
+                            spesifikasi_lain: " <?= $bj['spesifikasi_lain'] ?>",
+                            tipe_barang: "<?= $bj['tipe_barang'] ?>",
+                            ukuran_barang: "<?= $bj['ukuran_barang'] ?>",
+                            ndpm: "<?= $bj['ndpm'] ?>",
+                            cif_rupiah: "<?= $bj['cif_rupiah'] ?>",
+                            harga_perolehan_barang: "<?= $bj['harga_perolehan_barang'] ?>",
+                            kode_asal_bahan_baku: "<?= $bj['kode_asal_bahan_baku'] ?>",
+                            uraian: "<?= $bj['uraian'] ?>",
+                            barangTarif: [
+                                // PUSH  BARANG TARIF
+                                <?php foreach ($bj['barangTarif'] as $bjr) : ?> {
+                                        barang_tarif_kode_fasilitas_tarif: "<?= $bjr['barang_tarif_kode_fasilitas_tarif'] ?>",
+                                        barang_tarif_kode_fasilitas_tarif_text: "<?= $bjr['barang_tarif_kode_fasilitas_tarif_text'] ?>",
+                                        barang_tarif_kode_jenis_tarif: "<?= $bjr['barang_tarif_kode_jenis_tarif'] ?>",
+                                        barang_tarif_kode_jenis_tarif_text: "<?= $bjr['barang_tarif_kode_jenis_tarif_text'] ?>",
+                                        barang_tarif_kode_satuan_barang: "<?= $bjr['barang_tarif_kode_satuan_barang'] ?>",
+                                        barang_tarif_kode_satuan_barang_text: "<?= $bjr['barang_tarif_kode_satuan_barang_text'] ?>",
+                                        barang_tarif_seri_barang: "<?= $bjr['barang_tarif_seri_barang'] ?>",
+                                        id: "<?= $bjr['id'] ?>",
+                                        jumlah_satuan_bm: "<?= $bjr['jumlah_satuan_bm'] ?>",
+                                        kode_jenis_pungutan: "<?= $bjr['kode_jenis_pungutan'] ?>",
+                                        nilai_bayar: "<?= $bjr['nilai_bayar'] ?>",
+                                        nilai_fasilitas: "<?= $bjr['nilai_fasilitas'] ?>",
+                                        nilai_sudah_dilunasi: "<?= $bjr['nilai_sudah_dilunasi'] ?>",
+                                        tarif_bm: "<?= $bjr['tarif_bm'] ?>",
+                                        tarif_fasilitas: "<?= $bjr['tarif_fasilitas'] ?>"
+                                    },
+                                <?php endforeach; ?>
+                            ],
+                            barangDokumen: [
+                                // PUSH BARANG DOKUMEN
+                                <?php foreach ($bj['barangDokumen'] as $bjd) : ?> {
+                                        id: "<?= $bjd['id'] ?>",
+                                        no_seri_dokumen: "<?= $bjd['no_seri_dokumen'] ?>"
+                                    },
+                                <?php endforeach; ?>
+                            ],
+                        },
+                    });
+                    <?php
+                    $sudahDiisi = true;
+                    break;
+                    ?>
+                <?php endif; ?>
+
+            <?php endforeach; ?>
+            <?php if (!$sudahDiisi) : ?>
+                // GAK ADA BARANG DOK
+                listBarang.push({
+                    id: "<?= encrypt($ld['id']) ?>",
+                    purchase_order_id: "<?= encrypt($ld['purchase_order_id']) ?>",
+                    purchase_order_details_id: "<?= encrypt($ld['purchase_order_details_id']) ?>",
+                    penerimaan_barang_id: "<?= encrypt($ld['penerimaan_barang_id']) ?>",
+                    nama_barang_dok: "<?= str_replace('"', '',  $ld['nama_barang_dok']) ?>",
+                    jml_masuk: "<?= $ld['jml_masuk'] ?>",
+                    po_no: "<?= $ld['po_no'] ?>",
+                    harga_satuan_barang: "<?= ($ld['harga'] + $ld['harga_harian'] + $ld['harga_bulanan']) ?>",
+                    diskon: "<?= empty($ld['disc']) ? 0 : $ld['disc'] ?>",
+                    kode_barang: "<?= $ld['kode_barang'] ?>",
+                    detail_barang_dok: {
+                        asuransi: '',
+                        harga_cif: '',
+                        diskon: '',
+                        fob: '',
+                        freight: '',
+                        harga_ekspor: '',
+                        harga_penyerahan_barang: '',
+                        harga_satuan_barang: '',
+                        isi_per_kemasan: '',
+                        jumlah_kemasan: '',
+                        jumlah_satuan: '',
+                        kode_barang: '',
+                        kode_dokumen: '',
+                        kode_kategori_barang: '',
+                        kode_jenis_kemasan: '',
+                        kode_negara_asal: '',
+                        kode_perhitungan: '',
+                        kode_satuan_barang: '',
+                        merk_barang: '',
+                        netto: '',
+                        nilai_barang: '',
+                        nilai_tambah: '',
+                        pos_tarif: '',
+                        seri_barang: '',
+                        spesifikasi_lain: '',
+                        tipe_barang: '',
+                        ukuran_barang: '',
+                        ndpm: '',
+                        cif_rupiah: '',
+                        harga_perolehan_barang: '',
+                        kode_asal_bahan_baku: '',
+                        uraian: '',
+                        barangTarif: [],
+                        barangDokumen: [],
+                    },
+                });
+            <?php endif; ?>
+        <?php endforeach; ?>
+        //  PUSH ENTITAS
+        <?php foreach ($bc23Json['entitas'] as $en) : ?>
+            listInformasiEntitas.push({
+                id: "<?= $en['id'] ?>",
+                entitas_alamat_entitas: "<?= $en['entitas_alamat_entitas'] ?>",
+                entitas_kode_entitas: "Pengusaha (3)",
+                entitas_kode_jenis_identitas: "<?= $en['entitas_kode_jenis_identitas'] ?>",
+                entitas_kode_jenis_identitas_text: "<?= $en['entitas_kode_jenis_identitas_text'] ?>",
+                entitas_nama_entitas: "<?= $en['entitas_nama_entitas'] ?>",
+                entitas_nib_entitas: "<?= $en['entitas_nib_entitas'] ?>",
+                entitas_nomor_identitas: "<?= $en['entitas_nomor_identitas'] ?>",
+                entitas_nomor_ijin_entitas: "<?= $en['entitas_nomor_ijin_entitas'] ?>",
+                entitas_seri_entitas: "<?= $en['entitas_seri_entitas'] ?>",
+                entitas_tanggal_ijin_entitas: "<?= $en['entitas_tanggal_ijin_entitas'] ?>"
+            });
+        <?php endforeach; ?>
+        displayTableInformasiEntitas();
+        // PUSH KEMASAN
+        <?php foreach ($bc23Json['kemasan'] as $en) : ?>
+            listInformasiKemasan.push({
+                id: "<?= $en['id'] ?>",
+                kemasan_jumlah_kemasan: "<?= $en['kemasan_jumlah_kemasan'] ?>",
+                kemasan_kode_jenis_kemasan: "<?= $en['kemasan_kode_jenis_kemasan'] ?>",
+                kemasan_kode_jenis_kemasan_text: "<?= $en['kemasan_kode_jenis_kemasan_text'] ?>",
+                kemasan_merk_kemasan: "<?= $en['kemasan_merk_kemasan'] ?>",
+                kemasan_seri_kemasan: "<?= $en['kemasan_seri_kemasan'] ?>",
+            })
+        <?php endforeach; ?>
+        displayTableInformasiKemasan()
+        // PUSH KONTAINER
+        <?php foreach ($bc23Json['kontainer'] as $en) : ?>
+            listInformasiKontainer.push({
+                id: "<?= $en['id'] ?>",
+                kontainer_kode_jenis_kontainer: "<?= $en['kontainer_kode_jenis_kontainer'] ?>",
+                kontainer_kode_jenis_kontainer_text: "<?= $en['kontainer_kode_jenis_kontainer_text'] ?>",
+                kontainer_kode_tipe_kontainer: "<?= $en['kontainer_kode_tipe_kontainer'] ?>",
+                kontainer_kode_tipe_kontainer_text: "<?= $en['kontainer_kode_tipe_kontainer_text'] ?>",
+                kontainer_kode_ukuran_kontainer: "<?= $en['kontainer_kode_ukuran_kontainer'] ?>",
+                kontainer_kode_ukuran_kontainer_text: "<?= $en['kontainer_kode_ukuran_kontainer_text'] ?>",
+                kontainer_nomor_kontainer: "<?= $en['kontainer_nomor_kontainer'] ?>",
+                kontainer_seri_kontainer: "<?= $en['kontainer_seri_kontainer'] ?>",
+            });
+        <?php endforeach; ?>
+        displayTableInformasiKontainer();
+        // PUSH DOKUMEN PELENGKAP
+        <?php foreach ($bc23Json['dokumen'] as $en) : ?>
+            listInformasiDokumenPelengkap.push({
+                id: "<?= $en['id'] ?>",
+                dokumen_pelengkap_kode_dokumen: "Dokumen Invoice (3)",
+                dokumen_pelengkap_nomor_dokumen: "<?= $en['dokumen_pelengkap_nomor_dokumen'] ?>",
+                dokumen_pelengkap_seri_dokumen: "<?= $en['dokumen_pelengkap_seri_dokumen'] ?>",
+                dokumen_pelengkap_tanggal_dokumen: "<?= $en['dokumen_pelengkap_tanggal_dokumen'] ?>",
+            });
+        <?php endforeach; ?>
+        displayTableInformasiDokumenPelengkap();
+        // PUSH PENGANGKUT
+        <?php foreach ($bc23Json['pengangkut'] as $en) : ?>
+            listInformasiPengangkut.push({
+                id: "<?= $en['id'] ?>",
+                pengangkut_kode_bendera: "<?= $en['pengangkut_kode_bendera'] ?>",
+                pengangkut_kode_cara_angkut: "<?= $en['pengangkut_kode_cara_angkut'] ?>",
+                pengangkut_kode_cara_angkut_text: "<?= $en['pengangkut_kode_cara_angkut_text'] ?>",
+                pengangkut_nama_sarana_pengangkut: "<?= $en['pengangkut_nama_sarana_pengangkut'] ?>",
+                pengangkut_nomor_pengangkut: "<?= $en['pengangkut_nomor_pengangkut'] ?>",
+                pengangkut_seri_pengangkut: "<?= $en['pengangkut_seri_pengangkut'] ?>",
+            });
+        <?php endforeach; ?>
+        displayTableInformasiPengangkut();
+    <?php endif; ?>
     // INIT FORM VIEW
     $('.detail-barang-form-view').hide();
     // ROOT FORM VIEW
@@ -1469,6 +1740,23 @@
     $('#root_kode_kantor').select2({
         placeholder: "Pilih Kode Kantor",
         theme: "bootstrap-5",
+    }).change(function() {
+        <?php if (empty($bc23Detail)) : ?>
+            $.ajax({
+                url: `<?= base_url("bea-cukai-bc-23/get-no-aju"); ?>`,
+                method: "GET",
+                data: {
+                    kode_kantor: $('#root_kode_kantor').val()
+                },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        csrf.val(res.token);
+                        $(".root_no_aju").val(res?.noAju);
+                    }
+                }
+            })
+        <?php endif; ?>
     });
     $('#root_kode_kantor_bongkar').select2({
         placeholder: "Pilih Kode Kantor Bongkar",
@@ -1697,139 +1985,159 @@
     });
 
     // TABEL INFORMASI ENTITAS
-    var tableListInformasiEntitas = $('.table-list-informasi-entitas').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+    <?php if (empty($bc23Detail)) : ?>
+        var tableListInformasiEntitas = $('.table-list-informasi-entitas').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            lengthChange: true,
+            info: false,
+            paging: false,
+            searching: false,
+            ordering: false,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
             }
-        }
-    });
+        });
+    <?php else : ?>
+        var tableListInformasiEntitas = null;
+    <?php endif; ?>
 
     // TABEL INFORMASI KEMASAN
-    var tableListInformasiKemasan = $('.table-list-informasi-kemasan').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+    <?php if (empty($bc23Detail)) : ?>
+        var tableListInformasiKemasan = $('.table-list-informasi-kemasan').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            lengthChange: true,
+            info: false,
+            paging: false,
+            searching: false,
+            ordering: false,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
             }
-        }
-    });
+        });
+    <?php else : ?>
+        var tableListInformasiKemasan = null;
+    <?php endif; ?>
 
     // TABEL INFORMASI KONTAINER
-    var tableListInformasiKontainer = $('.table-list-informasi-kontainer').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+    <?php if (empty($bc23Detail)) : ?>
+        var tableListInformasiKontainer = $('.table-list-informasi-kontainer').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            lengthChange: true,
+            info: false,
+            paging: false,
+            searching: false,
+            ordering: false,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
             }
-        }
-    });
+        });
+    <?php else : ?>
+        var tableListInformasiKontainer = null;
+    <?php endif; ?>
 
     // TABEL INFORMASI DOKUMEN PELENGKAP
-    var tableListDokumenPelengkap = $('.table-list-informasi-dokumen-pelengkap').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+    <?php if (empty($bc23Detail)) : ?>
+        var tableListDokumenPelengkap = $('.table-list-informasi-dokumen-pelengkap').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            lengthChange: true,
+            info: false,
+            paging: false,
+            searching: false,
+            ordering: false,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
             }
-        }
-    });
+        });
+    <?php else : ?>
+        var tableListDokumenPelengkap = null;
+    <?php endif; ?>
 
     // TABEL INFORMASI PENGANGKUT
-    var tableListInformasiPengangkut = $('.table-list-informasi-pengangkut').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+    <?php if (empty($bc23Detail)) : ?>
+        var tableListInformasiPengangkut = $('.table-list-informasi-pengangkut').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            lengthChange: true,
+            info: false,
+            paging: false,
+            searching: false,
+            ordering: false,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
             }
-        }
-    });
+        });
+    <?php else : ?>
+        var tableListInformasiPengangkut = null;
+    <?php endif; ?>
 
     // SWITCH VIEW
     $('.btn-edit-dokumen-barang').click(function() {
@@ -3105,6 +3413,43 @@
                         var id = $('#id').val();
                         if (id) {
                             // UPDATE
+                            $.ajax({
+                                url: "<?= base_url("bea-cukai-bc-23/update"); ?>",
+                                data: formData,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                location.reload();
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                console.log(response);
+                                            }
+                                        });
+                                    }
+                                },
+                            });
                         } else {
                             // INSERT
                             $.ajax({
@@ -3119,7 +3464,7 @@
                                 contentType: false,
                                 success: function(response) {
                                     csrf.val(response.token);
-                                    if (response.status === true) {
+                                    if (response.status) {
                                         Swal.fire({
                                             icon: 'success',
                                             title: response.message,
@@ -3127,7 +3472,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                console.log(response);
+                                                window.location.replace("<?= base_url('bea-cukai-bc-23/id/') ?>" + response.penerimaan_barang_id + "/bc-23-id/" + response.id);
                                             }
                                         });
                                     } else {
@@ -3175,9 +3520,15 @@
             newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.tarif_bm)));
             newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.tarif_fasilitas)));
             newRow.append($('<td style="text-align: center;">').html(
-                `
+                <?php if (!empty($bc23Detail)) : ?> <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                    <?php else : ?> `
                     <button type="button" class="btn btn-danger" onclick="deleteRowBarangTarif('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
+                    <?php endif ?> <?php else : ?> `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowBarangTarif('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                <?php endif; ?>
+
             ));
             table.find('tbody').append(newRow);
         });
@@ -3224,9 +3575,15 @@
             newRow.append($('<td style="text-align: center;">').text(no++));
             newRow.append($('<td style="text-align: center;">').text(v.no_seri_dokumen));
             newRow.append($('<td style="text-align: center;">').html(
-                `
+                <?php if (!empty($bc23Detail)) : ?> <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                    <?php else : ?> `
                     <button type="button" class="btn btn-danger" onclick="deleteRowDetailBarangDokumen('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
+                    <?php endif ?> <?php else : ?> `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowDetailBarangDokumen('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                <?php endif; ?>
+
             ));
             table.find('tbody').append(newRow);
         });
@@ -3261,272 +3618,349 @@
     }
     // DATA DETAIL INFORMASI ENTITAS
     function displayTableInformasiEntitas() {
-        if ($.fn.DataTable.isDataTable('.table-list-informasi-entitas')) {
-            $('.table-list-informasi-entitas').DataTable().clear().draw();
-            tableListInformasiEntitas.destroy();
-        }
-        const table = $('.table-list-informasi-entitas');
-        const tbody = table.find('tbody');
-        var no = 1;
-
-        $.each(listInformasiEntitas, function(i, v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_alamat_entitas));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_kode_jenis_identitas_text));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_nama_entitas));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_nib_entitas));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_nomor_identitas));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_nomor_ijin_entitas));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_tanggal_ijin_entitas));
-            newRow.append($('<td style="text-align: center;">').text(v.entitas_seri_entitas));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                    <button type="button" class="btn btn-danger" onclick="deleteRowInformasiEntitas('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                `
-            ));
-            table.find('tbody').append(newRow);
-        });
-
-        tableListInformasiEntitas = $('.table-list-informasi-entitas').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            lengthChange: true,
-            info: false,
-            paging: false,
-            searching: false,
-            ordering: false,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
+        try {
+            <?php if (empty($bc23Detail)) : ?>
+                if ($.fn.DataTable.isDataTable('.table-list-informasi-entitas')) {
+                    $('.table-list-informasi-entitas').DataTable().clear().draw();
+                    tableListInformasiEntitas.destroy();
                 }
-            }
-        });
+            <?php endif; ?>
+            const table = $('.table-list-informasi-entitas');
+            const tbody = table.find('tbody');
+            tbody.empty();
+            var no = 1;
 
-        tableListInformasiEntitas.draw();
+            $.each(listInformasiEntitas, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td style="text-align: center;">').text(no++));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_alamat_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_kode_jenis_identitas_text));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nama_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nib_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nomor_identitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nomor_ijin_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_tanggal_ijin_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_seri_entitas));
+                newRow.append($('<td style="text-align: center;">').html(
+                    <?php if (!empty($bc23Detail)) : ?> <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                        <?php else : ?> `
+                        <button type="button" class="btn btn-danger" onclick="deleteRowInformasiEntitas('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    `
+                        <?php endif; ?> <?php else : ?> `
+                        <button type="button" class="btn btn-danger" onclick="deleteRowInformasiEntitas('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    `
+                    <?php endif; ?>
+                ));
+                table.find('tbody').append(newRow);
+            });
+
+            <?php if (empty($bc23Detail)) : ?>
+                tableListInformasiEntitas = $('.table-list-informasi-entitas').DataTable({
+                    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+                    lengthChange: true,
+                    info: false,
+                    paging: false,
+                    searching: false,
+                    ordering: false,
+                    order: [],
+                    fixedHeader: true,
+                    "initComplete": function(settings, json) {
+                        $('.dataTables_length').empty();
+                        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                    },
+                    display: "stripe",
+                    searching: false,
+                    language: {
+                        emptyTable: "Tidak Ada Data",
+                        lengthMenu: "Show _MENU_ entries",
+                        paginate: {
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                });
+                tableListInformasiEntitas.draw();
+            <?php endif; ?>
+        } catch (e) {
+            console.log(e);
+
+        }
+
     }
     // DATA DETAIL INFORMASI KEMASAN
     function displayTableInformasiKemasan() {
-        if ($.fn.DataTable.isDataTable('.table-list-informasi-kemasan')) {
-            $('.table-list-informasi-kemasan').DataTable().clear().draw();
-            tableListInformasiKemasan.destroy();
-        }
-        const table = $('.table-list-informasi-kemasan');
-        const tbody = table.find('tbody');
-        var no = 1;
+        try {
+            <?php if (empty($bc23Detail)) : ?>
+                if ($.fn.DataTable.isDataTable('.table-list-informasi-kemasan')) {
+                    $('.table-list-informasi-kemasan').DataTable().clear().draw();
+                    tableListInformasiKemasan.destroy();
+                }
+            <?php endif; ?>
+            const table = $('.table-list-informasi-kemasan');
+            const tbody = table.find('tbody');
+            tbody.empty();
+            var no = 1;
 
-        $.each(listInformasiKemasan, function(i, v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.kemasan_jumlah_kemasan));
-            newRow.append($('<td style="text-align: center;">').text(v.kemasan_kode_jenis_kemasan_text));
-            newRow.append($('<td style="text-align: center;">').text(v.kemasan_seri_kemasan));
-            newRow.append($('<td style="text-align: center;">').text(v.kemasan_merk_kemasan));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
+            $.each(listInformasiKemasan, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td style="text-align: center;">').text(no++));
+                newRow.append($('<td style="text-align: center;">').text(v.kemasan_jumlah_kemasan));
+                newRow.append($('<td style="text-align: center;">').text(v.kemasan_kode_jenis_kemasan_text));
+                newRow.append($('<td style="text-align: center;">').text(v.kemasan_seri_kemasan));
+                newRow.append($('<td style="text-align: center;">').text(v.kemasan_merk_kemasan));
+                newRow.append($('<td style="text-align: center;">').html(
+                    <?php if (!empty($bc23Detail)) : ?> <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                        <?php else : ?> `
                     <button type="button" class="btn btn-danger" onclick="deleteRowInformasiKemasan('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
-            ));
-            table.find('tbody').append(newRow);
-        });
+                        <?php endif; ?> <?php else : ?> `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowInformasiKemasan('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                    <?php endif; ?>
 
-        tableListInformasiKemasan = $('.table-list-informasi-kemasan').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            lengthChange: true,
-            info: false,
-            paging: false,
-            searching: false,
-            ordering: false,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-        tableListInformasiKemasan.draw();
+                ));
+                table.find('tbody').append(newRow);
+            });
+
+            <?php if (empty($bc23Detail)) : ?>
+                tableListInformasiKemasan = $('.table-list-informasi-kemasan').DataTable({
+                    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+                    lengthChange: true,
+                    info: false,
+                    paging: false,
+                    searching: false,
+                    ordering: false,
+                    order: [],
+                    fixedHeader: true,
+                    "initComplete": function(settings, json) {
+                        $('.dataTables_length').empty();
+                        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                    },
+                    display: "stripe",
+                    searching: false,
+                    language: {
+                        emptyTable: "Tidak Ada Data",
+                        lengthMenu: "Show _MENU_ entries",
+                        paginate: {
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                });
+                tableListInformasiKemasan.draw();
+            <?php endif; ?>
+        } catch (e) {
+            console.log(e);
+        }
+
     }
 
     // DATA TABEL INFORMASI KONTAINER
     function displayTableInformasiKontainer() {
-        if ($.fn.DataTable.isDataTable('.table-list-informasi-kontainer')) {
-            $('.table-list-informasi-kontainer').DataTable().clear().draw();
-            tableListInformasiKontainer.destroy();
-        }
-        const table = $('.table-list-informasi-kontainer');
-        const tbody = table.find('tbody');
-        var no = 1;
+        try {
+            <?php if (empty($bc23Detail)) : ?>
+                if ($.fn.DataTable.isDataTable('.table-list-informasi-kontainer')) {
+                    $('.table-list-informasi-kontainer').DataTable().clear().draw();
+                    tableListInformasiKontainer.destroy();
+                }
+            <?php endif; ?>
+            const table = $('.table-list-informasi-kontainer');
+            const tbody = table.find('tbody');
+            tbody.empty();
+            var no = 1;
 
-        $.each(listInformasiKontainer, function(i, v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.kontainer_kode_tipe_kontainer_text));
-            newRow.append($('<td style="text-align: center;">').text(v.kontainer_kode_ukuran_kontainer_text));
-            newRow.append($('<td style="text-align: center;">').text(v.kontainer_nomor_kontainer));
-            newRow.append($('<td style="text-align: center;">').text(v.kontainer_seri_kontainer));
-            newRow.append($('<td style="text-align: center;">').text(v.kontainer_kode_jenis_kontainer_text));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
+            $.each(listInformasiKontainer, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td style="text-align: center;">').text(no++));
+                newRow.append($('<td style="text-align: center;">').text(v.kontainer_kode_tipe_kontainer_text));
+                newRow.append($('<td style="text-align: center;">').text(v.kontainer_kode_ukuran_kontainer_text));
+                newRow.append($('<td style="text-align: center;">').text(v.kontainer_nomor_kontainer));
+                newRow.append($('<td style="text-align: center;">').text(v.kontainer_seri_kontainer));
+                newRow.append($('<td style="text-align: center;">').text(v.kontainer_kode_jenis_kontainer_text));
+                newRow.append($('<td style="text-align: center;">').html(
+
+                    <?php if (!empty($bc23Detail)) : ?> <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                        <?php else : ?> `
                     <button type="button" class="btn btn-danger" onclick="deleteRowInformasiKontainer('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
-            ));
-            table.find('tbody').append(newRow);
-        });
+                        <?php endif; ?> <?php else : ?> `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowInformasiKontainer('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                    <?php endif; ?>
+                ));
+                table.find('tbody').append(newRow);
+            });
 
-        tableListInformasiKontainer = $('.table-list-informasi-kontainer').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            lengthChange: true,
-            info: false,
-            paging: false,
-            searching: false,
-            ordering: false,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-        tableListInformasiKontainer.draw();
+            <?php if (empty($bc23Detail)) : ?>
+                tableListInformasiKontainer = $('.table-list-informasi-kontainer').DataTable({
+                    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+                    lengthChange: true,
+                    info: false,
+                    paging: false,
+                    searching: false,
+                    ordering: false,
+                    order: [],
+                    fixedHeader: true,
+                    "initComplete": function(settings, json) {
+                        $('.dataTables_length').empty();
+                        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                    },
+                    display: "stripe",
+                    searching: false,
+                    language: {
+                        emptyTable: "Tidak Ada Data",
+                        lengthMenu: "Show _MENU_ entries",
+                        paginate: {
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                });
+                tableListInformasiKontainer.draw();
+            <?php endif; ?>
+        } catch (e) {
+            console.log(e);
+        }
+
     }
 
     // DATA TABEL INFORMASI DOKUMEN PELENGKAP
     function displayTableInformasiDokumenPelengkap() {
-        if ($.fn.DataTable.isDataTable('.table-list-informasi-dokumen-pelengkap')) {
-            $('.table-list-informasi-dokumen-pelengkap').DataTable().clear().draw();
-            tableListDokumenPelengkap.destroy();
-        }
-        const table = $('.table-list-informasi-dokumen-pelengkap');
-        const tbody = table.find('tbody');
-        var no = 1;
+        try {
+            <?php if (empty($bc23Detail)) : ?>
+                if ($.fn.DataTable.isDataTable('.table-list-informasi-dokumen-pelengkap')) {
+                    $('.table-list-informasi-dokumen-pelengkap').DataTable().clear().draw();
+                    tableListDokumenPelengkap.destroy();
+                }
+            <?php endif; ?>
+            const table = $('.table-list-informasi-dokumen-pelengkap');
+            const tbody = table.find('tbody');
+            tbody.empty();
+            var no = 1;
 
-        $.each(listInformasiDokumenPelengkap, function(i, v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_nomor_dokumen));
-            newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_seri_dokumen));
-            newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_tanggal_dokumen));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
+            $.each(listInformasiDokumenPelengkap, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td style="text-align: center;">').text(no++));
+                newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_nomor_dokumen));
+                newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_seri_dokumen));
+                newRow.append($('<td style="text-align: center;">').text(v.dokumen_pelengkap_tanggal_dokumen));
+                newRow.append($('<td style="text-align: center;">').html(
+                    <?php if (!empty($bc23Detail)) : ?> <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                        <?php else : ?> `
                     <button type="button" class="btn btn-danger" onclick="deleteRowInformasiDokumenPelengkap('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
-            ));
-            table.find('tbody').append(newRow);
-        });
+                        <?php endif; ?> <?php else : ?> `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowInformasiDokumenPelengkap('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                    <?php endif; ?>
+                ));
+                table.find('tbody').append(newRow);
+            });
 
-        tableListDokumenPelengkap = $('.table-list-informasi-dokumen-pelengkap').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            lengthChange: true,
-            info: false,
-            paging: false,
-            searching: false,
-            ordering: false,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-        tableListDokumenPelengkap.draw();
+            <?php if (empty($bc23Detail)) : ?>
+                tableListDokumenPelengkap = $('.table-list-informasi-dokumen-pelengkap').DataTable({
+                    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+                    lengthChange: true,
+                    info: false,
+                    paging: false,
+                    searching: false,
+                    ordering: false,
+                    order: [],
+                    fixedHeader: true,
+                    "initComplete": function(settings, json) {
+                        $('.dataTables_length').empty();
+                        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                    },
+                    display: "stripe",
+                    searching: false,
+                    language: {
+                        emptyTable: "Tidak Ada Data",
+                        lengthMenu: "Show _MENU_ entries",
+                        paginate: {
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                });
+                tableListDokumenPelengkap.draw();
+            <?php endif; ?>
+        } catch (e) {
+            console.log(e);
+        }
+
     }
 
     // DATA TABEL INFORMASI PENGANGKUT
     function displayTableInformasiPengangkut() {
-        if ($.fn.DataTable.isDataTable('.table-list-informasi-pengangkut')) {
-            $('.table-list-informasi-pengangkut').DataTable().clear().draw();
-            tableListInformasiPengangkut.destroy();
-        }
-        const table = $('.table-list-informasi-pengangkut');
-        const tbody = table.find('tbody');
-        var no = 1;
+        try {
+            <?php if (empty($bc23Detail)) : ?>
+                if ($.fn.DataTable.isDataTable('.table-list-informasi-pengangkut')) {
+                    $('.table-list-informasi-pengangkut').DataTable().clear().draw();
+                    tableListInformasiPengangkut.destroy();
+                }
+            <?php endif; ?>
+            const table = $('.table-list-informasi-pengangkut');
+            const tbody = table.find('tbody');
+            tbody.empty();
+            var no = 1;
 
-        $.each(listInformasiPengangkut, function(i, v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_kode_bendera));
-            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_nama_sarana_pengangkut));
-            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_nomor_pengangkut));
-            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_kode_cara_angkut_text));
-            newRow.append($('<td style="text-align: center;">').text(v.pengangkut_seri_pengangkut));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
+            $.each(listInformasiPengangkut, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td style="text-align: center;">').text(no++));
+                newRow.append($('<td style="text-align: center;">').text(v.pengangkut_kode_bendera));
+                newRow.append($('<td style="text-align: center;">').text(v.pengangkut_nama_sarana_pengangkut));
+                newRow.append($('<td style="text-align: center;">').text(v.pengangkut_nomor_pengangkut));
+                newRow.append($('<td style="text-align: center;">').text(v.pengangkut_kode_cara_angkut_text));
+                newRow.append($('<td style="text-align: center;">').text(v.pengangkut_seri_pengangkut));
+                newRow.append($('<td style="text-align: center;">').html(
+                    <?php if (!empty($bc23Detail)) : ?> <?php if ($bc23Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                        <?php else : ?> `
                     <button type="button" class="btn btn-danger" onclick="deleteRowInformasiPengangkut('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
-            ));
-            table.find('tbody').append(newRow);
-        });
+                        <?php endif; ?> <?php else : ?> `
+                    <button type="button" class="btn btn-danger" onclick="deleteRowInformasiPengangkut('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                    <?php endif; ?>
+                ));
+                table.find('tbody').append(newRow);
+            });
 
-        tableListInformasiPengangkut = $('.table-list-informasi-pengangkut').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            lengthChange: true,
-            info: false,
-            paging: false,
-            searching: false,
-            ordering: false,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-        tableListInformasiPengangkut.draw();
+            <?php if (empty($bc23Detail)) : ?>
+                tableListInformasiPengangkut = $('.table-list-informasi-pengangkut').DataTable({
+                    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+                    lengthChange: true,
+                    info: false,
+                    paging: false,
+                    searching: false,
+                    ordering: false,
+                    order: [],
+                    fixedHeader: true,
+                    "initComplete": function(settings, json) {
+                        $('.dataTables_length').empty();
+                        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                    },
+                    display: "stripe",
+                    searching: false,
+                    language: {
+                        emptyTable: "Tidak Ada Data",
+                        lengthMenu: "Show _MENU_ entries",
+                        paginate: {
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                });
+                tableListInformasiPengangkut.draw();
+            <?php endif; ?>
+        } catch (e) {
+            console.log(e);
+        }
+
     }
 
     // DELETE ROW INFORMASI PENGANGKUT
@@ -3833,6 +4267,119 @@
                 v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+    }
+
+    function deleteAction() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Dokumen BC 2.3 ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append("id", $('#id').val());
+                $.ajax({
+                    url: `<?= base_url("bea-cukai-bc-23/delete"); ?>`,
+                    method: "POST",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            csrf.val(res.token);
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "<?= base_url('bea-cukai-bc-23') ?>"
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    console.log(res);
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    function postingAction() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting BC 2.3 ke aplikasi Ceisa Bea Cukai ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append("id", $('#id').val());
+                $.ajax({
+                    url: `<?= base_url("bea-cukai-bc-23/posting"); ?>`,
+                    method: "POST",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            csrf.val(res.token);
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    console.log(res);
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+        })
+
     }
 </script>
 
