@@ -89,15 +89,15 @@ class BC23Model extends Model
                 $statusLPB = explode(' ', "LOKAL BAKU");
                 $bcDataQry->where('status_penerimaan', $statusLPB[0]);
                 $bcDataQry->where('tipe_bahan', $statusLPB[1]);
-            } elseif ($addCondition['statusLPB'] == "LOKAL BP") {
+            } elseif ($addCondition['statusLPB'] == "LOKAL PENOLONG") {
                 $statusLPB = explode(' ', "LOKAL PENOLONG");
                 $bcDataQry->where('status_penerimaan', $statusLPB[0]);
                 $bcDataQry->where('tipe_bahan', $statusLPB[1]);
-            } elseif ($addCondition['statusLPB'] == "IMPORT BB") {
+            } elseif ($addCondition['statusLPB'] == "IMPORT BAKU") {
                 $statusLPB = explode(' ', "IMPORT BAKU");
                 $bcDataQry->where('status_penerimaan', $statusLPB[0]);
                 $bcDataQry->where('tipe_bahan', $statusLPB[1]);
-            } elseif ($addCondition['statusLPB'] == "IMPORT BP") {
+            } elseif ($addCondition['statusLPB'] == "IMPORT PENOLONG") {
                 $statusLPB = explode(' ', "IMPORT PENOLONG");
                 $bcDataQry->where('status_penerimaan', $statusLPB[0]);
                 $bcDataQry->where('tipe_bahan', $statusLPB[1]);

@@ -39,7 +39,7 @@ class BC23 extends BaseController
 
     public function index()
     {
-        return \view('BeaCukai/bc-23/index');
+        return view('BeaCukai/bc-23/index');
     }
 
     public function all()
@@ -57,7 +57,8 @@ class BC23 extends BaseController
         $condition = [
             "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang.bc_type" => 48
+            "penerimaan_barang.bc_type" => 48,
+            "penerimaan_barang.status_post" => "FINISH"
         ];
 
 
@@ -123,7 +124,7 @@ class BC23 extends BaseController
 
         $lpb = $penerimaanBarangModel->getById($id);
 
-        if ($lpb == null) {
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
             return redirect()->to('bea-cukai-bc-23');
         }
 
@@ -806,7 +807,7 @@ class BC23 extends BaseController
     {
         $kodeKantor = $this->request->getVar('kode_kantor');
         $kodeDokumenBC23 = '23';
-        $kodeUniqPerusahaan = generateUniqueCode(6);
+        $kodeUniqPerusahaan = "017189";
         $tanggalAju = date('Ymd');
         $sequenceNoUrutPengajuan = generateUniqueCode(6);
 
