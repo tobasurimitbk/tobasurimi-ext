@@ -81,6 +81,7 @@ class JurnalUmum extends BaseController
                     );
                     $total_debit += (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key]));
                 }
+                var_dump($result);
             }
 
             $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($this->request->getPost('type_transaksi'));
@@ -93,7 +94,6 @@ class JurnalUmum extends BaseController
                 'type_transaksi' => $this->request->getPost('type_transaksi'),
             ];
             exit;
-            // var_dump($result);
             $hasil = $this->jurnalUmumModel->insertJurnalBatch($result);
             // var_dump($hasil);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
