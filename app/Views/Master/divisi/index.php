@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Divisi</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Departemen</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
@@ -15,7 +15,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control divisi" placeholder="Masukkan Divisi" id="divisi" name="divisi">
-                                <label for="floatingInput">Divisi</label>
+                                <label for="floatingInput">Departemen</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -81,7 +81,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Divisi</h1>
+        <h1>Departemen</h1>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
