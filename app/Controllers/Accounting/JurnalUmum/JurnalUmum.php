@@ -56,8 +56,8 @@ class JurnalUmum extends BaseController
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
             foreach ($nm as $key => $val) {
-                print_r("kredit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])) . "-");
-                print_r("debit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])) . "-");
+                // print_r("kredit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])) . "-");
+                // print_r("debit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])) . "-");
                 if ($_POST['debit'][$key] == "" || $_POST['debit'][$key] == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
@@ -82,7 +82,7 @@ class JurnalUmum extends BaseController
                     );
                     $total_debit += (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key]));
                 }
-                var_dump($result);
+                // var_dump($result);
             }
 
             $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($this->request->getPost('type_transaksi'));
