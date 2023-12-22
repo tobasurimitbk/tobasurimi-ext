@@ -94,7 +94,7 @@ class JurnalUmum extends BaseController
                 'metode_input' => 'manual',
                 'type_transaksi' => $this->request->getPost('type_transaksi'),
             ];
-            exit;
+            // exit;
             $hasil = $this->jurnalUmumModel->insertJurnalBatch($result);
             // var_dump($hasil);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
