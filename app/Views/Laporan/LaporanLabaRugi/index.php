@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Neraca</h1>
+        <h1>Laba Rugi</h1>
     </div>
     <div class="card">
         <div class="card-body">
