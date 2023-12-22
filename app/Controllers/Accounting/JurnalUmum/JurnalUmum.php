@@ -53,6 +53,7 @@ class JurnalUmum extends BaseController
             $total_debit = 0;
             $total_credit = 0;
             $result = array();
+
             $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
             foreach ($nm as $key => $val) {
                 if ($_POST['debet'][$key] == "" || $_POST['debet'][$key] == 0) {
