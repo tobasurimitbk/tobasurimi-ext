@@ -59,7 +59,7 @@ class JurnalUmum extends BaseController
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' => $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
-                        'tanggal_jurnal' => $this->request->getPost('tgl_transaksi'),
+                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
                         'debit' => "0",
                         'kredit' => (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])),
                         'keterangan' => $_POST['ket'][$key],
@@ -70,7 +70,7 @@ class JurnalUmum extends BaseController
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' =>  $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
-                        'tanggal_jurnal' => $this->request->getPost('tgl_transaksi'),
+                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
                         'debit' => (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debet'][$key])),
                         'kredit' => "0",
                         'keterangan' => $_POST['ket'][$key],
@@ -83,7 +83,7 @@ class JurnalUmum extends BaseController
             $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($this->request->getPost('type_transaksi'));
             $dataTransaksiJurnal = [
                 'no_transaksi' => $no_transaksi_jurnal,
-                'tanggal_transaksi' => $this->request->getPost('tgl_transaksi'),
+                'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
                 'total_debit' => $total_debit,
                 'total_kredit' => $total_credit,
                 'metode_input' => 'manual',
