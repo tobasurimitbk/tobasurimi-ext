@@ -56,6 +56,8 @@ class JurnalUmum extends BaseController
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
             foreach ($nm as $key => $val) {
+                echo ((float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])));
+                echo ((float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])));
                 if ($_POST['debit'][$key] == "" || $_POST['debit'][$key] == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
@@ -90,10 +92,10 @@ class JurnalUmum extends BaseController
                 'metode_input' => 'manual',
                 'type_transaksi' => $this->request->getPost('type_transaksi'),
             ];
-            var_dump($result);
-            $hasil = $this->jurnalUmumModel->insertJurnalBatch($result);
-            var_dump($hasil);
             exit;
+            // var_dump($result);
+            $hasil = $this->jurnalUmumModel->insertJurnalBatch($result);
+            // var_dump($hasil);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
 
             session()->setFlashdata('success_message', 'Data Berhasil disimpan');
