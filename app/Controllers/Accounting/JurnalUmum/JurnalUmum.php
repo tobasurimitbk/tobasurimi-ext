@@ -56,33 +56,32 @@ class JurnalUmum extends BaseController
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
             foreach ($nm as $key => $val) {
-                // print_r("kredit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])) . "-");
-                // print_r("debit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])) . "-");
-                if ($_POST['debit'][$key] == "" || $_POST['debit'][$key] == 0) {
+                $debitValue = isset($_POST['debit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['debit'][$key])) : 0;
+                $kreditValue = isset($_POST['kredit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['kredit'][$key])) : 0;
+
+                if ($debitValue == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' => $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
-                        'debit' => "0",
-                        'kredit' => (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])),
+                        'debit' => $debitValue,
+                        'kredit' => $kreditValue,
                         'keterangan' => $_POST['ket'][$key],
                         'id_inputer' => session()->get("login")->user_id
                     );
-                    $total_credit += (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key]));
-                }
-                if ($_POST['kredit'][$key] == "" || $_POST['kredit'][$key] == 0) {
+                    $total_credit += $kreditValue;
+                } elseif ($kreditValue == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' =>  $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
-                        'debit' => (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])),
-                        'kredit' => "0",
+                        'debit' => $debitValue,
+                        'kredit' => $kreditValue,
                         'keterangan' => $_POST['ket'][$key],
                         'id_inputer' => session()->get("login")->user_id
                     );
-                    $total_debit += (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key]));
+                    $total_debit += $debitValue;
                 }
-                // var_dump($result);
             }
 
             $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($this->request->getPost('type_transaksi'));
@@ -94,9 +93,7 @@ class JurnalUmum extends BaseController
                 'metode_input' => 'manual',
                 'type_transaksi' => $this->request->getPost('type_transaksi'),
             ];
-            // exit;
-            $hasil = $this->jurnalUmumModel->insertJurnalBatch($result);
-            // var_dump($hasil);
+            $this->jurnalUmumModel->insertJurnalBatch($result);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
 
             session()->setFlashdata('success_message', 'Data Berhasil disimpan');
