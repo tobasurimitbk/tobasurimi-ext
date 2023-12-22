@@ -56,8 +56,8 @@ class JurnalUmum extends BaseController
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
             foreach ($nm as $key => $val) {
-                echo ("kredit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])) . "-");
-                echo ("debit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])) . "-");
+                print_r("kredit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key])) . "-");
+                print_r("debit" . (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])) . "-");
                 if ($_POST['debit'][$key] == "" || $_POST['debit'][$key] == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
@@ -69,7 +69,8 @@ class JurnalUmum extends BaseController
                         'id_inputer' => session()->get("login")->user_id
                     );
                     $total_credit += (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['kredit'][$key]));
-                } else if ($_POST['kredit'][$key] == "" || $_POST['kredit'][$key] == 0) {
+                }
+                if ($_POST['kredit'][$key] == "" || $_POST['kredit'][$key] == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' =>  $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
