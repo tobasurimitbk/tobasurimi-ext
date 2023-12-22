@@ -312,7 +312,7 @@
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
                                 <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['nik'] : '' ?>" id="root_nik" name="root_nik" type="number" class="form-control root_nik" placeholder="">
-                                <label>NIK</label>
+                                <label>Nomor NIK</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
@@ -361,13 +361,13 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['volume'] : '' ?>" id="root_volume" name="root_volume" type="number" maxlength="18" class="form-control root_volume" placeholder="">
+                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['volume'] : '' ?>" id="root_volume" name="root_volume" type="number" maxlength="19" class="form-control root_volume" placeholder="">
                                 <label>Volume</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['biaya_tambahan'] : '' ?>" id="root_biaya_tambahan" maxlength="18" name="root_biaya_tambahan" type="number" class="form-control root_biaya_tambahan" placeholder="">
+                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['biaya_tambahan'] : '' ?>" id="root_biaya_tambahan" maxlength="19" name="root_biaya_tambahan" type="number" class="form-control root_biaya_tambahan" placeholder="">
                                 <label>Biaya Tambahan</label>
                             </div>
                         </div>
@@ -375,19 +375,19 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['biaya_pengurang'] : '' ?>" id="root_biaya_pengurang" maxlength="18" name="root_biaya_pengurang" type="number" class="form-control root_biaya_pengurang" placeholder="">
+                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['biaya_pengurang'] : '' ?>" id="root_biaya_pengurang" maxlength="19" name="root_biaya_pengurang" type="number" class="form-control root_biaya_pengurang" placeholder="">
                                 <label>Biaya Pengurang</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['vd'] : '' ?>" id="root_vd" maxlength="18" name="root_vd" type="number" class="form-control root_vd" placeholder="">
+                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['vd'] : '' ?>" id="root_vd" maxlength="19" name="root_vd" type="number" class="form-control root_vd" placeholder="">
                                 <label>Nilai VD</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['uang_muka'] : '' ?>" id="root_uang_muka" maxlength="18" name="root_uang_muka" type="number" class="form-control root_uang_muka" placeholder="">
+                                <input <?= !empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> value="<?= !empty($bc40Detail) ? $bc40Detail['uang_muka'] : '' ?>" id="root_uang_muka" maxlength="19" name="root_uang_muka" type="number" class="form-control root_uang_muka" placeholder="">
                                 <label>Uang Muka</label>
                             </div>
                         </div>
@@ -395,7 +395,7 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input readonly value="<?= !empty($bc40Detail) ? $bc40Detail['nilai_jasa'] : '' ?>" id="root_nilai_jasa" maxlength="18" name="root_nilai_jasa" type="number" class="form-control root_nilai_jasa" placeholder="">
+                                <input readonly value="<?= !empty($bc40Detail) ? $bc40Detail['nilai_jasa'] : '' ?>" id="root_nilai_jasa" maxlength="19" name="root_nilai_jasa" type="number" class="form-control root_nilai_jasa" placeholder="">
                                 <label>Nilai Jasa</label>
                             </div>
                         </div>
@@ -517,180 +517,13 @@
                     </table>
                 </div>
                 <label class="form-label font-weight-bold lable-title mt-3 mb-2">
-                    Informasi Kemasan
-                </label>
-                <form class="form-informasi-kemasan">
-                    <div class="row">
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
-                                <input id="kemasan_jumlah_kemasan" name="kemasan_jumlah_kemasan" type="number" class="form-control kemasan_jumlah_kemasan" placeholder="">
-                                <label>Jumlah Kemasan</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kemasan_kode_jenis_kemasan" id="kemasan_kode_jenis_kemasan" name="kemasan_kode_jenis_kemasan" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($kodeJenisKemasan as $k) : ?>
-                                        <option value="<?= encrypt($k['description']) ?>">
-                                            <?= $k['description'] . " ( " . strtoupper($k['value']) . " )" ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label style="z-index: 1;">Pilih Kode Jenis Kemasan</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
-                                <input id="kemasan_seri_kemasan" name="kemasan_seri_kemasan" type="number" class="form-control kemasan_seri_kemasan" placeholder="">
-                                <label>Seri Kemasan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
-                                <input id="kemasan_merk_kemasan" name="kemasan_merk_kemasan" type="text" class="form-control kemasan_merk_kemasan" placeholder="">
-                                <label>Merk Kemasan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6">
-                            <div class="row" style="float: right; margin-bottom:5px;">
-                                <div class="col-sm" style="margin-right: -20px;">
-                                    <button type="button" class="btn btn-add btn-block float-right btn-submit-informasi-kemasan" style="float: right;">
-                                        <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
-                                    </button>
-                                </div>
-                                <div class="col-sm">
-                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiKemasan()" class="btn btn-add btn-block float-right btn-reset-informasi-kemasan">
-                                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-kemasan" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="text-align: center; width:10px;">No</th>
-                                <th style="text-align: center;">Jumlah Kemasan</th>
-                                <th style="text-align: center;">Kode Jenis Kemasan</th>
-                                <th style="text-align: center;">Seri Kemasan</th>
-                                <th style="text-align: center;">Merk Kemasan</th>
-                                <th style="text-align: center;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <label class="form-label font-weight-bold lable-title mt-3 mb-2">
-                    Informasi Kontainer (Opsional)
-                </label>
-                <form class="form-informasi-kontainer">
-                    <div class="row">
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kontainer_kode_tipe_kontainer" id="kontainer_kode_tipe_kontainer" name="kontainer_kode_tipe_kontainer" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($kodeTipeKontainer as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
-                                            <?= $k['value'] . " ( " . strtoupper($k['description']) . " )" ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label style="z-index: 1;">Pilih Kode Tipe Kontainer</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kontainer_kode_ukuran_kontainer" id="kontainer_kode_ukuran_kontainer" name="kontainer_kode_ukuran_kontainer" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($kodeUkuranKontainer as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
-                                            <?= $k['value'] . " ( " . strtoupper($k['description']) . " )" ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label style="z-index: 1;">Pilih Kode Ukuran Kontainer</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
-                                <input id="kontainer_nomor_kontainer" name="kontainer_nomor_kontainer" type="text" class="form-control kontainer_nomor_kontainer" placeholder="">
-                                <label>Nomor Kontainer</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
-                                <input id="kontainer_seri_kontainer" name="kontainer_seri_kontainer" type="number" class="form-control kontainer_seri_kontainer" placeholder="">
-                                <label>Seri Kontainer (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kontainer_kode_jenis_kontainer" id="kontainer_kode_jenis_kontainer" name="kontainer_kode_jenis_kontainer" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($kodeJenisKontainer as $k) : ?>
-                                        <option value="<?= encrypt($k['description']) ?>">
-                                            <?= $k['description'] . " ( " . strtoupper($k['value']) . " )" ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label style="z-index: 1;">Pilih Kode Jenis Kontainer (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6">
-                            <div class="row" style="float: right; margin-bottom:5px;">
-                                <div class="col-sm" style="margin-right: -20px;">
-                                    <button type="button" class="btn btn-add btn-block float-right btn-submit-informasi-kontainer" style="float: right;">
-                                        <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
-                                    </button>
-                                </div>
-                                <div class="col-sm">
-                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiKontainer()" class="btn btn-add btn-block float-right btn-reset-informasi-kontainer">
-                                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-kontainer" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="text-align: center; width:10px;">No</th>
-                                <th style="text-align: center;">Tipe Kontainer</th>
-                                <th style="text-align: center;">Ukuran Kontainer</th>
-                                <th style="text-align: center;">Nomor Kontainer</th>
-                                <th style="text-align: center;">Seri Kontainer</th>
-                                <th style="text-align: center;">Jenis Kontainer</th>
-                                <th style="text-align: center;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <label class="form-label font-weight-bold lable-title mt-3 mb-2">
                     Informasi Dokumen Pelengkap
                 </label>
-                <form class="form-dokumen-pelengkap">
+                <form class="form-informasi-dokumen-pelengkap">
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="dokumen_pelengkap_kode_dokumen" name="dokumen_pelengkap_kode_dokumen" type="text" class="form-control dokumen_pelengkap_kode_dokumen" placeholder="" readonly value="Dokumen Invoice (380)">
+                                <input id="dokumen_pelengkap_kode_dokumen" name="dokumen_pelengkap_kode_dokumen" type="text" class="form-control dokumen_pelengkap_kode_dokumen" placeholder="">
                                 <label>Kode Dokumen</label>
                             </div>
                         </div>
@@ -730,7 +563,7 @@
                                     </button>
                                 </div>
                                 <div class="col-sm">
-                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiDokumenPelengkap()" class="btn btn-add btn-block float-right btn-reset-informasi-dokumen-pelengkap">
+                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="" class="btn btn-add btn-block float-right btn-reset-informasi-dokumen-pelengkap">
                                         <i class="fa-solid fa-rotate-right mr-1"></i> Reset
                                     </button>
                                 </div>
@@ -743,6 +576,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center; width:10px;">No</th>
+                                <th style="text-align: center;">Kode Dokumen</th>
                                 <th style="text-align: center;">Nomor Dokumen</th>
                                 <th style="text-align: center;">Seri Dokumen</th>
                                 <th style="text-align: center;">Tanggal Dokumen</th>
@@ -760,12 +594,6 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input id="pengangkut_kode_bendera" name="pengangkut_kode_bendera" type="text" class="form-control pengangkut_kode_bendera" placeholder="">
-                                <label>Kode Bendera</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
                                 <input id="pengangkut_nama_sarana_pengangkut" name="pengangkut_nama_sarana_pengangkut" type="text" class="form-control pengangkut_nama_sarana_pengangkut" placeholder="">
                                 <label>Nama Sarana Pengangkut</label>
                             </div>
@@ -773,22 +601,7 @@
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
                                 <input id="pengangkut_nomor_pengangkut" name="pengangkut_nomor_pengangkut" type="text" class="form-control pengangkut_nomor_pengangkut" placeholder="">
-                                <label>Nomor Pengangkut (Voy Flight)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select pengangkut_kode_cara_angkut" id="pengangkut_kode_cara_angkut" name="pengangkut_kode_cara_angkut" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($kodePengangkutan as $k) : ?>
-                                        <option value="<?= encrypt($k['description']) ?>">
-                                            <?= $k['description'] . " ( " . strtoupper($k['value']) . " )" ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label style="z-index: 1;">Cara Pengangkutan</label>
+                                <label>Nomor Pengangkut (Nomor Polisi)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
@@ -821,11 +634,244 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center; width:10px;">No</th>
-                                <th style="text-align: center;">Kode Bendera</th>
                                 <th style="text-align: center;">Nama Pengangkut</th>
                                 <th style="text-align: center;">Nomor Pengangkut</th>
-                                <th style="text-align: center;">Cara Angkut</th>
                                 <th style="text-align: center;">Seri Pengangkut</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <label class="form-label font-weight-bold lable-title mt-3 mb-2">
+                    Informasi Kontainer (Opsional)
+                </label>
+                <form class="form-informasi-kontainer">
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kontainer_kode_jenis_kontainer" id="kontainer_kode_jenis_kontainer" name="kontainer_kode_jenis_kontainer" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeJenisKontainer as $k) : ?>
+                                        <option value="<?= encrypt($k['description']) ?>">
+                                            <?= $k['description'] . " ( " . strtoupper($k['value']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Jenis Kontainer (Opsional)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kontainer_kode_tipe_kontainer" id="kontainer_kode_tipe_kontainer" name="kontainer_kode_tipe_kontainer" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeTipeKontainer as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= $k['value'] . " ( " . strtoupper($k['description']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Tipe Kontainer</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kontainer_kode_ukuran_kontainer" id="kontainer_kode_ukuran_kontainer" name="kontainer_kode_ukuran_kontainer" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeUkuranKontainer as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= $k['value'] . " ( " . strtoupper($k['description']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Ukuran Kontainer</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="kontainer_nomor_kontainer" name="kontainer_nomor_kontainer" type="text" class="form-control kontainer_nomor_kontainer" placeholder="">
+                                <label>Nomor Kontainer</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="kontainer_seri_kontainer" name="kontainer_seri_kontainer" type="number" class="form-control kontainer_seri_kontainer" placeholder="">
+                                <label>Seri Kontainer (Opsional)</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="row" style="float: right; margin-bottom:5px;">
+                                <div class="col-sm" style="margin-right: -20px;">
+                                    <button type="button" class="btn btn-add btn-block float-right btn-submit-informasi-kontainer" style="float: right;">
+                                        <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
+                                    </button>
+                                </div>
+                                <div class="col-sm">
+                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiKontainer()" class="btn btn-add btn-block float-right btn-reset-informasi-kontainer">
+                                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-kontainer" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center; width:10px;">No</th>
+                                <th style="text-align: center;">Tipe Kontainer</th>
+                                <th style="text-align: center;">Ukuran Kontainer</th>
+                                <th style="text-align: center;">Nomor Kontainer</th>
+                                <th style="text-align: center;">Seri Kontainer</th>
+                                <th style="text-align: center;">Jenis Kontainer</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <label class="form-label font-weight-bold lable-title mt-3 mb-2">
+                    Informasi Kemasan
+                </label>
+                <form class="form-informasi-kemasan">
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="kemasan_jumlah_kemasan" name="kemasan_jumlah_kemasan" type="number" class="form-control kemasan_jumlah_kemasan" placeholder="">
+                                <label>Jumlah Kemasan</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kemasan_kode_jenis_kemasan" id="kemasan_kode_jenis_kemasan" name="kemasan_kode_jenis_kemasan" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeJenisKemasan as $k) : ?>
+                                        <option value="<?= encrypt($k['description']) ?>">
+                                            <?= $k['description'] . " ( " . strtoupper($k['value']) . " )" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Kode Jenis Kemasan</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="kemasan_seri_kemasan" name="kemasan_seri_kemasan" type="number" class="form-control kemasan_seri_kemasan" placeholder="">
+                                <label>Seri Kemasan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="kemasan_merk_kemasan" name="kemasan_merk_kemasan" type="text" class="form-control kemasan_merk_kemasan" placeholder="">
+                                <label>Merk Kemasan (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="row" style="float: right; margin-bottom:5px;">
+                                <div class="col-sm" style="margin-right: -20px;">
+                                    <button type="button" class="btn btn-add btn-block float-right btn-submit-informasi-kemasan" style="float: right;">
+                                        <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
+                                    </button>
+                                </div>
+                                <div class="col-sm">
+                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiKemasan()" class="btn btn-add btn-block float-right btn-reset-informasi-kemasan">
+                                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-kemasan" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center; width:10px;">No</th>
+                                <th style="text-align: center;">Jumlah Kemasan</th>
+                                <th style="text-align: center;">Kode Jenis Kemasan</th>
+                                <th style="text-align: center;">Seri Kemasan</th>
+                                <th style="text-align: center;">Merk Kemasan</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <label class="form-label font-weight-bold lable-title mt-3 mb-2">
+                    Informasi Kemasan
+                </label>
+                <form class="form-informasi-pungutan">
+                    <div class="row">
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select pungutan_kode_fasilitas_tarif" id="pungutan_kode_fasilitas_tarif" name="pungutan_kode_fasilitas_tarif" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeFasilitasTarif as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            (<?= $k['value'] ?>) <?= $k['description'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Kode Fasilitas Tarif</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-floating mb-3">
+                                <input id="pungutan_kode_jenis_pungutan" name="pungutan_kode_jenis_pungutan" type="text" class="form-control pungutan_kode_jenis_pungutan" placeholder="" value="PPN" readonly>
+                                <label>Kode Jenis Pungutan</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-floating mb-3">
+                                <input id="pungutan_nilai_pungutan" name="pungutan_nilai_pungutan" maxlength="19" type="number" class="form-control pungutan_nilai_pungutan" placeholder="">
+                                <label>NilaiPungutan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="row" style="float: right; margin-bottom:5px;">
+                                <div class="col-sm" style="margin-right: -20px;">
+                                    <button type="button" class="btn btn-add btn-block float-right btn-submit-informasi-pungutan" style="float: right;">
+                                        <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
+                                    </button>
+                                </div>
+                                <div class="col-sm">
+                                    <button type="button" style="border-color: #e7323a !important; background-color: #e7323a !important; float: right;" onclick="resetFormInformasiKemasan()" class="btn btn-add btn-block float-right btn-reset-informasi-pungutan">
+                                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-kemasan" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center; width:10px;">No</th>
+                                <th style="text-align: center;">Kode Fasilitas Tarif</th>
+                                <th style="text-align: center;">Kode Jenis Pungutan</th>
+                                <th style="text-align: center;">Nilai Pungutan</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -835,9 +881,6 @@
                 </div>
             </div>
             <br />
-            <!-- <label class="form-label mt-2">
-                Dengan ini saya menyatakan bertanggung jawab atas kebenaran hal-hal yang diberitahukan dalam pemberitahuan pabean ini.
-            </label> -->
         </div>
     </div>
 
@@ -870,73 +913,73 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="asuransi" name="asuransi" type="number" class="asuransi form-control" placeholder="">
-                                <label>Nilai Asuransi</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="asuransi" name="asuransi" maxlength="19" type="number" class="asuransi form-control" placeholder="">
+                                <label>Nilai Asuransi (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_cif" name="harga_cif" type="number" class="harga_cif form-control" placeholder="">
-                                <label>Harga Cif</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="bruto" name="bruto" maxlength="21" type="number" class="bruto form-control" placeholder="">
+                                <label>Bruto (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="diskon" name="diskon" readonly type="text" class="diskon form-control" placeholder="">
-                                <label>Diskon</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="cif" name="cif" maxlength="19" type="number" class="cif form-control" placeholder="">
+                                <label>Nilai Cif (Opsional)</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="fob" name="fob" type="number" class="fob form-control" placeholder="">
-                                <label>Free On Board</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="freight" name="freight" type="number" class="form-control freight" placeholder="">
-                                <label>Freight</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="diskon" name="diskon" readonly type="text" class="diskon form-control" placeholder="">
+                                <label>Diskon (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
                                 <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> type="text" name="harga_ekspor" class="form-control" id="harga_ekspor" placeholder="">
-                                <label>Harga Ekspor</label>
+                                <label>Harga Ekspor (Opsional)</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_penyerahan_barang" name="harga_penyerahan_barang" type="number" class="harga_penyerahan_barang form-control" placeholder="">
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_penyerahan_barang" maxlength="19" name="harga_penyerahan_barang" type="number" class="harga_penyerahan_barang form-control" placeholder="">
                                 <label>Harga Penyerahan Barang</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
                                 <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_satuan_barang" readonly name="harga_satuan_barang" type="text" class="form-control harga_satuan_barang" placeholder="">
-                                <label>Harga Satuan Barang</label>
+                                <label>Harga Satuan Barang (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> type="text" class="form-control isi_per_kemasan" name="isi_per_kemasan" id="isi_per_kemasan" placeholder="">
-                                <label>Isi Per Kemasan</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> type="number" class="form-control isi_per_kemasan" name="isi_per_kemasan" id="isi_per_kemasan" placeholder="">
+                                <label>Isi Per Kemasan (Opsional)</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="jumlah_kemasan" name="jumlah_kemasan" type="number" class="jumlah_kemasan form-control" placeholder="">
                                 <label>Jumlah Kemasan</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="jumlah_satuan" name="jumlah_satuan" type="number" class="form-control jumlah_satuan" placeholder="">
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="jumlah_realisasi" name="jumlah_realisasi" type="number" class="form-control jumlah_realisasi" maxlength="19" placeholder="">
+                                <label>Jumlah Realisasi (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="jumlah_satuan" maxlength="21" name="jumlah_satuan" type="number" class="form-control jumlah_satuan" placeholder="">
                                 <label>Jumlah Satuan</label>
                             </div>
                         </div>
@@ -963,19 +1006,6 @@
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_kategori_barang" id="kode_kategori_barang" name="kode_kategori_barang" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($kodeKategoriBarang as $k) : ?>
-                                        <option value="<?= encrypt(str_replace(']', '', explode(',', $k['description'])[1])) ?>">
-                                            <?= str_replace(']', '', explode(',', $k['description'])[1]) . " ( " . strtoupper($k['value']) . " )" ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label style="z-index: 1;">Pilih Kode Kategori Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_jenis_kemasan" id="kode_jenis_kemasan" name="kode_jenis_kemasan" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($kodeJenisKemasan as $k) : ?>
@@ -987,47 +1017,12 @@
                                 <label style="z-index: 1;">Pilih Kode Jenis Kemasan</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_negara_asal" id="kode_negara_asal" name="kode_negara_asal" aria-label="Floating label select example">
+                                <select class="form-select kode_satuan_barang" id="kode_satuan_barang" name="kode_satuan_barang" aria-label="Floating label select example">
                                     <option value=""></option>
-                                    <?php foreach ($kodeNegaraAsal as $k) : ?>
-                                        <option value="<?= encrypt($k['code']) ?>">
-                                            <?= $k['code'] . " ( " . strtoupper($k['country_name']) . " )" ?>
-                                        </option>
-                                    <?php endforeach; ?>
                                 </select>
-                                <label style="z-index: 1;">Kode Negara Asal</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_perhitungan" id="kode_perhitungan" name="kode_perhitungan" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($kodePerhitungan as $k) : ?>
-                                        <option value="<?= encrypt($k['value']) ?>">
-                                            <?= $k['description'] ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label style="z-index: 1;">Kode Perhitungan</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> class="form-select kode_satuan_barang" id="kode_satuan_barang" name="kode_satuan_barang" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php if (!empty($bc40Detail)) : ?>
-                                        <?php foreach ($kodeSatuanBarang as $k) : ?>
-                                            <option value="<?= $k['id'] ?>">
-                                                <?= $k['text'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                                <label style="z-index: 1;">Kode Satuan Barang</label>
+                                <label style="z-index: 1;">Pilih Kode Satuan Barang</label>
                             </div>
                         </div>
                     </div>
@@ -1054,12 +1049,6 @@
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="nilai_tambah" name="nilai_tambah" type="text" class="form-control nilai_tambah" placeholder="">
-                                <label>Nilai Tambah</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 mt-1">
-                            <div class="form-floating mb-3">
                                 <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="pos_tarif" name="pos_tarif" type="text" class="form-control pos_tarif" placeholder="">
                                 <label>Pos Tarif</label>
                             </div>
@@ -1070,14 +1059,14 @@
                                 <label>Seri Barang</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
                                 <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="spesifikasi_lain" name="spesifikasi_lain" type="text" class="form-control spesifikasi_lain" placeholder="">
                                 <label>Spesifikasi Lain</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
                                 <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="tipe_barang" name="tipe_barang" type="text" class="form-control tipe_barang" placeholder="">
@@ -1090,24 +1079,30 @@
                                 <label>Ukuran Barang</label>
                             </div>
                         </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="uraian" name="uraian" type="text" class="form-control uraian" placeholder="">
+                                <label>Uraian Barang</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="ndpm" name="ndpm" type="number" class="form-control ndpm" placeholder="">
-                                <label>NDPM</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="volume" name="volume" type="number" class="form-control volume" placeholder="">
+                                <label>Volume (m3)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="cif_rupiah" name="cif_rupiah" type="number" class="form-control cif_rupiah" placeholder="">
-                                <label>Cif Rupiah</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="cif_rupiah" name="cif_rupiah" maxlength="19" type="number" class="form-control cif_rupiah" placeholder="">
+                                <label>Cif Rupiah (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_perolehan_barang" name="harga_perolehan_barang" type="text" class="form-control harga_perolehan_barang" placeholder="">
-                                <label>Harga Perolehan Barang</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="harga_perolehan" name="harga_perolehan" type="number" maxlength="19" class="form-control harga_perolehan" placeholder="">
+                                <label>Harga Perolehan (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -1122,20 +1117,32 @@
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label style="z-index: 1;">Kode Asal Bahan Baku</label>
+                                <label style="z-index: 1;">Kode Asal Bahan Baku (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3">
-                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="uraian" name="uraian" type="text" class="form-control uraian" placeholder="">
-                                <label>Uraian</label>
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="ndpm" name="ndpm" type="number" class="form-control ndpm" placeholder="">
+                                <label>NDPM (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="uang_muka" name="uang_muka" type="number" class="form-control uang_muka" maxlength="19" placeholder="">
+                                <label>Uang Muka (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mt-1">
+                            <div class="form-floating mb-3">
+                                <input <?= (!empty($bc40Detail) ? ($bc40Detail['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '') ?> id="nilai_jasa" name="nilai_jasa" type="number" class="form-control nilai_jasa" placeholder="">
+                                <label>Nilai Jasa (Opsional)</label>
                             </div>
                         </div>
                     </div>
                 </form>
 
                 <label class="form-label font-weight-bold lable-title mb-3">
-                    Barang Tarif
+                    Barang Tarif PPN
                 </label>
                 <form class="form-barang-tarif" role="form" method="POST" enctype="multipart/form-data">
                     <div class="row">
@@ -1183,24 +1190,18 @@
                         </div>
                         <div class="col-sm-4">
                             <div class="form-floating mb-3">
-                                <input id="kode_jenis_pungutan" name="kode_jenis_pungutan" type="text" class="form-control kode_jenis_pungutan" placeholder="" value="BM (BEA MASUK)" readonly>
-                                <label>Kode Jenis Pungutan</label>
+                                <input id="nilai_bayar" maxlength="18" name="nilai_bayar" type="number" class="form-control nilai_bayar" placeholder="">
+                                <label>Nilai Bayar Barang Tarif PPN</label>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-floating mb-3">
-                                <input id="nilai_bayar" name="nilai_bayar" type="number" class="form-control nilai_bayar" placeholder="">
-                                <label>Nilai Bayar BM (Bea Masuk)</label>
+                                <input id="nilai_fasilitas" maxlength="18" name="nilai_fasilitas" type="number" class="form-control nilai_fasilitas" placeholder="">
+                                <label>Nilai Fasilitas Tarif PPN</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-floating mb-3">
-                                <input id="nilai_fasilitas" name="nilai_fasilitas" type="number" class="form-control nilai_fasilitas" placeholder="">
-                                <label>Nilai Fasilitas</label>
-                            </div>
-                        </div>
                         <div class="col-sm-4">
                             <div class="form-floating mb-3">
                                 <input id="nilai_sudah_dilunasi" name="nilai_sudah_dilunasi" type="number" class="form-control nilai_sudah_dilunasi" placeholder="">
@@ -1213,18 +1214,24 @@
                                 <label>Seri Barang</label>
                             </div>
                         </div>
+                        <div class="col-sm-4">
+                            <div class="form-floating mb-3">
+                                <input id="tarif" name="tarif" type="number" class="form-control tarif" maxlength="19" placeholder="">
+                                <label>Tarif PPN</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="form-floating mb-3">
-                                <input id="tarif_bm" name="tarif_bm" type="number" class="form-control tarif_bm" placeholder="">
-                                <label>Tarif BM(Bea Masuk)</label>
+                                <input id="tarif_fasilitas" name="tarif_fasilitas" type="number" maxlength="6" class="form-control tarif_fasilitas" placeholder="">
+                                <label>Tarif Fasilitas</label>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-floating mb-3">
-                                <input id="tarif_fasilitas" name="tarif_fasilitas" type="number" class="form-control tarif_fasilitas" placeholder="">
-                                <label>Tarif Fasilitas</label>
+                                <input id="kode_jenis_pungutan" name="kode_jenis_pungutan" type="text" class="form-control kode_jenis_pungutan" value="PPN" readonly placeholder="">
+                                <label>Kode Jenis Pungutan</label>
                             </div>
                         </div>
                     </div>
@@ -1253,57 +1260,20 @@
                             <tr>
                                 <th style="text-align: center; width:10px;">No</th>
                                 <th style="text-align: center;">Kode Jenis Tarif</th>
-                                <th style="text-align: center;">Jml Satuan Barang Tarif BM</th>
+                                <th style="text-align: center;">Jml Satuan Barang Tarif PPN</th>
+                                <th style="text-align: center;">Kode Fasilitas Tarif</th>
                                 <th style="text-align: center;">Kode Satuan Barang</th>
-                                <th style="text-align: center;">Nilai Bayar BM</th>
-                                <th style="text-align: center;">Nilai Fasilitas</th>
+                                <th style="text-align: center;">Nilai Bayar Tarif PPN</th>
+                                <th style="text-align: center;">Nilai Fasilitas Tarif PPN</th>
                                 <th style="text-align: center;">Nilai Sudah Dilunasi</th>
                                 <th style="text-align: center;">Seri Barang</th>
-                                <th style="text-align: center;">Tarif BM</th>
+                                <th style="text-align: center;">Tarif PPN</th>
                                 <th style="text-align: center;">Tarif Fasilitas</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
 
-                        </tbody>
-                    </table>
-                </div>
-                <label class="form-label font-weight-bold lable-title mt-3 mb-3">
-                    Barang Dokumen
-                </label>
-                <form class="form-barang-dokumen">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-floating mb-3">
-                                <input id="no_seri_dokumen" name="no_seri_dokumen" type="text" class="form-control no_seri_dokumen" placeholder="">
-                                <label>Nomor Seri Dokumen</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6">
-                            <div class="row" style="float: right; margin-bottom:5px;">
-                                <div class="col-sm">
-                                    <button type="button" class="btn btn-add btn-block float-right btn-submit-no-seri-dokumen" style="float: right; margin-right:-15px;">
-                                        <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-barang-dokumen" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Nomor Seri Dokumen</th>
-                                <th style="text-align: center; width:10px;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
                         </tbody>
                     </table>
                 </div>
@@ -1316,9 +1286,382 @@
     // CSRF
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
+    // DECLARE VARIABLE
+    var listBarang = [];
+    var listInformasiPengangkut = [];
+    var listInformasiDokumenPelengkap = [];
+    var listInformasiKontainer = [];
+    var listInformasiEntitas = [];
+    var listInformasiKemasan = [];
+    var selectedDetailBarang = null;
+    // INSERT LIST BARANG (FROM SERVER)
+    <?php foreach ($lpbDetail as $ld) : ?>
+        listBarang.push({
+            id: "<?= encrypt($ld['id']) ?>",
+            purchase_order_id: "<?= encrypt($ld['purchase_order_id']) ?>",
+            purchase_order_details_id: "<?= encrypt($ld['purchase_order_details_id']) ?>",
+            penerimaan_barang_id: "<?= encrypt($ld['penerimaan_barang_id']) ?>",
+            nama_barang_dok: "<?= str_replace('"', '',  $ld['nama_barang_dok']) ?>",
+            jml_masuk: "<?= $ld['jml_masuk'] ?>",
+            po_no: "<?= $ld['po_no'] ?>",
+            harga_satuan_barang: "<?= ($ld['harga'] + $ld['harga_harian'] + $ld['harga_bulanan']) ?>",
+            diskon: "<?= empty($ld['disc']) ? 0 : $ld['disc'] ?>",
+            kode_barang: "<?= $ld['kode_barang'] ?>",
+            detail_barang_dok: {
+                asuransi: '',
+                harga_cif: '',
+                diskon: '',
+                fob: '',
+                freight: '',
+                harga_ekspor: '',
+                harga_penyerahan_barang: '',
+                harga_satuan_barang: '',
+                isi_per_kemasan: '',
+                jumlah_kemasan: '',
+                jumlah_satuan: '',
+                kode_barang: '',
+                kode_dokumen: '',
+                kode_kategori_barang: '',
+                kode_jenis_kemasan: '',
+                kode_negara_asal: '',
+                kode_perhitungan: '',
+                kode_satuan_barang: '',
+                merk_barang: '',
+                netto: '',
+                nilai_barang: '',
+                nilai_tambah: '',
+                pos_tarif: '',
+                seri_barang: '',
+                spesifikasi_lain: '',
+                tipe_barang: '',
+                ukuran_barang: '',
+                ndpm: '',
+                cif_rupiah: '',
+                harga_perolehan_barang: '',
+                kode_asal_bahan_baku: '',
+                uraian: '',
+                barangTarif: [],
+                barangDokumen: [],
+            },
+        });
+    <?php endforeach; ?>
 
     // INIT FORM VIEW
     $('.detail-barang-form-view').hide();
+    // DATE
+    $(".tanggal_penerimaan_lpb, #root_tanggal_bc_11, #root_tanggal_tiba, #root_tanggal_ttd, #entitas_tanggal_ijin_entitas,#dokumen_pelengkap_tanggal_dokumen").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    // SELECT 2
+    $('#kode_satuan_barang').select2({
+        placeholder: "Pilih Kode Satuan Barang",
+        theme: "bootstrap-5",
+        ajax: {
+            url: '<?= base_url('bea-cukai-bc-40/satuan-barang') ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1
+                };
+            },
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: data.results,
+                    pagination: {
+                        more: (params.page * 10) < data.total_count
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+
+    // TABEL BARANG LPB
+    var tableListLPB = $('.table-list-lpb').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        lengthChange: true,
+        info: false,
+        paging: false,
+        searching: true,
+        ordering: false,
+        order: [],
+        fixedHeader: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    // TABEL INFORMASI ENTITAS
+    var tableListInformasiEntitas = $('.table-list-informasi-entitas').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        lengthChange: true,
+        info: false,
+        paging: false,
+        searching: false,
+        ordering: false,
+        order: [],
+        fixedHeader: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    // SWITCH VIEW
+    // SWITCH VIEW
+    $('.btn-edit-dokumen-barang').click(function() {
+        $('.detail-barang-form-view').show();
+        $('.root-form-view').hide();
+        // PASSING
+        var id = $(this).data('id');
+
+        $.each(listBarang, function(i, v) {
+            if (id === v.id) {
+                selectedDetailBarang = v;
+            }
+        });
+
+        $('#detail-barang-form-nama-barang').text(selectedDetailBarang.nama_barang_dok);
+        $('#detail-barang-form-no-po').text(selectedDetailBarang.po_no);
+        $('#harga_satuan_barang').val(formatRupiah(selectedDetailBarang.harga_satuan_barang));
+        $('#kode_barang').val(selectedDetailBarang.kode_barang);
+        $('#diskon').val(selectedDetailBarang.diskon);
+        // DRAW FORM DETAIL DOKUMEN BARANG
+        drawFormDetailDokumenBarang();
+    });
+
+    // SIMPAN INFORMASI ENTITAS
+    $('.btn-submit-informasi-entitas').click(function() {
+        if ($('.form-informasi-entitas').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Informasi Entitas ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    listInformasiEntitas.push({
+                        id: getID(),
+                        entitas_alamat_entitas: $('#entitas_alamat_entitas').val(),
+                        entitas_kode_entitas: $('#entitas_kode_entitas').val(),
+                        entitas_kode_jenis_identitas: $('#entitas_kode_jenis_identitas').val(),
+                        entitas_kode_jenis_identitas_text: $('#entitas_kode_jenis_identitas').find('option:selected').text(),
+                        entitas_nama_entitas: $('#entitas_nama_entitas').val(),
+                        entitas_nib_entitas: $('#entitas_nib_entitas').val(),
+                        entitas_nomor_identitas: $('#entitas_nomor_identitas').val(),
+                        entitas_nomor_ijin_entitas: $('#entitas_nomor_ijin_entitas').val(),
+                        entitas_tanggal_ijin_entitas: $('#entitas_tanggal_ijin_entitas').val(),
+                        entitas_seri_entitas: $('#entitas_seri_entitas').val(),
+                    });
+                    displayTableInformasiEntitas();
+                    resetFormInformasiEntitas();
+                }
+            })
+        }
+    });
+
+    // DATA DETAIL INFORMASI ENTITAS
+    function displayTableInformasiEntitas() {
+        try {
+            <?php if (empty($bc40Detail)) : ?>
+                if ($.fn.DataTable.isDataTable('.table-list-informasi-entitas')) {
+                    $('.table-list-informasi-entitas').DataTable().clear().draw();
+                    tableListInformasiEntitas.destroy();
+                }
+            <?php endif; ?>
+            const table = $('.table-list-informasi-entitas');
+            const tbody = table.find('tbody');
+            tbody.empty();
+            var no = 1;
+
+            $.each(listInformasiEntitas, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td style="text-align: center;">').text(no++));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_alamat_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_kode_jenis_identitas_text));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nama_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nib_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nomor_identitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_nomor_ijin_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_tanggal_ijin_entitas));
+                newRow.append($('<td style="text-align: center;">').text(v.entitas_seri_entitas));
+                newRow.append($('<td style="text-align: center;">').html(
+                    <?php if (!empty($bc40Detail)) : ?> <?php if ($bc40Detail['status_posting'] == "Sudah Posting") : ?> `-`
+                        <?php else : ?> `
+                        <button type="button" class="btn btn-danger" onclick="deleteRowInformasiEntitas('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    `
+                        <?php endif; ?> <?php else : ?> `
+                        <button type="button" class="btn btn-danger" onclick="deleteRowInformasiEntitas('${v.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    `
+                    <?php endif; ?>
+                ));
+                table.find('tbody').append(newRow);
+            });
+
+            <?php if (empty($bc40Detail)) : ?>
+                tableListInformasiEntitas = $('.table-list-informasi-entitas').DataTable({
+                    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+                    lengthChange: true,
+                    info: false,
+                    paging: false,
+                    searching: false,
+                    ordering: false,
+                    order: [],
+                    fixedHeader: true,
+                    "initComplete": function(settings, json) {
+                        $('.dataTables_length').empty();
+                        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                    },
+                    display: "stripe",
+                    searching: false,
+                    language: {
+                        emptyTable: "Tidak Ada Data",
+                        lengthMenu: "Show _MENU_ entries",
+                        paginate: {
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                });
+                tableListInformasiEntitas.draw();
+            <?php endif; ?>
+        } catch (e) {
+            console.log(e);
+
+        }
+
+    }
+
+    // DELETE ROW DETAIL INFORMASI ENTITAS
+    function deleteRowInformasiEntitas(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Informasi Entitas ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var indexToRemove = -1;
+                $.each(listInformasiEntitas, function(i, v) {
+                    if (v.id === id) {
+                        indexToRemove = i;
+                    }
+                });
+                if (indexToRemove !== -1) {
+                    listInformasiEntitas.splice(indexToRemove, 1);
+                }
+                displayTableInformasiEntitas();
+            }
+        })
+    }
+
+
+    function resetFormInformasiEntitas() {
+        $('#entitas_alamat_entitas').val('');
+        $('#entitas_kode_jenis_identitas').val(null).change();
+        $('#entitas_nama_entitas').val('');
+        $('#entitas_nib_entitas').val('');
+        $('#entitas_nomor_identitas').val('');
+        $('#entitas_nomor_ijin_entitas').val('');
+        $('#entitas_tanggal_ijin_entitas').val('');
+        $('#entitas_seri_entitas').val('');
+    }
+
+    // HELPER 
+    function drawFormDetailDokumenBarang() {
+        $('#asuransi').val(selectedDetailBarang.detail_barang_dok.asuransi);
+        $('#harga_cif').val(selectedDetailBarang.detail_barang_dok.harga_cif);
+        // $('#diskon').val(selectedDetailBarang.detail_barang_dok.diskon);
+        $('#fob').val(selectedDetailBarang.detail_barang_dok.fob);
+        $('#freight').val(selectedDetailBarang.detail_barang_dok.freight);
+        $('#harga_ekspor').val(selectedDetailBarang.detail_barang_dok.harga_ekspor);
+        $('#harga_penyerahan_barang').val(selectedDetailBarang.detail_barang_dok.harga_penyerahan_barang);
+        // $('#harga_satuan_barang').val(selectedDetailBarang.detail_barang_dok.harga_satuan_barang);
+        $('#isi_per_kemasan').val(selectedDetailBarang.detail_barang_dok.isi_per_kemasan);
+        $('#jumlah_kemasan').val(selectedDetailBarang.detail_barang_dok.jumlah_kemasan);
+        $('#jumlah_satuan').val(selectedDetailBarang.detail_barang_dok.jumlah_satuan);
+        // $('#kode_barang').val(selectedDetailBarang.detail_barang_dok.kode_barang);
+        $('#kode_dokumen').val(selectedDetailBarang.detail_barang_dok.kode_dokumen).change();
+        $('#kode_kategori_barang').val(selectedDetailBarang.detail_barang_dok.kode_kategori_barang).change();
+        $('#kode_jenis_kemasan').val(selectedDetailBarang.detail_barang_dok.kode_jenis_kemasan).change();
+        $('#kode_negara_asal').val(selectedDetailBarang.detail_barang_dok.kode_negara_asal).change();
+        $('#kode_perhitungan').val(selectedDetailBarang.detail_barang_dok.kode_perhitungan).change();
+        $('#kode_satuan_barang').val(selectedDetailBarang.detail_barang_dok.kode_satuan_barang).change();
+        $('#merk_barang').val(selectedDetailBarang.detail_barang_dok.merk_barang);
+        $('#netto').val(selectedDetailBarang.detail_barang_dok.netto);
+        $('#nilai_barang').val(selectedDetailBarang.detail_barang_dok.nilai_barang);
+        $('#nilai_tambah').val(selectedDetailBarang.detail_barang_dok.nilai_tambah);
+        $('#pos_tarif').val(selectedDetailBarang.detail_barang_dok.pos_tarif);
+        $('#seri_barang').val(selectedDetailBarang.detail_barang_dok.seri_barang);
+        $('#spesifikasi_lain').val(selectedDetailBarang.detail_barang_dok.spesifikasi_lain);
+        $('#tipe_barang').val(selectedDetailBarang.detail_barang_dok.tipe_barang);
+        $('#ukuran_barang').val(selectedDetailBarang.detail_barang_dok.ukuran_barang);
+        $('#ndpm').val(selectedDetailBarang.detail_barang_dok.ndpm);
+        $('#cif_rupiah').val(selectedDetailBarang.detail_barang_dok.cif_rupiah);
+        $('#harga_perolehan_barang').val(selectedDetailBarang.detail_barang_dok.harga_perolehan_barang);
+        $('#kode_asal_bahan_baku').val(selectedDetailBarang.detail_barang_dok.kode_asal_bahan_baku).change();
+        $('#uraian').val(selectedDetailBarang.detail_barang_dok.uraian);
+        // // DISPLAY BARANG TARIF TABEL
+        // displayTableBarangTarif();
+        // // DISPLAY BARANG DOKUMEN
+        // displayTableBarangDokumen();
+    }
+
+    function formatRupiah(angka) {
+        angka = angka || 0;
+        angka = angka.toString().replace(/\./g, '').replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuanFormatted = parts[0].split('').reverse().join('').match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        var desimal = parts[1] || '00';
+        return ribuanFormatted + ',' + desimal;
+    }
+
+    function getID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0,
+                v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 </script>
 
 <?= $this->endSection(); ?>
