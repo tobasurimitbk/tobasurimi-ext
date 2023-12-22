@@ -334,3 +334,16 @@ function decrypt($hashed)
    $decrypt =  openssl_decrypt(base64_decode($hashed), $encrypt_method, $key, 0, $iv);
    return $decrypt == false ? 0 : $decrypt;
 }
+
+function generateUniqueCode($codeLength)
+{
+   $characters = '0123456789';
+   $code = '';
+   $charactersLength = strlen($characters);
+
+   for ($i = 0; $i < $codeLength; $i++) {
+      $code .= $characters[rand(0, $charactersLength - 1)];
+   }
+
+   return $code;
+}
