@@ -71,6 +71,14 @@ class NeracaSaldo extends BaseController
             ->where($condition)
             ->groupBy('kategori_id')
             ->findAll();
+        $dataJurnalUmumWithGroupHeader = $this->jurnalUmumModel
+            ->asObject()
+            ->select('*, sub_akuns.header_id as id_header')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->where($condition)
+            ->groupBy('id_header')
+            ->findAll();
 
         $data = [
             "dataMetadata" => $dataMetadata,
@@ -79,6 +87,7 @@ class NeracaSaldo extends BaseController
             "dataSubAkuns" => $dataSubAkun,
             "dataJurnalUmum" => $dataJurnalUmum,
             "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
+            "dataJurnalUmumWithGroupHeader" => $dataJurnalUmumWithGroupHeader,
             "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
         ];
         return view('Laporan/LaporanNeracaSaldo/index', $data);
