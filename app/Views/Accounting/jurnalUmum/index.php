@@ -61,7 +61,7 @@
                             <tr>
                                 <td scope="row"><input name="chk_a[]" type="checkbox" class="checkall_a" value="" /></td>
                                 <td>
-                                    <select name="cari[]" id="akun_coa_1" class="form-control " style="background-color: white;">
+                                    <select name="cari[]" id="akun_coa_1" class="form-control " style="background-color: white;" required>
                                         <option value="" data-code=""></option>
                                         <?php
                                         if (!empty($subAkuns)) {
