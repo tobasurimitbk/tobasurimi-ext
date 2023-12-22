@@ -56,7 +56,7 @@ class JurnalUmum extends BaseController
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
             foreach ($nm as $key => $val) {
-                if ($_POST['debet'][$key] == "" || $_POST['debet'][$key] == 0) {
+                if ($_POST['debit'][$key] == "" || $_POST['debit'][$key] == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' => $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
@@ -72,12 +72,12 @@ class JurnalUmum extends BaseController
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' =>  $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
-                        'debit' => (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debet'][$key])),
+                        'debit' => (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key])),
                         'kredit' => "0",
                         'keterangan' => $_POST['ket'][$key],
                         'id_inputer' => session()->get("login")->user_id
                     );
-                    $total_debit += (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debet'][$key]));
+                    $total_debit += (float) str_replace(",", ".", str_replace(["Rp. ", "."], "",  $_POST['debit'][$key]));
                 }
             }
 

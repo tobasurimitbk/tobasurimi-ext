@@ -52,7 +52,7 @@
                             <tr>
                                 <th scope="col" style="width: 3%;"></th>
                                 <th scope="col" style="width: 20%;">Nama Akun</th>
-                                <th scope="col" style="width: 20%;">Debet</th>
+                                <th scope="col" style="width: 20%;">Debit</th>
                                 <th scope="col" style="width: 20%;">Kredit</th>
                                 <th scope="col" style="width: 20%;">Keterangan</th>
                             </tr>
@@ -75,7 +75,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" name="debet[]" id="debet" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
+                                    <input type="text" name="debit[]" id="debit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
                                 </td>
                                 <td>
                                     <input type="text" name="kredit[]" id="kredit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems2();" class="form-control xx">
