@@ -3,6 +3,7 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Helpers\BeaCukaiApi;
 use App\Models\BC23BarangDokumenModel;
 use App\Models\BC23BarangModel;
 use App\Models\BC23BarangTarifModel;
@@ -111,6 +112,211 @@ class BC23 extends BaseController
 
         return response()->setJSON($data);
     }
+
+
+    public function createHeaderView($penerimaanBarangID)
+    {
+
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $kantorBeaCukaiModel = new KantorBeaCukaiModel();
+        $metaDataModel = new MetadataModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'noAju' => $this->generateNomorAju(),
+            'kodeKantor' => $kantorBeaCukaiModel->findAll(),
+            'kodeTujunTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
+            'selectedKantor' => $metaDataModel->where('name', "Kode Kantor Pabean Pengawas Static")->first(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-23/form-header', $data);
+    }
+
+    public function createEntitasView($penerimaanBarangID)
+    {
+
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+        $countryModel = new CountryModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'npwpDefault' => $metaDataModel->where('name', "NPWP Importir Default BC")->first(),
+            'namaImportirDefault' => $metaDataModel->where('name', "Nama Importir Default BC")->first(),
+            'alamatImportirDefault' => $metaDataModel->where('name', "Alamat Importir Default BC")->first(),
+            'nibDefault' => $metaDataModel->where('name', "NIB Default BC")->first(),
+            'kodeNegaraAsal' => $countryModel->findAll(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-23/form-entitas', $data);
+    }
+
+    public function createDokumenView($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'kodeDokumen' => $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->findAll(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-23/form-dokumen', $data);
+    }
+
+    public function createPengangkutView($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+        $countryModel = new CountryModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'kodePengangkutan' => $metaDataModel->where('name', "Pengangkutan")->findAll(),
+            'kodeBendera' => $countryModel->findAll(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-23/form-pengangkut', $data);
+    }
+
+    public function createKemasanPetiKemas($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'kodeJenisKemasan' => $metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
+            'kodeTipeKontainer' => $metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
+            'kodeUkuranKontainer' => $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
+            'kodeJenisKontainer' => $metaDataModel->where('name', "Jenis Kontainer")->findAll(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-23/form-kemasan-peti-kemas', $data);
+    }
+
+    public function createTransaksiView($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'kodeValuta' => $metaDataModel->where('name', "Valuta")->findAll(),
+            'kodeIncoterm' => $metaDataModel->where('name', "Kode Incoterm BC")->findAll(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-23/form-transaksi', $data);
+    }
+
+
+    // API GET
+    public function getValuta()
+    {
+        $beacukaiApi = new BeaCukaiApi();
+        $kodeValuta = decrypt($this->request->getVar('harga_kode_valuta'));
+        $res = $beacukaiApi->getNilaiValuta($kodeValuta);
+
+        return response()->setJSON([
+            'data' => $res,
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function apiPelabuhanTest()
+    {
+        $kantorBeaCukaiModel = new KantorBeaCukaiModel();
+
+        $jwtToken = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIzbXo1OTYwdE9MbkhhT0JLTHRQSG15N2VmT0plQVo5UmVZdkJMOGxVZDhFIn0.eyJleHAiOjE3MDM1ODI2NDgsImlhdCI6MTcwMzU3MTg0OCwianRpIjoiMWM2MWFkN2ItNzkwYy00ZTA4LTk1N2YtYTk0MjBlYTY5NzA5IiwiaXNzIjoiaHR0cHM6Ly9zc28tc3NvLXBvcnRhbC5hcHBzLnByb2RkYy5jdXN0b21zLmdvLmlkL2F1dGgvcmVhbG1zL3BvcnRhbF9oMmgiLCJzdWIiOiIzZTk4NmE0NS0zNzFjLTRlZTMtOTZhNi04MTg2OTBjYmFkNWIiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwb3J0YWxfaDJoX2NsaWVudCIsInNlc3Npb25fc3RhdGUiOiI3MjYzYmM2Ni05OWY0LTQxM2MtODY1Zi05ZTBlNDJjZGNlN2YiLCJhY3IiOiIxIiwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiNzI2M2JjNjYtOTlmNC00MTNjLTg2NWYtOWUwZTQyY2RjZTdmIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiRmVicnkgU2ludG9zbyIsImlkZW50aXRhcyI6IjAxNzE4OTE4NDEyNTAwMCIsInByZWZlcnJlZF91c2VybmFtZSI6InRvYmFzdXJpbWkiLCJnaXZlbl9uYW1lIjoiRmVicnkgU2ludG9zbyIsImZhbWlseV9uYW1lIjoiIiwiZW1haWwiOiJleGltQHRvYmFzdXJpbWkuY29tIn0.Oy97v-86zIAUzlyXaFMWGb5MY9DQtmUKoF-SWJ6jPWjC1tySaZwZSnRAx4RgWrSqpMJup5jcO-cMSNWeHNm53vDOKyXfcNxBx5HomGjvMgZp7uz1OJKABBrPu3ksv_31q02qi3SawvPBMk8xgkPLS80MQpvZ92f6sUdHbj9JUMwZfnT6V0siJ0Td0LGXRGtIgceVFNjothuKNucqT9W0iw-PBR7-NbEc3o4JY1qsOdnmSUL1_i4OeIfCu3VorFJRpmezwaMz4a1Xy1XQV5zVgxU5eJDARpi63YGUlXb8WlE178hHQpx0vdUGVgKaUM4qVxg5pgGlGXOskMnJCT6Akw";
+
+        foreach ($kantorBeaCukaiModel->findAll() as $k) {
+            $baseUrl = "https://apis-gw.beacukai.go.id/openapi/pelabuhan/kodeKantor/" . $k['kode'];
+
+            $headers = array(
+                'Authorization: Bearer ' . $jwtToken,
+                'Content-Type: application/json',
+            );
+
+            // Inisialisasi cURL session
+            $ch = curl_init();
+
+            // Set konfigurasi cURL
+            curl_setopt($ch, CURLOPT_URL, $baseUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            // Eksekusi permintaan cURL dan simpan responsnya
+            $response = curl_exec($ch);
+
+            // Cek apakah ada kesalahan
+            if (curl_errno($ch)) {
+                echo 'Error: ' . curl_error($ch);
+            }
+
+            // Tutup session cURL
+            curl_close($ch);
+
+            $responseData = \json_decode($response);
+
+            if (isset($responseData?->data) && count($responseData?->data) != 0) {
+                print_r($responseData);
+                break;
+            }
+        }
+
+        echo "KOSONG";
+    }
+
+    // LAMA
 
     public function create($id)
     {
@@ -805,16 +1011,27 @@ class BC23 extends BaseController
 
     public function generateNomorAju()
     {
-        $kodeKantor = $this->request->getVar('kode_kantor');
-        $kodeDokumenBC23 = '23';
-        $kodeUniqPerusahaan = "017189";
-        $tanggalAju = date('Ymd');
-        $sequenceNoUrutPengajuan = generateUniqueCode(6);
+        $metaDataModel = new MetadataModel();
+        $bc23Model = new BC23Model();
 
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'noAju' => decrypt($kodeKantor) . '-' . $kodeDokumenBC23 . '-' . $kodeUniqPerusahaan . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan
-        ]);
+        $kodeKantorStatic = $metaDataModel->where('name', "Kode Kantor BC Static")->first();
+        $kodeDokumenBC23Static = $metaDataModel->where('name', "Kode BC23 Static")->first();
+        $tanggalAju = date('Ymd');
+        $sequenceNoUrutPengajuan = "";
+
+        $bc23Last = $bc23Model->orderBy('createdAt', "DESC")->limit(1)->first();
+
+        if ($bc23Last == null) {
+            $sequenceNoUrutPengajuan = "000001";
+        } else {
+            // Buatkan auto increment
+            $arrNo = explode('-', $bc23Last['no_aju']);
+            $lastNomor = $arrNo[4];
+            // lakukan increment
+            $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+            $sequenceNoUrutPengajuan = $nextNomor;
+        }
+
+        return $kodeDokumenBC23Static['value'] . '-' . $kodeKantorStatic['value'] . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
     }
 }
