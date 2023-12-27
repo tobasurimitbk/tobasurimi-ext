@@ -4,7 +4,7 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-    <form action="<?= base_url('jurnal/addJurnal') ?>" method="post">
+    <form action="<?= base_url('jurnal/addJurnal') ?>" method="post" onsubmit="return validateForm();">
 
         <input type="hidden" class="id" name="id" id="id" />
         <?= csrf_field() ?>
@@ -122,8 +122,9 @@
         for (var i = 0; i < inputs.length; i++) {
             var ip = inputs[i];
 
+            // console.log(parseFloat(hilang_titik(ip.value)));
             if (ip.name && ip.name.indexOf("jumlahDebet") < 0) {
-                sum += parseInt(hilang_titik(ip.value)) || 0;
+                sum += parseFloat(hilang_titik(ip.value)) || 0;
             }
 
         }
@@ -138,7 +139,7 @@
             var ip = inputs[i];
 
             if (ip.name && ip.name.indexOf("jumlahKredit") < 0) {
-                sum += parseInt(hilang_titik(ip.value)) || 0;
+                sum += parseFloat(hilang_titik(ip.value)) || 0;
             }
 
         }
@@ -240,7 +241,25 @@
 
     function hilang_titik(string) {
         string = string.replace('Rp. ', '');
-        return string.split('.').join('');
+        string = string.split('.').join('')
+        return string.replace(',', '.');
+    }
+
+    function validateForm() {
+        var jumlahDebet = parseFloat(hilang_titik(document.getElementById('jumlahDebet').value)) || 0;
+        var jumlahKredit = parseFloat(hilang_titik(document.getElementById('jumlahKredit').value)) || 0;
+
+        if (jumlahDebet !== jumlahKredit) {
+            // alert("Jumlah Debet dan Kredit harus sama.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Debit dan Kredit Tidak Balance',
+                confirmButtonColor: '#4e73df',
+            })
+            return false; // Prevent form submission
+        }
+
+        return true; // Allow form submission
     }
 
     getItems();
