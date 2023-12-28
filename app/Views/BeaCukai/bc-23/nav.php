@@ -18,7 +18,7 @@
         <a class="nav-link <?= request()->uri->getSegment(3) === "transaksi" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/transaksi/' . encrypt($lpb->id)) ?>">Transaksi</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Barang</a>
+        <a class="nav-link <?= request()->uri->getSegment(3) === "barang" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/barang/' . encrypt($lpb->id)) ?>">Barang</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="#">Pungutan</a>

@@ -100,18 +100,81 @@
                             Harga Lainnya
                         </label>
                         <div class="mt-1">
-
+                            <div class="form-floating mb-3">
+                                <input id="harga_lainnya_biaya_penambah" maxlength="24" name="harga_lainnya_biaya_penambah" type="text" class="form-control harga_lainnya_biaya_penambah" placeholder="" oninput="this.value = this.value.replace(/[^\d,]/g, '')">
+                                <label>Biaya Penambah</label>
+                            </div>
                         </div>
-
+                        <div class="mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="harga_lainnya_biaya_pengurang" maxlength="24" name="harga_lainnya_biaya_pengurang" type="text" class="form-control harga_lainnya_biaya_pengurang" placeholder="" oninput="this.value = this.value.replace(/[^\d,]/g, '')">
+                                <label>Biaya Pengurang</label>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="harga_lainnya_free_on_board" maxlength="24" name="harga_lainnya_free_on_board" type="text" class="form-control harga_lainnya_free_on_board" placeholder="" oninput="this.value = this.value.replace(/[^\d,]/g, '')">
+                                <label>FOB (Free on Board)</label>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="harga_lainnya_freight" maxlength="24" name="harga_lainnya_freight" type="text" class="form-control harga_lainnya_freight" placeholder="" oninput="this.value = this.value.replace(/[^\d,]/g, '')">
+                                <label>Freight</label>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select harga_lainnya_kode_asuransi" id="harga_lainnya_kode_asuransi" name="harga_lainnya_kode_asuransi" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeAsuransi as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['value']) . " - " . strtoupper($k['description']) . "" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Asuransi</label>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="harga_lainnya_nilai_asuransi" name="harga_lainnya_nilai_asuransi" type="text" class="form-control harga_lainnya_nilai_asuransi" placeholder="" oninput="this.value = this.value.replace(/[^\d,]/g, '')">
+                                <label>Nilai Asuransi</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <label class="form-label font-weight-bold lable-title mt-4 mb-2">
                             Berat
                         </label>
                         <div class="mt-1">
-
+                            <div class="form-floating mb-3">
+                                <input id="berat_bruto" name="berat_bruto" type="text" class="form-control berat_bruto" placeholder="" oninput="this.value = this.value.replace(/[^\d,]/g, '')">
+                                <label>Berat Bersih/Bruto (KGM)</label>
+                            </div>
                         </div>
-
+                        <div class="mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="berat_netto" name="berat_netto" type="text" class="form-control berat_netto" placeholder="" oninput="this.value = this.value.replace(/[^\d,]/g, '')">
+                                <label>Berat Kotor/Netto (KGM)</label>
+                            </div>
+                        </div>
+                        <label class="form-label font-weight-bold lable-title mt-4 mb-2">
+                            Keterangan Pajak
+                        </label>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select pajak_jasa_kena_pajak" id="pajak_jasa_kena_pajak" name="pajak_jasa_kena_pajak" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($kodeKenaPajak as $k) : ?>
+                                        <option value="<?= encrypt($k['value']) ?>">
+                                            <?= strtoupper($k['value']) . " - " . strtoupper($k['description']) . "" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Jasa Kena Pajak</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -152,13 +215,12 @@
                     if (res.status) {
                         csrf.val(res.token);
                         if (res.data.status) {
-                            $("#harga_ndpbm").val(formatRupiah(res?.data?.data));
-                            $("#harga_cif").val(formatRupiah(res?.data?.data));
+                            $("#harga_ndpbm").val((res?.data?.data));
+                            $("#harga_cif").val((res?.data?.data));
                         }
                     }
 
                     if (res.data.status === false) {
-                        console.log(res.data.message);
                         Swal.fire({
                             icon: 'warning',
                             title: res.data.message,
@@ -166,7 +228,6 @@
                             confirmButtonText: 'Ok'
                         });
                     }
-
                 }
             });
         } else {
@@ -182,8 +243,17 @@
     $('#harga_nilai_barang').keyup(function() {
         var ndpbm = $("#harga_ndpbm").val() || 0;
         var hargaBarang = $(this).val() || 0;
+        $('#harga_nilai_pabean').val((Number(ndpbm) * Number(hargaBarang)))
+    });
 
-        $('#harga_nilai_pabean').val(formatRupiah(Number(repairRupiah(ndpbm)) * Number(repairRupiah(hargaBarang))))
+    $('#pajak_jasa_kena_pajak').select2({
+        placeholder: "Pilih Jasa Kena Pajak",
+        theme: "bootstrap-5",
+    });
+
+    $('#harga_lainnya_kode_asuransi').select2({
+        placeholder: "Pilih Asuransi",
+        theme: "bootstrap-5",
     });
 
     $('#harga_kode_harga_barang').select2({
@@ -208,75 +278,6 @@
         .children('span')
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
-
-    var tableListInformasiKemasan = $('.table-list-informasi-kemasan').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
-    var tableListPetiKemas = $('.table-list-informasi-peti-kemas').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
-
-    function formatRupiah(angka) {
-        angka = angka || 0;
-        angka = angka.toString().replace(/\./g, '').replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuanFormatted = parts[0].split('').reverse().join('').match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        var desimal = parts[1] || '00';
-        return ribuanFormatted + ',' + desimal;
-    }
-
-    function repairRupiah(rupiahString) {
-        var cleanedString = rupiahString.replace(/[^\d,]/g, '');
-        var parts = cleanedString.split(',');
-        var ribuan = parts[0].replace(/\./g, '');
-        var repairedNumber = ribuan + '.' + (parts[1] || '00');
-        var result = parseFloat(repairedNumber);
-        return isNaN(result) ? 0 : result;
-    }
 </script>
 
 

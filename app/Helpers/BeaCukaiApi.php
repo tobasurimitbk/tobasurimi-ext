@@ -63,7 +63,7 @@ class BeaCukaiApi
                 }
             } else {
                 return [
-                    'data' => "Server Ceisa Error : " . $httpCode,
+                    'message' => "Server Ceisa Error : " . $httpCode,
                     'status' => false
                 ];
             }

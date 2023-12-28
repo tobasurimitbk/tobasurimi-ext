@@ -251,10 +251,32 @@ class BC23 extends BaseController
         $data = [
             'kodeValuta' => $metaDataModel->where('name', "Valuta")->findAll(),
             'kodeIncoterm' => $metaDataModel->where('name', "Kode Incoterm BC")->findAll(),
+            'kodeAsuransi' => $metaDataModel->where('name', "Kode Asuransi BC")->findAll(),
+            'kodeKenaPajak' => $metaDataModel->where('name', "Kode Kena Pajak BC")->findAll(),
             'lpb' => $lpb
         ];
 
         return view('BeaCukai/bc-23/form-transaksi', $data);
+    }
+
+    public function createBarangView($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 2.3") {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        $data = [
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-23/form-barang', $data);
     }
 
 
@@ -305,9 +327,9 @@ class BC23 extends BaseController
             // Tutup session cURL
             curl_close($ch);
 
-            $responseData = \json_decode($response);
+            $responseData = json_decode($response);
 
-            if (isset($responseData?->data) && count($responseData?->data) != 0) {
+            if (isset($responseData->data) && count($responseData->data) != 0) {
                 print_r($responseData);
                 break;
             }
