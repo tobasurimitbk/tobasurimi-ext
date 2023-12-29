@@ -1,6 +1,6 @@
 <ul class="nav nav-tabs">
     <li class="nav-item">
-        <a class="nav-link <?= request()->uri->getSegment(3) === "header" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/header/' . encrypt($lpb->id)) ?>">Header</a>
+        <a class="nav-link <?= request()->uri->getSegment(3) === "header" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/header/' . encrypt($lpb->id)) ?>" style="<?= session()->getFlashdata('isCompleteFormHeader') == false ? 'color: red' :  'color:green' ?>">Header</a>
     </li>
     <li class="nav-item">
         <a class="nav-link <?= request()->uri->getSegment(3) === "entitas" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/entitas/' . encrypt($lpb->id)) ?>">Entitas</a>

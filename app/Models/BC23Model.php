@@ -260,6 +260,22 @@ class BC23Model extends Model
         return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
     }
 
+    public function isCompleteFormHeader($penerimaanBarangID)
+    {
+        $isCompleteForm = false;
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($data['no_aju'] != null && $data['kode_pelabuhan_bongkar'] != null && $data['kode_kantor_bongkar'] != null && $data['kode_kantor'] != null && $data['kode_tujuan_tpb'] != null) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
     public function isCompleteFormPernyataan($penerimaanBarangID)
     {
         $isCompleteForm = false;
@@ -273,6 +289,6 @@ class BC23Model extends Model
                 $isCompleteForm = false;
             }
         }
-        return $data;
+        return $isCompleteForm;
     }
 }

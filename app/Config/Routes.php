@@ -719,6 +719,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
 
 
     $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');
+    $routes->post('id/header', 'BeaCukai\BC23::createHeaderAction');
     $routes->get('id/entitas/(:segment)', 'BeaCukai\BC23::createEntitasView/$1');
     $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC23::createDokumenView/$1');
     $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC23::createPengangkutView/$1');

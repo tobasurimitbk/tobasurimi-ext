@@ -117,7 +117,6 @@ class BC23 extends BaseController
 
     public function createHeaderView($penerimaanBarangID)
     {
-
         $bc23Model = new BC23Model();
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $kantorBeaCukaiModel = new KantorBeaCukaiModel();
@@ -135,14 +134,53 @@ class BC23 extends BaseController
         $this->setFlashDataNavigatorSession($penerimaanBarangID);
 
         $data = [
+            'bc23' => $bc23Model->get($penerimaanBarangID),
             'noAju' => $bc23 == null ? $this->generateNomorAju() : $bc23['no_aju'],
             'kodeKantor' => $kantorBeaCukaiModel->findAll(),
-            'kodeTujunTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
+            'kodeTujuanTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
             'selectedKantor' => $metaDataModel->where('name', "Kode Kantor Pabean Pengawas Static")->first(),
             'lpb' => $lpb
         ];
 
         return view('BeaCukai/bc-23/form-header', $data);
+    }
+
+    public function createHeaderAction()
+    {
+        $bc23Model = new BC23Model();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $lastData = $bc23Model->get($penerimaanBarangID);
+
+        if ($lastData == null) {
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            // insert
+            $bc23Model->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_no_lokal' => $bc23Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+
+                'kode_pelabuhan_bongkar' => $this->request->getVar('header_pelabuhan_bongkar'),
+                'kode_kantor_bongkar' => decrypt($this->request->getVar('header_kantor_pabean_bongkar')),
+                'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean_pengawas')),
+                'kode_tujuan_tpb' => decrypt($this->request->getVar('header_kode_tujuan_tpb')),
+            ]);
+        } else {
+            // update
+            $bc23Model->update($lastData['id'], [
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'kode_pelabuhan_bongkar' => $this->request->getVar('header_pelabuhan_bongkar'),
+                'kode_kantor_bongkar' => decrypt($this->request->getVar('header_kantor_pabean_bongkar')),
+                'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean_pengawas')),
+                'kode_tujuan_tpb' => decrypt($this->request->getVar('header_kode_tujuan_tpb')),
+            ]);
+        }
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Header berhasil diupdate",
+        ]);
     }
 
     public function createEntitasView($penerimaanBarangID)
@@ -369,12 +407,13 @@ class BC23 extends BaseController
             // insert
             $bc23Model->insert([
                 'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_no_lokal' => $bc23Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+
                 'nama_ttd' => $this->request->getVar('pernyatan_nama'),
                 'kota_ttd' => $this->request->getVar('pernyatan_tempat'),
                 'tanggal_ttd' => $this->request->getVar('pernyataan_tanggal') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pernyataan_tanggal')), "Y-m-d") : "",
                 'jabatan_pengusaha_ttd' => $this->request->getVar('pernyatan_jabatan'),
-                'bc_no_lokal' => $bc23Model->getNo(date('m'), date('Y'), $last_day),
-                'no_aju' => $this->generateNomorAju()
             ]);
         } else {
             // update
@@ -398,9 +437,11 @@ class BC23 extends BaseController
     private function setFlashDataNavigatorSession($penerimaanBarangID)
     {
         $bc23Model = new BC23Model();
-        $isCompleteForm = $bc23Model->isCompleteFormPernyataan($penerimaanBarangID);
+        $isCompleteFormPernyataan = $bc23Model->isCompleteFormPernyataan($penerimaanBarangID);
+        $isCompleteFormHeader = $bc23Model->isCompleteFormHeader($penerimaanBarangID);
 
-        session()->setFlashdata('isCompleteFormPernyataan', $isCompleteForm);
+        session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
+        session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
     }
 
 
