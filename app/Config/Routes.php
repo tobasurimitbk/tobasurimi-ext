@@ -716,6 +716,20 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC23::index');
     $routes->get('all', 'BeaCukai\BC23::all');
     $routes->get('id/(:segment)', 'BeaCukai\BC23::create/$1');
+
+
+    $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');
+    $routes->get('id/entitas/(:segment)', 'BeaCukai\BC23::createEntitasView/$1');
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC23::createDokumenView/$1');
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC23::createPengangkutView/$1');
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC23::createKemasanPetiKemas/$1');
+    $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC23::createTransaksiView/$1');
+    $routes->get('id/barang/(:segment)', 'BeaCukai\BC23::createBarangView/$1');
+
+
+    $routes->get('api/valuta', 'BeaCukai\BC23::getValuta');
+
+
     $routes->get('satuan-barang', 'BeaCukai\BC23::getKodeSatuanBarang');
     $routes->get('id/(:segment)/bc-23-id/(:segment)', 'BeaCukai\BC23::update/$1/$2');
     $routes->get('get-no-aju', 'BeaCukai\BC23::generateNomorAju');
