@@ -460,6 +460,7 @@
 
         <?php if (!empty($documentData)) : ?>
             const itemList = <?= json_encode($documentData->itemList) ?>;
+            console.log(itemList);
             table.rows.add(itemList).draw(false);
             // $('#itemSubTotal').html('<?= $documentData->dpp ?>');
             // $('#taxTotal').html('<?= $documentData->tax ?>');
@@ -609,119 +610,6 @@
             $(element).removeClass('select-class');
         },
     });
-
-    /* $(".id_customer").change(function() {
-        const id = $(".id_customer").val()
-        if (id) {
-            $.ajax({
-                url: "<?= base_url('/surat-jalan/sales-invoice/'); ?>" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".id_surat_jalan").empty();
-                    $(".id_so").empty();
-                    $('.body-detail-table').empty()
-                    $(".foot-detail-table").empty()
-                    $("#dpp").val('')
-                    $("#ppn").val('')
-                    $("#total_invoice").val('')
-
-                    $(".id_surat_jalan").append(`<option value=""></option>`);
-
-                    // console.log(res.dataWarehouse)
-                    res.forEach(function(item) {
-                        $(".id_surat_jalan").append(`<option  value="${item.id}" >${item.no_surat_jalan}</option>`);
-                    })
-                }
-            })
-        }
-    }) */
-
-    /* $(".id_surat_jalan").change(function() {
-        const id = $(".id_surat_jalan").val()
-        if (id) {
-            $.ajax({
-                url: "<?= base_url('/surat-jalan/detail/'); ?>" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".id_so").empty();
-                    $(".id_so").append(`<option value=""></option>`);
-
-                    // console.log(res.dataWarehouse)
-                    res.detail_so.forEach(function(item) {
-                        $(".id_so").append(`<option  value="${item.id}" selected>${item.no_so}</option>`);
-                    })
-
-                    let no = 1
-                    let html = ''
-                    let totalHarga = 0
-                    res.detail_barang.forEach(function(item) {
-                        totalHarga += parseFloat(item.amount)
-                        html += `
-                                <tr>
-                                    <td >${no}</td>
-                                    <td >${item.nama_barang}</td>
-                                    <td >${item.qty}</td>
-                                    <td >${item.kode_satuan}</td>
-                                    <td >${item.harga_barang}</td>
-                                    <td >${item.discount_percentage}</td>
-                                    <td >${item.amount}</td>
-                                    <td >${item.dept}</td>
-                                    <td >${item.warehouse_name}</td>
-                                    <td >${item.keterangan}</td>
-                                    <td >${item.no_so}</td>
-                                    <td >${item.no_surat_jalan}</td>
-                                </tr>
-                                 `
-                        no++
-                    })
-                    $('.body-detail-table').empty()
-                    $('.body-detail-table').append(html)
-                    $(".foot-detail-table").empty()
-                    const statusTax = $('.tax_status').val() === 'true'
-                    const includePa = $('.include_pa').val() === 'true'
-
-                    let hargaDpp = totalHarga
-                    let ppn = 0
-                    if (statusTax && includePa) {
-                        ppn = totalHarga * 11 / 100
-                        hargaDpp = totalHarga - ppn
-                    } else if (statusTax && !includePa) {
-                        ppn = totalHarga * 11 / 100
-                        totalHarga = totalHarga + ppn
-                    }
-
-                    $("#dpp").val(hargaDpp)
-                    $("#ppn").val(ppn)
-                    $("#total_invoice").val(totalHarga)
-
-                    let tag_total =
-                        `
-                        <tr>
-                            <td colspan="5"></td>
-                            <td><b>DPP</b></td>
-                            <td><b>${hargaDpp.toLocaleString()}</b></td>
-                            <td colspan="5"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"></td>
-                            <td><b>PPN</b></td>
-                            <td><b>${ppn.toLocaleString()}</b></td>
-                            <td colspan="5"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"></td>
-                            <td><b>Total Invoice</b></td>
-                            <td><b>${totalHarga.toLocaleString()}</b></td>
-                            <td colspan="5"></td>
-                        </tr>
-                        `
-                    $(".foot-detail-table").append(tag_total);
-                }
-            })
-        }
-    }) */
 
     $(".btn-submit").click(function() {
         if ($(".create-form").valid()) {

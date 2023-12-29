@@ -52,7 +52,7 @@ class SuratJalan extends BaseController
     {
         //Get Customers
         $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
-        
+
 
         $data = [
             "dataCustomers" => $customers,
@@ -214,11 +214,11 @@ class SuratJalan extends BaseController
                 "id_user"       => $this->userId,
                 "id_customer"   => $this->request->getPost('id_customer'),
                 "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-                "no_surat_jalan"=> $noSuratJalan,
+                "no_surat_jalan" => $noSuratJalan,
                 "no_po"         => $this->request->getPost('no_po'),
                 "note"          => $this->request->getPost('note'),
-                'multiple_id_so'=> json_encode($idArray),
-                'multiple_no_so'=> json_encode($noArray),
+                'multiple_id_so' => json_encode($idArray),
+                'multiple_no_so' => json_encode($noArray),
             ];
             $dataSuratJalan =  $this->SuratJalanModel->insert($values);
 
@@ -271,6 +271,12 @@ class SuratJalan extends BaseController
             ->findAll();
 
         $dataSuratJalan->itemList = $this->SalesOrderDetailModel->getItemListByIds($dataSuratJalan->multiple_id_so);
+
+        // var_dump($dataSuratJalan);
+        foreach ($dataSuratJalan->itemList as $value) {
+            $value->harga_barang = str_replace('Rp', '', toRupiah($value->harga_barang));
+            $value->amount = str_replace('Rp', '', toRupiah($value->amount));
+        }
 
         $data = [
             "data" => $dataSuratJalan,
@@ -428,7 +434,7 @@ class SuratJalan extends BaseController
             ->find($idCustomer);
 
         $condition = [
-            'id_customer'               => $idCustomer, 
+            'id_customer'               => $idCustomer,
             'tipe_sales_order'          => 'LOKAL',
             'surat_jalan_so_id'         => null,
             'sales_order_invoice_id'    => null
@@ -538,7 +544,7 @@ class SuratJalan extends BaseController
             ->join('satuans', 'satuans.id = barangs.satuan_id')
             ->whereIn('id_sales_order', $soIds)
             ->findAll(); */
-            // dd($soDet);
+        // dd($soDet);
 
         $data = [
             'companyName'   => $companyData->company,
@@ -560,7 +566,7 @@ class SuratJalan extends BaseController
 
         // output the generated pdf
         $domPdf->stream($fileName, array("Attachment" => false));
-        
+
         exit();
     }
 }

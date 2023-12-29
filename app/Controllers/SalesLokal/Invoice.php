@@ -339,6 +339,11 @@ class Invoice extends BaseController
 
         $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
 
+        foreach ($documentData->itemList as $value) {
+            $value->harga_barang = str_replace('Rp', '', toRupiah($value->harga_barang));
+            $value->amount = str_replace('Rp', '', toRupiah($value->amount));
+        }
+
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
 
         // dd($documentList);

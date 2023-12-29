@@ -136,7 +136,7 @@ class OrderForm extends BaseController
             }
             // var_dump($totalHarga);
             // Format totalHarga as Indonesian Rupiah
-            $formattedTotalHarga = 'Rp ' . number_format($totalHarga, 2, ',', '.');
+            $formattedTotalHarga = number_format($totalHarga, 2, ',', '.');
 
             array_push($dataSalesOrder, [
                 "no" => $no++,
