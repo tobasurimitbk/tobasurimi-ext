@@ -21,9 +21,9 @@
         <a class="nav-link <?= request()->uri->getSegment(3) === "barang" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/barang/' . encrypt($lpb->id)) ?>">Barang</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Pungutan</a>
+        <a class="nav-link <?= request()->uri->getSegment(3) === "pungutan" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/pungutan/' . encrypt($lpb->id)) ?>">Pungutan</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Pernyataan</a>
+        <a class="nav-link <?= request()->uri->getSegment(3) === "pernyataan" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/pernyataan/' . encrypt($lpb->id)) ?>" style="<?= session()->getFlashdata('isCompleteFormPernyataan') == false ? 'color: red' :  'color:green' ?>">Pernyataan</a>
     </li>
 </ul>

@@ -253,4 +253,26 @@ class BC23Model extends Model
             'pengangkut' => $bc23PengangkutModel->get($id)
         ];
     }
+
+    // BARU
+    public function get($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+    }
+
+    public function isCompleteFormPernyataan($penerimaanBarangID)
+    {
+        $isCompleteForm = false;
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($data['nama_ttd'] != null && $data['kota_ttd'] != null && $data['tanggal_ttd'] != null && $data['jabatan_pengusaha_ttd'] != null) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $data;
+    }
 }

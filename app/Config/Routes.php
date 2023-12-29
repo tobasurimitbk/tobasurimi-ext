@@ -725,7 +725,9 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC23::createKemasanPetiKemas/$1');
     $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC23::createTransaksiView/$1');
     $routes->get('id/barang/(:segment)', 'BeaCukai\BC23::createBarangView/$1');
-
+    $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC23::createPungutanView/$1');
+    $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC23::createPernyataanView/$1');
+    $routes->post('id/pernyataan', 'BeaCukai\BC23::createPernyataanAction');
 
     $routes->get('api/valuta', 'BeaCukai\BC23::getValuta');
 

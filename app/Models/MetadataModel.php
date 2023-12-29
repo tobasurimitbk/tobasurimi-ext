@@ -112,7 +112,7 @@ class MetadataModel extends Model
         foreach ($this->asArray()->where('name', "Kode Satuan BC")->orderBy('value', "ASC")->limit($limit, $offset)->findAll() as $d) {
             $data[] = [
                 'id' => encrypt($d['value']),
-                'text' => '(' . $d['value'] . ') ' . strtoupper($d['description'])
+                'text' => '' . $d['value'] . ' - ' . strtoupper($d['description'])
             ];
         }
         return $data;

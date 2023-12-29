@@ -8,18 +8,7 @@
 </style>
 
 <section class="section section-form">
-    <div class="section-header">
-        <h1 class="title-name">Dokumen BC 2.3</h1>
-        <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-23"); ?>">
-                Batal
-            </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
-                Simpan
-            </button>
-        </div>
-    </div>
-
+    <?php include('header.php') ?>
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">
@@ -87,7 +76,9 @@
                         </tbody>
                     </table>
                 </div>
-
+                <a href="#" class="btn btn-primary mt-4" style="float: right;">
+                    Simpan Perubahan
+                </a>
             </div>
         </div>
     </div>
