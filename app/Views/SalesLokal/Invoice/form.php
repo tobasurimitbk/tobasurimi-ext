@@ -472,39 +472,50 @@
             const itemList = table.rows().data();
 
             let itemSubTotal = 0;
+            let itemSubTotalTermasukPajak = 0;
             let discTotal = 0;
-            let taxTotal = 0;
+            let dummyGrandTotal = 0;
             let taxTotalHtml = 0;
             let dummyTax = 0;
 
             itemList.map((obj) => {
-                const itemAmt = +(obj.amount.replace(/\D/g, ''));
-                itemSubTotal += itemAmt;
+                // console.log(obj);
+                const itemAmt = +(obj.amount);
+                let taxAmt = 0;
                 discTotal += ((+obj.disc) / 100) * itemAmt;
                 if (taxStatus) {
-                    dummyTax += (+obj.taxChecked);
+                    dummyTax = (+obj.taxChecked);
+                    taxAmt = itemAmt * ((+obj.taxChecked) / 100);
                 } else {
-                    dummyTax += (+obj.tax);
+                    dummyTax = (+obj.tax);
+                    taxAmt = itemAmt * ((+obj.tax) / 100);
                 }
-                const taxAmt = itemAmt * (dummyTax / 100);
+                // console.log((dummyTax / 100));
+                // console.log(itemAmt);
 
                 if (taxStatus && !includeTax) {
-                    taxTotal += taxAmt;
-                    // taxTotalHtml += taxAmt;
+                    // taxTotal += taxAmt;
+                    itemSubTotal += itemAmt;
+                    taxTotalHtml += taxAmt;
                 } else if (taxStatus && includeTax) {
-                    taxTotal += taxAmt;
+                    itemSubTotal += itemAmt - taxAmt;
+                    dummyGrandTotal += itemAmt;
+                    taxTotalHtml += taxAmt;
+                } else {
+                    // taxTotal += taxAmt;
+                    itemSubTotal += itemAmt;
+                    taxTotalHtml += taxAmt;
                 }
-                taxTotalHtml += taxAmt;
+                // console.log(itemSubTotal);
             });
 
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#taxTotal').html(taxTotalHtml.toLocaleString());
 
-            let grandTotal = 0;
 
             if (taxStatus && includeTax) {
                 $('#includeTaxText').html('(Termasuk Pajak)');
-                grandTotal = itemSubTotal - discTotal;
+                grandTotal = dummyGrandTotal - discTotal;
             } else if (taxStatus && !includeTax) {
                 $('#includeTaxText').html('');
                 grandTotal = itemSubTotal + taxTotalHtml - discTotal;

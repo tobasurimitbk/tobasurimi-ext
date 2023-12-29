@@ -105,64 +105,6 @@ class Customer extends BaseController
         return;
     }
 
-    // public function allCustomer()
-    // {
-
-    //     $draw = $this->request->getVar('draw');
-    //     $row = $this->request->getVar('start');
-    //     $rowperpage = $this->request->getVar('length');
-    //     $temp = $this->request->getVar('order');
-    //     $columnIndex = $temp[0]['column']; // Column index
-
-    //     $temp = $this->request->getVar('columns');
-    //     $columnName = $temp[$columnIndex]['data']; // Column index
-
-    //     $temp = $this->request->getVar('order');
-    //     $columnSortOrder = $temp[0]['dir']; // Column index
-
-    //     $search = $this->request->getVar('search');
-    //     //$searchValue = $temp['value']; // Column index
-
-    //     $values = [
-    //         "company_id"    => $this->this_company_id,
-    //         "search"        => $search
-    //     ];
-
-    //     $totalRecords = $this->CustomerModel->total_list(array());
-    //     $totalRecordwithFilter = $this->CustomerModel->total_list($values);
-
-    //     $res = $this->CustomerModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
-
-    //     $number = $row * $rowperpage;
-
-    //     $data = [];
-
-    //     for ($i = 0; $i < count($res); $i++) {
-
-    //         $data[] = array(
-    //             "number" => ($row + $i + 1),
-    //             "no" => ($row + $i + 1),
-    //             "id" => $res[$i]["id"],
-    //             "kode" => $res[$i]["kode"],
-    //             "name" => $res[$i]["name"],
-    //             "phone" => $res[$i]["phone"],
-    //             "contact_person" => $res[$i]["contact_person"],
-    //             "saldo" => $res[$i]["saldo"],
-    //             "currencyName" => $res[$i]["currencyName"],
-    //         );
-    //     }
-
-    //     ## Response
-    //     $response = array(
-    //         "draw" => intval($draw),
-    //         "iTotalRecords" => $totalRecords,
-    //         "iTotalDisplayRecords" => $totalRecordwithFilter,
-    //         "aaData" => $data
-    //     );
-
-    //     return $this->response->setJSON($response);
-    // }
-
     public function saveCustomer()
     {
         try {
@@ -201,6 +143,7 @@ class Customer extends BaseController
             if ($this->validate($rules)) {
                 $last_year = date("Y-m-t", strtotime(date('Y') . "-12-31"));
                 $kode = $this->CustomerModel->get_kode(date('m'), date('Y'), date('y'), $last_year);
+                $piutangValue = $this->request->getPost("piutang") ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getPost("piutang"))) : 0;
                 $values = [
                     "company_id" => $this->this_company_id,
                     "kode" => $kode,
@@ -217,9 +160,12 @@ class Customer extends BaseController
                     "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
                     "nik" => $this->request->getPost("nik"),
                     "termin" => $this->request->getPost("termin"),
+                    "piutang" => number_format($piutangValue, 2, '.', ''),
                     "currency" => $this->request->getPost("currency"),
                     "sales_id" => $this->request->getPost("sales_id")
                 ];
+                // var_dump($values);
+                // exit;
 
                 $id = $this->CustomerModel->insert($values);
                 if ($id > 0) {

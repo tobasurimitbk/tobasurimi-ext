@@ -97,7 +97,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select currency" id="currency" name="currency">
                                     <option value=""></option>
@@ -105,12 +105,18 @@
                                 <label for="floatingInput">Mata Uang (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select termin" id="termin" name="termin">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Termin (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <label for="floatingInput">Limit Piutang (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -903,6 +909,17 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    function formatRupiah(angka) {
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var desimal = parts[1] || '00';
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return 'Rp. ' + ribuanFormatted + ',' + desimal;
     }
 </script>
 

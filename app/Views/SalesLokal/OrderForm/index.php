@@ -34,6 +34,8 @@
 
                                 <th onclick="changeSort('no_sales_order')" class="sort">No Order</th>
 
+                                <th onclick="changeSort('nama_customer')" class="sort">Nama Customer</th>
+
                                 <th onclick="changeSort('destination')" class="sort">Destinasi</th>
 
                                 <th onclick="changeSort('qty_barang')" class="sort">QTY Barang</th>
@@ -114,6 +116,9 @@
             sortable: false
         }, {
             data: "no_sales_order",
+            className: "text-center"
+        }, {
+            data: "nama_customer",
             className: "text-center"
         }, {
             data: "destination",

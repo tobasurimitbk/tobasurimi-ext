@@ -122,23 +122,35 @@ class OrderForm extends BaseController
         foreach ($dataOrderForm['data'] as $data) {
             $totalQty = 0;
             $totalHarga = 0;
+            $customerName = "";
             $dataQtySalesOrderDetail = $this->SalesOrderDetailModel->getItemListByIds(json_decode($data->id));
-            foreach ($dataQtySalesOrderDetail as $datas) {
-                $totalQty = $datas->qty;
-                $totalHarga = str_replace(',', '', $datas->harga_barang);
+            $dataCustomer = $this->CustomerModel->get_by_id($data->id_customer);
+            // var_dump($dataCustomer["name"]);
+
+            foreach ($dataCustomer as $datasC) {
+                $customerName = $datasC["name"];
             }
+            foreach ($dataQtySalesOrderDetail as $datas) {
+                $totalQty += $datas->qty;
+                $totalHarga += $datas->total_harga_barang;
+            }
+            // var_dump($totalHarga);
+            // Format totalHarga as Indonesian Rupiah
+            $formattedTotalHarga = 'Rp ' . number_format($totalHarga, 2, ',', '.');
+
             array_push($dataSalesOrder, [
-                "no"            => $no++,
-                "id"            => $data->id,
-                "no_sales_order"      => $data->no_sales_order,
-                "destination"        => $data->destination,
+                "no" => $no++,
+                "id" => bin2hex($this->encrypter->encrypt($data->id)),
+                "no_sales_order" => $data->no_sales_order,
+                "nama_customer" => $customerName,
+                "destination" => $data->destination,
                 "qty_barang" => $totalQty,
-                "total_harga"         => number_format($totalHarga),
-                "keterangan"  => $data->keterangan
+                "total_harga" => $formattedTotalHarga,
+                "keterangan" => $data->keterangan
             ]);
         }
 
-
+        // var_dump($dataSalesOrder);
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $dataOrderForm['totalData'],
@@ -344,12 +356,16 @@ class OrderForm extends BaseController
                 $this->stockDetailModel->addOrReduceStock($row->id_barang, $row->warehouse_id, 'New', $row->qty, 'Out', '');
 
                 $totalQty = $totalQty + $row->qty;
+                $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
+                // var_dump($row->amount);
+                // var_dump($amountValue);
+                // exit;
                 $valueBarang = [
                     "id_sales_order"        => $dataSalesOrder,
                     "id_barang"             => $row->id_barang,
                     "qty"                   => $row->qty,
                     "harga_barang"          => str_replace(',', '', $row->harga_barang),
-                    "amount"                => formatter($row->amount, "CURR_TO_INT"),
+                    "amount"                => number_format($amountValue, 2, '.', ''),
                     "keterangan"            => $row->keterangan,
                     // "tax"                   => $row->tax,
                     "discount_percentage"   => $row->disc,
@@ -389,10 +405,11 @@ class OrderForm extends BaseController
     public function getById($id = null)
     {
         //Get data sales order
+        $id = $this->encrypter->decrypt(hex2bin($id));
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
 
         // var_dump($dataSalesOrder);
-        // die;
+        // exit;
 
         // validation
         if ($dataSalesOrder == null) {
@@ -402,8 +419,8 @@ class OrderForm extends BaseController
         }
 
         foreach ($dataSalesOrder->detail as &$detail) {
-            $detail['harga_barang'] = floatval($detail['harga_barang']);
-            $detail['amount'] = floatval($detail['amount']);
+            $detail['harga_barang'] = ($detail['harga_barang']);
+            $detail['amount'] = ($detail['amount']);
 
             $detail['barangTotal'] = $detail['harga_barang'] * $detail['qty'];
             $detail['discAmt'] = $detail['barangTotal'] * $detail['discount_percentage'] / 100;
@@ -720,7 +737,8 @@ class OrderForm extends BaseController
     public function delete()
     {
         try {
-            $id = $this->request->getPost("id");
+            // $id = $this->request->getPost("id");
+            $id = $this->encrypter->decrypt(hex2bin($this->request->getPost("id")));
 
 
             if (!empty($id)) {

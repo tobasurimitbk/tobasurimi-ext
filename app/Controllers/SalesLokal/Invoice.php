@@ -232,7 +232,7 @@ class Invoice extends BaseController
                 // "id_surat_jalan"    => $postData['id_surat_jalan'],
                 // "no_surat_jalan"    => $postData['no_surat_jalan'],
                 "no_faktur"         => $noFaktur,
-                "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-',$postData['tanggal_faktur']))),
+                "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-', $postData['tanggal_faktur']))),
                 "terms"             => $postData['terms'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
@@ -331,12 +331,12 @@ class Invoice extends BaseController
         }
 
         $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
-        
+
         $tipeShipping = $this->MetadataModel->asObject()
             ->select(['id', 'value'])
             ->where('name', 'tipe_shipping_via')
             ->findAll();
-        
+
         $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
 
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
@@ -353,7 +353,7 @@ class Invoice extends BaseController
             // 'dataSuratJalan'=> $dataSuratJalan,
             // 'dataSo'        => $dataSo
 
-        ];//dd($data);
+        ]; //dd($data);
         return view('SalesLokal/Invoice/form', $data);
     }
 
@@ -429,15 +429,15 @@ class Invoice extends BaseController
                 $documentData = $this->SalesOrderModel->asObject()
                     ->where('surat_jalan_so_id', null)
                     ->groupStart()
-                        ->where('sales_order_invoice_id', null)
-                        ->orWhere('id', $soInvData->document_id)
+                    ->where('sales_order_invoice_id', null)
+                    ->orWhere('id', $soInvData->document_id)
                     ->groupEnd()
                     ->find($postData['doc_id']);
             } else {
                 $documentData = $this->SuratJalanModel->asObject()
                     ->groupStart()
-                        ->where('sales_order_invoice_id', null)
-                        ->orWhere('id', $soInvData->document_id)
+                    ->where('sales_order_invoice_id', null)
+                    ->orWhere('id', $soInvData->document_id)
                     ->groupEnd()
                     ->find($postData['doc_id']);
             }
@@ -458,7 +458,7 @@ class Invoice extends BaseController
                 "document_id"       => $postData['doc_id'],
                 "id_customer"       => $documentData->id_customer,
                 "no_faktur"         => $postData['no_faktur'],
-                "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-',$postData['tanggal_faktur']))),
+                "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-', $postData['tanggal_faktur']))),
                 "terms"             => $postData['terms'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
@@ -602,12 +602,12 @@ class Invoice extends BaseController
             ->findAll();
 
         $invTotal = $salesOrderData[0]->total_harga + $salesOrderData[0]->estimated_freight;
-        
+
         $invData->docNo = ($invData->document_type == 'pengiriman') ? $sjData->no_surat_jalan : $salesOrderData[0]->no_sales_order;
 
         $data = [
             'companyName'   => $companyData->company,
-            'companyAccount'=> $companyData->invoice_account,
+            'companyAccount' => $companyData->invoice_account,
             'invData'       => $invData,
             'soData'        => $salesOrderData,
             'invTotal'      => $invTotal
@@ -626,7 +626,7 @@ class Invoice extends BaseController
 
         // output the generated pdf
         $domPdf->stream($fileName, array("Attachment" => false));
-        
+
         exit();
     }
 
@@ -647,7 +647,7 @@ class Invoice extends BaseController
         $documentList->where('sales_order_invoice_id', null);
 
         if (!empty($documentId)) {
-            $documentList->orWhere('id', $documentId);    
+            $documentList->orWhere('id', $documentId);
         }
 
         $documentList->groupEnd();
@@ -676,7 +676,7 @@ class Invoice extends BaseController
                 ->join('employees', 'employees.id = sales_order.sales_id')
                 ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->find($docId);
-            
+
             $salesName = $soData->salesName;
             $termin = $soData->termin;
             $customerName = $soData->customerName;
@@ -704,7 +704,7 @@ class Invoice extends BaseController
         }
 
         $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
-        $itemTax = $this->TaxModel->where('id','4')->asObject()->findAll();
+        $itemTax = $this->TaxModel->where('id', '4')->asObject()->findAll();
 
         $dpp = 0;
         $taxAmt = 0;

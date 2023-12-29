@@ -30,6 +30,7 @@ class CustomerModel extends Model
         'tipe_pelanggan',
         'termin',
         'currency',
+        'piutang',
         'saldo',
         'nik',
         'sales_id',
@@ -186,9 +187,9 @@ class CustomerModel extends Model
         // $query = $builder->get();
 
         $customerMeta = $this->asObject()
-        ->join('metadata', 'metadata.id = customers.tipe_pelanggan')
-        ->select($selectQry)
-        ->where($arrCondition);
+            ->join('metadata', 'metadata.id = customers.tipe_pelanggan')
+            ->select($selectQry)
+            ->where($arrCondition);
 
         return $customerMeta;
     }
@@ -201,7 +202,7 @@ class CustomerModel extends Model
         $builder->select('kode');
         $builder->orderBy('kode', 'desc');
         $builder->where('createdAt >=', $thn . "-01-01" . " 00:00:00")
-        ->where('createdAt <=', $last_year . " 23:59:59");
+            ->where('createdAt <=', $last_year . " 23:59:59");
         $builder->like('kode', $lastStr);
         $query = $builder->get();
 
@@ -209,10 +210,10 @@ class CustomerModel extends Model
 
         $lastKode = '0001';
         if ($query->getResultArray()) {
-            foreach($query->getResultArray() as $string) {
+            foreach ($query->getResultArray() as $string) {
                 $explode = explode('/', $string['kode']);
                 $number = intval($explode[3]);
-                if($number > $lastKode) {
+                if ($number > $lastKode) {
                     $lastKode = $number;
                 }
             }
