@@ -212,6 +212,32 @@ class BC23 extends BaseController
         return view('BeaCukai/bc-23/form-entitas', $data);
     }
 
+    public function createEntitasAction($penerimaanBarangID)
+    {
+        $bc23EntitasModel = new BC23EntitasModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $lastData = $bc23EntitasModel->get($penerimaanBarangID);
+
+        if ($lastData == null) {
+            // insert
+            $bc23EntitasModel->create([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
+                'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
+                'nib_entitas' => $this->request->getVar('entitas_nib'),
+                'nomor_identitas' => $this->request->getVar('entitas_npwp_importir'),
+                'nomor_ijin_entitas' => $this->request->getVar('entitas_nomor_ijin_tpb'),
+                'tanggal_ijin_entitas' =>  $this->request->getVar('entitas_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('entitas_tanggal_skep_tpb')), "Y-m-d") : "",
+                'nama_pemasok' => $this->request->getVar('nama_pemasok'),
+                'alamat_'
+            ]);
+        } else {
+            // update
+
+        }
+    }
+
     public function createDokumenView($penerimaanBarangID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();

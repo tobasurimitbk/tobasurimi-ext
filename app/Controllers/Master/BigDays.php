@@ -39,7 +39,7 @@ class BigDays extends BaseController
         ];
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
+            "year"          => $this->request->getGet("year"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];

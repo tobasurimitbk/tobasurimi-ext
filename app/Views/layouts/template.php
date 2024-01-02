@@ -62,6 +62,7 @@
     <script src="<?= base_url(); ?>assets/js/jquery.mask.min.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url(); ?>assets/js/imask.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url(); ?>assets/js/bootstrap-datepicker.min.js?v=<?= time(); ?>"></script>
+    <script src="<?= base_url() ?>assets/js/loading.js?v=<?= time(); ?>"></script>
 
 
 
@@ -89,13 +90,23 @@
     <script>
         //Function Set Spinner Button
         const setLoading = function() {
-            $(".delete-btn").attr("disabled", true)
-            $(".btn-submit-form").attr("disabled", true)
+            // $(".delete-btn").attr("disabled", true)
+            // $(".btn-submit-form").attr("disabled", true)
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesomeColor: "#222FCC",
+                fontawesome: "fa fa-cog fa-spin"
+            });
         }
 
         const stopLoading = function() {
-            $(".delete-btn").attr("disabled", false)
-            $(".btn-submit-form").attr("disabled", false)
+            // $(".delete-btn").attr("disabled", false)
+            // $(".btn-submit-form").attr("disabled", false)
+            $.LoadingOverlay("hide", {
+                image: "",
+                fontawesomeColor: "#222FCC",
+                fontawesome: "fa fa-cog fa-spin"
+            });
         }
 
         const formatNumber = function(el) {
@@ -104,11 +115,11 @@
 
             // Format the value as a currency with commas
             if (value.length > 0) {
-            const formatter = new Intl.NumberFormat('en-US', {
-                currency: 'IDR',
-                minimumFractionDigits: 2,
-            });
-            value = formatter.format(value / 100);
+                const formatter = new Intl.NumberFormat('en-US', {
+                    currency: 'IDR',
+                    minimumFractionDigits: 2,
+                });
+                value = formatter.format(value / 100);
             }
 
             el.value = value;
@@ -116,14 +127,13 @@
 
         var invalidChars = ["-", "e", "+", "E"];
 
-        $("input[type='number']").on("keydown", function(e){ 
-            if(invalidChars.includes(e.key)){
+        $("input[type='number']").on("keydown", function(e) {
+            if (invalidChars.includes(e.key)) {
                 e.preventDefault();
             }
         });
 
-        const lettersOnly = function(event)
-        {
+        const lettersOnly = function(event) {
             if (String.fromCharCode(event.keyCode).match(/[^0-9A-Za-z ]/g)) return false;
             // if (String.fromCharCode(event.keyCode).match(/[^0-9A-Za-z,-_/.() ]/g)) return false;
         }

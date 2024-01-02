@@ -57,8 +57,19 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                <div class="col-md-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <select class="form-select year" name="year" id="year" aria-label="Floating label select example">
+                            <?php
+                            for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) {
+                            ?>
+                                <option <?= $i == date('Y') ? 'selected' : '' ?> value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Pilih Tahun </label>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -104,7 +115,7 @@
             url: "<?= base_url("big-days/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search").val();
+                data.year = $(".year").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -420,7 +431,24 @@
                 }
             })
         })
-    })
+    });
+
+    $('#year').select2({
+        placeholder: "Pilih Tahun",
+        theme: "bootstrap-5",
+    }).change(function() {
+        table.ajax.reload();
+    });
+
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px').css('height', ' calc(3.5rem + 2px)');
+
 
     const changeSort = function(val) {
         if (sort !== val) {

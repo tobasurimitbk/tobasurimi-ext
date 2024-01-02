@@ -75,47 +75,138 @@ class EmployeesModel extends Model
     public function get_by_id($id)
     {
         $requete = "SELECT * FROM employees WHERE id='" . $id . "'";
-        //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();
+    }
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'employees.nip' => 'employees.nip',
+            'employees.name' => 'employees.name',
+            'employees.division_id' => 'employees.division_id',
+            'employees.bagian_id' => 'employees.bagian_id',
+            'employees.tipe' => 'employees.tipe',
+            'employees.dob' => 'employees.dob',
+            'employees.gender' => 'employees.gender',
+            'employees.status' => 'employees.status'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'employees.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "employees.*,
+            divisis.divisi,
+            bagian.nama_bagian";
+
+        $employeeQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('divisis', 'divisis.id = employees.division_id')
+            ->join('bagian', 'bagian.id = employees.bagian_id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $employeeQry->countAllResults(false);
+
+        if ($addCondition['division_id'] || $addCondition['bagian_id'] || $addCondition['tipe'] || $addCondition['search']) {
+            $employeeQry->groupStart();
+        }
+
+        if ($addCondition['division_id']) {
+            $employeeQry->where('employees.division_id', $addCondition['division_id']);
+        }
+
+        if ($addCondition['bagian_id']) {
+            $employeeQry->where('employees.bagian_id', $addCondition['bagian_id']);
+        }
+
+        if ($addCondition['tipe']) {
+            $employeeQry->where('employees.tipe', $addCondition['tipe']);
+        }
+
+        if ($addCondition['search']) {
+            $employeeQry->like('employees.name', $addCondition['search'])->orLike('employees.nip', $addCondition['search']);
+        }
+
+
+        if ($addCondition['division_id'] || $addCondition['bagian_id'] || $addCondition['tipe'] || $addCondition['search']) {
+            $employeeQry->groupEnd();
+        }
+
+        $totalFilteredData = $employeeQry->countAllResults(false);
+        $data = $employeeQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
     }
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
-        $requete = "SELECT employees.*,divisis.divisi as divisionName FROM employees ";
-        $requete .= "LEFT JOIN divisis ON (employees.division_id=divisis.id) ";
-        // $requete = "SELECT customers.*,provinces.province_name,cities.city_name,s1.nama_sub as ap_name,s2.nama_sub as ar_name FROM customers ";
-        // $requete .= "LEFT JOIN provinces ON (customers.province_id=provinces.id) ";
-        // $requete .= "LEFT JOIN cities ON (customers.city_id=cities.id) ";
-        // $requete .= "LEFT JOIN sub_akuns s1 ON (customers.ap_id=s1.id) ";
-        // $requete .= "LEFT JOIN sub_akuns s2 ON (customers.ar_id=s2.id) ";
-        $requete .= "WHERE employees.deletedAt is null ";
-        if (isset($values["name"]))
-            $requete .= ($values["name"] == "") ? "" : ("AND UPPER(employees.name) like '%" . strtoupper($values["name"]) . "%' ");
-        if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(employees.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nik) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nip) like '%" . strtoupper($values["search"]) . "%' OR UPPER(divisis.divisi) like '%" . strtoupper($values["search"]) . "%') ");
+        $requete = "SELECT employees.*, divisis.divisi as divisionName FROM employees ";
+        $requete .= "LEFT JOIN divisis ON (employees.division_id = divisis.id) ";
+        $requete .= "WHERE employees.deletedAt IS NULL";
 
-        if ($sortby != '')
-            $requete .= "ORDER BY $sortby ";
-        if ($limit >= 0)
-            $requete .= "LIMIT $limit OFFSET $offset";
+        if (isset($values["name"])) {
+            $requete .= ($values["name"] == "") ? "" : " AND UPPER(employees.name) LIKE '%" . strtoupper($values["name"]) . "%'";
+        }
+
+        if (isset($values["search"])) {
+            $searchCondition = (
+                "UPPER(employees.name) LIKE '%" . strtoupper($values["search"]) . "%' OR " .
+                "UPPER(employees.nik) LIKE '%" . strtoupper($values["search"]) . "%' OR " .
+                "UPPER(employees.nip) LIKE '%" . strtoupper($values["search"]) . "%' OR " .
+                "UPPER(divisis.divisi) LIKE '%" . strtoupper($values["search"]) . "%'"
+            );
+            $requete .= ($values["search"] == "") ? "" : " AND ($searchCondition)";
+        }
+
+        if (isset($values["company_id"])) {
+            $requete .= ($values["company_id"] == "") ? "" : " AND employees.company_id = " . (int)$values["company_id"];
+        }
+
+        if ($sortby != '') {
+            $requete .= " ORDER BY $sortby ";
+        }
+
+        if ($limit >= 0) {
+            $requete .= " LIMIT $limit OFFSET $offset";
+        }
 
         $query = $this->db->query($requete);
         return $query->getResultArray();
     }
 
+
     public function total_list($values)
     {
-        $requete  = "SELECT count(*) as total FROM employees ";
-        $requete .= "WHERE employees.deletedAt is null ";
-        if (isset($values["name"]))
-            $requete .= ($values["name"] == "") ? "" : ("AND UPPER(employees.name) like '%" . strtoupper($values["name"]) . "%' ");
-        if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(employees.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nik) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nip) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.jabatan_id) like '%" . strtoupper($values["search"]) . "%') ");
+        $requete = "SELECT COUNT(*) as total FROM employees WHERE employees.deletedAt IS NULL ";
+
+        if (isset($values["name"])) {
+            $requete .= ($values["name"] == "") ? "" : "AND UPPER(employees.name) LIKE '%" . strtoupper($values["name"]) . "%' ";
+        }
+
+        if (isset($values["search"])) {
+            $searchCondition = (
+                "UPPER(employees.name) LIKE '%" . strtoupper($values["search"]) . "%' OR " .
+                "UPPER(employees.nik) LIKE '%" . strtoupper($values["search"]) . "%' OR " .
+                "UPPER(employees.nip) LIKE '%" . strtoupper($values["search"]) . "%' OR " .
+                "UPPER(employees.jabatan_id) LIKE '%" . strtoupper($values["search"]) . "%'"
+            );
+            $requete .= ($values["search"] == "") ? "" : " AND ($searchCondition)";
+        }
+
+        if (isset($values["company_id"])) {
+            $requete .= ($values["company_id"] == "") ? "" : " AND employees.company_id = " . (int)$values["company_id"];
+        }
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
 
     public function getEmployees($company_id)
     {

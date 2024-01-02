@@ -68,10 +68,9 @@ class BigDaysModel extends Model
 
         $totalData = $DataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['year']) {
             $DataQry->groupStart()
-                ->like('name', $addCondition['search'])
-                ->orLike('date', $addCondition['search'])
+                ->where('YEAR(date)', $addCondition['year'])
                 ->groupEnd();
         }
 
