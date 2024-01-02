@@ -39,20 +39,20 @@
                                 <table class="table table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0" id="tabel-riwayat-payroll">
                                     <thead class="thead-dark">
                                         <tr>
-                                            <th width="10">No</th>
-                                            <th>Periode</th>
-                                            <th>Gaji Diterima</th>
-                                            <th>Slip Gaji</th>
+                                            <th width="10" style="text-align: center;">No</th>
+                                            <th style="text-align: center;">Periode</th>
+                                            <th style="text-align: center;">Gaji Diterima</th>
+                                            <th style="text-align: center;">Slip Gaji</th>
                                         </tr>
                                     </thead>
                                     <tbody class="body-detail-table" id="body-detail-table">
                                         <?php $no = 1; ?>
                                         <?php foreach ($payrollList as $p) : ?>
                                             <tr>
-                                                <td><?= $no++ ?></td>
-                                                <td><?= date('M-Y', strtotime($p['year_month'])) ?></td>
-                                                <td><?= toRupiah($p['nominal_gaji_diterima']) ?></td>
-                                                <td>
+                                                <td style="text-align: center;"><?= $no++ ?></td>
+                                                <td style="text-align: center;"><?= date('M-Y', strtotime($p['year_month'])) ?></td>
+                                                <td style="text-align: center;"><?= toRupiah($p['nominal_gaji_diterima']) ?></td>
+                                                <td style="text-align: center;">
                                                     <a href="<?= base_url('payroll/print/single/' . encrypt($p['id'])) ?>"><span class="badge badge-primary">Unduh Slip</span></a>
                                                 </td>
                                             </tr>
