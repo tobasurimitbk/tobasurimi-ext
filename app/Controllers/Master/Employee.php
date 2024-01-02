@@ -315,7 +315,7 @@ class Employee extends BaseController
                         $angkaDesimal = number_format((float) $angka, 3, '.', '');
 
                         $res[] = [
-                            'employee_id' => encrypt($insert),
+                            'employee_id' => $insert,
                             'tunjangan_id' => $g,
                             'nominal' => $angkaDesimal
                         ];
