@@ -53,7 +53,7 @@
                                 <select class="form-select" name="parent_type_id" id="parent_type_id">
                                     <option value=""></option>
                                     <?php foreach ($kelompokBarang as $kb) : ?>
-                                        <option value="<?= $kb['id'] ?>"><?= $kb['parent_name'] ?></option>
+                                        <option value="<?= encrypt($kb['id']) ?>"><?= $kb['parent_name'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Kelompok Barang</label>
@@ -87,7 +87,7 @@
                                         <select class="form-select" name="satuan_id" id="satuan_id">
                                             <option value=""></option>
                                             <?php foreach ($satuanBarang as $sb) : ?>
-                                                <option value="<?= $sb['id'] ?>"><?= $sb['kode_satuan'] ?></option>
+                                                <option value="<?= encrypt($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <label for="floatingInput">Satuan Barang</label>
@@ -108,7 +108,7 @@
                                 <select class="form-select" name="divisi_id" id="divisi_id">
                                     <option value=""></option>
                                     <?php foreach ($divisi as $d) : ?>
-                                        <option value="<?= $d->hexid; ?>"><?= $d->divisi; ?></option>
+                                        <option value="<?= encrypt($d->id); ?>"><?= $d->divisi; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Department</label>
@@ -215,8 +215,9 @@
         $('.btn-add').click(function() {
             $('.title-name').text("Tambah Bahan Jadi");
             $(".create-form :input:not([name='type'])").val('');
-            $('input[name="parent_type_id"]').val(null).change();
-            $('input[name="satuan_id"]').val(null).change();
+            $('select[name="parent_type_id"]').val(null).change();
+            $('select[name="satuan_id"]').val(null).change();
+            $('select[name="divisi_id"]').val(null).change();
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
@@ -312,6 +313,10 @@
                     $('select[name="satuan_id"]').val(res.data.satuan_id).change();
                     $('input[name="barang_name"]').val(res.data.barang_name);
                     $('input[name="minimum_stock"]').val(res.data.minimum_stock);
+                    $('select[name="divisi_id"]').val(res.data.divisi_id).change();
+                    $('input[name="harga_pokok"]').val(formatRupiah(res.data.harga_pokok));
+                    $('input[name="harga_jual"]').val(formatRupiah(res.data.harga_jual));
+
                     $('input[name="id"]').val(res.data.id);
 
                     $('.add-modal').modal('show');
@@ -359,6 +364,14 @@
                                                 table.ajax.reload();
                                                 $(".add-modal").modal("hide");
                                             })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        }).then(() => {
+
+                                        });
                                     }
                                 },
                                 onError: function(response) {
@@ -395,11 +408,11 @@
                                             })
                                     } else {
                                         Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            icon: 'warning',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            $(".add-modal").modal("hide")
+
                                         });
                                     }
                                 },
@@ -586,7 +599,7 @@
         var desimal = parts[1] || '00';
         var reverse = ribuan.toString().split('').reverse().join('');
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return 'Rp. ' + ribuanFormatted + ',' + desimal;
+        return '' + ribuanFormatted + ',' + desimal;
     }
 </script>
 

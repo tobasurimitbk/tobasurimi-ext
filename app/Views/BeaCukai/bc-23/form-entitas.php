@@ -16,6 +16,7 @@
             </div>
             <div class="card-body">
                 <?php include_once('nav.php') ?>
+                <?= csrf_field() ?>
                 <form id="form-entitas">
                     <div class="row">
                         <div class="col-sm-4">
@@ -36,7 +37,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= "\n\n" . $alamatImportirDefault['value'] ?></textarea>
+                                    <textarea name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= "\n" . $alamatImportirDefault['value'] ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -133,6 +134,10 @@
 </section>
 
 <script>
+    // CSRF
+    const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
+
     $('#entitas_negara').select2({
         placeholder: "Pilih Negara",
         theme: "bootstrap-5",
@@ -252,6 +257,8 @@
         },
     });
 
+    $('#btn-loading').hide();
+
     $('#btn-simpan-perubahan').click(function() {
         if ($('#form-entitas').valid()) {
             Swal.fire({
@@ -267,7 +274,6 @@
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-entitas"));
                     formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
-
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/entitas"); ?>",
                         data: formData,

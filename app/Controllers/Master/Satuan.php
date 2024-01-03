@@ -4,6 +4,7 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 use App\Models\SatuansModel;
+use Exception;
 
 class Satuan extends BaseController
 {
@@ -56,7 +57,7 @@ class Satuan extends BaseController
 
             $data[] = array(
                 "no" => ($row + $i + 1),
-                "id" => $res[$i]["id"],
+                "id" => encrypt($res[$i]["id"]),
                 "kode_satuan" => $res[$i]["kode_satuan"],
                 "nama_satuan" => $res[$i]["nama_satuan"],
             );
@@ -141,7 +142,7 @@ class Satuan extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+                $id = decrypt($this->request->getPost("id"));
 
                 $values = [
                     "kode_satuan" => $this->request->getPost("kode_satuan"),
@@ -161,7 +162,7 @@ class Satuan extends BaseController
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -174,7 +175,7 @@ class Satuan extends BaseController
                 ];
                 echo json_encode($data);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -188,6 +189,7 @@ class Satuan extends BaseController
     public function getByIdSatuan($id = null)
     {
         if (!empty($id)) {
+            $id = decrypt($id);
             $res = $this->SatuansModel->get_by_id($id);
             if (count($res)) {
                 $data = [
@@ -216,7 +218,7 @@ class Satuan extends BaseController
     public function deleteSatuan()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
 
             if (!empty($id)) {
                 $values = [

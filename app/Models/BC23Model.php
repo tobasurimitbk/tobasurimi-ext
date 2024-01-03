@@ -291,4 +291,17 @@ class BC23Model extends Model
         }
         return $isCompleteForm;
     }
+
+    public function isCompleteFormEntitas($penerimaanBarangID)
+    {
+        $bc23EntitasModel = new BC23EntitasModel();
+        $isCompleteForm = false;
+        $data = $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            $isCompleteForm = true;
+        }
+        return $isCompleteForm;
+    }
 }

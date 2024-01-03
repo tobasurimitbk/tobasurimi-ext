@@ -58,7 +58,7 @@
                                 <select class="form-select" name="parent_type_id" id="parent_type_id">
                                     <option value=""></option>
                                     <?php foreach ($kelompokBarang as $kb) : ?>
-                                        <option value="<?= $kb['id'] ?>"><?= $kb['parent_name'] ?></option>
+                                        <option value="<?= encrypt($kb['id']) ?>"><?= $kb['parent_name'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Kelompok Barang</label>
@@ -92,7 +92,7 @@
                                         <select class="form-select" name="satuan_id" id="satuan_id">
                                             <option value=""></option>
                                             <?php foreach ($satuanBarang as $sb) : ?>
-                                                <option value="<?= $sb['id'] ?>"><?= $sb['kode_satuan'] ?></option>
+                                                <option value="<?= encrypt($sb['id']) ?>"><?= $sb['kode_satuan'] ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <label for="floatingInput">Satuan Barang</label>
@@ -308,8 +308,8 @@
         $('.btn-add').click(function() {
             $('.title-name').text("Tambah Bahan Penolong");
             $(".create-form :input:not([name='type'])").val('');
-            $('input[name="parent_type_id"]').val(null).change();
-            $('input[name="satuan_id"]').val(null).change();
+            $('select[name="parent_type_id"]').val(null).change();
+            $('select[name="satuan_id"]').val(null).change();
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
@@ -452,6 +452,14 @@
                                                 table.ajax.reload();
                                                 $(".add-modal").modal("hide");
                                             })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        }).then(() => {
+
+                                        });
                                     }
                                 },
                                 onError: function(response) {
@@ -488,11 +496,11 @@
                                             })
                                     } else {
                                         Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            icon: 'warning',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            $(".add-modal").modal("hide")
+
                                         });
                                     }
                                 },

@@ -134,7 +134,7 @@ class BC23 extends BaseController
         $this->setFlashDataNavigatorSession($penerimaanBarangID);
 
         $data = [
-            'bc23' => $bc23Model->get($penerimaanBarangID),
+            'bc23' => $bc23,
             'noAju' => $bc23 == null ? $this->generateNomorAju() : $bc23['no_aju'],
             'kodeKantor' => $kantorBeaCukaiModel->findAll(),
             'kodeTujuanTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
@@ -189,10 +189,12 @@ class BC23 extends BaseController
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
         $countryModel = new CountryModel();
+        $bc23EntitasModel = new BC23EntitasModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $bc23Entitas = $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
 
         if ($lpb == null || $lpb->bc_type != "BC 2.3") {
             return redirect()->to('bea-cukai-bc-23');
@@ -201,6 +203,7 @@ class BC23 extends BaseController
         $this->setFlashDataNavigatorSession($penerimaanBarangID);
 
         $data = [
+            'bc23Entitas' => $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first(),
             'npwpDefault' => $metaDataModel->where('name', "NPWP Importir Default BC")->first(),
             'namaImportirDefault' => $metaDataModel->where('name', "Nama Importir Default BC")->first(),
             'alamatImportirDefault' => $metaDataModel->where('name', "Alamat Importir Default BC")->first(),
@@ -212,7 +215,7 @@ class BC23 extends BaseController
         return view('BeaCukai/bc-23/form-entitas', $data);
     }
 
-    public function createEntitasAction($penerimaanBarangID)
+    public function createEntitasAction()
     {
         $bc23EntitasModel = new BC23EntitasModel();
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
@@ -221,7 +224,7 @@ class BC23 extends BaseController
 
         if ($lastData == null) {
             // insert
-            $bc23EntitasModel->create([
+            $bc23EntitasModel->insert([
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
@@ -229,13 +232,37 @@ class BC23 extends BaseController
                 'nomor_identitas' => $this->request->getVar('entitas_npwp_importir'),
                 'nomor_ijin_entitas' => $this->request->getVar('entitas_nomor_ijin_tpb'),
                 'tanggal_ijin_entitas' =>  $this->request->getVar('entitas_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('entitas_tanggal_skep_tpb')), "Y-m-d") : "",
-                'nama_pemasok' => $this->request->getVar('nama_pemasok'),
-                'alamat_'
+                'nama_pemasok' => $this->request->getVar('entitas_nama_pemasok'),
+                'alamat_pemasok' => $this->request->getVar('entitas_alamat_pemasok'),
+                'kode_negara_pemasok' => $this->request->getVar('entitas_negara'),
+                'npwp_pemilik_barang' => $this->request->getVar('entitas_npwp_pemilik_barang'),
+                'nama_pemilik_barang' => $this->request->getVar('entitas_nama_pemilik_barang'),
+                'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang')
             ]);
         } else {
             // update
-
+            $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->update([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
+                'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
+                'nib_entitas' => $this->request->getVar('entitas_nib'),
+                'nomor_identitas' => $this->request->getVar('entitas_npwp_importir'),
+                'nomor_ijin_entitas' => $this->request->getVar('entitas_nomor_ijin_tpb'),
+                'tanggal_ijin_entitas' =>  $this->request->getVar('entitas_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('entitas_tanggal_skep_tpb')), "Y-m-d") : "",
+                'nama_pemasok' => $this->request->getVar('entitas_nama_pemasok'),
+                'alamat_pemasok' => $this->request->getVar('entitas_alamat_pemasok'),
+                'kode_negara_pemasok' => $this->request->getVar('entitas_negara'),
+                'npwp_pemilik_barang' => $this->request->getVar('entitas_npwp_pemilik_barang'),
+                'nama_pemilik_barang' => $this->request->getVar('entitas_nama_pemilik_barang'),
+                'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang')
+            ]);
         }
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Entitas berhasil diupdate",
+        ]);
     }
 
     public function createDokumenView($penerimaanBarangID)
@@ -465,9 +492,11 @@ class BC23 extends BaseController
         $bc23Model = new BC23Model();
         $isCompleteFormPernyataan = $bc23Model->isCompleteFormPernyataan($penerimaanBarangID);
         $isCompleteFormHeader = $bc23Model->isCompleteFormHeader($penerimaanBarangID);
+        $isCompleteFormEntitas = $bc23Model->isCompleteFormEntitas($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
+        session()->setFlashdata('isCompleteFormEntitas', $isCompleteFormEntitas);
     }
 
 
