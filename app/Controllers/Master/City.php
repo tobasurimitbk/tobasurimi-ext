@@ -21,7 +21,7 @@ class City extends BaseController
     {
         $dataCity = [];
 
-        if (is_int($id)) {
+        if (is_numeric($id)) {
             $id = $id;
         } else {
             $id = decrypt($id);
