@@ -28,7 +28,7 @@ class POLokalBahanBaku extends BaseController
     protected $CompaniesModel;
     protected $SupplierModel;
     protected $BeaCukaiModel;
-    private $barangModel;
+    protected $barangModel;
     protected $metadataModel;
     protected $BagianModel;
     protected $SatuansModel;
@@ -554,6 +554,11 @@ class POLokalBahanBaku extends BaseController
 
     public function print($id = null)
     {
+        if (is_numeric($id)) {
+            $id = $id;
+        } else {
+            $id = decrypt($id);
+        }
         if ($id) {
             $filename = "PO LOKAL Bahan Baku";
 

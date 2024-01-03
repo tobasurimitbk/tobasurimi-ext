@@ -93,8 +93,6 @@
     let sort = "createdAt";
     let sortType = "desc";
 
-    let list_delete = [];
-
     var row = 0;
 
     const table = $('.dataTable').DataTable({

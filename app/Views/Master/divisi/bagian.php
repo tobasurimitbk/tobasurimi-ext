@@ -8,9 +8,7 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("divisi"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right" onclick="submitForm()" id="btn-submit-bagian">
-                Simpan
-            </button>
+
         </div>
     </div>
     <div class="card">
@@ -64,8 +62,11 @@
 
                     </div>
                     <div class="col-md-6">
+                        <button class="btn btn-add btn-block float-right" onclick="submitForm()" id="btn-submit-bagian">
+                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i> Tambah
+                        </button>
                         <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="resetForm()">
-                            Reset
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Reset
                         </button>
                     </div>
                 </div>

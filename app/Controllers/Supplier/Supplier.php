@@ -24,6 +24,7 @@ class Supplier extends BaseController
     protected $RMPurchaseOrderDetailModel;
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
+    protected $warehousesModel;
 
     public function __construct()
     {
