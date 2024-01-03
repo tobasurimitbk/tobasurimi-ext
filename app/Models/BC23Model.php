@@ -304,4 +304,17 @@ class BC23Model extends Model
         }
         return $isCompleteForm;
     }
+
+    public function isCompleteFormDokumen($penerimaanBarangID)
+    {
+        $bc23DokumenModel = new BC23DokumenModel();
+        $isCompleteForm = false;
+        $data = $bc23DokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            $isCompleteForm = true;
+        }
+        return $isCompleteForm;
+    }
 }

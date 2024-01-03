@@ -25,31 +25,31 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_npwp_importir" value="<?= $npwpDefault['value'] ?>" name="entitas_npwp_importir" type="text" class="form-control entitas_npwp_importir" placeholder="">
+                                    <input id="entitas_npwp_importir" value="<?= $bc23Entitas == null ? $npwpDefault['value'] : $bc23Entitas['nomor_identitas'] ?>" name="entitas_npwp_importir" type="text" class="form-control entitas_npwp_importir" placeholder="">
                                     <label>NPWP</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nama_importir" value="<?= $namaImportirDefault['value'] ?>" name="entitas_nama_importir" type="text" class="form-control entitas_nama_importir" placeholder="">
+                                    <input id="entitas_nama_importir" value="<?= $bc23Entitas == null ? $namaImportirDefault['value'] : $bc23Entitas['nama_entitas'] ?>" name="entitas_nama_importir" type="text" class="form-control entitas_nama_importir" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= "\n" . $alamatImportirDefault['value'] ?></textarea>
+                                    <textarea name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= "\n" . ($bc23Entitas == null) ? $alamatImportirDefault['value'] : $bc23Entitas['alamat_entitas'] ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nomor_ijin_tpb" name="entitas_nomor_ijin_tpb" type="text" class="form-control entitas_nomor_ijin_tpb" placeholder="">
+                                    <input value="<?= $bc23Entitas != null ? $bc23Entitas['nomor_ijin_entitas'] : '' ?>" id="entitas_nomor_ijin_tpb" name="entitas_nomor_ijin_tpb" type="text" class="form-control entitas_nomor_ijin_tpb" placeholder="">
                                     <label>Nomor Ijin TPB</label>
                                 </div>
                             </div>
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" name="entitas_tanggal_skep_tpb" type="text" placeholder="" class="form-control entitas_tanggal_skep_tpb" id="entitas_tanggal_skep_tpb">
+                                    <input value="<?= $bc23Entitas == null ? '' : date('d/m/Y', strtotime($bc23Entitas['tanggal_ijin_entitas']))  ?>" autocomplete="one-time-code" name="entitas_tanggal_skep_tpb" type="text" placeholder="" class="form-control entitas_tanggal_skep_tpb" id="entitas_tanggal_skep_tpb">
                                     <label>Tanggal Skep TPB</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -57,7 +57,7 @@
                                 </div>
                             </div>
                             <div class="form-floating mb-3">
-                                <input id="entitas_nib" value="<?= $nibDefault['value'] ?>" name="entitas_nib" type="text" class="form-control entitas_nib" placeholder="">
+                                <input id="entitas_nib" value="<?= $bc23Entitas == null ? $nibDefault['value'] : $bc23Entitas['nib_entitas'] ?>" name="entitas_nib" type="text" class="form-control entitas_nib" placeholder="">
                                 <label>NIB</label>
                             </div>
                         </div>
@@ -68,13 +68,13 @@
                             <div class="mt-1">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <input id="entitas_nama_pemasok" value="" name="entitas_nama_pemasok" type="text" class="form-control entitas_nama_pemasok" placeholder="">
+                                        <input id="entitas_nama_pemasok" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemasok'] : '' ?>" name="entitas_nama_pemasok" type="text" class="form-control entitas_nama_pemasok" placeholder="">
                                         <label>Nama</label>
                                     </div>
                                 </div>
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <textarea name="entitas_alamat_pemasok" id="entitas_alamat_pemasok" class="form-control entitas_alamat_pemasok" style="height: 100px;"></textarea>
+                                        <textarea name="entitas_alamat_pemasok" id="entitas_alamat_pemasok" class="form-control entitas_alamat_pemasok" style="height: 100px;"><?= ($bc23Entitas != null) ? $bc23Entitas['alamat_pemasok'] : '' ?></textarea>
                                         <label>Alamat</label>
                                     </div>
                                 </div>
@@ -83,7 +83,7 @@
                                         <select class="form-select entitas_negara" id="entitas_negara" name="entitas_negara" aria-label="Floating label select example">
                                             <option value=""></option>
                                             <?php foreach ($kodeNegaraAsal as $k) : ?>
-                                                <option value="<?= encrypt($k['code']) ?>">
+                                                <option <?= $bc23Entitas != null ? ($bc23Entitas['kode_negara_pemasok'] == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
                                                     <?= $k['code'] . " - " . strtoupper($k['country_name']) . "" ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -101,19 +101,19 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_npwp_pemilik_barang" value="" name="entitas_npwp_pemilik_barang" type="text" class="form-control entitas_npwp_pemilik_barang" placeholder="">
+                                    <input id="entitas_npwp_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['npwp_pemilik_barang'] : '' ?>" name="entitas_npwp_pemilik_barang" type="text" class="form-control entitas_npwp_pemilik_barang" placeholder="">
                                     <label>NPWP</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nama_pemilik_barang" value="" name="entitas_nama_pemilik_barang" type="text" class="form-control entitas_nama_pemilik_barang" placeholder="">
+                                    <input id="entitas_nama_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemilik_barang'] : '' ?>" name="entitas_nama_pemilik_barang" type="text" class="form-control entitas_nama_pemilik_barang" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_pemilik_barang" id="entitas_alamat_pemilik_barang" class="form-control entitas_alamat_pemilik_barang" style="height: 100px;"></textarea>
+                                    <textarea name="entitas_alamat_pemilik_barang" id="entitas_alamat_pemilik_barang" class="form-control entitas_alamat_pemilik_barang" style="height: 100px;"><?= $bc23Entitas != null ? $bc23Entitas['alamat_pemilik_barang'] : '' ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>

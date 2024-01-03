@@ -203,7 +203,7 @@ class BC23 extends BaseController
         $this->setFlashDataNavigatorSession($penerimaanBarangID);
 
         $data = [
-            'bc23Entitas' => $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first(),
+            'bc23Entitas' => $bc23Entitas,
             'npwpDefault' => $metaDataModel->where('name', "NPWP Importir Default BC")->first(),
             'namaImportirDefault' => $metaDataModel->where('name', "Nama Importir Default BC")->first(),
             'alamatImportirDefault' => $metaDataModel->where('name', "Alamat Importir Default BC")->first(),
@@ -234,7 +234,7 @@ class BC23 extends BaseController
                 'tanggal_ijin_entitas' =>  $this->request->getVar('entitas_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('entitas_tanggal_skep_tpb')), "Y-m-d") : "",
                 'nama_pemasok' => $this->request->getVar('entitas_nama_pemasok'),
                 'alamat_pemasok' => $this->request->getVar('entitas_alamat_pemasok'),
-                'kode_negara_pemasok' => $this->request->getVar('entitas_negara'),
+                'kode_negara_pemasok' => decrypt($this->request->getVar('entitas_negara')),
                 'npwp_pemilik_barang' => $this->request->getVar('entitas_npwp_pemilik_barang'),
                 'nama_pemilik_barang' => $this->request->getVar('entitas_nama_pemilik_barang'),
                 'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang')
@@ -251,7 +251,7 @@ class BC23 extends BaseController
                 'tanggal_ijin_entitas' =>  $this->request->getVar('entitas_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('entitas_tanggal_skep_tpb')), "Y-m-d") : "",
                 'nama_pemasok' => $this->request->getVar('entitas_nama_pemasok'),
                 'alamat_pemasok' => $this->request->getVar('entitas_alamat_pemasok'),
-                'kode_negara_pemasok' => $this->request->getVar('entitas_negara'),
+                'kode_negara_pemasok' => decrypt($this->request->getVar('entitas_negara')),
                 'npwp_pemilik_barang' => $this->request->getVar('entitas_npwp_pemilik_barang'),
                 'nama_pemilik_barang' => $this->request->getVar('entitas_nama_pemilik_barang'),
                 'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang')
@@ -286,6 +286,99 @@ class BC23 extends BaseController
         ];
 
         return view('BeaCukai/bc-23/form-dokumen', $data);
+    }
+
+    public function allDokumen()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $condition = [
+            "bc_23_dokumen.deletedAt"  => null,
+            "bc_23_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $bc23DokumenModel = new BC23DokumenModel();
+        $metaDataModel = new MetadataModel();
+
+
+        $beaCukaiDokumen = $bc23DokumenModel->getList($condition, $addCondition, $limit, $offset);
+        $resDokumen = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiDokumen['data'] as $data) {
+            $jenisDokumen = $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->id_dokumen)->first();
+            array_push($resDokumen, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "id_dokumen"             => $data->id_dokumen . ' - ' . $jenisDokumen['value'],
+                "nomor_dokumen"         => $data->nomor_dokumen,
+                "seri_dokumen"          => $data->seri_dokumen,
+                "tanggal_dokumen"       => date('d/m/Y', strtotime($data->tanggal_dokumen))
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $beaCukaiDokumen['totalData'],
+            "recordsFiltered"   => $beaCukaiDokumen['totalFilteredData'],
+            "data"              => $resDokumen,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function createDokumenAction()
+    {
+        $bc23DokumenModel = new BC23DokumenModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $lastData = $bc23DokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+        $seriDokumen = $lastData == null ? 1 : $lastData['seri_dokumen'] + 1;
+
+        $bc23DokumenModel->insert([
+            'penerimaan_barang_id' => $penerimaanBarangID,
+            'id_dokumen' => decrypt($this->request->getVar('dokumen_jenis_dokumen')),
+            'nomor_dokumen' => $this->request->getVar('dokumen_nomor_dokumen'),
+            'seri_dokumen' => $seriDokumen,
+            'tanggal_dokumen' => $this->request->getVar('dokumen_tanggal') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('dokumen_tanggal')), "Y-m-d") : "",
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Dokumen berhasil ditambah",
+        ]);
+    }
+
+    public function deleteDokumenAction()
+    {
+        $bc23DokumenModel = new BC23DokumenModel();
+        $id = decrypt($this->request->getVar('id'));
+        $bc23DokumenModel->delete($id);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Dokumen berhasil dihapus",
+        ]);
     }
 
     public function createPengangkutView($penerimaanBarangID)
@@ -493,10 +586,12 @@ class BC23 extends BaseController
         $isCompleteFormPernyataan = $bc23Model->isCompleteFormPernyataan($penerimaanBarangID);
         $isCompleteFormHeader = $bc23Model->isCompleteFormHeader($penerimaanBarangID);
         $isCompleteFormEntitas = $bc23Model->isCompleteFormEntitas($penerimaanBarangID);
+        $isCompleteFormDokumen = $bc23Model->isCompleteFormDokumen($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
         session()->setFlashdata('isCompleteFormEntitas', $isCompleteFormEntitas);
+        session()->setFlashdata('isCompleteFormDokumen', $isCompleteFormDokumen);
     }
 
 

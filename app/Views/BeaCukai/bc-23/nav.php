@@ -6,7 +6,7 @@
         <a class="nav-link <?= request()->uri->getSegment(3) === "entitas" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/entitas/' . encrypt($lpb->id)) ?>" style="<?= session()->getFlashdata('isCompleteFormEntitas') == false ? 'color: red' :  'color:green' ?>">Entitas</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link <?= request()->uri->getSegment(3) === "dokumen" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/dokumen/' . encrypt($lpb->id)) ?>">Dokumen</a>
+        <a class="nav-link <?= request()->uri->getSegment(3) === "dokumen" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/dokumen/' . encrypt($lpb->id)) ?>" style="<?= session()->getFlashdata('isCompleteFormDokumen') == false ? 'color: red' :  'color:green' ?>">Dokumen</a>
     </li>
     <li class="nav-item">
         <a class="nav-link <?= request()->uri->getSegment(3) === "pengangkut" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/pengangkut/' . encrypt($lpb->id)) ?>">Pengangkut</a>
