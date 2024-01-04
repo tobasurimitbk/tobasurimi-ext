@@ -242,7 +242,7 @@
         if (data.status == 'BELUM DIBUAT') {
             location.replace(`<?= base_url("bea-cukai-bc-23/id/header"); ?>/${data.penerimaan_barang_id}`);
         } else {
-            location.replace(`<?= base_url("bea-cukai-bc-23/id/header"); ?>/${data.penerimaan_barang_id}/bc-23-id/${data.id}`);
+            location.replace(`<?= base_url("bea-cukai-bc-23/id/header"); ?>/${data.penerimaan_barang_id}`);
         }
     });
 
