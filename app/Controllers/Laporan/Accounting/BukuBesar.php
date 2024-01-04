@@ -58,6 +58,9 @@ class BukuBesar extends BaseController
             ->findAll();
         $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");
         $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR("");
+        foreach ($dataHeaderAkun as $val) {
+            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
+        }
         $dataSubAkun = $this->Sub_AkunsModel->getAPAR("");
         // $dataJurnalUmum = $this->jurnalUmumModel->getDataJurnal($condition);
         $dataJurnalUmum = $this->jurnalUmumModel

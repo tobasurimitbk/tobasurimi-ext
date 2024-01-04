@@ -10,7 +10,7 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-12">
-                    <form method="post" action="<?= base_url('/laporan-accounting/bukubesar') ?>">
+                    <form method="post" action="<?= base_url('/laporan-accounting/bukubesar') ?>" class="create-form" role="form">
                         <?= csrf_field(); ?>
                         <div class="row">
                             <div class="col-md-3 mb-3">
@@ -29,9 +29,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-2 mb-3">
                                 <div class="input-group">
                                     <button type="submit" name="cariTanggal" class="btn btn-primary" value="cari">Cari</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select id_header" name="id_header" id="id_header">
+                                        <option value="">All</option>
+                                        <?php foreach ($dataHeaderAkun ?? [] as $HeaderAkunData) : ?>
+                                            <option value="<?= $HeaderAkunData->hexid; ?>" data-header-id=""><?= $HeaderAkunData->nama_header; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Filter</label>
                                 </div>
                             </div>
                         </div>
@@ -72,7 +83,7 @@
                                 foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
                                     if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
                             ?>
-                                        <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= $HeaderAkunData->id; ?>" aria-expanded="false">
+                                        <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= $HeaderAkunData->hexid; ?>" aria-expanded="false" data-header-id="<?= $HeaderAkunData->hexid; ?>">
                                             <td colspan="7"><i class="fas fa-chevron-down"></i><?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
                                         </tr>
 
@@ -104,7 +115,7 @@
                                         $totaldebit += $JurnalUmumData->debit;
                                         $totalkredit += $JurnalUmumData->kredit;
                                     ?>
-                                        <tr class="collapse_<?= $HeaderAkunData->id; ?> collapse out">
+                                        <tr class="collapse_<?= $HeaderAkunData->hexid; ?> collapse out">
                                             <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
                                             <td><?= $transaksi_format; ?></td>
                                             <td><?= $JurnalUmumData->no_transaksi; ?></td>
@@ -119,7 +130,7 @@
                                 foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
                                     if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
                                     ?>
-                                        <tr>
+                                        <tr data-header-id="<?= $HeaderAkunData->hexid; ?>">
                                             <td colspan="4" style="text-align: right;">Total <?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
                                             <td><?= format_ribuan($totaldebit); ?></td>
                                             <td><?= format_ribuan($totalkredit); ?></td>
@@ -165,6 +176,31 @@
             autoclose: true
         });
 
+        //CSS SELECT2 FLOATING LABEL
+        $('.id_header').select2({
+            placeholder: "Filter",
+            theme: "bootstrap-5"
+        });
+        $('.id_header')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.id_header')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.id_header')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         // Tambahkan event listener untuk mengatur dateStart saat dateEnd berubah
         $(".dateEnd").on("changeDate", function(e) {
             // Ambil tanggal yang dipilih pada dateEnd
@@ -188,6 +224,39 @@
                 $(targetClass).removeClass('in')
             }
             $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+        });
+
+        $("#id_header").change(function() {
+            var selectedValue = $(this).val();
+
+            // Show all rows initially
+            // $("tbody tr").show();
+
+            // Hide rows that don't match the selected value
+            if (selectedValue) {
+                // console.log(selectedValue);
+                $("tbody tr").each(function() {
+                    var headerIdValue = $(this).data('header-id');
+                    var targetClass = $(this).data('target');
+                    if (headerIdValue === selectedValue) {
+                        $(this).show();
+                        // if ($(targetClass).hasClass('out')) {
+                        //     $(targetClass).addClass('in')
+                        //     $(targetClass).removeClass('out')
+                        // } else {
+                        //     $(targetClass).addClass('out')
+                        //     $(targetClass).removeClass('in')
+                        // }
+                    } else {
+                        // console.log(headerIdValue);
+                        $(this).hide();
+                        if ($(targetClass).hasClass('in')) {
+                            $(targetClass).addClass('out')
+                            $(targetClass).removeClass('in')
+                        }
+                    }
+                });
+            }
         });
     });
 </script>
