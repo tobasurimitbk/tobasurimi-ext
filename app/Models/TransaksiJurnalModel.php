@@ -27,9 +27,9 @@ class TransaksiJurnalModel extends Model
     // Dates
     protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'createdAt';
-    protected $updatedField  = 'updatedAt';
-    protected $deletedField  = 'deletedAt';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 
     // Validation
     protected $validationRules      = [];
@@ -74,16 +74,8 @@ class TransaksiJurnalModel extends Model
 
     public function getNoTransaksiLast($type)
     {
-        if ($type == "penjualan") {
-            $transaksi_format = "SI-";
-        } else if ($type == "pembelian") {
-            $transaksi_format = "PI-";
-        } else if ($type == "penerimaan") {
-            $transaksi_format = "RP-";
-        } else if ($type == "biaya") {
-            $transaksi_format = "EXP-";
-        } else {
-            $transaksi_format = "SA-";
+        if ($type) {
+            $transaksi_format = $type . "-";
         }
 
         $query = $this->select('no_transaksi')

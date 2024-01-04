@@ -96,17 +96,6 @@
                                 $totalkredit = 0;
                                 foreach ($dataJurnalUmum as $JurnalUmumData) :
                                     if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
-                                        if ($JurnalUmumData->type_transaksi == "penjualan") {
-                                            $transaksi_format = "Sales Invoice";
-                                        } else if ($JurnalUmumData->type_transaksi == "pembelian") {
-                                            $transaksi_format = "Purchase Invoice";
-                                        } else if ($JurnalUmumData->type_transaksi == "penerimaan") {
-                                            $transaksi_format = "Receive Payment";
-                                        } else if ($JurnalUmumData->type_transaksi == "biaya") {
-                                            $transaksi_format = "Expense";
-                                        } else {
-                                            $transaksi_format = "Saldo Awal";
-                                        }
                                         if ($JurnalUmumData->debit == 0) {
                                             $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
                                         } else {
@@ -117,7 +106,7 @@
                                     ?>
                                         <tr class="collapse_<?= $HeaderAkunData->hexid; ?> collapse out">
                                             <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
-                                            <td><?= $transaksi_format; ?></td>
+                                            <td><?= $JurnalUmumData->value; ?></td>
                                             <td><?= $JurnalUmumData->no_transaksi; ?></td>
                                             <td><?= $JurnalUmumData->keterangan; ?></td>
                                             <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
@@ -228,11 +217,6 @@
 
         $("#id_header").change(function() {
             var selectedValue = $(this).val();
-
-            // Show all rows initially
-            // $("tbody tr").show();
-
-            // Hide rows that don't match the selected value
             if (selectedValue) {
                 // console.log(selectedValue);
                 $("tbody tr").each(function() {
@@ -240,15 +224,7 @@
                     var targetClass = $(this).data('target');
                     if (headerIdValue === selectedValue) {
                         $(this).show();
-                        // if ($(targetClass).hasClass('out')) {
-                        //     $(targetClass).addClass('in')
-                        //     $(targetClass).removeClass('out')
-                        // } else {
-                        //     $(targetClass).addClass('out')
-                        //     $(targetClass).removeClass('in')
-                        // }
                     } else {
-                        // console.log(headerIdValue);
                         $(this).hide();
                         if ($(targetClass).hasClass('in')) {
                             $(targetClass).addClass('out')

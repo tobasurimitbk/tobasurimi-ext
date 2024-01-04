@@ -68,6 +68,7 @@ class BukuBesar extends BaseController
             ->select('*, sub_akuns.header_id as id_header')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
             ->where($condition)
             ->findAll();
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
@@ -75,6 +76,7 @@ class BukuBesar extends BaseController
             ->select('*, sub_akuns.header_id as id_header')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
             ->where($condition)
             ->groupBy('id_header')
             ->findAll();

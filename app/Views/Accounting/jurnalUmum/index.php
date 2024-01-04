@@ -38,11 +38,15 @@
                         <label class="col-form-label">Type Transaksi</label>
                         <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" required="">
                             <option value="" data-code=""></option>
-                            <option value="penjualan" data-code="">Penjualan</option>
-                            <option value="pembelian" data-code="">Pembelian</option>
-                            <option value="penerimaan" data-code="">Penerimaan</option>
-                            <option value="biaya" data-code="">Biaya</option>
-                            <option value="saldoawal" data-code="">Saldo Awal</option>
+                            <?php
+                            if (!empty($dataMetadataTipeTransaksi)) {
+                                foreach ($dataMetadataTipeTransaksi as $Tipe) {
+                            ?>
+                                    <option value="<?= $Tipe->hexid; ?>"><?= $Tipe->value; ?></option>
+                            <?php
+                                }
+                            }
+                            ?>
                         </select>
                     </div>
                 </div>

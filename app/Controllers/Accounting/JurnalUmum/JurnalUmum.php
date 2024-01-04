@@ -7,6 +7,7 @@ use App\Models\AccountModuleModel;
 use App\Models\Sub_AkunsModel;
 use App\Models\JurnalUmumModel;
 use App\Models\TransaksiJurnalModel;
+use App\Models\MetadataModel;
 
 class JurnalUmum extends BaseController
 {
@@ -16,6 +17,7 @@ class JurnalUmum extends BaseController
     protected $jurnalUmumModel;
     protected $transaksiJurnalModel;
     protected $encrypter;
+    protected $MetadataModel;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class JurnalUmum extends BaseController
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
+        $this->MetadataModel = new MetadataModel();
         $this->encrypter = \Config\Services::encrypter();
     }
 
@@ -38,8 +41,17 @@ class JurnalUmum extends BaseController
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }
 
+        $dataMetadataTipeTransaksi = $this->MetadataModel
+            ->asObject()
+            ->where('name', 'tipe_transaksi')
+            ->findAll();
+        foreach ($dataMetadataTipeTransaksi as $val) {
+            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
+        }
+
         $data = [
             "dataAccountModule" => $accountModuleData,
+            "dataMetadataTipeTransaksi" => $dataMetadataTipeTransaksi,
             "subAkuns" => $subAkunsModel
         ];
 
@@ -83,15 +95,23 @@ class JurnalUmum extends BaseController
                     $total_debit += $debitValue;
                 }
             }
+            $kodeTransaksi = "";
+            $dataMetadataTipeTransaksi = $this->MetadataModel
+                ->asObject()
+                ->where('id', $this->encrypter->decrypt(hex2bin($this->request->getPost('type_transaksi'))))
+                ->findAll();
+            foreach ($dataMetadataTipeTransaksi as $val) {
+                $kodeTransaksi = $val->description;
+            }
 
-            $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($this->request->getPost('type_transaksi'));
+            $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
             $dataTransaksiJurnal = [
                 'no_transaksi' => $no_transaksi_jurnal,
                 'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
                 'total_debit' => $total_debit,
                 'total_kredit' => $total_credit,
                 'metode_input' => 'manual',
-                'type_transaksi' => $this->request->getPost('type_transaksi'),
+                'type_transaksi' => $this->encrypter->decrypt(hex2bin($this->request->getPost('type_transaksi'))),
             ];
             $this->jurnalUmumModel->insertJurnalBatch($result);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);

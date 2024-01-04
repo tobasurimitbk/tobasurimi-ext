@@ -29,9 +29,26 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-2 mb-3">
                                 <div class="input-group">
                                     <button type="submit" name="cariTanggal" class="btn btn-primary" value="cari">Cari</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi">
+                                        <option value="" data-code=""></option>
+                                        <?php
+                                        if (!empty($dataMetadataTipeTransaksi)) {
+                                            foreach ($dataMetadataTipeTransaksi as $Tipe) {
+                                        ?>
+                                                <option value="<?= $Tipe->hexid; ?>"><?= $Tipe->value; ?></option>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                    <label for="floatingInput">Filter</label>
                                 </div>
                             </div>
                         </div>
@@ -44,8 +61,8 @@
                     <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th colspan="2">Akun</th>
                                 <th colspan="2">Tanggal</th>
+                                <th colspan="2">Desc</th>
                                 <th>Debit</th>
                                 <th>Kredit</th>
                             </tr>
@@ -57,29 +74,47 @@
                                 $nilaiFloat = floatval($nilai);
                                 return "Rp " . number_format($nilaiFloat, 2, ',', '.');
                             }
-                            // kategori
-                            $total_debit  = 0;
-                            $total_kredit = 0;
-                            foreach ($dataJurnalUmum as $jurnalUmumData) :
-                                $total_debit  += $jurnalUmumData->debit;
-                                $total_kredit += $jurnalUmumData->kredit;
+                            foreach ($dataMetadataTipeTransaksi as $Tipe) :
+                                foreach ($dataTransaksiJurnal as $transaksiJurnalData) :
+                                    foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
+                                        if ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                             ?>
-                                <tr>
-                                    <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
-                                    <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumData->tanggal_jurnal)); ?></td>
-                                    <td><?= format_ribuan($jurnalUmumData->debit); ?></td>
-                                    <td><?= format_ribuan($jurnalUmumData->kredit); ?></td>
-                                </tr>
+                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>">
+                                                <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)); ?></td>
+                                                <td colspan="4"><?= $jurnalUmumWithGroupData->no_transaksi . " " . $jurnalUmumWithGroupData->value; ?></td>
+                                            </tr>
+                                        <?php
+                                        endif;
+                                    endforeach;
+                                    // kategori
+                                    $total_debit  = 0;
+                                    $total_kredit = 0;
+                                    foreach ($dataJurnalUmum as $jurnalUmumData) :
+                                        $total_debit  += $jurnalUmumData->debit;
+                                        $total_kredit += $jurnalUmumData->kredit;
+                                        if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
+                                        ?>
+                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>">
+                                                <td colspan="2"></td>
+                                                <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
+                                                <td class="yy"><?= format_ribuan($jurnalUmumData->debit); ?></td>
+                                                <td class="xx"><?= format_ribuan($jurnalUmumData->kredit); ?></td>
+                                            </tr>
                             <?php
+                                        endif;
+                                    endforeach;
+                                endforeach;
                             endforeach;
                             // akhir sub akun
                             ?>
+                        </tbody>
+                        <tfoot>
                             <tr>
                                 <td colspan="4"><strong>Total Transaksi</strong></td>
-                                <td><?= format_ribuan($total_debit); ?></td>
-                                <td><?= format_ribuan($total_kredit); ?></td>
+                                <td id="jumlahDebet"><?= format_ribuan($total_debit); ?></td>
+                                <td id="jumlahKredit"><?= format_ribuan($total_kredit); ?></td>
                             </tr>
-                        </tbody>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -125,7 +160,31 @@
 
         // Set nilai awal dateStart pada saat dokumen siap (document ready)
         $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
-        // $(".dateEnd").datepicker("setDate", new Date(currentDate));
+
+        $('.type_transaksi').select2({
+            placeholder: "Filter",
+            theme: "bootstrap-5"
+        });
+        $('.type_transaksi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.type_transaksi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.type_transaksi')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         $(".clickable").click(function(e) {
             e.preventDefault();
             var targetClass = $(this).data('target');
@@ -138,6 +197,49 @@
             }
             $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
         });
+
+        $("#type_transaksi").change(function() {
+            var selectedValue = $(this).val();
+            var inputsDebit = 0;
+            var inputsKredit = 0;
+            if (selectedValue) {
+                // Reset totalInputs menjadi 0 setiap kali dropdown berubah
+                totalInputsDebit = 0;
+                totalInputsKredit = 0;
+                $("tbody tr").each(function() {
+                    var headerIdValue = $(this).data('header-id');
+                    if (headerIdValue === selectedValue) {
+                        inputsDebit = $(this).find('.yy');
+                        inputsDebit.each(function() {
+                            var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                            totalInputsDebit += inputValue;
+                        });
+                        inputsKredit = $(this).find('.xx');
+                        inputsKredit.each(function() {
+                            var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                            totalInputsKredit += inputValue;
+                        });
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+                $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
+                $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
+            }
+        });
+
+
+        function formatRupiah(angka) {
+            angka = angka.replace(/\./g, ',');
+            angka = angka.replace(/[^\d,]/g, '');
+            var parts = angka.split(',');
+            var ribuan = parts[0];
+            var desimal = parts[1] || '00';
+            var reverse = ribuan.toString().split('').reverse().join('');
+            var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+            return 'Rp. ' + ribuanFormatted + ',' + desimal;
+        }
     });
 </script>
 
