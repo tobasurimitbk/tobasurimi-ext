@@ -40,24 +40,8 @@ class BC23PengangkutModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get($bc23ID)
+    public function get($penerimaanBarangID)
     {
-        $metaDataModel = new MetadataModel();
-
-        $result = [];
-        foreach ($this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll() as $r) {
-            $kodeCaraAngkut = $metaDataModel->bcMetaDataHelper("Pengangkutan", null, $r['kode_cara_angkut']);
-
-            $result[] = [
-                'id' => $r['id'],
-                'pengangkut_kode_bendera' => $r['kode_bendera'],
-                'pengangkut_kode_cara_angkut' => encrypt($r['kode_cara_angkut']),
-                'pengangkut_kode_cara_angkut_text' => $kodeCaraAngkut['description'] . ' (' . $kodeCaraAngkut['value'] . ')',
-                'pengangkut_nama_sarana_pengangkut' => $r['nama_sarana_pengangkut'],
-                'pengangkut_nomor_pengangkut' => $r['nomor_pengangkut'],
-                'pengangkut_seri_pengangkut' => $r['seri_pengangkut'],
-            ];
-        }
-        return $result;
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
     }
 }

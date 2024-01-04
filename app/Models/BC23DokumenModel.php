@@ -41,18 +41,11 @@ class BC23DokumenModel extends Model
     protected $afterDelete    = [];
 
 
-    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $limit = 10, $offset = 0)
     {
-        $availableSort = [
-            'bc_23_dokumen.nomor_dokumen' => 'bc_23_dokumen.nomor_dokumen',
-            'bc_23_dokumen.seri_dokumen' => 'bc_23_dokumen.seri_dokumen',
-            'bc_23_dokumen.tanggal_dokumen' => 'bc_23_dokumen.tanggal_dokumen',
-        ];
 
-        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_23_dokumen.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        $sort = 'bc_23_dokumen.createdAt';
+        $sortType = 'DESC';
 
         $selectQry = "bc_23_dokumen.*";
 
@@ -75,18 +68,8 @@ class BC23DokumenModel extends Model
         ];
     }
 
-    public function get($bc23ID)
+    public function get($penerimaanBarangID)
     {
-        $result = [];
-        foreach ($this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll() as $r) {
-            $result[] = [
-                'id' => $r['id'],
-                'dokumen_pelengkap_kode_dokumen' => "Dokumen Invoice (3)",
-                'dokumen_pelengkap_nomor_dokumen' => $r['kode_dokumen'],
-                'dokumen_pelengkap_seri_dokumen' => $r['seri_dokumen'],
-                'dokumen_pelengkap_tanggal_dokumen' => date('d/m/Y', strtotime($r['tanggal_dokumen']))
-            ];
-        }
-        return $result;
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
     }
 }

@@ -241,7 +241,7 @@ class BC23 extends BaseController
             ]);
         } else {
             // update
-            $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->update([
+            $bc23EntitasModel->update($lastData['id'], [
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
@@ -305,11 +305,6 @@ class BC23 extends BaseController
             "bc_23_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
         ];
 
-        $addCondition = [
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-        ];
-
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
@@ -317,7 +312,7 @@ class BC23 extends BaseController
         $metaDataModel = new MetadataModel();
 
 
-        $beaCukaiDokumen = $bc23DokumenModel->getList($condition, $addCondition, $limit, $offset);
+        $beaCukaiDokumen = $bc23DokumenModel->getList($condition, $limit, $offset);
         $resDokumen = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
@@ -386,6 +381,8 @@ class BC23 extends BaseController
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
         $countryModel = new CountryModel();
+        $bc23Model = new BC23Model();
+        $bc23PengangkutModel = new BC23PengangkutModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
@@ -400,20 +397,93 @@ class BC23 extends BaseController
         $data = [
             'kodePengangkutan' => $metaDataModel->where('name', "Pengangkutan")->findAll(),
             'kodeBendera' => $countryModel->findAll(),
+            'bc23' => $bc23Model->get($penerimaanBarangID),
+            'bc23Pengangkut' => $bc23PengangkutModel->get($penerimaanBarangID),
             'lpb' => $lpb
         ];
 
         return view('BeaCukai/bc-23/form-pengangkut', $data);
     }
 
+    public function createPengangkutAction()
+    {
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bc23Model = new BC23Model();
+        $bc23PengangkutModel = new BC23PengangkutModel();
+
+        $lastDataBC23 = $bc23Model->get($penerimaanBarangID);
+        $lastPengangkutBC23 = $bc23PengangkutModel->get($penerimaanBarangID);
+
+        if ($lastDataBC23 == null) {
+            // insert
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            // insert
+            $bc23Model->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_no_lokal' => $bc23Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+
+                'no_bc_11' => $this->request->getVar('bc_11_no_bc_11'),
+                'tanggal_bc_11' => $this->request->getVar('bc_11_tanggal_bc_11') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('bc_11_tanggal_bc_11')), "Y-m-d") : "",
+                'pos_bc_11' => $this->request->getVar('bc_11_pos_bc_11'),
+                'sub_pos_bc_11' => $this->request->getVar('bc_11_sub_pos_bc_11'),
+                'sub_pos_pos_bc_11' => $this->request->getVar('bc_11_sub_sub_pos_bc_11'),
+                'kode_pelabuhan_muat' => $this->request->getVar('pengangkutan_pelabuhan_muat'),
+                'kode_pelabuhan_transit' => $this->request->getVar('pengangkutan_pelabuhan_transit'),
+                'kode_tps' => $this->request->getVar('pengangkutan_tempat_penimbunan')
+            ]);
+        } else {
+            // update
+            $bc23Model->update($lastDataBC23['id'], [
+                'no_bc_11' => $this->request->getVar('bc_11_no_bc_11'),
+                'tanggal_bc_11' => $this->request->getVar('bc_11_tanggal_bc_11') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('bc_11_tanggal_bc_11')), "Y-m-d") : "",
+                'pos_bc_11' => $this->request->getVar('bc_11_pos_bc_11'),
+                'sub_pos_bc_11' => $this->request->getVar('bc_11_sub_pos_bc_11'),
+                'sub_pos_pos_bc_11' => $this->request->getVar('bc_11_sub_sub_pos_bc_11'),
+                'kode_pelabuhan_muat' => $this->request->getVar('pengangkutan_pelabuhan_muat'),
+                'kode_pelabuhan_transit' => $this->request->getVar('pengangkutan_pelabuhan_transit'),
+                'kode_tps' => $this->request->getVar('pengangkutan_tempat_penimbunan')
+            ]);
+        }
+
+        if ($lastPengangkutBC23 == null) {
+            $bc23PengangkutModel->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
+                'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
+                'nomor_pengangkut' => $this->request->getVar('pengangkutan_nomor_pengangkut'),
+                'kode_bendera' => decrypt($this->request->getVar('pengangkutan_kode_bendera')),
+            ]);
+        } else {
+            $bc23PengangkutModel->update($lastPengangkutBC23['id'], [
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
+                'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
+                'nomor_pengangkut' => $this->request->getVar('pengangkutan_nomor_pengangkut'),
+                'kode_bendera' => decrypt($this->request->getVar('pengangkutan_kode_bendera')),
+            ]);
+        }
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Pengangkut berhasil diupdate",
+        ]);
+    }
+
     public function createKemasanPetiKemas($penerimaanBarangID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
+        $bc23KemasanModel = new BC23KemasanModel();
+        $bc23KontainerModel = new BC23KontainerModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $kemasanLast = $bc23KemasanModel->getLast($penerimaanBarangID);
+        $kontainerLast = $bc23KontainerModel->getLast($penerimaanBarangID);
+
 
         if ($lpb == null || $lpb->bc_type != "BC 2.3") {
             return redirect()->to('bea-cukai-bc-23');
@@ -426,10 +496,199 @@ class BC23 extends BaseController
             'kodeTipeKontainer' => $metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
             'kodeUkuranKontainer' => $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
             'kodeJenisKontainer' => $metaDataModel->where('name', "Jenis Kontainer")->findAll(),
+            'seriKemasan' => $kemasanLast == null ? 1 : $kemasanLast['seri_kemasan'] + 1,
+            'seriKontainer' => $kontainerLast == null ? 1 : $kontainerLast['seri_kontainer'] + 1,
             'lpb' => $lpb
         ];
 
         return view('BeaCukai/bc-23/form-kemasan-peti-kemas', $data);
+    }
+
+    public function allKemasan()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $condition = [
+            "bc_23_kemasan.deletedAt"  => null,
+            "bc_23_kemasan.penerimaan_barang_id" => $penerimaanBarangID,
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $bc23KemasanModel = new BC23KemasanModel();
+        $metaDataModel = new MetadataModel();
+
+        $bc23Kemasan = $bc23KemasanModel->getList($condition, $limit, $offset);
+        $resKemasan = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($bc23Kemasan['data'] as $data) {
+            $kemasan = $metaDataModel->where('name', 'Jenis Kemasan')->where('description', $data->kode_jenis_kemasan)->first();
+            array_push($resKemasan, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "jumlah_kemasan"        => $data->jumlah_kemasan,
+                "kode_jenis_kemasan"    => $data->kode_jenis_kemasan . ' - ' . $kemasan['value'],
+                "merk_kemasan"          => $data->merk_kemasan,
+                "seri_kemasan"          => $data->seri_kemasan
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $bc23Kemasan['totalData'],
+            "recordsFiltered"   => $bc23Kemasan['totalFilteredData'],
+            "data"              => $resKemasan,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function allKontainer()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $condition = [
+            "bc_23_kontainer.deletedAt"  => null,
+            "bc_23_kontainer.penerimaan_barang_id" => $penerimaanBarangID,
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $bc23KontainerModel = new BC23KontainerModel();
+        $metaDataModel = new MetadataModel();
+
+        $bc23Kontainer = $bc23KontainerModel->getList($condition, $limit, $offset);
+        $resKontainer = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($bc23Kontainer['data'] as $data) {
+            $ukuranKontainer = $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->where('value', $data->kode_ukuran_kontainer)->first();
+            $jenisKontainer = $metaDataModel->where('name', "Jenis Kontainer")->where('description', $data->kode_jenis_kontainer)->first();
+            $tipeKontainer = $metaDataModel->where('name', "Kode Tipe Kontainer BC")->where('value', $data->kode_tipe_kontainer)->first();
+
+            array_push($resKontainer, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "kode_tipe_kontainer"   => $data->kode_tipe_kontainer . ' - ' . $tipeKontainer['description'],
+                "kode_ukuran_kontainer" => $ukuranKontainer['description'],
+                "nomor_kontainer"       => $data->nomor_kontainer,
+                "seri_kontainer"        => $data->seri_kontainer,
+                "kode_jenis_kontainer"  => $data->kode_jenis_kontainer . ' - ' . $jenisKontainer['value']
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $bc23Kontainer['totalData'],
+            "recordsFiltered"   => $bc23Kontainer['totalFilteredData'],
+            "data"              => $resKontainer,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function createKemasanAction()
+    {
+        $bc23KemasanModel = new BC23KemasanModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $bc23KemasanModel->insert([
+            'penerimaan_barang_id' => $penerimaanBarangID,
+            'seri_kemasan' => $this->request->getVar('kemasan_seri_kemasan'),
+            'jumlah_kemasan' => $this->request->getVar('kemasan_jumlah_kemasan'),
+            'kode_jenis_kemasan' => decrypt($this->request->getVar('kemasan_jenis_kemasan')),
+            'merk_kemasan' => $this->request->getVar('kemasan_merk_kemasan')
+        ]);
+
+        $kemasanLast = $bc23KemasanModel->getLast($penerimaanBarangID);
+
+        return response()->setJSON([
+            'status' => true,
+            'kemasan_seri_kemasan' => $kemasanLast != null ? $kemasanLast['seri_kemasan'] + 1 : 1,
+            'token' => csrf_hash(),
+            'message' => "Kemasan berhasil ditambahkan"
+        ]);
+    }
+
+    public function deleteKemasanAction()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $bc23KemasanModel = new BC23KemasanModel();
+        $penerimaanBarangID = $bc23KemasanModel->find($id)['penerimaan_barang_id'];
+        $bc23KemasanModel->delete($id);
+
+        $kemasanLast = $bc23KemasanModel->getLast($penerimaanBarangID);
+
+        return response()->setJSON([
+            'status' => true,
+            'kemasan_seri_kemasan' => $kemasanLast != null ? $kemasanLast['seri_kemasan'] + 1 : 1,
+            'token' => csrf_hash(),
+            'message' => "Kemasan berhasil dihapus"
+        ]);
+    }
+
+    public function createKontainerAction()
+    {
+        $bc23KontainerModel = new BC23KontainerModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $bc23KontainerModel->insert([
+            'penerimaan_barang_id' => $penerimaanBarangID,
+            'nomor_kontainer' => $this->request->getVar('kontainer_nomor'),
+            'kode_ukuran_kontainer' => decrypt($this->request->getVar('kontainer_ukuran')),
+            'kode_jenis_kontainer' => decrypt($this->request->getVar('kontainer_jenis')),
+            'kode_tipe_kontainer' => decrypt($this->request->getVar('kontainer_tipe')),
+            'seri_kontainer' => $this->request->getVar('kontainer_seri')
+        ]);
+
+        $kontainerLast = $bc23KontainerModel->getLast($penerimaanBarangID);
+
+        return response()->setJSON([
+            'status' => true,
+            'kontainer_seri' => $kontainerLast != null ? $kontainerLast['seri_kontainer'] + 1 : 1,
+            'token' => csrf_hash(),
+            'message' => "Kontainer berhasil ditambahkan"
+        ]);
+    }
+
+    public function deleteKontainerAction()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $bc23KontainerModel = new BC23KontainerModel();
+        $penerimaanBarangID = $bc23KontainerModel->find($id)['penerimaan_barang_id'];
+        $bc23KontainerModel->delete($id);
+
+        $kontainerLast = $bc23KontainerModel->getLast($penerimaanBarangID);
+
+        return response()->setJSON([
+            'status' => true,
+            'kontainer_seri' => $kontainerLast != null ? $kontainerLast['seri_kontainer'] + 1 : 1,
+            'token' => csrf_hash(),
+            'message' => "Kontainer berhasil dihapus"
+        ]);
     }
 
     public function createTransaksiView($penerimaanBarangID)
@@ -587,11 +846,15 @@ class BC23 extends BaseController
         $isCompleteFormHeader = $bc23Model->isCompleteFormHeader($penerimaanBarangID);
         $isCompleteFormEntitas = $bc23Model->isCompleteFormEntitas($penerimaanBarangID);
         $isCompleteFormDokumen = $bc23Model->isCompleteFormDokumen($penerimaanBarangID);
+        $isCompleteFormPengangkut = $bc23Model->isCompleteFormPengangkut($penerimaanBarangID);
+        $isCompleteFormPetiKemas = $bc23Model->isCompleteFormPetiKemas($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
         session()->setFlashdata('isCompleteFormEntitas', $isCompleteFormEntitas);
         session()->setFlashdata('isCompleteFormDokumen', $isCompleteFormDokumen);
+        session()->setFlashdata('isCompleteFormPengangkut', $isCompleteFormPengangkut);
+        session()->setFlashdata('isCompleteFormPetiKemas', $isCompleteFormPetiKemas);
     }
 
 

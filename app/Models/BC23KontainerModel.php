@@ -40,27 +40,35 @@ class BC23KontainerModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get($bc23ID)
+    public function getList($condition, $limit = 10, $offset = 0)
     {
-        $metaDataModel = new MetadataModel();
 
-        $result = [];
-        foreach ($this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll() as $r) {
-            $kodeJenisKontainer = $metaDataModel->bcMetaDataHelper("Jenis Kontainer", null, $r['kode_jenis_kontainer']);
-            $kodeTipeKontainer = $metaDataModel->bcMetaDataHelper("Kode Tipe Kontainer BC", $r['kode_tipe_kontainer'], null);
-            $kodeUkuranKontainer = $metaDataModel->bcMetaDataHelper("Kode Ukuran Kontainer BC", $r['kode_ukuran_kontainer'], null);
-            $result[] = [
-                'id' => $r['id'],
-                'kontainer_kode_jenis_kontainer' => encrypt($r['kode_jenis_kontainer']),
-                'kontainer_kode_jenis_kontainer_text' => $kodeJenisKontainer['description'] . ' (' . $kodeJenisKontainer['value'] . ')',
-                'kontainer_kode_tipe_kontainer' => encrypt($r['kode_tipe_kontainer']),
-                'kontainer_kode_tipe_kontainer_text' => $kodeTipeKontainer['value'] . ' (' . $kodeTipeKontainer['description'] . ')',
-                'kontainer_kode_ukuran_kontainer' => encrypt($r['kode_ukuran_kontainer']),
-                'kontainer_kode_ukuran_kontainer_text' => $kodeUkuranKontainer['value'] . ' (' . $kodeUkuranKontainer['description'] . ')',
-                'kontainer_nomor_kontainer' => $r['nomor_kontainer'],
-                'kontainer_seri_kontainer' => $r['seri_kontainer'],
-            ];
-        }
-        return $result;
+        $sort = 'bc_23_kontainer.createdAt';
+        $sortType = 'DESC';
+
+        $selectQry = "bc_23_kontainer.*";
+
+        $pinjamanQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $pinjamanQry->countAllResults(false);
+
+        $totalFilteredData = $pinjamanQry->countAllResults(false);
+        $data = $pinjamanQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getLast($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
     }
 }

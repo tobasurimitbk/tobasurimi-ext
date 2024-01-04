@@ -295,26 +295,29 @@ class BC23Model extends Model
     public function isCompleteFormEntitas($penerimaanBarangID)
     {
         $bc23EntitasModel = new BC23EntitasModel();
-        $isCompleteForm = false;
-        $data = $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
-        if ($data == null) {
-            $isCompleteForm = false;
-        } else {
-            $isCompleteForm = true;
-        }
-        return $isCompleteForm;
+        return $bc23EntitasModel->get($penerimaanBarangID) == null ? false : true;
     }
 
     public function isCompleteFormDokumen($penerimaanBarangID)
     {
         $bc23DokumenModel = new BC23DokumenModel();
-        $isCompleteForm = false;
-        $data = $bc23DokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
-        if ($data == null) {
-            $isCompleteForm = false;
-        } else {
-            $isCompleteForm = true;
-        }
-        return $isCompleteForm;
+        return $bc23DokumenModel->get($penerimaanBarangID) == null ? false : true;
+    }
+
+    public function isCompleteFormPengangkut($penerimaanBarangID)
+    {
+        $bc23PengangkutModel = new BC23PengangkutModel();
+        return $bc23PengangkutModel->get($penerimaanBarangID) == null ? false : true;
+    }
+
+    public function isCompleteFormPetiKemas($penerimaanBarangID)
+    {
+        $bc23KontainerModel = new BC23KontainerModel();
+        $bc23KemasanModel = new BC23KemasanModel();
+
+        $kontainer = $bc23KontainerModel->getLast($penerimaanBarangID) != null ? true : false;
+        $kemasan = $bc23KemasanModel->getLast($penerimaanBarangID) != null ? true : false;
+
+        return $kontainer && $kemasan;
     }
 }
