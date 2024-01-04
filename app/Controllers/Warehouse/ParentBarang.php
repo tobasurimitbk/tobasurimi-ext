@@ -51,7 +51,7 @@ class ParentBarang extends BaseController
         $parentBarangModel->insert([
             'parent_type' => ($type == "") ? "bahan_baku" : $type,
             'parent_name' => $parentName,
-            'kategori' => $kategori,
+            'kategori' => decrypt($kategori),
             'company_id' => $this->this_company_id
         ]);
 
@@ -67,11 +67,11 @@ class ParentBarang extends BaseController
         $parentBarangModel = new ParentBarangModel();
         $parentName = $this->request->getVar('parentName');
         $kategori = $this->request->getVar('kategori');
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
 
         $parentBarangModel->update($id, [
             'parent_name' => $parentName,
-            'kategori' => $kategori
+            'kategori' => decrypt($kategori)
         ]);
 
         return response()->setJSON([
@@ -84,7 +84,7 @@ class ParentBarang extends BaseController
     public function delete()
     {
         $parentBarangModel = new ParentBarangModel();
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
 
         $rememberName = $parentBarangModel->where('id', $id)->first()['parent_name'];
         $parentBarangModel->update($id, [
@@ -100,11 +100,13 @@ class ParentBarang extends BaseController
 
     public function get()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $parentBarangModel = new ParentBarangModel();
+        $res = $parentBarangModel->where('id', $id)->first();
+        $res['kategori'] = encrypt($res['kategori']);
 
         return response()->setJSON([
-            'data' => $parentBarangModel->where('id', $id)->first(),
+            'data' => $res,
             'token' => csrf_hash(),
             'status' => true,
         ]);
@@ -146,7 +148,7 @@ class ParentBarang extends BaseController
         foreach ($res['data'] as $data) {
             array_push($rdata, [
                 "no"                    => $no++,
-                "id"                    => $data['id'],
+                "id"                    => encrypt($data['id']),
                 "parent_name"           => $data['parent_name'],
                 "kategori"              => $data['kategori'] == null ? "-" : $data['kategori'],
             ]);
@@ -158,7 +160,6 @@ class ParentBarang extends BaseController
             "recordsFiltered"   => $res['totalFilteredData'],
             "data"              => $rdata,
             "payload"           => $payload,
-            "test" => $_GET
         ];
 
         return response()->setJSON($data);

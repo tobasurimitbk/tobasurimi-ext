@@ -8,23 +8,13 @@
 </style>
 
 <section class="section section-form">
-    <div class="section-header">
-        <h1 class="title-name">Dokumen BC 2.3</h1>
-        <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-23"); ?>">
-                Batal
-            </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
-                Simpan
-            </button>
+    <?php include('header.php') ?>
+    <div class="card">
+        <div class="card-header" style="font-weight: bold; color:black;">
+            BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
         </div>
-    </div>
-
-    <div class="root-form-view">
-        <div class="card">
-            <div class="card-header" style="font-weight: bold; color:black;">
-                BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
-            </div>
+        <?= csrf_field() ?>
+        <form id="form-dokumen">
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <div class="row mt-3">
@@ -64,7 +54,7 @@
                     <div class="col-md-6">
                         <div class="row" style="float: right; margin-bottom:5px;">
                             <div class="col-sm" style="margin-right: -20px;">
-                                <button type="button" class="btn btn-add btn-block float-right btn-submit-informasi-pengangkut" style="float: right;">
+                                <button type="button" class="btn btn-add btn-block float-right btn-submit-dokumen" style="float: right;">
                                     <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                                 </button>
                             </div>
@@ -76,7 +66,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-dokumen" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center; width:10px;">No</th>
+                                <th style="text-align: center;">Seri Dokumen</th>
                                 <th style="text-align: center;">Jenis Dokumen</th>
                                 <th style="text-align: center;">Nomor Dokumen</th>
                                 <th style="text-align: center;">Tanggal</th>
@@ -87,14 +77,18 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
-        </div>
+        </form>
+
     </div>
 
 </section>
 
 <script>
+    // CSRF
+    const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
+
     $('#dokumen_jenis_dokumen').select2({
         placeholder: "Pilih Jenis Dokumen",
         theme: "bootstrap-5",
@@ -116,15 +110,29 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
     // TABEL LIST DOKUMEN
-    var tableListInformasiDokumen = $('.table-list-informasi-dokumen').DataTable({
+    const tableListInformasiDokumen = $('.table-list-informasi-dokumen').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
+        processing: true,
+        serverSide: true,
         ordering: false,
-        order: [],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("bea-cukai-bc-23/id/dokumen/data/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
+                data.sort = "bc_23_dokumen.createdAt";
+                data.sortType = "DESC";
+            }
+        },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
             $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
@@ -132,8 +140,50 @@
         },
         display: "stripe",
         searching: false,
+        columns: [
+
+            {
+                data: "seri_dokumen",
+                searchable: false,
+                sortable: false,
+                className: "text-center",
+            },
+            {
+                data: "id_dokumen",
+                searchable: false,
+                sortable: false,
+                className: "text-center",
+            },
+            {
+                data: "nomor_dokumen",
+                searchable: false,
+                sortable: false,
+                className: "text-center"
+            },
+            {
+                data: "tanggal_dokumen",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    return `<button type="button" class="btn btn-danger" onclick="removeDokumen('${row?.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
+                }
+            }
+
+
+        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
         language: {
-            emptyTable: "Tidak Ada Data",
+            emptyTable: "Tidak ada dokumen",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
@@ -141,6 +191,134 @@
             }
         }
     });
+
+    var validatorDokumen = $("#form-dokumen").validate({
+        rules: {
+            dokumen_jenis_dokumen: {
+                required: true
+            },
+            dokumen_nomor_dokumen: {
+                required: true
+            },
+            dokumen_tanggal: {
+                required: true
+            },
+        },
+        messages: {
+            dokumen_jenis_dokumen: {
+                required: "Pilih jenis dokumen"
+            },
+            dokumen_nomor_dokumen: {
+                required: "Nomor dokumen wajib diisi"
+            },
+            dokumen_tanggal: {
+                required: "Tanggal dokumen wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('.btn-submit-dokumen').click(function() {
+        if ($('#form-dokumen').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Dokumen ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData(document.querySelector("#form-dokumen"));
+                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    $.ajax({
+                        url: "<?= base_url("bea-cukai-bc-23/id/dokumen/create"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                csrf.val(response.token);
+                                tableListInformasiDokumen.ajax.reload();
+                                $('#dokumen_jenis_dokumen').val(null).change();
+                                $('#dokumen_nomor_dokumen').val('');
+                                $('#dokumen_tanggal').val('');
+                            }
+                        },
+                    });
+                }
+            })
+        }
+    });
+
+    function removeDokumen(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Dokumen ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("bea-cukai-bc-23/id/dokumen/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            tableListInformasiDokumen.ajax.reload();
+                        }
+                    },
+                });
+            }
+        })
+
+    }
 </script>
 
 

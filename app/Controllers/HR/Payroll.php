@@ -535,6 +535,12 @@ class Payroll extends BaseController
     {
         $dompdf = new Dompdf();
 
+        if (is_numeric($payrollID)) {
+            $payrollID = $payrollID;
+        } else {
+            $payrollID = decrypt($payrollID);
+        }
+
         // set model
         $payrollModel = new PayrollsModel();
         $employeeModel = new EmployeesModel();

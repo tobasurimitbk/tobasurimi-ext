@@ -21,6 +21,12 @@ class City extends BaseController
     {
         $dataCity = [];
 
+        if (is_numeric($id)) {
+            $id = $id;
+        } else {
+            $id = decrypt($id);
+        }
+
         $res = $this->CitiesModel->get_by_province_id($id);
 
         $data = [

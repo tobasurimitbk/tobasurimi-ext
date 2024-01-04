@@ -139,7 +139,9 @@ class Attendance extends BaseController
 
         // get attendance Total (ngecek apakah sudah digenerate belum)
         $totalAttendances = $AttendanceModel->where('year_month', $year . "-" . $month)
-            ->where('company_id', $this->this_company_id)
+            ->join('employees', 'employees.id = attendances.employee_id')
+            ->where('employees.deletedAt', null)
+            ->where('attendances.company_id', $this->this_company_id)
             ->countAllResults();
 
         $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination(

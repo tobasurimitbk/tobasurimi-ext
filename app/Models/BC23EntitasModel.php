@@ -40,27 +40,32 @@ class BC23EntitasModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get($bc23ID)
-    {
-        $metaDataModel = new MetadataModel();
+    // public function get($bc23ID)
+    // {
+    //     $metaDataModel = new MetadataModel();
 
-        $result = [];
-        foreach ($this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll() as $r) {
-            $kodeJenisIdentitas = $metaDataModel->bcMetaDataHelper("Jenis Identitas", null, $r['kode_jenis_entitas']);
-            $result[] = [
-                'id' => $r['id'],
-                'entitas_alamat_entitas' => $r['alamat_entitas'],
-                'entitas_kode_entitas' => "Pengusaha (3)",
-                'entitas_kode_jenis_identitas' => encrypt($r['kode_jenis_entitas']),
-                'entitas_kode_jenis_identitas_text' => $kodeJenisIdentitas['description'] . ' (' . $kodeJenisIdentitas['value'] . ')',
-                'entitas_nama_entitas' => $r['nama_entitas'],
-                'entitas_nib_entitas' => $r['nib_entitas'],
-                'entitas_nomor_identitas' => $r['nomor_identitas'],
-                'entitas_nomor_ijin_entitas' => $r['nomor_ijin_entitas'],
-                'entitas_seri_entitas' => $r['seri_entitas'],
-                'entitas_tanggal_ijin_entitas' => date('d/m/Y', strtotime($r['tanggal_ijin_entitas']))
-            ];
-        }
-        return $result;
+    //     $result = [];
+    //     foreach ($this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll() as $r) {
+    //         $kodeJenisIdentitas = $metaDataModel->bcMetaDataHelper("Jenis Identitas", null, $r['kode_jenis_entitas']);
+    //         $result[] = [
+    //             'id' => $r['id'],
+    //             'entitas_alamat_entitas' => $r['alamat_entitas'],
+    //             'entitas_kode_entitas' => "Pengusaha (3)",
+    //             'entitas_kode_jenis_identitas' => encrypt($r['kode_jenis_entitas']),
+    //             'entitas_kode_jenis_identitas_text' => $kodeJenisIdentitas['description'] . ' (' . $kodeJenisIdentitas['value'] . ')',
+    //             'entitas_nama_entitas' => $r['nama_entitas'],
+    //             'entitas_nib_entitas' => $r['nib_entitas'],
+    //             'entitas_nomor_identitas' => $r['nomor_identitas'],
+    //             'entitas_nomor_ijin_entitas' => $r['nomor_ijin_entitas'],
+    //             'entitas_seri_entitas' => $r['seri_entitas'],
+    //             'entitas_tanggal_ijin_entitas' => date('d/m/Y', strtotime($r['tanggal_ijin_entitas']))
+    //         ];
+    //     }
+    //     return $result;
+    // }
+
+    public function get($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
     }
 }

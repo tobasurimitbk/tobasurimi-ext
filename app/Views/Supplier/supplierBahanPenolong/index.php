@@ -184,6 +184,18 @@
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).change(function() {
+        var code = $(this).val();
+        if (code === "ID") {
+            $('.province_parent_id').attr('disabled', false);
+            $('.city_parent_id').attr('disabled', false);
+        } else {
+            $('.province_parent_id').attr('disabled', true);
+            $('.city_parent_id').attr('disabled', true);
+            $('.province_parent_id').val(null).change();
+            $('.city_parent_id').val(null).change();
+        }
+
     });
 
     //CSS SELECT2 FLOATING LABEL
@@ -200,7 +212,7 @@
         .children('span')
         .children('span')
         .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+        .css('margin-top', '22px').css('margin-left', '1px');
 
     $('.form-select')
         .parent('div')

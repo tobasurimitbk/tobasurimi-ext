@@ -15,7 +15,6 @@ class Barang extends BaseController
 {
     protected $this_company_id;
     private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap;
-    protected $encrypter;
 
     public function __construct()
     {
@@ -24,7 +23,6 @@ class Barang extends BaseController
         $this->kodeBahanPenolong = "BP";
         $this->kodeBahanJadi = "BJ";
         $this->kodeBahanScrap = "BS";
-        $this->encrypter = \Config\Services::encrypter();
     }
 
     public function bahanBakuView()
@@ -60,9 +58,6 @@ class Barang extends BaseController
         $divisisModel = new DivisisModel();
         $divisisModelData = $divisisModel->asObject()->where('deletedAt', null)->findAll();
 
-        foreach ($divisisModelData as $val) {
-            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
-        }
         $data = [
             'type' => "bahan_jadi",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_jadi")->where('deletedAt', null)->findAll(),
@@ -91,11 +86,24 @@ class Barang extends BaseController
         $barangModel = new BarangMasterModel();
         $type = $this->request->getVar('type');
 
+        $barang = $barangModel->where('kode_barang', $this->request->getVar('kode_barang'))
+            ->where('type_barang', $type)
+            ->where('deletedAt', null)
+            ->first();
+
+        if ($barang != null) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Kode barang sudah ada"
+            ]);
+        }
+
         $barangModel->insert([
             'company_id' => $this->this_company_id,
-            'satuan_id' => $this->request->getVar('satuan_id'),
-            'parent_type_id' => $this->request->getVar('parent_type_id'),
-            'divisi_id' => $this->request->getVar('divisi_id') ? $this->encrypter->decrypt(hex2bin($this->request->getVar('divisi_id'))) : null,
+            'satuan_id' => decrypt($this->request->getVar('satuan_id')),
+            'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
+            'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
@@ -106,22 +114,22 @@ class Barang extends BaseController
 
         return response()->setJSON([
             'status' => true,
-            'token' => \csrf_hash(),
+            'token' => csrf_hash(),
             'message' => "Barang baru berhasil ditambahkan"
         ]);
     }
 
     public function update()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $barangModel = new BarangMasterModel();
         $type = $this->request->getVar('type');
 
         $barangModel->update($id, [
             'company_id' => $this->this_company_id,
-            'satuan_id' => $this->request->getVar('satuan_id'),
-            'parent_type_id' => $this->request->getVar('parent_type_id'),
-            'divisi_id' => $this->request->getVar('divisi_id') ? $this->encrypter->decrypt(hex2bin($this->request->getVar('divisi_id'))) : null,
+            'satuan_id' => decrypt($this->request->getVar('satuan_id')),
+            'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
+            'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
@@ -130,15 +138,15 @@ class Barang extends BaseController
         ]);
 
         return response()->setJSON([
-            'status' => \true,
-            'token' => \csrf_hash(),
+            'status' => true,
+            'token' => csrf_hash(),
             'message' => "Barang baru berhasil diupdate"
         ]);
     }
 
     public function delete()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $barangModel = new BarangMasterModel();
 
         $barangModel->update($id, [
@@ -148,18 +156,24 @@ class Barang extends BaseController
         return response()->setJSON([
             'status' => true,
             'message' => "Barang berhasil dihapus",
-            'token' => \csrf_hash()
+            'token' => csrf_hash()
         ]);
     }
 
     public function get()
     {
         $barangModel = new BarangMasterModel();
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
+        $res = $barangModel->where('id', $id)->where('deletedAt', null)->first();
+        $res['id'] = encrypt($res['id']);
+        $res['company_id'] = encrypt($res['company_id']);
+        $res['satuan_id'] = encrypt($res['satuan_id']);
+        $res['parent_type_id'] = encrypt($res['parent_type_id']);
+        $res['divisi_id'] = encrypt($res['divisi_id']);
 
-        return \response()->setJSON([
-            'token' => \csrf_hash(),
-            'data' => $barangModel->where('id', $id)->where('deletedAt', null)->first()
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'data' => $res,
         ]);
     }
 
@@ -202,7 +216,7 @@ class Barang extends BaseController
             $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "Import", $this->this_company_id);
             array_push($rdata, [
                 "no"                    => $no++,
-                "id"                    => $data['id'],
+                "id"                    => encrypt($data['id']),
                 "kelompok_barang"       => $data['kelompok_barang'],
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => $data['barang_name'],
@@ -265,7 +279,8 @@ class Barang extends BaseController
 
             return response()->setJSON([
                 'codeNew' => $codeName . "-" . $newIncrement,
-                'token' => csrf_hash()
+                'token' => csrf_hash(),
+
             ]);
         } catch (Exception $e) {
             return response()->setJSON([

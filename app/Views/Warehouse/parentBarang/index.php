@@ -69,7 +69,7 @@
                             <select class="form-select" id="kategori" name="kategori">
                                 <option value="">Pilih Kategori</option>
                                 <?php foreach ($kategoriBP as $k) : ?>
-                                    <option value="<?= $k['value'] ?>">
+                                    <option value="<?= encrypt($k['value']) ?>">
                                         <?= $k['value'] ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -323,6 +323,7 @@
                                 contentType: false,
                                 success: function(response) {
                                     csrf.val(response.token);
+                                    $('#id').val('');
                                     if (response.status) {
                                         Swal.fire({
                                                 icon: 'success',

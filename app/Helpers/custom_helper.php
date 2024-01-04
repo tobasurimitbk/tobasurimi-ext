@@ -306,6 +306,7 @@ function can($menuName, $childMenuName, $access = [])
 
 function convertBulanToAngkaRomawi($bulanInteger)
 {
+   $bulanInteger = (int)$bulanInteger;
    $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
    if ($bulanInteger >= 1 && $bulanInteger <= 12) {
       return $romawi[$bulanInteger];

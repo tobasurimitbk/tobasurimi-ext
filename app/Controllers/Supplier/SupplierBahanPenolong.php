@@ -69,7 +69,7 @@ class SupplierBahanPenolong extends BaseController
         foreach ($supplierData['data'] as $data) {
             array_push($dataSupplier, [
                 "no"            => $no++,
-                "id"            => $data->id,
+                "id"            => encrypt($data->id),
                 "kode"          => $data->kode,
                 "name"          => $data->name,
                 "address"       => $data->address,
@@ -180,7 +180,7 @@ class SupplierBahanPenolong extends BaseController
 
             $supplierCode = $this->request->getPost("kode");
             if ($supplierCode == 'AUTO GENERATE') {
-                $supplierCode = $supplierModel->generateSupplierCode();
+                $supplierCode = "";
             }
 
             $insertData = [
@@ -291,7 +291,7 @@ class SupplierBahanPenolong extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+                $id = decrypt($this->request->getPost("id"));
 
                 $payload = [
                     "company_id"        => $this->this_company_id,
@@ -343,6 +343,7 @@ class SupplierBahanPenolong extends BaseController
     {
 
         $supplierModel = new SupplierModel();
+        $id = decrypt($id);
         $supplierData = $supplierModel->getSupplierById($id);
 
         if (!$supplierData) {
@@ -368,7 +369,7 @@ class SupplierBahanPenolong extends BaseController
     {
         try {
             $supplierModel = new SupplierModel();
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
 
             if (empty($id)) {
                 $data = [

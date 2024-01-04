@@ -54,7 +54,7 @@
                                 <select class="form-select" name="parent_type_id" id="parent_type_id">
                                     <option value=""></option>
                                     <?php foreach ($kelompokBarang as $kb) : ?>
-                                        <option value="<?= $kb['id'] ?>"><?= $kb['parent_name'] ?></option>
+                                        <option value="<?= encrypt($kb['id']) ?>"><?= $kb['parent_name'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Kelompok Barang</label>
@@ -88,7 +88,7 @@
                                         <select class="form-select" name="satuan_id" id="satuan_id">
                                             <option value=""></option>
                                             <?php foreach ($satuanBarang as $sb) : ?>
-                                                <option value="<?= $sb['id'] ?>"><?= $sb['kode_satuan'] ?></option>
+                                                <option value="<?= encrypt($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <label for="floatingInput">Satuan Barang</label>
@@ -96,10 +96,11 @@
                                 </div>
                                 <div class="col-sm">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" onchange="this.value = formatRupiah(this.value);" type="text" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
+                                        <input autocomplete="one-time-code" oninput="this.value = (parseInt(this.value) >= 0 ? Math.floor(this.value) : '');" type="number" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
                                         <label for="floatingInput">Stok Minimum</label>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -195,8 +196,8 @@
         $('.btn-add').click(function() {
             $('.title-name').text("Tambah Bahan Baku");
             $(".create-form :input:not([name='type'])").val('');
-            $('input[name="parent_type_id"]').val(null).change();
-            $('input[name="satuan_id"]').val(null).change();
+            $('select[name="parent_type_id"]').val(null).change();
+            $('select[name="satuan_id"]').val(null).change();
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
@@ -339,6 +340,14 @@
                                                 table.ajax.reload();
                                                 $(".add-modal").modal("hide");
                                             })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        }).then(() => {
+
+                                        });
                                     }
                                 },
                                 onError: function(response) {
@@ -375,11 +384,11 @@
                                             })
                                     } else {
                                         Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            icon: 'warning',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            $(".add-modal").modal("hide")
+
                                         });
                                     }
                                 },
@@ -532,15 +541,6 @@
         dropdownParent: $(".add-modal .modal-content")
     });
 
-    function formatRupiah(angka) {
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted;
-    }
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

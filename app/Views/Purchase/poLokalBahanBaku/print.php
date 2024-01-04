@@ -512,7 +512,7 @@
                 <tr>
                     <td class="txt-underline txt-bold">KWITANSI TAMBAHAN</td>
                     <td>NO. NOTA : <?= $dataPO->po_no ?></td>
-                    <td class="txt-bold txt-right txt-underline">Tanggal: <?= $dataPO->po_date ?></td>
+                    <td class="txt-bold txt-right txt-underline">Tanggal: <?= date('d/m/Y', strtotime($dataPO->po_date))  ?></td>
                 </tr>
             </table>
 

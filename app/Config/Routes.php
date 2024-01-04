@@ -48,13 +48,15 @@ $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth'
 // MASTER DATA
 // EMPLOYEE
 $routes->get('/employee', 'Master\Employee::employee', ['filter' => 'Auth']);
-$routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
-$routes->get('/employee/id/(:segment)', 'Master\Employee::getByIdEmployee/$1', ['filter' => 'Auth']);
+$routes->get('/employee/all', 'Master\Employee::all', ['filter' => 'Auth']);
+$routes->get('/employee/id/(:segment)', 'Master\Employee::updateView/$1', ['filter' => 'Auth']);
 $routes->post('/employee/save', 'Master\Employee::saveEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/update', 'Master\Employee::updateEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/delete', 'Master\Employee::deleteEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/getKomponenGaji', 'Master\Employee::getKomponenGaji', ['filter' => 'Auth']);
 $routes->post('/employee/get-bagian', 'Master\Bagian::getBagianByDivision', ['filter' => 'Auth']);
+
+$routes->get('/employee/create', 'Master\Employee::createView', ['filter' => 'Auth']);
 
 // CUSTOMER
 $routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
@@ -719,13 +721,20 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
 
 
     $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');
+    $routes->post('id/header', 'BeaCukai\BC23::createHeaderAction');
     $routes->get('id/entitas/(:segment)', 'BeaCukai\BC23::createEntitasView/$1');
+    $routes->post('id/entitas', 'BeaCukai\BC23::createEntitasAction');
     $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC23::createDokumenView/$1');
+    $routes->get('id/dokumen/data/all', 'BeaCukai\BC23::allDokumen');
+    $routes->post('id/dokumen/create', 'BeaCukai\BC23::createDokumenAction');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC23::deleteDokumenAction');
     $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC23::createPengangkutView/$1');
     $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC23::createKemasanPetiKemas/$1');
     $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC23::createTransaksiView/$1');
     $routes->get('id/barang/(:segment)', 'BeaCukai\BC23::createBarangView/$1');
-
+    $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC23::createPungutanView/$1');
+    $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC23::createPernyataanView/$1');
+    $routes->post('id/pernyataan', 'BeaCukai\BC23::createPernyataanAction');
 
     $routes->get('api/valuta', 'BeaCukai\BC23::getValuta');
 

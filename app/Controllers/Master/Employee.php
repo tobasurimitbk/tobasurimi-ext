@@ -4,13 +4,16 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 use App\Models\BagianModel;
+use App\Models\CitiesModel;
 use App\Models\DivisisModel;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
 use App\Models\GajiConjunctionModel;
 use App\Models\GajiDivisiModel;
 use App\Models\GolonganModel;
+use App\Models\JabatanModel;
 use App\Models\MetadataModel;
+use App\Models\PayrollsModel;
 use App\Models\UserModel;
 use App\Models\TunjanganModel;
 use Exception;
@@ -28,6 +31,10 @@ class Employee extends BaseController
     protected $DivisionModel;
     protected $MetaDataModel;
     protected $GolonganModel;
+    protected $JabatanModel;
+    protected $BagianModel;
+    protected $CitiesModel;
+    protected $PayrollModel;
 
     public function __construct()
     {
@@ -42,6 +49,10 @@ class Employee extends BaseController
         $this->DivisionModel = new DivisisModel();
         $this->MetaDataModel = new MetadataModel();
         $this->GolonganModel = new GolonganModel();
+        $this->JabatanModel = new JabatanModel();
+        $this->BagianModel = new BagianModel();
+        $this->CitiesModel = new CitiesModel();
+        $this->PayrollModel = new PayrollsModel();
     }
 
     public function employee()
@@ -50,6 +61,7 @@ class Employee extends BaseController
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $data = [
             "dataProvinces" => $dataProvinces,
+            'divisi' => $this->DivisionModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
             "tipeEmployee" => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findall()
         ];
 
@@ -118,6 +130,70 @@ class Employee extends BaseController
         return;
     }
 
+    public function all()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+        ];
+
+        $condition = [
+            "employees.company_id"  => $this->this_company_id,
+            "employees.deletedAt" => null,
+            "divisis.deletedAt" => null,
+            "bagian.deletedAt" => null
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "search" => $this->request->getGet("search"),
+            "division_id" => decrypt($this->request->getGet("division_id")),
+            "bagian_id" => ($this->request->getGet("bagian_id")),
+            "tipe" => ($this->request->getGet("tipe")),
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $dataModel = $this->EmployeesModel->getList($condition, $addCondition, $limit, $offset);
+
+        $dataEmployee = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($dataModel['data'] as $data) {
+
+            array_push($dataEmployee, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "nip"                   => $data->nip,
+                "name"                  => $data->name,
+                "divisionName"          => $data->divisi,
+                "dob"                   => $data->dob == "0000-00-00" ? '-' : date('d/m/Y', strtotime($data->dob)),
+                "gender"                => strtoupper($data->gender),
+                "acc_no"                => strtoupper($data->acc_no),
+                "tipe"                  => strtoupper($data->tipe),
+                "status"                => strtoupper($data->status),
+                "bagianName"            => strtoupper($data->nama_bagian)
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $dataModel['totalData'],
+            "recordsFiltered"   => $dataModel['totalFilteredData'],
+            "data"              => $dataEmployee,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
     public function allEmployee()
     {
         $draw = $this->request->getVar('draw');
@@ -156,7 +232,7 @@ class Employee extends BaseController
 
             $data[] = array(
                 "no" => ($row + $i + 1),
-                "id" => $res[$i]["id"],
+                "id" => encrypt($res[$i]["id"]),
                 "nip" => $res[$i]["nip"],
                 "name" => $res[$i]["name"],
                 "divisionName" => $res[$i]["divisionName"],
@@ -194,7 +270,7 @@ class Employee extends BaseController
                 "gender" => $this->request->getPost("gender"), // required
                 "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
                 "dob" => $this->request->getPost("dob") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
-                "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"), // required
+                "division_id" =>  decrypt($this->request->getPost("division_id")), // required
                 "phone_no" => $this->request->getPost("phone_no") ?? "",
                 "acc_no" => $this->request->getPost("acc_no") ?? "",
                 "email" => $this->request->getPost("email") ?? "",
@@ -202,16 +278,16 @@ class Employee extends BaseController
                 "status" => $this->request->getPost("status") ?? "",
                 "nik" => $this->request->getPost("nik") ?? "",
                 "child" => $this->request->getPost("child") ?? 0,
-                "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT") ?? 0,
+                "province_id" => decrypt($this->request->getPost("province_id")) ?? 0,
                 "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT") ?? 0,
                 "postal_code" => $this->request->getPost("zip_code") ?? "",
-                "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT") ?? 0,
-                "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT") ?? 0,
-                "jabatan_id" => $this->request->getPost("jabatan_id") ?? "", // required
+                "religion_id" => decrypt($this->request->getPost("religion_id")) ?? 0,
+                "marriage_id" => decrypt($this->request->getPost("marriage_id")) ?? 0,
+                "jabatan_id" => decrypt($this->request->getPost("jabatan_id")) ?? "", // required
                 "bank_name" => $this->request->getPost("bank_name") ?? "",
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
                 "pin"  => $this->request->getPost("pin") ?? "",
-                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0,
+                "pendidikan" => decrypt($this->request->getPost("pendidikan")) ?? 0,
                 "tipe" => $this->request->getPost('tipe'),
                 "bagian_id" => $this->request->getPost('bagian_id')
             ];
@@ -227,7 +303,7 @@ class Employee extends BaseController
                 // insert employee
                 $insert = $this->EmployeesModel->insert($values);
                 $gajiDivisi = $this->GajiDivisiModel->getGajiByDivisionReturnIDOnArray(
-                    $this->request->getPost("division_id"),
+                    decrypt($this->request->getPost("division_id")),
                     $this->this_company_id
                 );
 
@@ -252,18 +328,19 @@ class Employee extends BaseController
                     return \response()->setJSON([
                         "status" => true,
                         "message" => "Data Employee Baru Berhasil disimpan",
+                        "id" => encrypt($insert),
                         'token' => csrf_hash()
                     ]);
                 } else {
                     return \response()->setJSON([
-                        "status" => \false,
+                        "status" => false,
                         "message" => "Data Employee Baru gagal disimpan",
                         'token' => csrf_hash()
                     ]);
                 }
             } else {
                 return \response()->setJSON([
-                    "status" => \false,
+                    "status" => false,
                     "message" => "Format gambar harus bertipe png, jpg, jpeg",
                     'token' => csrf_hash()
                 ]);
@@ -272,7 +349,7 @@ class Employee extends BaseController
 
             return \response()->setJSON([
                 'message' => "Terjadi kesalahan saat input data employee baru (Code: 500)",
-                'status' => \false
+                'status' => false
             ]);
         }
     }
@@ -281,7 +358,7 @@ class Employee extends BaseController
     {
         try {
 
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
             $status = $this->request->getPost("status") === "Aktif" ? 'Aktif' : 'Non Aktif';
             $name = $this->request->getPost("name");
 
@@ -299,7 +376,7 @@ class Employee extends BaseController
                 "gender" => $this->request->getPost("gender"), // required
                 "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
                 "dob" => $this->request->getPost("dob") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
-                "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"), // required
+                "division_id" =>  decrypt($this->request->getPost("division_id")), // required
                 "phone_no" => $this->request->getPost("phone_no") ?? "",
                 "acc_no" => $this->request->getPost("acc_no") ?? "",
                 "email" => $this->request->getPost("email") ?? "",
@@ -307,16 +384,16 @@ class Employee extends BaseController
                 "status" => $this->request->getPost("status") ?? "",
                 "nik" => $this->request->getPost("nik") ?? "",
                 "child" => $this->request->getPost("child") ?? 0,
-                "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT") ?? 0,
+                "province_id" => decrypt($this->request->getPost("province_id")) ?? 0,
                 "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT") ?? 0,
                 "postal_code" => $this->request->getPost("zip_code") ?? "",
-                "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT") ?? 0,
-                "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT") ?? 0,
-                "jabatan_id" => $this->request->getPost("jabatan_id") ?? "", // required
+                "religion_id" => decrypt($this->request->getPost("religion_id")) ?? 0,
+                "marriage_id" => decrypt($this->request->getPost("marriage_id")) ?? 0,
+                "jabatan_id" => decrypt($this->request->getPost("jabatan_id")) ?? "", // required
                 "bank_name" => $this->request->getPost("bank_name") ?? "",
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
                 "pin"  => $this->request->getPost("pin") ?? "",
-                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0,
+                "pendidikan" => decrypt($this->request->getPost("pendidikan")) ?? 0,
                 "tipe" => $this->request->getPost('tipe'),
                 "bagian_id" => $this->request->getPost('bagian_id')
             ];
@@ -333,7 +410,7 @@ class Employee extends BaseController
                 if ($this->EmployeesModel->update($id, $values)) {
 
                     $gajiDivisi = $this->GajiDivisiModel->getGajiByDivisionReturnIDOnArray(
-                        $this->request->getPost("division_id"),
+                        decrypt($this->request->getPost("division_id")),
                         $this->this_company_id
                     );
 
@@ -427,7 +504,7 @@ class Employee extends BaseController
     public function deleteEmployee()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
             $UserModel = new UserModel();
 
             if (!empty($id)) {
@@ -471,13 +548,56 @@ class Employee extends BaseController
         return;
     }
 
+    public function createView()
+    {
+        $data = [
+            'title' => "Tambah Karyawan",
+            'dataProvinces' => $this->ProvincesModel->search_list(array(), 'province_name'),
+            'tipeEmployee' => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
+            'jabatan' => $this->JabatanModel->where('deletedAt', null)->findAll(),
+            'divisi' => $this->DivisionModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
+            'dataPernikahan' => $this->MetaDataModel->getByName("status pernikahan"),
+            'dataAgama' => $this->MetaDataModel->getByName("religion"),
+            'dataPendidikan' => $this->MetaDataModel->getByName("pendidikan")
+
+        ];
+        return view('Master/employee/form', $data);
+    }
+
+    public function updateView($id)
+    {
+        $id = decrypt($id);
+        $data =  $this->EmployeesModel->find($id);
+
+        if ($data == null) {
+            return redirect()->to('employee');
+        }
+
+        $data = [
+            'title' => "Edit Karyawan",
+            'dataProvinces' => $this->ProvincesModel->search_list(array(), 'province_name'),
+            'tipeEmployee' => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
+            'jabatan' => $this->JabatanModel->where('deletedAt', null)->findAll(),
+            'divisi' => $this->DivisionModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
+            'dataPernikahan' => $this->MetaDataModel->getByName("status pernikahan"),
+            'dataAgama' => $this->MetaDataModel->getByName("religion"),
+            'dataPendidikan' => $this->MetaDataModel->getByName("pendidikan"),
+            'bagianList' => $this->BagianModel->where('division_id', $data['division_id'])->findAll(),
+            'cityList' => $this->CitiesModel->get_by_province_id($data['province_id']),
+            'payrollList' => $this->PayrollModel->where('employee_id', $data['id'])->where('deletedAt', null)->findAll(),
+            'data' => $data,
+
+        ];
+        return view('Master/employee/form', $data);
+    }
+
     public function getKomponenGaji()
     {
         // variable declare
-        $divisionID = $this->request->getVar('divisi_id');
-        $employeeID = $this->request->getVar('employee_id');
+        $divisionID = decrypt($this->request->getVar('divisi_id'));
+        $employeeID = decrypt($this->request->getVar('employee_id'));
 
-        return \response()->setJSON([
+        return response()->setJSON([
             'status' => true,
             'komponenGaji' => (empty($employeeID)) ?
                 $this->GajiDivisiModel->getGajiByDivision(

@@ -40,6 +40,41 @@ class BC23DokumenModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'bc_23_dokumen.nomor_dokumen' => 'bc_23_dokumen.nomor_dokumen',
+            'bc_23_dokumen.seri_dokumen' => 'bc_23_dokumen.seri_dokumen',
+            'bc_23_dokumen.tanggal_dokumen' => 'bc_23_dokumen.tanggal_dokumen',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_23_dokumen.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "bc_23_dokumen.*";
+
+        $pinjamanQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $pinjamanQry->countAllResults(false);
+
+        $totalFilteredData = $pinjamanQry->countAllResults(false);
+        $data = $pinjamanQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
     public function get($bc23ID)
     {
         $result = [];

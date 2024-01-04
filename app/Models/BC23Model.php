@@ -253,4 +253,68 @@ class BC23Model extends Model
             'pengangkut' => $bc23PengangkutModel->get($id)
         ];
     }
+
+    // BARU
+    public function get($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+    }
+
+    public function isCompleteFormHeader($penerimaanBarangID)
+    {
+        $isCompleteForm = false;
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($data['no_aju'] != null && $data['kode_pelabuhan_bongkar'] != null && $data['kode_kantor_bongkar'] != null && $data['kode_kantor'] != null && $data['kode_tujuan_tpb'] != null) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPernyataan($penerimaanBarangID)
+    {
+        $isCompleteForm = false;
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($data['nama_ttd'] != null && $data['kota_ttd'] != null && $data['tanggal_ttd'] != null && $data['jabatan_pengusaha_ttd'] != null) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormEntitas($penerimaanBarangID)
+    {
+        $bc23EntitasModel = new BC23EntitasModel();
+        $isCompleteForm = false;
+        $data = $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            $isCompleteForm = true;
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormDokumen($penerimaanBarangID)
+    {
+        $bc23DokumenModel = new BC23DokumenModel();
+        $isCompleteForm = false;
+        $data = $bc23DokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            $isCompleteForm = true;
+        }
+        return $isCompleteForm;
+    }
 }
