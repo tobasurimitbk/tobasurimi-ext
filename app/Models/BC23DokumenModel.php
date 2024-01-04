@@ -41,18 +41,11 @@ class BC23DokumenModel extends Model
     protected $afterDelete    = [];
 
 
-    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $limit = 10, $offset = 0)
     {
-        $availableSort = [
-            'bc_23_dokumen.nomor_dokumen' => 'bc_23_dokumen.nomor_dokumen',
-            'bc_23_dokumen.seri_dokumen' => 'bc_23_dokumen.seri_dokumen',
-            'bc_23_dokumen.tanggal_dokumen' => 'bc_23_dokumen.tanggal_dokumen',
-        ];
 
-        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_23_dokumen.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        $sort = 'bc_23_dokumen.createdAt';
+        $sortType = 'DESC';
 
         $selectQry = "bc_23_dokumen.*";
 

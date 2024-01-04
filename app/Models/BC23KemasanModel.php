@@ -40,22 +40,34 @@ class BC23KemasanModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get($bc23ID)
+    public function getList($condition, $limit = 10, $offset = 0)
     {
-        $metaDataModel = new MetadataModel();
+        $sort = 'bc_23_kemasan.createdAt';
+        $sortType = 'DESC';
 
-        $result = [];
-        foreach ($this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll() as $r) {
-            $kodeJenisKemasan = $metaDataModel->bcMetaDataHelper("Jenis Kemasan", null, $r['kode_jenis_kemasan']);
-            $result[] = [
-                'id' => $r['id'],
-                'kemasan_jumlah_kemasan' => $r['jumlah_kemasan'],
-                'kemasan_kode_jenis_kemasan' => encrypt($r['kode_jenis_kemasan']),
-                'kemasan_kode_jenis_kemasan_text' => $kodeJenisKemasan['description'] . ' (' . $kodeJenisKemasan['value'] . ')',
-                'kemasan_merk_kemasan' => $r['merk_kemasan'],
-                'kemasan_seri_kemasan' => $r['seri_kemasan'],
-            ];
-        }
-        return $result;
+        $selectQry = "bc_23_kemasan.*";
+
+        $pinjamanQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $pinjamanQry->countAllResults(false);
+
+        $totalFilteredData = $pinjamanQry->countAllResults(false);
+        $data = $pinjamanQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getLast($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
     }
 }

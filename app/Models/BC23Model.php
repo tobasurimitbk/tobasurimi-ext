@@ -309,4 +309,15 @@ class BC23Model extends Model
         $bc23PengangkutModel = new BC23PengangkutModel();
         return $bc23PengangkutModel->get($penerimaanBarangID) == null ? false : true;
     }
+
+    public function isCompleteFormPetiKemas($penerimaanBarangID)
+    {
+        $bc23KontainerModel = new BC23KontainerModel();
+        $bc23KemasanModel = new BC23KemasanModel();
+
+        $kontainer = $bc23KontainerModel->getLast($penerimaanBarangID) != null ? true : false;
+        $kemasan = $bc23KemasanModel->getLast($penerimaanBarangID) != null ? true : false;
+
+        return $kontainer && $kemasan;
+    }
 }

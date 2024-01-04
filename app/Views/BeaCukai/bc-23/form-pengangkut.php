@@ -126,6 +126,12 @@
                                     <label>Kode Pelabuhan Bongkar</label>
                                 </div>
                             </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="pengangkutan_tempat_penimbunan" value="<?= $bc23 != null ? $bc23['kode_tps'] : '' ?>" name="pengangkutan_tempat_penimbunan" type="text" class="form-control pengangkutan_tempat_penimbunan" placeholder="">
+                                    <label>Kode Tempat Penimbunan</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <a href="#" class="btn btn-primary mt-4" id="btn-simpan-perubahan" style="float: right;">
@@ -208,6 +214,9 @@
             pengangkutan_pelabuhan_bongkar: {
                 required: true
             },
+            pengangkutan_tempat_penimbunan: {
+                required: true
+            }
         },
         messages: {
             bc_11_no_bc_11: {
@@ -246,6 +255,9 @@
             pengangkutan_pelabuhan_bongkar: {
                 required: "Kode pelabuhan bongkar wajib diisi"
             },
+            pengangkutan_tempat_penimbunan: {
+                required: "Kode tempat penimbunan wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
