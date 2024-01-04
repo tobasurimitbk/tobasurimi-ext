@@ -9,7 +9,7 @@
         <a class="nav-link <?= request()->uri->getSegment(3) === "dokumen" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/dokumen/' . encrypt($lpb->id)) ?>" style="<?= session()->getFlashdata('isCompleteFormDokumen') == false ? 'color: red' :  'color:green' ?>">Dokumen</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link <?= request()->uri->getSegment(3) === "pengangkut" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/pengangkut/' . encrypt($lpb->id)) ?>">Pengangkut</a>
+        <a class="nav-link <?= request()->uri->getSegment(3) === "pengangkut" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/pengangkut/' . encrypt($lpb->id)) ?>" style="<?= session()->getFlashdata('isCompleteFormPengangkut') == false ? 'color: red' :  'color:green' ?>">Pengangkut</a>
     </li>
     <li class="nav-item">
         <a class="nav-link <?= request()->uri->getSegment(3) === "kemasan-peti-kemas" ? 'active' : '' ?>" href="<?= base_url('bea-cukai-bc-23/id/kemasan-peti-kemas/' . encrypt($lpb->id)) ?>">Kemasan & Peti Kemas</a>

@@ -241,7 +241,7 @@ class BC23 extends BaseController
             ]);
         } else {
             // update
-            $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->update([
+            $bc23EntitasModel->update($lastData['id'], [
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
@@ -386,6 +386,8 @@ class BC23 extends BaseController
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
         $countryModel = new CountryModel();
+        $bc23Model = new BC23Model();
+        $bc23PengangkutModel = new BC23PengangkutModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
@@ -400,10 +402,76 @@ class BC23 extends BaseController
         $data = [
             'kodePengangkutan' => $metaDataModel->where('name', "Pengangkutan")->findAll(),
             'kodeBendera' => $countryModel->findAll(),
+            'bc23' => $bc23Model->get($penerimaanBarangID),
+            'bc23Pengangkut' => $bc23PengangkutModel->get($penerimaanBarangID),
             'lpb' => $lpb
         ];
 
         return view('BeaCukai/bc-23/form-pengangkut', $data);
+    }
+
+    public function createPengangkutAction()
+    {
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bc23Model = new BC23Model();
+        $bc23PengangkutModel = new BC23PengangkutModel();
+
+        $lastDataBC23 = $bc23Model->get($penerimaanBarangID);
+        $lastPengangkutBC23 = $bc23PengangkutModel->get($penerimaanBarangID);
+
+        if ($lastDataBC23 == null) {
+            // insert
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            // insert
+            $bc23Model->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_no_lokal' => $bc23Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+
+                'no_bc_11' => $this->request->getVar('bc_11_no_bc_11'),
+                'tanggal_bc_11' => $this->request->getVar('bc_11_tanggal_bc_11') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('bc_11_tanggal_bc_11')), "Y-m-d") : "",
+                'pos_bc_11' => $this->request->getVar('bc_11_pos_bc_11'),
+                'sub_pos_bc_11' => $this->request->getVar('bc_11_sub_pos_bc_11'),
+                'sub_pos_pos_bc_11' => $this->request->getVar('bc_11_sub_sub_pos_bc_11'),
+                'kode_pelabuhan_muat' => $this->request->getVar('pengangkutan_pelabuhan_muat'),
+                'kode_pelabuhan_transit' => $this->request->getVar('pengangkutan_pelabuhan_transit')
+            ]);
+        } else {
+            // update
+            $bc23Model->update($lastDataBC23['id'], [
+                'no_bc_11' => $this->request->getVar('bc_11_no_bc_11'),
+                'tanggal_bc_11' => $this->request->getVar('bc_11_tanggal_bc_11') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('bc_11_tanggal_bc_11')), "Y-m-d") : "",
+                'pos_bc_11' => $this->request->getVar('bc_11_pos_bc_11'),
+                'sub_pos_bc_11' => $this->request->getVar('bc_11_sub_pos_bc_11'),
+                'sub_pos_pos_bc_11' => $this->request->getVar('bc_11_sub_sub_pos_bc_11'),
+                'kode_pelabuhan_muat' => $this->request->getVar('pengangkutan_pelabuhan_muat'),
+                'kode_pelabuhan_transit' => $this->request->getVar('pengangkutan_pelabuhan_transit')
+            ]);
+        }
+
+        if ($lastPengangkutBC23 == null) {
+            $bc23PengangkutModel->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
+                'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
+                'nomor_pengangkut' => $this->request->getVar('pengangkutan_nomor_pengangkut'),
+                'kode_bendera' => decrypt($this->request->getVar('pengangkutan_kode_bendera')),
+            ]);
+        } else {
+            $bc23PengangkutModel->update($lastPengangkutBC23['id'], [
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
+                'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
+                'nomor_pengangkut' => $this->request->getVar('pengangkutan_nomor_pengangkut'),
+                'kode_bendera' => decrypt($this->request->getVar('pengangkutan_kode_bendera')),
+            ]);
+        }
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Pengangkut berhasil diupdate",
+        ]);
     }
 
     public function createKemasanPetiKemas($penerimaanBarangID)
@@ -587,11 +655,13 @@ class BC23 extends BaseController
         $isCompleteFormHeader = $bc23Model->isCompleteFormHeader($penerimaanBarangID);
         $isCompleteFormEntitas = $bc23Model->isCompleteFormEntitas($penerimaanBarangID);
         $isCompleteFormDokumen = $bc23Model->isCompleteFormDokumen($penerimaanBarangID);
+        $isCompleteFormPengangkut = $bc23Model->isCompleteFormPengangkut($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
         session()->setFlashdata('isCompleteFormEntitas', $isCompleteFormEntitas);
         session()->setFlashdata('isCompleteFormDokumen', $isCompleteFormDokumen);
+        session()->setFlashdata('isCompleteFormPengangkut', $isCompleteFormPengangkut);
     }
 
 
