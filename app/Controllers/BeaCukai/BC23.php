@@ -695,10 +695,26 @@ class BC23 extends BaseController
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
+        $bc23Model = new BC23Model();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $bc23 = $bc23Model->get($penerimaanBarangID);
+
+        if ($bc23 != null) {
+            $bc23['ndpbm'] = formatRupiah($bc23['ndpbm']);
+            $bc23['nilai_barang'] = formatRupiah($bc23['nilai_barang']);
+            $bc23['cif'] = formatRupiah($bc23['cif']);
+            $bc23['harga_penyerahan'] = formatRupiah($bc23['harga_penyerahan']);
+            $bc23['biaya_tambahan'] = formatRupiah($bc23['biaya_tambahan']);
+            $bc23['biaya_pengurang'] = formatRupiah($bc23['biaya_pengurang']);
+            $bc23['fob'] = formatRupiah($bc23['fob']);
+            $bc23['freight'] = formatRupiah($bc23['freight']);
+            $bc23['asuransi'] = formatRupiah($bc23['asuransi']);
+            $bc23['bruto'] = formatRupiah($bc23['bruto']);
+            $bc23['netto'] = formatRupiah($bc23['netto']);
+        }
 
         if ($lpb == null || $lpb->bc_type != "BC 2.3") {
             return redirect()->to('bea-cukai-bc-23');
@@ -711,11 +727,72 @@ class BC23 extends BaseController
             'kodeIncoterm' => $metaDataModel->where('name', "Kode Incoterm BC")->findAll(),
             'kodeAsuransi' => $metaDataModel->where('name', "Kode Asuransi BC")->findAll(),
             'kodeKenaPajak' => $metaDataModel->where('name', "Kode Kena Pajak BC")->findAll(),
+            'bc23' => $bc23,
             'lpb' => $lpb
         ];
 
         return view('BeaCukai/bc-23/form-transaksi', $data);
     }
+
+    public function createTransaksiAction()
+    {
+        $bc23Model = new BC23Model();
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $lastDataBC23 = $bc23Model->get($penerimaanBarangID);
+        if ($lastDataBC23 == null) {
+            // insert
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            // insert
+            $bc23Model->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_no_lokal' => $bc23Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+
+                'kode_valuta' => decrypt($this->request->getVar('harga_kode_valuta')),
+                'ndpbm' => convertRupiahToNumber($this->request->getVar('harga_ndpbm')),
+                'kode_incoterm' => decrypt($this->request->getVar('harga_kode_harga_barang')),
+                'nilai_barang' => convertRupiahToNumber($this->request->getVar('harga_nilai_barang')),
+                'cif' => convertRupiahToNumber($this->request->getVar('harga_cif')),
+                'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
+                'biaya_tambahan' => convertRupiahToNumber($this->request->getVar('harga_lainnya_biaya_penambah')),
+                'biaya_pengurang' => convertRupiahToNumber($this->request->getVar('harga_lainnya_biaya_pengurang')),
+                'fob' => convertRupiahToNumber($this->request->getVar('harga_lainnya_free_on_board')),
+                'freight' => convertRupiahToNumber($this->request->getVar('harga_lainnya_freight')),
+                'kode_asuransi' => decrypt($this->request->getVar('harga_lainnya_kode_asuransi')),
+                'asuransi' => convertRupiahToNumber($this->request->getVar('harga_lainnya_nilai_asuransi')),
+                'bruto' => convertRupiahToNumber($this->request->getVar('berat_bruto')),
+                'netto' => convertRupiahToNumber($this->request->getVar('berat_netto')),
+                'kode_kena_pajak' => decrypt($this->request->getVar('pajak_jasa_kena_pajak'))
+            ]);
+        } else {
+            $bc23Model->update($lastDataBC23['id'], [
+                'kode_valuta' => decrypt($this->request->getVar('harga_kode_valuta')),
+                'ndpbm' => convertRupiahToNumber($this->request->getVar('harga_ndpbm')),
+                'kode_incoterm' => decrypt($this->request->getVar('harga_kode_harga_barang')),
+                'nilai_barang' => convertRupiahToNumber($this->request->getVar('harga_nilai_barang')),
+                'cif' => convertRupiahToNumber($this->request->getVar('harga_cif')),
+                'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
+                'biaya_tambahan' => convertRupiahToNumber($this->request->getVar('harga_lainnya_biaya_penambah')),
+                'biaya_pengurang' => convertRupiahToNumber($this->request->getVar('harga_lainnya_biaya_pengurang')),
+                'fob' => convertRupiahToNumber($this->request->getVar('harga_lainnya_free_on_board')),
+                'freight' => convertRupiahToNumber($this->request->getVar('harga_lainnya_freight')),
+                'kode_asuransi' => decrypt($this->request->getVar('harga_lainnya_kode_asuransi')),
+                'asuransi' => convertRupiahToNumber($this->request->getVar('harga_lainnya_nilai_asuransi')),
+                'bruto' => convertRupiahToNumber($this->request->getVar('berat_bruto')),
+                'netto' => convertRupiahToNumber($this->request->getVar('berat_netto')),
+                'kode_kena_pajak' => decrypt($this->request->getVar('pajak_jasa_kena_pajak'))
+            ]);
+        }
+
+        return response()->setJSON([
+            'message' => "Transaksi berhasil diupdate",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
 
     public function createBarangView($penerimaanBarangID)
     {
@@ -848,6 +925,7 @@ class BC23 extends BaseController
         $isCompleteFormDokumen = $bc23Model->isCompleteFormDokumen($penerimaanBarangID);
         $isCompleteFormPengangkut = $bc23Model->isCompleteFormPengangkut($penerimaanBarangID);
         $isCompleteFormPetiKemas = $bc23Model->isCompleteFormPetiKemas($penerimaanBarangID);
+        $isCompleteFormFormTransaksi = $bc23Model->isCompleteFormTransaksi($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
@@ -855,6 +933,7 @@ class BC23 extends BaseController
         session()->setFlashdata('isCompleteFormDokumen', $isCompleteFormDokumen);
         session()->setFlashdata('isCompleteFormPengangkut', $isCompleteFormPengangkut);
         session()->setFlashdata('isCompleteFormPetiKemas', $isCompleteFormPetiKemas);
+        session()->setFlashdata('isCompleteFormTransaksi', $isCompleteFormFormTransaksi);
     }
 
 

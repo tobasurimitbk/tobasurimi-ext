@@ -348,3 +348,23 @@ function generateUniqueCode($codeLength)
 
    return $code;
 }
+
+function convertRupiahToNumber($rupiah)
+{
+   $withoutDot = str_replace('.', '', $rupiah);
+   $numberWithDot = str_replace(',', '.', $withoutDot);
+   return floatval($numberWithDot);
+}
+
+function formatRupiah($angka)
+{
+   $formatter = new NumberFormatter('id-ID', NumberFormatter::CURRENCY);
+   $parsedNumber = floatval($angka);
+
+   if (!is_numeric($parsedNumber)) {
+      return "0,00";
+   }
+
+   $formattedNumber = $formatter->formatCurrency($parsedNumber, 'IDR');
+   return str_replace('Rp', '', $formattedNumber);
+}

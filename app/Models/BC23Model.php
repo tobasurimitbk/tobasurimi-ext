@@ -320,4 +320,14 @@ class BC23Model extends Model
 
         return $kontainer && $kemasan;
     }
+
+    public function isCompleteFormTransaksi($penerimaanBarangID)
+    {
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            return false;
+        } else {
+            return ($data['kode_valuta'] != null && $data['kode_incoterm'] != null && $data['kode_asuransi'] != null && $data['kode_kena_pajak'] != null) ? true : false;
+        }
+    }
 }
