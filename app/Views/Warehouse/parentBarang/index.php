@@ -167,6 +167,7 @@
         // hide modal
         $('.btn-discard').click(function() {
             $('#id').val('');
+            $('#parentName').val(null);
             $('.add-modal').modal('hide');
         });
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
