@@ -4,6 +4,8 @@ namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Helpers\BeaCukaiApi;
+use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\BarangMasterModel;
 use App\Models\BC23BarangDokumenModel;
 use App\Models\BC23BarangModel;
 use App\Models\BC23BarangTarifModel;
@@ -20,6 +22,10 @@ use App\Models\KantorBeaCukaiModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\RMImportPODetailModel;
+use App\Models\RMPurchaseOrderDetailModel;
+use App\Models\RMPurchaseOrderModel;
+use App\Models\SupplierHargaModel;
 use Exception;
 
 // META DATA -> jenis_dok_aju
@@ -798,9 +804,6 @@ class BC23 extends BaseController
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $metaDataModel = new MetadataModel();
-        $hsCodeModel = new HsCodesModel();
-        $countryModel = new CountryModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
@@ -813,6 +816,72 @@ class BC23 extends BaseController
         $this->setFlashDataNavigatorSession($penerimaanBarangID);
 
         $data = [
+            'lpb' => $lpb,
+            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan)
+        ];
+
+        return view('BeaCukai/bc-23/form-barang', $data);
+    }
+
+    public function createBarangDetailView($penerimaanBarangID, $penerimaanBarangDetailID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $metaDataModel = new MetadataModel();
+        $hsCodeModel = new HsCodesModel();
+        $countryModel = new CountryModel();
+        $bc23BarangModel = new BC23BarangModel();
+        $rmImportPoDetailModel = new RMImportPODetailModel(); // import bahan baku
+        $rmLokalPoDetailModel = new RMPurchaseOrderDetailModel(); // lokal bahan baku
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel(); // lokal | import penolong
+        $supplierHargaModel = new SupplierHargaModel();
+        $barangMasterModel = new BarangMasterModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $penerimaanBarangDetailID = decrypt($penerimaanBarangDetailID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $lpbDetail = $penerimaanBarangDetailModel->find($penerimaanBarangDetailID);
+        $poDetail = null;
+        $barangDetail = null;
+
+        if ($lpb == null || $lpbDetail == null) {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        // get po detail
+        if ($lpb->status_penerimaan == "LOKAL" && $lpb->tipe_bahan == "BAKU") {
+            // PO LOKAL BAKU 
+            $poDetail = $rmLokalPoDetailModel->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id')
+                ->where('penerimaan_barang_detail.id', $penerimaanBarangDetailID)
+                ->first();
+
+            $barangDetail = $supplierHargaModel->select('barang_master.*')->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+                ->where('supplier_harga.id', $poDetail['supplier_harga_id'])
+                ->first();
+        } else if ($lpb->status_penerimaan == "IMPORT" && $lpb->tipe_bahan == "BAKU") {
+            // PO IMPORT BAKU
+            $poDetail = $rmImportPoDetailModel->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_import_po_details.id')
+                ->where('penerimaan_barang_detail.id', $penerimaanBarangDetailID)
+                ->first();
+
+            $barangDetail = $barangMasterModel->find($poDetail['barang_id']);
+        } else {
+            // PO LOKAL | IMPORT PENOLONG
+            $poDetail = $amPurchaseOrderDetailModel->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id')
+                ->where('penerimaan_barang_detail.id', $penerimaanBarangDetailID)
+                ->first();
+
+            $barangDetail = $barangMasterModel->find($poDetail['barang_id']);
+        }
+
+        $seriBarang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+
+
+        $data = [
             'kodeFasilitasTarif' => $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->findAll(),
             'kodeJenisTarif' => $metaDataModel->where('name', "Kode Jenis Tarif BC")->findAll(),
             'kodeJenisPungutan' => $metaDataModel->where('name', "Kode Jenis Pungutan BC")->findAll(),
@@ -821,11 +890,15 @@ class BC23 extends BaseController
             'kodeKategoriBarang' => $metaDataModel->where('name', 'Kategori Barang BC')->orderBy('description', "ASC")->findAll(),
             'kodeJenisKemasan' => $metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
             'lpb' => $lpb,
-            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan)
+            'lpbDetail' => $lpbDetail,
+            'poDetail' => $poDetail,
+            'barangDetail' => $barangDetail,
+            'seriBarang' => $seriBarang == null ? 1 : $seriBarang['seri_barang'] + 1,
         ];
 
-        return view('BeaCukai/bc-23/form-barang', $data);
+        return view('BeaCukai/bc-23/form-detail-barang', $data);
     }
+
 
     public function createPungutanView($penerimaanBarangID)
     {
@@ -1673,20 +1746,9 @@ class BC23 extends BaseController
     public function getKodeSatuanBarang()
     {
         $metaDataModel = new MetadataModel();
-        $page = $this->request->getVar('page');
-        $limit = 5;
-        $offset = ($page - 1) * $limit;
-
-        $data = $metaDataModel->getKodeSatuanBarang($limit, $offset);
-
-        $response = [
-            'results' => $data,
-            'pagination' => [
-                'more' => count($data) == $limit
-            ]
-        ];
-
-        return $this->response->setJSON($response);
+        $search = $this->request->getVar('search');
+        $data = $metaDataModel->getKodeSatuanBarang($search);
+        return $this->response->setJSON(['results' => $data,]);
     }
 
     public function generateNomorAju()

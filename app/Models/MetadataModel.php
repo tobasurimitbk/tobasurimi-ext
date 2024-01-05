@@ -106,10 +106,11 @@ class MetadataModel extends Model
         return $this->asArray()->where('name', 'jenis_dok_aju')->where('description', 'po_lokal_bb')->findAll();
     }
 
-    public function getKodeSatuanBarang($limit, $offset = 0)
+    public function getKodeSatuanBarang($search)
     {
         $data = [];
-        foreach ($this->asArray()->where('name', "Kode Satuan BC")->orderBy('value', "ASC")->limit($limit, $offset)->findAll() as $d) {
+        foreach ($this->asArray()->where('name', "Kode Satuan BC")->like('value', '%' . $search . '%')->orderBy('value', "ASC")->limit(10)->get()
+            ->getResultArray() as $d) {
             $data[] = [
                 'id' => encrypt($d['value']),
                 'text' => '' . $d['value'] . ' - ' . strtoupper($d['description'])
