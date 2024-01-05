@@ -168,7 +168,8 @@
         //CSS SELECT2 FLOATING LABEL
         $('.id_header').select2({
             placeholder: "Filter",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            allowClear: true
         });
         $('.id_header')
             .parent('div')
@@ -217,10 +218,23 @@
 
         $("#id_header").change(function() {
             var selectedValue = $(this).val();
-            if (selectedValue) {
+            if (!selectedValue) {
                 // console.log(selectedValue);
                 $("tbody tr").each(function() {
+                    if ($(this).attr('data-header-id')) {
+                        $(this).show();
+                        var targetClass = $(this).data('target');
+                        if ($(targetClass).hasClass('in')) {
+                            $(targetClass).addClass('out')
+                            $(targetClass).removeClass('in')
+                        }
+                    }
+                });
+            } else {
+                $("tbody tr").each(function() {
                     var headerIdValue = $(this).data('header-id');
+                    console.log("Selected :" + selectedValue);
+                    console.log("Header :" + headerIdValue);
                     var targetClass = $(this).data('target');
                     if (headerIdValue === selectedValue) {
                         $(this).show();

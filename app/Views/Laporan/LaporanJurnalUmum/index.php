@@ -163,7 +163,8 @@
 
         $('.type_transaksi').select2({
             placeholder: "Filter",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            allowClear: true
         });
         $('.type_transaksi')
             .parent('div')
@@ -202,10 +203,35 @@
             var selectedValue = $(this).val();
             var inputsDebit = 0;
             var inputsKredit = 0;
-            if (selectedValue) {
+
+            // Check if the selected value is empty
+            if (!selectedValue) {
                 // Reset totalInputs menjadi 0 setiap kali dropdown berubah
                 totalInputsDebit = 0;
                 totalInputsKredit = 0;
+                // Reset data-header-id and show all rows
+                $("tbody tr").each(function() {
+                    if ($(this).attr('data-header-id')) {
+                        $(this).show();
+                    }
+                    inputsDebit = $(this).find('.yy');
+                    inputsDebit.each(function() {
+                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        totalInputsDebit += inputValue;
+                    });
+                    inputsKredit = $(this).find('.xx');
+                    inputsKredit.each(function() {
+                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        totalInputsKredit += inputValue;
+                    });
+                });
+                $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
+                $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
+            } else {
+                // Reset totalInputs menjadi 0 setiap kali dropdown berubah
+                totalInputsDebit = 0;
+                totalInputsKredit = 0;
+
                 $("tbody tr").each(function() {
                     var headerIdValue = $(this).data('header-id');
                     if (headerIdValue === selectedValue) {
@@ -228,6 +254,7 @@
                 $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
             }
         });
+
 
 
         function formatRupiah(angka) {
