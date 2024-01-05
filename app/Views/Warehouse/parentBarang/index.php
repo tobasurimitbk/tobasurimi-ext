@@ -165,8 +165,8 @@
 
         });
         // hide modal
-        $('.btn-discard').click(function() {
-            $('#id').val('');
+        $('.btn-hide-form').click(function() {
+            $('input[name="id"]').val('');
             $('#parentName').val(null);
             $('.add-modal').modal('hide');
         });
@@ -195,7 +195,7 @@
                 success: function(res) {
                     csrf.val();
                     if (res.status) {
-                        $("#id").val(id);
+                        $("#id").val(res?.data?.id);
                         $("#parentName").val(res?.data?.parent_name);
                         $("#kategori").val(res?.data?.kategori);
                         $('.add-modal').modal('show');
@@ -213,6 +213,7 @@
         // delete
         $(".delete-btn").click(function() {
             var parentName = $('#parentName').val();
+
             Swal.fire({
                 icon: 'question',
                 title: 'Hapus Kelompok Barang ' + parentName + '?',
@@ -225,8 +226,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     let csrf = $(`[name="${csrfToken}"]`);
-                    let id = $("#id").val();
-
+                    let id = $('input[name="id"]').val();
                     $.ajax({
                         url: "<?= base_url("parent-barang/delete"); ?>",
                         data: {
