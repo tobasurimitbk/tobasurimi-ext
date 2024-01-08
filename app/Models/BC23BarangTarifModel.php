@@ -40,6 +40,33 @@ class BC23BarangTarifModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function getList($condition, $limit = 10, $offset = 0)
+    {
+
+        $sort = 'bc_23_barang_tarif.createdAt';
+        $sortType = 'DESC';
+
+        $selectQry = "bc_23_barang_tarif.*";
+
+        $pinjamanQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $pinjamanQry->countAllResults(false);
+
+        $totalFilteredData = $pinjamanQry->countAllResults(false);
+        $data = $pinjamanQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
     public function get($bc23BarangID)
     {
         $metaDataModel = new MetadataModel();

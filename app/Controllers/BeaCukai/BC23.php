@@ -844,6 +844,10 @@ class BC23 extends BaseController
         $lpbDetail = $penerimaanBarangDetailModel->find($penerimaanBarangDetailID);
         $poDetail = null;
         $barangDetail = null;
+        $kodeSatuanBarang = null;
+        $bc23DokumenBarang = null;
+
+        $this->setFlashDataNavigatorSession($penerimaanBarangID);
 
         if ($lpb == null || $lpbDetail == null) {
             return redirect()->to('bea-cukai-bc-23');
@@ -879,7 +883,10 @@ class BC23 extends BaseController
         }
 
         $seriBarang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
-
+        $bc23DokumenBarang =  $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+        if ($bc23DokumenBarang != null) {
+            $kodeSatuanBarang = $metaDataModel->where('name', "Kode Satuan BC")->where('value', $bc23DokumenBarang['kode_satuan_barang'])->first();
+        }
 
         $data = [
             'kodeFasilitasTarif' => $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->findAll(),
@@ -894,11 +901,282 @@ class BC23 extends BaseController
             'poDetail' => $poDetail,
             'barangDetail' => $barangDetail,
             'seriBarang' => $seriBarang == null ? 1 : $seriBarang['seri_barang'] + 1,
+            'bc23DokumenBarang' => $bc23DokumenBarang,
+            'kodeSatuanBarang' => $kodeSatuanBarang
         ];
 
         return view('BeaCukai/bc-23/form-detail-barang', $data);
     }
 
+    public function allPungutan()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+
+        $condition = [
+            "bc_23_barang_tarif.deletedAt"  => null,
+            "bc_23_barang_tarif.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_23_barang_tarif.penerimaan_barang_detail_id" => $penerimaanBarangDetailID
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $metaDataModel = new MetadataModel();
+
+        $bc23BarangTarif = $bc23BarangTarifModel->getList($condition, $limit, $offset);
+        $res = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($bc23BarangTarif['data'] as $data) {
+            $kodeJenisPungutan = $metaDataModel->where('name', "Kode Jenis Pungutan BC")->where('value', $data->kode_jenis_pungutan)->first();
+            $kodeJenisTarif = $metaDataModel->where('name', "Kode Jenis Tarif BC")->where('value', $data->kode_jenis_tarif)->first();
+            $kodeFasilitasTarif =  $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->where('value', $data->kode_fasilitas_tarif)->first();
+
+            array_push($res, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "kode_jenis_pungutan"   => $data->kode_jenis_pungutan . ' - ' . $kodeJenisPungutan['description'],
+                "kode_jenis_tarif"      => $data->kode_jenis_tarif . ' - ' . $kodeJenisTarif['description'],
+                "tarif_bea_masuk"       => ($data->tarif_bea_masuk),
+                "kode_fasilitas_tarif"  => $data->kode_fasilitas_tarif . ' - ' . $kodeFasilitasTarif['description'],
+                "tarif_fasilitas"       => ($data->tarif_fasilitas)
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $bc23BarangTarif['totalData'],
+            "recordsFiltered"   => $bc23BarangTarif['totalFilteredData'],
+            "data"              => $res,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function createPungutanAction()
+    {
+        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $bc23BarangModel = new BC23BarangModel();
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+
+        $bc23Barang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+
+        if ($bc23Barang == null) {
+            return response()->setJSON([
+                'message' => "Isi dokumen barang detail terlebih dahulu sebelum mengisi pungutan & dokumen barang",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $bc23BarangTarifModel->insert([
+            'penerimaan_barang_id' => $penerimaanBarangID,
+            'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
+            'kode_jenis_pungutan' => decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')),
+            'kode_jenis_tarif' => decrypt($this->request->getVar('barang_detail_kode_jenis_tarif')),
+            'tarif_bea_masuk' => convertRupiahToNumber($this->request->getVar('barang_detail_nilai_tarif')),
+            'kode_fasilitas_tarif' => decrypt($this->request->getVar('barang_detail_kode_fasilitas_tarif')),
+            'tarif_fasilitas' => convertRupiahToNumber($this->request->getVar('barang_detail_tarif_fasilitas')),
+            'seri_barang' => $bc23Barang['seri_barang'],
+        ]);
+
+        return response()->setJSON([
+            'message' => "Pungutan berhasil ditambahkan",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function deletePungutanAction()
+    {
+        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $bc23BarangTarifModel->delete(decrypt($this->request->getVar('id')));
+
+        return response()->setJSON([
+            'message' => "Pungutan berhasil dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function allDokumenBarang()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+
+        $condition = [
+            "bc_23_dokumen.deletedAt"  => null,
+            "bc_23_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $bc23DokumenModel = new BC23DokumenModel();
+        $metaDataModel = new MetadataModel();
+        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
+
+        $beaCukaiDokumen = $bc23DokumenModel->getList($condition, $limit, $offset);
+        $resDokumen = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiDokumen['data'] as $data) {
+            $jenisDokumen = $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->id_dokumen)->first();
+            $barangDokumen = $bc23BarangDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)
+                ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
+                ->where('seri_dokumen', $data->seri_dokumen)->where('deletedAt', null)
+                ->first();
+
+            array_push($resDokumen, [
+                "no"                    => $no++,
+                "bc_23_dokumen_id"      => encrypt($data->id),
+                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "id_dokumen"            => $data->id_dokumen . ' - ' . $jenisDokumen['value'],
+                "nomor_dokumen"         => $data->nomor_dokumen,
+                "seri_dokumen"          => $data->seri_dokumen,
+                "tanggal_dokumen"       => date('d/m/Y', strtotime($data->tanggal_dokumen)),
+                "is_used"               => $barangDokumen == null ? false : true,
+                "barang_dokumen_id"     => $barangDokumen == null ? 0 : encrypt($barangDokumen['id'])
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $beaCukaiDokumen['totalData'],
+            "recordsFiltered"   => $beaCukaiDokumen['totalFilteredData'],
+            "data"              => $resDokumen,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function createBarangDokumenAction()
+    {
+        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
+
+        $barangDokumenID = decrypt($this->request->getVar('bc_23_dokumen_id'));
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+
+        $bc23BarangDokumenModel->insert([
+            'penerimaan_barang_id' => $penerimaanBarangID,
+            'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
+            'bc_23_dokumen_id' => $barangDokumenID,
+            'seri_dokumen' => $this->request->getVar('seri_dokumen')
+        ]);
+
+        return response()->setJSON([
+            'message' => "Dokumen berhasil ditambahkan",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function deleteBarangDokumenAction()
+    {
+        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
+        $bc23BarangDokumenModel->delete(decrypt($this->request->getVar('id')));
+
+        return response()->setJSON([
+            'message' => "Dokumen berhasil dihapus",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function createBarangDetailAction()
+    {
+        $bc23BarangModel = new BC23BarangModel();
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+
+        $bc23Barang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+
+        if ($bc23Barang == null) {
+            $bc23BarangModel->insert([
+                'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
+                'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
+                'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),
+                'pos_tarif' => decrypt($this->request->getVar('barang_detail_kode_hs')),
+                'kode_barang' => $this->request->getVar('barang_detail_kode_barang'),
+                'uraian' => $this->request->getVar('barang_detail_uraian'),
+                'merk_barang' => $this->request->getVar('barang_detail_merk_barang'),
+                'tipe_barang' => $this->request->getVar('barang_detail_tipe_barang'),
+                'spesifikasi_lain' => $this->request->getVar('barang_detail_spesifikasi_lain'),
+                'kode_kategori_barang' => decrypt($this->request->getVar('barang_detail_kategori_barang')),
+                'kode_negara_asal' => decrypt($this->request->getVar('barang_detail_negara')),
+                'harga_perolehan_barang' => convertRupiahToNumber($this->request->getVar('barang_detail_harga')),
+                'nilai_tambah' => convertRupiahToNumber($this->request->getVar('barang_detail_biaya_tambahan')),
+                'fob' => convertRupiahToNumber($this->request->getVar('barang_detail_fob')),
+                'harga_satuan_barang' => convertRupiahToNumber($this->request->getVar('barang_detail_harga_satuan')),
+                'freight' => convertRupiahToNumber($this->request->getVar('barang_detail_freight')),
+                'asuransi' => convertRupiahToNumber($this->request->getVar('barang_detail_asuransi')),
+                'cif_rupiah' => convertRupiahToNumber($this->request->getVar('barang_detail_cif')),
+                'harga_ekspor' => convertRupiahToNumber($this->request->getVar('barang_detail_nilai_pabean')),
+                'jumlah_satuan' => $this->request->getVar('barang_detail_jumlah_satuan'),
+                'kode_satuan_barang' => decrypt($this->request->getVar('barang_detail_kode_satuan_barang')),
+                'jumlah_kemasan' => $this->request->getvar('barang_detail_jumlah_kemasan'),
+                'kode_jenis_kemasan' => decrypt($this->request->getVar('barang_detail_kode_jenis_kemasan')),
+                'netto' => $this->request->getVar('barang_detail_berat_bersih')
+            ]);
+        } else {
+            $bc23BarangModel->update($bc23Barang['id'], [
+                'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
+                'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
+                'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),
+                'pos_tarif' => decrypt($this->request->getVar('barang_detail_kode_hs')),
+                'kode_barang' => $this->request->getVar('barang_detail_kode_barang'),
+                'uraian' => $this->request->getVar('barang_detail_uraian'),
+                'merk_barang' => $this->request->getVar('barang_detail_merk_barang'),
+                'tipe_barang' => $this->request->getVar('barang_detail_tipe_barang'),
+                'spesifikasi_lain' => $this->request->getVar('barang_detail_spesifikasi_lain'),
+                'kode_kategori_barang' => decrypt($this->request->getVar('barang_detail_kategori_barang')),
+                'kode_negara_asal' => decrypt($this->request->getVar('barang_detail_negara')),
+                'harga_perolehan_barang' => convertRupiahToNumber($this->request->getVar('barang_detail_harga')),
+                'nilai_tambah' => convertRupiahToNumber($this->request->getVar('barang_detail_biaya_tambahan')),
+                'fob' => convertRupiahToNumber($this->request->getVar('barang_detail_fob')),
+                'harga_satuan_barang' => convertRupiahToNumber($this->request->getVar('barang_detail_harga_satuan')),
+                'freight' => convertRupiahToNumber($this->request->getVar('barang_detail_freight')),
+                'asuransi' => convertRupiahToNumber($this->request->getVar('barang_detail_asuransi')),
+                'cif_rupiah' => convertRupiahToNumber($this->request->getVar('barang_detail_cif')),
+                'harga_ekspor' => convertRupiahToNumber($this->request->getVar('barang_detail_nilai_pabean')),
+                'jumlah_satuan' => $this->request->getVar('barang_detail_jumlah_satuan'),
+                'kode_satuan_barang' => decrypt($this->request->getVar('barang_detail_kode_satuan_barang')),
+                'jumlah_kemasan' => $this->request->getvar('barang_detail_jumlah_kemasan'),
+                'kode_jenis_kemasan' => decrypt($this->request->getVar('barang_detail_kode_jenis_kemasan')),
+                'netto' => $this->request->getVar('barang_detail_berat_bersih')
+            ]);
+        }
+
+        return response()->setJSON([
+            'message' => "Detail Barang Dokumen Berhasil Disimpan",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
 
     public function createPungutanView($penerimaanBarangID)
     {
@@ -999,6 +1277,7 @@ class BC23 extends BaseController
         $isCompleteFormPengangkut = $bc23Model->isCompleteFormPengangkut($penerimaanBarangID);
         $isCompleteFormPetiKemas = $bc23Model->isCompleteFormPetiKemas($penerimaanBarangID);
         $isCompleteFormFormTransaksi = $bc23Model->isCompleteFormTransaksi($penerimaanBarangID);
+        $isCompleteFormBarang = $bc23Model->isCompleteFormBarang($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
@@ -1007,6 +1286,7 @@ class BC23 extends BaseController
         session()->setFlashdata('isCompleteFormPengangkut', $isCompleteFormPengangkut);
         session()->setFlashdata('isCompleteFormPetiKemas', $isCompleteFormPetiKemas);
         session()->setFlashdata('isCompleteFormTransaksi', $isCompleteFormFormTransaksi);
+        session()->setFlashdata('isCompleteFormBarang', $isCompleteFormBarang);
     }
 
 

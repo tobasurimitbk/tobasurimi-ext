@@ -39,6 +39,7 @@ class BC23BarangModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+
     public function get($bc23ID)
     {
         return $this->where('bc_23_id', $bc23ID)->where('deletedAt', null)->findAll();
