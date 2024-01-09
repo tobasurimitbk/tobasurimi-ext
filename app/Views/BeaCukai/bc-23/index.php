@@ -36,8 +36,8 @@
                 <div class="col-md-3 mb-3">
                     <select name="statusLPB" class="form-select statusLPB" id="statusLPB">
                         <option value="SEMUA">JENIS LPB : SEMUA</option>
-                        <option value="LOKAL BAKU">JENIS LPB : LOKAL BB</option>
-                        <option value="LOKAL PENOLONG">JENIS LPB : LOKAL BP</option>
+                        <!-- <option value="LOKAL BAKU">JENIS LPB : LOKAL BB</option>
+                        <option value="LOKAL PENOLONG">JENIS LPB : LOKAL BP</option> -->
                         <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
                         <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option>
                     </select>

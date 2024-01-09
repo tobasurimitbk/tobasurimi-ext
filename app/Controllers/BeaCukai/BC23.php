@@ -836,6 +836,7 @@ class BC23 extends BaseController
         $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel(); // lokal | import penolong
         $supplierHargaModel = new SupplierHargaModel();
         $barangMasterModel = new BarangMasterModel();
+        $bc23Model = new BC23Model();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
         $penerimaanBarangDetailID = decrypt($penerimaanBarangDetailID);
@@ -884,14 +885,16 @@ class BC23 extends BaseController
 
         $seriBarang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
         $bc23DokumenBarang =  $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+        $bc23 = $bc23Model->where('penerimaan_barang_id', $penerimaanBarangID)->first();
+
         if ($bc23DokumenBarang != null) {
             $kodeSatuanBarang = $metaDataModel->where('name', "Kode Satuan BC")->where('value', $bc23DokumenBarang['kode_satuan_barang'])->first();
         }
 
         $data = [
-            'kodeFasilitasTarif' => $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->findAll(),
+            'kodeFasilitasTarif' => $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN'])->findAll(),
             'kodeJenisTarif' => $metaDataModel->where('name', "Kode Jenis Tarif BC")->findAll(),
-            'kodeJenisPungutan' => $metaDataModel->where('name', "Kode Jenis Pungutan BC")->findAll(),
+            'kodeJenisPungutan' => $metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['BM', 'PPN', 'PPH'])->findAll(),
             'kodeNegaraAsal' => $countryModel->findAll(),
             'kodeHS' => $hsCodeModel->findAll(),
             'kodeKategoriBarang' => $metaDataModel->where('name', 'Kategori Barang BC')->orderBy('description', "ASC")->findAll(),
@@ -902,7 +905,9 @@ class BC23 extends BaseController
             'barangDetail' => $barangDetail,
             'seriBarang' => $seriBarang == null ? 1 : $seriBarang['seri_barang'] + 1,
             'bc23DokumenBarang' => $bc23DokumenBarang,
-            'kodeSatuanBarang' => $kodeSatuanBarang
+            'kodeSatuanBarang' => $kodeSatuanBarang,
+            'jenisNegara' => $metaDataModel->where('name', "Jenis Negara BC")->where('deletedAt', null)->findAll(),
+            'ndpbm' => $bc23 == null ? 0 : ($bc23['ndpbm'] == null ? 0 : $bc23['ndpbm'])
         ];
 
         return view('BeaCukai/bc-23/form-detail-barang', $data);
@@ -968,6 +973,7 @@ class BC23 extends BaseController
     {
         $bc23BarangTarifModel = new BC23BarangTarifModel();
         $bc23BarangModel = new BC23BarangModel();
+        $metaDataModel = new MetadataModel();
 
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
         $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
@@ -982,6 +988,48 @@ class BC23 extends BaseController
             ]);
         }
 
+        $pungutan = $bc23BarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
+            ->where('kode_jenis_pungutan', decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')))
+            ->first();
+
+        if ($pungutan != null) {
+            $kodeJenisPungutan = $metaDataModel->where('name', "Kode Jenis Pungutan BC")->where('value', $pungutan['kode_jenis_pungutan'])->first();
+
+            return response()->setJSON([
+                'message' => "Jenis pungutan " . $kodeJenisPungutan['description'] . " sudah ada",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $kodeJenisPungutanStr = decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan'));
+        $nilaiTarif =  ($this->request->getVar('barang_detail_nilai_tarif'));
+        $tarifFasilitas = ($this->request->getVar('barang_detail_tarif_fasilitas'));
+        $tarifFasilitas = ($tarifFasilitas == 0) ? 1 : $tarifFasilitas;
+
+        if ($kodeJenisPungutanStr == "PPN" || $kodeJenisPungutanStr == "PPH") {
+            $beaMasuk = $bc23BarangTarifModel
+                ->where('penerimaan_barang_id', $penerimaanBarangID)
+                ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
+                ->where('kode_jenis_pungutan', "BM")
+                ->first();
+
+            if ($beaMasuk == null) {
+                return response()->setJSON([
+                    'message' => "Pungutan Bea Masuk wajib ada jikalau ingin input pungutan PPN/PPH",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $nilaiBayar100 = $bc23Barang['harga_ekspor'] * (($nilaiTarif + $beaMasuk['nilai_bayar']) / 100);
+            $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
+        } else {
+            $nilaiBayar100 = $bc23Barang['harga_ekspor'] * ($nilaiTarif / 100);
+            $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
+        }
+
         $bc23BarangTarifModel->insert([
             'penerimaan_barang_id' => $penerimaanBarangID,
             'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
@@ -991,6 +1039,8 @@ class BC23 extends BaseController
             'kode_fasilitas_tarif' => decrypt($this->request->getVar('barang_detail_kode_fasilitas_tarif')),
             'tarif_fasilitas' => convertRupiahToNumber($this->request->getVar('barang_detail_tarif_fasilitas')),
             'seri_barang' => $bc23Barang['seri_barang'],
+            'kode_satuan_barang' => $bc23Barang['kode_satuan_barang'],
+            'nilai_bayar' => $nilaiBayar
         ]);
 
         return response()->setJSON([
@@ -1140,7 +1190,8 @@ class BC23 extends BaseController
                 'kode_satuan_barang' => decrypt($this->request->getVar('barang_detail_kode_satuan_barang')),
                 'jumlah_kemasan' => $this->request->getvar('barang_detail_jumlah_kemasan'),
                 'kode_jenis_kemasan' => decrypt($this->request->getVar('barang_detail_kode_jenis_kemasan')),
-                'netto' => $this->request->getVar('barang_detail_berat_bersih')
+                'netto' => $this->request->getVar('barang_detail_berat_bersih'),
+                'persentase_jenis_negara' => $this->request->getVar('persentase_jenis_negara')
             ]);
         } else {
             $bc23BarangModel->update($bc23Barang['id'], [
@@ -1167,7 +1218,8 @@ class BC23 extends BaseController
                 'kode_satuan_barang' => decrypt($this->request->getVar('barang_detail_kode_satuan_barang')),
                 'jumlah_kemasan' => $this->request->getvar('barang_detail_jumlah_kemasan'),
                 'kode_jenis_kemasan' => decrypt($this->request->getVar('barang_detail_kode_jenis_kemasan')),
-                'netto' => $this->request->getVar('barang_detail_berat_bersih')
+                'netto' => $this->request->getVar('barang_detail_berat_bersih'),
+                'persentase_jenis_negara' => $this->request->getVar('persentase_jenis_negara')
             ]);
         }
 
@@ -1182,6 +1234,8 @@ class BC23 extends BaseController
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $metaDataModel = new MetadataModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
@@ -1193,9 +1247,81 @@ class BC23 extends BaseController
 
         $this->setFlashDataNavigatorSession($penerimaanBarangID);
 
+        $kodeJenisPungutan = $metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['BM', 'PPN', 'PPH'])->findAll();
+
+        $barangTarif = $bc23BarangTarifModel
+            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->findAll();
+
+        $pungutanList = [];
+
+        $bmDitangguhkan = 0;
+        $bmDibebaskan = 0;
+        $bmTidakDipungut = 0;
+
+        $pphDitangguhkan = 0;
+        $pphDibebaskan = 0;
+        $pphTidakDipungut = 0;
+
+        $ppnDitangguhkan = 0;
+        $ppnDibebaskan = 0;
+        $ppnTidakDipungut = 0;
+
+        foreach ($barangTarif as $b) {
+            if ($b['kode_jenis_pungutan'] == "BM" && $b['kode_fasilitas_tarif'] == 3) {
+                $bmDitangguhkan += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "BM" && $b['kode_fasilitas_tarif'] == 5) {
+                $bmDibebaskan += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "BM" && $b['kode_fasilitas_tarif'] == 6) {
+                $bmTidakDipungut  += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "PPH" && $b['kode_fasilitas_tarif'] == 3) {
+                $pphDitangguhkan += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "PPH" && $b['kode_fasilitas_tarif'] == 5) {
+                $pphDibebaskan += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "PPH" && $b['kode_fasilitas_tarif'] == 6) {
+                $pphTidakDipungut += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "PPN" && $b['kode_fasilitas_tarif'] == 3) {
+                $ppnDitangguhkan += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "PPN" && $b['kode_fasilitas_tarif'] == 5) {
+                $ppnDibebaskan += $b['nilai_bayar'];
+            } elseif ($b['kode_jenis_pungutan'] == "PPN" && $b['kode_fasilitas_tarif'] == 6) {
+                $ppnTidakDipungut += $b['nilai_bayar'];
+            }
+        }
+
+        foreach ($kodeJenisPungutan as $k) {
+            if ($k['value'] == "BM") {
+                $pungutanList[] = [
+                    'pungutan' => $k['value'],
+                    'tidak_dipungut' => $bmTidakDipungut,
+                    'dibebaskan' => $bmDibebaskan,
+                    'ditangguhkan' => $bmDitangguhkan
+
+                ];
+            } elseif ($k['value'] == "PPH") {
+                $pungutanList[] = [
+                    'pungutan' => $k['value'],
+                    'tidak_dipungut' => $pphTidakDipungut,
+                    'dibebaskan' => $pphDibebaskan,
+                    'ditangguhkan' => $pphDitangguhkan
+
+                ];
+            } elseif ($k['value'] == "PPN") {
+                $pungutanList[] = [
+                    'pungutan' => $k['value'],
+                    'tidak_dipungut' => $ppnTidakDipungut,
+                    'dibebaskan' => $ppnDibebaskan,
+                    'ditangguhkan' => $ppnDitangguhkan
+
+                ];
+            }
+        }
+
         $data = [
             'lpb' => $lpb,
-            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan)
+            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan),
+            'pungutanList' => $pungutanList,
+            'barangTarif' => $barangTarif
         ];
 
         return view('BeaCukai/bc-23/form-pungutan', $data);
@@ -1278,6 +1404,7 @@ class BC23 extends BaseController
         $isCompleteFormPetiKemas = $bc23Model->isCompleteFormPetiKemas($penerimaanBarangID);
         $isCompleteFormFormTransaksi = $bc23Model->isCompleteFormTransaksi($penerimaanBarangID);
         $isCompleteFormBarang = $bc23Model->isCompleteFormBarang($penerimaanBarangID);
+        $isCompleteFormPungutan = $bc23Model->isCompleteFormPungutan($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
@@ -1287,6 +1414,7 @@ class BC23 extends BaseController
         session()->setFlashdata('isCompleteFormPetiKemas', $isCompleteFormPetiKemas);
         session()->setFlashdata('isCompleteFormTransaksi', $isCompleteFormFormTransaksi);
         session()->setFlashdata('isCompleteFormBarang', $isCompleteFormBarang);
+        session()->setFlashdata('isCompleteFormPungutan', $isCompleteFormPungutan);
     }
 
 

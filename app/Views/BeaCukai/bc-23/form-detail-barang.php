@@ -161,16 +161,30 @@
                                     <label style="z-index: 1;">Negara</label>
                                 </div>
                             </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select persentase_jenis_negara" id="persentase_jenis_negara" name="persentase_jenis_negara" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php foreach ($jenisNegara as $k) : ?>
+                                            <option <?= $bc23DokumenBarang != null ? ($bc23DokumenBarang['persentase_jenis_negara'] == $k['description'] ? 'selected' : '') : '' ?> value="<?= ($k['description']) ?>">
+                                                <?= $k['value'] . " / " . $k['description'] . "%" ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label style="z-index: 1;">Lokasi Negara</label>
+                                </div>
+                            </div>
                             <label class="form-label font-weight-bold lable-title mb-3">
                                 Harga
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input readonly id="barang_detail_harga" value="<?= $bc23DokumenBarang == null ? formatRupiah($lpbDetail['sub_total']) : formatRupiah($bc23DokumenBarang['harga_perolehan_barang']) ?>" maxlength="24" name="barang_detail_harga" type="text" class="form-control barang_detail_harga" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input readonly id="barang_detail_harga" value="<?= formatRupiah($lpbDetail['sub_total'])  ?>" maxlength="24" name="barang_detail_harga" type="text" class="form-control barang_detail_harga" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Harga</label>
                                     <small><i>Harga total sesuai dengan LPB diterima</i></small>
                                 </div>
                             </div>
+
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
                                     <input id="barang_detail_biaya_tambahan" maxlength="24" name="barang_detail_biaya_tambahan" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['nilai_tambah']) ?>" class="form-control barang_detail_biaya_tambahan" placeholder="" onchange="this.value = formatRupiah(this.value)">
@@ -179,7 +193,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_fob" maxlength="24" name="barang_detail_fob" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['fob']) ?>" class="form-control barang_detail_fob" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_fob" readonly maxlength="24" name="barang_detail_fob" type="text" value="<?= formatRupiah($lpbDetail['sub_total']) ?>" class="form-control barang_detail_fob" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>FOB</label>
                                 </div>
                             </div>
@@ -192,25 +206,25 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_freight" maxlength="24" name="barang_detail_freight" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['freight']) ?>" class="form-control barang_detail_freight" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_freight" maxlength="24" name="barang_detail_freight" readonly type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['freight']) ?>" class="form-control barang_detail_freight" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Freight</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_asuransi" maxlength="24" name="barang_detail_asuransi" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['asuransi']) ?>" class="form-control barang_detail_asuransi" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_asuransi" readonly maxlength="24" name="barang_detail_asuransi" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['asuransi']) ?>" class="form-control barang_detail_asuransi" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Asuransi</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_cif" maxlength="24" name="barang_detail_cif" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['cif_rupiah']) ?>" class="form-control barang_detail_cif" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_cif" maxlength="24" name="barang_detail_cif" readonly type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['cif_rupiah']) ?>" class="form-control barang_detail_cif" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Nilai CIF</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_nilai_pabean" maxlength="24" name="barang_detail_nilai_pabean" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['harga_ekspor']) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input readonly id="barang_detail_nilai_pabean" maxlength="24" name="barang_detail_nilai_pabean" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : formatRupiah($bc23DokumenBarang['harga_ekspor']) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Nilai Pabean</label>
                                 </div>
                             </div>
@@ -324,7 +338,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="number" minlength="1" maxlength="100" class="form-control barang_detail_nilai_tarif" placeholder="">
+                                    <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="number" min="0" max="100" class="form-control barang_detail_nilai_tarif" placeholder="" oninput="$(this).val(Math.max(0, Math.min(100, $(this).val())))">
                                     <label>Nilai Tarif (%)</label>
                                 </div>
                             </div>
@@ -343,7 +357,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_tarif_fasilitas" name="barang_detail_tarif_fasilitas" type="number" class="form-control barang_detail_tarif_fasilitas" placeholder="" minlength="1" maxlength="100">
+                                    <input id="barang_detail_tarif_fasilitas" max="100" value="100" name="barang_detail_tarif_fasilitas" type="number" class="form-control barang_detail_tarif_fasilitas" placeholder="" minlength="1" maxlength="100" oninput="$(this).val(Math.max(0, Math.min(100, $(this).val())))">
                                     <label>Tarif Fasilitas (%)</label>
                                 </div>
                             </div>
@@ -380,12 +394,9 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-
-
 </section>
 
 <script>
@@ -404,6 +415,26 @@
     $('#barang_detail_kode_hs').select2({
         placeholder: "Pilih Kode HS/Pos Tarif",
         theme: "bootstrap-5",
+    });
+
+    $('#persentase_jenis_negara').select2({
+        placeholder: "Pilih Lokasi Negara",
+        theme: "bootstrap-5",
+    }).change(function() {
+        var percentace = Number($(this).val()) / 100;
+        var freight = Number(convertRupiahToNumber($('#barang_detail_fob').val())) * percentace;
+        var ndpbm = "<?= $ndpbm ?>";
+        $('#barang_detail_freight').val(formatRupiah(freight));
+
+        var asuransi = (freight + Number(convertRupiahToNumber($('#barang_detail_harga').val()))) * 0.5;
+        $('#barang_detail_asuransi').val(formatRupiah(asuransi));
+
+        var cif = ((asuransi) + (freight) + convertRupiahToNumber($('#barang_detail_harga').val()));
+        $('#barang_detail_cif').val(formatRupiah(cif));
+
+        var nilaiPabean = ndpbm * cif;
+        $('#barang_detail_nilai_pabean').val(formatRupiah(nilaiPabean));
+
     });
 
     $('#barang_detail_kategori_barang').select2({
@@ -732,6 +763,9 @@
             barang_detail_negara: {
                 required: true
             },
+            persentase_jenis_negara: {
+                required: true
+            },
             barang_detail_harga: {
                 required: true
             },
@@ -799,6 +833,9 @@
             },
             barang_detail_negara: {
                 required: "Pilih negara"
+            },
+            persentase_jenis_negara: {
+                required: "Pilih lokasi negara"
             },
             barang_detail_harga: {
                 required: "Harga wajib diisi"
@@ -901,7 +938,7 @@
                                 $('#barang_detail_kode_jenis_tarif').val(null).change();
                                 $('#barang_detail_nilai_tarif').val('');
                                 $('#barang_detail_kode_fasilitas_tarif').val(null).change();
-                                $('#barang_detail_tarif_fasilitas').val('');
+                                $('#barang_detail_tarif_fasilitas').val('100');
                             } else {
                                 Swal.fire({
                                     icon: 'warning',
@@ -1077,6 +1114,7 @@
             });
         }
     });
+
 
     function removePungutan(id) {
         Swal.fire({

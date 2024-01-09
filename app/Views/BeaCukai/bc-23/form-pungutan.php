@@ -22,11 +22,11 @@
                         Data Pungutan
                     </label>
                 </div>
-                <div class="col-sm">
+                <!-- <div class="col-sm">
                     <a href="#" type="button" class="btn btn-primary mt-4 mb-2" style="float: right;">
                         Generate Pungutan
                     </a>
-                </div>
+                </div> -->
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-pungutan" width="100%" cellspacing="0">
@@ -40,6 +40,19 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if (count($barangTarif) != 0) : ?>
+                            <?php $no = 1; ?>
+                            <?php foreach ($pungutanList as $p) : ?>
+                                <tr>
+                                    <td style="text-align: center;"><?= $no++ ?></td>
+                                    <td style="text-align: center;"><?= ($p['pungutan']) ?></td>
+                                    <td style="text-align: center;"><?= formatRupiah($p['tidak_dipungut']) ?></td>
+                                    <td style="text-align: center;"><?= formatRupiah($p['dibebaskan']) ?></td>
+                                    <td style="text-align: center;"><?= formatRupiah($p['ditangguhkan']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

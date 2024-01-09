@@ -351,9 +351,10 @@ function generateUniqueCode($codeLength)
 
 function convertRupiahToNumber($rupiah)
 {
-   $numberOnly = preg_replace('/[^0-9]/', '', $rupiah);
-   $result = (int)$numberOnly;
-   return $result;
+   $angka = str_replace('.', '', $rupiah);
+   $angkaArray = explode(',', $angka);
+   $angkaTanpaKoma = $angkaArray[0];
+   return $angkaTanpaKoma;
 }
 
 function formatRupiah($angka)

@@ -351,4 +351,14 @@ class BC23Model extends Model
 
         return $totalSudahDiisi == $totalPerluDiisi ? true : false;
     }
+
+    public function isCompleteFormPungutan($penerimaanBarangID)
+    {
+        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $barangTarif = $bc23BarangTarifModel
+            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->findAll();
+
+        return count($barangTarif) == 0 ? false : true;
+    }
 }

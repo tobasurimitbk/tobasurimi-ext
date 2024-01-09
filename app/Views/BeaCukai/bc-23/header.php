@@ -8,11 +8,11 @@
             <button class="btn btn-warning btn-print float-right text-white root-form-view" disabled>
                 Print
             </button>
-            <button class="btn btn-show-form btn-success float-right btn-submit-parent root-form-view btn-submit-root-form-view">
-                Validasi
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view" disabled>
-                Kirim ke Ceisa 4.0
+            <?php
+            $isFinished = session()->getFlashdata('isCompleteFormHeader') && session()->getFlashdata('isCompleteFormEntitas') && session()->getFlashdata('isCompleteFormDokumen') && session()->getFlashdata('isCompleteFormPengangkut') && session()->getFlashdata('isCompleteFormPetiKemas') && session()->getFlashdata('isCompleteFormTransaksi') && session()->getFlashdata('isCompleteFormBarang') && session()->getFlashdata('isCompleteForPungutan')  && session()->getFlashdata('isCompleteFormPernyataan');
+            ?>
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view" <?= ($isFinished == true) ? '' : 'disabled' ?>>
+                Kirim ke Ceisa 4.0 <?= $isFinished; ?>
             </button>
         </div>
     <?php endif; ?>
