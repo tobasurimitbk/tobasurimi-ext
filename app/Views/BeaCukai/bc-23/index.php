@@ -29,7 +29,7 @@
                 <div class="col-md-3 mb-3">
                     <select name="statusBC" class="form-select statusBC" id="statusBC">
                         <option value="Belum Dibuat">STATUS BC : BELUM DIBUAT</option>
-                        <option value="Belum Posting">STATUS BC : BELUM POSTING</option>
+                        <option value="Belum Posting">STATUS BC : BELUM LENGKAP</option>
                         <option value="Sudah Posting">STATUS BC : SUDAH POSTING</option>
                     </select>
                 </div>
