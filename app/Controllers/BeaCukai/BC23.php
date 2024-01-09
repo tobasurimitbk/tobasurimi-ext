@@ -154,7 +154,9 @@ class BC23 extends BaseController
     public function createHeaderAction()
     {
         $bc23Model = new BC23Model();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
 
         $lastData = $bc23Model->get($penerimaanBarangID);
 
@@ -181,6 +183,10 @@ class BC23 extends BaseController
                 'kode_tujuan_tpb' => decrypt($this->request->getVar('header_kode_tujuan_tpb')),
             ]);
         }
+
+        $penerimaanBarangModel->update($penerimaanBarangID, [
+            "tanggal" => $this->request->getVar("tanggal_penerimaan_barang") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_barang")), "Y-m-d") : "",
+        ]);
 
         return response()->setJSON([
             'status' => true,
