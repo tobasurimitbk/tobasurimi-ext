@@ -134,6 +134,7 @@ class PenerimaanBarangDetailModel extends Model
             if ($tipe_bahan === "BAKU") {
                 $builder->select(
                     'penerimaan_barang_detail.*, satuans.id as id_satuan, 
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 satuans.kode_satuan, 
                 barang_master.kode_barang, 
                 barang_master.barang_name as nama_barang,
@@ -161,6 +162,7 @@ class PenerimaanBarangDetailModel extends Model
             if ($tipe_bahan === "PENOLONG") {
                 $builder->select(
                     'penerimaan_barang_detail.*, satuans.id as id_satuan, 
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 satuans.nama_satuan, 
                 barang_master.kode_barang, 
                 barang_master.barang_name as nama_barang,
@@ -191,6 +193,7 @@ class PenerimaanBarangDetailModel extends Model
             if ($tipe_bahan === "BAKU") {
                 $builder->select(
                     'penerimaan_barang_detail.*, satuans.id as id_satuan, 
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 satuans.nama_satuan, 
                 barang_master.kode_barang, 
                 barang_master.barang_name as nama_barang,
@@ -215,6 +218,7 @@ class PenerimaanBarangDetailModel extends Model
             if ($tipe_bahan === "PENOLONG") {
                 $builder->select(
                     'penerimaan_barang_detail.*, satuans.id as id_satuan, 
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 satuans.nama_satuan, 
                 barang_master.kode_barang, 
                 barang_master.barang_name as nama_barang,

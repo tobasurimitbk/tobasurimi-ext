@@ -29,15 +29,15 @@
                 <div class="col-md-3 mb-3">
                     <select name="statusBC" class="form-select statusBC" id="statusBC">
                         <option value="Belum Dibuat">STATUS BC : BELUM DIBUAT</option>
-                        <option value="Belum Posting">STATUS BC : BELUM POSTING</option>
+                        <option value="Belum Posting">STATUS BC : BELUM LENGKAP</option>
                         <option value="Sudah Posting">STATUS BC : SUDAH POSTING</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
                     <select name="statusLPB" class="form-select statusLPB" id="statusLPB">
                         <option value="SEMUA">JENIS LPB : SEMUA</option>
-                        <option value="LOKAL BAKU">JENIS LPB : LOKAL BB</option>
-                        <option value="LOKAL PENOLONG">JENIS LPB : LOKAL BP</option>
+                        <!-- <option value="LOKAL BAKU">JENIS LPB : LOKAL BB</option>
+                        <option value="LOKAL PENOLONG">JENIS LPB : LOKAL BP</option> -->
                         <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
                         <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option>
                     </select>

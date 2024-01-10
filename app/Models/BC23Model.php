@@ -320,4 +320,45 @@ class BC23Model extends Model
 
         return $kontainer && $kemasan;
     }
+
+    public function isCompleteFormTransaksi($penerimaanBarangID)
+    {
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            return false;
+        } else {
+            return ($data['kode_valuta'] != null && $data['kode_incoterm'] != null && $data['kode_asuransi'] != null && $data['kode_kena_pajak'] != null) ? true : false;
+        }
+    }
+
+    public function isCompleteFormBarang($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $bc23BarangModel = new BC23BarangModel();
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $lpbDetail = $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan);
+
+        $totalPerluDiisi = count($lpbDetail);
+        $totalSudahDiisi = 0;
+        foreach ($lpbDetail as $l) {
+            $bc23DokumenBarang =  $bc23BarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first();
+            if ($bc23DokumenBarang != null) {
+                $totalSudahDiisi++;
+            }
+        }
+
+        return $totalSudahDiisi == $totalPerluDiisi ? true : false;
+    }
+
+    public function isCompleteFormPungutan($penerimaanBarangID)
+    {
+        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $barangTarif = $bc23BarangTarifModel
+            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->findAll();
+
+        return count($barangTarif) == 0 ? false : true;
+    }
 }

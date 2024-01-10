@@ -117,7 +117,9 @@
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataAJU as $aju) : ?>
-                                    <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
+                                    <?php if ($aju['id'] == 48) : ?>
+                                        <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>

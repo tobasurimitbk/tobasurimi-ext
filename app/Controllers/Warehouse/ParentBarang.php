@@ -104,6 +104,7 @@ class ParentBarang extends BaseController
         $parentBarangModel = new ParentBarangModel();
         $res = $parentBarangModel->where('id', $id)->first();
         $res['kategori'] = encrypt($res['kategori']);
+        $res['id'] = encrypt($res['id']);
 
         return response()->setJSON([
             'data' => $res,

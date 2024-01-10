@@ -739,12 +739,24 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/kemasan-peti-kemas/kemasan/delete', 'BeaCukai\BC23::deleteKemasanAction');
     $routes->post('id/kemasan-peti-kemas/kontainer/create', 'BeaCukai\BC23::createKontainerAction');
     $routes->post('id/kemasan-peti-kemas/kontainer/delete', 'BeaCukai\BC23::deleteKontainerAction');
-
+    // TRANSAKSI
     $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC23::createTransaksiView/$1');
+    $routes->post('id/transaksi', 'BeaCukai\BC23::createTransaksiAction');
+    // BARANG
     $routes->get('id/barang/(:segment)', 'BeaCukai\BC23::createBarangView/$1');
+    $routes->get('id/barang/(:segment)/(:segment)', 'BeaCukai\BC23::createBarangDetailView/$1/$2');
+    $routes->get('id/barang-pungutan-all', 'BeaCukai\BC23::allPungutan');
+    $routes->post('id/barang-pungutan-create', 'BeaCukai\BC23::createPungutanAction');
+    $routes->post('id/barang-pungutan-delete', 'BeaCukai\BC23::deletePungutanAction');
+    $routes->get('id/barang-dokumen-all', 'BeaCukai\BC23::allDokumenBarang');
+    $routes->post('id/barang-dokumen-create', 'BeaCukai\BC23::createBarangDokumenAction');
+    $routes->post('id/barang-dokumen-delete', 'BeaCukai\BC23::deleteBarangDokumenAction');
+    $routes->post('id/barang', 'BeaCukai\BC23::createBarangDetailAction');
+
     $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC23::createPungutanView/$1');
     $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC23::createPernyataanView/$1');
     $routes->post('id/pernyataan', 'BeaCukai\BC23::createPernyataanAction');
+
 
     $routes->get('api/valuta', 'BeaCukai\BC23::getValuta');
 
