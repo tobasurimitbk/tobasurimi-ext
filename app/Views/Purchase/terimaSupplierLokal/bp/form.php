@@ -1119,7 +1119,7 @@
                 po_no: "<?= $d['po_no'] ?>",
                 tanggal: "<?= $d['tanggal'] ?>",
                 no_penerimaan_barang: "<?= $d['no_penerimaan_barang'] ?>",
-                nama_barang_dok: "<?= $d['nama_barang_dok'] ?>",
+                nama_barang_dok: "<?= str_replace('"', '\"', $d['nama_barang_dok']) ?>",
                 qty_lpb: "<?= $d['qty_lpb'] ?>",
                 qty_retur: "<?= $d['qty_retur'] ?>",
                 qty_telah_diterima: "<?= $d['qty_telah_diterima'] ?>",

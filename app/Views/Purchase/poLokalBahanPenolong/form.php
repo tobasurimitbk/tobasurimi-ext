@@ -933,7 +933,7 @@
             listBarang.push({
                 barang_id: "<?= $l['barang_id'] ?>",
                 kode_barang: "<?= $l['kode_barang'] ?>",
-                nama_barang: "<?= $l['nama_barang'] ?>",
+                nama_barang: "<?= str_replace('"', '\"', $l['nama_barang'])  ?>",
                 satuan_id: "<?= $l['satuan_id'] ?>",
                 nama_satuan: "<?= $l['nama_satuan'] ?>",
                 harga_satuan: "<?= $l['harga_satuan'] ?>",
