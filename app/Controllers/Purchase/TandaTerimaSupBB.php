@@ -108,6 +108,7 @@ class TandaTerimaSupBB extends BaseController
     {
         $data = [
             'dataSupplier' => $this->supplierModel->getSupplierByType("BAHAN PENOLONG"),
+            'noTandaTerima' => $this->tandaTerimaFakturModel->getNo(),
             'isUsed' => false
         ];
         return view('Purchase/terimaSupplierLokal/bp/form', $data);

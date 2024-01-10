@@ -40,11 +40,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? 'readonly' : '' ?> type="text" class="form-control no_tanda_terima_faktur" id="no_tanda_terima_faktur" name="no_tanda_terima_faktur" placeholder="No Tanda Terima Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_no'] : '' ?>">
+                                    <input readonly autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? 'readonly' : '' ?> type="text" class="form-control no_tanda_terima_faktur" id="no_tanda_terima_faktur" name="no_tanda_terima_faktur" placeholder="No Tanda Terima Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_no'] : $noTandaTerima ?>">
                                     <label for="floatingInput">No Terima Faktur</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($dataTandaTerimaFaktur) ? 'display:none' : '' ?> " class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($dataTandaTerimaFaktur) ? 'display:none' : '' ?> " class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
