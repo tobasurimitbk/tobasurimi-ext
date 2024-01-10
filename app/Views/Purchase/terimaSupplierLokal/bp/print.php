@@ -178,12 +178,20 @@
                 <td class="txt-right"><?= toRupiah($tambahan) ?></td>
                 <td></td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td></td>
                 <td><?= $taxList ?></td>
                 <td class="txt-right"><?= toRupiah($taxTotal) ?></td>
                 <td></td>
-            </tr>
+            </tr> -->
+            <?php foreach ($taxData as $t) : ?>
+                <tr>
+                    <td></td>
+                    <td><?= $t->tax_type ?></td>
+                    <td class="txt-right"><?= toRupiah($t->tax_amt) ?></td>
+                    <td></td>
+                </tr>
+            <?php endforeach; ?>
             <tr>
                 <th></th>
                 <th class="txt-right">TOTAL</th>
@@ -295,13 +303,20 @@
                 <th class="txt-right">JUMLAH</th>
                 <th class="txt-left">NO. PERKIRAAN</th>
             </tr>
-            <?php if (!empty($taxReturnList)) : ?>
+            <!-- <?php if (!empty($taxReturnList)) : ?>
                 <tr>
                     <td><?= $taxReturnList ?></td>
                     <td class="txt-right"><?= str_replace('Rp', '', toRupiah($taxReturnTotal)) ?></td>
                     <td></td>
                 </tr>
-            <?php endif; ?>
+            <?php endif; ?> -->
+            <?php foreach ($taxReturnData as $t) : ?>
+                <tr>
+                    <td><?= $t->tax_type ?></td>
+                    <td class="txt-right"><?= str_replace('Rp', '', toRupiah($t->tax_amt)) ?></td>
+                    <td></td>
+                </tr>
+            <?php endforeach; ?>
             <tr>
                 <th class="txt-right">TOTAL</th>
                 <th class="txt-right"><?= str_replace('Rp', '', toRupiah($taxReturnTotal))  ?></th>
