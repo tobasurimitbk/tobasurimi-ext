@@ -152,22 +152,28 @@
                             <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($barang as $s) : ?>
-                                    <option data-satuan_id="<?= $s['satuan_id'] ?>" data-nama_barang="<?= strtoupper($s['barang_name']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['id'] ?>">
-                                        <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name']) . " )" ?>
+                                    <option data-parent_name="<?= $s['parent_name'] ?>" data-satuan_id="<?= $s['satuan_id'] ?>" data-nama_barang="<?= strtoupper($s['barang_name']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['id'] ?>">
+                                        <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['parent_name']) . " ) ( " . strtoupper($s['barang_name']) . " )" ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Kode Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <input type="hidden" name="barang_update_id" id="barang_update_id" class="barang_update_id">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang">
                             <label for="floatingInput">Nama Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" readonly type="text" class="form-control nama_kategori" id="nama_kategori" name="nama_kategori">
+                            <label for="floatingInput">Nama Kategori</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select disabled class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -367,6 +373,7 @@
         theme: "bootstrap-5"
     }).change(function() {
         $('#nama_barang').val($(this).find("option:selected").data("nama_barang"));
+        $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
         $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
 
         $.ajax({

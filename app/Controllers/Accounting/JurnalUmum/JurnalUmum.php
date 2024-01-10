@@ -8,6 +8,8 @@ use App\Models\Sub_AkunsModel;
 use App\Models\JurnalUmumModel;
 use App\Models\TransaksiJurnalModel;
 use App\Models\MetadataModel;
+use App\Models\DivisisModel;
+use App\Models\SupplierModel;
 
 class JurnalUmum extends BaseController
 {
@@ -18,6 +20,8 @@ class JurnalUmum extends BaseController
     protected $transaksiJurnalModel;
     protected $encrypter;
     protected $MetadataModel;
+    protected $supplierModel;
+    protected $divisionModel;
 
     public function __construct()
     {
@@ -28,6 +32,8 @@ class JurnalUmum extends BaseController
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
         $this->MetadataModel = new MetadataModel();
         $this->encrypter = \Config\Services::encrypter();
+        $this->supplierModel = new SupplierModel();
+        $this->divisionModel = new DivisisModel();
     }
 
     public function index()
@@ -121,5 +127,20 @@ class JurnalUmum extends BaseController
             session()->setFlashdata('error_message', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
         }
         return redirect()->to('jurnal');
+    }
+
+    public function insertDataPembelian($divisionID, $supplierID, $aMPurchaseOrderDetailData)
+    {
+        $dataDepartment = $this->divisionModel->getAccountKasForJurnal($divisionID);
+        $dataSupplier = $this->supplierModel->getAccountSupplierForJurnal($supplierID);
+        foreach ($dataDepartment as $value) {
+            var_dump($value->ap_id);
+        }
+        foreach ($dataSupplier as $value) {
+            var_dump($value->ar_id);
+        }
+        foreach ($aMPurchaseOrderDetailData as $value) {
+            var_dump($value);
+        }
     }
 }

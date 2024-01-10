@@ -118,9 +118,10 @@ class BarangMasterModel extends Model
             'barang_master.type_barang' => $type
         ];
 
-        $selectQry = "barang_master.*, satuans.nama_satuan";
+        $selectQry = "barang_master.*, satuans.nama_satuan, parent_barang.parent_name";
         $data = $this->select($selectQry)
             ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
+            ->join('parent_barang', 'barang_master.parent_type_id = parent_barang.id', 'left')
             ->where($arrCondition)
             ->findAll();
 
@@ -149,5 +150,70 @@ class BarangMasterModel extends Model
     public function getBarang($barangID)
     {
         return $this->where('id', $barangID)->first();
+    }
+
+    public function getListForAccount($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'       => 'barang_master.kode_barang',
+            'barang_name'       => 'barang_master.barang_name',
+            'createdAt'         => 'barang_master.createdAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "barang_master.*,
+                    account_barang.ap_id,
+                    account_barang.ar_id,";
+
+        $barangDataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $barangDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $barangDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $barangDataQry->like('barang_master.barang_name', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $barangDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $barangDataQry->countAllResults(false);
+        $data = $barangDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getAccountBarangForJurnal($barangID)
+    {
+        $select =   "barang_master.*,
+                    account_barang.ap_id,
+                    account_barang.ar_id,";
+        return $this->asObject()
+            ->select($select)
+            ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
+            ->where('barang_master.id', $barangID)
+            ->where('barang_master.deletedAt', null)
+            ->findAll();
     }
 }

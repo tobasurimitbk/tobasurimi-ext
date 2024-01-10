@@ -282,4 +282,17 @@ class SupplierModel extends Model
             'allPO' => $allPo,
         ];
     }
+
+    public function getAccountSupplierForJurnal($supplierID)
+    {
+        $select =   "suppliers.*,
+                    account_supplier.ap_id,
+                    account_supplier.ar_id,";
+        return $this->asObject()
+            ->select($select)
+            ->join('account_supplier', 'suppliers.id = account_supplier.supplier_id', 'left')
+            ->where('suppliers.id', $supplierID)
+            ->where('suppliers.deletedAt', null)
+            ->findAll();
+    }
 }

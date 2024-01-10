@@ -988,7 +988,31 @@ $routes->get('/tipe-barang/id/(:segment)', 'Accounting\Barang\TipeBarang::getByI
 $routes->post('/tipe-barang/save', 'Accounting\Barang\TipeBarang::saveTipeBarang', ['filter' => 'Auth']);
 $routes->post('/tipe-barang/update', 'Accounting\Barang\TipeBarang::updateTipeBarang', ['filter' => 'Auth']);
 $routes->post('/tipe-barang/delete', 'Accounting\Barang\TipeBarang::deleteTipeBarang', ['filter' => 'Auth']);
-
+$routes->post('/tipe-barang/get', 'Accounting\Barang\TipeBarang::get', ['filter' => 'Auth']);
+//Akun Customer
+$routes->get('/akun-customer', 'Accounting\AccountCustomer\AccountCustomerController::index', ['filter' => 'Auth']);
+$routes->get('/akun-customer/all', 'Accounting\AccountCustomer\AccountCustomerController::allAccountCustomer', ['filter' => 'Auth']);
+$routes->get('/akun-customer/id/(:segment)', 'Accounting\AccountCustomer\AccountCustomerController::getByIdAccountModule/$1', ['filter' => 'Auth']);
+$routes->post('/akun-customer/save', 'Accounting\AccountCustomer\AccountCustomerController::saveAccountCustomer', ['filter' => 'Auth']);
+$routes->post('/akun-customer/update', 'Accounting\AccountCustomer\AccountCustomerController::updateAccountCustomer', ['filter' => 'Auth']);
+$routes->post('/akun-customer/delete', 'Accounting\AccountCustomer\AccountCustomerController::deleteAccountCustomer', ['filter' => 'Auth']);
+$routes->post('/akun-customer/get', 'Accounting\AccountCustomer\AccountCustomerController::get', ['filter' => 'Auth']);
+//Akun Supplier
+$routes->get('/akun-supplier', 'Accounting\AccountSupplier\AccountSupplierController::index', ['filter' => 'Auth']);
+$routes->get('/akun-supplier/all', 'Accounting\AccountSupplier\AccountSupplierController::allAccountSupplier', ['filter' => 'Auth']);
+$routes->get('/akun-supplier/id/(:segment)', 'Accounting\AccountSupplier\AccountSupplierController::getByIdAccountModule/$1', ['filter' => 'Auth']);
+$routes->post('/akun-supplier/save', 'Accounting\AccountSupplier\AccountSupplierController::saveAccountSupplier', ['filter' => 'Auth']);
+$routes->post('/akun-supplier/update', 'Accounting\AccountSupplier\AccountSupplierController::updateAccountSupplier', ['filter' => 'Auth']);
+$routes->post('/akun-supplier/delete', 'Accounting\AccountSupplier\AccountSupplierController::deleteAccountSupplier', ['filter' => 'Auth']);
+$routes->post('/akun-supplier/get', 'Accounting\AccountSupplier\AccountSupplierController::get', ['filter' => 'Auth']);
+//Tipe Barang
+$routes->get('/akun-department', 'Accounting\AccountDepartment\AccountDepartmentController::index', ['filter' => 'Auth']);
+$routes->get('/akun-department/all', 'Accounting\AccountDepartment\AccountDepartmentController::allAccountDepartment', ['filter' => 'Auth']);
+$routes->get('/akun-department/id/(:segment)', 'Accounting\AccountDepartment\AccountDepartmentController::getByIdAccountModule/$1', ['filter' => 'Auth']);
+$routes->post('/akun-department/save', 'Accounting\AccountDepartment\AccountDepartmentController::saveAccountDepartment', ['filter' => 'Auth']);
+$routes->post('/akun-department/update', 'Accounting\AccountDepartment\AccountDepartmentController::updateAccountDepartment', ['filter' => 'Auth']);
+$routes->post('/akun-department/delete', 'Accounting\AccountDepartment\AccountDepartmentController::deleteAccountDepartment', ['filter' => 'Auth']);
+$routes->post('/akun-department/get', 'Accounting\AccountDepartment\AccountDepartmentController::get', ['filter' => 'Auth']);
 //Laporan
 //Accounting
 $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);

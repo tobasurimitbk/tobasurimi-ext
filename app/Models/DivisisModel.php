@@ -122,4 +122,63 @@ class DivisisModel extends Model
             ->where('tunjangan.deletedAt', null)
             ->findAll();
     }
+
+    public function getListForAccount($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'divisi_name'       => 'divisis.divisi',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'divisis.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "divisis.*,
+                    account_divisis.ap_id,
+                    account_divisis.ar_id,";
+
+        $divisisDataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('account_divisis', 'divisis.id = account_divisis.divisis_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $divisisDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $divisisDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $divisisDataQry->like('divisis.divisi', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $divisisDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $divisisDataQry->countAllResults(false);
+        $data = $divisisDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getAccountKasForJurnal($divisionID)
+    {
+        $select =   "divisis.*,
+                    account_divisis.ap_id,
+                    account_divisis.ar_id,";
+        return $this->asObject()
+            ->select($select)
+            ->join('account_divisis', 'divisis.id = account_divisis.divisis_id', 'left')
+            ->where('divisis.id', $divisionID)
+            ->where('divisis.deletedAt', null)
+            ->findAll();
+    }
 }

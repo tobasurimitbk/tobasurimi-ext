@@ -1,67 +1,54 @@
 <?php
 
-namespace App\Controllers\Accounting\Barang;
+namespace App\Controllers\Accounting\AccountDepartment;
 
 use App\Controllers\BaseController;
 use App\Models\MetadataModel;
-use App\Models\BarangMasterModel;
+use App\Models\DivisisModel;
 use App\Models\Sub_AkunsModel;
-use App\Models\AccountBarangModel;
+use App\Models\AccountDivisisModel;
 
-class TipeBarang extends BaseController
+class AccountDepartmentController extends BaseController
 {
     protected $token;
     protected $this_company_id;
     protected $Sub_AkunsModel;
-    protected $barangMasterModel;
-    protected $accountBarangModel;
+    protected $divisisModel;
+    protected $accountDivisisModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
-        $this->barangMasterModel = new BarangMasterModel();
-        $this->accountBarangModel = new AccountBarangModel();
+        $this->divisisModel = new DivisisModel();
+        $this->accountDivisisModel = new AccountDivisisModel();
     }
 
     public function index()
     {
-        $metaDataModel = new MetadataModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
-
-        $type = "bahan_baku";
         $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
-
-        if (!empty(@$_GET['type'])) {
-            $type = $this->request->getGet('type');
-        }
-
         $data = [
-            'type' => $type,
-            'kategoriBP' => $metaDataModel->where('name', 'Kelompok BP')->findAll(),
             "subAkuns" => $subAkunsModel
         ];
-        // return view('Warehouse/parentBarang/index', $data);
-        return view('Accounting/parentBarang/index', $data);
+        return view('Accounting/accountDivisis/index', $data);
     }
 
-    public function saveTipeBarang()
+    public function saveAccountDepartment()
     {
+        $divisisId = $this->request->getVar('id');
+        $getDataAccountDivisis = $this->accountDivisisModel->where('divisis_id', $divisisId)->where('deleted_at', NULL)->first();
 
-        $type = $this->request->getVar('type');
-        $barangMasterId = $this->request->getVar('id');
-        $getDataAccountBarang = $this->accountBarangModel->where('barang_master_id', $barangMasterId)->where('deleted_at', NULL)->first();
-
-        if ($getDataAccountBarang != null) {
-            $this->accountBarangModel->update($getDataAccountBarang['id'], [
-                'barang_master_id' => $barangMasterId,
+        if ($getDataAccountDivisis != null) {
+            $this->accountDivisisModel->update($getDataAccountDivisis['id'], [
+                'divisis_id' => $divisisId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id')
             ]);
         } else {
-            $this->accountBarangModel->insert([
-                'barang_master_id' => $barangMasterId,
+            $this->accountDivisisModel->insert([
+                'divisis_id' => $divisisId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id')
             ]);
@@ -70,25 +57,25 @@ class TipeBarang extends BaseController
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
-            'message' => "Akun Barang Berhasil Ditambahkan"
+            'message' => "Akun Department Berhasil Ditambahkan"
         ]);
     }
     public function get()
     {
         $id = $this->request->getVar('id');
-        $dataAccountBarang = $this->barangMasterModel
-            ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
-            ->where('barang_master.id', $id)
+        $dataAccountDivisis = $this->divisisModel
+            ->join('account_divisis', 'divisis.id = account_divisis.divisis_id', 'left')
+            ->where('divisis.id', $id)
             ->first();
 
         return response()->setJSON([
-            'data' => $dataAccountBarang,
+            'data' => $dataAccountDivisis,
             'token' => csrf_hash(),
             'status' => true,
         ]);
     }
 
-    public function allTipeBarang()
+    public function allAccountDepartment()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -100,7 +87,6 @@ class TipeBarang extends BaseController
 
         $condition = [
             "company_id"  => $this->this_company_id,
-            "type_barang" => $this->request->getGet('parent_type'),
             "deletedAt" => NULL
         ];
 
@@ -117,7 +103,7 @@ class TipeBarang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $this->barangMasterModel->getListForAccount($condition, $addCondition, $limit, $offset);
+        $res = $this->divisisModel->getListForAccount($condition, $addCondition, $limit, $offset);
         $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
 
         $rdata = [];
@@ -143,7 +129,7 @@ class TipeBarang extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data['id'],
-                "parent_name"           => $data['barang_name'],
+                "parent_name"           => $data['divisi'],
                 "ap_id"                 => $dataNamaAP,
                 "ar_id"                 => $dataNamaAR,
             ]);

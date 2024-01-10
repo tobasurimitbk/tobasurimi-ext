@@ -3,6 +3,7 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
@@ -36,6 +37,8 @@ class POLokalBahanPenolong extends BaseController
     protected $penerimaanBarangModel;
     protected $taxModel;
 
+    protected $jurnalController;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -45,14 +48,15 @@ class POLokalBahanPenolong extends BaseController
         $this->MetadataModel = new MetadataModel();
         $this->SppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
+        $this->divisionModel = new DivisisModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
-        $this->divisionModel = new DivisisModel();
         $this->companyModel = new CompaniesModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->satuanModel = new SatuansModel();
         $this->taxModel = new TaxModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function poLokalBahanPenolong()
@@ -117,10 +121,17 @@ class POLokalBahanPenolong extends BaseController
             "createdBy" => session()->get("login")->user_id,
         ];
 
+        $divisionID = $this->request->getVar('divisionID');
+        $supplierID = $this->request->getVar('supplierID');
+        $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
+        $this->jurnalController->insertDataPembelian($divisionID, $supplierID, $aMPurchaseOrderDetailData);
+        // var_dump(json_decode($this->request->getVar('listBarang')));
+        // var_dump($dataSupplier);
+        exit;
+
         // insert new po
         $poID = $this->aMPurchaseOrderModel->insert($dataAmPurchaseOrderData);
 
-        $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
 
         foreach ($aMPurchaseOrderDetailData as $d) {
             $this->aMPurchaseOrderDetailModel->insert([

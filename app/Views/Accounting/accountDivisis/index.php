@@ -3,27 +3,13 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Akun Barang</h1>
+        <h1>Akun Department</h1>
     </div>
     <div class="card">
         <div class="card-body">
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "" || $type == "bahan_baku" ? "active" : "" ?> " href="<?= base_url('tipe-barang') ?>">Bahan Baku</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_penolong" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_penolong') ?>">Bahan Penolong</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_jadi" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_jadi') ?>">Bahan Jadi</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_scrap" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_scrap') ?>">Bahan Scrap</a>
-                </li>
-            </ul>
             <div class="row justify-content-end mt-3">
                 <div class="col-md-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kelompok Barang" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Department" value="" />
                 </div>
             </div>
             <div class="row mt-3">
@@ -32,7 +18,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th>Barang</th>
+                                <th>Department</th>
                                 <th>Akun Pembelian</th>
                                 <th>Akun Penjualan</th>
                             </tr>
@@ -56,13 +42,12 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
-                    <input type="hidden" name="type" id="type" value="<?= $type ?>">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Barang" id="parentName" name="parentName">
-                                <label for="floatingInput">Nama Barang</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Department" id="parentName" name="parentName">
+                                <label for="floatingInput">Nama Department</label>
                             </div>
                         </div>
                     </div>
@@ -136,13 +121,12 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("tipe-barang/all"); ?>",
+                url: "<?= base_url("akun-department/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
                     data.sort = sort;
                     data.sortType = sortType;
-                    data.parent_type = "<?= $type ?>";
                 }
             },
             "initComplete": function(settings, json) {
@@ -198,10 +182,10 @@
             console.log(id);
             formData.append("id", id);
 
-            $('.title-name').text("Update Akun Barang");
+            $('.title-name').text("Update Akun Department");
             $('.delete-btn').show();
             $.ajax({
-                url: "<?= base_url("tipe-barang/get"); ?>",
+                url: "<?= base_url("akun-department/get"); ?>",
                 data: formData,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -215,7 +199,7 @@
                     if (res.status) {
                         console.log(res);
                         $("#id").val(id);
-                        $("#parentName").val(res?.data?.barang_name);
+                        $("#parentName").val(res?.data?.divisi);
                         $("#akun_ap_id").val(res?.data?.ap_id).change();
                         $("#akun_ar_id").val(res?.data?.ar_id).change();
                         $('.add-modal').modal('show');
@@ -238,7 +222,7 @@
             },
             messages: {
                 parentName: {
-                    required: "Nama Barang Wajib Diisi"
+                    required: "Nama Department Wajib Diisi"
                 },
             },
             errorElement: 'span',
@@ -281,7 +265,7 @@
                         let csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form"));
                         $.ajax({
-                            url: "<?= base_url("tipe-barang/save"); ?>",
+                            url: "<?= base_url("akun-department/save"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());

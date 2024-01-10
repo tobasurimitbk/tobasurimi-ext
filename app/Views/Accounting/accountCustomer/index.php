@@ -3,24 +3,13 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Akun Barang</h1>
+        <h1>Account Customer</h1>
+        <button class="btn btn-show-form btn-add float-right">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
     </div>
     <div class="card">
         <div class="card-body">
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "" || $type == "bahan_baku" ? "active" : "" ?> " href="<?= base_url('tipe-barang') ?>">Bahan Baku</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_penolong" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_penolong') ?>">Bahan Penolong</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_jadi" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_jadi') ?>">Bahan Jadi</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= $type == "bahan_scrap" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_scrap') ?>">Bahan Scrap</a>
-                </li>
-            </ul>
             <div class="row justify-content-end mt-3">
                 <div class="col-md-2">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kelompok Barang" value="" />
@@ -32,9 +21,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th>Barang</th>
-                                <th>Akun Pembelian</th>
-                                <th>Akun Penjualan</th>
+                                <th onclick="changeSort('customer_name')" class="sort">Customer</th>
+                                <th class="sort">Akun Pembelian</th>
+                                <th class="sort">Akun Penjualan</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -56,13 +45,23 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
-                    <input type="hidden" name="type" id="type" value="<?= $type ?>">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Barang" id="parentName" name="parentName">
-                                <label for="floatingInput">Nama Barang</label>
+                                <select class="form-select customer_id" name="customer_id" id="customer_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($customerModel)) {
+                                        foreach ($customerModel as $customer) {
+                                    ?>
+                                            <option value="<?= $customer['id']; ?>"><?= $customer['kode']; ?> <?= $customer['name']; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Nama Konsumen</label>
                             </div>
                         </div>
                     </div>
@@ -111,6 +110,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="button" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -118,7 +118,7 @@
 
 <script>
     let sort = "nomor";
-    let sortType = "desc";
+    let sortType = "asc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -136,13 +136,12 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("tipe-barang/all"); ?>",
+                url: "<?= base_url("akun-customer/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
                     data.sort = sort;
                     data.sortType = sortType;
-                    data.parent_type = "<?= $type ?>";
                 }
             },
             "initComplete": function(settings, json) {
@@ -158,7 +157,7 @@
                 sortable: false,
                 width: "5%"
             }, {
-                data: "parent_name",
+                data: "customer_name",
                 className: "text-center",
             }, {
                 data: "ap_id",
@@ -184,6 +183,11 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         });
+        // create modal show
+        $('.btn-show-form').click(function() {
+            resetVal();
+            $('.add-modal').modal('show');
+        });
         // hide modal
         $('.btn-discard').click(function() {
             $('.add-modal').modal('hide');
@@ -192,16 +196,18 @@
             const data = table.row(this).data();
             let csrf = $(`[name="${csrfToken}"]`);
             let id = data.id;
-            let type = $("input[name='type']").val();
             let formData = new FormData();
-            $('#parentName').val(null);
-            console.log(id);
             formData.append("id", id);
+            if (id != 1) {
+                $('.delete-btn').show();
+            } else {
+                $('.delete-btn').hide();
 
-            $('.title-name').text("Update Akun Barang");
-            $('.delete-btn').show();
+            }
+
+            $('.title-name').text("Update Kategori ");
             $.ajax({
-                url: "<?= base_url("tipe-barang/get"); ?>",
+                url: "<?= base_url("akun-customer/get"); ?>",
                 data: formData,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -213,9 +219,19 @@
                 success: function(res) {
                     csrf.val();
                     if (res.status) {
-                        console.log(res);
-                        $("#id").val(id);
-                        $("#parentName").val(res?.data?.barang_name);
+                        $("#id").val(id).change();
+                        if (id != 1) {
+                            $('.delete-btn').show();
+                            $("#customer_id").prop("disabled", false).select2();
+
+                            $("#customer_id").val(res?.data?.customer_id).change();
+                        } else {
+                            $('.delete-btn').hide();
+                            $("#customer_id").select2({
+                                disabled: 'readonly'
+                            });
+                            $("#customer_id").val("").change()
+                        }
                         $("#akun_ap_id").val(res?.data?.ap_id).change();
                         $("#akun_ar_id").val(res?.data?.ar_id).change();
                         $('.add-modal').modal('show');
@@ -229,6 +245,58 @@
                 }
             })
         });
+
+        // delete
+        $(".delete-btn").click(function() {
+            var parentName = $('#parentName').val();
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Account Customer ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let id = $("#id").val();
+
+                    // console.log(id);
+
+                    $.ajax({
+                        url: "<?= base_url("akun-customer/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                        $(".add-modal").modal("hide")
+                                    });
+                            } else {
+                                $('#parentName').val(null);
+                                $(".add-modal").modal("hide")
+                            }
+                        },
+                    });
+                }
+            })
+        })
         // init validation
         var validator = $(".create-form").validate({
             rules: {
@@ -238,7 +306,7 @@
             },
             messages: {
                 parentName: {
-                    required: "Nama Barang Wajib Diisi"
+                    required: "Kelompok Barang Wajib Diisi"
                 },
             },
             errorElement: 'span',
@@ -280,51 +348,100 @@
                         let id = $('input[name="id"]').val();
                         let csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form"));
-                        $.ajax({
-                            url: "<?= base_url("tipe-barang/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
+
+                        if (id) {
+                            $.ajax({
+                                url: "<?= base_url("akun-customer/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload();
+                                                resetVal();
+                                                $(".add-modal").modal("hide");
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload();
-                                            $('#parentName').val(null);
+                                        }).then(() => {
+                                            resetVal();
                                             $(".add-modal").modal("hide")
-                                        })
-                                } else {
+                                        });
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     }).then(() => {
-                                        $('#parentName').val(null);
                                         $(".add-modal").modal("hide")
                                     });
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                }).then(() => {
-                                    $(".add-modal").modal("hide")
-                                });
-                            }
-                        });
+                            });
+                        } else {
+                            $.ajax({
+                                url: "<?= base_url("akun-customer/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload();
+                                                resetVal();
+                                                $(".add-modal").modal("hide")
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        }).then(() => {
+                                            resetVal();
+                                            $(".add-modal").modal("hide")
+                                        });
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        $(".add-modal").modal("hide")
+                                    });
+                                }
+                            });
+                        }
                     }
                 })
 
@@ -339,6 +456,11 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+    const resetVal = function() {
+        $("#customer_id").val("").change();
+        $("#akun_ap_id").val("").change();
+        $("#akun_ar_id").val("").change();
     }
 
     // Akun AR
@@ -393,6 +515,33 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
     $('.akun_ap_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    // Akun AP
+    $('.customer_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    })
+    //CSS SELECT2 FLOATING LABEL
+    $('.customer_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.customer_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.customer_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
