@@ -121,13 +121,13 @@ class POLokalBahanPenolong extends BaseController
             "createdBy" => session()->get("login")->user_id,
         ];
 
-        $divisionID = $this->request->getVar('divisionID');
-        $supplierID = $this->request->getVar('supplierID');
+        // $divisionID = $this->request->getVar('divisionID');
+        // $supplierID = $this->request->getVar('supplierID');
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
-        $this->jurnalController->insertDataPembelian($divisionID, $supplierID, $aMPurchaseOrderDetailData);
+        // $this->jurnalController->insertDataPembelian($divisionID, $supplierID, $aMPurchaseOrderDetailData);
         // var_dump(json_decode($this->request->getVar('listBarang')));
         // var_dump($dataSupplier);
-        exit;
+        // exit;
 
         // insert new po
         $poID = $this->aMPurchaseOrderModel->insert($dataAmPurchaseOrderData);
