@@ -127,10 +127,19 @@
                                 </div>
                             </div>
                             <div class="mt-1">
-                                <div class="form-floating mb-3">
+                                <div class="form-floating mb-2">
                                     <input id="pengangkutan_tempat_penimbunan" value="<?= $bc23 != null ? $bc23['kode_tps'] : '' ?>" name="pengangkutan_tempat_penimbunan" type="text" class="form-control pengangkutan_tempat_penimbunan" placeholder="">
                                     <label>Kode Tempat Penimbunan</label>
                                 </div>
+                            </div>
+                            <div class="mt-0">
+                                <a href="#" class="btn btn-success btn-block" id="btn-ambil-manifest" style="float: right;">
+                                    Ambil Data Manifest Dokumen B/L
+                                </a>
+                                <button class="btn btn-success btn-block" type="button" disabled id="btn-loading-manifest" style="float: right;">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Loading
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -282,6 +291,7 @@
     });
 
     $('#btn-loading').hide();
+    $('#btn-loading-manifest').hide();
 
     $('#btn-simpan-perubahan').click(function() {
         if ($('#form-pengangkut').valid()) {
