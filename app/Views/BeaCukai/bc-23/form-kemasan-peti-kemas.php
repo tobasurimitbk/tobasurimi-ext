@@ -147,11 +147,18 @@
                             <div class="col-md-6"></div>
                             <div class="col-md-6">
                                 <div class="row" style="float: right; margin-bottom:5px;">
-                                    <div class="col-sm" style="margin-right: -20px;">
+                                    <div class="col-sm" style="margin-right: -10px;">
                                         <button type="button" class="btn btn-add btn-block float-right btn-submit-peti-kemas" style="float: right;">
                                             <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                                         </button>
                                     </div>
+                                    <?php if ($bc23DokumenBL != null) : ?>
+                                        <div class="col-sm" style="margin-right: -10px;">
+                                            <button style="border-color: #FFA426 !important; background-color: #FFA426 !important; margin-right: 10px !important;" id="btn-ambil-manifest" class="btn btn-add btn-block float-right">
+                                                <i class="fas fa-download mr-1"></i> Ambil B/L
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -584,6 +591,44 @@
             })
         }
     });
+
+    $('#btn-ambil-manifest').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: `<?= base_url("bea-cukai-bc-23/api/get-kontainer-peti-kemas"); ?>`,
+            method: "GET",
+            data: {
+                penerimaan_barang_id: "<?= encrypt($lpb->id) ?>"
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            success: function(res) {
+                csrf.val(res.token);
+                tableListInformasiPetiKemas.ajax.reload();
+                if (res.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            }
+        });
+    });
+
 
     function removeKemasan(id) {
         Swal.fire({

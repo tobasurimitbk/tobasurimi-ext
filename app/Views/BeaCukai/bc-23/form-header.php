@@ -93,7 +93,7 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= !empty($bc23) ? ($bc23['status_posting'] == "Sudah Posting" ? 'disabled' : '') : '' ?> class="form-select header_kode_tujuan_tpb" id="header_kode_tujuan_tpb" name="header_kode_tujuan_tpb" aria-label="Floating label select example">
+                                    <select class="form-select header_kode_tujuan_tpb" id="header_kode_tujuan_tpb" name="header_kode_tujuan_tpb" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeTujuanTpb as $k) : ?>
                                             <option <?= !empty($bc23) ? (encrypt($bc23['kode_tujuan_tpb']) == encrypt($k['description']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['description']) ?>">
