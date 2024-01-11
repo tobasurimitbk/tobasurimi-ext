@@ -220,7 +220,7 @@
                     csrf.val();
                     if (res.status) {
                         $("#id").val(id).change();
-                        if (id != 1) {
+                        if (res?.data?.supplier_id != 0) {
                             $('.delete-btn').show();
                             $("#supplier_id").prop("disabled", false).select2();
 

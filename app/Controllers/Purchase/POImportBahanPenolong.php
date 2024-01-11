@@ -3,6 +3,8 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
+
 use App\Models\BarangModel;
 use App\Models\MetadataModel;
 use App\Models\AMPurchaseOrderModel;
@@ -36,6 +38,8 @@ class POImportBahanPenolong extends BaseController
     protected $penerimaanBarangModel;
     protected $dompdf;
 
+    protected $jurnalController;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -54,6 +58,7 @@ class POImportBahanPenolong extends BaseController
         $this->divisionModel = new DivisisModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->dompdf = new Dompdf();
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function poImportBahanPenolong()
@@ -274,7 +279,9 @@ class POImportBahanPenolong extends BaseController
 
     public function updateStatusPOImportBahanPenolong()
     {
-        $this->amPurchaseOrderModel->update($this->request->getVar('id'), ['is_posted' => 1]);
+        $id = $this->request->getVar("id");
+        $this->amPurchaseOrderModel->update($id, ['is_posted' => 1]);
+        $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "IMPORT", "pembelian");
         return response()->setJSON([
             "status" => true,
             "message" => "Data PO Import BP Berhasil Diposting",

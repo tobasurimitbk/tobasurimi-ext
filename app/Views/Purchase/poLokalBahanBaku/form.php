@@ -237,7 +237,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
+                            <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example" disabled>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataBagian)) {

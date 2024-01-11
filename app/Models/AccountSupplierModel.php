@@ -93,4 +93,13 @@ class AccountSupplierModel extends Model
             'sortType'  => $sortType
         ];
     }
+
+    public function getAccountSupplierForJurnal()
+    {
+        $select =   "account_supplier.*";
+        return $this->asObject()
+            ->select($select)
+            ->where('account_supplier.deleted_at', null)
+            ->findAll();
+    }
 }

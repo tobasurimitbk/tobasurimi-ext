@@ -63,26 +63,9 @@ class AccountModuleModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'account_module.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        // $selectQry = "supplier_tipes.*, 
-        //               cities.city_name AS city_name, 
-        //               provinces.province_name AS province_name";
         $accountModuleDataQry = $this->asObject()
             ->select("*")
             ->orderBy($sort, $sortType);
-
-        // $selectQry = "suppliers.*, 
-        //               cities.city_name AS city_name, 
-        //               provinces.province_name AS province_name,
-        //               ap.nama_sub AS ap_name,
-        //               ar.nama_sub AS ar_name";
-        // $supplierDataQry = $this->asObject()
-        //     ->select($selectQry)
-        //     ->where($condition)
-        //     ->join('cities', 'suppliers.city_id = cities.id', 'left')
-        //     ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
-        //     ->join('sub_akuns AS ap', 'suppliers.ap_id = ap.id', 'left')
-        //     ->join('sub_akuns AS ar', 'suppliers.ar_id = ar.id', 'left')
-        //     ->orderBy($sort, $sortType);
 
         $totalData = $accountModuleDataQry->countAllResults(false);
 
@@ -111,44 +94,12 @@ class AccountModuleModel extends Model
         return $accountModuleData;
     }
 
-    // public function getSupplierByType($kategori, $type, $company_id)
-    // {
-    //     $arrCondition = [
-    //         'deletedAt' => null,
-    //         'kategori' => $kategori,
-    //         'type' => $type,
-    //         'company_id' => $company_id
-    //     ];
-
-    //     $builder = $this->db->table('suppliers');
-    //     $builder->where($arrCondition);
-    //     $query = $builder->get();
-
-    //     return $query->getResultArray();
-    // }
-
-    // public function generateSupplierCode(): string
-    // {
-    //     $month = idate('m');
-    //     $year = date('y');
-    //     $romanMonth = romanMonthNumber($month);
-    //     $numberTemplate = "/SUP/$romanMonth/$year";
-
-    //     $lastData = $this->asObject()
-    //         ->like('kode', $numberTemplate, 'before')
-    //         ->orderBy('createdAt', 'DESC')
-    //         ->first();
-
-    //     $invNumber = '001' . $numberTemplate;
-
-    //     if (!empty($lastData)) {
-    //         $asd = explode('/', $lastData->kode);
-    //         $lastIncrement = intval($asd[0]) + 1;
-    //         $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-
-    //         $invNumber = $paddedNumber . $numberTemplate;
-    //     }
-
-    //     return $invNumber;
-    // }
+    public function getAccountModuleForJurnal()
+    {
+        $select =   "account_module.*";
+        return $this->asObject()
+            ->select($select)
+            ->where('account_module.deletedAt', null)
+            ->findAll();
+    }
 }

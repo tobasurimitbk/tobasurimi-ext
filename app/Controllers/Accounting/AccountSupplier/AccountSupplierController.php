@@ -91,10 +91,23 @@ class AccountSupplierController extends BaseController
                     $dataNamaAR = "-";
                 }
             }
+
+            if ($data->name) {
+                $dataNamaSupplier = $data->name;
+            } else {
+                if ($data->type == "BAHAN BAKU") {
+                    $dataNamaSupplier = "DEFAULT BAHAN BAKU";
+                } else if ($data->type == "BAHAN PENOLONG") {
+                    $dataNamaSupplier = "DEFAULT BAHAN PENOLONG";
+                } else if ($data->type == "INTERNASIONAL") {
+                    $dataNamaSupplier = "DEFAULT INTERNASIONAL";
+                }
+            }
+
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
-                "customer_name"           => $data->name ? $data->name : "Default",
+                "customer_name"           => $dataNamaSupplier,
                 "ap_id"                 => $dataNamaAP,
                 "ar_id"                 => $dataNamaAR,
             ]);

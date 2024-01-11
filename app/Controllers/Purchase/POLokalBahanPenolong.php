@@ -121,16 +121,10 @@ class POLokalBahanPenolong extends BaseController
             "createdBy" => session()->get("login")->user_id,
         ];
 
-        // $divisionID = $this->request->getVar('divisionID');
-        // $supplierID = $this->request->getVar('supplierID');
-        $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
-        // $this->jurnalController->insertDataPembelian($divisionID, $supplierID, $aMPurchaseOrderDetailData);
-        // var_dump(json_decode($this->request->getVar('listBarang')));
-        // var_dump($dataSupplier);
-        // exit;
 
         // insert new po
         $poID = $this->aMPurchaseOrderModel->insert($dataAmPurchaseOrderData);
+        $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
 
 
         foreach ($aMPurchaseOrderDetailData as $d) {
@@ -149,6 +143,8 @@ class POLokalBahanPenolong extends BaseController
                 'remaining_qty' => $d->qty
             ]);
         }
+
+        // $this->jurnalController->insertDataPembelian($poID);
 
         return response()->setJSON([
             'message' => "PO Bahan penolong berhasil ditambah",
@@ -322,9 +318,12 @@ class POLokalBahanPenolong extends BaseController
     {
         $id = $this->request->getPost("id");
 
+        // exit;
         $this->aMPurchaseOrderModel->update($id, [
             'is_posted' => true
         ]);
+
+        $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "LOKAL", "pembelian");
 
         return response()->setJSON([
             'message' => "PO Berhasil diposting",

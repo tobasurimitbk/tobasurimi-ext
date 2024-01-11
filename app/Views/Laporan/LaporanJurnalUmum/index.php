@@ -74,6 +74,7 @@
                                 $nilaiFloat = floatval($nilai);
                                 return "Rp " . number_format($nilaiFloat, 2, ',', '.');
                             }
+                            $flag = 0;
                             foreach ($dataMetadataTipeTransaksi as $Tipe) :
                                 foreach ($dataTransaksiJurnal as $transaksiJurnalData) :
                                     foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
@@ -90,6 +91,7 @@
                                     $total_debit  = 0;
                                     $total_kredit = 0;
                                     foreach ($dataJurnalUmum as $jurnalUmumData) :
+                                        $flag = 1;
                                         $total_debit  += $jurnalUmumData->debit;
                                         $total_kredit += $jurnalUmumData->kredit;
                                         if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
@@ -111,8 +113,8 @@
                         <tfoot>
                             <tr>
                                 <td colspan="4"><strong>Total Transaksi</strong></td>
-                                <td id="jumlahDebet"><?= format_ribuan($total_debit); ?></td>
-                                <td id="jumlahKredit"><?= format_ribuan($total_kredit); ?></td>
+                                <td id="jumlahDebet"><?= ($flag != 0) ? format_ribuan($total_debit) :  format_ribuan(0); ?></td>
+                                <td id="jumlahKredit"><?= ($flag != 0) ? format_ribuan($total_kredit) : format_ribuan(0); ?></td>
                             </tr>
                         </tfoot>
                     </table>
