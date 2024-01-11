@@ -108,6 +108,7 @@ class TandaTerimaSupBB extends BaseController
     {
         $data = [
             'dataSupplier' => $this->supplierModel->getSupplierByType("BAHAN PENOLONG"),
+            'noTandaTerima' => $this->tandaTerimaFakturModel->getNo(),
             'isUsed' => false
         ];
         return view('Purchase/terimaSupplierLokal/bp/form', $data);
@@ -276,6 +277,7 @@ class TandaTerimaSupBB extends BaseController
         $itemTotal = 0;
         $taxTotal = 0;
         $taxReturnTotal = 0;
+        $taxPph23 = 0;
 
         $dataInv = $tandaTerimaFakturModel->asObject()
             ->select("tanda_terima_faktur.*, DATE_FORMAT(tanda_terima_faktur.invoice_date, '%d/%m/%Y') AS invoice_date, suppliers.name AS supplier_name")
@@ -307,7 +309,11 @@ class TandaTerimaSupBB extends BaseController
 
         foreach ($taxData as $tax) {
             $taxList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
-            $taxTotal += $tax->tax_amt;
+            if ($tax->tax_type == "PPh Pasal 23") {
+                $taxPph23 += $tax->tax_amt;
+            } else {
+                $taxTotal += $tax->tax_amt;
+            }
         }
 
         foreach ($taxReturnData as $tax) {
@@ -315,7 +321,7 @@ class TandaTerimaSupBB extends BaseController
             $taxReturnTotal += $tax->tax_amt;
         }
 
-        $total = $itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan;
+        $total = ($itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan) - $taxPph23;
 
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
@@ -324,13 +330,17 @@ class TandaTerimaSupBB extends BaseController
         $data['taxList'] = implode(', ', $taxList);
         $data['taxReturnList'] = implode(', ', $taxReturnList);
         $data["itemTotal"] = $itemTotal;
-        $data["potongan"] = $dataInv->tambahan;
-        $data["tambahan"] = $dataInv->potongan;
+        $data["potongan"] = $dataInv->potongan;
+        $data["tambahan"] = $dataInv->tambahan;
         $data['total'] = $total;
         $data['taxTotal'] = $taxTotal;
         $data['taxReturnTotal'] = $taxReturnTotal;
-        $data['terbilang'] = penyebut($total);
+        $data['terbilang'] = penyebut($total < 0 ? $total * -1 : $total);
         $data['taxReturnTerbilang'] = $taxReturnTotal > 0 ? penyebut($taxReturnTotal) : 'nol';
+        $data['taxReturnData'] = $taxReturnData;
+        $data['taxData'] = $taxData;
+
+        // dd($data['taxData']);
 
         $this->dompdf->loadHtml(view('Purchase/terimaSupplierLokal/bp/print', $data));
         $this->dompdf->setPaper('A5', 'landscape');

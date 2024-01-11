@@ -5,11 +5,11 @@
         background-color: #f8f9fa;
     }
 
-    .section {
+    .section1 {
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 80vh;
+        height: 50vh;
     }
 
     p {
@@ -31,7 +31,10 @@
     }
 </style>
 <section class="section">
-    <div class="">
+    <div class="section-header">
+        <h1>403 Forhibidden</h1>
+    </div>
+    <div class="section1">
         <div class="card-body text-center">
             <h1 class="text-danger">403</h1>
             <p>Anda tidak punya akses untuk mengakses modul ini</p>

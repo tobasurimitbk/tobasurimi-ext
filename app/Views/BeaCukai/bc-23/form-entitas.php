@@ -42,14 +42,21 @@
                                 </div>
                             </div>
                             <div class="mt-1">
-                                <div class="form-floating mb-3">
-                                    <input value="<?= $bc23Entitas != null ? $bc23Entitas['nomor_ijin_entitas'] : '' ?>" id="entitas_nomor_ijin_tpb" name="entitas_nomor_ijin_tpb" type="text" class="form-control entitas_nomor_ijin_tpb" placeholder="">
-                                    <label>Nomor Ijin TPB</label>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select entitas_nomor_ijin_tpb" id="entitas_nomor_ijin_tpb" name="entitas_nomor_ijin_tpb" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php foreach ($nomorIjinTPB as $k) : ?>
+                                            <option data-tanggal_skep_tpb="<?= date('d/m/Y', strtotime($k['tanggal_skep_tpb'])) ?>" <?= !empty($bc23Entitas) ? ($bc23Entitas['nomor_ijin_entitas'] == $k['no_izin_tpb'] ? 'selected' : '') : '' ?> value="<?= $k['no_izin_tpb'] ?>">
+                                                <?= $k['no_izin_tpb'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label style="z-index: 1;">Nomor Izin TPB</label>
                                 </div>
                             </div>
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= $bc23Entitas == null ? '' : date('d/m/Y', strtotime($bc23Entitas['tanggal_ijin_entitas']))  ?>" autocomplete="one-time-code" name="entitas_tanggal_skep_tpb" type="text" placeholder="" class="form-control entitas_tanggal_skep_tpb" id="entitas_tanggal_skep_tpb">
+                                    <input readonly value="<?= $bc23Entitas == null ? '' : date('d/m/Y', strtotime($bc23Entitas['tanggal_ijin_entitas']))  ?>" autocomplete="one-time-code" name="entitas_tanggal_skep_tpb" type="text" placeholder="" class="form-control entitas_tanggal_skep_tpb" id="entitas_tanggal_skep_tpb">
                                     <label>Tanggal Skep TPB</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -101,19 +108,19 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_npwp_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['npwp_pemilik_barang'] : '' ?>" name="entitas_npwp_pemilik_barang" type="text" class="form-control entitas_npwp_pemilik_barang" placeholder="">
+                                    <input id="entitas_npwp_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['npwp_pemilik_barang'] : $npwpDefault['value'] ?>" name="entitas_npwp_pemilik_barang" type="text" class="form-control entitas_npwp_pemilik_barang" placeholder="">
                                     <label>NPWP</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nama_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemilik_barang'] : '' ?>" name="entitas_nama_pemilik_barang" type="text" class="form-control entitas_nama_pemilik_barang" placeholder="">
+                                    <input id="entitas_nama_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemilik_barang'] : $namaImportirDefault['value'] ?>" name="entitas_nama_pemilik_barang" type="text" class="form-control entitas_nama_pemilik_barang" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_pemilik_barang" id="entitas_alamat_pemilik_barang" class="form-control entitas_alamat_pemilik_barang" style="height: 100px;"><?= $bc23Entitas != null ? $bc23Entitas['alamat_pemilik_barang'] : '' ?></textarea>
+                                    <textarea name="entitas_alamat_pemilik_barang" id="entitas_alamat_pemilik_barang" class="form-control entitas_alamat_pemilik_barang" style="height: 100px;"><?= $bc23Entitas != null ? $bc23Entitas['alamat_pemilik_barang'] : $alamatImportirDefault['value'] ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -141,6 +148,14 @@
     $('#entitas_negara').select2({
         placeholder: "Pilih Negara",
         theme: "bootstrap-5",
+    });
+
+    $('#entitas_nomor_ijin_tpb').select2({
+        placeholder: "Pilih No Ijin TPB",
+        theme: "bootstrap-5",
+    }).change(function() {
+        var selected = $(this).find('option:selected');
+        $('#entitas_tanggal_skep_tpb').val(selected.data('tanggal_skep_tpb'));
     });
 
     $("#entitas_tanggal_skep_tpb").datepicker({

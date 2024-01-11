@@ -709,9 +709,15 @@ $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Wareho
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
 // BEA CUKAI 2.3 - 4.1
-
 // PO UTK BEA CUKAI
-$routes->get('/po-bea-cukai/dropdown', 'BeaCukai\BeaCukaiController::dropdownBeaCukaiPO', ['filter' => 'Auth']);
+// $routes->get('/po-bea-cukai/dropdown', 'BeaCukai\BeaCukaiController::dropdownBeaCukaiPO', ['filter' => 'Auth']);
+$routes->get('no-izin-tpb', 'Master\NomorIjinTPB::index', ['filter' => 'Auth']);
+$routes->get('no-izin-tpb/all', 'Master\NomorIjinTPB::all', ['filter' => 'Auth']);
+$routes->post('no-izin-tpb/create', 'Master\NomorIjinTPB::create', ['filter' => 'Auth']);
+$routes->post('no-izin-tpb/update', 'Master\NomorIjinTPB::update', ['filter' => 'Auth']);
+$routes->post('no-izin-tpb/delete', 'Master\NomorIjinTPB::delete', ['filter' => 'Auth']);
+$routes->get('no-izin-tpb/get', 'Master\NomorIjinTPB::get', ['filter' => 'Auth']);
+
 
 // BC 2.3
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
@@ -752,22 +758,15 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/barang-dokumen-create', 'BeaCukai\BC23::createBarangDokumenAction');
     $routes->post('id/barang-dokumen-delete', 'BeaCukai\BC23::deleteBarangDokumenAction');
     $routes->post('id/barang', 'BeaCukai\BC23::createBarangDetailAction');
-
+    // PUNGUTAN
     $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC23::createPungutanView/$1');
+    // PERNYATAAN
     $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC23::createPernyataanView/$1');
     $routes->post('id/pernyataan', 'BeaCukai\BC23::createPernyataanAction');
-
-
+    // API
     $routes->get('api/valuta', 'BeaCukai\BC23::getValuta');
-
-
+    $routes->get('api/get-pelabuhan', 'BeaCukai\BC23::getPelabuhan');
     $routes->get('satuan-barang', 'BeaCukai\BC23::getKodeSatuanBarang');
-    // $routes->get('id/(:segment)/bc-23-id/(:segment)', 'BeaCukai\BC23::update/$1/$2');
-    // $routes->get('get-no-aju', 'BeaCukai\BC23::generateNomorAju');
-    $routes->post('create', 'BeaCukai\BC23::createAction');
-    $routes->post('update', 'BeaCukai\BC23::updateAction');
-    $routes->post('delete', 'BeaCukai\BC23::deleteAction');
-    $routes->post('posting', 'BeaCukai\BC23::postingAction');
 });
 
 // BC 4.0

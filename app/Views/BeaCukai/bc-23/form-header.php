@@ -50,12 +50,6 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="header_pelabuhan_bongkar" value="<?= !empty($bc23) ? $bc23['kode_pelabuhan_bongkar'] : '' ?>" name="header_pelabuhan_bongkar" type="text" class="header_pelabuhan_bongkar form-control" placeholder="">
-                                    <label>Kode Pelabuhan Bongkar</label>
-                                </div>
-                            </div>
-                            <div class="mt-1">
-                                <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select header_kantor_pabean_bongkar" id="header_kantor_pabean_bongkar" name="header_kantor_pabean_bongkar" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeKantor as $k) : ?>
@@ -63,6 +57,18 @@
                                                 <?= strtoupper($k['kode']) . " - " . strtoupper($k['kantor_name']) . " " ?>
                                             </option>
                                         <?php endforeach; ?>
+                                    </select>
+                                    <label style="z-index: 1;">Pilih Kode Kantor Bongkar</label>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select header_pelabuhan_bongkar" id="header_pelabuhan_bongkar" name="header_pelabuhan_bongkar" aria-label="Floating label select example">
+                                        <?php if (!empty($bc23)) : ?>
+                                            <option value="<?= $bc23['kode_pelabuhan_bongkar'] ?>"><?= $bc23['kode_pelabuhan_bongkar'] ?></option>
+                                        <?php else : ?>
+                                            <option value=""></option>
+                                        <?php endif; ?>
                                     </select>
                                     <label style="z-index: 1;">Pilih Kode Kantor Bongkar</label>
                                 </div>
@@ -123,6 +129,42 @@
     $('#btn-loading').hide();
 
     $('#header_kantor_pabean_bongkar').select2({
+        placeholder: "Pilih Kode Kantor Bongkar",
+        theme: "bootstrap-5",
+    }).change(function() {
+        $.ajax({
+            url: `<?= base_url("bea-cukai-bc-23/api/get-pelabuhan"); ?>`,
+            method: "GET",
+            data: {
+                header_kantor_pabean_bongkar: $('#header_kantor_pabean_bongkar').val()
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.data.status === false) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: res.data.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                } else {
+                    $('#header_pelabuhan_bongkar').empty();
+                    $.each(res.data.data, function(i, v) {
+                        var option = $('<option>').val(v.kodePelabuhan).text(v.kodePelabuhan);
+                        $('#header_pelabuhan_bongkar').append(option);
+                    });
+                }
+            }
+        });
+    });
+
+    $('#header_pelabuhan_bongkar').select2({
         placeholder: "Pilih Kode Kantor Bongkar",
         theme: "bootstrap-5",
     });

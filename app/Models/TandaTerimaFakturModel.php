@@ -212,4 +212,31 @@ class TandaTerimaFakturModel extends Model
         $res = $this->where('id', $tandaTerimaFakturID)->first();
         return $res;
     }
+
+    public function getNo()
+    {
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+
+        $month = idate('m');
+        $year = date('y');
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "/TT/$romanMonth/$year";
+
+        $lastData = $tandaTerimaFakturModel->asObject()
+            ->like('faktur_no', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $invNumber = '001' . $numberTemplate;
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->faktur_no);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+
+        return $invNumber;
+    }
 }
