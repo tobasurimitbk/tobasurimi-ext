@@ -149,7 +149,7 @@
                 className: "text-center",
             },
             {
-                data: "id_dokumen",
+                data: "kode_dokumen",
                 searchable: false,
                 sortable: false,
                 className: "text-center",

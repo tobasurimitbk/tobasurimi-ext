@@ -18,6 +18,12 @@
                 <?php include_once('nav.php') ?>
                 <form id="form-pengangkut">
                     <?= csrf_field() ?>
+                    <div class="alert alert-info alert-dismissible fade show mt-3 text-white" role="alert">
+                        <strong id="text-respon-ceisa"></strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     <div class="row mt-1">
                         <div class="col-sm-4 mt-1">
                             <label class="form-label font-weight-bold lable-title mt-4 mb-2">
@@ -133,10 +139,10 @@
                                 </div>
                             </div>
                             <div class="mt-0">
-                                <a href="#" class="btn btn-success btn-block" id="btn-ambil-manifest" style="float: right;">
-                                    Ambil Data Manifest Dokumen B/L
+                                <a href="#" <?= $bc23DokumenBL == null ? 'disabled' : '' ?> class="btn btn-warning btn-block" id="btn-ambil-manifest" style="float: right;">
+                                    <?= $bc23DokumenBL == null ? "Dokumen B/L atau AWB belum diisi" : "Ambil Data Manifest Dokumen B/L" ?>
                                 </a>
-                                <button class="btn btn-success btn-block" type="button" disabled id="btn-loading-manifest" style="float: right;">
+                                <button class="btn btn-warning btn-block" type="button" disabled id="btn-loading-manifest" style="float: right;">
                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                     Loading
                                 </button>
@@ -159,6 +165,8 @@
     // CSRF
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
+
+    $('.alert-dismissible').hide();
 
     $('#pengangkutan_cara_pengangkutan').select2({
         placeholder: "Pilih Cara Pengangkutan",
@@ -292,6 +300,65 @@
 
     $('#btn-loading').hide();
     $('#btn-loading-manifest').hide();
+
+    $('#btn-ambil-manifest').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: `<?= base_url("bea-cukai-bc-23/api/get-manifest"); ?>`,
+            method: "GET",
+            data: {
+                penerimaan_barang_id: "<?= encrypt($lpb->id) ?>"
+            },
+            beforeSend: function() {
+                $('#btn-loading-manifest').show();
+                $('#btn-ambil-manifest').hide();
+            },
+            complete: function() {
+                $('#btn-loading-manifest').hide();
+                $('#btn-ambil-manifest').show();
+            },
+            dataType: "json",
+            success: function(res) {
+                csrf.val(res.token);
+                if (res.status) {
+                    if (res.data.status) {
+                        var manifestData = res.data.data;
+                        // alert
+                        $('.alert-dismissible').show();
+                        $('#text-respon-ceisa').text(manifestData.respon);
+                        // append
+                        $('#bc_11_no_bc_11').val(manifestData.noBc11);
+                        $('#bc_11_tanggal_bc_11').val(manifestData.tglBc11);
+                        $('#bc_11_pos_bc_11').val(manifestData.noPos);
+                        $('#bc_11_sub_pos_bc_11').val(manifestData.noPos);
+                        $('#bc_11_sub_sub_pos_bc_11').val(manifestData.noPos);
+                        $('#pengangkutan_cara_pengangkutan').val(manifestData.caraPengangkutan).change();
+                        $('#pengangkutan_nama_sarana_pengangkut').val(manifestData.namaSaranaPengangkut);
+                        $('#pengangkutan_nomor_pengangkut').val(manifestData.noVoyage);
+                        $('#pengangkutan_kode_bendera').val(manifestData.bendera).change();
+                        $('#pengangkutan_pelabuhan_muat').val(manifestData.pelAsal);
+                        $('#pengangkutan_pelabuhan_transit').val(manifestData.pelTransit);
+                        $('#pengangkutan_tempat_penimbunan').val(manifestData.kodeGudang);
+
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            }
+        });
+    });
 
     $('#btn-simpan-perubahan').click(function() {
         if ($('#form-pengangkut').valid()) {

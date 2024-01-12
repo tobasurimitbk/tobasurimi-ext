@@ -36,7 +36,7 @@
                             </div>
                         </div>
 
-                        <a href="#" id="btn-sesuai-valuta-terbaru" class="btn btn-primary" style="float: right;">
+                        <a href="#" id="btn-sesuai-valuta-terbaru" class="btn btn-warning" style="float: right;">
                             Sesuai Valuta Terbaru
                         </a>
 

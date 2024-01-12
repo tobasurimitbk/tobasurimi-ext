@@ -12,7 +12,7 @@
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">
-                BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
+                BC 4.0 - PEMBERITAHUAN PEMASUKAN BARANG ASAL TEMPAT LAIN DALAM DAERAH PABEAN KE TEMPAT PENIMBUNAN BERIKAT
             </div>
             <div class="card-body">
                 <?php include_once('nav.php') ?>
@@ -50,32 +50,7 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select header_kantor_pabean_bongkar" id="header_kantor_pabean_bongkar" name="header_kantor_pabean_bongkar" aria-label="Floating label select example">
-                                        <option value=""></option>
-                                        <?php foreach ($kodeKantor as $k) : ?>
-                                            <option <?= !empty($bc23) ? (encrypt($bc23['kode_kantor_bongkar']) == encrypt($k['kode']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['kode']) ?>">
-                                                <?= strtoupper($k['kode']) . " - " . strtoupper($k['kantor_name']) . " " ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label style="z-index: 1;">Pilih Kode Kantor Bongkar</label>
-                                </div>
-                            </div>
-                            <div class="mt-1">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select header_pelabuhan_bongkar" id="header_pelabuhan_bongkar" name="header_pelabuhan_bongkar" aria-label="Floating label select example">
-                                        <?php if (!empty($bc23)) : ?>
-                                            <option value="<?= $bc23['kode_pelabuhan_bongkar'] ?>"><?= $bc23['kode_pelabuhan_bongkar'] ?></option>
-                                        <?php else : ?>
-                                            <option value=""></option>
-                                        <?php endif; ?>
-                                    </select>
-                                    <label style="z-index: 1;">Pilih Kode Kantor Bongkar</label>
-                                </div>
-                            </div>
-                            <div class="mt-1">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select header_kantor_pabean_pengawas" disabled id="header_kantor_pabean_pengawas" name="header_kantor_pabean_pengawas" aria-label="Floating label select example">
+                                    <select class="form-select header_kantor_pabean" disabled id="header_kantor_pabean" name="header_kantor_pabean" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeKantor as $k) : ?>
                                             <option <?= !empty($selectedKantor) ? (encrypt($selectedKantor['value']) == encrypt($k['kode']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['kode']) ?>">
@@ -83,7 +58,7 @@
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label style="z-index: 1;">Pilih Kantor Pabean Pengawas</label>
+                                    <label style="z-index: 1;">Kantor Pabean</label>
                                 </div>
                             </div>
                         </div>
@@ -93,15 +68,28 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select header_kode_tujuan_tpb" id="header_kode_tujuan_tpb" name="header_kode_tujuan_tpb" aria-label="Floating label select example">
+                                    <select class="form-select header_kode_jenis_tpb" id="header_kode_jenis_tpb" name="header_kode_jenis_tpb" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeTujuanTpb as $k) : ?>
-                                            <option <?= !empty($bc23) ? (encrypt($bc23['kode_tujuan_tpb']) == encrypt($k['description']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['description']) ?>">
+                                            <option <?= !empty($bc40) ? (encrypt($bc40['kode_jenis_tpb']) == encrypt($k['description']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['description']) ?>">
                                                 <?= strtoupper($k['description']) . " - " . strtoupper($k['value']) . " " ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label style="z-index: 1;">Pilih Kode Tujuan TPB</label>
+                                    <label style="z-index: 1;">Jenis TPB</label>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select header_kode_tujuan_pengiriman" id="header_kode_tujuan_pengiriman" name="header_kode_tujuan_pengiriman" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php foreach ($kodeTujuanPengiriman as $k) : ?>
+                                            <option <?= !empty($bc40) ? (encrypt($bc40['kode_tujuan_pengiriman']) == encrypt(json_decode($k['value'])[1]) ? 'selected' : '') : '' ?> value="<?= encrypt(json_decode($k['value'])[1]) ?>">
+                                                <?= json_decode($k['value'])[1] . " - " . strtoupper($k['description']) . " " ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label style="z-index: 1;">Tujuan Pengiriman</label>
                                 </div>
                             </div>
                         </div>
@@ -128,49 +116,13 @@
     // init loading
     $('#btn-loading').hide();
 
-    $('#header_kantor_pabean_bongkar').select2({
-        placeholder: "Pilih Kode Kantor Bongkar",
-        theme: "bootstrap-5",
-    }).change(function() {
-        $.ajax({
-            url: `<?= base_url("bea-cukai-bc-23/api/get-pelabuhan"); ?>`,
-            method: "GET",
-            data: {
-                header_kantor_pabean_bongkar: $('#header_kantor_pabean_bongkar').val()
-            },
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            dataType: "json",
-            success: function(res) {
-                if (res.data.status === false) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: res.data.message,
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else {
-                    $('#header_pelabuhan_bongkar').empty();
-                    $.each(res.data.data, function(i, v) {
-                        var option = $('<option>').val(v.kodePelabuhan).text(v.kodePelabuhan);
-                        $('#header_pelabuhan_bongkar').append(option);
-                    });
-                }
-            }
-        });
-    });
-
-    $('#header_pelabuhan_bongkar').select2({
-        placeholder: "Pilih Kode Kantor Bongkar",
+    $('#header_kode_tujuan_pengiriman').select2({
+        placeholder: "Pilih Tujuan Pengiriman",
         theme: "bootstrap-5",
     });
 
-    $('#header_kode_tujuan_tpb').select2({
-        placeholder: "Pilih Kode Tujuan TPB",
+    $('#header_kode_jenis_tpb').select2({
+        placeholder: "Pilih Jenis TPB",
         theme: "bootstrap-5",
     });
 
@@ -183,25 +135,31 @@
 
     var validatorHeader = $("#form-header").validate({
         rules: {
-            header_pelabuhan_bongkar: {
+            header_no_pengajuan: {
                 required: true
             },
-            header_kantor_pabean_bongkar: {
+            tanggal_penerimaan_barang: {
                 required: true
             },
-            header_kode_tujuan_tpb: {
+            header_kode_jenis_tpb: {
+                required: true
+            },
+            header_kode_tujuan_pengiriman: {
                 required: true
             },
         },
         messages: {
-            header_pelabuhan_bongkar: {
-                required: "Kode pelabuhan bongkar wajib diisi"
+            header_no_pengajuan: {
+                required: "Nomor pengajuan wajib diisi"
             },
-            header_kantor_pabean_bongkar: {
-                required: "Pilih kantor bongkar"
+            tanggal_penerimaan_barang: {
+                required: "Tanggal pengiriman barang wajib diisi"
             },
-            header_kode_tujuan_tpb: {
-                required: "Pilih tujuan TPB"
+            header_kode_jenis_tpb: {
+                required: "Pilih jenis TPB"
+            },
+            header_kode_tujuan_pengiriman: {
+                required: "Pilih tujuan pengiriman"
             },
         },
         errorElement: 'span',
@@ -240,11 +198,11 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-header"));
-                    formData.append("header_kantor_pabean_pengawas", $('#header_kantor_pabean_pengawas').val());
+                    formData.append("header_kantor_pabean", $('#header_kantor_pabean').val());
                     formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
 
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/header"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-40/id/header"); ?>",
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -276,10 +234,8 @@
                     });
                 }
             })
-
         }
     });
-
 
     $('.form-select')
         .parent('div')

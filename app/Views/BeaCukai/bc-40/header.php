@@ -1,5 +1,5 @@
 <div class="section-header">
-    <h1 class="title-name">Dokumen BC 2.3</h1>
+    <h1 class="title-name">Dokumen BC 4.0</h1>
     <?php if (request()->uri->getSegment(5) == null) : ?>
         <?php
         $isFinished = session()->getFlashdata('isCompleteFormHeader') && session()->getFlashdata('isCompleteFormEntitas') && session()->getFlashdata('isCompleteFormDokumen') && session()->getFlashdata('isCompleteFormPengangkut') && session()->getFlashdata('isCompleteFormPetiKemas') && session()->getFlashdata('isCompleteFormTransaksi') && session()->getFlashdata('isCompleteFormBarang') && session()->getFlashdata('isCompleteFormPernyataan');

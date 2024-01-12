@@ -29,8 +29,9 @@
                 <div class="col-md-3 mb-3">
                     <select name="statusBC" class="form-select statusBC" id="statusBC">
                         <option value="Belum Dibuat">STATUS BC : BELUM DIBUAT</option>
-                        <option value="Belum Posting">STATUS BC : BELUM POSTING</option>
-                        <option value="Sudah Posting">STATUS BC : SUDAH POSTING</option>
+                        <option value="Belum Lengkap">STATUS BC : BELUM LENGKAP</option>
+                        <option value="Siap Kirim">STATUS BC : SIAP KIRIM CEISA 4.0</option>
+                        <option value="Sudah Kirim">STATUS BC : SUDAH KIRIM CEISA 4.0</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -38,8 +39,8 @@
                         <option value="SEMUA">JENIS LPB : SEMUA</option>
                         <option value="LOKAL BAKU">JENIS LPB : LOKAL BB</option>
                         <option value="LOKAL PENOLONG">JENIS LPB : LOKAL BP</option>
-                        <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
-                        <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option>
+                        <!-- <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
+                        <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option> -->
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -239,11 +240,7 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        if (data.status == 'BELUM DIBUAT') {
-            location.replace(`<?= base_url("bea-cukai-bc-40/id"); ?>/${data.penerimaan_barang_id}`);
-        } else {
-            location.replace(`<?= base_url("bea-cukai-bc-40/id"); ?>/${data.penerimaan_barang_id}/bc-23-id/${data.id}`);
-        }
+        location.replace(`<?= base_url("bea-cukai-bc-40/id/header/"); ?>${data.penerimaan_barang_id}`);
     });
 
 

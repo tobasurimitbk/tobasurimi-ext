@@ -102,7 +102,7 @@
                                 </div>
                             </div>
 
-                            <a href="#" id="btn-sesuai-kode-hs" class="btn btn-primary" style="float: right;">
+                            <a href="#" id="btn-sesuai-kode-hs" class="btn btn-warning" style="float: right;">
                                 Sesuai Hs
                             </a> <br><br>
 
@@ -655,7 +655,7 @@
                 className: "text-center",
             },
             {
-                data: "id_dokumen",
+                data: "kode_dokumen",
                 className: "text-center"
             },
             {
