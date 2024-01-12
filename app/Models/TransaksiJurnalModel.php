@@ -52,6 +52,10 @@ class TransaksiJurnalModel extends Model
     {
         return $this->insert($data);
     }
+    public function insertBatchTransaksiJurnal($data)
+    {
+        return $this->insertBatch($data);
+    }
     public function getIdTransaksiLast()
     {
         $transaksi_format = "TRN-";

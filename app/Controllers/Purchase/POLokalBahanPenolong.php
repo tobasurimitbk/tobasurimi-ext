@@ -318,12 +318,12 @@ class POLokalBahanPenolong extends BaseController
     {
         $id = $this->request->getPost("id");
 
+        $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "LOKAL", "pembelian");
         // exit;
         $this->aMPurchaseOrderModel->update($id, [
             'is_posted' => true
         ]);
 
-        $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "LOKAL", "pembelian");
 
         return response()->setJSON([
             'message' => "PO Berhasil diposting",
