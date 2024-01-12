@@ -77,7 +77,7 @@ class BC40 extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($beaCukaiData['data'] as $data) {
-            $status = $data->status_posting == null ? "BELUM DIBUAT" : strtoupper($data->status_posting);
+            $status = $data->status_dokumen == null ? "BELUM DIBUAT" : strtoupper($data->status_dokumen);
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -101,44 +101,5 @@ class BC40 extends BaseController
         ];
 
         return response()->setJSON($data);
-    }
-
-    public function create($id)
-    {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $metaDataModel = new MetadataModel();
-        $countryModel = new CountryModel();
-        $kantorBeaCukaiModel = new KantorBeaCukaiModel();
-
-        $id = decrypt($id);
-
-        $lpb = $penerimaanBarangModel->getById($id);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
-            return redirect()->to('bea-cukai-bc-40');
-        }
-
-        $data = [
-            // data helper passing in form select
-            'kodeFasilitasTarif' => $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->findAll(),
-            'kodeJenisTarif' => $metaDataModel->where('name', "Kode Jenis Tarif BC")->findAll(),
-            'kodeAsalBahanBaku' => $metaDataModel->where('name', "Kode Asal Bahan Baku BC")->findAll(),
-            'kodeJenisKemasan' => $metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
-            'kodeDokumen' => $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->findAll(),
-            'kodeKantor' => $kantorBeaCukaiModel->findAll(),
-            'kodeTujunTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
-            'kodeJenisIdentas' => $metaDataModel->where('name', "Jenis Identitas")->findAll(),
-            'kodeTipeKontainer' => $metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
-            'kodeUkuranKontainer' => $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
-            'kodeJenisKontainer' => $metaDataModel->where('name', "Jenis Kontainer")->findAll(),
-            'kodeTujuanPengiriman' => $metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->findAll(),
-
-            // data detail
-            'lpb' => $penerimaanBarangModel->getById($id),
-            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $lpb->tipe_bahan, $lpb->status_penerimaan)
-        ];
-
-        return view('BeaCukai/bc-40/form', $data);
     }
 }

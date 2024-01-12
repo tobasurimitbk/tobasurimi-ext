@@ -77,10 +77,12 @@ class BC40Model extends Model
         if ($addCondition['statusBC']) {
             if ($addCondition['statusBC'] == "Belum Dibuat") {
                 $bcDataQry->where('bc_40.id IS NULL');
-            } elseif ($addCondition['statusBC'] == "Belum Posting") {
-                $bcDataQry->where('bc_40.status_posting', "Belum Posting");
+            } elseif ($addCondition['statusBC'] == "Belum Lengkap") {
+                $bcDataQry->where('bc_40.status_dokumen', "Belum Lengkap");
+            } elseif ($addCondition['statusBC'] == "Siap Kirim") {
+                $bcDataQry->where('bc_40.status_dokumen', "Siap Kirim");
             } else {
-                $bcDataQry->where('bc_40.status_posting', "Sudah Posting");
+                $bcDataQry->where('bc_40.status_dokumen', "Sudah Kirim");
             }
         }
 
