@@ -7,6 +7,7 @@ use App\Models\BC40Model;
 use App\Models\CountryModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\MetadataModel;
+use App\Models\NomorIjinTPBModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 
@@ -171,6 +172,46 @@ class BC40 extends BaseController
             'token' => csrf_hash(),
             'message' => "Header berhasil diupdate",
         ]);
+    }
+
+    public function createEntitasView($penerimaanBarangID)
+    {
+        $bc40Model = new BC40Model();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+        $nomorIjinTPBModel = new NomorIjinTPBModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $bc40 = $bc40Model->get($penerimaanBarangID);
+
+        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+            return redirect()->to('bea-cukai-bc-40');
+        }
+
+        $data = [
+            'bc40' => $bc40,
+            'npwpDefault' => $metaDataModel->where('name', "NPWP Importir Default BC")->first(),
+            'namaImportirDefault' => $metaDataModel->where('name', "Nama Importir Default BC")->first(),
+            'alamatImportirDefault' => $metaDataModel->where('name', "Alamat Importir Default BC")->first(),
+            'nibDefault' => $metaDataModel->where('name', "NIB Default BC")->first(),
+            'nomorIjinTPB' => $nomorIjinTPBModel->findAll(),
+            'lpb' => $lpb
+
+        ];
+
+        return view('BeaCukai/bc-40/form-entitas', $data);
+    }
+
+    public function createEntitasAction()
+    {
+        $bc40Model = new BC40Model();
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaaan_barang_id'));
+
+        $bc40 = $bc40Model->get($penerimaanBarangID);
     }
 
     // Navigator display

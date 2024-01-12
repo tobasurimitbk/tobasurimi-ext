@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BC23DokumenModel extends Model
+class BCBarangDokumenModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_23_dokumen';
+    protected $table            = 'bc_barang_dokumen';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -39,37 +39,4 @@ class BC23DokumenModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-
-    public function getList($condition, $limit = 10, $offset = 0)
-    {
-
-        $sort = 'bc_23_dokumen.createdAt';
-        $sortType = 'DESC';
-
-        $selectQry = "bc_23_dokumen.*";
-
-        $pinjamanQry = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $pinjamanQry->countAllResults(false);
-
-        $totalFilteredData = $pinjamanQry->countAllResults(false);
-        $data = $pinjamanQry->findAll($limit, $offset);
-
-        return [
-            'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
-            'sort'              => $sort,
-            'sortType'          => $sortType
-        ];
-    }
-
-    public function get($penerimaanBarangID)
-    {
-        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
-    }
 }

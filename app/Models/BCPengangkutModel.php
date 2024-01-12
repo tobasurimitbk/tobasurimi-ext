@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BC23PengangkutModel extends Model
+class BCPengangkutModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_23_pengangkut';
+    protected $table            = 'bc_pengangkut';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;

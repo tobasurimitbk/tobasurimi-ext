@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BC23BarangDokumenModel extends Model
+class BCKemasanModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_23_barang_dokumen';
+    protected $table            = 'bc_kemasan';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -40,15 +40,34 @@ class BC23BarangDokumenModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get($bc23BarangID)
+    public function getList($condition, $limit = 10, $offset = 0)
     {
-        $result = [];
-        foreach ($this->where('bc_23_barang_id', $bc23BarangID)->where('deletedAt', null)->findAll() as $r) {
-            $result[] = [
-                'id' => $r['id'],
-                'no_seri_dokumen' => $r['no_seri_dokumen']
-            ];
-        }
-        return $result;
+        $sort = 'bc_kemasan.createdAt';
+        $sortType = 'DESC';
+
+        $selectQry = "bc_kemasan.*";
+
+        $pinjamanQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $pinjamanQry->countAllResults(false);
+
+        $totalFilteredData = $pinjamanQry->countAllResults(false);
+        $data = $pinjamanQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getLast($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
     }
 }

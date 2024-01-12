@@ -8,7 +8,7 @@
 </style>
 
 <section class="section section-form">
-    <?php include('header.php') ?>
+    <?php include_once('header.php') ?>
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">

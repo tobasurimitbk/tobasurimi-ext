@@ -129,7 +129,7 @@
             dataSrc: "data",
             data: function(data) {
                 data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
-                data.sort = "bc_23_dokumen.createdAt";
+                data.sort = "bc_dokumen.createdAt";
                 data.sortType = "DESC";
             }
         },

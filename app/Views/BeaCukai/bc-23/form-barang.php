@@ -59,7 +59,7 @@
                             $totalHargaLPB = 0;
                             $jmlOrderPO = 0;
                             $totalHargaPO = 0;
-                            $bc23BarangModel = new App\Models\BC23BarangModel();
+                            $bcBarangModel = new App\Models\BCBarangModel();
                             ?>
                             <?php foreach ($lpbDetail as $l) : ?>
                                 <?php
@@ -68,11 +68,11 @@
                                 $jmlOrderPO +=  $l['qty'];
                                 $totalHargaPO += $l['qty'] * ($l['harga'] + $l['harga_harian'] + $l['harga_bulanan']);
                                 ?>
-                                <?php $bc23DokumenBarang =  $bc23BarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first(); ?>
+                                <?php $bcDokumenBarang =  $bcBarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first(); ?>
                                 <tr style="cursor: pointer;" data-penerimaan_barang_id="<?= encrypt($lpb->id) ?>" data-penerimaan_barang_detail_id="<?= encrypt($l['penerimaan_barang_detail_id']) ?>">
                                     <td style="text-align: center;"><?= $no++; ?></td>
                                     <td style="text-align: center;"><?= $l['po_no'] ?></td>
-                                    <td style="text-align: center;"><?= $bc23DokumenBarang == null ? "-" : $bc23DokumenBarang['pos_tarif'] ?></td>
+                                    <td style="text-align: center;"><?= $bcDokumenBarang == null ? "-" : $bcDokumenBarang['pos_tarif'] ?></td>
                                     <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
                                     <td style="text-align: center;"><?= $l['nama_barang_dok'] ?></td>
                                     <td style="text-align: center;"><?= $l['jml_masuk'] ?></td>
@@ -80,7 +80,7 @@
                                     <td style="text-align: center;"><?= $l['qty'] ?></td>
                                     <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['qty'] * ($l['harga'] + $l['harga_harian'] + $l['harga_bulanan']))) ?></td>
                                     <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['id']) ?>">
-                                        <?php if ($bc23DokumenBarang == null) : ?>
+                                        <?php if ($bcDokumenBarang == null) : ?>
                                             <span class="badge badge-danger">
                                                 BELUM DIISI
                                             </span>

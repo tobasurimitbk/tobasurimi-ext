@@ -40,7 +40,7 @@
                             Sesuai Valuta Terbaru
                         </a>
 
-                        <button class="btn btn-primary" type="button" disabled id="btn-sesuai-valuta-terbaru-loading" style="float: right;">
+                        <button class="btn btn-warning" type="button" disabled id="btn-sesuai-valuta-terbaru-loading" style="float: right;">
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Loading
                         </button>
