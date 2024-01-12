@@ -147,4 +147,59 @@ class BC40Model extends Model
             'totalFilteredData' => $totalFilteredData,
         ];
     }
+
+    public function get($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+    }
+
+    public function getNo($bln, $thn, $last_day)
+    {
+        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
+
+        $builder = $this->db->table('bc_40');
+        $builder->select('bc_no_lokal');
+        $builder->orderBy('bc_no_lokal', 'DESC');
+        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")->where('createdAt <=', $last_day . " 23:59:59");
+        $builder->where('deletedAt', null);
+        $builder->like('bc_no_lokal', $lastStr);
+        $query = $builder->get();
+
+        $kode = 'TOBA/BC40';
+
+        $lastNumber = '1';
+
+        if (!empty($query->getResultArray())) {
+            foreach ($query->getResultArray() as $string) {
+                $explode = explode('/', $string['bc_no_lokal']);
+                $number = intval($explode[2]);
+
+                if ($number > $lastNumber) {
+                    $lastNumber = $number;
+                }
+            }
+            $lastNumber++;
+        }
+
+        $formattedlastNumber = sprintf("%02d", $lastNumber);
+        $generatedNo = $kode . '/' . $formattedlastNumber . '/' . $lastStr;
+
+        return $generatedNo;
+    }
+
+    public function isCompleteFormHeader($penerimaanBarangID)
+    {
+        $isCompleteForm = false;
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($data['no_aju'] != null && $data['kode_kantor'] != null && $data['kode_jenis_tpb'] != null && $data['kode_tujuan_pengiriman'] != null) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
 }

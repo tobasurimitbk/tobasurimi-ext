@@ -102,4 +102,109 @@ class BC40 extends BaseController
 
         return response()->setJSON($data);
     }
+
+    public function createHeaderView($penerimaanBarangID)
+    {
+        $bc40Model = new BC40Model();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+        $kantorBeaCukaiModel = new KantorBeaCukaiModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $bc40 = $bc40Model->get($penerimaanBarangID);
+
+        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+            return redirect()->to('bea-cukai-bc-40');
+        }
+
+        $data = [
+            'bc40' => $bc40,
+            'noAju' => $bc40 == null ? $this->generateNomorAju() : $bc40['no_aju'],
+            'kodeKantor' => $kantorBeaCukaiModel->findAll(),
+            'kodeTujuanTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
+            'kodeTujuanPengiriman' => $metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->like('value', '40')->where('deletedAt', null)->findAll(),
+            'selectedKantor' => $metaDataModel->where('name', "Kode Kantor Pabean Pengawas Static")->first(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-40/form-header', $data);
+    }
+
+    public function createHeaderAction()
+    {
+        $bc40Model = new BC40Model();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $lastData = $bc40Model->get($penerimaanBarangID);
+        if ($lastData == null) {
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            // insert
+            $bc40Model->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_no_lokal' => $bc40Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+
+                'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean')),
+                'kode_jenis_tpb' => decrypt($this->request->getVar('header_kode_jenis_tpb')),
+                'kode_tujuan_pengiriman' => decrypt($this->request->getVar('header_kode_tujuan_pengiriman'))
+            ]);
+        } else {
+            // update
+            $bc40Model->update($lastData['id'], [
+                'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean')),
+                'kode_jenis_tpb' => decrypt($this->request->getVar('header_kode_jenis_tpb')),
+                'kode_tujuan_pengiriman' => decrypt($this->request->getVar('header_kode_tujuan_pengiriman'))
+            ]);
+        }
+
+        $penerimaanBarangModel->update($penerimaanBarangID, [
+            "tanggal" => $this->request->getVar("tanggal_penerimaan_barang") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_barang")), "Y-m-d") : "",
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Header berhasil diupdate",
+        ]);
+    }
+
+    // Navigator display
+    private function setFlashDataNavigatorSession($penerimaanBarangID)
+    {
+        $bc40Model = new BC40Model();
+        $isCompleteFormHeader = $bc40Model->isCompleteFormHeader($penerimaanBarangID);
+
+        session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
+    }
+
+    public function generateNomorAju()
+    {
+        $metaDataModel = new MetadataModel();
+        $bc40Model = new bc40Model();
+
+        $kodeKantorStatic = $metaDataModel->where('name', "Kode Kantor BC Static")->first();
+        $kodeDokumenbc40Static = $metaDataModel->where('name', "Kode BC40 Static")->first();
+        $tanggalAju = date('Ymd');
+        $sequenceNoUrutPengajuan = "";
+
+        $bc40Last = $bc40Model->orderBy('createdAt', "DESC")->limit(1)->first();
+
+        if ($bc40Last == null) {
+            $sequenceNoUrutPengajuan = "000001";
+        } else {
+            // Buatkan auto increment
+            $arrNo = explode('-', $bc40Last['no_aju']);
+            $lastNomor = $arrNo[3];
+            // lakukan increment
+            $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+            $sequenceNoUrutPengajuan = $nextNomor;
+        }
+
+        return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic['value'] . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+    }
 }

@@ -240,11 +240,7 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        if (data.status == 'BELUM DIBUAT') {
-            location.replace(`<?= base_url("bea-cukai-bc-40/id"); ?>/${data.penerimaan_barang_id}`);
-        } else {
-            location.replace(`<?= base_url("bea-cukai-bc-40/id"); ?>/${data.penerimaan_barang_id}/bc-23-id/${data.id}`);
-        }
+        location.replace(`<?= base_url("bea-cukai-bc-40/id/header/"); ?>${data.penerimaan_barang_id}`);
     });
 
 
