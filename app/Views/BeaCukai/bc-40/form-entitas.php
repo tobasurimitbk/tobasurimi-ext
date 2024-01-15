@@ -25,19 +25,19 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="pengusaha_tpb_npwp" value="<?= $npwpDefault['value'] ?>" name="pengusaha_tpb_npwp" type="number" class="form-control pengusaha_tpb_npwp" placeholder="">
+                                    <input id="pengusaha_tpb_npwp" value="<?= $bcEntitas == null ? $npwpDefault['value'] : ($bcEntitas['nomor_identitas'] != null ? $bcEntitas['nomor_identitas'] : $npwpDefault['value']) ?>" name="pengusaha_tpb_npwp" type="number" class="form-control pengusaha_tpb_npwp" placeholder="">
                                     <label>NPWP</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="pengusaha_tpb_nama" value="<?= $namaImportirDefault['value']  ?>" name="pengusaha_tpb_nama" type="text" class="form-control pengusaha_tpb_nama" placeholder="">
+                                    <input id="pengusaha_tpb_nama" value="<?= $bcEntitas == null ? $namaImportirDefault['value'] : ($bcEntitas['nama_entitas'] != null ? $bcEntitas['nama_entitas'] : $namaImportirDefault['value'])  ?>" name="pengusaha_tpb_nama" type="text" class="form-control pengusaha_tpb_nama" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="pengusaha_tpb_alamat" id="pengusaha_tpb_alamat" class="form-control pengusaha_tpb_alamat" style="height: 100px;"><?= "\n" . $alamatImportirDefault['value'] ?></textarea>
+                                    <textarea name="pengusaha_tpb_alamat" id="pengusaha_tpb_alamat" class="form-control pengusaha_tpb_alamat" style="height: 100px;"><?= "\n" . ($bcEntitas == null) ? $alamatImportirDefault['value'] : ($bcEntitas['alamat_entitas'] != null ? $bcEntitas['alamat_entitas'] : $alamatImportirDefault['value']) ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -46,7 +46,7 @@
                                     <select class="form-select pengusaha_tpb_nomor_ijin_tpb" id="pengusaha_tpb_nomor_ijin_tpb" name="pengusaha_tpb_nomor_ijin_tpb" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($nomorIjinTPB as $k) : ?>
-                                            <option data-tanggal_skep_tpb="<?= date('d/m/Y', strtotime($k['tanggal_skep_tpb'])) ?>" <?= !empty($bc23Entitas) ? ($bc23Entitas['nomor_ijin_entitas'] == $k['no_izin_tpb'] ? 'selected' : '') : '' ?> value="<?= $k['no_izin_tpb'] ?>">
+                                            <option <?= $bcEntitas != null ? ($bcEntitas['nomor_ijin_entitas'] == $k['no_izin_tpb'] ? 'selected' : '') : '' ?> data-tanggal_skep_tpb="<?= date('d/m/Y', strtotime($k['tanggal_skep_tpb'])) ?>" value="<?= $k['no_izin_tpb'] ?>">
                                                 <?= $k['no_izin_tpb'] ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -56,7 +56,7 @@
                             </div>
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input disabled readonly value="" autocomplete="one-time-code" name="pengusaha_tpb_tanggal_skep_tpb" type="text" placeholder="" class="form-control pengusaha_tpb_tanggal_skep_tpb" id="pengusaha_tpb_tanggal_skep_tpb">
+                                    <input disabled readonly value="<?= $bcEntitas == null ? '' : ($bcEntitas['tanggal_ijin_entitas'] != null ? date('d/m/Y', strtotime($bcEntitas['tanggal_ijin_entitas'])) : '') ?>" autocomplete="one-time-code" name="pengusaha_tpb_tanggal_skep_tpb" type="text" placeholder="" class="form-control pengusaha_tpb_tanggal_skep_tpb" id="pengusaha_tpb_tanggal_skep_tpb">
                                     <label>Tanggal Skep TPB</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                             <div class="form-floating mb-3">
-                                <input id="pengusaha_tpb_nib" value="<?= $nibDefault['value'] ?>" name="pengusaha_tpb_nib" type="text" class="form-control pengusaha_tpb_nib" placeholder="">
+                                <input id="pengusaha_tpb_nib" value="<?= $bcEntitas == null ? $nibDefault['value'] : ($bcEntitas['nib_entitas'] != null ? $bcEntitas['nib_entitas'] : $nibDefault['value']) ?>" name="pengusaha_tpb_nib" type="text" class="form-control pengusaha_tpb_nib" placeholder="">
                                 <label>NIB</label>
                             </div>
                         </div>
@@ -75,19 +75,19 @@
                             <div class="mt-1">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <input id="pengirim_npwp" value="" name="pengirim_npwp" type="number" class="form-control pengirim_npwp" placeholder="">
+                                        <input id="pengirim_npwp" value="<?= $bcEntitas != null ? $bcEntitas['npwp_pemasok'] : '' ?>" name="pengirim_npwp" type="number" class="form-control pengirim_npwp" placeholder="">
                                         <label>NPWP</label>
                                     </div>
                                 </div>
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <input id="pengirim_nama" value="" name="pengirim_nama" type="text" class="form-control pengirim_nama" placeholder="">
+                                        <input id="pengirim_nama" value="<?= $bcEntitas != null ? $bcEntitas['nama_pemasok'] : '' ?>" name="pengirim_nama" type="text" class="form-control pengirim_nama" placeholder="">
                                         <label>Nama</label>
                                     </div>
                                 </div>
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <textarea name="pengirim_alamat" id="pengirim_alamat" class="form-control pengirim_alamat" style="height: 100px;"></textarea>
+                                        <textarea name="pengirim_alamat" id="pengirim_alamat" class="form-control pengirim_alamat" style="height: 100px;"><?= $bcEntitas != null ? $bcEntitas['alamat_pemasok'] : '' ?></textarea>
                                         <label>Alamat</label>
                                     </div>
                                 </div>
@@ -100,19 +100,19 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="pemilik_barang_npwp" value="<?= $npwpDefault['value'] ?>" name="pemilik_barang_npwp" type="number" class="form-control pemilik_barang_npwp" placeholder="">
+                                    <input id="pemilik_barang_npwp" value="<?= $bcEntitas == null ? $npwpDefault['value'] : ($bcEntitas['npwp_pemilik_barang'] == null ? $npwpDefault['value'] : $bcEntitas['npwp_pemilik_barang'])  ?>" name="pemilik_barang_npwp" type="number" class="form-control pemilik_barang_npwp" placeholder="">
                                     <label>NPWP</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="pemilik_barang_nama" value="<?= $namaImportirDefault['value']  ?>" name="pemilik_barang_nama" type="text" class="form-control pemilik_barang_nama" placeholder="">
+                                    <input id="pemilik_barang_nama" value="<?= $bcEntitas == null ? $namaImportirDefault['value'] : ($bcEntitas['nama_pemilik_barang'] == null ? $namaImportirDefault['value'] : $bcEntitas['nama_pemilik_barang']) ?>" name="pemilik_barang_nama" type="text" class="form-control pemilik_barang_nama" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="pemilik_barang_alamat" id="pemilik_barang_alamat" class="form-control pemilik_barang_alamat" style="height: 100px;"><?= "\n" . $alamatImportirDefault['value'] ?></textarea>
+                                    <textarea name="pemilik_barang_alamat" id="pemilik_barang_alamat" class="form-control pemilik_barang_alamat" style="height: 100px;"><?= "\n" . ($bcEntitas == null) ? $alamatImportirDefault['value'] : ($bcEntitas['alamat_pemilik_barang'] == null ? $alamatImportirDefault['value'] : $bcEntitas['alamat_pemilik_barang']) ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -277,8 +277,9 @@
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-entitas"));
                     formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    formData.append("pengusaha_tpb_tanggal_skep_tpb", $('#pengusaha_tpb_tanggal_skep_tpb').val());
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/entitas"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-40/id/entitas"); ?>",
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());

@@ -4,6 +4,7 @@ namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Models\BC40Model;
+use App\Models\BCEntitasModel;
 use App\Models\CountryModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\MetadataModel;
@@ -180,6 +181,7 @@ class BC40 extends BaseController
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
         $nomorIjinTPBModel = new NomorIjinTPBModel();
+        $bcEntitasModel = new BCEntitasModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
@@ -198,6 +200,7 @@ class BC40 extends BaseController
             'alamatImportirDefault' => $metaDataModel->where('name', "Alamat Importir Default BC")->first(),
             'nibDefault' => $metaDataModel->where('name', "NIB Default BC")->first(),
             'nomorIjinTPB' => $nomorIjinTPBModel->findAll(),
+            'bcEntitas' => $bcEntitasModel->get($penerimaanBarangID),
             'lpb' => $lpb
 
         ];
@@ -207,11 +210,53 @@ class BC40 extends BaseController
 
     public function createEntitasAction()
     {
-        $bc40Model = new BC40Model();
+        $bcEntitasModel = new BCEntitasModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaaan_barang_id'));
+        $lastData = $bcEntitasModel->get($penerimaanBarangID);
+        if ($lastData == null) {
+            // insert
+            $bcEntitasModel->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_type' => '40',
+                'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
+                'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
+                'nib_entitas' => $this->request->getVar('pengusaha_tpb_nib'),
+                'nomor_identitas' => $this->request->getVar('pengusaha_tpb_npwp'),
+                'nomor_ijin_entitas' => $this->request->getVar('pengusaha_tpb_nomor_ijin_tpb'),
+                'tanggal_ijin_entitas' =>  $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb')), "Y-m-d") : "",
+                'nama_pemasok' => $this->request->getVar('pengirim_nama'),
+                'alamat_pemasok' => $this->request->getVar('pengirim_alamat'),
+                'npwp_pemasok' => $this->request->getVar('pengirim_npwp'),
+                'npwp_pemilik_barang' => $this->request->getVar('pemilik_barang_npwp'),
+                'nama_pemilik_barang' => $this->request->getVar('pemilik_barang_nama'),
+                'alamat_pemilik_barang' => $this->request->getVar('pemilik_barang_alamat')
+            ]);
+        } else {
+            // update
+            $bcEntitasModel->update($lastData['id'], [
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_type' => '40',
+                'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
+                'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
+                'nib_entitas' => $this->request->getVar('pengusaha_tpb_nib'),
+                'nomor_identitas' => $this->request->getVar('pengusaha_tpb_npwp'),
+                'nomor_ijin_entitas' => $this->request->getVar('pengusaha_tpb_nomor_ijin_tpb'),
+                'tanggal_ijin_entitas' =>  $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb')), "Y-m-d") : "",
+                'nama_pemasok' => $this->request->getVar('pengirim_nama'),
+                'alamat_pemasok' => $this->request->getVar('pengirim_alamat'),
+                'npwp_pemasok' => $this->request->getVar('pengirim_npwp'),
+                'npwp_pemilik_barang' => $this->request->getVar('pemilik_barang_npwp'),
+                'nama_pemilik_barang' => $this->request->getVar('pemilik_barang_nama'),
+                'alamat_pemilik_barang' => $this->request->getVar('pemilik_barang_alamat')
+            ]);
+        }
 
-        $bc40 = $bc40Model->get($penerimaanBarangID);
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Entitas berhasil diupdate",
+        ]);
     }
 
     // Navigator display
@@ -219,8 +264,18 @@ class BC40 extends BaseController
     {
         $bc40Model = new BC40Model();
         $isCompleteFormHeader = $bc40Model->isCompleteFormHeader($penerimaanBarangID);
+        $isCompleteFormEntitas = $bc40Model->isCompleteFormEntitas($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
+        session()->setFlashdata('isCompleteFormEntitas', $isCompleteFormEntitas);
+
+        if (
+            $isCompleteFormHeader && $isCompleteFormEntitas
+        ) {
+            $bc40Model->set('status_dokumen', "Siap Kirim")->where('penerimaan_barang_id', $penerimaanBarangID)->update();
+        } else {
+            $bc40Model->set('status_dokumen', "Belum Lengkap")->where('penerimaan_barang_id', $penerimaanBarangID)->update();
+        }
     }
 
     public function generateNomorAju()

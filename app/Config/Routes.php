@@ -784,6 +784,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/header', 'BeaCukai\BC40::createHeaderAction');
     // ENTITAS
     $routes->get('id/entitas/(:segment)', 'BeaCukai\BC40::createEntitasView/$1');
+    $routes->post('id/entitas', 'BeaCukai\BC40::createEntitasAction');
 });
 
 

@@ -202,4 +202,10 @@ class BC40Model extends Model
         }
         return $isCompleteForm;
     }
+
+    public function isCompleteFormEntitas($penerimaanBarangID)
+    {
+        $bcEntitasModel = new BCEntitasModel();
+        return $bcEntitasModel->get($penerimaanBarangID) == null ? false : true;
+    }
 }
