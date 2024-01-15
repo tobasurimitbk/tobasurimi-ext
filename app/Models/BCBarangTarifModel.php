@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BC23BarangTarifModel extends Model
+class BCBarangTarifModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_23_barang_tarif';
+    protected $table            = 'bc_barang_tarif';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -43,10 +43,10 @@ class BC23BarangTarifModel extends Model
     public function getList($condition, $limit = 10, $offset = 0)
     {
 
-        $sort = 'bc_23_barang_tarif.createdAt';
+        $sort = 'bc_barang_tarif.createdAt';
         $sortType = 'DESC';
 
-        $selectQry = "bc_23_barang_tarif.*";
+        $selectQry = "bc_barang_tarif.*";
 
         $pinjamanQry = $this->asObject()
             ->select($selectQry)
@@ -72,7 +72,7 @@ class BC23BarangTarifModel extends Model
         $metaDataModel = new MetadataModel();
 
         $result = [];
-        foreach ($this->where('bc_23_barang_id', $bc23BarangID)->where('deletedAt', null)->findAll() as $r) {
+        foreach ($this->where('bc_barang_id', $bc23BarangID)->where('deletedAt', null)->findAll() as $r) {
             $kodeFasilitasTarif = $metaDataModel->bcMetaDataHelper("Kode Fasilitas Tarif BC", $r['kode_fasilitas_tarif'], null);
             $kodeJenisTarif = $metaDataModel->bcMetaDataHelper("Kode Jenis Tarif BC", $r['kode_jenis_tarif'], null);
             $kodeSatuanBarang = $metaDataModel->bcMetaDataHelper("Kode Satuan BC", $r['kode_satuan_barang'], null);

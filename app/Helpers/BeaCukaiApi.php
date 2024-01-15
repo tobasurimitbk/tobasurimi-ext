@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\BC23BarangDokumenModel;
-use App\Models\BC23BarangTarifModel;
+use App\Models\BCBarangDokumenModel;
+use App\Models\BCBarangTarifModel;
 use App\Models\MetadataModel;
 use Exception;
 
@@ -278,8 +278,8 @@ class BeaCukaiApi
     // PAYLOAD
     public function payloadTempleateKirimBC23($bc23Data, $bc23Kontainer, $bc23Barang, $bc23Entitas, $bc23Kemasan, $bc23Dokumen, $bc23Pengangkut)
     {
-        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
-        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $BCBarangDokumenModel = new BCBarangDokumenModel();
+        $BCBarangTarifModel = new BCBarangTarifModel();
 
         $payload = [
             'asalData' => 'S',
@@ -372,7 +372,7 @@ class BeaCukaiApi
                 'barangDokumen' => []
             ];
 
-            $barangTarifData = $bc23BarangTarifModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
+            $barangTarifData = $BCBarangTarifModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
                 ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
                 ->where('deletedAt', null)
                 ->findAll();
@@ -395,7 +395,7 @@ class BeaCukaiApi
             }
             $barang['barangTarif'] = $barangTarifArr;
 
-            $barangDokumenData = $bc23BarangDokumenModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
+            $barangDokumenData = $BCBarangDokumenModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
                 ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
                 ->where('deletedAt', null)
                 ->findAll();

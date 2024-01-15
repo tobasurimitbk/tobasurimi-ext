@@ -610,7 +610,7 @@
             data: function(data) {
                 data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
                 data.penerimaan_barang_detail_id = "<?= encrypt($lpbDetail['id']) ?>";
-                data.sort = "bc_23_dokumen.createdAt";
+                data.sort = "bc_dokumen.createdAt";
                 data.sortType = "DESC";
             }
         },
@@ -622,7 +622,7 @@
         display: "stripe",
         searching: false,
         columns: [{
-                data: "bc_23_dokumen_id",
+                data: "bc_dokumen_id",
                 className: "text-center",
                 sortable: false,
                 width: "5%",
@@ -631,16 +631,16 @@
                     var is_used = row?.is_used;
                     var seri_dokumen = row?.seri_dokumen;
                     var barang_dokumen_id = row?.barang_dokumen_id;
-                    var bc_23_dokumen_id = row?.bc_23_dokumen_id;
+                    var bc_dokumen_id = row?.bc_dokumen_id;
                     if (is_used) {
                         // delete
                         return `
-                            <input name="bc_23_dokumen_id[]" data-seri_dokumen="${seri_dokumen}" data-bc_23_dokumen_id="${bc_23_dokumen_id}" data-barang_dokumen_id="${barang_dokumen_id}" class="child bc_23_dokumen_id" type="checkbox"  checked>
+                            <input name="bc_dokumen_id[]" data-seri_dokumen="${seri_dokumen}" data-bc_dokumen_id="${bc_dokumen_id}" data-barang_dokumen_id="${barang_dokumen_id}" class="child bc_dokumen_id" type="checkbox"  checked>
                         `
                     } else {
                         // create
                         return `
-                        <input name="bc_23_dokumen_id[]" data-seri_dokumen="${seri_dokumen}" data-bc_23_dokumen_id="${bc_23_dokumen_id}" data-barang_dokumen_id="${barang_dokumen_id}" class="child bc_23_dokumen_id" type="checkbox" >
+                        <input name="bc_dokumen_id[]" data-seri_dokumen="${seri_dokumen}" data-bc_dokumen_id="${bc_dokumen_id}" data-barang_dokumen_id="${barang_dokumen_id}" class="child bc_dokumen_id" type="checkbox" >
                         `
                     }
 
@@ -1006,11 +1006,11 @@
         }
     })
 
-    $(document).on('click', '.bc_23_dokumen_id', function() {
+    $(document).on('click', '.bc_dokumen_id', function() {
         var checkbox = $(this);
         var isChecked = checkbox.prop('checked');
         var seriDokumen = checkbox.data('seri_dokumen');
-        var bc23DokumenID = checkbox.data('bc_23_dokumen_id');
+        var bc23DokumenID = checkbox.data('bc_dokumen_id');
         var barangDokumenID = checkbox.data('barang_dokumen_id');
 
         if (isChecked) {
@@ -1029,7 +1029,7 @@
                     var formData = new FormData();
                     formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
                     formData.append("penerimaan_barang_detail_id", "<?= encrypt($lpbDetail['id']) ?>");
-                    formData.append("bc_23_dokumen_id", bc23DokumenID);
+                    formData.append("bc_dokumen_id", bc23DokumenID);
                     formData.append("seri_dokumen", seriDokumen);
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/barang-dokumen-create"); ?>",

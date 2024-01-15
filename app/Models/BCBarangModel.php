@@ -4,32 +4,24 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BeaCukaiDokumenModel extends Model
+class BCBarangModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bea_cukai_dokumen';
+    protected $table            = 'bc_barang';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'id',
-        'bea_cukai_id',
-        'dokumen_id',
-        'no_dokumen',
-        'date',
-        'note'
-    ];
+    protected $useSoftDeletes   = false;
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
     protected $deletedField  = 'deletedAt';
-
     // Validation
     protected $validationRules      = [];
     protected $validationMessages   = [];
@@ -46,20 +38,4 @@ class BeaCukaiDokumenModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function getByBeaCukaiId($id)
-    {
-        $arrCondition = [
-            'bea_cukai_dokumen.deletedAt' => null,
-            'bea_cukai_dokumen.bea_cukai_id' => $id
-        ];
-
-        $builder = $this->db->table('bea_cukai_dokumen')
-        ->select('bea_cukai_dokumen.*, metadata.value, metadata.description')
-        ->join('metadata', 'bea_cukai_dokumen.dokumen_id = metadata.id', 'left');
-        $builder->where($arrCondition);
-        $query = $builder->get();
-
-        return $query->getResultArray();
-    }
 }

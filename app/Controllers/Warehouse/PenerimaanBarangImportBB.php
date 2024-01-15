@@ -4,7 +4,6 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
-use App\Models\BeaCukaiModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
@@ -28,7 +27,6 @@ class PenerimaanBarangImportBB extends BaseController
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
-    protected $beaCukaiModel;
     protected $stockDetailModel;
     protected $warehouseModel;
     protected $dompdf;
@@ -47,7 +45,6 @@ class PenerimaanBarangImportBB extends BaseController
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuansModel();
         $this->stockDetailModel = new StockDetailModel();
-        $this->beaCukaiModel = new BeaCukaiModel();
         $this->warehouseModel = new WarehousesModel();
         $this->dompdf = new Dompdf();
     }

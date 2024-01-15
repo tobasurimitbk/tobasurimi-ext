@@ -222,29 +222,29 @@ class BC23Model extends Model
 
     public function isCompleteFormEntitas($penerimaanBarangID)
     {
-        $bc23EntitasModel = new BC23EntitasModel();
-        return $bc23EntitasModel->get($penerimaanBarangID) == null ? false : true;
+        $bcEntitasModel = new BCEntitasModel();
+        return $bcEntitasModel->get($penerimaanBarangID) == null ? false : true;
     }
 
     public function isCompleteFormDokumen($penerimaanBarangID)
     {
-        $bc23DokumenModel = new BC23DokumenModel();
-        return $bc23DokumenModel->get($penerimaanBarangID) == null ? false : true;
+        $bcDokumenModel = new BCDokumenModel();
+        return $bcDokumenModel->get($penerimaanBarangID) == null ? false : true;
     }
 
     public function isCompleteFormPengangkut($penerimaanBarangID)
     {
-        $bc23PengangkutModel = new BC23PengangkutModel();
+        $bc23PengangkutModel = new BCPengangkutModel();
         return $bc23PengangkutModel->get($penerimaanBarangID) == null ? false : true;
     }
 
     public function isCompleteFormPetiKemas($penerimaanBarangID)
     {
-        $bc23KontainerModel = new BC23KontainerModel();
-        $bc23KemasanModel = new BC23KemasanModel();
+        $bcKontainerModel = new BCKontainerModel();
+        $bcKemasanModel = new BCKemasanModel();
 
-        $kontainer = $bc23KontainerModel->getLast($penerimaanBarangID) != null ? true : false;
-        $kemasan = $bc23KemasanModel->getLast($penerimaanBarangID) != null ? true : false;
+        $kontainer = $bcKontainerModel->getLast($penerimaanBarangID) != null ? true : false;
+        $kemasan = $bcKemasanModel->getLast($penerimaanBarangID) != null ? true : false;
 
         return $kontainer && $kemasan;
     }
@@ -263,7 +263,7 @@ class BC23Model extends Model
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $bc23BarangModel = new BC23BarangModel();
+        $bcBarangModel = new BCBarangModel();
 
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
         $lpbDetail = $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan);
@@ -271,8 +271,8 @@ class BC23Model extends Model
         $totalPerluDiisi = count($lpbDetail);
         $totalSudahDiisi = 0;
         foreach ($lpbDetail as $l) {
-            $bc23DokumenBarang =  $bc23BarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first();
-            if ($bc23DokumenBarang != null) {
+            $bcDokumenBarang =  $bcBarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first();
+            if ($bcDokumenBarang != null) {
                 $totalSudahDiisi++;
             }
         }
@@ -282,8 +282,8 @@ class BC23Model extends Model
 
     public function isCompleteFormPungutan($penerimaanBarangID)
     {
-        $bc23BarangTarifModel = new BC23BarangTarifModel();
-        $barangTarif = $bc23BarangTarifModel
+        $bcBarangTarifModel = new BCBarangTarifModel();
+        $barangTarif = $bcBarangTarifModel
             ->where('penerimaan_barang_id', $penerimaanBarangID)
             ->findAll();
 

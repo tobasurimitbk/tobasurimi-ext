@@ -12,7 +12,6 @@ use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\BarangMasterModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
-use App\Models\BeaCukaiModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\PenerimaanBarangModel;
@@ -30,7 +29,6 @@ class POImportBahanPenolong extends BaseController
     protected $amPurchaseOrderDetailModel;
     protected $sppModel;
     protected $supplierModel;
-    protected $beaCukaiModel;
     protected $companyModel;
     protected $barangMasterModel;
     protected $satuanModel;
@@ -51,7 +49,6 @@ class POImportBahanPenolong extends BaseController
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
-        $this->beaCukaiModel = new BeaCukaiModel();
         $this->companyModel = new CompaniesModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->satuanModel = new SatuansModel();

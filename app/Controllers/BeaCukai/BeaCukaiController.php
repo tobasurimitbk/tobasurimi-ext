@@ -3,11 +3,6 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
-use App\Models\BeaCukaiModel;
-use App\Models\BeaCukaiBarangModel;
-use App\Models\BeaCukaiDokumenModel;
-use App\Models\BeaCukaiKemasanModel;
-use App\Models\BeaCukaiKontainerModel;
 use App\Models\CountryModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\SupplierModel;
@@ -28,11 +23,6 @@ class BeaCukaiController extends BaseController
         $this->modelRMPurchaseOrder = new RMPurchaseOrderModel();
         $this->modelRMImportPO = new RMImportPOModel();
         $this->modelAMPurchaseOrder = new AMPurchaseOrderModel();
-        $this->modelBeaCukai = new BeaCukaiModel();
-        $this->modelBeaCukaiBarang = new BeaCukaiBarangModel();
-        $this->modelBeaCukaiDokumen = new BeaCukaiDokumenModel();
-        $this->modelBeaCukaiKemasan = new BeaCukaiKemasanModel();
-        $this->modelBeaCukaiKontainer = new BeaCukaiKontainerModel();
         $this->modelKantorBeaCukai = new KantorBeaCukaiModel();
         $this->modelSupplier = new SupplierModel();
         $this->modelCountry = new CountryModel();

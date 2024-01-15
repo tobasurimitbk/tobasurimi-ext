@@ -7,7 +7,7 @@
         $bc23 = $bc23Model->get(decrypt(request()->uri->getSegment(4)));
         ?>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-23"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-40"); ?>">
                 Batal
             </a>
             <?php if ($bc23 != null) : ?>

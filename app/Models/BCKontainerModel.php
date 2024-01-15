@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BC23KontainerModel extends Model
+class BCKontainerModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_23_kontainer';
+    protected $table            = 'bc_kontainer';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -43,10 +43,10 @@ class BC23KontainerModel extends Model
     public function getList($condition, $limit = 10, $offset = 0)
     {
 
-        $sort = 'bc_23_kontainer.createdAt';
+        $sort = 'bc_kontainer.createdAt';
         $sortType = 'DESC';
 
-        $selectQry = "bc_23_kontainer.*";
+        $selectQry = "bc_kontainer.*";
 
         $pinjamanQry = $this->asObject()
             ->select($selectQry)

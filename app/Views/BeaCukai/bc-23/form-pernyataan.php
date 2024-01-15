@@ -36,7 +36,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input value="<?= !empty($bc23) ? date('d/m/Y', strtotime($bc23['tanggal_ttd'])) : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" id="pernyataan_tanggal" name="pernyataan_tanggal" type="text" class="form-control pernyataan_tanggal" placeholder="">
+                                <input value="<?= !empty($bc23) ? ($bc23['tanggal_ttd'] == null ? date('d/m/Y') : date('d/m/Y', strtotime($bc23['tanggal_ttd']))) : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" id="pernyataan_tanggal" name="pernyataan_tanggal" type="text" class="form-control pernyataan_tanggal" placeholder="">
                                 <label>Tanggal</label>
                             </div>
                         </div>

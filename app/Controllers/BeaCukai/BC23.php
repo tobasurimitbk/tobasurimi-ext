@@ -6,15 +6,15 @@ use App\Controllers\BaseController;
 use App\Helpers\BeaCukaiApi;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\BarangMasterModel;
-use App\Models\BC23BarangDokumenModel;
-use App\Models\BC23BarangModel;
-use App\Models\BC23BarangTarifModel;
-use App\Models\BC23DokumenModel;
-use App\Models\BC23EntitasModel;
-use App\Models\BC23KemasanModel;
-use App\Models\BC23KontainerModel;
+use App\Models\BCBarangDokumenModel;
+use App\Models\BCBarangModel;
+use App\Models\BCBarangTarifModel;
+use App\Models\BCDokumenModel;
+use App\Models\BCEntitasModel;
+use App\Models\BCKemasanModel;
+use App\Models\BCKontainerModel;
 use App\Models\BC23Model;
-use App\Models\BC23PengangkutModel;
+use App\Models\BCPengangkutModel;
 use App\Models\CountryModel;
 use App\Models\HsCodesModel;
 use App\Models\KantorBeaCukaiModel;
@@ -202,13 +202,13 @@ class BC23 extends BaseController
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
         $countryModel = new CountryModel();
-        $bc23EntitasModel = new BC23EntitasModel();
+        $BCEntitasModel = new BCEntitasModel();
         $nomorIjinTPBModel = new NomorIjinTPBModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $bc23Entitas = $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        $bc23Entitas = $BCEntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
 
         if ($lpb == null || $lpb->bc_type != "BC 2.3") {
             return redirect()->to('bea-cukai-bc-23');
@@ -232,15 +232,16 @@ class BC23 extends BaseController
 
     public function createEntitasAction()
     {
-        $bc23EntitasModel = new BC23EntitasModel();
+        $BCEntitasModel = new BCEntitasModel();
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-        $lastData = $bc23EntitasModel->get($penerimaanBarangID);
+        $lastData = $BCEntitasModel->get($penerimaanBarangID);
 
         if ($lastData == null) {
             // insert
-            $bc23EntitasModel->insert([
+            $BCEntitasModel->insert([
                 'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_type' => '23',
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
                 'nib_entitas' => $this->request->getVar('entitas_nib'),
@@ -256,8 +257,9 @@ class BC23 extends BaseController
             ]);
         } else {
             // update
-            $bc23EntitasModel->update($lastData['id'], [
+            $BCEntitasModel->update($lastData['id'], [
                 'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_type' => '23',
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
                 'nib_entitas' => $this->request->getVar('entitas_nib'),
@@ -316,20 +318,23 @@ class BC23 extends BaseController
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
         $condition = [
-            "bc_23_dokumen.deletedAt"  => null,
-            "bc_23_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_dokumen.deletedAt"  => null,
+            "bc_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_dokumen.bc_type" => '23'
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $bc23DokumenModel = new BC23DokumenModel();
+        $BCDokumenModel = new BCDokumenModel();
         $metaDataModel = new MetadataModel();
 
 
-        $beaCukaiDokumen = $bc23DokumenModel->getList($condition, $limit, $offset);
+        $beaCukaiDokumen = $BCDokumenModel->getList($condition, $limit, $offset);
         $resDokumen = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+
 
         foreach ($beaCukaiDokumen['data'] as $data) {
             $jenisDokumen = $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->kode_dokumen)->first();
@@ -357,13 +362,14 @@ class BC23 extends BaseController
 
     public function createDokumenAction()
     {
-        $bc23DokumenModel = new BC23DokumenModel();
+        $BCDokumenModel = new BCDokumenModel();
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-        $lastData = $bc23DokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+        $lastData = $BCDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
         $seriDokumen = $lastData == null ? 1 : $lastData['seri_dokumen'] + 1;
 
-        $bc23DokumenModel->insert([
+        $BCDokumenModel->insert([
+            'bc_type' => '23',
             'penerimaan_barang_id' => $penerimaanBarangID,
             'id_dokumen' => generateUniqueCode(5),
             'nomor_dokumen' => $this->request->getVar('dokumen_nomor_dokumen'),
@@ -381,9 +387,9 @@ class BC23 extends BaseController
 
     public function deleteDokumenAction()
     {
-        $bc23DokumenModel = new BC23DokumenModel();
+        $BCDokumenModel = new BCDokumenModel();
         $id = decrypt($this->request->getVar('id'));
-        $bc23DokumenModel->delete($id);
+        $BCDokumenModel->delete($id);
 
         return response()->setJSON([
             'status' => true,
@@ -398,13 +404,13 @@ class BC23 extends BaseController
         $metaDataModel = new MetadataModel();
         $countryModel = new CountryModel();
         $bc23Model = new BC23Model();
-        $bc23DokumenModel = new BC23DokumenModel();
-        $bc23PengangkutModel = new BC23PengangkutModel();
+        $BCDokumenModel = new BCDokumenModel();
+        $BCPengangkutModel = new BCPengangkutModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $bc23DokumenBL = $bc23DokumenModel
+        $bc23DokumenBL = $BCDokumenModel
             ->whereIn('kode_dokumen', [705, 740]) // (702 = BL, 740 = AWB)
             ->where('penerimaan_barang_id', $penerimaanBarangID)->first();
 
@@ -418,7 +424,7 @@ class BC23 extends BaseController
             'kodePengangkutan' => $metaDataModel->where('name', "Pengangkutan")->findAll(),
             'kodeBendera' => $countryModel->findAll(),
             'bc23' => $bc23Model->get($penerimaanBarangID),
-            'bc23Pengangkut' => $bc23PengangkutModel->get($penerimaanBarangID),
+            'bc23Pengangkut' => $BCPengangkutModel->get($penerimaanBarangID),
             'bc23DokumenBL' => $bc23DokumenBL,
             'lpb' => $lpb
         ];
@@ -430,10 +436,10 @@ class BC23 extends BaseController
     {
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
         $bc23Model = new BC23Model();
-        $bc23PengangkutModel = new BC23PengangkutModel();
+        $BCPengangkutModel = new BCPengangkutModel();
 
         $lastDataBC23 = $bc23Model->get($penerimaanBarangID);
-        $lastPengangkutBC23 = $bc23PengangkutModel->get($penerimaanBarangID);
+        $lastPengangkutBC23 = $BCPengangkutModel->get($penerimaanBarangID);
 
         if ($lastDataBC23 == null) {
             // insert
@@ -443,7 +449,6 @@ class BC23 extends BaseController
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'bc_no_lokal' => $bc23Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
-
                 'no_bc_11' => $this->request->getVar('bc_11_no_bc_11'),
                 'tanggal_bc_11' => $this->request->getVar('bc_11_tanggal_bc_11') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('bc_11_tanggal_bc_11')), "Y-m-d") : "",
                 'pos_bc_11' => $this->request->getVar('bc_11_pos_bc_11'),
@@ -468,7 +473,8 @@ class BC23 extends BaseController
         }
 
         if ($lastPengangkutBC23 == null) {
-            $bc23PengangkutModel->insert([
+            $BCPengangkutModel->insert([
+                'bc_type' => '23',
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
                 'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
@@ -476,7 +482,8 @@ class BC23 extends BaseController
                 'kode_bendera' => decrypt($this->request->getVar('pengangkutan_kode_bendera')),
             ]);
         } else {
-            $bc23PengangkutModel->update($lastPengangkutBC23['id'], [
+            $BCPengangkutModel->update($lastPengangkutBC23['id'], [
+                'bc_type' => '23',
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
                 'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
@@ -496,17 +503,17 @@ class BC23 extends BaseController
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $metaDataModel = new MetadataModel();
-        $bc23KemasanModel = new BC23KemasanModel();
-        $bc23KontainerModel = new BC23KontainerModel();
-        $bc23DokumenModel = new BC23DokumenModel();
+        $BCKemasanModel = new BCKemasanModel();
+        $BCKontainerModel = new BCKontainerModel();
+        $BCDokumenModel = new BCDokumenModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
 
         $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $kemasanLast = $bc23KemasanModel->getLast($penerimaanBarangID);
-        $kontainerLast = $bc23KontainerModel->getLast($penerimaanBarangID);
+        $kemasanLast = $BCKemasanModel->getLast($penerimaanBarangID);
+        $kontainerLast = $BCKontainerModel->getLast($penerimaanBarangID);
 
-        $bc23DokumenBL = $bc23DokumenModel
+        $bc23DokumenBL = $BCDokumenModel
             ->whereIn('kode_dokumen', [705, 740]) // (702 = BL, 740 = AWB)
             ->where('penerimaan_barang_id', $penerimaanBarangID)->first();
 
@@ -543,17 +550,17 @@ class BC23 extends BaseController
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
         $condition = [
-            "bc_23_kemasan.deletedAt"  => null,
-            "bc_23_kemasan.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_kemasan.deletedAt"  => null,
+            "bc_kemasan.penerimaan_barang_id" => $penerimaanBarangID,
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $bc23KemasanModel = new BC23KemasanModel();
+        $BCKemasanModel = new BCKemasanModel();
         $metaDataModel = new MetadataModel();
 
-        $bc23Kemasan = $bc23KemasanModel->getList($condition, $limit, $offset);
+        $bc23Kemasan = $BCKemasanModel->getList($condition, $limit, $offset);
         $resKemasan = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
@@ -594,17 +601,17 @@ class BC23 extends BaseController
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
         $condition = [
-            "bc_23_kontainer.deletedAt"  => null,
-            "bc_23_kontainer.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_kontainer.deletedAt"  => null,
+            "bc_kontainer.penerimaan_barang_id" => $penerimaanBarangID,
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $bc23KontainerModel = new BC23KontainerModel();
+        $BCKontainerModel = new BCKontainerModel();
         $metaDataModel = new MetadataModel();
 
-        $bc23Kontainer = $bc23KontainerModel->getList($condition, $limit, $offset);
+        $bc23Kontainer = $BCKontainerModel->getList($condition, $limit, $offset);
         $resKontainer = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
@@ -638,10 +645,11 @@ class BC23 extends BaseController
 
     public function createKemasanAction()
     {
-        $bc23KemasanModel = new BC23KemasanModel();
+        $BCKemasanModel = new BCKemasanModel();
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-        $bc23KemasanModel->insert([
+        $BCKemasanModel->insert([
+            'bc_type' => '23',
             'penerimaan_barang_id' => $penerimaanBarangID,
             'seri_kemasan' => $this->request->getVar('kemasan_seri_kemasan'),
             'jumlah_kemasan' => $this->request->getVar('kemasan_jumlah_kemasan'),
@@ -649,7 +657,7 @@ class BC23 extends BaseController
             'merk_kemasan' => $this->request->getVar('kemasan_merk_kemasan')
         ]);
 
-        $kemasanLast = $bc23KemasanModel->getLast($penerimaanBarangID);
+        $kemasanLast = $BCKemasanModel->getLast($penerimaanBarangID);
 
         return response()->setJSON([
             'status' => true,
@@ -662,11 +670,11 @@ class BC23 extends BaseController
     public function deleteKemasanAction()
     {
         $id = decrypt($this->request->getVar('id'));
-        $bc23KemasanModel = new BC23KemasanModel();
-        $penerimaanBarangID = $bc23KemasanModel->find($id)['penerimaan_barang_id'];
-        $bc23KemasanModel->delete($id);
+        $BCKemasanModel = new BCKemasanModel();
+        $penerimaanBarangID = $BCKemasanModel->find($id)['penerimaan_barang_id'];
+        $BCKemasanModel->delete($id);
 
-        $kemasanLast = $bc23KemasanModel->getLast($penerimaanBarangID);
+        $kemasanLast = $BCKemasanModel->getLast($penerimaanBarangID);
 
         return response()->setJSON([
             'status' => true,
@@ -678,10 +686,11 @@ class BC23 extends BaseController
 
     public function createKontainerAction()
     {
-        $bc23KontainerModel = new BC23KontainerModel();
+        $BCKontainerModel = new BCKontainerModel();
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-        $bc23KontainerModel->insert([
+        $BCKontainerModel->insert([
+            'bc_type' => '23',
             'penerimaan_barang_id' => $penerimaanBarangID,
             'nomor_kontainer' => $this->request->getVar('kontainer_nomor'),
             'kode_ukuran_kontainer' => decrypt($this->request->getVar('kontainer_ukuran')),
@@ -690,7 +699,7 @@ class BC23 extends BaseController
             'seri_kontainer' => $this->request->getVar('kontainer_seri')
         ]);
 
-        $kontainerLast = $bc23KontainerModel->getLast($penerimaanBarangID);
+        $kontainerLast = $BCKontainerModel->getLast($penerimaanBarangID);
 
         return response()->setJSON([
             'status' => true,
@@ -703,11 +712,11 @@ class BC23 extends BaseController
     public function deleteKontainerAction()
     {
         $id = decrypt($this->request->getVar('id'));
-        $bc23KontainerModel = new BC23KontainerModel();
-        $penerimaanBarangID = $bc23KontainerModel->find($id)['penerimaan_barang_id'];
-        $bc23KontainerModel->delete($id);
+        $BCKontainerModel = new BCKontainerModel();
+        $penerimaanBarangID = $BCKontainerModel->find($id)['penerimaan_barang_id'];
+        $BCKontainerModel->delete($id);
 
-        $kontainerLast = $bc23KontainerModel->getLast($penerimaanBarangID);
+        $kontainerLast = $BCKontainerModel->getLast($penerimaanBarangID);
 
         return response()->setJSON([
             'status' => true,
@@ -720,14 +729,14 @@ class BC23 extends BaseController
     public function getBLKontainerPetiKemas()
     {
         $beacukaiApi = new BeaCukaiApi();
-        $bc23DokumenModel = new BC23DokumenModel();
+        $BCDokumenModel = new BCDokumenModel();
         $bc23Model = new BC23Model();
         $metaDataModel = new MetadataModel();
-        $bc23KontainerModel = new BC23KontainerModel();
+        $BCKontainerModel = new BCKontainerModel();
 
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-        $bc23DokumenBL = $bc23DokumenModel
+        $bc23DokumenBL = $BCDokumenModel
             ->whereIn('kode_dokumen', [705, 740]) // (702 = BL, 740 = AWB)
             ->where('penerimaan_barang_id', $penerimaanBarangID)->first();
 
@@ -767,12 +776,12 @@ class BC23 extends BaseController
             ]);
         }
         foreach ($listKontainer as $l) {
-            $kontainerFirst = $bc23KontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('nomor_kontainer', $l->noKontainer)->first();
+            $kontainerFirst = $BCKontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('nomor_kontainer', $l->noKontainer)->first();
             if ($kontainerFirst == null) {
-                $kontainerLast = $bc23KontainerModel->getLast($penerimaanBarangID);
+                $kontainerLast = $BCKontainerModel->getLast($penerimaanBarangID);
                 $seriKontainer =  $kontainerLast != null ? $kontainerLast['seri_kontainer'] + 1 : 1;
 
-                $bc23KontainerModel->insert([
+                $BCKontainerModel->insert([
                     'penerimaan_barang_id' => $penerimaanBarangID,
                     'nomor_kontainer' => $l->noKontainer,
                     'kode_ukuran_kontainer' => $l->ukuranKontainer,
@@ -923,7 +932,7 @@ class BC23 extends BaseController
         $metaDataModel = new MetadataModel();
         $hsCodeModel = new HsCodesModel();
         $countryModel = new CountryModel();
-        $bc23BarangModel = new BC23BarangModel();
+        $BCBarangModel = new BCBarangModel();
         $rmImportPoDetailModel = new RMImportPODetailModel(); // import bahan baku
         $rmLokalPoDetailModel = new RMPurchaseOrderDetailModel(); // lokal bahan baku
         $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel(); // lokal | import penolong
@@ -976,8 +985,8 @@ class BC23 extends BaseController
             $barangDetail = $barangMasterModel->find($poDetail['barang_id']);
         }
 
-        $seriBarang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
-        $bc23DokumenBarang =  $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+        $seriBarang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+        $bc23DokumenBarang =  $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
         $bc23 = $bc23Model->where('penerimaan_barang_id', $penerimaanBarangID)->first();
 
         if ($bc23DokumenBarang != null) {
@@ -1020,18 +1029,18 @@ class BC23 extends BaseController
         $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
 
         $condition = [
-            "bc_23_barang_tarif.deletedAt"  => null,
-            "bc_23_barang_tarif.penerimaan_barang_id" => $penerimaanBarangID,
-            "bc_23_barang_tarif.penerimaan_barang_detail_id" => $penerimaanBarangDetailID
+            "bc_barang_tarif.deletedAt"  => null,
+            "bc_barang_tarif.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_barang_tarif.penerimaan_barang_detail_id" => $penerimaanBarangDetailID
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $BCBarangTarifModel = new BCBarangTarifModel();
         $metaDataModel = new MetadataModel();
 
-        $bc23BarangTarif = $bc23BarangTarifModel->getList($condition, $limit, $offset);
+        $bc23BarangTarif = $BCBarangTarifModel->getList($condition, $limit, $offset);
         $res = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
@@ -1064,14 +1073,14 @@ class BC23 extends BaseController
 
     public function createPungutanAction()
     {
-        $bc23BarangTarifModel = new BC23BarangTarifModel();
-        $bc23BarangModel = new BC23BarangModel();
+        $BCBarangTarifModel = new BCBarangTarifModel();
+        $BCBarangModel = new BCBarangModel();
         $metaDataModel = new MetadataModel();
 
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
         $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
 
-        $bc23Barang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+        $bc23Barang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
 
         if ($bc23Barang == null) {
             return response()->setJSON([
@@ -1081,7 +1090,7 @@ class BC23 extends BaseController
             ]);
         }
 
-        $pungutan = $bc23BarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)
+        $pungutan = $BCBarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)
             ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
             ->where('kode_jenis_pungutan', decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')))
             ->first();
@@ -1102,7 +1111,7 @@ class BC23 extends BaseController
         $tarifFasilitas = ($tarifFasilitas == 0) ? 1 : $tarifFasilitas;
 
         if ($kodeJenisPungutanStr == "PPN" || $kodeJenisPungutanStr == "PPH") {
-            $beaMasuk = $bc23BarangTarifModel
+            $beaMasuk = $BCBarangTarifModel
                 ->where('penerimaan_barang_id', $penerimaanBarangID)
                 ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
                 ->where('kode_jenis_pungutan', "BM")
@@ -1123,9 +1132,10 @@ class BC23 extends BaseController
             $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
         }
 
-        $bc23BarangTarifModel->insert([
+        $BCBarangTarifModel->insert([
             'penerimaan_barang_id' => $penerimaanBarangID,
             'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
+            'bc_type' => '23',
             'kode_jenis_pungutan' => decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')),
             'kode_jenis_tarif' => decrypt($this->request->getVar('barang_detail_kode_jenis_tarif')),
             'tarif_bea_masuk' => convertRupiahToNumber($this->request->getVar('barang_detail_nilai_tarif')),
@@ -1145,8 +1155,8 @@ class BC23 extends BaseController
 
     public function deletePungutanAction()
     {
-        $bc23BarangTarifModel = new BC23BarangTarifModel();
-        $bc23BarangTarifModel->delete(decrypt($this->request->getVar('id')));
+        $BCBarangTarifModel = new BCBarangTarifModel();
+        $BCBarangTarifModel->delete(decrypt($this->request->getVar('id')));
 
         return response()->setJSON([
             'message' => "Pungutan berhasil dihapus",
@@ -1169,31 +1179,31 @@ class BC23 extends BaseController
         $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
 
         $condition = [
-            "bc_23_dokumen.deletedAt"  => null,
-            "bc_23_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_dokumen.deletedAt"  => null,
+            "bc_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $bc23DokumenModel = new BC23DokumenModel();
+        $BCDokumenModel = new BCDokumenModel();
         $metaDataModel = new MetadataModel();
-        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
+        $BCBarangDokumenModel = new BCBarangDokumenModel();
 
-        $beaCukaiDokumen = $bc23DokumenModel->getList($condition, $limit, $offset);
+        $beaCukaiDokumen = $BCDokumenModel->getList($condition, $limit, $offset);
         $resDokumen = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($beaCukaiDokumen['data'] as $data) {
             $jenisDokumen = $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->kode_dokumen)->first();
-            $barangDokumen = $bc23BarangDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)
+            $barangDokumen = $BCBarangDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)
                 ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
                 ->where('seri_dokumen', $data->seri_dokumen)->where('deletedAt', null)
                 ->first();
 
             array_push($resDokumen, [
                 "no"                    => $no++,
-                "bc_23_dokumen_id"      => encrypt($data->id),
+                "bc_dokumen_id"      => encrypt($data->id),
                 "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
                 "kode_dokumen"          => $data->kode_dokumen . ' - ' . $jenisDokumen['value'],
                 "nomor_dokumen"         => $data->nomor_dokumen,
@@ -1217,16 +1227,16 @@ class BC23 extends BaseController
 
     public function createBarangDokumenAction()
     {
-        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
+        $BCBarangDokumenModel = new BCBarangDokumenModel();
 
-        $barangDokumenID = decrypt($this->request->getVar('bc_23_dokumen_id'));
+        $barangDokumenID = decrypt($this->request->getVar('bc_dokumen_id'));
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
         $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
 
-        $bc23BarangDokumenModel->insert([
+        $BCBarangDokumenModel->insert([
             'penerimaan_barang_id' => $penerimaanBarangID,
             'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
-            'bc_23_dokumen_id' => $barangDokumenID,
+            'bc_dokumen_id' => $barangDokumenID,
             'seri_dokumen' => $this->request->getVar('seri_dokumen')
         ]);
 
@@ -1239,8 +1249,8 @@ class BC23 extends BaseController
 
     public function deleteBarangDokumenAction()
     {
-        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
-        $bc23BarangDokumenModel->delete(decrypt($this->request->getVar('id')));
+        $BCBarangDokumenModel = new BCBarangDokumenModel();
+        $BCBarangDokumenModel->delete(decrypt($this->request->getVar('id')));
 
         return response()->setJSON([
             'message' => "Dokumen berhasil dihapus",
@@ -1251,17 +1261,19 @@ class BC23 extends BaseController
 
     public function createBarangDetailAction()
     {
-        $bc23BarangModel = new BC23BarangModel();
+        $BCBarangModel = new BCBarangModel();
 
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
         $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
 
-        $bc23Barang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+        $bc23Barang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
 
         if ($bc23Barang == null) {
-            $bc23BarangModel->insert([
+            $BCBarangModel->insert([
                 'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
                 'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
+                'bc_type' => '23',
+                'kode_dokumen' => '23',
                 'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),
                 'pos_tarif' => decrypt($this->request->getVar('barang_detail_kode_hs')),
                 'kode_barang' => $this->request->getVar('barang_detail_kode_barang'),
@@ -1287,7 +1299,9 @@ class BC23 extends BaseController
                 'persentase_jenis_negara' => $this->request->getVar('persentase_jenis_negara')
             ]);
         } else {
-            $bc23BarangModel->update($bc23Barang['id'], [
+            $BCBarangModel->update($bc23Barang['id'], [
+                'bc_type' => '23',
+                'kode_dokumen' => '23',
                 'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
                 'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
                 'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),
@@ -1327,7 +1341,7 @@ class BC23 extends BaseController
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $bc23BarangTarifModel = new BC23BarangTarifModel();
+        $BCBarangTarifModel = new BCBarangTarifModel();
         $metaDataModel = new MetadataModel();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
@@ -1342,7 +1356,7 @@ class BC23 extends BaseController
 
         $kodeJenisPungutan = $metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['BM', 'PPN', 'PPH'])->findAll();
 
-        $barangTarif = $bc23BarangTarifModel
+        $barangTarif = $BCBarangTarifModel
             ->where('penerimaan_barang_id', $penerimaanBarangID)
             ->findAll();
 
@@ -1548,27 +1562,27 @@ class BC23 extends BaseController
     public function delete()
     {
         $bc23Model = new BC23Model();
-        $bc23BarangModel = new BC23BarangModel();
-        $bc23BarangDokumenModel = new BC23BarangDokumenModel();
-        $bc23BarangTarifModel = new BC23BarangTarifModel();
-        $bc23EntitasModel = new BC23EntitasModel();
-        $bc23KemasanModel = new BC23KemasanModel();
-        $bc23KontainerModel = new BC23KontainerModel();
-        $bc23PengangkutModel = new BC23PengangkutModel();
-        $bc23DokumenModel = new BC23DokumenModel();
-        $bc23PengangkutModel = new BC23PengangkutModel();
+        $BCBarangModel = new BCBarangModel();
+        $BCBarangDokumenModel = new BCBarangDokumenModel();
+        $BCBarangTarifModel = new BCBarangTarifModel();
+        $BCEntitasModel = new BCEntitasModel();
+        $BCKemasanModel = new BCKemasanModel();
+        $BCKontainerModel = new BCKontainerModel();
+        $BCPengangkutModel = new BCPengangkutModel();
+        $BCDokumenModel = new BCDokumenModel();
+        $BCPengangkutModel = new BCPengangkutModel();
 
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
         $bc23Model->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23KemasanModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23KontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23PengangkutModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23DokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23BarangDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $bc23BarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCEntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCKemasanModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCKontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCPengangkutModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCBarangDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $BCBarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
 
         return response()->setJSON([
             'message' => "Dokumen BC 23 Berhasil dihapus",
@@ -1581,13 +1595,13 @@ class BC23 extends BaseController
     public function kirimCeisa($penerimaanBarangID)
     {
         $bc23Model = new BC23Model();
-        $bc23BarangModel = new BC23BarangModel();
-        $bc23EntitasModel = new BC23EntitasModel();
-        $bc23KemasanModel = new BC23KemasanModel();
-        $bc23KontainerModel = new BC23KontainerModel();
-        $bc23PengangkutModel = new BC23PengangkutModel();
-        $bc23DokumenModel = new BC23DokumenModel();
-        $bc23PengangkutModel = new BC23PengangkutModel();
+        $BCBarangModel = new BCBarangModel();
+        $BCEntitasModel = new BCEntitasModel();
+        $BCKemasanModel = new BCKemasanModel();
+        $BCKontainerModel = new BCKontainerModel();
+        $BCPengangkutModel = new BCPengangkutModel();
+        $BCDokumenModel = new BCDokumenModel();
+        $BCPengangkutModel = new BCPengangkutModel();
         $beacukaiApi = new BeaCukaiApi();
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
@@ -1597,12 +1611,12 @@ class BC23 extends BaseController
             return redirect()->to('bea-cukai-bc-23');
         }
 
-        $bc23Kontainer = $bc23KontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Barang = $bc23BarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Entitas = $bc23EntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Kemasan = $bc23KemasanModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Dokumen = $bc23DokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Pengangkut = $bc23PengangkutModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
+        $bc23Kontainer = $BCKontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
+        $bc23Barang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
+        $bc23Entitas = $BCEntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
+        $bc23Kemasan = $BCKemasanModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
+        $bc23Dokumen = $BCDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
+        $bc23Pengangkut = $BCPengangkutModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
 
         $payload = $beacukaiApi->payloadTempleateKirimBC23(
             $bc23Data,
@@ -1648,13 +1662,13 @@ class BC23 extends BaseController
     public function getManifest()
     {
         $beacukaiApi = new BeaCukaiApi();
-        $bc23DokumenModel = new BC23DokumenModel();
+        $BCDokumenModel = new BCDokumenModel();
         $bc23Model = new BC23Model();
         $metaDataModel = new MetadataModel();
 
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-        $bc23DokumenBL = $bc23DokumenModel
+        $bc23DokumenBL = $BCDokumenModel
             ->whereIn('kode_dokumen', [705, 740]) // (702 = BL, 740 = AWB)
             ->where('penerimaan_barang_id', $penerimaanBarangID)->first();
 

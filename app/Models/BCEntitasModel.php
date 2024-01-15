@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BC23KemasanModel extends Model
+class BCEntitasModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_23_kemasan';
+    protected $table            = 'bc_entitas';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -40,34 +40,8 @@ class BC23KemasanModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getList($condition, $limit = 10, $offset = 0)
+    public function get($penerimaanBarangID)
     {
-        $sort = 'bc_23_kemasan.createdAt';
-        $sortType = 'DESC';
-
-        $selectQry = "bc_23_kemasan.*";
-
-        $pinjamanQry = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $pinjamanQry->countAllResults(false);
-
-        $totalFilteredData = $pinjamanQry->countAllResults(false);
-        $data = $pinjamanQry->findAll($limit, $offset);
-
-        return [
-            'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
-            'sort'              => $sort,
-            'sortType'          => $sortType
-        ];
-    }
-
-    public function getLast($penerimaanBarangID)
-    {
-        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
     }
 }
