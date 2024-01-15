@@ -279,14 +279,24 @@ class POImportBahanPenolong extends BaseController
 
     public function updateStatusPOImportBahanPenolong()
     {
+        $data = [
+            "status"    => true,
+            "message"   => "Data PO Import BP Berhasil Diposting",
+            'token'     => csrf_hash()
+        ];
         $id = $this->request->getVar("id");
-        $this->amPurchaseOrderModel->update($id, ['is_posted' => 1]);
-        $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "IMPORT", "pembelian");
-        return response()->setJSON([
-            "status" => true,
-            "message" => "Data PO Import BP Berhasil Diposting",
-            'token' => csrf_hash()
-        ]);
+        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "IMPORT", "pembelian");
+        if ($result) {
+            $responseBody = json_decode($result->getBody(), true);
+            if ($responseBody && isset($responseBody['status'])) {
+                $data["status"] =  false;
+                $data["message"] = $responseBody['message'];
+                $data["token"] = csrf_hash();
+            }
+        } else {
+            $this->amPurchaseOrderModel->update($id, ['is_posted' => 1]);
+        }
+        return response()->setJSON($data);
     }
 
     public function closePOImportBahanPenolong()

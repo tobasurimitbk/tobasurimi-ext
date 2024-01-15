@@ -3,6 +3,8 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
+
 use App\Models\BarangMasterModel;
 use App\Models\CompaniesModel;
 use App\Models\MetadataModel;
@@ -31,6 +33,7 @@ class POImportBahanBaku extends BaseController
     protected $satuanModel;
     protected $penerimaanBarangModel;
     protected $dompdf;
+    protected $jurnalController;
 
     public function __construct()
     {
@@ -48,6 +51,7 @@ class POImportBahanBaku extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->dompdf = new Dompdf();
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function poImportBahanBaku()
@@ -270,12 +274,25 @@ class POImportBahanBaku extends BaseController
 
     public function updateStatusPOImportBahanBaku()
     {
-        $this->rmImportPOModel->update($this->request->getVar('id'), ['is_posted' => 1]);
-        return response()->setJSON([
-            "status" => true,
-            "message" => "Data PO Import BB Berhasil Diposting",
-            'token' => csrf_hash()
-        ]);
+        $data = [
+            "status"    => true,
+            "message"   => "Data PO Import BB Berhasil Diposting",
+            'token'     => csrf_hash()
+        ];
+
+        $result = $this->jurnalController->insertDataPembelian($this->request->getVar('id'), "BAHAN BAKU", "IMPORT", "pembelian");
+
+        if ($result) {
+            $responseBody = json_decode($result->getBody(), true);
+            if ($responseBody && isset($responseBody['status'])) {
+                $data["status"] =  false;
+                $data["message"] = $responseBody['message'];
+                $data["token"] = csrf_hash();
+            }
+        } else {
+            $this->rmImportPOModel->update($this->request->getVar('id'), ['is_posted' => 1]);
+        }
+        return response()->setJSON($data);
     }
 
     public function closePOImportBahanBaku()

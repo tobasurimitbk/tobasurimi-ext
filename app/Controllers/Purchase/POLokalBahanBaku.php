@@ -3,6 +3,7 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 
 use App\Models\CompaniesModel;
 use App\Models\RMPurchaseOrderModel;
@@ -37,6 +38,7 @@ class POLokalBahanBaku extends BaseController
     protected $penerimaanBarangModel;
     protected $dompdf;
     protected $penerimaanBarangDetailModel;
+    protected $jurnalController;
 
     public function __construct()
     {
@@ -56,6 +58,7 @@ class POLokalBahanBaku extends BaseController
         $this->dompdf = new Dompdf();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function poLokalBahanBaku()
@@ -487,14 +490,23 @@ class POLokalBahanBaku extends BaseController
             }
 
             if (!empty($id)) {
-                $this->RMPurchaseOrderModel->update($id, $payload);
-
                 $data = [
                     "status"    => true,
-                    "message"   => "Data Berhasil diposting",
+                    "message"   => "Data PO Lokal BB Berhasil diposting",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];
+                $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian");
+                if ($result) {
+                    $responseBody = json_decode($result->getBody(), true);
+                    if ($responseBody && isset($responseBody['status'])) {
+                        $data["status"] =  false;
+                        $data["message"] = $responseBody['message'];
+                        $data["token"] = csrf_hash();
+                    }
+                } else {
+                    $this->RMPurchaseOrderModel->update($id, $payload);
+                }
                 echo json_encode($data);
             } else {
                 $data = [

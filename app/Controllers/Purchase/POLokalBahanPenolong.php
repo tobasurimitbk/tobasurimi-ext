@@ -316,19 +316,29 @@ class POLokalBahanPenolong extends BaseController
 
     public function updateStatusPOLokalBahanPenolong()
     {
+        $data = [
+            "status"    => true,
+            "message"   => "Data PO Lokal BP Berhasil Diposting",
+            'token'     => csrf_hash()
+        ];
+
         $id = $this->request->getPost("id");
 
-        $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "LOKAL", "pembelian");
-        // exit;
-        $this->aMPurchaseOrderModel->update($id, [
-            'is_posted' => true
-        ]);
+        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "LOKAL", "pembelian");
+        if ($result) {
+            $responseBody = json_decode($result->getBody(), true);
+            if ($responseBody && isset($responseBody['status'])) {
+                $data["status"] =  false;
+                $data["message"] = $responseBody['message'];
+                $data["token"] = csrf_hash();
+            }
+        } else {
+            $this->aMPurchaseOrderModel->update($id, [
+                'is_posted' => true
+            ]);
+        }
 
-
-        return response()->setJSON([
-            'message' => "PO Berhasil diposting",
-            'status' => true,
-        ]);
+        return response()->setJSON($data);
     }
 
     public function closePOLokalBahanPenolong()
