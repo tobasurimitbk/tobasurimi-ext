@@ -18,7 +18,7 @@
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
-                    Pastikan User melampirkan dokumen Invoice dan dokumen <b> B/L atau AWB </b> sebagai dokumen pendukung wajib
+                    Wajib melampirkan dokumen Invoice dan dokumen <b> B/L atau AWB </b> sebagai dokumen pendukung wajib
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

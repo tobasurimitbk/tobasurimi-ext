@@ -11,11 +11,17 @@
     <?php include('header.php') ?>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
-            BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
+            BC 4.0 - PEMBERITAHUAN PEMASUKAN BARANG ASAL TEMPAT LAIN DALAM DAERAH PABEAN KE TEMPAT PENIMBUNAN BERIKAT
         </div>
         <div class="card-body">
             <?php include_once('nav.php') ?>
             <?= csrf_field() ?>
+            <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
+                <b>Wajib</b> mencantumkan data kemasan minimal 1 (satu) jenis kemasan
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             <div class="row mt-1">
                 <div class="col-sm-6 mt-1">
                     <form id="form-kemasan">
@@ -152,13 +158,6 @@
                                             <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                                         </button>
                                     </div>
-                                    <?php if ($bc23DokumenBL != null) : ?>
-                                        <div class="col-sm" style="margin-right: -10px;">
-                                            <button style="border-color: #FFA426 !important; background-color: #FFA426 !important; margin-right: 10px !important;" id="btn-ambil-manifest" class="btn btn-add btn-block float-right">
-                                                <i class="fas fa-download mr-1"></i> Ambil B/L
-                                            </button>
-                                        </div>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -236,7 +235,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kemasan/data/all"); ?>",
+            url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kemasan/data/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
@@ -319,7 +318,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kontainer/data/all"); ?>",
+            url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kontainer/data/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
@@ -517,7 +516,7 @@
                     var formData = new FormData(document.querySelector("#form-kemasan"));
                     formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kemasan/create"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kemasan/create"); ?>",
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -562,7 +561,7 @@
                     var formData = new FormData(document.querySelector("#form-kontainer"));
                     formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kontainer/create"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kontainer/create"); ?>",
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -595,7 +594,7 @@
     $('#btn-ambil-manifest').click(function(e) {
         e.preventDefault();
         $.ajax({
-            url: `<?= base_url("bea-cukai-bc-23/api/get-kontainer-peti-kemas"); ?>`,
+            url: `<?= base_url("bea-cukai-bc-40/api/get-kontainer-peti-kemas"); ?>`,
             method: "GET",
             data: {
                 penerimaan_barang_id: "<?= encrypt($lpb->id) ?>"
@@ -644,7 +643,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kemasan/delete"); ?>",
+                    url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kemasan/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -683,7 +682,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kontainer/delete"); ?>",
+                    url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kontainer/delete"); ?>",
                     data: {
                         id: id
                     },

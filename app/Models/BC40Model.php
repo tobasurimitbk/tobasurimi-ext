@@ -239,7 +239,6 @@ class BC40Model extends Model
 
     public function isCompleteFormPetiKemas($penerimaanBarangID)
     {
-        $bcKontainerModel = new BCKontainerModel();
         $bcKemasanModel = new BCKemasanModel();
 
         $kemasan = $bcKemasanModel->getLast($penerimaanBarangID) != null ? true : false;
@@ -250,12 +249,11 @@ class BC40Model extends Model
     public function isCompleteFormTransaksi($penerimaanBarangID)
     {
         $data = $this->get($penerimaanBarangID);
-        return false;
-        // if ($data == null) {
-        //     return false;
-        // } else {
-        //     return ($data['kode_valuta'] != null && $data['kode_incoterm'] != null && $data['kode_asuransi'] != null && $data['kode_kena_pajak'] != null) ? true : false;
-        // }
+        if ($data == null) {
+            return false;
+        } else {
+            return ($data['nilai_jasa'] != null && $data['harga_perolehan'] != null && $data['volume'] != null && $data['bruto'] != null) ? true : false;
+        }
     }
 
     public function isCompleteFormBarang($penerimaanBarangID)
