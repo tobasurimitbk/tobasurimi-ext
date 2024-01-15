@@ -8,7 +8,6 @@ use App\Models\CompaniesModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
-use App\Models\BeaCukaiModel;
 use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
 use App\Models\SatuansModel;
@@ -27,7 +26,6 @@ class POLokalBahanBaku extends BaseController
     protected $RMPurchaseOrderDetailModel;
     protected $CompaniesModel;
     protected $SupplierModel;
-    protected $BeaCukaiModel;
     protected $barangModel;
     protected $metadataModel;
     protected $BagianModel;
@@ -45,7 +43,6 @@ class POLokalBahanBaku extends BaseController
         $this->RMPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->SupplierModel = new SupplierModel();
-        $this->BeaCukaiModel = new BeaCukaiModel();
         $this->barangModel = new BarangMasterModel();
         $this->metadataModel = new MetadataModel();
         $this->BagianModel = new BagianModel();

@@ -15,7 +15,6 @@ use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
-use App\Models\BeaCukaiModel;
 use App\Models\SupplierHargaModel;
 use Dompdf\Dompdf;
 
@@ -33,7 +32,6 @@ class PenerimaanBarangLokalBP extends BaseController
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
-    protected $beaCukaiModel;
     protected $supplierHargaModel;
     protected $stockDetailModel;
     protected $warehouseModel;
@@ -55,7 +53,6 @@ class PenerimaanBarangLokalBP extends BaseController
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuansModel();
         $this->stockDetailModel = new StockDetailModel();
-        $this->beaCukaiModel = new BeaCukaiModel();
         $this->supplierHargaModel = new SupplierHargaModel();
         $this->warehouseModel = new WarehousesModel();
         $this->dompdf = new Dompdf();

@@ -9,7 +9,6 @@ use App\Models\MetadataModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\SupplierModel;
-use App\Models\BeaCukaiModel;
 use App\Models\DivisisModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SatuansModel;
@@ -42,7 +41,6 @@ class POImportBahanBaku extends BaseController
         $this->rmImportPOModel = new RMImportPOModel();
         $this->rmImportPODetailModel = new RMImportPODetailModel();
         $this->supplierModel = new SupplierModel();
-        $this->beaCukaiModel = new BeaCukaiModel();
         $this->divisisModel = new DivisisModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->satuanModel = new SatuansModel();

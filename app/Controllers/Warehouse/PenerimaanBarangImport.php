@@ -17,7 +17,6 @@ use App\Models\StockDetailModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuansModel;
 use App\Models\TaxModel;
-use App\Models\BeaCukaiModel;
 
 use Dompdf\Dompdf;
 
@@ -60,7 +59,6 @@ class PenerimaanBarangImport extends BaseController
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuansModel();
         $this->taxModel = new TaxModel();
-        $this->beaCukaiModel = new BeaCukaiModel();
 
         $this->dompdf = new Dompdf();
     }

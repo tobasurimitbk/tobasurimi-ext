@@ -12,7 +12,6 @@ use App\Models\SupplierModel;
 use App\Models\SppModel;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
-use App\Models\BeaCukaiModel;
 use App\Models\CompaniesModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SatuansModel;
@@ -29,7 +28,6 @@ class POLokalBahanPenolong extends BaseController
     protected $SppModel;
     protected $supplierModel;
     protected $divisionModel;
-    protected $BeaCukaiModel;
     protected $dompdf;
     protected $companyModel;
     protected $barangMasterModel;
@@ -49,7 +47,6 @@ class POLokalBahanPenolong extends BaseController
         $this->SppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
         $this->divisionModel = new DivisisModel();
-        $this->BeaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
         $this->companyModel = new CompaniesModel();
         $this->barangMasterModel = new BarangMasterModel();

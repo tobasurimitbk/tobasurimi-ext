@@ -16,7 +16,6 @@ use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
-use App\Models\BeaCukaiModel;
 use App\Models\SupplierHargaModel;
 // use PhpOffice\PhpSpreadsheet\Spreadsheet;
 // use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -61,7 +60,6 @@ class PenerimaanBarangLokal extends BaseController
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuansModel();
         $this->stockDetailModel = new StockDetailModel();
-        $this->beaCukaiModel = new BeaCukaiModel();
         $this->supplierHargaModel = new SupplierHargaModel();
 
         $this->dompdf = new Dompdf();
