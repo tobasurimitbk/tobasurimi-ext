@@ -785,6 +785,14 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     // ENTITAS
     $routes->get('id/entitas/(:segment)', 'BeaCukai\BC40::createEntitasView/$1');
     $routes->post('id/entitas', 'BeaCukai\BC40::createEntitasAction');
+    // DOKUMEN
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC40::createDokumenView/$1');
+    $routes->get('id/dokumen/data/all', 'BeaCukai\BC40::allDokumen');
+    $routes->post('id/dokumen/create', 'BeaCukai\BC40::createDokumenAction');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC40::deleteDokumenAction');
+    // PENGANGKUT
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC40::createPengangkutView/$1');
+    $routes->post('id/pengangkut', 'BeaCukai\BC40::createPengangkutAction');
 });
 
 

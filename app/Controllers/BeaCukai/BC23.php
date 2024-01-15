@@ -241,7 +241,7 @@ class BC23 extends BaseController
             // insert
             $BCEntitasModel->insert([
                 'penerimaan_barang_id' => $penerimaanBarangID,
-                'bc_type' => '23',
+                'bc_type' => 23,
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
                 'nib_entitas' => $this->request->getVar('entitas_nib'),
@@ -259,7 +259,7 @@ class BC23 extends BaseController
             // update
             $BCEntitasModel->update($lastData['id'], [
                 'penerimaan_barang_id' => $penerimaanBarangID,
-                'bc_type' => '23',
+                'bc_type' => 23,
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
                 'nib_entitas' => $this->request->getVar('entitas_nib'),
@@ -320,7 +320,7 @@ class BC23 extends BaseController
         $condition = [
             "bc_dokumen.deletedAt"  => null,
             "bc_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
-            "bc_dokumen.bc_type" => '23'
+            "bc_dokumen.bc_type" => 23
         ];
 
         $limit = $this->request->getGet("length");
@@ -369,7 +369,7 @@ class BC23 extends BaseController
         $seriDokumen = $lastData == null ? 1 : $lastData['seri_dokumen'] + 1;
 
         $BCDokumenModel->insert([
-            'bc_type' => '23',
+            'bc_type' => 23,
             'penerimaan_barang_id' => $penerimaanBarangID,
             'id_dokumen' => generateUniqueCode(5),
             'nomor_dokumen' => $this->request->getVar('dokumen_nomor_dokumen'),
@@ -474,7 +474,7 @@ class BC23 extends BaseController
 
         if ($lastPengangkutBC23 == null) {
             $BCPengangkutModel->insert([
-                'bc_type' => '23',
+                'bc_type' => 23,
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
                 'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
@@ -483,7 +483,7 @@ class BC23 extends BaseController
             ]);
         } else {
             $BCPengangkutModel->update($lastPengangkutBC23['id'], [
-                'bc_type' => '23',
+                'bc_type' => 23,
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'kode_cara_angkut' => decrypt($this->request->getVar('pengangkutan_cara_pengangkutan')),
                 'nama_sarana_pengangkut' => $this->request->getVar('pengangkutan_nama_sarana_pengangkut'),
@@ -649,7 +649,7 @@ class BC23 extends BaseController
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
         $BCKemasanModel->insert([
-            'bc_type' => '23',
+            'bc_type' => 23,
             'penerimaan_barang_id' => $penerimaanBarangID,
             'seri_kemasan' => $this->request->getVar('kemasan_seri_kemasan'),
             'jumlah_kemasan' => $this->request->getVar('kemasan_jumlah_kemasan'),
@@ -690,7 +690,7 @@ class BC23 extends BaseController
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
 
         $BCKontainerModel->insert([
-            'bc_type' => '23',
+            'bc_type' => 23,
             'penerimaan_barang_id' => $penerimaanBarangID,
             'nomor_kontainer' => $this->request->getVar('kontainer_nomor'),
             'kode_ukuran_kontainer' => decrypt($this->request->getVar('kontainer_ukuran')),
@@ -1135,7 +1135,7 @@ class BC23 extends BaseController
         $BCBarangTarifModel->insert([
             'penerimaan_barang_id' => $penerimaanBarangID,
             'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
-            'bc_type' => '23',
+            'bc_type' => 23,
             'kode_jenis_pungutan' => decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')),
             'kode_jenis_tarif' => decrypt($this->request->getVar('barang_detail_kode_jenis_tarif')),
             'tarif_bea_masuk' => convertRupiahToNumber($this->request->getVar('barang_detail_nilai_tarif')),
@@ -1272,8 +1272,8 @@ class BC23 extends BaseController
             $BCBarangModel->insert([
                 'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
                 'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
-                'bc_type' => '23',
-                'kode_dokumen' => '23',
+                'bc_type' => 23,
+                'kode_dokumen' => 23,
                 'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),
                 'pos_tarif' => decrypt($this->request->getVar('barang_detail_kode_hs')),
                 'kode_barang' => $this->request->getVar('barang_detail_kode_barang'),
@@ -1300,8 +1300,8 @@ class BC23 extends BaseController
             ]);
         } else {
             $BCBarangModel->update($bc23Barang['id'], [
-                'bc_type' => '23',
-                'kode_dokumen' => '23',
+                'bc_type' => 23,
+                'kode_dokumen' => 23,
                 'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
                 'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
                 'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),

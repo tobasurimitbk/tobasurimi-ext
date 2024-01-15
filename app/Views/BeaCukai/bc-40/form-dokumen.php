@@ -11,18 +11,12 @@
     <?php include('header.php') ?>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
-            BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
+            BC 4.0 - PEMBERITAHUAN PEMASUKAN BARANG ASAL TEMPAT LAIN DALAM DAERAH PABEAN KE TEMPAT PENIMBUNAN BERIKAT
         </div>
         <?= csrf_field() ?>
         <form id="form-dokumen">
             <div class="card-body">
                 <?php include_once('nav.php') ?>
-                <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
-                    Pastikan User melampirkan dokumen Invoice dan dokumen <b> B/L atau AWB </b> sebagai dokumen pendukung wajib
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
                 <div class="row mt-3">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -131,7 +125,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("bea-cukai-bc-23/id/dokumen/data/all"); ?>",
+            url: "<?= base_url("bea-cukai-bc-40/id/dokumen/data/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
@@ -259,7 +253,7 @@
                     var formData = new FormData(document.querySelector("#form-dokumen"));
                     formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/dokumen/create"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-40/id/dokumen/create"); ?>",
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -301,7 +295,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-23/id/dokumen/delete"); ?>",
+                    url: "<?= base_url("bea-cukai-bc-40/id/dokumen/delete"); ?>",
                     data: {
                         id: id
                     },

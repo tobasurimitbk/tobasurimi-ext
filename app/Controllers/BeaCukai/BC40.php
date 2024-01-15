@@ -4,7 +4,9 @@ namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Models\BC40Model;
+use App\Models\BCDokumenModel;
 use App\Models\BCEntitasModel;
+use App\Models\BCPengangkutModel;
 use App\Models\CountryModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\MetadataModel;
@@ -128,7 +130,7 @@ class BC40 extends BaseController
             'noAju' => $bc40 == null ? $this->generateNomorAju() : $bc40['no_aju'],
             'kodeKantor' => $kantorBeaCukaiModel->findAll(),
             'kodeTujuanTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
-            'kodeTujuanPengiriman' => $metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->like('value', '40')->where('deletedAt', null)->findAll(),
+            'kodeTujuanPengiriman' => $metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->like('value', 40)->where('deletedAt', null)->findAll(),
             'selectedKantor' => $metaDataModel->where('name', "Kode Kantor Pabean Pengawas Static")->first(),
             'lpb' => $lpb
         ];
@@ -218,7 +220,7 @@ class BC40 extends BaseController
             // insert
             $bcEntitasModel->insert([
                 'penerimaan_barang_id' => $penerimaanBarangID,
-                'bc_type' => '40',
+                'bc_type' => 40,
                 'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
                 'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
                 'nib_entitas' => $this->request->getVar('pengusaha_tpb_nib'),
@@ -236,7 +238,7 @@ class BC40 extends BaseController
             // update
             $bcEntitasModel->update($lastData['id'], [
                 'penerimaan_barang_id' => $penerimaanBarangID,
-                'bc_type' => '40',
+                'bc_type' => 40,
                 'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
                 'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
                 'nib_entitas' => $this->request->getVar('pengusaha_tpb_nib'),
@@ -259,18 +261,206 @@ class BC40 extends BaseController
         ]);
     }
 
+    public function createDokumenView($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $metaDataModel = new MetadataModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+            return redirect()->to('bea-cukai-bc-40');
+        }
+
+        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+
+        $data = [
+            'kodeDokumen' => $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->findAll(),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-40/form-dokumen', $data);
+    }
+
+    public function allDokumen()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $condition = [
+            "bc_dokumen.deletedAt"  => null,
+            "bc_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_dokumen.bc_type" => 40
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $BCDokumenModel = new BCDokumenModel();
+        $metaDataModel = new MetadataModel();
+
+
+        $beaCukaiDokumen = $BCDokumenModel->getList($condition, $limit, $offset);
+        $resDokumen = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+
+
+        foreach ($beaCukaiDokumen['data'] as $data) {
+            $jenisDokumen = $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->kode_dokumen)->first();
+            array_push($resDokumen, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "kode_dokumen"          => $data->kode_dokumen . ' - ' . $jenisDokumen['value'],
+                "nomor_dokumen"         => $data->nomor_dokumen,
+                "seri_dokumen"          => $data->seri_dokumen,
+                "tanggal_dokumen"       => date('d/m/Y', strtotime($data->tanggal_dokumen))
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $beaCukaiDokumen['totalData'],
+            "recordsFiltered"   => $beaCukaiDokumen['totalFilteredData'],
+            "data"              => $resDokumen,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function createDokumenAction()
+    {
+        $BCDokumenModel = new BCDokumenModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $lastData = $BCDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+        $seriDokumen = $lastData == null ? 1 : $lastData['seri_dokumen'] + 1;
+
+        $BCDokumenModel->insert([
+            'bc_type' => 40,
+            'penerimaan_barang_id' => $penerimaanBarangID,
+            'id_dokumen' => generateUniqueCode(5),
+            'nomor_dokumen' => $this->request->getVar('dokumen_nomor_dokumen'),
+            'seri_dokumen' => $seriDokumen,
+            'kode_dokumen' => decrypt($this->request->getVar('dokumen_jenis_dokumen')),
+            'tanggal_dokumen' => $this->request->getVar('dokumen_tanggal') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('dokumen_tanggal')), "Y-m-d") : "",
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Dokumen berhasil ditambah",
+        ]);
+    }
+
+    public function deleteDokumenAction()
+    {
+        $BCDokumenModel = new BCDokumenModel();
+        $id = decrypt($this->request->getVar('id'));
+        $BCDokumenModel->delete($id);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Dokumen berhasil dihapus",
+        ]);
+    }
+
+    public function createPengangkutView($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $BCPengangkutModel = new BCPengangkutModel();
+
+        $penerimaanBarangID = decrypt($penerimaanBarangID);
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+
+        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+            return redirect()->to('bea-cukai-bc-40');
+        }
+
+        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+
+        $data = [
+            'bcPengangkut' => $BCPengangkutModel->get($penerimaanBarangID),
+            'lpb' => $lpb
+        ];
+
+        return view('BeaCukai/bc-40/form-pengangkut', $data);
+    }
+
+    public function createPengangkutAction()
+    {
+        $BCPengangkutModel = new BCPengangkutModel();
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $lastData = $BCPengangkutModel->get($penerimaanBarangID);
+
+        if ($lastData == null) {
+            $BCPengangkutModel->insert([
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'nama_sarana_pengangkut' => $this->request->getVar('jenis_sarana_pengangkut'),
+                'nomor_pengangkut' => $this->request->getVar('nomor_sarana_pengangkut'),
+                'seri_pengangkut' => 1,
+                'bc_type' => 40
+            ]);
+        } else {
+            $BCPengangkutModel->update($lastData['id'], [
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'nama_sarana_pengangkut' => $this->request->getVar('jenis_sarana_pengangkut'),
+                'nomor_pengangkut' => $this->request->getVar('nomor_sarana_pengangkut'),
+                'seri_pengangkut' => 1,
+                'bc_type' => 40
+            ]);
+        }
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Pengangkut berhasil diupdate"
+        ]);
+    }
+
+
+
     // Navigator display
     private function setFlashDataNavigatorSession($penerimaanBarangID)
     {
         $bc40Model = new BC40Model();
         $isCompleteFormHeader = $bc40Model->isCompleteFormHeader($penerimaanBarangID);
         $isCompleteFormEntitas = $bc40Model->isCompleteFormEntitas($penerimaanBarangID);
+        $isCompleteFormDokumen = $bc40Model->isCompleteFormDokumen($penerimaanBarangID);
+        $isCompleteFormPengangkut = $bc40Model->isCompleteFormPengangkut($penerimaanBarangID);
+        $isCompleteFormPetiKemas = $bc40Model->isCompleteFormPetiKemas($penerimaanBarangID);
+        $isCompleteFormFormTransaksi = $bc40Model->isCompleteFormTransaksi($penerimaanBarangID);
+        $isCompleteFormBarang = $bc40Model->isCompleteFormBarang($penerimaanBarangID);
+        $isCompleteFormPungutan = $bc40Model->isCompleteFormPungutan($penerimaanBarangID);
+        $isCompleteFormPernyataan = $bc40Model->isCompleteFormPernyataan($penerimaanBarangID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
+        session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
         session()->setFlashdata('isCompleteFormEntitas', $isCompleteFormEntitas);
+        session()->setFlashdata('isCompleteFormDokumen', $isCompleteFormDokumen);
+        session()->setFlashdata('isCompleteFormPengangkut', $isCompleteFormPengangkut);
+        session()->setFlashdata('isCompleteFormPetiKemas', $isCompleteFormPetiKemas);
+        session()->setFlashdata('isCompleteFormTransaksi', $isCompleteFormFormTransaksi);
+        session()->setFlashdata('isCompleteFormBarang', $isCompleteFormBarang);
+        session()->setFlashdata('isCompleteFormPungutan', $isCompleteFormPungutan);
 
         if (
-            $isCompleteFormHeader && $isCompleteFormEntitas
+            $isCompleteFormPernyataan && $isCompleteFormHeader && $isCompleteFormEntitas &&
+            $isCompleteFormEntitas && $isCompleteFormDokumen && $isCompleteFormPengangkut &&
+            $isCompleteFormPetiKemas && $isCompleteFormFormTransaksi && $isCompleteFormBarang
         ) {
             $bc40Model->set('status_dokumen', "Siap Kirim")->where('penerimaan_barang_id', $penerimaanBarangID)->update();
         } else {
