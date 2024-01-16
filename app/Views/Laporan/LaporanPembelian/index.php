@@ -120,6 +120,7 @@
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
+                    data.filter = $(".list_supplier").val();
                     data.sort = sort;
                     data.sortType = sortType;
                 }
@@ -189,6 +190,39 @@
                 }
             }
         });
+        //CSS SELECT2 FLOATING LABEL
+        $('.list_supplier').select2({
+            placeholder: "Filter Supplier",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+        $('.list_supplier')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.list_supplier')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.list_supplier')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        $(".search").keyup(function() {
+            table.ajax.reload();
+        })
+
+        $(".list_supplier").change(function() {
+            table.ajax.reload();
+        })
     });
 </script>
 <?= $this->endSection(); ?>

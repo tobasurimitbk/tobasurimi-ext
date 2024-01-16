@@ -96,7 +96,14 @@ class TransaksiPembelianModel extends Model
         }
 
         if ($addCondition['search']) {
-            $accountCustomerDataQry->like('suppliers.name', $addCondition['search']);
+            $accountCustomerDataQry->like('suppliers.name', $addCondition['search'])
+                ->orLike('rm_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('rm_import_pos.po_no', $addCondition['search'])
+                ->orLike('am_purchase_orders.po_no', $addCondition['search']);
+        }
+
+        if ($addCondition['filter']) {
+            $accountCustomerDataQry->where('suppliers.id', $addCondition['filter']);
         }
 
         if ($addCondition['search']) {

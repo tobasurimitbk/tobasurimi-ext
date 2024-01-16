@@ -46,11 +46,12 @@ class Pembelian extends BaseController
     public function allTransaksi()
     {
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "filter"        => $this->request->getGet("filter"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
         ];
 
         $condition = [
@@ -60,6 +61,7 @@ class Pembelian extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
+            "filter"        => $this->request->getGet("filter"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];
