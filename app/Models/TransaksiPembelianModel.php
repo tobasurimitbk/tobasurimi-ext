@@ -15,8 +15,11 @@ class TransaksiPembelianModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'no_transaksi',
-        'id_local_payment',
+        'id_local_bb',
+        'id_import_bb',
+        'id_po_bp',
+        'id_transaksi_jurnal',
+        'id_supplier',
         'tgl_transaksi',
         'createdAt',
         'updatedAt',
@@ -47,66 +50,74 @@ class TransaksiPembelianModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getPaymentList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'payment_no'        => 'local_po_payments.payment_no',
-            'due_date'          => 'local_po_payments.due_date',
-            'payment_date'      => 'local_po_payments.payment_date',
-            'payment_method'    => 'local_po_payments.payment_method',
-            'amount'            => 'local_po_payments.amount',
-            'createdAt'         => 'local_po_payments.createdAt'
+            'supplier_name'              => 'suppliers.name',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'supplier_name'] ?? 'suppliers.name';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "
-                      transaksi_pembelian.id AS id,   
-                      DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y') AS payment_date, 
-                      transaksi_pembelian.no_transaksi_pembelian AS ev_num,
-                      DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y') AS due_date, 
-                      local_po_payments.payment_no AS payment_no, 
-                      local_po_payments.amount AS amount,
-                      local_po_payments.payment_method AS payment_method,
-                      suppliers.name AS supplierName";
-        $supplierDataQry = $this->asObject()
+        $selectQry = "transaksi_pembelian.*, 
+        rm_purchase_orders.*,
+        rm_import_pos.*,
+        am_purchase_orders.*,
+        suppliers.*,
+        transaksi_pembelian.id AS transaksi_pembelian_id,
+        DATE_FORMAT(rm_purchase_orders.po_date, '%d/%m/%Y') AS po_date_lokal_bb,
+        DATE_FORMAT(rm_import_pos.po_date, '%d/%m/%Y') AS po_date_import_bb,
+        DATE_FORMAT(am_purchase_orders.po_date, '%d/%m/%Y') AS po_date_po_bp,
+        transaksi_jurnal.no_transaksi AS evidance_num,
+        rm_purchase_orders.id AS id_lokal_bb,
+        rm_import_pos.id AS id_import_bb,
+        am_purchase_orders.id AS id_po_bp,
+        rm_purchase_orders.po_no AS po_no_lokal_bb,
+        rm_import_pos.po_no AS po_no_import_bb,
+        am_purchase_orders.po_no AS po_no_po_bp,
+        rm_import_pos.currency AS currency_import_bb,
+        am_purchase_orders.currency AS currency_po_bp,
+        suppliers.name AS supplier_name";
+        $accountCustomerDataQry = $this->asObject()
             ->select($selectQry)
-            ->where($condition)
-            ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
-            ->join('local_po_payments', 'local_po_payments.id = transaksi_pembelian.id_local_payment')
+            ->where("transaksi_pembelian.deletedAt", NULL)
+            ->join('rm_purchase_orders', 'transaksi_pembelian.id_local_bb = rm_purchase_orders.id', 'left')
+            ->join('rm_import_pos', 'transaksi_pembelian.id_import_bb = rm_import_pos.id', 'left')
+            ->join('am_purchase_orders', 'transaksi_pembelian.id_po_bp = am_purchase_orders.id', 'left')
+            ->join('transaksi_jurnal', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
+            ->join('suppliers', 'transaksi_pembelian.id_supplier = suppliers.id', 'left')
             ->orderBy($sort, $sortType);
 
-        $totalData = $supplierDataQry->countAllResults(false);
+        $totalData = $accountCustomerDataQry->countAllResults(false);
 
-        if ($addCondition['search'] != "" || $addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "") {
-            $supplierDataQry->groupStart();
+        if ($addCondition['search']) {
+            $accountCustomerDataQry->groupStart();
         }
 
-        if ($addCondition['search'] != "") {
-            $supplierDataQry
-                ->where('payment_no', $addCondition['search'])
-                ->orWhere('suppliers.name', $addCondition['search']);
+        if ($addCondition['search']) {
+            $accountCustomerDataQry->like('suppliers.name', $addCondition['search']);
         }
 
-        if ($addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "") {
-            $supplierDataQry
-                ->where("DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y')", $addCondition['dateStart'])
-                ->orWhere("DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y')", $addCondition['dateEnd']);
+        if ($addCondition['search']) {
+            $accountCustomerDataQry->groupEnd();
         }
 
-        if ($addCondition['search'] != "" || $addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "") {
-            $supplierDataQry->groupEnd();
-        }
+        $totalFilteredData = $accountCustomerDataQry->countAllResults(false);
+        $data = $accountCustomerDataQry->findAll($limit, $offset);
 
-        $totalFilteredData = $supplierDataQry->countAllResults(false);
-        $data = $supplierDataQry->findAll($limit, $offset);
+        // var_dump($data);
 
         return [
             'data'              => $data,
             'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
         ];
+    }
+    public function insertBatchTransaksiPembelian($data)
+    {
+        return $this->insertBatch($data);
     }
 }

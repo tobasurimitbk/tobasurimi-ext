@@ -180,4 +180,20 @@ class RMImportPODetailModel extends Model
             'sub_total' => $subTotal
         ];
     }
+
+    public function getPoBBImportDetailById($id)
+    {
+        $selectQry = "rm_import_po_details.*";
+
+        $condition = [
+            "rm_import_po_id" => $id,
+        ];
+
+        $poBBImportDetailData = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->findAll();
+
+        return $poBBImportDetailData;
+    }
 }

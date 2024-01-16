@@ -264,4 +264,20 @@ class AMPurchaseOrderDetailModel extends Model
             'sub_total' => $subTotal
         ];
     }
+
+    public function getPoBPDetailById($id)
+    {
+        $selectQry = "am_purchase_order_details.*";
+
+        $condition = [
+            "am_purchase_order_id" => $id,
+        ];
+
+        $poBPDetailData = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->findAll();
+
+        return $poBPDetailData;
+    }
 }

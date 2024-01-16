@@ -78,6 +78,7 @@
                                 <th>Invoice Date</th>
                                 <th>Tax Invoice</th>
                                 <th>PO Num</th>
+                                <th>Supplier</th>
                                 <th>Valas</th>
                                 <th>Exchange Rate</th>
                                 <th>Nominal Value</th>
@@ -96,226 +97,98 @@
 </section>
 
 <script>
-    let sort = "payment_no";
-    let sortType = "desc";
-
-    const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        processing: true,
-        serverSide: true,
-        ordering: true,
-        order: [
-            [1, 'asc']
-        ],
-
-        fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("/laporan-accounting/pembelian/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                console.log(data);
-                data.search = $(".search").val();
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
-                data.sort = sort;
-                data.sortType = sortType;
-            }
-        },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        //responsive: true,
-        display: "stripe",
-        searching: false,
-        columns: [{
+    let sort = "nomor";
+    let sortType = "asc";
+    $(document).ready(function() {
+        const csrfToken = '<?= csrf_token() ?>';
+        const table = $('.dataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [1, 'asc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("laporan-accounting/pembelian/all"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.search = $(".search").val();
+                    data.sort = sort;
+                    data.sortType = sortType;
+                }
+            },
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            columns: [{
                 data: "no",
                 className: "text-center",
-                orderable: false,
-                width: "5%"
-            },
-            {
-                data: "payment_date",
-                className: "text-center"
-            },
-            {
-                data: "dokumen",
-                className: "text-center"
-            },
-            {
-                data: "ev_num",
-                className: "text-center"
-            },
-            {
-                data: "payment_date",
-                className: "text-center"
-            },
-            {
-                data: "payment_method",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
                 sortable: false,
-                render: function(data, type, row) {
-                    let id = row?.id;
-                    return `
-                        <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="printPoLokal('<?= base_url("pembayaran-po-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    `
+                width: "5%"
+            }, {
+                data: "po_date",
+                className: "text-center",
+            }, {
+                data: "dokumen_num",
+                className: "text-center",
+            }, {
+                data: "evidance_num",
+                className: "text-center",
+            }, {
+                data: "invoice_num",
+                className: "text-center",
+            }, {
+                data: "invoice_date",
+                className: "text-center",
+            }, {
+                data: "tax_invoice",
+                className: "text-center",
+            }, {
+                data: "po_num",
+                className: "text-center",
+            }, {
+                data: "supplier_name",
+                className: "text-center",
+            }, {
+                data: "valas",
+                className: "text-center",
+            }, {
+                data: "exchange",
+                className: "text-center",
+            }, {
+                data: "nominal",
+                className: "text-center",
+            }, {
+                data: "nominal_idr",
+                className: "text-center",
+            }, {
+                data: "paid_idr",
+                className: "text-center",
+            }, ],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
                 }
             }
-        ],
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
-
-    $(document).ready(function() {
-        $(".dateStart").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $(".dateEnd").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $('.icon-dateStart').click(function() {
-            $(".dateStart").focus();
-        });
-
-        $('.icon-dateEnd').click(function() {
-            $(".dateEnd").focus();
-        });
-
-        $(".dataTable_info").addClass("pt-0");
-
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
-
-        $(".dateStart, .dateEnd").change(function() {
-            table.ajax.reload();
-        })
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-po-lokal/"); ?>${data.id}`);
         });
     });
-    const printPoLokal = function(url) {
-        window.open(url, "_blank");
-    }
-
-    // Data Supplier
-    $('.list_supplier').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".card .card-body")
-    })
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.list_supplier')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.list_supplier')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.list_supplier')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
-    // Data Supplier
-    $('.dokumen').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".card .card-body")
-    })
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.dokumen')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.dokumen')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.dokumen')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 </script>
 <?= $this->endSection(); ?>
