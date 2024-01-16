@@ -785,6 +785,37 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     // ENTITAS
     $routes->get('id/entitas/(:segment)', 'BeaCukai\BC40::createEntitasView/$1');
     $routes->post('id/entitas', 'BeaCukai\BC40::createEntitasAction');
+    // DOKUMEN
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC40::createDokumenView/$1');
+    $routes->get('id/dokumen/data/all', 'BeaCukai\BC40::allDokumen');
+    $routes->post('id/dokumen/create', 'BeaCukai\BC40::createDokumenAction');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC40::deleteDokumenAction');
+    // PENGANGKUT
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC40::createPengangkutView/$1');
+    $routes->post('id/pengangkut', 'BeaCukai\BC40::createPengangkutAction');
+    // KONTAINER(PETI KEMAS)
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC40::createKemasanPetiKemas/$1');
+    $routes->get('id/kemasan-peti-kemas/kemasan/data/all', 'BeaCukai\BC40::allKemasan');
+    $routes->get('id/kemasan-peti-kemas/kontainer/data/all', 'BeaCukai\BC40::allKontainer');
+    $routes->post('id/kemasan-peti-kemas/kemasan/create', 'BeaCukai\BC40::createKemasanAction');
+    $routes->post('id/kemasan-peti-kemas/kemasan/delete', 'BeaCukai\BC40::deleteKemasanAction');
+    $routes->post('id/kemasan-peti-kemas/kontainer/create', 'BeaCukai\BC40::createKontainerAction');
+    $routes->post('id/kemasan-peti-kemas/kontainer/delete', 'BeaCukai\BC40::deleteKontainerAction');
+    // TRANSAKSI
+    $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC40::createTransaksiView/$1');
+    $routes->post('id/transaksi', 'BeaCukai\BC40::createTransaksiAction');
+    // BARANG
+    $routes->get('id/barang/(:segment)', 'BeaCukai\BC40::createBarangView/$1');
+    $routes->get('id/barang/(:segment)/(:segment)', 'BeaCukai\BC40::createBarangDetailView/$1/$2');
+    $routes->get('id/barang-pungutan-all', 'BeaCukai\BC40::allPungutan');
+    $routes->post('id/barang-pungutan-create', 'BeaCukai\BC40::createPungutanAction');
+    $routes->post('id/barang-pungutan-delete', 'BeaCukai\BC40::deletePungutanAction');
+    $routes->get('id/barang-dokumen-all', 'BeaCukai\BC40::allDokumenBarang');
+    $routes->post('id/barang-dokumen-create', 'BeaCukai\BC40::createBarangDokumenAction');
+    $routes->post('id/barang-dokumen-delete', 'BeaCukai\BC40::deleteBarangDokumenAction');
+    $routes->post('id/barang', 'BeaCukai\BC40::createBarangDetailAction');
+    // API
+    $routes->get('satuan-barang', 'BeaCukai\BC23::getKodeSatuanBarang');
 });
 
 

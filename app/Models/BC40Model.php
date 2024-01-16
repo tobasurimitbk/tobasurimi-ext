@@ -203,9 +203,87 @@ class BC40Model extends Model
         return $isCompleteForm;
     }
 
+    public function isCompleteFormPernyataan($penerimaanBarangID)
+    {
+        $isCompleteForm = false;
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($data['nama_ttd'] != null && $data['kota_ttd'] != null && $data['tanggal_ttd'] != null && $data['jabatan_pengusaha_ttd'] != null) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
     public function isCompleteFormEntitas($penerimaanBarangID)
     {
         $bcEntitasModel = new BCEntitasModel();
         return $bcEntitasModel->get($penerimaanBarangID) == null ? false : true;
+    }
+
+    public function isCompleteFormDokumen($penerimaanBarangID)
+    {
+        $bcDokumenModel = new BCDokumenModel();
+        return $bcDokumenModel->get($penerimaanBarangID) == null ? false : true;
+    }
+
+    public function isCompleteFormPengangkut($penerimaanBarangID)
+    {
+        $bc23PengangkutModel = new BCPengangkutModel();
+        return $bc23PengangkutModel->get($penerimaanBarangID) == null ? false : true;
+    }
+
+    public function isCompleteFormPetiKemas($penerimaanBarangID)
+    {
+        $bcKemasanModel = new BCKemasanModel();
+
+        $kemasan = $bcKemasanModel->getLast($penerimaanBarangID) != null ? true : false;
+
+        return $kemasan;
+    }
+
+    public function isCompleteFormTransaksi($penerimaanBarangID)
+    {
+        $data = $this->get($penerimaanBarangID);
+        if ($data == null) {
+            return false;
+        } else {
+            return ($data['nilai_jasa'] != null && $data['harga_perolehan'] != null && $data['volume'] != null && $data['bruto'] != null) ? true : false;
+        }
+    }
+
+    public function isCompleteFormBarang($penerimaanBarangID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $bcBarangModel = new BCBarangModel();
+
+        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
+        $lpbDetail = $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan);
+
+        $totalPerluDiisi = count($lpbDetail);
+        $totalSudahDiisi = 0;
+        foreach ($lpbDetail as $l) {
+            $bcDokumenBarang =  $bcBarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first();
+            if ($bcDokumenBarang != null) {
+                $totalSudahDiisi++;
+            }
+        }
+
+        return $totalSudahDiisi == $totalPerluDiisi ? true : false;
+    }
+
+    public function isCompleteFormPungutan($penerimaanBarangID)
+    {
+        $bcBarangTarifModel = new BCBarangTarifModel();
+        $barangTarif = $bcBarangTarifModel
+            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->findAll();
+
+        return count($barangTarif) == 0 ? false : true;
     }
 }
