@@ -283,12 +283,12 @@ class BeaCukaiApi
 
         $payload = [
             'asalData' => 'S',
-            'asuransi' => $bcData['asuransi'],
-            'bruto' => $bcData['bruto'],
-            'cif' => $bcData['cif'],
-            'fob' => $bcData['fob'],
-            'freight' => $bcData['freight'],
-            'hargaPenyerahan' => $bcData['harga_penyerahan'],
+            'asuransi' => (float)$bcData['asuransi'],
+            'bruto' => (float)$bcData['bruto'],
+            'cif' => (float)$bcData['cif'],
+            'fob' => (float)$bcData['fob'],
+            'freight' =>  (float)$bcData['freight'],
+            'hargaPenyerahan' =>  (float)$bcData['harga_penyerahan'],
             'jabatanTtd' => $bcData['jabatan_pengusaha_ttd'],
             'jumlahKontainer' => count($bcKontainer),
             'kodeAsuransi' => $bcData['kode_asuransi'],
@@ -305,14 +305,14 @@ class BeaCukaiApi
             'kodeValuta' => $bcData['kode_valuta'],
             'kotaTtd' => $bcData['kota_ttd'],
             'namaTtd' => $bcData['nama_ttd'],
-            'ndpbm' => $bcData['ndpbm'],
-            'netto' => $bcData['netto'],
+            'ndpbm' =>  (float)$bcData['ndpbm'],
+            'netto' =>  (float)$bcData['netto'],
             'nik' => '-', // ?
             'nilaiBarang' => (float)$bcData['nilai_barang'],
             'nomorAju' => $bcData['no_aju'],
             'nomorBc11' => $bcData['no_bc_11'],
             'posBc11' => $bcData['pos_bc_11'],
-            'seri' => $bcData['seri'],
+            'seri' => (int)$bcData['seri'],
             'subposBc11' => $bcData['sub_pos_bc_11'],
             'tanggalBc11' => $bcData['tanggal_bc_11'],
             'tanggalTiba' =>  $bcData['tanggal_bc_11'], // ?
@@ -388,9 +388,9 @@ class BeaCukaiApi
                     'nilaiBayar' => (float)$bt['nilai_bayar'],
                     'nilaiFasilitas' => 0, // ?
                     'nilaiSudahDilunasi' => 0, // ?
-                    'seriBarang' => $bt['seri_barang'],
-                    'tarif' => (float) $bt['tarif_bea_masuk'],
-                    'tarifFasilitas' => (float) $bt['tarif_fasilitas']
+                    'seriBarang' => (int)$bt['seri_barang'],
+                    'tarif' => (float)$bt['tarif_bea_masuk'],
+                    'tarifFasilitas' => (float)$bt['tarif_fasilitas']
                 ];
             }
             $barang['barangTarif'] = $barangTarifArr;
@@ -421,7 +421,7 @@ class BeaCukaiApi
                 'nomorIdentitas' => $b['nomor_identitas'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
-                'seriEntitas' => $b['seri_entitas']
+                'seriEntitas' => (int)$b['seri_entitas']
             ];
         }
 
@@ -429,7 +429,7 @@ class BeaCukaiApi
             $kemasanArr[] = [
                 'jumlahKemasan' => (int)$b['jumlah_kemasan'],
                 'kodeJenisKemasan' => $b['kode_jenis_kemasan'],
-                'seriKemasan' => $b['seri_kemasan'],
+                'seriKemasan' => (int)$b['seri_kemasan'],
                 'merkKemasan' => $b['merk_kemasan']
             ];
         }
@@ -460,7 +460,7 @@ class BeaCukaiApi
                 'namaPengangkut' => $b['nama_sarana_pengangkut'],
                 'nomorPengangkut' => $b['nomor_pengangkut'],
                 'kodeCaraAngkut' => $b['kode_cara_angkut'],
-                'seriPengangkut' => $b['seri_pengangkut']
+                'seriPengangkut' => (int)$b['seri_pengangkut']
             ];
         }
 
