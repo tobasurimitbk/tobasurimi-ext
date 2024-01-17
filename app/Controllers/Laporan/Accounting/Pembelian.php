@@ -97,7 +97,7 @@ class Pembelian extends BaseController
             $invoiceTransaksi = $data->no_invoice;
             $tglInvoiceTransaksi = $data->tanggal_penerimaan;
             $taxInvoiceTransaksi = "";
-            $poNumberTransaksi = str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no);
+            $poNumberTransaksi = str_replace(',', ", ", str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no));
             $supplierTransaksi = $data->supplier_name;
             $valasTransaksi = "IDR";
             $exchangeTransaksi = 1.0;
