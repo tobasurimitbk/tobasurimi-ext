@@ -141,6 +141,7 @@
     $('#pengusaha_tpb_nomor_ijin_tpb').select2({
         placeholder: "Pilih No Ijin TPB",
         theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         var selected = $(this).find('option:selected');
         $('#pengusaha_tpb_tanggal_skep_tpb').val(selected.data('tanggal_skep_tpb'));

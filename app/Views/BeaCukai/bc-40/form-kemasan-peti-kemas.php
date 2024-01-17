@@ -195,21 +195,25 @@
     $('#kemasan_jenis_kemasan').select2({
         placeholder: "Pilih Jenis Kemasan",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#kontainer_ukuran').select2({
         placeholder: "Pilih Ukuran Peti Kemas",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#kontainer_jenis').select2({
         placeholder: "Pilih Jenis Peti Kemas",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#kontainer_tipe').select2({
         placeholder: "Pilih Tipe Peti Kemas",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('.form-select')

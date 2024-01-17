@@ -119,11 +119,13 @@
     $('#header_kode_tujuan_pengiriman').select2({
         placeholder: "Pilih Tujuan Pengiriman",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#header_kode_jenis_tpb').select2({
         placeholder: "Pilih Jenis TPB",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $("#tanggal_penerimaan_barang").datepicker({

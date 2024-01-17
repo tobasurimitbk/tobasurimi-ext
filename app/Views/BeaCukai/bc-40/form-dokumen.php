@@ -92,6 +92,7 @@
     $('#dokumen_jenis_dokumen').select2({
         placeholder: "Pilih Jenis Dokumen",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $("#dokumen_tanggal").datepicker({

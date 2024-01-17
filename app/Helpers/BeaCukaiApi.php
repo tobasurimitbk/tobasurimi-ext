@@ -276,49 +276,49 @@ class BeaCukaiApi
     }
 
     // PAYLOAD
-    public function payloadTempleateKirimBC23($bc23Data, $bc23Kontainer, $bc23Barang, $bc23Entitas, $bc23Kemasan, $bc23Dokumen, $bc23Pengangkut)
+    public function payloadTempleateKirimBC23($bcData, $bcKontainer, $bcBarang, $bcEntitas, $bcKemasan, $bcDokumen, $bcPengangkut)
     {
         $BCBarangDokumenModel = new BCBarangDokumenModel();
         $BCBarangTarifModel = new BCBarangTarifModel();
 
         $payload = [
             'asalData' => 'S',
-            'asuransi' => $bc23Data['asuransi'],
-            'bruto' => $bc23Data['bruto'],
-            'cif' => $bc23Data['cif'],
-            'fob' => $bc23Data['fob'],
-            'freight' => $bc23Data['freight'],
-            'hargaPenyerahan' => $bc23Data['harga_penyerahan'],
-            'jabatanTtd' => $bc23Data['jabatan_pengusaha_ttd'],
-            'jumlahKontainer' => count($bc23Kontainer),
-            'kodeAsuransi' => $bc23Data['kode_asuransi'],
-            'kodeDokumen' => $bc23Data['kode_dokumen'],
-            'kodeIncoterm' => $bc23Data['kode_incoterm'],
-            'kodeKantor' => $bc23Data['kode_kantor'],
-            'kodeKantorBongkar' => $bc23Data['kode_kantor_bongkar'],
-            'kodePelBongkar' => $bc23Data['kode_pelabuhan_bongkar'],
-            'kodePelMuat' => $bc23Data['kode_pelabuhan_muat'],
-            'kodePelTransit' => $bc23Data['kode_pelabuhan_transit'],
-            'kodeTps' => $bc23Data['kode_tps'],
-            'kodeTujuanTpb' => $bc23Data['kode_tujuan_tpb'],
+            'asuransi' => $bcData['asuransi'],
+            'bruto' => $bcData['bruto'],
+            'cif' => $bcData['cif'],
+            'fob' => $bcData['fob'],
+            'freight' => $bcData['freight'],
+            'hargaPenyerahan' => $bcData['harga_penyerahan'],
+            'jabatanTtd' => $bcData['jabatan_pengusaha_ttd'],
+            'jumlahKontainer' => count($bcKontainer),
+            'kodeAsuransi' => $bcData['kode_asuransi'],
+            'kodeDokumen' => $bcData['kode_dokumen'],
+            'kodeIncoterm' => $bcData['kode_incoterm'],
+            'kodeKantor' => $bcData['kode_kantor'],
+            'kodeKantorBongkar' => $bcData['kode_kantor_bongkar'],
+            'kodePelBongkar' => $bcData['kode_pelabuhan_bongkar'],
+            'kodePelMuat' => $bcData['kode_pelabuhan_muat'],
+            'kodePelTransit' => $bcData['kode_pelabuhan_transit'],
+            'kodeTps' => $bcData['kode_tps'],
+            'kodeTujuanTpb' => $bcData['kode_tujuan_tpb'],
             'kodeTutupPu' => '11', // referensi bc 1.1 
-            'kodeValuta' => $bc23Data['kode_valuta'],
-            'kotaTtd' => $bc23Data['kota_ttd'],
-            'namaTtd' => $bc23Data['nama_ttd'],
-            'ndpbm' => $bc23Data['ndpbm'],
-            'netto' => $bc23Data['netto'],
+            'kodeValuta' => $bcData['kode_valuta'],
+            'kotaTtd' => $bcData['kota_ttd'],
+            'namaTtd' => $bcData['nama_ttd'],
+            'ndpbm' => $bcData['ndpbm'],
+            'netto' => $bcData['netto'],
             'nik' => '-', // ?
-            'nilaiBarang' => (float)$bc23Data['nilai_barang'],
-            'nomorAju' => $bc23Data['no_aju'],
-            'nomorBc11' => $bc23Data['no_bc_11'],
-            'posBc11' => $bc23Data['pos_bc_11'],
-            'seri' => $bc23Data['seri'],
-            'subposBc11' => $bc23Data['sub_pos_bc_11'],
-            'tanggalBc11' => $bc23Data['tanggal_bc_11'],
-            'tanggalTiba' =>  $bc23Data['tanggal_bc_11'], // ?
-            'tanggalTtd' => $bc23Data['tanggal_ttd'],
-            'biayaTambahan' => (float)$bc23Data['biaya_tambahan'],
-            'biayaPengurang' => (float)$bc23Data['biaya_pengurang'],
+            'nilaiBarang' => (float)$bcData['nilai_barang'],
+            'nomorAju' => $bcData['no_aju'],
+            'nomorBc11' => $bcData['no_bc_11'],
+            'posBc11' => $bcData['pos_bc_11'],
+            'seri' => $bcData['seri'],
+            'subposBc11' => $bcData['sub_pos_bc_11'],
+            'tanggalBc11' => $bcData['tanggal_bc_11'],
+            'tanggalTiba' =>  $bcData['tanggal_bc_11'], // ?
+            'tanggalTtd' => $bcData['tanggal_ttd'],
+            'biayaTambahan' => (float)$bcData['biaya_tambahan'],
+            'biayaPengurang' => (float)$bcData['biaya_pengurang'],
             'barang' => [],
             'entitas' => [],
             'kemasan' => [],
@@ -333,11 +333,11 @@ class BeaCukaiApi
         $dokumenArr = [];
         $pengangkutArr = [];
 
-        foreach ($bc23Barang as $b) {
+        foreach ($bcBarang as $b) {
             $barang = [
                 'idBarang' => $b['id'],
                 'asuransi' => (float)$b['asuransi'],
-                'cif' => (float)$bc23Data['cif'],
+                'cif' => (float)$bcData['cif'],
                 'diskon' => (float)$b['diskon'], // ?
                 'fob' => (float)$b['fob'],
                 'freight' => (float)$b['freight'],
@@ -364,7 +364,7 @@ class BeaCukaiApi
                 'tipe' => $b['tipe_barang'],
                 'ukuran' => $b['ukuran_barang'], // ?
                 'uraian' => $b['uraian'],
-                'ndpbm' => (float) $bc23Data['ndpbm'], // ?
+                'ndpbm' => (float) $bcData['ndpbm'], // ?
                 'cifRupiah' => (float) $b['cif_rupiah'],
                 'hargaPerolehan' => (float)$b['harga_perolehan_barang'], // ?
                 'kodeAsalBahanBaku' => 0, //kode asal bahan baku: [0] Impor atau [1] Lokal
@@ -411,7 +411,7 @@ class BeaCukaiApi
             $barangArr[] = $barang;
         }
 
-        foreach ($bc23Entitas as $b) {
+        foreach ($bcEntitas as $b) {
             $entitasArr[] = [
                 'alamatEntitas' => $b['alamat_entitas'],
                 'kodeEntitas' => $b['kode_entitas'],
@@ -425,7 +425,7 @@ class BeaCukaiApi
             ];
         }
 
-        foreach ($bc23Kemasan as $b) {
+        foreach ($bcKemasan as $b) {
             $kemasanArr[] = [
                 'jumlahKemasan' => (int)$b['jumlah_kemasan'],
                 'kodeJenisKemasan' => $b['kode_jenis_kemasan'],
@@ -434,7 +434,7 @@ class BeaCukaiApi
             ];
         }
 
-        foreach ($bc23Kontainer as $b) {
+        foreach ($bcKontainer as $b) {
             $kontainerArr[] = [
                 'kodeTipeKontainer' => $b['kode_tipe_kontainer'],
                 'kodeUkuranKontainer' => $b['kode_ukuran_kontainer'],
@@ -444,7 +444,7 @@ class BeaCukaiApi
             ];
         }
 
-        foreach ($bc23Dokumen as $b) {
+        foreach ($bcDokumen as $b) {
             $dokumenArr[] = [
                 'kodeDokumen' => $b['kode_dokumen'],
                 'nomorDokumen' => $b['nomor_dokumen'],
@@ -454,7 +454,7 @@ class BeaCukaiApi
             ];
         }
 
-        foreach ($bc23Pengangkut as $b) {
+        foreach ($bcPengangkut as $b) {
             $pengangkutArr[] = [
                 'kodeBendera' => $b['kode_bendera'],
                 'namaPengangkut' => $b['nama_sarana_pengangkut'],
@@ -470,6 +470,184 @@ class BeaCukaiApi
         $payload['kontainer'] = $kontainerArr;
         $payload['dokumen'] = $dokumenArr;
         $payload['pengangkut'] = $pengangkutArr;
+
+        return $payload;
+    }
+
+    public function payloadTempleateKirimBC40($bcData, $bcKontainer, $bcBarang, $bcEntitas, $bcKemasan, $bcDokumen, $bcPengangkut, $bcBarangTarif)
+    {
+        $BCBarangTarifModel = new BCBarangTarifModel();
+
+        $payload = [
+            'asalData' => 'S',
+            'asuransi' => (float)$bcData['asuransi'],
+            'bruto' => (float)$bcData['bruto'],
+            'cif' => (float)$bcData['cif'],
+            'kodeJenisTpb' => (float)$bcData['kode_jenis_tpb'],
+            'freight' => (float)$bcData['freight'],
+            'hargaPenyerahan' => (float)$bcData['harga_penyerahan'],
+            'idPengguna' => $bcData['id_pengguna'],
+            'jabatanTtd' => $bcData['jabatan_ttd'],
+            'jumlahKontainer' => (int)count($bcKontainer),
+            'kodeDokumen' => $bcData['kode_dokumen'],
+            'kodeKantor' => $bcData['kode_kantor'],
+            'kodeTujuanPengiriman' => $bcData['kode_tujuan_pengiriman'],
+            'kotaTtd' => $bcData['kota_ttd'],
+            'namaTtd' => $bcData['nama_ttd'],
+            'netto' => (int)$bcData['netto'],
+            'nik' => $bcData['nik'],
+            'nomorAju' => $bcData['no_aju'],
+            'seri' => (int)$bcData['seri'],
+            'tanggalAju' => date('Y-m-d'),
+            'tanggalTtd' => $bcData['tanggal_ttd'],
+            'userPortal' => null,
+            'volume' => (float)$bcData['volume'],
+            'biayaTambahan' => null,
+            'biayaPengurang' => null,
+            'vd' => null,
+            'uangMuka' => (float)$bcData['uang_muka'],
+            'nilaiJasa' => (float)$bcData['nilai_jasa'],
+            'entitas' => [],
+            'dokumen' => [],
+            'pengangkut' => [],
+            'kontainer' => [],
+            'kemasan' => [],
+            'pungutan' => [],
+            'barang' => [],
+        ];
+        $entitasArr = [];
+        $dokumenArr = [];
+        $pengangkutArr = [];
+        $kontainerArr = [];
+        $kemasanArr = [];
+        $barangTarifArr = [];
+        $barangArr = [];
+
+        foreach ($bcEntitas as $b) {
+            $entitasArr[] = [
+                'alamatEntitas' => $b['alamat_entitas'],
+                'kodeEntitas' => $b['kode_entitas'],
+                'kodeJenisEntitas' => $b['kode_jenis_entitas'],
+                'namaEntitas' => $b['nama_entitas'],
+                'nibEntitas' => $b['nib_entitas'],
+                'nomorIdentitas' => $b['nomor_identitas'],
+                'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
+                'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
+                'seriEntitas' => (int)$b['seri_entitas']
+            ];
+        }
+
+        foreach ($bcDokumen as $b) {
+            $dokumenArr[] = [
+                'kodeDokumen' => $b['kode_dokumen'],
+                'nomorDokumen' => $b['nomor_dokumen'],
+                'seriDokumen' => (int)$b['seri_dokumen'],
+                'tanggalDokumen' => $b['tanggal_dokumen'],
+            ];
+        }
+
+        foreach ($bcPengangkut as $b) {
+            $pengangkutArr[] = [
+                'namaPengangkut' => $b['nama_sarana_pengangkut'],
+                'nomorPengangkut' => $b['nomor_pengangkut'],
+                'seriPengangkut' => (int)$b['seri_pengangkut']
+            ];
+        }
+
+        foreach ($bcKontainer as $b) {
+            $kontainerArr[] = [
+                'kodeJenisKontainer' => $b['kode_jenis_kontainer'],
+                'kodeTipeKontainer' => $b['kode_tipe_kontainer'],
+                'kodeUkuranKontainer' => $b['kode_ukuran_kontainer'],
+                'nomorKontainer' => $b['nomor_kontainer'],
+                'seriKontainer' => (int)$b['seri_kontainer'],
+            ];
+        }
+
+        foreach ($bcKemasan as $b) {
+            $kemasanArr[] = [
+                'jumlahKemasan' => (int)$b['jumlah_kemasan'],
+                'kodeJenisKemasan' => $b['kode_jenis_kemasan'],
+                'merkKemasan' => $b['merk_kemasan'],
+                'seriKemasan' => (int)$b['seri_kemasan'],
+            ];
+        }
+
+        foreach ($bcBarangTarif as $b) {
+            $barangTarifArr[] = [
+                'kodeFasilitasTarif' => $b['kode_fasilitas_tarif'],
+                'kodeJenisPungutan' => $b['kode_jenis_pungutan'],
+                'nilaiPungutan' => (float)$b['nilai_bayar'],
+            ];
+        }
+
+        foreach ($bcBarang as $b) {
+            $barang = [
+                'asuransi' => null,
+                'bruto' => null,
+                'cif' => null,
+                'diskon' => (float)$b['diskon'],
+                'hargaEkspor' => null,
+                'hargaPenyerahan' => (float)$b['harga_ekspor'],
+                'hargaSatuan' => null,
+                'isiPerKemasan' => (int)$b['jumlah_satuan'],
+                'jumlahRealisasi' => null,
+                'jumlahSatuan' => (float)$b['jumlah_satuan'],
+                'kodeBarang' => $b['kode_barang'],
+                'kodeDokumen' => $b['kode_dokumen'],
+                'kodeJenisKemasan' => $b['kode_jenis_kemasan'],
+                'kodeSatuanBarang' => $b['kode_satuan_barang'],
+                'merk' => $b['merk_barang'],
+                'netto' => (float)$b['netto'],
+                'nilaiBarang' => (float)$b['nilai_barang'],
+                'posTarif' => $b['pos_tarif'],
+                'seriBarang' => (int)$b['seri_barang'],
+                'spesifikasiLain' => $b['spesifikasi_lain'],
+                'tipe' => $b['tipe_barang'],
+                'ukuran' => $b['ukuran_barang'],
+                'uraian' => $b['uraian'],
+                'volume' => (float)$bcData['volume'],
+                'cifRupiah' => null,
+                'hargaPerolehan' => null,
+                'kodeAsalBahanBaku' => '1',
+                'ndpbm' => null,
+                'uangMuka' => null,
+                'nilaiJasa' => null,
+                'barangTarif' => [],
+            ];
+
+            $barangTarifData = $BCBarangTarifModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
+                ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
+                ->where('deletedAt', null)
+                ->findAll();
+
+            $barangTarifArr = [];
+            foreach ($barangTarifData as $bt) {
+                $barangTarifArr[] = [
+                    'kodeJenisTarif' => $bt['kode_jenis_tarif'],
+                    'jumlahSatuan' => 0,
+                    'kodeFasilitasTarif' => $bt['kode_fasilitas_tarif'],
+                    'kodeSatuanBarang' => $bt['kode_satuan_barang'],
+                    'nilaiBayar' => (float)$bt['nilai_bayar'],
+                    'nilaiFasilitas' => 0,
+                    'nilaiSudahDilunasi' => 0,
+                    'seriBarang' => (int)$bt['seri_barang'],
+                    'tarif' => (float) $bt['tarif_bea_masuk'],
+                    'tarifFasilitas' => (float) $bt['tarif_fasilitas'],
+                    'kodeJenisPungutan' => $bt['kode_jenis_pungutan']
+                ];
+            }
+            $barang['barangTarif'] = $barangTarifArr;
+            $barangArr[] = $barang;
+        }
+
+        $payload['barang'] = $barangArr;
+        $payload['entitas'] = $entitasArr;
+        $payload['kemasan'] = $kemasanArr;
+        $payload['kontainer'] = $kontainerArr;
+        $payload['dokumen'] = $dokumenArr;
+        $payload['pengangkut'] = $pengangkutArr;
+        $payload['pungutan'] = $barangTarifArr;
 
         return $payload;
     }

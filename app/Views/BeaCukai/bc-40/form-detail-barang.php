@@ -205,7 +205,7 @@
 
                             <div class="mt-1">
                                 <div class="form-floating">
-                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= $bc40DokumenBarang == null ? formatRupiah($poDetail['additional_cost']) : formatRupiah($bc40DokumenBarang['nilai_tambah']) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= $bc40DokumenBarang == null ? (formatRupiah(array_key_exists('additional_cost', $poDetail) ? $poDetail['additional_cost'] : 0)) : formatRupiah($bc40DokumenBarang['nilai_tambah']) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Harga Penggantian/Nilai Jasa</label>
                                     <small class="mb-3"><i>Diambil dari biaya tambahan Purchase Order</i></small>
                                 </div>
@@ -351,41 +351,43 @@
     $('#barang_detail_kode_hs').select2({
         placeholder: "Pilih Kode HS/Pos Tarif",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#barang_detail_kategori_barang').select2({
         placeholder: "Pilih Kategori Barang",
         theme: "bootstrap-5",
-    });
-
-    $('#barang_detail_negara').select2({
-        placeholder: "Pilih Negara",
-        theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#barang_detail_kode_jenis_kemasan').select2({
         placeholder: "Pilih Kode Jenis Kemasan",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#barang_detail_kode_jenis_pungutan').select2({
         placeholder: "Pilih Jenis Pungutan",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#barang_detail_kode_jenis_tarif').select2({
         placeholder: "Pilih Jenis Tarif",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#barang_detail_kode_fasilitas_tarif').select2({
         placeholder: "Pilih Fasilitas Tarif",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('#barang_detail_kode_satuan_barang').select2({
         placeholder: "Pilih Kode Satuan Barang",
         theme: "bootstrap-5",
+        allowClear: true,
         ajax: {
             url: '<?= base_url('bea-cukai-bc-40/satuan-barang') ?>',
             dataType: 'json',

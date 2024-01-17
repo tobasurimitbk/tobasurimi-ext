@@ -79,6 +79,52 @@
     </div>
 </section>
 
+<div class="modal fade" id="modalUpdateNoAju" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><label class="title-name"></label> Ubah Nomor Pengajuan</h5>
+            </div>
+            <form id="form-update">
+                <input type="hidden" name="penerimaan_barang_id" class="penerimaan_barang_id" id="penerimaan_barang_id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6 mt-1">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input id="tanggal_pengajuan" value="" name="tanggal_pengajuan" type="text" class="tanggal_pengajuan form-control" placeholder="">
+                                    <label>Tanggal</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input id="no_urut_dokumen" name="no_urut_dokumen" type="number" class="no_urut_dokumen form-control" placeholder="" oninput="event.target.value = /^\d{0,6}$/.test(event.target.value) ? event.target.value : ''">
+                                <label>Nomor Urut</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input id="no_pengajuan" name="no_pengajuan" type="text" readonly class="no_pengajuan form-control" placeholder="">
+                                <label>Preview Nomor Pengajuan</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-submit-form" id="ubahNoAjuButton">Simpan</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -170,16 +216,21 @@
                                 BELUM DIBUAT
                             </div>`
                     } else {
-                        if (row.status == "BELUM POSTING") {
+                        if (row.status == "BELUM LENGKAP") {
                             htmlRes += `
-                            <div class="text-primary">
-                                BELUM POSTING
-                            </div>`
+                                <div class="text-warning">
+                                    BELUM LENGKAP
+                                </div>`
+                        } else if (row.status == "SIAP KIRIM") {
+                            htmlRes += `
+                                <div class="text-primary">
+                                    SIAP KIRIM
+                                </div>`
                         } else {
                             htmlRes += `
-                            <div class="text-success">
-                                SUDAH POSTING
-                            </div>`
+                                <div class="text-success">
+                                    SUDAH KIRIM
+                                </div>`
                         }
                     }
 
@@ -196,19 +247,44 @@
 
                     if (row.status == "BELUM DIBUAT") {
                         htmlRes += `
-                            -
-                        `;
+                            -`
                     } else {
-                        if (row.status == "BELUM POSTING") {
-                            htmlRes += `
-                            <button onclick="postingAction('${row.id}')" class="btn btn-success posting-spp">
-                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                            `
+                        if (row.status == "BELUM LENGKAP") {
+                            if (row.is_update_no_aju) {
+                                htmlRes += `
+                                <button onclick="noAjuShowModal('${row.penerimaan_barang_id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
+                                    <i class="fas fa-edit fa-sm"></i>
+                                </button>
+                                `;
+                            }
 
+                            htmlRes += `
+                                <button onclick="deleteAction('${row.penerimaan_barang_id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            `;
+
+                        } else if (row.status == "SIAP KIRIM") {
+
+                            if (row.is_update_no_aju) {
+                                htmlRes += `
+                                <button onclick="noAjuShowModal('${row.penerimaan_barang_id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
+                                    <i class="fas fa-edit fa-sm"></i>
+                                </button>
+                                `;
+                            }
+
+                            htmlRes += `
+                                <button onclick="postingAction('${row.penerimaan_barang_id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            `;
+
+                            htmlRes += `
+                                <button onclick="deleteAction('${row.penerimaan_barang_id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            `;
                         } else {
                             htmlRes += `
                             <button class="btn btn-warning btn-print" onclick="alert('Hello')" style="box-shadow: none !important;">
@@ -263,6 +339,147 @@
         autoclose: true
     });
 
+
+    var validator = $("#form-update").validate({
+        rules: {
+            tanggal_pengajuan: {
+                required: true
+            },
+            no_urut_dokumen: {
+                required: true,
+                digits: true,
+                minlength: 6,
+            },
+        },
+        messages: {
+            tanggal_pengajuan: {
+                required: "Tanggal wajib diisi"
+            },
+            no_urut_dokumen: {
+                required: "Nomor urut wajib diisi",
+                digits: "Nomor urut harus berupa angka",
+                minlength: "Nomor urut harus terdiri dari 6 digit",
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('#ubahNoAjuButton').click(function(e) {
+        e.preventDefault();
+        if ($('#form-update').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Ubah Nomor Aju ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData(document.querySelector("#form-update"));
+                    $.ajax({
+                        url: `<?= base_url("bea-cukai-bc-40/id/update-no-aju"); ?>`,
+                        method: "POST",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(res) {
+                            csrf.val(res.token);
+                            if (res.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: res.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    table.ajax.reload();
+                                });
+                                $('#modalUpdateNoAju').modal('hide');
+
+                            } else {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: res.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    table.ajax.reload();
+                                });
+                            }
+                        }
+                    })
+                }
+            })
+        }
+    });
+
+
+    $('#no_urut_dokumen').keyup(function() {
+        var noAju = $('#no_pengajuan').val();
+        var splitValues = noAju.split("-");
+        splitValues[3] = $(this).val();
+        $('#no_pengajuan').val(splitValues[0] + '-' + splitValues[1] + '-' + splitValues[2] + '-' + splitValues[3]);
+    });
+
+    $("#tanggal_pengajuan").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    }).change(function() {
+        var tanggalPengajuan = $(this).val();
+        var noAju = $('#no_pengajuan').val();
+        var tanggalPengajuanSplit = tanggalPengajuan.split("/");
+        var noPengajuanSplit = noAju.split("-");
+        $('#no_pengajuan').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
+    });
+
+    function noAjuShowModal(id, noAju) {
+        var splitValues = noAju.split("-");
+
+        var year = splitValues[2].substring(0, 4);
+        var month = splitValues[2].substring(4, 6);
+        var day = splitValues[2].substring(6, 8);
+
+        var formattedDate = day + '/' + month + '/' + year;
+
+        $('#tanggal_pengajuan').val(formattedDate);
+        $('#no_pengajuan').val(noAju);
+        $('#no_urut_dokumen').val(splitValues[3]);
+        $('#modalUpdateNoAju').modal('show');
+        $('#penerimaan_barang_id').val(id);
+    }
+
     function changeSort(val) {
         if (sort !== val) {
             sortType = "asc";
@@ -287,7 +504,7 @@
                 var formData = new FormData();
                 formData.append("id", id);
                 $.ajax({
-                    url: `<?= base_url("bea-cukai-bc-23/delete"); ?>`,
+                    url: `<?= base_url("bea-cukai-bc-40/id/delete"); ?>`,
                     method: "POST",
                     data: formData,
                     beforeSend: function(xhr) {
@@ -338,46 +555,7 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                var formData = new FormData();
-                formData.append("id", id);
-                $.ajax({
-                    url: `<?= base_url("bea-cukai-bc-23/posting"); ?>`,
-                    method: "POST",
-                    data: formData,
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    processData: false,
-                    contentType: false,
-                    success: function(res) {
-                        if (res.status) {
-                            csrf.val(res.token);
-                            Swal.fire({
-                                icon: 'success',
-                                title: res.message,
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    table.ajax.reload();
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: res.message,
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    table.ajax.reload();
-                                }
-                            });
-                        }
-                    }
-                })
+                window.location.replace("<?= base_url('bea-cukai-bc-40/api/kirim-dokumen/') ?>" + id)
             }
         })
 

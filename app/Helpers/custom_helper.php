@@ -367,5 +367,6 @@ function formatRupiah($angka)
    }
 
    $formattedNumber = $formatter->formatCurrency($parsedNumber, 'IDR');
-   return str_replace('Rp', '', $formattedNumber);
+   $res = preg_replace('/[^\d,]/', '', $formattedNumber);
+   return number_format(convertRupiahToNumber($res), 0, ',', '.');
 }
