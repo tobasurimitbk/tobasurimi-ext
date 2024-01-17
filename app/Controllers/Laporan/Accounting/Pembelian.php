@@ -12,6 +12,8 @@ use App\Models\KursModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\PenerimaanBarangModel;
+use App\Models\PenerimaanBarangDetailModel;
 
 class Pembelian extends BaseController
 {
@@ -23,6 +25,8 @@ class Pembelian extends BaseController
     protected $rMImportPODetailModel;
     protected $rMPurchaseOrderDetailModel;
     protected $aMPurchaseOrderDetailModel;
+    protected $penerimaanBarangModel;
+    protected $penerimaanBarangDetailModel;
 
     public function __construct()
     {
@@ -34,6 +38,8 @@ class Pembelian extends BaseController
         $this->rMImportPODetailModel = new RMImportPODetailModel();
         $this->rMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
     }
     public function index()
     {
@@ -52,24 +58,29 @@ class Pembelian extends BaseController
             "filter"        => $this->request->getGet("filter"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
+            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $condition = [
             // "company_id"  => $this->this_company_id,
-            "deletedAt" => NULL
+            "penerimaan_barang.deletedAt" => NULL
         ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "filter"        => $this->request->getGet("filter"),
             "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType")
+            "sortType"      => $this->request->getGet("sortType"),
+            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
+        // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
 
         $rdata = [];
@@ -78,107 +89,77 @@ class Pembelian extends BaseController
 
 
         // var_dump($res);
+        // exit;
         foreach ($res['data'] as $data) {
-            $tglTransaksi = "";
-            $dokumenTransaksi = "";
-            $buktiTransaksi = "";
-            $invoiceTransaksi = "";
-            $tglInvoiceTransaksi = "";
+            $tglTransaksi = $data->tanggal_penerimaan;
+            $dokumenTransaksi = $data->BC23_AJU ? "BC 2.3/" . $data->BC23_AJU : ($data->BC40_AJU ? "BC 4.0/" . $data->BC40_AJU : "-");
+            $buktiTransaksi = $data->no_penerimaan_barang;
+            $invoiceTransaksi = $data->no_invoice;
+            $tglInvoiceTransaksi = $data->tanggal_penerimaan;
             $taxInvoiceTransaksi = "";
-            $poNumberTransaksi = "";
-            $supplierTransaksi = "";
-            $valasTransaksi = "";
-            $exchangeTransaksi = "";
-            $nominalTransaksi = "";
-            $nominalIdrTransaksi = "";
-            $paidIdrTransaksi = "";
+            $poNumberTransaksi = str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no);
+            $supplierTransaksi = $data->supplier_name;
+            $valasTransaksi = "IDR";
+            $exchangeTransaksi = 1.0;
+            $nominalTransaksi = 0.0;
+            $nominalIdrTransaksi = 0.0;
+            $paidIdrTransaksi = 0.0;
             $totalHargaAll = 0.0;
-            if ($data->id_local_bb != NULL) {
-                $tglTransaksi = $data->po_date_lokal_bb;
-                $dokumenTransaksi = "";
-                $buktiTransaksi = $data->evidance_num;
-                $invoiceTransaksi = "";
-                $tglInvoiceTransaksi = "";
-                $taxInvoiceTransaksi = "";
-                $poNumberTransaksi = $data->po_no_lokal_bb;
-                $supplierTransaksi = $data->supplier_name;
-                $valasTransaksi = "IDR";
-                $exchangeTransaksi = 1.0;
-                $detail = $this->rMPurchaseOrderDetailModel->getPoBBLokalDetailById($data->id_lokal_bb);
-                foreach ($detail as $value) {
-                    $totalHarga = $value->general_price * $value->qty;
-                    $totalHargaAll += $totalHarga;
+            $lokalbb = "";
+            $importbb = "";
+            $bp = "";
+            if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
+                $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
+                foreach ($lokalbb as $value) {
+                    $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
+                    $nominalTransaksi += $totalxqty;
                 }
-                $nominalTransaksi = $totalHargaAll;
-                $nominalIdrTransaksi = $totalHargaAll * $exchangeTransaksi;
-                $paidIdrTransaksi = "";
-            } else if ($data->id_import_bb != NULL) {
-                // var_dump($data);
-                $tglTransaksi = $data->po_date_import_bb;
-                $dokumenTransaksi = "";
-                $buktiTransaksi = $data->evidance_num;
-                $invoiceTransaksi = "";
-                $tglInvoiceTransaksi = "";
-                $taxInvoiceTransaksi = "";
-                $poNumberTransaksi = $data->po_no_import_bb;
-                $supplierTransaksi = $data->supplier_name;
-                // Konversi format tanggal
-                $datetime = \DateTime::createFromFormat('d/m/Y', $data->po_date_import_bb);
-                $converted_date = $datetime->format('Y-m-d');
-
-                // Gunakan nilai yang telah dikonversi
-                $kursData = $this->kursModel->getByMetaId($data->currency_import_bb, $converted_date);
-                // var_dump($kursData);
-                foreach ($metaValuta as $value) {
-                    if ($data->currency_import_bb == $value['id']) {
-                        $valasTransaksi = $value['value'];
-                        $exchangeTransaksi = $kursData->nilai_kurs;
+                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
+                $nominalIdrTransaksi += $totalHargaAll;
+            } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
+                $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
+                foreach ($importbb as $value) {
+                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
+                    if ($kursData) {
+                        foreach ($metaValuta as $valueValuta) {
+                            if ($value['currency'] == $valueValuta['id']) {
+                                $valasTransaksi = $valueValuta['value'];
+                                $exchangeTransaksi = $kursData->nilai_kurs;
+                            }
+                        }
                     }
+                    $nominalTransaksi += $value['total_po'];
                 }
-                $detail = $this->rMImportPODetailModel->getPoBBImportDetailById($data->id_import_bb);
-                foreach ($detail as $value) {
-                    $totalHargaAll += $value->total;
-                }
-                $nominalTransaksi = $totalHargaAll;
-                $nominalIdrTransaksi = $totalHargaAll * $exchangeTransaksi;
-                $paidIdrTransaksi = "";
-            } else if ($data->id_po_bp != NULL) {
-                $tglTransaksi = $data->po_date_po_bp;
-                $dokumenTransaksi = "";
-                $buktiTransaksi = $data->evidance_num;
-                $invoiceTransaksi = "";
-                $tglInvoiceTransaksi = "";
-                $taxInvoiceTransaksi = "";
-                $poNumberTransaksi = $data->po_no_po_bp;
-                $supplierTransaksi = $data->supplier_name;
-                $valasTransaksi = "IDR";
-                $exchangeTransaksi = 1.0;
-                $datetime = \DateTime::createFromFormat('d/m/Y', $data->po_date_po_bp);
-                $converted_date = $datetime->format('Y-m-d');
-
-                // Gunakan nilai yang telah dikonversi
-                $kursData = $this->kursModel->getByMetaId($data->currency_po_bp, $converted_date);
-                foreach ($metaValuta as $value) {
-                    if ($data->currency_po_bp == $value['id']) {
-                        $valasTransaksi = $value['value'];
-                        $exchangeTransaksi = $kursData->nilai_kurs;
+                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
+                $nominalIdrTransaksi += $totalHargaAll;
+            } else if ($data->tipe_bahan == "PENOLONG") {
+                $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
+                foreach ($bp as $value) {
+                    // var_dump($valasTransaksi);
+                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
+                    // var_dump($kursData);
+                    if ($kursData) {
+                        foreach ($metaValuta as $valueValuta) {
+                            if ($value['currency'] == $valueValuta['id']) {
+                                $valasTransaksi = $valueValuta['value'];
+                                $exchangeTransaksi = $kursData->nilai_kurs;
+                            }
+                        }
                     }
+                    // var_dump($valasTransaksi);
+                    // var_dump($exchangeTransaksi);
+                    $nominalTransaksi += $value['total_po'];
                 }
-                $detail = $this->aMPurchaseOrderDetailModel->getPoBPDetailById($data->id_po_bp);
-                foreach ($detail as $value) {
-                    $totalHargaAll += $value->total;
-                }
-                $nominalTransaksi = $totalHargaAll;
-                $nominalIdrTransaksi = $totalHargaAll * $exchangeTransaksi;
-                $paidIdrTransaksi = "";
+                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
+                $nominalIdrTransaksi += $totalHargaAll;
             }
-            // var_dump($poNumberTransaksi);
-            // var_dump($supplierTransaksi);
-            // var_dump($valasTransaksi);
+            // var_dump($lokalbb);
+            // var_dump($importbb);
+            // var_dump($bp);
 
             array_push($rdata, [
                 "no"                    => $no++,
-                "id"                    => $data->transaksi_pembelian_id,
+                "id"                    => $data->id,
                 "po_date"               => $tglTransaksi,
                 "dokumen_num"           => $dokumenTransaksi,
                 "evidance_num"          => $buktiTransaksi,

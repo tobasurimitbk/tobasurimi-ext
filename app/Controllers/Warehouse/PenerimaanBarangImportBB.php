@@ -155,7 +155,7 @@ class PenerimaanBarangImportBB extends BaseController
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
-            'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+            'no_invoice' => $this->request->getVar('no_invoice'),
             "tipe_bahan" => "BAKU",
             "status_post" => "WAITING",
             "status_penerimaan" => "IMPORT",
@@ -230,7 +230,7 @@ class PenerimaanBarangImportBB extends BaseController
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
-            'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+            'no_invoice' => $this->request->getVar('no_invoice'),
             "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
         ]);
 

@@ -91,7 +91,7 @@ class TransaksiPembelianModel extends Model
 
         $totalData = $accountCustomerDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $accountCustomerDataQry->groupStart();
         }
 
@@ -106,7 +106,22 @@ class TransaksiPembelianModel extends Model
             $accountCustomerDataQry->where('suppliers.id', $addCondition['filter']);
         }
 
-        if ($addCondition['search']) {
+        var_dump($addCondition['startdate']);
+        exit;
+
+        if ($addCondition['startdate']) {
+            $accountCustomerDataQry->where('rm_purchase_orders.po_date >=', $addCondition['startdate'])
+                ->orWhere('rm_import_pos.po_date >=', $addCondition['startdate'])
+                ->orWhere('am_purchase_orders.po_date >=', $addCondition['startdate']);
+        }
+
+        if ($addCondition['lastdate']) {
+            $accountCustomerDataQry->where('rm_purchase_orders.po_date <=', $addCondition['lastdate'])
+                ->orWhere('rm_import_pos.po_date <=', $addCondition['lastdate'])
+                ->orWhere('am_purchase_orders.po_date <=', $addCondition['lastdate']);
+        }
+
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $accountCustomerDataQry->groupEnd();
         }
 

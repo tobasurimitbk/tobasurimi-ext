@@ -13,7 +13,7 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <div class="input-group input-group-password">
-                                <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Pembayaran">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                                 </div>
@@ -21,7 +21,7 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <div class="input-group input-group-password">
-                                <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Pembayaran">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
@@ -121,6 +121,8 @@
                 data: function(data) {
                     data.search = $(".search").val();
                     data.filter = $(".list_supplier").val();
+                    data.dateStart = $(".dateStart").val();
+                    data.dateEnd = $(".dateEnd").val();
                     data.sort = sort;
                     data.sortType = sortType;
                 }
@@ -216,11 +218,33 @@
             .find('label')
             .css('z-index', '1');
 
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
+
         $(".search").keyup(function() {
             table.ajax.reload();
         })
 
-        $(".list_supplier").change(function() {
+        $(".dateStart, .dateEnd, .list_supplier").change(function() {
             table.ajax.reload();
         })
     });

@@ -31,6 +31,7 @@ class PenerimaanBarangModel extends Model
         'kemasan',
         'jumlah_kemasan',
         'no_surat_jalan',
+        'no_invoice',
         'createdAt',
         'updatedAt',
         'deletedAt',
@@ -108,6 +109,78 @@ class PenerimaanBarangModel extends Model
         }
 
         if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+            $penerimaanBarangDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
+        $data = $penerimaanBarangDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListForAccounting($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_penerimaan_barang'      => 'penerimaan_barang.no_penerimaan_barang',
+            'warehouse_name'            => 'warehouses.warehouse_name',
+            'tipe_bahan'                => 'penerimaan_barang.tipe_bahan',
+            'supplier_name'             => 'suppliers.name',
+            'createdAt'                 => 'penerimaan_barang.createdAt',
+            'updatedAt'                 => 'penerimaan_barang.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "penerimaan_barang.*, 
+                    DATE_FORMAT(penerimaan_barang.tanggal, '%d/%m/%Y') AS tanggal_penerimaan,
+                    warehouses.warehouse_name, 
+                    suppliers.name as supplier_name, 
+                    COUNT(penerimaan_barang_detail.id) AS itemCount, 
+                    penerimaan_barang_detail.harga,
+                    bc_23.no_aju AS BC23_AJU,
+                    bc_40.no_aju AS BC40_AJU,";
+        $penerimaanBarangDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
+            ->join('bc_23', 'bc_23.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_40', 'bc_40.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->groupBy(('penerimaan_barang.id'))
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $penerimaanBarangDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+            $penerimaanBarangDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search']);
+        }
+
+        if ($addCondition['filter']) {
+            $penerimaanBarangDataQry->where('suppliers.id', $addCondition['filter']);
+        }
+
+        if ($addCondition['startdate']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.createdAt >=', $addCondition['startdate'] . " 00:00:00");
+        }
+
+        if ($addCondition['lastdate']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.createdAt <=', $addCondition['lastdate'] . " 23:59:59");
+        }
+
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
 
