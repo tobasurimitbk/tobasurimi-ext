@@ -122,7 +122,7 @@ class PenerimaanBarangLokalBB extends BaseController
 
     public function create()
     {
-        $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
+        $dataAJU = $this->metadataModel->getBCUsed('po_lokal_bb');
         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataSatuan = $this->satuanModel->asObject()->find();
