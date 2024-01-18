@@ -39,6 +39,7 @@
             <input autocomplete="one-time-code" value="<?= empty($dataSupplier) ? "" : $dataSupplier->id; ?>" type="hidden" class="id_supplier" name="id_supplier" id="id_supplier" />
             <input autocomplete="one-time-code" type="hidden" class="id_supplier_harga" name="id_supplier_harga" id="id_supplier_harga" />
             <input autocomplete="one-time-code" type="hidden" class="row" name="row" id="row" />
+            <br>
             <form class="harga-form" role="form" method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6">
@@ -60,11 +61,11 @@
                                 <option value=""></option>
                                 <?php foreach ($dataBagian as $b) : ?>
                                     <option value="<?= $b->id; ?>">
-                                        <?= $b->nama_bagian; ?>
+                                        <?= $b->nama_bagian; ?> / <?= $b->divisi ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Bagian</label>
+                            <label for="floatingInput">Bagian / Departemen</label>
                         </div>
                     </div>
                 </div>
@@ -231,12 +232,14 @@
 
     $('.bahan_baku').select2({
         placeholder: "Pilih Nama Barang",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     })
 
     $('.bagian').select2({
         placeholder: "Pilih Nama Bagian",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     })
 
     //CSS SELECT2 FLOATING LABEL
@@ -342,7 +345,6 @@
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    setLoading()
                     const csrf = $(`[name="${csrfToken}"]`);
 
                     let data = new FormData(document.querySelector(".harga-form"));
@@ -355,6 +357,10 @@
                         data: data,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -668,6 +674,7 @@
                                 id: id_supplier_harga,
                                 bahan_baku_id: bahan_baku_id,
                                 bagian_id: bagian_id,
+                                bagian_name: bagian_name,
                                 barang_name: barang_name,
                                 spesifikasi: spesifikasi,
                                 harga_umum: Number(harga_umum).toLocaleString(undefined, {

@@ -826,6 +826,8 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC40::kirimCeisa/$1');
 });
 
+// BC 2.7
+
 
 // BC 2.5
 $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {

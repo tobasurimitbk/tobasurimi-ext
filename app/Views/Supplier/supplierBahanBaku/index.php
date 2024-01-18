@@ -598,55 +598,6 @@
         autoclose: true
     })
 
-
-    $('.laporan_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5"
-    })
-
-    $('.province_parent_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    })
-
-    $('.city_parent_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    })
-
-    $('.country_code').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    }).change(function() {
-        let selectedOption = $(this).val();
-        // console.log(selectedOption);
-        if (selectedOption != "ID") {
-            $('#province_parent_id').prop('disabled', true);
-            $('#city_parent_id').prop('disabled', true);
-        } else {
-            $('#province_parent_id').prop('disabled', false);
-            $('#city_parent_id').prop('disabled', false);
-        }
-    });
-
-    $('.supplier_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-    });
-
-    $('.barang_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-    });
-
-    $('.warehouse_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-    });
-
     //CSS SELECT2 FLOATING LABEL
     $('.form-select')
         .parent('div')
@@ -667,6 +618,61 @@
         .parent('div')
         .find('label')
         .css('z-index', '1');
+
+    $('.laporan_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true
+    })
+
+    $('.province_parent_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content"),
+        allowClear: true
+    })
+
+    $('.city_parent_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content"),
+        allowClear: true
+    })
+
+    $('.country_code').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content"),
+        allowClear: true
+    }).change(function() {
+        let selectedOption = $(this).val();
+        // console.log(selectedOption);
+        if (selectedOption != "ID") {
+            $('#province_parent_id').prop('disabled', true);
+            $('#city_parent_id').prop('disabled', true);
+        } else {
+            $('#province_parent_id').prop('disabled', false);
+            $('#city_parent_id').prop('disabled', false);
+        }
+    });
+
+    $('.supplier_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+    $('.barang_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+    $('.warehouse_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
 
     let table = $('#firstDataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
