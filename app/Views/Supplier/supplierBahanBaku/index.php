@@ -598,27 +598,6 @@
         autoclose: true
     })
 
-    //CSS SELECT2 FLOATING LABEL
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.form-select')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
     $('.laporan_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
@@ -673,6 +652,27 @@
         theme: "bootstrap-5",
         allowClear: true
     });
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.form-select')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
     let table = $('#firstDataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -889,7 +889,7 @@
         $(".dataTable_info").addClass("pt-0");
 
         $(".btn-show-form-laporan").click(function() {
-            $(".laporan-modal").show();
+            $(".laporan-modal").modal('show');
             $(".col-md-12 > div[class^='laporan-']").hide();
             // $(".modal-footer .btn-submit-form").hide();
             // $('.laporan-rincian-per-barang').hide();
@@ -941,7 +941,7 @@
         })
 
         $(".btn-hide-laporan").click(function() {
-            $(".laporan-modal").hide()
+            $(".laporan-modal").modal('hide')
             $(".laporan_id").val("").change()
         })
 

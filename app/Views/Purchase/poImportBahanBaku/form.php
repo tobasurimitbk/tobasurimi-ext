@@ -268,7 +268,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                        <tbody class="body-detail-table" id="body-detail-table">
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
@@ -403,7 +403,8 @@
     // init select2
     $('#company_id').select2({
         placeholder: "Pilih Unit Company",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         var companyID = $(this).val();
         var formData = new FormData();
@@ -415,6 +416,10 @@
             dataType: "json",
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+
+            },
+            complete: function() {
+
             },
             processData: false,
             contentType: false,
@@ -433,28 +438,32 @@
     });
     $('#division_id').select2({
         placeholder: "Pilih Departemen",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
 
     });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
 
     });
 
     $('#currency').select2({
         placeholder: "Pilih mata uang",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
 
     });
 
     $('#barang_id').select2({
         placeholder: "Pilih Bahan Baku",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
     });
@@ -488,12 +497,12 @@
     // tambah barang
     $('.btn-add').click(function() {
         $('.title-detail-name').text('Tambah ');
-        $('.detail-modal').show();
+        $('.detail-modal').modal('show');
         resetForm();
     });
     // close modal
     $('.btn-hide-detail').click(function() {
-        $('.detail-modal').hide();
+        $('.detail-modal').modal('hide');
     });
     // HARGA SATUAN DAN QTY CHANE
     $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
@@ -746,6 +755,10 @@
                                 dataType: "json",
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+
+                                },
+                                complete: function() {
+
                                 },
                                 processData: false,
                                 contentType: false,
@@ -827,6 +840,10 @@
                                 dataType: "json",
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+
+                                },
+                                complete: function() {
+
                                 },
                                 processData: false,
                                 contentType: false,
@@ -877,7 +894,7 @@
                             listBarang.splice(indexToRemove, 1);
                             insertList();
                             resetForm();
-                            $('.detail-modal').hide();
+                            $('.detail-modal').modal('hide');
                         }
                     }
                 });
@@ -913,7 +930,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             insertList();
-                            $('.detail-modal').hide();
+                            $('.detail-modal').modal('hide');
                         }
                     })
                 }
@@ -1062,7 +1079,7 @@
         $('#keterangan').val(item.keterangan);
 
         $('.title-detail-name').text('Update ');
-        $('.detail-modal').show();
+        $('.detail-modal').modal('show');
 
     }
 
