@@ -90,9 +90,17 @@
                         </div>
                         <div class="harian-form">
                             <?php if (!empty($detail)) : ?>
-                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <!-- <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                     <input <?= !empty($detail) ? 'disabled' : '' ?> value="<?= !empty($detail) ? $detail['pembayaranDetail']['lpb_no'] : '' ?>" type="text" class="form-control">
                                     <label for="floatingInput" style="z-index: 1;">Nomor LPB</label>
+                                </div> -->
+                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                    <select class="form-select" disabled>
+                                        <?php foreach ($penerimaanData as $value) : ?>
+                                            <option <?= $detail['pembayaranDetail']['lpb_no'] == $value->id ? 'selected' : '' ?> value=""><?= !empty($detail) ? $value->no_penerimaan_barang : '' ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
                                 </div>
                             <?php else : ?>
                                 <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">

@@ -49,8 +49,8 @@
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? "disabled" : "" ?> class="form-select " name="po_type" id="po_type">
                                 <option disabled selected value=""></option>
-                                <option value="BAKU" <?= (!empty($paymentData) && $paymentData->po_type == 'BAKU') ? 'selected' : '' ?>>Baku</option>
-                                <option value="PENOLONG" <?= (!empty($paymentData) && $paymentData->po_type == 'PENOLONG') ? 'selected' : '' ?>>Penolong</option>
+                                <option value="BAHAN BAKU" <?= (!empty($paymentData) && $paymentData->po_type == 'BAHAN BAKU') ? 'selected' : '' ?>>BAHAN BAKU</option>
+                                <option value="BAHAN PENOLONG" <?= (!empty($paymentData) && $paymentData->po_type == 'BAHAN PENOLONG') ? 'selected' : '' ?>>BAHAN PENOLONG</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">PO Type</label>
                         </div>

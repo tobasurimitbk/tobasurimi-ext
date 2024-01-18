@@ -3,6 +3,7 @@
 namespace App\Controllers\Pembayaran;
 
 use App\Controllers\BaseController;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\ImportPOPaymentModel;
 use App\Models\SupplierModel;
@@ -15,11 +16,13 @@ class PembayaranPOImport extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $jurnalController;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function pembayaranPOImport()
@@ -109,7 +112,7 @@ class PembayaranPOImport extends BaseController
 
         $dataPembayaranPOImport = [];
 
-        $condition = [ ];
+        $condition = [];
         $addCondition = [
             "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
@@ -316,7 +319,9 @@ class PembayaranPOImport extends BaseController
             $importPOPaymentModel->insert($payload);
             // update paid po here
 
-            $importPOPaymentModel->db->transComplete();
+            $id = $importPOPaymentModel->db->transComplete();
+
+            $result = $this->jurnalController->insertDataPembayaran($id, "IMPORT");
 
             $data = [
                 "id"        => "",

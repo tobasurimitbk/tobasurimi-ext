@@ -47,10 +47,9 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select dokumen" name="dokumen" id="dokumen">
-                                    <option value="" data-code=""></option>
+                                    <option value="all" data-code="">ALL</option>n>
                                     <option value="pabean" data-code="">Dokumen Pabean</option>
                                     <option value="non" data-code="">Non Pabean</option>
-                                    <option value="all" data-code="">ALL</option>
                                 </select>
                                 <label for="floatingInput">Dokumen</label>
                             </div>
@@ -97,7 +96,7 @@
 </section>
 
 <script>
-    let sort = "nomor";
+    let sort = "createdAt";
     let sortType = "asc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
@@ -198,14 +197,14 @@
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.list_supplier')
+        $('.list_supplier, .dokumen')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.list_supplier')
+        $('.list_supplier, .dokumen')
             .parent('div')
             .children('span')
             .children('span')
@@ -213,7 +212,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.list_supplier')
+        $('.list_supplier, .dokumen')
             .parent('div')
             .find('label')
             .css('z-index', '1');

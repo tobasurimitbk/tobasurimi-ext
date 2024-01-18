@@ -19,6 +19,10 @@ use App\Models\AccountSupplierModel;
 use App\Models\AccountBarangModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
+use App\Models\LocalPOPaymentModel;
+use App\Models\LocalPOPaymentDetailModel;
+use App\Models\ImportPOPaymentModel;
+use App\Models\PenerimaanBarangModel;
 
 class JurnalUmum extends BaseController
 {
@@ -41,6 +45,10 @@ class JurnalUmum extends BaseController
     protected $accountSupplierModel;
     protected $accountModuleModel;
     protected $accountBarangModel;
+    protected $localPOPaymentModel;
+    protected $localPOPaymentDetailModel;
+    protected $importPOPaymentModel;
+    protected $penerimaanBarangModel;
 
     public function __construct()
     {
@@ -63,6 +71,10 @@ class JurnalUmum extends BaseController
         $this->accountSupplierModel = new AccountSupplierModel();
         $this->accountModuleModel = new AccountModuleModel();
         $this->accountBarangModel = new AccountBarangModel();
+        $this->localPOPaymentModel = new LocalPOPaymentModel();
+        $this->localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
+        $this->importPOPaymentModel = new ImportPOPaymentModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
     }
 
     public function index()
@@ -233,7 +245,7 @@ class JurnalUmum extends BaseController
                         // start input jurnal dari banyak detail barang
 
                         foreach ($dataPOBBDetail as $dataBBDetail) {
-                            $totalPOqty = (($dataBBDetail->general_price * $dataBBDetail->qty));
+                            $totalPOqty = (($dataBBDetail->general_price * $dataBBDetail->qty) + ($dataBBDetail->daily_price * $dataBBDetail->qty) + ($dataBBDetail->monthly_price * $dataBBDetail->qty));
                             $totalPO += $totalPOqty;
                             $barangAPFound = false;
                             foreach ($dataAccountBarang as $value) {
@@ -448,8 +460,8 @@ class JurnalUmum extends BaseController
                     $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataBP->division_id);
                     $dataSupplier = $this->supplierModel->getSupplierForJurnal($dataBP->supplier_id);
                     $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
-                    $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
                     $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                    $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
                     // var_dump($dataAccountModule);
                     // exit;
 
@@ -565,6 +577,163 @@ class JurnalUmum extends BaseController
                 // exit;
                 $this->jurnalUmumModel->insertJurnalBatch($result);
                 $this->transaksiPembelianModel->insertBatchTransaksiPembelian($resultTransaksiPembelian);
+            }
+        }
+    }
+
+    public function insertDataPembayaran($payID, $module)
+    {
+        $KasAP = "";
+        $KasAR = "";
+        $UtangAP = "";
+        $UtangAR = "";
+        $barangAP = "";
+        $barangAR = "";
+        $dataPO = "";
+        if ($module == "LOKAL") {
+            $result = array();
+            $POlocal = $this->localPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
+            if ($POlocal) {
+                $dataSupplier = $this->supplierModel->getSupplierForJurnal($POlocal->supplier_id);
+                $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembayaran')->findAll();
+
+                $dataPenerimaan = $this->penerimaanBarangModel->asObject()
+                    ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+                    ->where('penerimaan_barang.id', $POlocal->lpb_no)
+                    ->where('penerimaan_barang.deletedAt', null)
+                    ->where('penerimaan_barang_detail.deletedAt', null)
+                    ->findAll();
+                foreach ($dataSupplier as $value) {
+                    foreach ($dataAccountSupplier as $valueAccount) {
+                        if ($value->id == $valueAccount->supplier_id) {
+                            $UtangAP = $valueAccount->ap_id;
+                            $UtangAR = $valueAccount->ar_id;
+                        }
+                    }
+                    foreach ($dataAccountModule as $valueModule) {
+                        if ($valueModule->type == strtoupper($POlocal->type_po) && $valueModule->kategori == $module && $valueModule->module == "pembelian") {
+                            $UtangAP = $valueModule->ap_id;
+                            $UtangAR = $valueModule->ar_id;
+                        }
+                    }
+                }
+                // start inisialisasi kode transaksi
+                foreach ($dataMetadataTipeTransaksi as $val) {
+                    $kodeTransaksi = $val->description;
+                    $idTransaksi = $val->id;
+                }
+                // end inisialisasi kode transaksi
+                // input ke transaksi jurnal
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                    'total_debit' => $POlocal->amount,
+                    'total_kredit' => $POlocal->amount,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                );
+
+                // ambil id dari transaksi jurnal untuk jurnal umum
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                //untuk insert ke jurnal umum
+
+                foreach ($dataPenerimaan as $value) {
+                    $dataPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                }
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $POlocal->akun_kas,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                    'debit' => 0,
+                    'kredit' => repairDouble($POlocal->amount),
+                    'keterangan' => "Pembayaran PO " . $dataPO,
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $POlocal->akun_selisih == 0 || $POlocal->akun_selisih == NULL ? $UtangAR : $POlocal->akun_selisih,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                    'debit' => repairDouble($POlocal->amount),
+                    'kredit' => 0,
+                    'keterangan' => "Pembayaran PO " . $dataPO,
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+            }
+        } else {
+            $POimport = $this->importPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
+            if ($POimport) {
+                $dataSupplier = $this->supplierModel->getSupplierForJurnal($POimport->supplier_id);
+                $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembayaran')->findAll();
+
+                $dataPenerimaan = $this->penerimaanBarangModel->asObject()
+                    ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+                    ->where('penerimaan_barang.id', $POimport->penerimaan_barang_id)
+                    ->where('penerimaan_barang.deletedAt', null)
+                    ->where('penerimaan_barang_detail.deletedAt', null)
+                    ->findAll();
+                foreach ($dataSupplier as $value) {
+                    foreach ($dataAccountSupplier as $valueAccount) {
+                        if ($value->id == $valueAccount->supplier_id) {
+                            $UtangAP = $valueAccount->ap_id;
+                            $UtangAR = $valueAccount->ar_id;
+                        }
+                    }
+                    foreach ($dataAccountModule as $valueModule) {
+                        if ($valueModule->type == strtoupper($POimport->po_type) && $valueModule->kategori == $module && $valueModule->module == "pembelian") {
+                            $UtangAP = $valueModule->ap_id;
+                            $UtangAR = $valueModule->ar_id;
+                        }
+                    }
+                }
+                // start inisialisasi kode transaksi
+                foreach ($dataMetadataTipeTransaksi as $val) {
+                    $kodeTransaksi = $val->description;
+                    $idTransaksi = $val->id;
+                }
+                // end inisialisasi kode transaksi
+                // input ke transaksi jurnal
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
+                    'total_debit' => $POimport->amount,
+                    'total_kredit' => $POimport->amount,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                );
+
+                // ambil id dari transaksi jurnal untuk jurnal umum
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                //untuk insert ke jurnal umum
+
+                foreach ($dataPenerimaan as $value) {
+                    $dataPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                }
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $POimport->akun_kas,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
+                    'debit' => 0,
+                    'kredit' => repairDouble($POimport->amount),
+                    'keterangan' => "Pembayaran PO " . $dataPO,
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $POimport->akun_selisih == 0 || $POimport->akun_selisih == NULL ? $UtangAR : $POimport->akun_selisih,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
+                    'debit' => repairDouble($POimport->amount),
+                    'kredit' => 0,
+                    'keterangan' => "Pembayaran PO " . $dataPO,
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $this->jurnalUmumModel->insertJurnalBatch($result);
             }
         }
     }

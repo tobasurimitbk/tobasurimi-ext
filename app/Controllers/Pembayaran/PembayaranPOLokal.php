@@ -3,6 +3,7 @@
 namespace App\Controllers\Pembayaran;
 
 use App\Controllers\BaseController;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 
 use App\Models\SupplierModel;
 use App\Models\LocalPOPaymentModel;
@@ -22,12 +23,14 @@ class PembayaranPOLokal extends BaseController
     protected $token;
     protected $this_company_id;
     protected $Sub_AkunsModel;
+    protected $jurnalController;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function pembayaranPOLokalBP()
@@ -101,6 +104,8 @@ class PembayaranPOLokal extends BaseController
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
             ]);
 
+            $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
+
             return response()->setJSON([
                 'message' => "Kwitansi pembayaran lokal bahan penolong berhasil dibuat",
                 'status' => true,
@@ -142,6 +147,7 @@ class PembayaranPOLokal extends BaseController
 
             $lpb = $penerimaanBarangModel->where('id', $this->request->getVar('lpb'))->first();
 
+
             $id = $localPOPaymentModel->insert([
                 'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
                 'supplier_id' => $this->request->getVar('supplier_id'),
@@ -154,12 +160,14 @@ class PembayaranPOLokal extends BaseController
                 'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
                 'multiple_po_no' => $resPoNo,
                 'multiple_po_id' => $resPoID,
-                'lpb_no' => $lpb == null ? null : $lpb['no_penerimaan_barang'],
+                'lpb_no' => $this->request->getVar('lpb'),
                 'month' => $this->request->getVar('bulan'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
 
             ]);
+
+            $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
 
             return response()->setJSON([
                 'message' => "Kwitansi pembayaran lokal bahan baku berhasil dibuat",
@@ -284,6 +292,7 @@ class PembayaranPOLokal extends BaseController
     {
         $supplierModel = new SupplierModel();
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
 
         $supplierList = $supplierModel->asObject()
@@ -297,6 +306,8 @@ class PembayaranPOLokal extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
+        $penerimaanData = $penerimaanBarangModel->asObject()->where('deletedAt', NULL)->findAll();
+
         if ($localPOPaymentModel->where('id', $id)->first() == null) {
             return redirect()->to('pembayaran-po-lokal-bb');
         }
@@ -304,7 +315,8 @@ class PembayaranPOLokal extends BaseController
         $data = [
             "suppliers" => $supplierList,
             "detail" => $localPOPaymentModel->getBB($id, $this->this_company_id),
-            "subsAkuns" => $subAkunsModel
+            "subsAkuns" => $subAkunsModel,
+            "penerimaanData" => $penerimaanData,
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
