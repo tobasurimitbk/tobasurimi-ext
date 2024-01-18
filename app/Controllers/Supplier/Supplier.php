@@ -66,7 +66,13 @@ class Supplier extends BaseController
     {
         $supplierData = $this->supplierModel->getSupplierById($id);
         $barangData = $this->barangMasterModel->getBarangByType('bahan_baku');
-        $bagianData =  $this->bagianModel->where('deletedAt', null)->asObject()->findAll();
+        $bagianData =  $this->bagianModel
+            ->select('bagian.*,divisis.divisi')
+            ->join('divisis', 'divisis.id = bagian.division_id')
+            ->where('bagian.deletedAt', null)
+            ->where('divisis.deletedAt', null)
+            ->asObject()
+            ->findAll();
 
         $dataSupplier = [];
         $dataSupplierHarga = [];

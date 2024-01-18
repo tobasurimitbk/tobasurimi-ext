@@ -1082,7 +1082,6 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 const csrf = $(`[name="${csrfToken}"]`);
-                                setLoading()
                                 let data = new FormData(document.querySelector(".create-form"));
 
                                 let update_list_items = [];
@@ -1147,6 +1146,10 @@
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+
+                                        },
+                                        complete: function() {
+
                                         },
                                         method: "POST",
                                         dataType: "json",
@@ -1189,7 +1192,11 @@
                                         url: "<?= base_url("po-lokal-bahan-baku/save"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
+
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        },
+                                        complete: function() {
+
                                         },
                                         method: "POST",
                                         dataType: "json",

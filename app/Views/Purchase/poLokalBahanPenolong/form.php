@@ -317,7 +317,8 @@
     // init select2
     $('#company_id').select2({
         placeholder: "",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         var companyID = $(this).val();
         var formData = new FormData();
@@ -329,6 +330,9 @@
             dataType: "json",
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+
             },
             processData: false,
             contentType: false,
@@ -348,29 +352,24 @@
 
     $('#division_id').select2({
         placeholder: "",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
 
     });
 
     $('#supplier_id').select2({
         placeholder: "",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
 
     });
 
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
     $('#barang_id').select2({
         placeholder: "",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         $('#nama_barang').val($(this).find("option:selected").data("nama_barang"));
         $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
@@ -391,6 +390,14 @@
             },
         });
     });
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
     $("#po_date,#payment_date").datepicker({
         todayHighlight: true,
@@ -668,6 +675,10 @@
                                 dataType: "json",
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+
+                                },
+                                complete: function() {
+
                                 },
                                 processData: false,
                                 contentType: false,
@@ -727,6 +738,10 @@
                                 dataType: "json",
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+
+                                },
+                                complete: function() {
+
                                 },
                                 processData: false,
                                 contentType: false,

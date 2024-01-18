@@ -123,9 +123,7 @@
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataAJU as $aju) : ?>
-                                    <?php if ($aju['id'] == 48) : ?>
-                                        <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
-                                    <?php endif; ?>
+                                    <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
@@ -325,6 +323,7 @@
     $('.multiple_po_id').select2({
         placeholder: "Pilih Nomor PO",
         theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         let arr = $('.multiple_po_id').val();
         $.ajax({
@@ -347,7 +346,8 @@
 
     $('.supplier_id').select2({
         placeholder: "Pilih Supplier",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         $.ajax({
             url: `<?= base_url('penerimaan-barang-import-bp/get-po'); ?>`,
@@ -369,7 +369,8 @@
 
     $('.warehouse_id').select2({
         placeholder: "Pilih Warehouse Penerimaan",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
@@ -395,7 +396,8 @@
 
     $('.aju_document_type').select2({
         placeholder: "Pilih Dokumen Bea Cukai",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id')

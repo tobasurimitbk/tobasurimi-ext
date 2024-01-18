@@ -210,7 +210,7 @@ class BC40Model extends Model
         if ($data == null) {
             $isCompleteForm = false;
         } else {
-            if ($data['nama_ttd'] != null && $data['kota_ttd'] != null && $data['tanggal_ttd'] != null && $data['jabatan_pengusaha_ttd'] != null) {
+            if ($data['nama_ttd'] != null && $data['kota_ttd'] != null && $data['tanggal_ttd'] != null && $data['jabatan_ttd'] != null) {
                 $isCompleteForm = true;
             } else {
                 $isCompleteForm = false;

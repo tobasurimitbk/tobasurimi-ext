@@ -1237,6 +1237,7 @@ class BC23 extends BaseController
             'penerimaan_barang_id' => $penerimaanBarangID,
             'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
             'bc_dokumen_id' => $barangDokumenID,
+            'bc_type' => 30,
             'seri_dokumen' => $this->request->getVar('seri_dokumen')
         ]);
 

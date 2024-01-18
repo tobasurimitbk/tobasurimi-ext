@@ -101,9 +101,9 @@ class MetadataModel extends Model
             ->where('name', $name)->findAll();
     }
 
-    public function getBCUsedPembelianLokalBB()
+    public function getBCUsed($po_used)
     {
-        return $this->asArray()->where('name', 'jenis_dok_aju')->where('description', 'po_lokal_bb')->findAll();
+        return $this->asArray()->where('name', 'jenis_dok_aju')->like('description', '%' . $po_used . '%')->findAll();
     }
 
     public function getKodeSatuanBarang($search)

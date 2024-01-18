@@ -24,26 +24,26 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating">
-                                <input id="harga_penyerahan" readonly value="<?= $bc40 == null ? "0" : ($bc40['harga_penyerahan'] == null ? "0" : $bc40['harga_penyerahan']) ?>" name="harga_penyerahan" type="text" class="form-control harga_penyerahan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_penyerahan" readonly value="<?= $bc40 == null ? "0" : ($bc40['harga_penyerahan'] == null ? "0" : formatRupiah($bc40['harga_penyerahan'])) ?>" name="harga_penyerahan" type="text" class="form-control harga_penyerahan" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Harga Penyerahan</label>
                             </div>
                             <span class="text-small mb-3"><i>Harga Penyerahan akan terakumulasi secara otomatis setelah mengisi data barang</i></span>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="nilai_jasa" value="<?= $bc40 == null ? "0" : ($bc40['nilai_jasa'] == null ? "0" : $bc40['nilai_jasa']) ?>" name="nilai_jasa" type="text" class="form-control nilai_jasa" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="nilai_jasa" value="<?= $bc40 == null ? "0" : ($bc40['nilai_jasa'] == null ? "0" : formatRupiah($bc40['nilai_jasa'])) ?>" name="nilai_jasa" type="text" class="form-control nilai_jasa" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Nilai Jasa</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="nilai_uang_muka" value="<?= $bc40 == null ? "0" : ($bc40['uang_muka'] == null ? "0" : $bc40['uang_muka']) ?>" name="nilai_uang_muka" type="text" class="form-control nilai_uang_muka" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="nilai_uang_muka" value="<?= $bc40 == null ? "0" : ($bc40['uang_muka'] == null ? "0" : formatRupiah($bc40['uang_muka'])) ?>" name="nilai_uang_muka" type="text" class="form-control nilai_uang_muka" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Nilai Uang Muka</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_perolehan" value="<?= $bc40 == null ? "0" : ($bc40['harga_perolehan'] == null ? "0" : $bc40['harga_perolehan']) ?>" name="harga_perolehan" type="text" class="form-control harga_perolehan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_perolehan" value="<?= $bc40 == null ? "0" : ($bc40['harga_perolehan'] == null ? "0" : formatRupiah($bc40['harga_perolehan'])) ?>" name="harga_perolehan" type="text" class="form-control harga_perolehan" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Harga Perolehan</label>
                             </div>
                         </div>
@@ -55,19 +55,19 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="volume" value="<?= $bc40 == null ? "0" : ($bc40['volume'] == null ? "0" : $bc40['volume']) ?>" name="volume" type="text" class="form-control volume" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="volume" value="<?= $bc40 == null ? "0" : ($bc40['volume'] == null ? "0" : formatRupiah($bc40['volume'])) ?>" name="volume" type="text" class="form-control volume" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Volume (M3)</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="berat_kotor" value="<?= $bc40 == null ? "0" : ($bc40['bruto'] == null ? "0" : $bc40['bruto']) ?>" name="berat_kotor" type="text" class="form-control berat_kotor" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="berat_kotor" value="<?= $bc40 == null ? "0" : ($bc40['bruto'] == null ? "0" : formatRupiah($bc40['bruto'])) ?>" name="berat_kotor" type="text" class="form-control berat_kotor" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Berat Kotor (KGM)</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating">
-                                <input id="berat_bersih" readonly value="<?= $bc40 == null ? "0" : ($bc40['netto'] == null ? "0" : $bc40['netto']) ?>" name="berat_bersih" type="text" class="form-control berat_bersih" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="berat_bersih" readonly value="<?= $bc40 == null ? "0" : ($bc40['netto'] == null ? "0" : formatRupiah($bc40['netto'])) ?>" name="berat_bersih" type="text" class="form-control berat_bersih" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Berat Bersih (KGM)</label>
                             </div>
                             <span class="text-small"><i>Berat bersih nilainya akan diakumulasikan dari total berat bersih pada tab Barang</i></span>

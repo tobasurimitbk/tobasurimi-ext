@@ -3,15 +3,15 @@
     <?php if (request()->uri->getSegment(5) == null) : ?>
         <?php
         $isFinished = session()->getFlashdata('isCompleteFormHeader') && session()->getFlashdata('isCompleteFormEntitas') && session()->getFlashdata('isCompleteFormDokumen') && session()->getFlashdata('isCompleteFormPengangkut') && session()->getFlashdata('isCompleteFormPetiKemas') && session()->getFlashdata('isCompleteFormTransaksi') && session()->getFlashdata('isCompleteFormBarang') && session()->getFlashdata('isCompleteFormPernyataan');
-        $bc23Model = new \App\Models\BC23Model();
-        $bc23 = $bc23Model->get(decrypt(request()->uri->getSegment(4)));
+        $bc40Model = new \App\Models\BC40Model();
+        $bc40 = $bc40Model->get(decrypt(request()->uri->getSegment(4)));
         ?>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-40"); ?>">
                 Batal
             </a>
-            <?php if ($bc23 != null) : ?>
-                <button <?= $bc23['status_dokumen'] == 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
+            <?php if ($bc40 != null) : ?>
+                <button <?= $bc40['status_dokumen'] == 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
                     Hapus
                 </button>
             <?php endif; ?>
@@ -26,13 +26,13 @@
 </div>
 <script>
     function submitDokumen() {
-        window.location.replace("<?= base_url('bea-cukai-bc-23/api/kirim-dokumen/' . request()->uri->getSegment(4)) ?>");
+        window.location.replace("<?= base_url('bea-cukai-bc-40/api/kirim-dokumen/' . request()->uri->getSegment(4)) ?>");
     }
 
     function deleteAction() {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Dokumen BC 2.3 ?',
+            title: 'Hapus Dokumen BC 4.0 ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -44,7 +44,7 @@
                 var formData = new FormData();
                 formData.append("penerimaan_barang_id", "<?= request()->uri->getSegment(4) ?>");
                 $.ajax({
-                    url: `<?= base_url("bea-cukai-bc-23/id/delete"); ?>`,
+                    url: `<?= base_url("bea-cukai-bc-40/id/delete"); ?>`,
                     method: "POST",
                     data: formData,
                     beforeSend: function(xhr) {
@@ -67,7 +67,7 @@
                                 confirmButtonColor: '#4e73df',
                                 confirmButtonText: 'Ok'
                             }).then((result) => {
-                                location.replace("<?= base_url('bea-cukai-bc-23') ?>")
+                                location.replace("<?= base_url('bea-cukai-bc-40') ?>")
                             });
                         }
                     }

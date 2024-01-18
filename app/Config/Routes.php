@@ -814,9 +814,19 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/barang-dokumen-create', 'BeaCukai\BC40::createBarangDokumenAction');
     $routes->post('id/barang-dokumen-delete', 'BeaCukai\BC40::deleteBarangDokumenAction');
     $routes->post('id/barang', 'BeaCukai\BC40::createBarangDetailAction');
+    // PUNGUTAN
+    $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC40::createPungutanView/$1');
+    // PERNYATAAN
+    $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC40::createPernyataanView/$1');
+    $routes->post('id/pernyataan', 'BeaCukai\BC40::createPernyataanAction');
     // API
     $routes->get('satuan-barang', 'BeaCukai\BC23::getKodeSatuanBarang');
+    $routes->post('id/update-no-aju', 'BeaCukai\BC40::updateNoAju');
+    $routes->post('id/delete', 'BeaCukai\BC40::delete');
+    $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC40::kirimCeisa/$1');
 });
+
+// BC 2.7
 
 
 // BC 2.5

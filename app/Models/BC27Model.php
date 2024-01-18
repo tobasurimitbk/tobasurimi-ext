@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BCBarangModel extends Model
+class BC27Model extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_barang';
+    protected $table            = 'bc_27';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -22,6 +22,7 @@ class BCBarangModel extends Model
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
     protected $deletedField  = 'deletedAt';
+
     // Validation
     protected $validationRules      = [];
     protected $validationMessages   = [];
@@ -38,22 +39,4 @@ class BCBarangModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function totalHargaPenyerahan($penerimaanBarangID)
-    {
-        $total = 0;
-        foreach ($this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->findAll() as $t) {
-            $total += $t['harga_ekspor'];
-        }
-        return $total;
-    }
-
-    public function totalBeratBersih($penerimaanBarangID)
-    {
-        $total = 0;
-        foreach ($this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->findAll() as $t) {
-            $total += $t['netto'];
-        }
-        return $total;
-    }
 }

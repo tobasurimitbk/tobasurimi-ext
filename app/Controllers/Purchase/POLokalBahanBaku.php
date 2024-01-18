@@ -65,7 +65,7 @@ class POLokalBahanBaku extends BaseController
 
     public function createPOLokalBahanBaku()
     {
-        $dataBCType = $this->metadataModel->getBCUsedPembelianLokalBB();
+        $dataBCType = $this->metadataModel->getBCUsed("po_lokal_bb");
         $dataCompany =  $this->CompaniesModel->getCompanies();
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
         $dataBagian = $this->BagianModel->where('deletedAt', null)->findAll();

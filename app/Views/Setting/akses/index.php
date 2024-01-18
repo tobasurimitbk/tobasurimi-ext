@@ -258,14 +258,15 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 let data = new FormData(document.querySelector(".create-form"));
-
-                setLoading()
-
                 $.ajax({
                     url: "<?= base_url("akses/save"); ?>",
                     data: data,
                     beforeSend: function(xhr) {
+                        setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",

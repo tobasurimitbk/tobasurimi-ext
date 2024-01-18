@@ -598,28 +598,31 @@
         autoclose: true
     })
 
-
     $('.laporan_id').select2({
         placeholder: "",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     })
 
     $('.province_parent_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
+        dropdownParent: $(".add-modal .modal-content"),
+        allowClear: true
     })
 
     $('.city_parent_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
+        dropdownParent: $(".add-modal .modal-content"),
+        allowClear: true
     })
 
     $('.country_code').select2({
         placeholder: "",
         theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
+        dropdownParent: $(".add-modal .modal-content"),
+        allowClear: true
     }).change(function() {
         let selectedOption = $(this).val();
         // console.log(selectedOption);
@@ -635,16 +638,19 @@
     $('.supplier_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('.barang_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     $('.warehouse_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
+        allowClear: true
     });
 
     //CSS SELECT2 FLOATING LABEL
@@ -883,7 +889,7 @@
         $(".dataTable_info").addClass("pt-0");
 
         $(".btn-show-form-laporan").click(function() {
-            $(".laporan-modal").show();
+            $(".laporan-modal").modal('show');
             $(".col-md-12 > div[class^='laporan-']").hide();
             // $(".modal-footer .btn-submit-form").hide();
             // $('.laporan-rincian-per-barang').hide();
@@ -935,7 +941,7 @@
         })
 
         $(".btn-hide-laporan").click(function() {
-            $(".laporan-modal").hide()
+            $(".laporan-modal").modal('hide')
             $(".laporan_id").val("").change()
         })
 
