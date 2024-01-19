@@ -92,8 +92,8 @@ class ComposerStaticInitcd7b42aec54522d8d79e420940867d39
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -1447,7 +1447,6 @@ class ComposerStaticInitcd7b42aec54522d8d79e420940867d39
         'Matrix\\Operators\\Operator' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operators/Operator.php',
         'Matrix\\Operators\\Subtraction' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operators/Subtraction.php',
         'MyCLabs\\Enum\\Enum' => __DIR__ . '/..' . '/myclabs/php-enum/src/Enum.php',
-        'MyCLabs\\Enum\\PHPUnit\\Comparator' => __DIR__ . '/..' . '/myclabs/php-enum/src/PHPUnit/Comparator.php',
         'PHPUnit\\Exception' => __DIR__ . '/..' . '/phpunit/phpunit/src/Exception.php',
         'PHPUnit\\Framework\\ActualValueIsNotAnObjectException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Exception/ActualValueIsNotAnObjectException.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert.php',
@@ -1499,6 +1498,7 @@ class ComposerStaticInitcd7b42aec54522d8d79e420940867d39
         'PHPUnit\\Framework\\Constraint\\LogicalXor' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/Operator/LogicalXor.php',
         'PHPUnit\\Framework\\Constraint\\ObjectEquals' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/Object/ObjectEquals.php',
         'PHPUnit\\Framework\\Constraint\\ObjectHasAttribute' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/Object/ObjectHasAttribute.php',
+        'PHPUnit\\Framework\\Constraint\\ObjectHasProperty' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/Object/ObjectHasProperty.php',
         'PHPUnit\\Framework\\Constraint\\Operator' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/Operator/Operator.php',
         'PHPUnit\\Framework\\Constraint\\RegularExpression' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/String/RegularExpression.php',
         'PHPUnit\\Framework\\Constraint\\SameSize' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/Cardinality/SameSize.php',
@@ -1729,8 +1729,8 @@ class ComposerStaticInitcd7b42aec54522d8d79e420940867d39
         'PHPUnit\\TextUI\\XmlConfiguration\\Migrator' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/Migration/Migrator.php',
         'PHPUnit\\TextUI\\XmlConfiguration\\MoveAttributesFromFilterWhitelistToCoverage' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/Migration/Migrations/MoveAttributesFromFilterWhitelistToCoverage.php',
         'PHPUnit\\TextUI\\XmlConfiguration\\MoveAttributesFromRootToCoverage' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/Migration/Migrations/MoveAttributesFromRootToCoverage.php',
-        'PHPUnit\\TextUI\\XmlConfiguration\\MoveWhitelistDirectoriesToCoverage' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/Migration/Migrations/MoveWhitelistDirectoriesToCoverage.php',
         'PHPUnit\\TextUI\\XmlConfiguration\\MoveWhitelistExcludesToCoverage' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/Migration/Migrations/MoveWhitelistExcludesToCoverage.php',
+        'PHPUnit\\TextUI\\XmlConfiguration\\MoveWhitelistIncludesToCoverage' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/Migration/Migrations/MoveWhitelistIncludesToCoverage.php',
         'PHPUnit\\TextUI\\XmlConfiguration\\PHPUnit' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/PHPUnit/PHPUnit.php',
         'PHPUnit\\TextUI\\XmlConfiguration\\Php' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/PHP/Php.php',
         'PHPUnit\\TextUI\\XmlConfiguration\\PhpHandler' => __DIR__ . '/..' . '/phpunit/phpunit/src/TextUI/XmlConfiguration/PHP/PhpHandler.php',

@@ -55,9 +55,19 @@
                             </div>
                         </div>
                         <div class="col-md-1">
-                            <button class="btn btn-warning btn-print float-right text-white" onclick="print('<?= base_url("/laporan-accounting/pembelian/print"); ?>')">
+                            <!-- <button class="btn btn-warning btn-print float-right text-white" onclick="print('<?= base_url("/laporan-accounting/pembelian/printPDF"); ?>')">
                                 <i class="fa-solid fa-print"></i> Print
-                            </button>
+                            </button> -->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-warning">Export</button>
+                                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <div class="dropdown-menu" role="menu">
+                                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/pembelian/printPDF"); ?>')">PDF</a>
+                                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Excel</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -262,7 +272,16 @@
 
         return formattedDate;
     }
-    const print = function(url) {
+    const printPDF = function(url) {
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var search = $(".search").val() ? $(".search").val() : "all";
+        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
+        // console.log(url2);
+        window.open(url2, "_blank");
+    }
+    const printExcel = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
