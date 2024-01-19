@@ -44,7 +44,7 @@
                                 <label for="floatingInput">Supplier</label>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select dokumen" name="dokumen" id="dokumen">
                                     <option value="all" data-code="">ALL</option>n>
@@ -53,6 +53,11 @@
                                 </select>
                                 <label for="floatingInput">Dokumen</label>
                             </div>
+                        </div>
+                        <div class="col-md-1">
+                            <button class="btn btn-warning btn-print float-right text-white" onclick="print('<?= base_url("/laporan-accounting/pembelian/print"); ?>')">
+                                <i class="fa-solid fa-print"></i> Print
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -246,6 +251,25 @@
         $(".dateStart, .dateEnd, .list_supplier").change(function() {
             table.ajax.reload();
         })
+
     });
+    const convertDateFormat = function(dateString) {
+        // Memisahkan tanggal, bulan, dan tahun dari string
+        var dateParts = dateString.split("/");
+
+        // Membalikkan urutan elemen array untuk membuat format "YYYY-MM-DD"
+        var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+
+        return formattedDate;
+    }
+    const print = function(url) {
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var search = $(".search").val() ? $(".search").val() : "all";
+        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
+        // console.log(url2);
+        window.open(url2, "_blank");
+    }
 </script>
 <?= $this->endSection(); ?>
