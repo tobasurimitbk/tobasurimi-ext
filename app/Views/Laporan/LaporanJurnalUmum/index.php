@@ -4,7 +4,22 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Jurnal Umum</h1>
+        <div class="col-md-10">
+            <h1>Jurnal Umum</h1>
+        </div>
+
+        <div class="col-md-2 text-right">
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning">Export</button>
+                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu" role="menu">
+                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/jurnalumum/printPDF"); ?>')">PDF</a>
+                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/jurnalumum/printExcel"); ?>')">Excel</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -270,6 +285,31 @@
             return 'Rp. ' + ribuanFormatted + ',' + desimal;
         }
     });
+    const convertDateFormat = function(dateString) {
+        // Memisahkan tanggal, bulan, dan tahun dari string
+        var dateParts = dateString.split("/");
+
+        // Membalikkan urutan elemen array untuk membuat format "YYYY-MM-DD"
+        var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+
+        return formattedDate;
+    }
+    const printPDF = function(url) {
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var filter = $(".type_transaksi").val() ? $(".type_transaksi").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
+        // console.log(url2);
+        window.open(url2, "_blank");
+    }
+    const printExcel = function(url) {
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var filter = $(".type_transaksi").val() ? $(".type_transaksi").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
+        // console.log(url2);
+        window.open(url2, "_blank");
+    }
 </script>
 
 

@@ -9,6 +9,7 @@ use App\Models\HeaderAkunsModel;
 use App\Models\MetadataModel;
 use App\Models\JurnalUmumModel;
 use App\Models\TransaksiJurnalModel;
+use Dompdf\Dompdf;
 
 class JurnalUmum extends BaseController
 {
@@ -116,5 +117,108 @@ class JurnalUmum extends BaseController
             "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
         ];
         return view('Laporan/LaporanJurnalUmum/index', $data);
+    }
+
+    public function exportPDF($tglAwal, $tglAkhir, $filter)
+    {
+        $dompdf = new Dompdf();
+        $dateStart = $tglAwal;
+        $dateEnd = $tglAkhir;
+        $Filter = $filter != "all" ? $this->encrypter->decrypt(hex2bin($filter)) : "";
+
+        if ($dateStart != "" && $dateEnd != "") {
+            $condition = [
+                'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
+                'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
+            ];
+            $condition2 = [
+                'tanggal_transaksi >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
+                'tanggal_transaksi <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
+            ];
+            $condition3 = [
+                'name' => 'tipe_transaksi',
+            ];
+        } else {
+            $condition = [
+                'tanggal_jurnal >=' => date('Y-m-01'),
+                'tanggal_jurnal <=' => date('Y-m-d')
+            ];
+            $condition2 = [
+                'tanggal_transaksi >=' => date('Y-m-01'),
+                'tanggal_transaksi <=' => date('Y-m-d')
+            ];
+            $condition3 = [
+                'name' => 'tipe_transaksi',
+            ];
+        }
+        if ($Filter != "") {
+            $condition = [
+                'transaksi_jurnal.type_transaksi' => $Filter,
+            ];
+            $condition2 = [
+                'type_transaksi' => $Filter,
+            ];
+            $condition3 = [
+                'name' => 'tipe_transaksi',
+                'id' => $Filter,
+            ];
+        } else {
+            $condition3 = [
+                'name' => 'tipe_transaksi',
+            ];
+        }
+
+        // var_dump($condition);
+        // var_dump($condition2);
+        // var_dump($condition3);
+        // exit;
+
+        $dataMetadataTipeTransaksi = $this->MetadataModel
+            ->asObject()
+            ->where($condition3)
+            ->findAll();
+        foreach ($dataMetadataTipeTransaksi as $val) {
+            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
+        }
+        $dataTransaksiJurnal = $this->transaksiJurnalModel
+            ->asObject()
+            ->where($condition2)
+            ->findAll();
+        foreach ($dataTransaksiJurnal as $val) {
+            $val->tipe_transaksi_hex = bin2hex($this->encrypter->encrypt($val->type_transaksi));
+        }
+        $dataJurnalUmum = $this->jurnalUmumModel
+            ->asObject()
+            ->select('*, sub_akuns.header_id as id_header')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
+            ->where($condition)
+            ->findAll();
+        $dataJurnalUmumWithGroup = $this->jurnalUmumModel
+            ->asObject()
+            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
+            ->where($condition)
+            ->groupBy('trans_id')
+            ->findAll();
+        // var_dump($dataJurnalUmumWithGroup);
+
+        $data = [
+            "dataTransaksiJurnal" => $dataTransaksiJurnal,
+            "dataJurnalUmum" => $dataJurnalUmum,
+            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
+            "dataMetadataTipeTransaksi" => $dataMetadataTipeTransaksi,
+            "dateStart" => $dateStart ? date("d/m/Y", strtotime($dateStart)) : date('d/m/Y'),
+            "dateEnd" => $dateEnd ? date("d/m/Y", strtotime($dateEnd)) : date('d/m/Y'),
+        ];
+        $dompdf->loadHtml(view('Laporan/LaporanJurnalUmum/print', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Laporan Jurnal Umum ", array("Attachment" => false));
+
+        exit(0);
     }
 }
