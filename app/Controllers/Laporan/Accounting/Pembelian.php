@@ -331,6 +331,7 @@ class Pembelian extends BaseController
 
         $spreadsheet = new Spreadsheet();
 
+
         $condition = [
             "penerimaan_barang.deletedAt" => NULL
         ];
