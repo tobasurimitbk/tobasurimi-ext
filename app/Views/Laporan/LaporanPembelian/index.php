@@ -4,7 +4,22 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Pembelian</h1>
+        <div class="col-md-10">
+            <h1>Laporan Pembelian</h1>
+        </div>
+
+        <div class="col-md-2 text-right">
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning">Export</button>
+                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu" role="menu">
+                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/pembelian/printPDF"); ?>')">PDF</a>
+                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Excel</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -12,16 +27,16 @@
                 <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <div class="input-group input-group-password">
-                                <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
+                            <div class="input-group" style="height: 50px;">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <div class="input-group input-group-password">
-                                <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
+                            <div class="input-group" style="height: 50px;">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
@@ -44,41 +59,19 @@
                                 <label for="floatingInput">Supplier</label>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select dokumen" name="dokumen" id="dokumen">
-                                    <option value="all" data-code="">ALL</option>n>
-                                    <option value="pabean" data-code="">Dokumen Pabean</option>
-                                    <option value="non" data-code="">Non Pabean</option>
-                                </select>
-                                <label for="floatingInput">Dokumen</label>
-                            </div>
-                        </div>
-                        <div class="col-md-1">
-                            <!-- <button class="btn btn-warning btn-print float-right text-white" onclick="print('<?= base_url("/laporan-accounting/pembelian/printPDF"); ?>')">
-                                <i class="fa-solid fa-print"></i> Print
-                            </button> -->
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-warning">Export</button>
-                                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <div class="dropdown-menu" role="menu">
-                                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/pembelian/printPDF"); ?>')">PDF</a>
-                                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Excel</a>
-                                </div>
-                            </div>
+                        <div class="col-md-3" style="height: 50px;">
+                            <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <!-- <div class="row">
                 <div class="col-md-4"></div>
                 <div class="col-md-4"></div>
                 <div class="col-md-4 mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
-            </div>
+            </div> -->
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
