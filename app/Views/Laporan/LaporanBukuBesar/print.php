@@ -48,7 +48,7 @@
 </head>
 
 <body>
-  <h5>Laporan Jurnal Umum</h5>
+  <h5>Laporan Buku Besar</h5>
   <h6>PT. TOBA SURIMI INDUSTRIES, Tbk ()</h6>
   <h6><?= ($dateStart != "All") ? $dateStart : "" ?> - <?= ($dateEnd != "Now") ? $dateEnd : "" ?></h6>
 
