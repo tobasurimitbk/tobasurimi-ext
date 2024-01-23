@@ -8,7 +8,6 @@ use App\Models\SupplierModel;
 use App\Models\RMImportPOModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\KursModel;
-use App\Models\MetadataModel;
 
 class PembayaranPOImport extends BaseController
 {
@@ -19,7 +18,6 @@ class PembayaranPOImport extends BaseController
     protected $kursModel;
     protected $rmImportPOModel; // Import BB
     protected $amPurchaseOrderModel; // Import BP - Lokal BP
-    protected $metaDataModel;
 
     public function __construct()
     {
@@ -30,7 +28,6 @@ class PembayaranPOImport extends BaseController
         $this->kursModel = new KursModel();
         $this->rmImportPOModel = new RMImportPOModel();
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
-        $this->metaDataModel = new MetadataModel();
     }
 
     public function pembayaranPOImport()
@@ -51,9 +48,8 @@ class PembayaranPOImport extends BaseController
         $id = decrypt($id);
         $data = [
             'supplierList' => $this->supplierModel->asObject()->where('deletedAt', null)->where('type', "INTERNASIONAL")->findAll(),
-            'paymentData' => $this->importPOPaymentModel->asArray()->find($id),
+            'paymentData' => $this->importPOPaymentModel->asObject()->find($id),
             'poDetail' => null,
-            'sisaBayar' => 0,
         ];
 
 
@@ -61,13 +57,12 @@ class PembayaranPOImport extends BaseController
             return redirect()->to('pembayaran-po-import');
         }
 
-        if ($data['paymentData']['po_type'] == "BAKU") {
-            $data['poDetail'] = $this->rmImportPOModel->asObject()->find($data['paymentData']['po_id']);
+        if ($data['paymentData']->po_type == "BAKU") {
+            $data['poDetail'] = $this->rmImportPOModel->asObject()->find($data['paymentData']->po_id);
         } else {
-            $data['poDetail'] = $this->amPurchaseOrderModel->asObject()->find($data['paymentData']['po_id']);
+            $data['poDetail'] = $this->amPurchaseOrderModel->asObject()->find($data['paymentData']->po_id);
         }
 
-        $data['sisaBayar'] = $data['poDetail']->total - $this->importPOPaymentModel->getTotalPembayaran($data['paymentData']['po_id']);
 
         return view('Pembayaran/pembayaranPOImport/form', $data);
     }
@@ -281,7 +276,7 @@ class PembayaranPOImport extends BaseController
         $responseData = [];
 
         $condition = [
-            'po_type' => $this->request->getVar('po_type') == "BAKU" ? "BAKU" : "PENOLONG",
+            'po_type' => $this->request->getVar('po_type') == "BAKU" ? "BAHAN BAKU" : "BAHAN PENOLONG",
             'deletedAt' => null,
             'company_id' => $this->this_company_id,
             'po_id' => decrypt($this->request->getVar('po_id'))
@@ -293,7 +288,7 @@ class PembayaranPOImport extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        if ($condition['po_type'] == "BAKU") {
+        if ($condition['po_type'] == "BAHAN BAKU") {
             $poFirst = $this->rmImportPOModel->where('deletedAt', null)->where('id', $condition['po_id'])->first();
         } else {
             $poFirst = $this->amPurchaseOrderModel->where('deletedAt', null)->where('id', $condition['po_id'])->first();

@@ -170,7 +170,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-po-import/"); ?>${data.id}`);
+            location.replace(`<?= base_url("pembayaran-po-import/id/"); ?>${data.id}`);
         })
     })
 </script>

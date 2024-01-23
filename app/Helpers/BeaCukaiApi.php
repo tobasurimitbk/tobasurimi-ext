@@ -216,7 +216,7 @@ class BeaCukaiApi
             ];
         } else {
             return [
-                'message' => "Server Ceisa Error : " . $httpCode,
+                'message' => $response,
                 'status' => false
             ];
         }
@@ -483,7 +483,7 @@ class BeaCukaiApi
             'asuransi' => (float)$bcData['asuransi'],
             'bruto' => (float)$bcData['bruto'],
             'cif' => (float)$bcData['cif'],
-            'kodeJenisTpb' => (float)$bcData['kode_jenis_tpb'],
+            'kodeJenisTpb' => (string)$bcData['kode_jenis_tpb'],
             'freight' => (float)$bcData['freight'],
             'hargaPenyerahan' => (float)$bcData['harga_penyerahan'],
             'idPengguna' => $bcData['id_pengguna'],
@@ -495,16 +495,16 @@ class BeaCukaiApi
             'kotaTtd' => $bcData['kota_ttd'],
             'namaTtd' => $bcData['nama_ttd'],
             'netto' => (int)$bcData['netto'],
-            'nik' => $bcData['nik'],
-            'nomorAju' => $bcData['no_aju'],
+            'nik' => $bcData['nik'] == null ? "-" : $bcData['nik'],
+            'nomorAju' => str_replace('-', '', $bcData['no_aju']),
             'seri' => (int)$bcData['seri'],
             'tanggalAju' => date('Y-m-d'),
             'tanggalTtd' => $bcData['tanggal_ttd'],
-            'userPortal' => null,
+            'userPortal' => '-',
             'volume' => (float)$bcData['volume'],
-            'biayaTambahan' => null,
-            'biayaPengurang' => null,
-            'vd' => null,
+            'biayaTambahan' => 0,
+            'biayaPengurang' => 0,
+            'vd' => 0,
             'uangMuka' => (float)$bcData['uang_muka'],
             'nilaiJasa' => (float)$bcData['nilai_jasa'],
             'entitas' => [],
@@ -533,7 +533,8 @@ class BeaCukaiApi
                 'nomorIdentitas' => $b['nomor_identitas'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
-                'seriEntitas' => (int)$b['seri_entitas']
+                'seriEntitas' => (int)$b['seri_entitas'],
+                'kodeJenisIdentitas' => '5'
             ];
         }
 
@@ -577,15 +578,15 @@ class BeaCukaiApi
             $barangTarifArr[] = [
                 'kodeFasilitasTarif' => $b['kode_fasilitas_tarif'],
                 'kodeJenisPungutan' => $b['kode_jenis_pungutan'],
-                'nilaiPungutan' => (float)$b['nilai_bayar'],
+                'nilaiPungutan' => (float)$b['nilai_bayar'] == null ? 0 : (float)$b['nilai_bayar'],
             ];
         }
 
         foreach ($bcBarang as $b) {
             $barang = [
-                'asuransi' => null,
-                'bruto' => null,
-                'cif' => null,
+                'asuransi' => 0,
+                'bruto' => 0,
+                'cif' => 0,
                 'diskon' => (float)$b['diskon'],
                 'hargaEkspor' => null,
                 'hargaPenyerahan' => (float)$b['harga_ekspor'],
