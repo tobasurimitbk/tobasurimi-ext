@@ -8,6 +8,7 @@ use App\Models\KategoriAkunsModel;
 use App\Models\HeaderAkunsModel;
 use App\Models\MetadataModel;
 use App\Models\JurnalUmumModel;
+use Dompdf\Dompdf;
 
 class NeracaSaldo extends BaseController
 {
@@ -91,5 +92,73 @@ class NeracaSaldo extends BaseController
             "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
         ];
         return view('Laporan/LaporanNeracaSaldo/index', $data);
+    }
+    public function exportPDF($tglAwal, $tglAkhir)
+    {
+        $dompdf = new Dompdf();
+        $dateStart = $tglAwal;
+        $dateEnd = $tglAkhir;
+
+        if ($dateStart != "" && $dateEnd != "") {
+            $condition = [
+                'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
+                'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
+            ];
+        } else {
+            $condition = [
+                'tanggal_jurnal >=' => date('Y-m-01'),
+                'tanggal_jurnal <=' => date('Y-m-d')
+            ];
+        }
+
+        $dataMetadata = $this->MetadataModel
+            ->asObject()
+            ->where('name', 'Kelompok Akun')
+            ->findAll();
+        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");
+        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR("");
+        $dataSubAkun = $this->Sub_AkunsModel->getAPAR("");
+        // $dataJurnalUmum = $this->jurnalUmumModel->getDataJurnal($condition);
+        $dataJurnalUmum = $this->jurnalUmumModel
+            ->asObject()
+            ->select('*, sub_akuns.header_id as id_header')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->where($condition)
+            ->findAll();
+        $dataJurnalUmumWithGroup = $this->jurnalUmumModel
+            ->asObject()
+            ->select('*, sub_akuns.header_id as id_header')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->where($condition)
+            ->groupBy('kategori_id')
+            ->findAll();
+        $dataJurnalUmumWithGroupHeader = $this->jurnalUmumModel
+            ->asObject()
+            ->select('*, sub_akuns.header_id as id_header')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->where($condition)
+            ->groupBy('id_header')
+            ->findAll();
+
+        $data = [
+            "dataMetadata" => $dataMetadata,
+            "dataKategoriAkun" => $dataKategoriAkun,
+            "dataHeaderAkun" => $dataHeaderAkun,
+            "dataSubAkuns" => $dataSubAkun,
+            "dataJurnalUmum" => $dataJurnalUmum,
+            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
+            "dataJurnalUmumWithGroupHeader" => $dataJurnalUmumWithGroupHeader,
+            "dateStart" => $dateStart ? date("d/m/Y", strtotime($dateStart)) : date('d/m/Y'),
+            "dateEnd" => $dateEnd ? date("d/m/Y", strtotime($dateEnd)) : date('d/m/Y'),
+        ];
+        $dompdf->loadHtml(view('Laporan/LaporanNeracaSaldo/print', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Laporan Jurnal Umum ", array("Attachment" => false));
+
+        exit(0);
     }
 }
