@@ -8,6 +8,7 @@ use App\Models\KategoriAkunsModel;
 use App\Models\HeaderAkunsModel;
 use App\Models\MetadataModel;
 use App\Models\JurnalUmumModel;
+use Dompdf\Dompdf;
 
 class Neraca extends BaseController
 {
@@ -70,5 +71,53 @@ class Neraca extends BaseController
             "dataJurnalUmum" => $dataJurnalUmum,
         ];
         return view('Laporan/LaporanNeraca/index', $data);
+    }
+    public function exportPDF($tglAwal, $tglAkhir)
+    {
+        $dompdf = new Dompdf();
+        $dateStart = $tglAwal;
+        $dateEnd = $tglAkhir;
+
+        if ($dateStart != "" && $dateEnd != "") {
+            $condition = [
+                'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
+                'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
+            ];
+        } else {
+            $condition = [
+                'tanggal_jurnal >=' => date('Y-m-01'),
+                'tanggal_jurnal <=' => date('Y-m-d')
+            ];
+        }
+
+        $dataMetadata = $this->MetadataModel
+            ->asObject()
+            ->where('name', 'Kelompok Akun')
+            ->groupStart()
+            ->like('value', 'Aktiva')
+            ->orLike('value', 'Kewajiban')
+            ->orLike('value', 'Modal')
+            ->groupEnd()
+            ->findAll();
+        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");
+        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR("");
+        $dataSubAkun = $this->Sub_AkunsModel->getAPAR("");
+        $dataJurnalUmum = $this->jurnalUmumModel->getDataJurnal($condition);
+
+        $data = [
+            "dataMetadata" => $dataMetadata,
+            "dataKategoriAkun" => $dataKategoriAkun,
+            "dataHeaderAkun" => $dataHeaderAkun,
+            "dataSubAkuns" => $dataSubAkun,
+            "dataJurnalUmum" => $dataJurnalUmum,
+            "dateStart" => $dateStart ? date("d/m/Y", strtotime($dateStart)) : date('d/m/Y'),
+            "dateEnd" => $dateEnd ? date("d/m/Y", strtotime($dateEnd)) : date('d/m/Y'),
+        ];
+        $dompdf->loadHtml(view('Laporan/LaporanNeraca/print', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Laporan Laba Rugi ", array("Attachment" => false));
+
+        exit(0);
     }
 }
