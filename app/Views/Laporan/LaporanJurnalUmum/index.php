@@ -7,7 +7,6 @@
         <div class="col-md-10">
             <h1>Jurnal Umum</h1>
         </div>
-
         <div class="col-md-2 text-right">
             <div class="btn-group">
                 <button type="button" class="btn btn-warning">Export</button>

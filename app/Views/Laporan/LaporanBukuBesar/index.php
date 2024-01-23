@@ -4,7 +4,21 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Buku Besar</h1>
+        <div class="col-md-10">
+            <h1>Buku Besar</h1>
+        </div>
+        <div class="col-md-2 text-right">
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning">Export</button>
+                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu" role="menu">
+                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/bukubesar/printPDF"); ?>')">PDF</a>
+                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/bukubesar/printExcel"); ?>')">Excel</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -34,6 +48,8 @@
                                     <button type="submit" name="cariTanggal" class="btn btn-primary" value="cari">Cari</button>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select id_header" name="id_header" id="id_header">
@@ -42,7 +58,18 @@
                                             <option value="<?= $HeaderAkunData->hexid; ?>" data-header-id=""><?= $HeaderAkunData->nama_header; ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput">Filter</label>
+                                    <label for="floatingInput">Filter Header</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select id_sub_akun" name="id_sub_akun" id="id_sub_akun">
+                                        <option value="">All</option>
+                                        <?php foreach ($dataSubAkuns ?? [] as $SubAkunsData) : ?>
+                                            <option value="<?= $SubAkunsData->hexid; ?>" data-header-id=""><?= $SubAkunsData->nama_sub; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Filter Sub Akun</label>
                                 </div>
                             </div>
                         </div>
@@ -166,27 +193,27 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_header').select2({
+        $('.id_header, .id_sub_akun').select2({
             placeholder: "Filter",
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.id_header')
+        $('.id_header, .id_sub_akun')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_header')
+        $('.id_header, .id_sub_akun')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+            .css('margin-top', '22px').css('margin-left', '-7px').css('z-index', '1');
 
-        $('.id_header')
+        $('.id_header, .id_sub_akun')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -249,6 +276,31 @@
             }
         });
     });
+    const convertDateFormat = function(dateString) {
+        // Memisahkan tanggal, bulan, dan tahun dari string
+        var dateParts = dateString.split("/");
+
+        // Membalikkan urutan elemen array untuk membuat format "YYYY-MM-DD"
+        var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+
+        return formattedDate;
+    }
+    const printPDF = function(url) {
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var filter = $(".id_header").val() ? $(".id_header").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
+        // console.log(url2);
+        window.open(url2, "_blank");
+    }
+    const printExcel = function(url) {
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var filter = $(".id_header").val() ? $(".id_header").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
+        // console.log(url2);
+        window.open(url2, "_blank");
+    }
 </script>
 
 

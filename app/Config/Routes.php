@@ -1083,6 +1083,8 @@ $routes->get('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index
 $routes->post('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/bukubesar/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\BukuBesar::exportPDF/$1/$2/$3', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/bukubesar/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\BukuBesar::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\JurnalUmum::exportPDF/$1/$2/$3', ['filter' => 'Auth']);
