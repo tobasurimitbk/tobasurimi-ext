@@ -21,7 +21,7 @@ class ImportPOPaymentModel extends Model
         'supplier_id',
         'po_type',
         'po_id',
-        'penerimaan_barang_id',
+        'pembayaran_oleh',
         'voucher_no',
         'currency',
         'payment_amt',
@@ -71,12 +71,10 @@ class ImportPOPaymentModel extends Model
 
         $selectQry = "import_po_payments.*, 
                       DATE_FORMAT(import_po_payments.payment_date, '%d/%m/%Y') AS payment_date,
-                      metadata.value AS currency,
                       suppliers.name AS supplier_name";
         $paymentDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('metadata', 'metadata.id = import_po_payments.currency')
             ->join('suppliers', 'suppliers.id = import_po_payments.supplier_id')
             ->orderBy($sort, $sortType);
 
@@ -86,7 +84,7 @@ class ImportPOPaymentModel extends Model
             $paymentDataQry->groupStart()
                 ->like('suppliers.name', $addCondition['search'])
                 ->orLike('import_po_payments.payment_no', $addCondition['search'])
-                ->orLike('metadata.value', $addCondition['search'])
+                ->orLike('import_po_payments.currency', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -108,5 +106,61 @@ class ImportPOPaymentModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+
+    public function getPuchaseOrderList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $selectQry = "barang_master.kode_barang, barang_master.barang_name";
+        $joinTable = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details' : 'am_purchase_order_details';
+        $orderField = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details.createdAt' : 'am_purchase_order_details.createdAt';
+        $table = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details' : 'am_purchase_order_details';
+
+        $poDataQry = $this->db->table($table)
+            ->select("$joinTable.*, $selectQry")
+            ->where($condition)
+            ->join('barang_master', "$joinTable.barang_id = barang_master.id", 'left')
+            ->orderBy($orderField, "DESC");
+
+        $totalData = $poDataQry->countAllResults(false);
+        $totalFilteredData = $poDataQry->countAllResults(false);
+
+        $data = $poDataQry->get($limit, $offset)->getResult();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $orderField,
+            'sortType'          => "DESC"
+        ];
+    }
+
+    public function getRiwayatPembayaranList($condition, $limit = 10, $offset = 0)
+    {
+        $poDataQry = $this->asObject()
+            ->where($condition)
+            ->orderBy("createdAt", "ASC");
+
+        $totalData = $poDataQry->countAllResults(false);
+        $totalFilteredData = $poDataQry->countAllResults(false);
+
+        $data = $poDataQry->get($limit, $offset)->getResult();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => "createdAt",
+            'sortType'          => "DESC"
+        ];
+    }
+
+    public function getTotalPembayaran($poID)
+    {
+        $totalDibayar = 0;
+        foreach ($this->asArray()->where('po_id', $poID)->where('deletedAt', null)->findAll() as $p) {
+            $totalDibayar += $p['payment_amt'];
+        }
+        return $totalDibayar;
     }
 }

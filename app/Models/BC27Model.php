@@ -39,4 +39,11 @@ class BC27Model extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+
+    public function get($penerimaanBarangID)
+    {
+        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+    }
 }

@@ -360,12 +360,15 @@ $routes->get('/pembayaran-po-lokal/print/(:num)', 'Pembayaran\PembayaranPOLokal:
 // PEMBAYARAN PO IMPORT
 $routes->get('/pembayaran-po-import', 'Pembayaran\PembayaranPOImport::pembayaranPOImport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all', 'Pembayaran\PembayaranPOImport::allPembayaranPOImport', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-import/(:num)', 'Pembayaran\PembayaranPOImport::getByIdPembayaranPOImport/$1', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::createPembayaranPOImport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import/id/(:segment)', 'Pembayaran\PembayaranPOImport::updatePembayaranPOImportView/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::createPembayaranPOImportView', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::savePembayaranPOImport', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/update', 'Pembayaran\PembayaranPOImport::updatePembayaranPOImport', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/delete', 'Pembayaran\PembayaranPOImport::deletePembayaranPOImport', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-import/get-po', 'Pembayaran\PembayaranPOImport::getDetailBarangByPO', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-import/generate-no-pembayaran', 'Pembayaran\PembayaranPOImport::getNomorPembayaran', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-import/po-belum-lunas', 'Pembayaran\PembayaranPOImport::listPembayaranPOBelumLunas', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import/all-po', 'Pembayaran\PembayaranPOImport::allPO', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import/all-riwayat-pembayaran', 'Pembayaran\PembayaranPOImport::allRiwayatPembayaran', ['filter' => 'Auth']);
 
 // penerimaan pembayaran SO
 $routes->get('/penerimaan-penjualan-lokal', 'Penerimaan\SalesOrderPayment::index', ['filter' => 'Auth']);

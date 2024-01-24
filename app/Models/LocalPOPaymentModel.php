@@ -341,7 +341,7 @@ class LocalPOPaymentModel extends Model
 
             $lpbDetail = $penerimaanBarangModel->where($conditionLpb)->like('multiple_po_id', $rm['rm_purchase_order_id'])->first();
 
-            $harga = ($rm['general_price'] + $rm['daily_price'] + $rm['monthly_price']) *  $rm['qty_diterima'];
+            $harga = ($rm['monthly_price']) *  $rm['qty_diterima'];
             $hargaTotal += $harga;
             $totalOrder += $rm['qty'];
             $totalDiterima += $rm['qty_diterima'];
@@ -419,7 +419,7 @@ class LocalPOPaymentModel extends Model
                 ->where('supplier_harga.id', $rm['supplier_harga_id'])
                 ->first();
 
-            $harga = ($rm['general_price'] + $rm['daily_price'] + $rm['monthly_price']) *  $rm['qty_diterima'];
+            $harga = ($rm['general_price'] + $rm['daily_price']) *  $rm['qty_diterima'];
             $hargaTotal += $harga;
             $totalOrder += $rm['qty'];
             $totalDiterima += $rm['qty_diterima'];

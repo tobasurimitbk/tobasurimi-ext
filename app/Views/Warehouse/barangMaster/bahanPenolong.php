@@ -278,7 +278,7 @@
                     render: function(data, type, row) {
                         return `
                         <div class="mt-0 actions">
-                            <button onclick="displayHistory(${row.id})" class="btn btn-success posting-spp actions">
+                            <button onclick="displayHistory('${row.id}')" class="btn btn-success posting-spp actions">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </button>
                         </div>
