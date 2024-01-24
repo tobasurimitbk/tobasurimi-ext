@@ -1630,7 +1630,8 @@ class BC23 extends BaseController
         );
 
         return response()->setJSON($payload);
-        // $res = $beacukaiApi->kirimDokumenBC23($payload, false);
+        // $res = $beacukaiApi->kirimDokumenBC($payload, false);
+        // return response()->setJSON($res);
     }
 
     // API GET

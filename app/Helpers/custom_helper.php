@@ -370,3 +370,8 @@ function formatRupiah($angka)
    $res = preg_replace('/[^\d,]/', '', $formattedNumber);
    return number_format(convertRupiahToNumber($res), 0, ',', '.');
 }
+
+function roundNumber($nilai, $kelipatan)
+{
+   return round($nilai / $kelipatan) * $kelipatan;
+}
