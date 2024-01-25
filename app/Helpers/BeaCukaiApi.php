@@ -171,7 +171,7 @@ class BeaCukaiApi
         }
     }
 
-    public function kirimDokumenBC23($payload, $isFinal = false)
+    public function kirimDokumenBC($payload, $isFinal = false)
     {
         $token = $this->getTokenApi();
 
@@ -309,7 +309,7 @@ class BeaCukaiApi
             'netto' =>  (float)$bcData['netto'],
             'nik' => '-', // ?
             'nilaiBarang' => (float)$bcData['nilai_barang'],
-            'nomorAju' => $bcData['no_aju'],
+            'nomorAju' => str_replace('-', '', $bcData['no_aju']),
             'nomorBc11' => $bcData['no_bc_11'],
             'posBc11' => $bcData['pos_bc_11'],
             'seri' => (int)$bcData['seri'],
@@ -359,7 +359,7 @@ class BeaCukaiApi
                 'nilaiBarang' => (float)$b['nilai_barang'], // ?
                 'nilaiTambah' => (float)$b['nilai_tambah'],
                 'posTarif' => $b['pos_tarif'],
-                'seriBarang' => $b['seri_barang'],
+                'seriBarang' => (int)$b['seri_barang'],
                 'spesifikasiLain' => $b['spesifikasi_lain'],
                 'tipe' => $b['tipe_barang'],
                 'ukuran' => $b['ukuran_barang'], // ?
@@ -367,7 +367,7 @@ class BeaCukaiApi
                 'ndpbm' => (float) $bcData['ndpbm'], // ?
                 'cifRupiah' => (float) $b['cif_rupiah'],
                 'hargaPerolehan' => (float)$b['harga_perolehan_barang'], // ?
-                'kodeAsalBahanBaku' => 0, //kode asal bahan baku: [0] Impor atau [1] Lokal
+                'kodeAsalBahanBaku' => '0', //kode asal bahan baku: [0] Impor atau [1] Lokal
                 'barangTarif' => [],
                 'barangDokumen' => []
             ];
@@ -385,7 +385,7 @@ class BeaCukaiApi
                     'kodeFasilitasTarif' => $bt['kode_fasilitas_tarif'],
                     'kodeSatuanBarang' => $bt['kode_satuan_barang'],
                     'kodeJenisPungutan' => $bt['kode_jenis_pungutan'],
-                    'nilaiBayar' => (float)$bt['nilai_bayar'],
+                    'nilaiBayar' => roundNumber($bt['nilai_bayar'], 0.01),
                     'nilaiFasilitas' => 0, // ?
                     'nilaiSudahDilunasi' => 0, // ?
                     'seriBarang' => (int)$bt['seri_barang'],
@@ -415,7 +415,7 @@ class BeaCukaiApi
             $entitasArr[] = [
                 'alamatEntitas' => $b['alamat_entitas'],
                 'kodeEntitas' => $b['kode_entitas'],
-                'kodeJenisEntitas' => $b['kode_jenis_entitas'],
+                'kodeJenisIdentitas' => $b['kode_jenis_entitas'],
                 'namaEntitas' => $b['nama_entitas'],
                 'nibEntitas' => $b['nib_entitas'],
                 'nomorIdentitas' => $b['nomor_identitas'],
@@ -588,11 +588,11 @@ class BeaCukaiApi
                 'bruto' => 0,
                 'cif' => 0,
                 'diskon' => (float)$b['diskon'],
-                'hargaEkspor' => null,
+                'hargaEkspor' => (float)$b['harga_ekspor'],
                 'hargaPenyerahan' => (float)$b['harga_ekspor'],
-                'hargaSatuan' => null,
+                'hargaSatuan' => (float)$b['harga_ekspor'] / (float)$b['jumlah_satuan'],
                 'isiPerKemasan' => (int)$b['jumlah_satuan'],
-                'jumlahRealisasi' => null,
+                'jumlahRealisasi' => 0,
                 'jumlahSatuan' => (float)$b['jumlah_satuan'],
                 'kodeBarang' => $b['kode_barang'],
                 'kodeDokumen' => $b['kode_dokumen'],
@@ -608,12 +608,13 @@ class BeaCukaiApi
                 'ukuran' => $b['ukuran_barang'],
                 'uraian' => $b['uraian'],
                 'volume' => (float)$bcData['volume'],
-                'cifRupiah' => null,
-                'hargaPerolehan' => null,
+                'jumlahKemasan' => count($bcKemasan),
+                'cifRupiah' => 0,
+                'hargaPerolehan' => 0,
                 'kodeAsalBahanBaku' => '1',
-                'ndpbm' => null,
-                'uangMuka' => null,
-                'nilaiJasa' => null,
+                'ndpbm' => 1,
+                'uangMuka' => 0,
+                'nilaiJasa' => 0,
                 'barangTarif' => [],
             ];
 
@@ -635,7 +636,8 @@ class BeaCukaiApi
                     'seriBarang' => (int)$bt['seri_barang'],
                     'tarif' => (float) $bt['tarif_bea_masuk'],
                     'tarifFasilitas' => (float) $bt['tarif_fasilitas'],
-                    'kodeJenisPungutan' => $bt['kode_jenis_pungutan']
+                    'kodeJenisPungutan' => $bt['kode_jenis_pungutan'],
+                    'nilaiPungutan' => 0
                 ];
             }
             $barang['barangTarif'] = $barangTarifArr;
