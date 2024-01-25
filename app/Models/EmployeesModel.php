@@ -375,7 +375,7 @@ class EmployeesModel extends Model
     {
         $res = $this->asArray()->select('employees.id, employees.name, employees.nip')->join('bagian', 'bagian.id = employees.bagian_id')
             ->where('employees.deletedAt', null)
-            ->where('bagian.nama_bagian', "SALES")
+            // ->where('bagian.nama_bagian', "SALES")
             ->findAll();
 
         return $res;

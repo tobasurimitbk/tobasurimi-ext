@@ -1629,9 +1629,9 @@ class BC23 extends BaseController
             $bc23Pengangkut
         );
 
-        return response()->setJSON($payload);
-        // $res = $beacukaiApi->kirimDokumenBC($payload, false);
-        // return response()->setJSON($res);
+        // return response()->setJSON($payload);
+        $res = $beacukaiApi->kirimDokumenBC($payload, false);
+        return response()->setJSON($res);
     }
 
     // API GET

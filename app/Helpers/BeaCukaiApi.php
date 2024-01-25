@@ -319,6 +319,7 @@ class BeaCukaiApi
             'tanggalTtd' => $bcData['tanggal_ttd'],
             'biayaTambahan' => (float)$bcData['biaya_tambahan'],
             'biayaPengurang' => (float)$bcData['biaya_pengurang'],
+            'kodeKenaPajak' => $bcData['kode_kena_pajak'],
             'barang' => [],
             'entitas' => [],
             'kemasan' => [],
@@ -411,7 +412,9 @@ class BeaCukaiApi
             $barangArr[] = $barang;
         }
 
+        // ENTITAS
         foreach ($bcEntitas as $b) {
+            // IMPORTIR ATAU PENGUSAHA TPB
             $entitasArr[] = [
                 'alamatEntitas' => $b['alamat_entitas'],
                 'kodeEntitas' => $b['kode_entitas'],
@@ -423,7 +426,33 @@ class BeaCukaiApi
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => (int)$b['seri_entitas']
             ];
+            // PEMASOK
+            $entitasArr[] = [
+                'alamatEntitas' => $b['alamat_pemasok'],
+                'kodeEntitas' => '5',
+                'kodeJenisIdentitas' => $b['kode_jenis_entitas'],
+                'namaEntitas' => $b['nama_pemasok'],
+                'kodeNegara' => $b['kode_negara_pemasok'],
+                'seriEntitas' => 2
+            ];
+            // PEMILIK BARANG
+            $entitasArr[] = [
+                'alamatEntitas' => $b['alamat_pemilik_barang'],
+                'kodeEntitas' => '7',
+                'kodeJenisIdentitas' => $b['kode_jenis_entitas'],
+                'namaEntitas' => $b['nama_pemilik_barang'],
+                'nibEntitas' => $b['nib_entitas'],
+                'nomorIdentitas' => $b['npwp_pemilik_barang'],
+                'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
+                'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
+                'kodeStatus' => '3', // KODE STATUS PENGUSAHA
+                'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
+                'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
+                'kodeJenisApi' => '1',
+                'seriEntitas' => 3
+            ];
         }
+
 
         foreach ($bcKemasan as $b) {
             $kemasanArr[] = [
@@ -504,7 +533,7 @@ class BeaCukaiApi
             'volume' => (float)$bcData['volume'],
             'biayaTambahan' => 0,
             'biayaPengurang' => 0,
-            'vd' => 0,
+            'vd' => 0, // NTR
             'uangMuka' => (float)$bcData['uang_muka'],
             'nilaiJasa' => (float)$bcData['nilai_jasa'],
             'entitas' => [],
@@ -531,6 +560,34 @@ class BeaCukaiApi
                 'namaEntitas' => $b['nama_entitas'],
                 'nibEntitas' => $b['nib_entitas'],
                 'nomorIdentitas' => $b['nomor_identitas'],
+                'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
+                'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
+                'seriEntitas' => (int)$b['seri_entitas'],
+                'kodeJenisIdentitas' => '5'
+            ];
+
+            $entitasArr[] = [
+                'alamatEntitas' => $b['alamat_entitas'],
+                'kodeEntitas' => '7',
+                'kodeJenisApi' => '2',
+                'kodeJenisEntitas' => $b['kode_jenis_entitas'],
+                'namaEntitas' => $b['alamat_pemasok'],
+                'nibEntitas' => $b['nib_entitas'],
+                'nomorIdentitas' => $b['npwp_pemasok'],
+                'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
+                'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
+                'seriEntitas' => (int)$b['seri_entitas'],
+                'kodeJenisIdentitas' => '5'
+            ];
+
+            $entitasArr[] = [
+                'alamatEntitas' => $b['alamat_pemilik_barang'],
+                'kodeEntitas' => '9',
+                'kodeJenisApi' => '2',
+                'kodeJenisEntitas' => $b['kode_jenis_entitas'],
+                'namaEntitas' => $b['nama_pemilik_barang'],
+                'nibEntitas' => $b['nib_entitas'],
+                'nomorIdentitas' => $b['npwp_pemilik_barang'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => (int)$b['seri_entitas'],

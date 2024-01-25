@@ -34,14 +34,26 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" disabled=true value="<?= $data->no_sales_order ?? '' ?>">
-                            <label for="floatingInput">No. Order</label>
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" <?= !empty($data) ? 'readonly' : '' ?> class="form-control no_sales_order" id="no_sales_order" name="no_sales_order" placeholder="No. Sales Order" required <?= !empty($data) ? 'disabled value="' . $data->no_sales_order . '"' : '' ?>>
+                                    <label for="floatingInput">No. Order</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px; <?= !empty($data) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker order_date" id="order_date" name="order_date" <?= !empty($data) ? ($data->order_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->order_date : ""; ?>" placeholder="Tanggal Pemesanan">
-                            <label for="floatingInput">Tanggal Pemesanan</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" name="order_date" type="text" value="<?= !empty($data) ? $data->order_date : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" class="form-control order_date" id="order_date">
+                                <label>Tanggal Pemesanan</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -58,7 +70,7 @@
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer) : ?>
-                                    <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                    <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Konsumen</label>
@@ -87,20 +99,25 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
-                            <label for="floatingInput">Tanggal Pengiriman</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" name="shipping_date" type="text" <?= !empty($paymentData) ? 'readonly' : '' ?> value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
+                                <label>Tanggal Pengiriman</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select company" name="company" id="company">
+                            <select disabled class="form-select company" name="company" id="company">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($companies)) {
                                     foreach ($companies as $c) {
                                 ?>
-                                        <option value="<?= $c->id; ?>" <?= !empty($data) ? ($data->id_company === $c->id ? "selected" : "") : ""; ?>><?= $c->company; ?></option>
+                                        <option <?= session()->get('login')->this_company_id == $c->id ? 'selected' : '' ?> value="<?= $c->id; ?>" <?= !empty($data) ? ($data->id_company === $c->id ? "selected" : "") : ""; ?>><?= $c->company; ?></option>
                                 <?php
                                     }
                                 }
@@ -108,7 +125,7 @@
                             </select>
                             <label for="floatingInput">Company</label>
                         </div>
-                    </div>
+                    </div> -->
                     <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?php // !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; 
@@ -121,7 +138,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" onkeyup="formatNumber(this)" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="End of time">
+                            <input autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="End of time">
                             <label for="floatingInput">Biaya Kirim</label>
                         </div>
                     </div>
@@ -508,7 +525,8 @@
 
         // Customer
         $('.id_customer').select2({
-            placeholder: "",
+            placeholder: "Pilih Nama Customer",
+            allowClear: true,
             theme: "bootstrap-5"
         }).change(function() {
             const customerAddress = $(this).find(':selected').data('address');
@@ -641,10 +659,10 @@
                     required: "Nama Customer wajib diisi"
                 },
                 order_date: {
-                    required: "tanggal pemesanan wajib diisi"
+                    required: "Tanggal pemesanan wajib diisi"
                 },
                 shipping_date: {
-                    required: "tanggal pengiriman wajib diisi"
+                    required: "Tanggal pengiriman wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -672,6 +690,9 @@
         // MODAL
         var validator_detail = $(".detail-form").validate({
             rules: {
+                no_sales_order: {
+                    required: true
+                },
                 id_barang: {
                     required: true
                 },
@@ -686,6 +707,9 @@
                 }
             },
             messages: {
+                no_sales_order: {
+                    required: "No sales order wajib diisi"
+                },
                 id_barang: {
                     required: "Nama barang wajib diisi"
                 },
@@ -942,6 +966,10 @@
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    setLoading();
+                                },
+                                complete: function() {
+                                    stopLoading();
                                 },
                                 method: "POST",
                                 dataType: "json",
@@ -995,6 +1023,10 @@
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    setLoading();
+                                },
+                                complete: function() {
+                                    stopLoading();
                                 },
                                 method: "POST",
                                 dataType: "json",
@@ -1302,15 +1334,34 @@
 
     })
 
-    const changeStatus = function() {
+    function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
-
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
         if (value) {
-            $(".no_order").attr("readonly", true);
-            $(".no_order").val("AUTO GENERATE");
+            $.ajax({
+                url: "<?= base_url("order-form-lokal/generate-no-order-form"); ?>",
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $(".no_sales_order").val(response.data);
+                },
+
+            });
+            $(".no_sales_order").attr("readonly", true);
         } else {
-            $(".no_order").attr("readonly", false);
-            $(".no_order").val("");
+            $(".no_sales_order").attr("readonly", false);
+            $(".no_sales_order").val("");
         }
     }
 

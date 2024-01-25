@@ -35,6 +35,7 @@ class OrderForm extends BaseController
     protected $SalesOrderDetailModel;
     protected $db;
     protected $AllNoModel;
+    protected $MetaDataModel;
 
     private $userId;
 
@@ -70,6 +71,8 @@ class OrderForm extends BaseController
             ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->where('customers.deletedAt', null)
+            ->where('employees.deletedAt', null)
             ->orderBy('customers.name', "ASC")
             //->where('customers.company_id', $this->this_company_id)
             ->findAll();
@@ -120,23 +123,13 @@ class OrderForm extends BaseController
 
         $dataSalesOrder = [];
         foreach ($dataOrderForm['data'] as $data) {
-            $totalQty = 0;
-            $totalHarga = 0;
             $customerName = "";
-            $dataQtySalesOrderDetail = $this->SalesOrderDetailModel->getItemListByIds(json_decode($data->id));
             $dataCustomer = $this->CustomerModel->get_by_id($data->id_customer);
-            // var_dump($dataCustomer["name"]);
 
             foreach ($dataCustomer as $datasC) {
                 $customerName = $datasC["name"];
             }
-            foreach ($dataQtySalesOrderDetail as $datas) {
-                $totalQty += $datas->qty;
-                $totalHarga += $datas->total_harga_barang;
-            }
-            // var_dump($totalHarga);
-            // Format totalHarga as Indonesian Rupiah
-            $formattedTotalHarga = number_format($totalHarga, 2, ',', '.');
+
 
             array_push($dataSalesOrder, [
                 "no" => $no++,
@@ -144,8 +137,8 @@ class OrderForm extends BaseController
                 "no_sales_order" => $data->no_sales_order,
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
-                "qty_barang" => $totalQty,
-                "total_harga" => $formattedTotalHarga,
+                "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->findAll()),
+                "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
                 "keterangan" => $data->keterangan
             ]);
         }
@@ -314,19 +307,12 @@ class OrderForm extends BaseController
 
         try {
             $this->SalesOrderModel->db->transException(true)->transStart();
-
-            $code = "SLL";
-            $currentYear = date('Y');
-            $currentMonth = date('m');
-            $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
-            $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
-            $noSalesOrder = "SLL/" . $number . "/" . $currentYear . "/" . $currentMonth;
             $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
             $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'])));
             $estimatedFreight = str_replace(',', '', $postData['estimated_freight']);
 
             $values = [
-                "no_sales_order"        => $noSalesOrder,
+                "no_sales_order"        => $postData['no_sales_order'],
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
                 "sales_id"              => $customerData->sales_id,
@@ -342,7 +328,7 @@ class OrderForm extends BaseController
                 // "tax_status"            => $postData['tax_status'],
                 // "include_pa"            => $postData['include_tax'],
                 "total_harga"           => $postData['total'],
-                "id_company"            => $postData['company'],
+                "id_company"            => $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL'
             ];
 
@@ -429,8 +415,8 @@ class OrderForm extends BaseController
 
         $customers = $this->CustomerModel
             ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
-            ->join('employees', 'employees.id = customers.sales_id')
-            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->findAll();
 
         $metadatas = $this->MetaDataModel->findAll();
@@ -449,6 +435,8 @@ class OrderForm extends BaseController
             // "seller_name" => $dataSalesOrder->seller_name,
 
         ];
+
+
         //echo json_encode($data);
 
         return view('SalesLokal/OrderForm/form', $data);
@@ -480,9 +468,9 @@ class OrderForm extends BaseController
 
     public function update()
     {
-        $items = json_decode($this->request->getPost("items"));
+        $items = json_decode($this->request->getVar("items"));
 
-        $payload = $this->request->getPost();
+        $payload = $this->request->getVar();
         $postData["items"] = json_decode($payload["items"], true);
 
         $data = [
@@ -587,7 +575,7 @@ class OrderForm extends BaseController
             "discount_rupiah" => $this->request->getPost('discount_rupiah'),
             "discount_percentage" => $this->request->getPost('discount_percentage'),
             // "ppn" => $this->request->getPost('ppn'),
-            "estimated_freight" => $this->request->getPost('estimated_freight'),
+            "estimated_freight" => formatter($this->request->getPost('estimated_freight'), "STR_TO_INT"),
             // "tax_status" => $this->request->getPost('tax_status'),
             // "include_pa" => $this->request->getPost('include_pa'),
             "total_harga" => $this->request->getPost('total'),
@@ -605,7 +593,10 @@ class OrderForm extends BaseController
             foreach ($items as $row) {
                 if ($row->id === "") {
                     $barangData = $this->BarangModel->asObject()
-                        ->where('id', $row->id_barang)
+                        ->select('barang_master.*')
+                        ->select('stock_details.qty as stok_detail')
+                        ->join('stock_details', 'stock_details.barang_id = barang_master.id', 'left')
+                        ->where('barang_master.id', $row->id_barang)
                         ->first();
 
                     if (empty($barangData)) {
@@ -618,7 +609,7 @@ class OrderForm extends BaseController
                         return;
                     }
 
-                    if ($barangData->stok < $row->qty) {
+                    if ($barangData->stok_detail < $row->qty) {
                         $data = [
                             "status"    => false,
                             "message"   => 'Stock tidak cukup',
@@ -918,14 +909,14 @@ class OrderForm extends BaseController
                         metadata.value AS termin";
         $salesOrderData = $this->SalesOrderModel->asObject()
             ->select($soSelectQry)
-            ->join('customers', 'customers.id = sales_order.id_customer')
-            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->find($id);
 
         $soDet = $this->SalesOrderDetailModel->asObject()
-            ->select('barangs.nama_barang AS namaBarang, barangs.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
-            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->select('barang_master.barang_name AS namaBarang, barang_master.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
+            ->join('barang_master', 'barang_master.id = sales_order_detail.id_barang')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id')
             ->where('id_sales_order', $id)
             ->findAll();
 
@@ -950,6 +941,22 @@ class OrderForm extends BaseController
         $domPdf->stream($fileName, array("Attachment" => false));
 
         exit();
+    }
+
+    public function generateNomorSalesOrder()
+    {
+        $code = "SLL";
+        $currentYear = date('Y');
+        $currentMonth = date('m');
+        $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
+        $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
+        $noSalesOrder = "SLL/" . $number . "/" . $currentYear . "/" . $currentMonth;
+
+        return response()->setJSON([
+            'data' => $noSalesOrder,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
     public function getMetaData($id)

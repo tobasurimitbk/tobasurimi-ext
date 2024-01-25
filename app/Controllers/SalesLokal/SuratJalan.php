@@ -196,12 +196,6 @@ class SuratJalan extends BaseController
         // $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
         // $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear);
         // $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
-        $code = "SJ";
-        $currentYear = date('Y');
-        $currentMonth = date('m');
-        $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
-        $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/");
-        $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
 
         $shippingDate = $this->request->getPost('shipping_date');
 
@@ -214,7 +208,7 @@ class SuratJalan extends BaseController
                 "id_user"       => $this->userId,
                 "id_customer"   => $this->request->getPost('id_customer'),
                 "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-                "no_surat_jalan" => $noSuratJalan,
+                "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
                 "no_po"         => $this->request->getPost('no_po'),
                 "note"          => $this->request->getPost('note'),
                 'multiple_id_so' => json_encode($idArray),
@@ -358,7 +352,7 @@ class SuratJalan extends BaseController
             "id_customer" => $this->request->getPost('id_customer'),
             "id_customer" => $this->request->getPost('id_customer'),
             "shipping_date" =>  $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-            "no_surat_jalan" => $this->request->getPost('no_surat_jalan'),
+            "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
             "no_po" => $this->request->getPost('no_po'),
             'multiple_id_so' => json_encode($idArray),
             'multiple_no_so' => json_encode($noArray),
@@ -429,8 +423,8 @@ class SuratJalan extends BaseController
     {
         $customerData = $this->CustomerModel->asObject()
             ->select('customers.*, metadata.value AS termin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
-            ->join('metadata', 'metadata.id = customers.termin')
-            ->join('employees', 'employees.id = customers.sales_id ')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->find($idCustomer);
 
         $condition = [
@@ -568,5 +562,20 @@ class SuratJalan extends BaseController
         $domPdf->stream($fileName, array("Attachment" => false));
 
         exit();
+    }
+
+    public function generateNomorSuratJalan()
+    {
+        $code = "SJ";
+        $currentYear = date('Y');
+        $currentMonth = date('m');
+        $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/");
+        $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
+
+        return response()->setJSON([
+            'data' => $noSuratJalan,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 }
