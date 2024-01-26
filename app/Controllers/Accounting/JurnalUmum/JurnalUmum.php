@@ -306,6 +306,9 @@ class JurnalUmum extends BaseController
                             'total_debit' => $totalPO,
                             'total_kredit' => $totalPO,
                             'metode_input' => 'system',
+                            'tipe_barang' => $type,
+                            'kategori_barang' => $kategori,
+                            'po_id' => $poID,
                             'type_transaksi' => $idTransaksi,
                         );
 
@@ -376,6 +379,9 @@ class JurnalUmum extends BaseController
                             'total_debit' => $totalPO,
                             'total_kredit' => $totalPO,
                             'metode_input' => 'system',
+                            'tipe_barang' => $type,
+                            'kategori_barang' => $kategori,
+                            'po_id' => $poID,
                             'type_transaksi' => $idTransaksi,
                         );
 
@@ -504,6 +510,9 @@ class JurnalUmum extends BaseController
                         'total_debit' => $totalPO,
                         'total_kredit' => $totalPO,
                         'metode_input' => 'system',
+                        'tipe_barang' => $type,
+                        'kategori_barang' => $kategori,
+                        'po_id' => $poID,
                         'type_transaksi' => $idTransaksi,
                     );
 

@@ -21,6 +21,9 @@ class TransaksiJurnalModel extends Model
         'total_debit',
         'total_kredit',
         'metode_input',
+        'tipe_barang',
+        'kategori_barang',
+        'po_id',
         'type_transaksi',
     ];
 
