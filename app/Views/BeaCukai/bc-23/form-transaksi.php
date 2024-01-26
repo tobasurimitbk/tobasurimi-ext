@@ -74,7 +74,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="harga_cif" name="harga_cif" value="<?= $bc23 != null ? ($bc23['cif'] != null ? $bc23['cif'] : '0,00') : '0,00' ?>" readonly type="text" class="harga_cif form-control" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_cif" name="harga_cif" value="<?= $bc23 != null ? ($bc23['cif'] != null ? $bc23['cif'] : '0,00') : '0,00' ?>" type="text" class="harga_cif form-control" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Harga Cif</label>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input readonly id="harga_lainnya_free_on_board" value="<?= $bc23 ? ($bc23['fob'] != null ? $bc23['fob'] : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_free_on_board" type="text" class="form-control harga_lainnya_free_on_board" placeholder="">
+                                <input id="harga_lainnya_free_on_board" value="<?= $bc23 ? ($bc23['fob'] != null ? $bc23['fob'] : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_free_on_board" type="text" class="form-control harga_lainnya_free_on_board" placeholder="">
                                 <label>FOB (Free on Board)</label>
                             </div>
                         </div>

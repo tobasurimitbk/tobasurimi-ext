@@ -1394,9 +1394,9 @@ class BC40 extends BaseController
             $bcBarangTarif
         );
 
-        return response()->setJSON($payload);
-        // $res = $beacukaiApi->kirimDokumenBC($payload, false);
-        // return response()->setJSON($res);
+        // return response()->setJSON($payload);
+        $res = $beacukaiApi->kirimDokumenBC($payload, false);
+        return response()->setJSON($res);
     }
 
 

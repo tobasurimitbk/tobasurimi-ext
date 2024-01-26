@@ -393,6 +393,7 @@ $routes->get('/order-form-lokal/getItemList', 'SalesLokal\OrderForm::getItemList
 $routes->get('/order-form-lokal/getItemList/(:num)', 'SalesLokal\OrderForm::getItemListById/$1', ['filter' => 'Auth']);
 
 $routes->get('/order-form-lokal/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
+$routes->post('/order-form-lokal/generate-no-order-form', 'SalesLokal\OrderForm::generateNomorSalesOrder', ['filter' => 'Auth']);
 
 // Invoice Lokal
 $routes->get('/invoice-penjualan-lokal', 'SalesLokal\Invoice::index', ['filter' => 'Auth']);
@@ -419,6 +420,7 @@ $routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::save', ['filter' => '
 $routes->post('/surat-jalan/update', 'SalesLokal\SuratJalan::update', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/print/(:num)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
+$routes->post('/surat-jalan/generate-no-surat-jalan', 'SalesLokal\SuratJalan::generateNomorSuratJalan', ['filter' => 'Auth']);
 
 // Retur Pembelian
 $routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);

@@ -106,7 +106,7 @@ class UserModel extends Model
         ];
 
         $builder = $this->asObject()
-        ->select("users.*");
+            ->select("users.*");
         $builder->where($arrCondition);
 
         $data = $builder->findAll();
@@ -122,10 +122,10 @@ class UserModel extends Model
 
 
         $data = $this->select($selectQry)
-        ->where('id !=', $id)
-        ->where('name', $name)
-        ->where('deletedAt', NULL)       
-        ->countAllResults();
+            ->where('id !=', $id)
+            ->where('name', $name)
+            ->where('deletedAt', NULL)
+            ->countAllResults();
 
         return $data;
     }
@@ -136,10 +136,10 @@ class UserModel extends Model
 
 
         $data = $this->select($selectQry)
-        ->where('id !=', $id)
-        ->where('username', $username)
-        ->where('deletedAt', NULL)       
-        ->countAllResults();
+            ->where('id !=', $id)
+            ->where('username', $username)
+            ->where('deletedAt', NULL)
+            ->countAllResults();
 
         return $data;
     }
@@ -167,9 +167,9 @@ class UserModel extends Model
         $selectQry = "users.*";
 
         $data = $this->select($selectQry)
-        ->where('employee_id', $id)
-        ->where('deletedAt', NULL)       
-        ->countAllResults();
+            ->where('employee_id', $id)
+            ->where('deletedAt', NULL)
+            ->countAllResults();
 
         return $data;
     }

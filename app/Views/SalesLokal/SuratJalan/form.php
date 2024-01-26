@@ -30,6 +30,20 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" <?= !empty($data) ? 'readonly' : '' ?> class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No. Sales Order" required <?= !empty($data) ? 'disabled value="' . $data->no_surat_jalan . '"' : '' ?>>
+                                    <label for="floatingInput">No. Surat Jalan</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px; <?= !empty($data) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <!-- <input type="text" name="" id="" value="<?= !empty($dataSJ) ? $dataSJ : ''; ?>"> -->
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
@@ -43,10 +57,9 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Nama Konsumen</label>
+                            <label for="floatingInput">Pilih Customer</label>
                         </div>
                     </div>
-
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->multiple_id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
@@ -55,7 +68,7 @@
                                 if (!empty($dataSo)) {
                                     foreach ($dataSo as $so) {
                                 ?>
-                                        <option value="<?= $so->id; ?>,<?= $so->no_sales_order ?>" <?= !empty($data) ? (in_array($so->id, $data->multiple_id_so) ? "selected" : "") : ""; ?>><?= $so->no_sales_order; ?></option>
+                                        <option value="<?= $so->id; ?>,<?= $so->no_surat_jalan ?>" <?= !empty($data) ? (in_array($so->id, $data->multiple_id_so) ? "selected" : "") : ""; ?>><?= $so->no_surat_jalan; ?></option>
                                 <?php
                                     }
                                 }
@@ -65,10 +78,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>">
-                            <label for="floatingInput">No. PO</label>
-                        </div>
+
+
                     </div>
                 </div>
 
@@ -76,7 +87,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->customerAddress ?? ''; ?>" disabled>
-                            <label for="floatingInput">Alamat Konsumen</label>
+                            <label for="floatingInput">Alamat Customer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -101,15 +112,20 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> placeholder="Tanggal Pengiriman" value="<?= !empty($data) ? $data->shipping_date : ""; ?>">
-                            <label for="floatingInput">Tanggal Pengiriman</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" class="form-control shipping_date" id="shipping_date">
+                                <label>Tanggal Pengiriman</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" disabled="true" value=" <?= !empty($data) ? $data->no_surat_jalan : ""; ?>" placeholder="No surat jalan">
-                            <label for="floatingInput">No Surat Jalan</label>
+                            <input autocomplete="one-time-code" " class=" form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>">
+                            <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
                     <input autocomplete="one-time-code" type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
@@ -138,7 +154,6 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>No.</th>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Qty</th>
@@ -175,10 +190,6 @@
             searching: false,
             ordering: false,
             columns: [{
-                    data: "no",
-                    className: "text-center",
-                },
-                {
                     data: "kode_barang",
                     className: "text-center"
                 },
@@ -219,12 +230,15 @@
                     next: '<i class="fa fa-angle-right"></i>'
                 }
             }
+
+
         });
 
         // Customer
         $('.id_customer').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
+            placeholder: "Pilih Customer",
+            theme: "bootstrap-5",
+            allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -327,7 +341,6 @@
                 dataType: "json",
                 success: function(res) {
                     table.clear();
-                    console.log(res)
                     table.rows.add(res).draw(false);
                 }
             })
@@ -510,7 +523,38 @@
                 }
             })
         }
-    })
+    });
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        if (value) {
+            $.ajax({
+                url: "<?= base_url("surat-jalan/generate-no-surat-jalan"); ?>",
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $(".no_surat_jalan").val(response.data);
+                },
+
+            });
+            $(".no_surat_jalan").attr("readonly", true);
+        } else {
+            $(".no_surat_jalan").attr("readonly", false);
+            $(".no_surat_jalan").val("");
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

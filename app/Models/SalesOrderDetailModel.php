@@ -81,8 +81,8 @@ class SalesOrderDetailModel extends Model
             $basePrice = ($amount / $data->qty) / ((100 - $data->disc) / 100);
             $totalPrice = ($amount / $data->qty) / ((100 - $data->disc) / 100);
 
-            $data->harga_barang = ($basePrice);
-            $data->total_harga_barang = ($totalPrice);
+            $data->harga_barang = number_format($basePrice);
+            $data->total_harga_barang = number_format($totalPrice);
         }
 
         // $totalPrice = 0;
