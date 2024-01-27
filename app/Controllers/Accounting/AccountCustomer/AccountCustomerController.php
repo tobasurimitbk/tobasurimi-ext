@@ -42,7 +42,7 @@ class AccountCustomerController extends BaseController
             "customerModel" => $customerModel,
             "subAkuns" => $subAkunsModel
         ];
-        return view('Accounting/AccountCustomer/index', $data);
+        return view('Accounting/accountCustomer/index', $data);
     }
 
     public function allAccountCustomer()
