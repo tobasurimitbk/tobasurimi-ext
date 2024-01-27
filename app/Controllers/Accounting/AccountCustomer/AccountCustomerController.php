@@ -16,6 +16,7 @@ class AccountCustomerController extends BaseController
     protected $Sub_AkunsModel;
     protected $encrypter;
 
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
