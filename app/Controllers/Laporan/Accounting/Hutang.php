@@ -14,6 +14,7 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
+use App\Models\TransaksiJurnalModel;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -31,6 +32,7 @@ class Hutang extends BaseController
     protected $aMPurchaseOrderDetailModel;
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
+    protected $transaksiJurnalModel;
 
     public function __construct()
     {
@@ -44,6 +46,7 @@ class Hutang extends BaseController
         $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->transaksiJurnalModel = new TransaksiJurnalModel();
     }
     public function index()
     {
@@ -95,59 +98,112 @@ class Hutang extends BaseController
         // var_dump($res);
         // exit;
         foreach ($res['data'] as $data) {
-            $journal_num = 'journal_num';
+            $journal_num = '-';
             $description = 'description';
-            $invoice = 'invoice';
+            $invoice = $data->no_invoice;
             $date = 'date';
-            $tax_report = 'tax_report';
-            $supplier = 'supplier';
+            $tax_report = '-';
+            $supplier = $data->supplier_name;
             $nominal_idr = 0.0;
             $remaining_idr = 0.0;
-            // if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
-            //     $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
-            //     foreach ($lokalbb as $value) {
-            //         $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-            //         $nominalTransaksi += $totalxqty;
-            //     }
-            //     $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-            //     $nominalIdrTransaksi += $totalHargaAll;
-            // } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
-            //     $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
-            //     foreach ($importbb as $value) {
-            //         $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-            //         if ($kursData) {
-            //             foreach ($metaValuta as $valueValuta) {
-            //                 if ($value['currency'] == $valueValuta['id']) {
-            //                     $valasTransaksi = $valueValuta['value'];
-            //                     $exchangeTransaksi = $kursData->nilai_kurs;
-            //                 }
-            //             }
-            //         }
-            //         $nominalTransaksi += $value['total_po'];
-            //     }
-            //     $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-            //     $nominalIdrTransaksi += $totalHargaAll;
-            // } else if ($data->tipe_bahan == "PENOLONG") {
-            //     $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
-            //     foreach ($bp as $value) {
-            //         // var_dump($valasTransaksi);
-            //         $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-            //         // var_dump($kursData);
-            //         if ($kursData) {
-            //             foreach ($metaValuta as $valueValuta) {
-            //                 if ($value['currency'] == $valueValuta['id']) {
-            //                     $valasTransaksi = $valueValuta['value'];
-            //                     $exchangeTransaksi = $kursData->nilai_kurs;
-            //                 }
-            //             }
-            //         }
-            //         // var_dump($valasTransaksi);
-            //         // var_dump($exchangeTransaksi);
-            //         $nominalTransaksi += $value['total_po'];
-            //     }
-            //     $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-            //     $nominalIdrTransaksi += $totalHargaAll;
-            // }
+            $nominalTransaksi = 0.0;
+            $exchangeTransaksi = 1.0;
+            if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
+                $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
+                foreach ($lokalbb as $value) {
+                    $poDetail = $this->rMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($value['purchase_order_id']);
+                    $transaksiJurnal = $this->transaksiJurnalModel->asObject()->where('deleted_at', null)->where('tipe_barang', $data->status_penerimaan)->where('kategori_barang', 'BAHAN ' . $data->tipe_bahan);
+                    if ($transaksiJurnal) {
+                        foreach ($transaksiJurnal as $valueTransaksiJurnal) {
+                            if (isset($valueTransaksiJurnal->no_transaksi)) {
+                                $journal_num = $valueTransaksiJurnal->no_transaksi;
+                            } else {
+                                $journal_num = "-";
+                            }
+                        }
+                    } else {
+                        $journal_num = "-";
+                    }
+
+                    foreach ($poDetail as $valueDetail) {
+                        $totalxqty = ($valueDetail['general_price'] + $valueDetail['daily_price'] + $valueDetail['monthly_price']) * $valueDetail['qty'];
+                        $nominalTransaksi += $totalxqty;
+                    }
+                    // $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
+                }
+                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
+                $nominal_idr += $totalHargaAll;
+            } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
+                $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
+                foreach ($importbb as $value) {
+                    $poDetail = $this->rMImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($value['purchase_order_id']);
+                    $transaksiJurnal = $this->transaksiJurnalModel->asObject()->where('deleted_at', null)->where('tipe_barang', $data->status_penerimaan)->where('kategori_barang', 'BAHAN ' . $data->tipe_bahan);
+                    if ($transaksiJurnal) {
+                        foreach ($transaksiJurnal as $valueTransaksiJurnal) {
+                            if (isset($valueTransaksiJurnal->no_transaksi)) {
+                                $journal_num = $valueTransaksiJurnal->no_transaksi;
+                            } else {
+                                $journal_num = "-";
+                            }
+                        }
+                    } else {
+                        $journal_num = "-";
+                    }
+
+                    foreach ($poDetail as $valueDetail) {
+                        $nominalTransaksi += $valueDetail['total'];
+                    }
+                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
+                    if ($kursData) {
+                        foreach ($metaValuta as $valueValuta) {
+                            if ($value['currency'] == $valueValuta['id']) {
+                                $valasTransaksi = $valueValuta['value'];
+                                $exchangeTransaksi = $kursData->nilai_kurs;
+                            }
+                        }
+                    }
+                    // $nominalTransaksi += $value['total_po'];
+                }
+                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
+                $nominal_idr += $totalHargaAll;
+            } else if ($data->tipe_bahan == "PENOLONG") {
+                $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
+                foreach ($bp as $value) {
+                    $poDetail = $this->aMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($value['purchase_order_id']);
+                    $transaksiJurnal = $this->transaksiJurnalModel->asObject()->where('deleted_at', null)->where('tipe_barang', $data->status_penerimaan)->where('kategori_barang', 'BAHAN ' . $data->tipe_bahan);
+                    if ($transaksiJurnal) {
+                        foreach ($transaksiJurnal as $valueTransaksiJurnal) {
+                            if (isset($valueTransaksiJurnal->no_transaksi)) {
+                                $journal_num = $valueTransaksiJurnal->no_transaksi;
+                            } else {
+                                $journal_num = "-";
+                            }
+                        }
+                    } else {
+                        $journal_num = "-";
+                    }
+
+                    foreach ($poDetail as $valueDetail) {
+                        $nominalTransaksi += $valueDetail['total'];
+                    }
+                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
+                    if ($kursData) {
+                        foreach ($metaValuta as $valueValuta) {
+                            if ($value['currency'] == $valueValuta['id']) {
+                                $valasTransaksi = $valueValuta['value'];
+                                $exchangeTransaksi = $kursData->nilai_kurs;
+                            }
+                        }
+                    }
+                    // $nominalTransaksi += $value['total_po'];
+                }
+                // var_dump($exchangeTransaksi);
+                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
+                $nominal_idr += $totalHargaAll;
+                // var_dump($nominalTransaksi);
+                // var_dump($exchangeTransaksi);
+                // var_dump($nominal_idr);
+            }
             // var_dump($lokalbb);
             // var_dump($importbb);
             // var_dump($bp);
