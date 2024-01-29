@@ -282,7 +282,7 @@ function formatDMYtoYMD($date)
 }
 
 // Access
-function can($parentMenuName, $childMenuName, $access)
+function can($parentMenuName, $childMenuName, $access = null)
 {
    // access isinya = [c,r,u,d,p,a]
    $this_access_arr = session()->get('login')->this_access;
