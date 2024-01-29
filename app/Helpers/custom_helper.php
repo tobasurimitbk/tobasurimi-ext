@@ -291,7 +291,6 @@ function can($parentMenuName, $childMenuName, $access)
       if ($this_access_arr[$i]->menuName == $parentMenuName) {
          $childArr = $this_access_arr[$i]->child;
          foreach ($childArr as $c) {
-            dd($childArr, $c);
             if (property_exists($c, 'access') && in_array($access, $c->access) && $c->name == $childMenuName) {
                return true;
             }

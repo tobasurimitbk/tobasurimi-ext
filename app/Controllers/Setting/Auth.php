@@ -107,7 +107,7 @@ class Auth extends BaseController
                                         "name"  => $res_child_access[$j]["menuName"],
                                         "menu_url_id"   => $res_child_access[$j]["menu_url_id"],
                                         "url"   => $res_child_access[$j]["url"],
-                                        "accessF"    => $access
+                                        "access"    => $access
                                     ];
 
                                     if (sizeof($access) !== 0) {
