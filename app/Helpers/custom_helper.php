@@ -282,7 +282,7 @@ function formatDMYtoYMD($date)
 }
 
 // Access
-function can($parentMenuName, $childMenuName, $access = null)
+function can($parentMenuName, $childMenuName, $access)
 {
    // access isinya = [c,r,u,d,p,a]
    $this_access_arr = session()->get('login')->this_access;
@@ -292,7 +292,7 @@ function can($parentMenuName, $childMenuName, $access = null)
          if ($this_access_arr[$i]->isParent == 0) {
             $childArr = $this_access_arr[$i]->child;
             foreach ($childArr as $c) {
-               if (in_array($access, $c->access) && $c->name == $childMenuName) {
+               if (property_exists($c, 'access') && in_array($access, $c->access) && $c->name == $childMenuName) {
                   return true;
                }
             }
