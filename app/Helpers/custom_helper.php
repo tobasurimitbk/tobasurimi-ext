@@ -289,12 +289,11 @@ function can($parentMenuName, $childMenuName, $access)
 
    for ($i = 0; $i < count($this_access_arr); $i++) {
       if ($this_access_arr[$i]->menuName == $parentMenuName) {
-         if ($this_access_arr[$i]->isParent == 0) {
-            $childArr = $this_access_arr[$i]->child;
-            foreach ($childArr as $c) {
-               if (property_exists($c, 'access') && in_array($access, $c->access) && $c->name == $childMenuName) {
-                  return true;
-               }
+         $childArr = $this_access_arr[$i]->child;
+         foreach ($childArr as $c) {
+            dd($childArr, $c);
+            if (property_exists($c, 'access') && in_array($access, $c->access) && $c->name == $childMenuName) {
+               return true;
             }
          }
       }
