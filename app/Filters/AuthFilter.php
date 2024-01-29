@@ -6,11 +6,14 @@ use App\Models\MetadataModel;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Filters\FilterInterface;
+use App\Helpers;
 
 class AuthFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
+        helper(['custom_helper']);
+
         // LOGIN CHECK 
         if (empty(session()->getTempdata("login"))) {
             return redirect()->to("/")->with('error', "Invalid Credential");
@@ -33,7 +36,7 @@ class AuthFilter implements FilterInterface
             $hakAkses = session()->get('login')->this_access;
             $segment1 = $uri->getSegment(1);
 
-            if (\in_array($segment1, $except)) {
+            if (in_array($segment1, $except)) {
                 $allowedAccess = true;
             } else
     
@@ -43,7 +46,7 @@ class AuthFilter implements FilterInterface
                 foreach ($hakAkses as $h) {
                     if (isset($h->child)) {
                         foreach ($h->child as $c) {
-                            if ($c->url == '/' . $segment1) {
+                            if ($c->url == '/' . $segment1 && can($h->menuName, $c->name, 'r')) {
                                 $allowedAccess = true;
                             }
                         }
