@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
 use App\Models\DivisisModel;
@@ -14,7 +15,7 @@ use Exception;
 class Barang extends BaseController
 {
     protected $this_company_id;
-    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap;
+    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap, $kodeBahanModal;
 
     public function __construct()
     {
@@ -23,6 +24,7 @@ class Barang extends BaseController
         $this->kodeBahanPenolong = "BP";
         $this->kodeBahanJadi = "BJ";
         $this->kodeBahanScrap = "BS";
+        $this->kodeBahanModal = "BM";
     }
 
     public function bahanBakuView()
@@ -81,10 +83,26 @@ class Barang extends BaseController
         return view('Warehouse/barangMaster/bahanScrap', $data);
     }
 
+    public function bahanModalView()
+    {
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
+        $data = [
+            'type' => "bahan_modal",
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_modal")->where('deletedAt', null)->findAll(),
+            'satuanBarang' => $satuanModel->findAll()
+        ];
+
+        return view('Warehouse/barangMaster/bahanModal', $data);
+    }
+
     public function create()
     {
         $barangModel = new BarangMasterModel();
+        $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $result = array();
         $type = $this->request->getVar('type');
+        $spek = $this->request->getPost('spek');
 
         $barang = $barangModel->where('kode_barang', $this->request->getVar('kode_barang'))
             ->where('type_barang', $type)
@@ -99,7 +117,7 @@ class Barang extends BaseController
             ]);
         }
 
-        $barangModel->insert([
+        $barangMasterID = $barangModel->insert([
             'company_id' => $this->this_company_id,
             'satuan_id' => decrypt($this->request->getVar('satuan_id')),
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
@@ -112,6 +130,16 @@ class Barang extends BaseController
             'harga_jual' => $this->request->getVar('harga_jual') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_jual'))) : 0,
         ]);
 
+        foreach ($spek as $key => $value) {
+            // var_dump($_POST['primer'][$key]);
+            $result[] = array(
+                'barang_master_id' => $barangMasterID,
+                'spesifikasi' => $_POST['spek'][$key],
+                // 'is_primer' => $_POST['primer'][$key] ? "true" : "false",
+            );
+        }
+        $barangSpesifikasiModel->insertBatch($result);
+
         return response()->setJSON([
             'status' => true,
             'token' => csrf_hash(),
@@ -123,7 +151,10 @@ class Barang extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $barangModel = new BarangMasterModel();
+        $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $result = array();
         $type = $this->request->getVar('type');
+        $spek = $this->request->getPost('spek');
 
         $barangModel->update($id, [
             'company_id' => $this->this_company_id,
@@ -136,6 +167,21 @@ class Barang extends BaseController
             'harga_pokok' => $this->request->getVar('harga_pokok') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_pokok'))) : 0,
             'harga_jual' => $this->request->getVar('harga_jual') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_jual'))) : 0,
         ]);
+        $check = $barangSpesifikasiModel->asObject()->where('barang_master_id', $id)->findAll();
+        if ($check) {
+            foreach ($check as $value) {
+                $barangSpesifikasiModel->delete($value->id);
+            }
+        }
+
+        foreach ($spek as $key => $value) {
+            $result[] = array(
+                'barang_master_id' => $id,
+                'spesifikasi' => $_POST['spek'][$key],
+                // 'is_primer' => $_POST['primer'][$key] ? "true" : "false",
+            );
+        }
+        $barangSpesifikasiModel->insertBatch($result);
 
         return response()->setJSON([
             'status' => true,
@@ -148,10 +194,20 @@ class Barang extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $barangModel = new BarangMasterModel();
+        $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
 
         $barangModel->update($id, [
             'deletedAt' => date('Y-m-d H:i:s')
         ]);
+
+        $check = $barangSpesifikasiModel->asObject()->where('barang_master_id', $id)->findAll();
+        if ($check) {
+            foreach ($check as $value) {
+                $barangSpesifikasiModel->update($value->id, [
+                    'deletedAt' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
 
         return response()->setJSON([
             'status' => true,
@@ -163,6 +219,7 @@ class Barang extends BaseController
     public function get()
     {
         $barangModel = new BarangMasterModel();
+        $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $id = decrypt($this->request->getVar('id'));
         $res = $barangModel->where('id', $id)->where('deletedAt', null)->first();
         $res['id'] = encrypt($res['id']);
@@ -170,10 +227,12 @@ class Barang extends BaseController
         $res['satuan_id'] = encrypt($res['satuan_id']);
         $res['parent_type_id'] = encrypt($res['parent_type_id']);
         $res['divisi_id'] = encrypt($res['divisi_id']);
+        $spekDetail = $barangSpesifikasiModel->getBarangSpesifikasiByBarangMasterID($id);
 
         return response()->setJSON([
             'token' => csrf_hash(),
             'data' => $res,
+            'dataSpekDetail' => $spekDetail,
         ]);
     }
 
@@ -251,8 +310,10 @@ class Barang extends BaseController
             $codeName = $this->kodeBahanPenolong;
         } elseif ($type == "bahan_jadi") {
             $codeName = $this->kodeBahanJadi;
-        } else {
+        } elseif ($type == "bahan_scrap") {
             $codeName = $this->kodeBahanScrap;
+        } else {
+            $codeName = $this->kodeBahanModal;
         }
 
         $lastBarang = $barangModel->asObject()

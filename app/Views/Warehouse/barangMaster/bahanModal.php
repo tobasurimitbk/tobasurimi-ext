@@ -1,9 +1,10 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
+<!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Bahan Penolong</h1>
+        <h1>Bahan Modal</h1>
         <button class="btn btn-show-form btn-add float-right">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -25,11 +26,6 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('satuan')" class="sort">Satuan</th>
-                                <th>Harga Terakhir (Lokal)</th>
-                                <th>Supplier Terakhir (Lokal)</th>
-                                <th>Harga Terakhir (Import)</th>
-                                <th>Supplier Terakhir (Import)</th>
-                                <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -41,7 +37,7 @@
     </div>
 </section>
 
-<div class="modal add-modal" id="add_modal" tabindex="-1">
+<div class="modal add-modal m-t-bahan-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
@@ -92,7 +88,7 @@
                                         <select class="form-select" name="satuan_id" id="satuan_id">
                                             <option value=""></option>
                                             <?php foreach ($satuanBarang as $sb) : ?>
-                                                <option value="<?= encrypt($sb['id']) ?>"><?= $sb['kode_satuan'] ?></option>
+                                                <option value="<?= encrypt($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <label for="floatingInput">Satuan Barang</label>
@@ -100,43 +96,47 @@
                                 </div>
                                 <div class="col-sm">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="number" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
+                                        <input autocomplete="one-time-code" oninput="this.value = (parseInt(this.value) >= 0 ? Math.floor(this.value) : '');" type="number" class="form-control" id="minimum_stock" name="minimum_stock" pattern="[0-9]*" title="Angka harus diawali dengan angka 0-9">
                                         <label for="floatingInput">Stok Minimum</label>
                                     </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th scope="col" style="width: 80%;">Spesifikasi</th>
+                                                <th scope="col" style="width: 5%;">Utama</th>
+                                                <th scope="col" style="width: 15%;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="body-table" id="tbody2" style="cursor: pointer;">
+                                            <tr>
+                                                <td>
+                                                    <input type="text" name="spek[]" id="spek" class="form-control">
+                                                </td>
+                                                <td>
+                                                    <!-- <input id="primer" name="primer[]" type="checkbox" class="checkall_a" value="" /> -->
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="primer" name="primer[]">
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
+                                                    <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th scope="col" style="width: 80%;">Spesifikasi</th>
-                                        <th scope="col" style="width: 5%;">Utama</th>
-                                        <th scope="col" style="width: 15%;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="body-table" id="tbody2" style="cursor: pointer;">
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="spek[]" id="spek" class="form-control">
-                                        </td>
-                                        <td>
-                                            <!-- <input id="primer" name="primer[]" type="checkbox" class="checkall_a" value="" /> -->
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="primer" name="primer[]">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
-                                            <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -147,88 +147,10 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="historiModalLabel">Histori Purchase Order</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="pembelianLokal-tab" data-toggle="tab" href="#pembelianLokal" role="tab" aria-controls="pembelianLokal" aria-selected="true">Purchase Order Lokal</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="pembelianImport-tab" data-toggle="tab" href="#pembelianImport" role="tab" aria-controls="pembelianImport" aria-selected="false">Purchase Order Import</a>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="pembelianLokal" role="tabpanel" aria-labelledby="pembelianLokal">
-                        <div class="row justify-content-end">
-                            <div class="col-md-3">
-                                <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Nomor PO" value="" type="text" class="form-control form-control-lg search-po-lokal">
-                            </div>
-                        </div>
-                        <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoLokal" id="tablePoLokal" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">No</th>
-                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')" class="sort">No PO</th>
-                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
-                                    <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
-                                    <th scope="col" onclick="changeShortPoLokal('barang_master.barang_name')" class="sort">Barang</th>
-                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="tab-pane fade" id="pembelianImport" role="tabpanel" aria-labelledby="pembelianImport">
-                        <div class="row justify-content-end">
-                            <div class="col-md-3">
-                                <input autocomplete="one-time-code" style="height: 40px;" value="" placeholder="Cari Nomor PO" type="text" class="form-control form-control-lg search-po-import">
-                            </div>
-                        </div>
-                        <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoImport" id="tablePoImport" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">No</th>
-                                    <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_no')" class="sort">No PO</th>
-                                    <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_date')" class="sort">Tanggal</th>
-                                    <th scope="col" onclick="changeShortPoImport('suppliers.name')" class="sort">Supplier</th>
-                                    <th scope="col" onclick="changeShortPoImport('barang_master.barang_name')" class="sort">Barang</th>
-                                    <th scope="col" onclick="changeShortPoImport('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     let sort = "nomor";
     let sortType = "desc";
-    let id_barang = "";
-    let sortTypePoLokal = "desc";
-    let sortTypePoImport = "desc";
-    let sortPoLokal = "am_purchase_orders.id";
-    let sortPoImport = "am_purchase_orders.id";
-    let tablePoImport = null;
-    let tablePoLokal = null;
-
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -283,37 +205,6 @@
                     data: "satuan",
                     className: "text-center",
                 },
-                {
-                    data: "harga_terakhir_lokal",
-                    className: "text-center",
-                },
-                {
-                    data: "supplier_terakhir_lokal",
-                    className: "text-center",
-                },
-                {
-                    data: "harga_terakhir_import",
-                    className: "text-center",
-                },
-                {
-                    data: "supplier_terakhir_import",
-                    className: "text-center",
-                },
-                {
-                    data: "id",
-                    className: "text-center actions",
-                    searchable: false,
-                    sortable: false,
-                    render: function(data, type, row) {
-                        return `
-                        <div class="mt-0 actions">
-                            <button onclick="displayHistory('${row.id}')" class="btn btn-success posting-spp actions">
-                                <i class="fa-solid fa-clock-rotate-left"></i>
-                            </button>
-                        </div>
-                    `
-                    }
-                }
 
             ],
             columnDefs: [{
@@ -321,7 +212,7 @@
                 targets: "_all"
             }],
             language: {
-                emptyTable: "Master Data Bahan Penolong Masih Kosong",
+                emptyTable: "Master Data Bahan Modal Masih Kosong",
                 lengthMenu: "Show _MENU_ entries",
                 paginate: {
                     previous: '<i class="fa fa-angle-left"></i>',
@@ -335,7 +226,7 @@
         });
 
         $('.btn-add').click(function() {
-            $('.title-name').text("Tambah Bahan Penolong");
+            $('.title-name').text("Tambah Bahan Modal");
             $(".create-form :input:not([name='type'])").val('');
             $('select[name="parent_type_id"]').val(null).change();
             $('select[name="satuan_id"]').val(null).change();
@@ -365,8 +256,7 @@
                     required: true
                 },
                 minimum_stock: {
-                    required: true,
-                    number: true
+                    required: true
                 },
             },
             messages: {
@@ -426,15 +316,17 @@
                 dataType: "json",
                 success: function(res) {
                     $('.delete-btn').show();
-                    $('.title-name').text("Update Bahan Penolong");
+                    $('.title-name').text("Update Bahan Modal");
                     $('input[name="kode_barang"]').attr('readonly', true);
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
                     $('select[name="satuan_id"]').val(res.data.satuan_id).change();
                     $('input[name="barang_name"]').val(res.data.barang_name);
-                    $('input[name="minimum_stock"]').val(res.data.minimum_stock);
+                    $('input[name="minimum_stock"]').val(res.data.minimum_stock).change();
                     $('input[name="id"]').val(res.data.id);
+                    $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
+
 
                     // Iterate through dataSpekDetail and append rows to the table
                     if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
@@ -472,6 +364,7 @@
                         let id = $('input[name="id"]').val();
                         let csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form"));
+                        console.log(data);
 
                         if (id) {
                             $.ajax({
@@ -615,147 +508,6 @@
                 }
             })
         });
-
-        tablePoLokal = $('#tablePoLokal').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: true,
-            order: [
-                [2, 'desc']
-            ],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("barang-bahan-penolong/histori"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.id = id_barang;
-                    data.search = $(".search-po-lokal").val();
-                    data.sort = sortPoImport;
-                    data.sortType = sortTypePoLokal;
-                    data.po_type = "Lokal";
-                }
-            },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.tablePoLokal').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            }, {
-                data: "po_no",
-                className: "text-center"
-            }, {
-                data: "po_date",
-                className: "text-center"
-            }, {
-                data: "nama_supplier",
-                className: "text-center"
-            }, {
-                data: "nama_barang",
-                className: "text-center"
-            }, {
-                data: "price",
-                className: "text-center"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        tablePoImport = $('#tablePoImport').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: true,
-            order: [
-                [2, 'desc']
-            ],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("barang-bahan-penolong/histori"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.id = id_barang;
-                    data.po_type = "Import";
-                    data.search = $(".search-po-import").val();
-                    data.sort = sortPoImport;
-                    data.sortType = sortTypePoImport;
-                }
-            },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.tablePoLokal').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            }, {
-                data: "po_no",
-                className: "text-center"
-            }, {
-                data: "po_date",
-                className: "text-center"
-            }, {
-                data: "nama_supplier",
-                className: "text-center"
-            }, {
-                data: "nama_barang",
-                className: "text-center"
-            }, {
-                data: "price",
-                className: "text-center"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        $(".search-po-import").keyup(function() {
-            tablePoImport.ajax.reload();
-        })
-
-        $(".search-po-lokal").keyup(function() {
-            tablePoLokal.ajax.reload();
-        })
-
     });
 
     function addRow(tableID) {
@@ -822,15 +574,6 @@
         }
     }
 
-    function displayHistory(id) {
-        id_barang = id;
-        $('.search-po-lokal').val();
-        $('.search-po-import').val();
-        tablePoLokal.ajax.reload();
-        tablePoImport.ajax.reload();
-        $('#historiModal').modal('show');
-    }
-
     function generateNewCode() {
         let csrfToken = '<?= csrf_token() ?>';
         let value = document.getElementById('generate_new_code').checked ? true : false;
@@ -855,24 +598,6 @@
         } else {
             $("input[name='kode_barang']").attr("readonly", false);
             $("input[name='kode_barang']").val("");
-        }
-    }
-
-    function changeShortPoImport(val) {
-        if (sortPoImport !== val) {
-            sortTypePoImport = "asc";
-            sortPoImport = val;
-        } else {
-            sortTypePoImport = sortTypePoImport === "asc" ? "desc" : "asc";
-        }
-    }
-
-    function changeShortPoLokal(val) {
-        if (sortPoLokal !== val) {
-            sortTypePoLokal = "asc";
-            sortPoLokal = val;
-        } else {
-            sortTypePoLokal = sortTypePoLokal === "asc" ? "desc" : "asc";
         }
     }
 </script>
@@ -928,6 +653,7 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
+
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

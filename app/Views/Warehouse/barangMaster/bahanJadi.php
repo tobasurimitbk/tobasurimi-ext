@@ -127,7 +127,36 @@
                             </div>
                         </div>
                     </div>
-
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col" style="width: 80%;">Spesifikasi</th>
+                                        <th scope="col" style="width: 5%;">Utama</th>
+                                        <th scope="col" style="width: 15%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table" id="tbody2" style="cursor: pointer;">
+                                    <tr>
+                                        <td>
+                                            <input type="text" name="spek[]" id="spek" class="form-control">
+                                        </td>
+                                        <td>
+                                            <!-- <input id="primer" name="primer[]" type="checkbox" class="checkall_a" value="" /> -->
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="primer" name="primer[]">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
+                                            <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -319,6 +348,21 @@
 
                     $('input[name="id"]').val(res.data.id);
 
+                    // Iterate through dataSpekDetail and append rows to the table
+                    if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
+                        // Clear existing rows from the table
+                        $('#tbody2').empty();
+                        res.dataSpekDetail.forEach(function(item) {
+                            var newRow = '<tr>' +
+                                '<td><input type="text" name="spek[]" class="form-control" value="' + item.spesifikasi + '"></td>' +
+                                '<td><div class="form-check"><input class="form-check-input" type="checkbox" id="primer" value="primer" name="primer[]" ' + (item.is_primer == 'true' ? 'checked' : '') + '></div></td>' +
+                                '<td><button type="button" class="btn btn-primary" onclick="addRow(\'tbody2\')"><i class="fas fa-plus"></i></button>' +
+                                '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\')"><i class="far fa-trash-alt"></i></button></td>' +
+                                '</tr>';
+                            $('#tbody2').append(newRow);
+                        });
+                    }
+
                     $('.add-modal').modal('show');
                 }
             })
@@ -484,6 +528,70 @@
             })
         });
     });
+
+    function addRow(tableID) {
+        var table = document.getElementById(tableID);
+        var rowCount = table.rows.length;
+        var row = table.insertRow();
+        var colCount = table.rows[0].cells.length;
+        var counter = 1;
+        // console.log(row);
+        rowCount++;
+        for (var i = 0; i < colCount; i++) {
+            var newcell = row.insertCell(i);
+            newcell.innerHTML = table.rows[0].cells[i].innerHTML;
+            var child = newcell.children;
+            for (var i2 = 0; i2 < child.length; i2++) {
+                var test = newcell.children[i2].tagName;
+                // console.log(test);
+                switch (test) {
+                    case "INPUT":
+                        if (newcell.children[i2].type == 'checkbox') {
+                            newcell.children[i2].value = "";
+                            newcell.children[i2].checked = false;
+                        } else {
+                            newcell.children[i2].value = "";
+                        }
+                        if (newcell.children[i2].id == 'nomber') {
+                            newcell.children[i2].value = counter++;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    function deleteRow(tableID) {
+        try {
+            var table = document.getElementById(tableID);
+            var rowCount = table.rows.length;
+
+            // Variable to track whether any checkbox is checked
+            var isChecked = false;
+
+            for (var i = 0; i < rowCount; i++) {
+                var row = table.rows[i];
+                var chkbox = row.cells[0].childNodes[0];
+
+                if (null != chkbox && true == chkbox.checked) {
+                    isChecked = true;
+                    table.deleteRow(i);
+                    rowCount--;
+                    i--;
+                }
+            }
+
+            // If no checkbox is checked, remove the last row
+            if (!isChecked && rowCount > 1) {
+                table.deleteRow(rowCount - 1);
+                rowCount--;
+            }
+        } catch (e) {
+            alert(e);
+        }
+    }
 
     function generateNewCode() {
         let csrfToken = '<?= csrf_token() ?>';
