@@ -985,6 +985,7 @@ $routes->get('/user/id/(:segment)', 'Setting\User::getByIdUser/$1', ['filter' =>
 $routes->post('/user/save', 'Setting\User::saveUser', ['filter' => 'Auth']);
 $routes->post('/user/update', 'Setting\User::updateUser', ['filter' => 'Auth']);
 $routes->post('/user/delete', 'Setting\User::deleteUser', ['filter' => 'Auth']);
+$routes->post('/user/find-divisi', 'Purchase\POLokalBahanPenolong::getDivisionByCompany', ['filter' => 'Auth']);
 
 // ROLE
 $routes->get('/role', 'Setting\Role::role', ['filter' => 'Auth']);

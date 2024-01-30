@@ -7,6 +7,7 @@ use App\Models\UserModel;
 use App\Models\CompaniesModel;
 use App\Models\RolesModel;
 use App\Models\AccessListsModel;
+use App\Models\DivisisModel;
 use App\Models\MenuUrlsModel;
 
 use DateTime;
@@ -18,6 +19,7 @@ class Auth extends BaseController
     protected $RolesModel;
     protected $AccessListsModel;
     protected $MenuUrlsModel;
+    protected $DivisiModel;
 
     public function __construct()
     {
@@ -26,6 +28,7 @@ class Auth extends BaseController
         $this->RolesModel = new RolesModel();
         $this->AccessListsModel = new AccessListsModel();
         $this->MenuUrlsModel = new MenuUrlsModel();
+        $this->DivisiModel = new DivisisModel();
     }
 
     public function login()
@@ -60,6 +63,7 @@ class Auth extends BaseController
                     $arr_companies = json_decode($res_user[0]["company_role"], true);
                     $in_company_id = implode(', ', array_column($arr_companies, 'company_id'));
                     $in_roles_id = implode(', ', array_column($arr_companies, 'role_id'));
+                    $arr_divisi_access_id = array_column($arr_companies, 'divisi_access_id');
 
                     $res_company = $this->CompaniesModel->get_by_in_id($in_company_id);
                     $res_roles = $this->RolesModel->get_by_in_id($in_roles_id);
@@ -71,7 +75,7 @@ class Auth extends BaseController
                                 if ($res_company[$i]["id"] == $arr_companies[$k]["company_id"] && $res_roles[$j]["id"] == $arr_companies[$k]["role_id"]) {
                                     $res_company[$i]["role_id"] = $res_roles[$j]["id"];
                                     $res_company[$i]["role_name"] = $res_roles[$j]["name"];
-                                    $check = 0;
+                                    $res_company[$i]["divisi_access_id"] = $arr_divisi_access_id[$i];
                                     break;
                                 }
                             }
@@ -126,6 +130,7 @@ class Auth extends BaseController
                         }
 
                         $this_company_id = $res_company[0]["id"];
+                        $this_access_divisi_id = $res_company[0]["divisi_access_id"];
                         $this_company = $res_company[0]["company"];
                         $this_access = $arr;
                         $this_role_id = $res_roles[0]["id"];
@@ -139,6 +144,7 @@ class Auth extends BaseController
                             "username" => $res_user[0]["username"],
                             "this_role_id" => $this_role_id,
                             "this_role_name" => $this_role_name,
+                            "this_access_divisi_id" => $this_access_divisi_id,
                             //"company_role" => $data->company_role,
                             //"company_role" => $data->company_role,
                             "arr_company"   => $res_company,

@@ -281,22 +281,18 @@ function formatDMYtoYMD($date)
    return $dateObj->format('Y-m-d');
 }
 
-function can($menuName, $childMenuName, $access = [])
+// Access
+function can($parentMenuName, $childMenuName, $access)
 {
    // access isinya = [c,r,u,d,p,a]
-   $hakAkses = session()->get('login')->this_access;
-   foreach ($hakAkses as $h) {
-      if ($h->menuName == $menuName) {
-         if (isset($h->child)) {
-            // ADA CHILD MENU
-            foreach ($h->child as $c) {
-               // CEK CHILD MENU NAME
-               if ($c->name == $childMenuName) {
-                  // CEK HAK AKSES
-                  if (array_intersect($c->access, $access)) {
-                     return true;
-                  }
-               }
+   $this_access_arr = session()->get('login')->this_access;
+
+   for ($i = 0; $i < count($this_access_arr); $i++) {
+      if ($this_access_arr[$i]->menuName == $parentMenuName) {
+         $childArr = $this_access_arr[$i]->child;
+         foreach ($childArr as $c) {
+            if (property_exists($c, 'access') && in_array($access, $c->access) && $c->name == $childMenuName) {
+               return true;
             }
          }
       }

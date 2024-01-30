@@ -148,7 +148,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
+                <?php if (can('Master Data', 'Customer', 'd')) : ?>
+                    <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -158,9 +160,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Customer</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Master Data', 'Customer', 'c')) : ?>
+            <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -314,21 +318,44 @@
             .css('z-index', '1');
 
         // TERMIN
+        //CSS SELECT2 FLOATING LABEL
+        $(".termin")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".termin")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".termin")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         $('.termin').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
         })
 
+
+        // MATA UANG
         //CSS SELECT2 FLOATING LABEL
-        $(".termin")
+        $(".currency")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".termin")
+        $(".currency")
             .parent('div')
             .children('span')
             .children('span')
@@ -336,27 +363,27 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".termin")
+        $(".currency")
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
-        // MATA UANG
         $('.currency').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
         })
 
+        // TIPE PELANGGAN
         //CSS SELECT2 FLOATING LABEL
-        $(".currency")
+        $(".tipe_pelanggan")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".currency")
+        $(".tipe_pelanggan")
             .parent('div')
             .children('span')
             .children('span')
@@ -364,27 +391,27 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".currency")
+        $(".tipe_pelanggan")
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
-        // TIPE PELANGGAN
         $('.tipe_pelanggan').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
         })
 
+        // PROVINCE PARENT
         //CSS SELECT2 FLOATING LABEL
-        $(".tipe_pelanggan")
+        $(".province_parent_id")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".tipe_pelanggan")
+        $(".province_parent_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -392,27 +419,28 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".tipe_pelanggan")
+        $(".province_parent_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
-        // PROVINCE PARENT
         $('.province_parent_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
         })
 
+
+        // CITY PARENT
         //CSS SELECT2 FLOATING LABEL
-        $(".province_parent_id")
+        $('.city_parent_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".province_parent_id")
+        $('.city_parent_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -420,38 +448,16 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".province_parent_id")
+        $('.city_parent_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
-        // CITY PARENT
         $('.city_parent_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
         })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.city_parent_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.city_parent_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.city_parent_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -834,48 +840,104 @@
 
                         let id = $(".id").val();
 
-                        $.ajax({
-                            url: id ? "<?= base_url("customer/update"); ?>" : "<?= base_url("customer/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
+                        if (id) {
+                            <?php if (can('Master Data', 'Customer', 'd')) : ?>
+                                $.ajax({
+                                    url: "<?= base_url("customer/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    $(".add-modal").modal("hide")
+                                                    table.ajax.reload()
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            <?php else : ?>
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Anda tidak punya akses untuk update',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            <?php endif; ?>
+
+                        } else {
+                            $.ajax({
+                                url: "<?= base_url("customer/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal").modal("hide")
+                                                table.ajax.reload()
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        .then(() => {
-                                            $(".add-modal").modal("hide")
-                                            table.ajax.reload()
-                                        })
-                                } else {
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
+                            });
+                        }
+
+
                     }
                 })
             }

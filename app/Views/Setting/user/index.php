@@ -80,6 +80,7 @@
                             <tr>
                                 <th>Company</th>
                                 <th>Role</th>
+                                <th>Departemen</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -110,7 +111,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select company_id" name="company_id" id="company_id">
+                                <select class="form-select company_id" name="company_id" id="company_id" onchange="changeCompany($(this).val(), [])">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Company</label>
@@ -124,6 +125,12 @@
                                 <label for="floatingInput">Role</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-subtitle-modal"></div>
+                    <div class="card-text" style="margin-top: -10px;">
+                        Pilih Departemen Yang Dapat Diakses User
+                    </div>
+                    <div class="row" id="row_divisi">
                     </div>
                 </form>
             </div>
@@ -429,6 +436,12 @@
                 url: `<?= base_url("company/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     $(".company_id").empty()
                     $(".company_id").append(`<option value=""></option>`)
@@ -443,6 +456,12 @@
             $.ajax({
                 url: `<?= base_url("role/dropdown"); ?>`,
                 method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(res) {
                     $(".role_id").empty()
@@ -488,6 +507,12 @@
                 url: `<?= base_url("employee/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     $(".employee_id").empty()
                     $(".employee_id").val("").change()
@@ -558,8 +583,16 @@
                                 let new_company_role = []
                                 let tag_html = "";
 
-                                row = 0;
+                                var divisiChecklistValue = $('.divisi_access_list:checked').map(function() {
+                                    return this.value;
+                                }).get();
 
+                                var divisiChecklistName = $('.divisi_access_list:checked').map(function() {
+                                    return $(this).data('divisi_name');
+                                }).get();
+
+
+                                row = 0;
                                 $(".body-detail-table").empty()
 
                                 company_role.map(item => {
@@ -571,6 +604,9 @@
                                         tag_html += "<td>";
                                         tag_html += role_name;
                                         tag_html += "</td>";
+                                        tag_html += "<td>";
+                                        tag_html += divisiChecklistName === undefined ? "-" : divisiChecklistName.join(", ");
+                                        tag_html += "</td>";
                                         tag_html += "</tr>";
 
                                         new_company_role.push({
@@ -579,6 +615,8 @@
                                             role_id: role_id,
                                             company_name: company_name,
                                             role_name: role_name,
+                                            divisi_access_id: divisiChecklistValue,
+                                            divisi_access_name: divisiChecklistName
                                         });
                                     } else {
                                         tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
@@ -588,13 +626,16 @@
                                         tag_html += "<td>";
                                         tag_html += item.role_name;
                                         tag_html += "</td>";
+                                        tag_html += "<td>";
+                                        tag_html += item.divisi_access_name === undefined ? "-" : (item.divisi_access_name.length === 0 ? '-' : item.divisi_access_name.join(", "));
+                                        tag_html += "</td>";
                                         tag_html += "</tr>";
 
                                         new_company_role.push(item);
                                     }
 
                                     row = row + 1;
-                                })
+                                });
 
                                 company_role = new_company_role;
 
@@ -635,12 +676,21 @@
                             cancelButtonText: 'Batal',
                         }).then((result) => {
                             if (result.isConfirmed) {
+                                var divisiChecklistValue = $('.divisi_access_list:checked').map(function() {
+                                    return this.value;
+                                }).get();
+                                var divisiChecklistName = $('.divisi_access_list:checked').map(function() {
+                                    return $(this).data('divisi_name');
+                                }).get();
+
                                 company_role.push({
                                     row: row + 1,
                                     company_id: company_id,
                                     role_id: role_id,
                                     company_name: company_name,
                                     role_name: role_name,
+                                    divisi_access_id: divisiChecklistValue,
+                                    divisi_access_name: divisiChecklistName
                                 })
 
                                 let tag_html = "";
@@ -650,6 +700,9 @@
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += role_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += divisiChecklistName === undefined ? "-" : (divisiChecklistName.length === 0 ? "-" : divisiChecklistName.join(", "));
                                 tag_html += "</td>";
                                 tag_html += "</tr>";
                                 $(".body-detail-table").append(tag_html)
@@ -665,6 +718,7 @@
                         confirmButtonColor: '#4e73df',
                     })
                 }
+
             }
         })
 
@@ -700,7 +754,9 @@
                             company_role.forEach((item) => {
                                 new_company_role.push({
                                     "company_id": item.company_id,
-                                    "role_id": item.role_id
+                                    "role_id": item.role_id,
+                                    "divisi_access_id": item.divisi_access_id !== undefined ? item.divisi_access_id : [],
+                                    "divisi_access_name": item.divisi_access_name !== undefined ? item.divisi_access_name : [],
                                 })
                             })
                             data.append("company_role", JSON.stringify(new_company_role))
@@ -825,7 +881,11 @@
                             id: id
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -885,6 +945,12 @@
                 url: "<?= base_url("user/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
@@ -905,6 +971,9 @@
                             tag_html += "<td>";
                             tag_html += item.role_name;
                             tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.divisi_access_name === undefined ? "-" : item.divisi_access_name.join(", ");
+                            tag_html += "</td>";
                             tag_html += "</tr>";
 
                             company_role.push({
@@ -913,6 +982,8 @@
                                 role_id: item.role_id,
                                 company_name: item.company_name,
                                 role_name: item.role_name,
+                                divisi_access_id: item.divisi_access_id !== null && item.divisi_access_id !== undefined ? item.divisi_access_id : [],
+                                divisi_access_name: item.divisi_access_name !== null && item.divisi_access_name !== undefined ? item.divisi_access_name : []
                             });
 
                             row = row + 1;
@@ -970,6 +1041,9 @@
                         tag_html += "<td>";
                         tag_html += item.role_name;
                         tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.divisi_access_name === undefined ? "-" : item.divisi_access_name.join(", ");
+                        tag_html += "</td>";
                         tag_html += "</tr>";
 
                         new_company_role.push({
@@ -997,15 +1071,29 @@
         let company_id = $(this).data('companyid')
         let role_id = $(this).data('roleid')
         let id = $(this).data('id')
+        let divisi_access_id_selected = [];
 
         $(".id_detail").val(id)
 
         validator_detail.resetForm();
         validator_detail.reset();
 
+        company_role.map(item => {
+            if (item.company_id == company_id) {
+                divisi_access_id_selected = item.divisi_access_id;
+            }
+        });
+
+
         $.ajax({
             url: `<?= base_url("company/dropdown"); ?>`,
             method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
             dataType: "json",
             success: function(res) {
                 $(".company_id").empty()
@@ -1014,7 +1102,9 @@
                     $(".company_id").append(`<option value="${item.id}">${item.company}</option>`)
                 })
 
-                $(".company_id").val(company_id).change();
+                $(".company_id").val(company_id);
+                changeCompany(company_id, divisi_access_id_selected)
+
             }
         })
 
@@ -1022,6 +1112,12 @@
             url: `<?= base_url("role/dropdown"); ?>`,
             method: "GET",
             dataType: "json",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
             success: function(res) {
                 $(".role_id").empty()
                 $(".role_id").append(`<option value=""></option>`)
@@ -1032,8 +1128,53 @@
                 $(".role_id").val(role_id).change();
                 $(".detail-modal").modal("show");
             }
-        })
-    })
+        });
+
+
+    });
+
+    const changeCompany = function(company_id, divisi_access_id_selected) {
+        console.log(divisi_access_id_selected);
+        var csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append("companyID", company_id);
+        $.ajax({
+            url: "<?= base_url("user/find-divisi"); ?>",
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                $('#row_divisi').empty();
+                if (response.data.length === 0) {
+                    $('#row_divisi').html("<i style='margin-top:3px; color:red;'>Departemen tidak ada</i>");
+                }
+                response.data.forEach(function(item) {
+                    $('#row_divisi').append(
+                        `
+                        <div class="col-sm-4 mt-2">
+                            <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                                <input type="checkbox" ${$.inArray(item.id, divisi_access_id_selected) !== -1 ? 'checked' : ''} name="divisi_access_list" class="custom-control-input divisi_access_list" data-divisi_name="${item.divisi}" value="${item.id}" id="${item.id}">
+                                <label class="custom-control-label" for="${item.id}">${item.divisi}</label>
+                            </div>
+                        </div>
+                        `
+                    );
+                });
+
+            }
+        });
+    }
+
 
     const password_show_hide = function() {
         var x = document.getElementById("password");

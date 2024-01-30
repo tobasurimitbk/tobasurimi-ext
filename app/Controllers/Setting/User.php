@@ -44,12 +44,14 @@ class User extends BaseController
         $name = "";
         $role_id = "";
         $role_name = "";
+        $access_divisi_id = [];
 
         for ($i = 0; $i < count($ses); $i++) {
             if ($ses[$i]["id"] == $id) {
                 $name = $ses[$i]["company"];
                 $role_id = $ses[$i]["role_id"];
                 $role_name = $ses[$i]["role_name"];
+                $access_divisi_id = $ses[$i]["divisi_access_id"];
                 break;
             }
         }
@@ -103,6 +105,7 @@ class User extends BaseController
             $this->session->this_role_id = $role_id;
             $this->session->this_role_name = $role_name;
             $this->session->this_access = $arr;
+            $this->session->this_access_divisi_id = $access_divisi_id;
 
             session()->setTempdata("login", $this->session, 36000);
 
@@ -368,7 +371,9 @@ class User extends BaseController
                         "company_id" => $item->company_id,
                         "role_id" => $item->role_id,
                         "company_name" => $company_name ? $company_name["company"] : "",
-                        "role_name" => $role_name ? $role_name["name"] : ""
+                        "role_name" => $role_name ? $role_name["name"] : "",
+                        "divisi_access_id" => $item->divisi_access_id,
+                        "divisi_access_name" => $item->divisi_access_name
                     ]);
                 }
                 $data = [
