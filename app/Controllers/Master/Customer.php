@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 use App\Models\ProvincesModel;
 use App\Models\CustomerModel;
 use App\Models\BanksModel;
+use App\Models\CountryModel;
 use App\Models\EmployeesModel;
 use App\Models\ListAddressesModel;
 use App\Models\SalesOrderModel;
@@ -22,7 +23,8 @@ class Customer extends BaseController
     protected $ListAddressesModel;
     protected $SalesOrderModel;
     protected $employessModel;
-    private $soInvModel;
+    protected $soInvModel;
+    protected $countryModel;
 
     public function __construct()
     {
@@ -35,6 +37,7 @@ class Customer extends BaseController
         $this->SalesOrderModel = new SalesOrderModel();
         $this->soInvModel = new SalesOrderInvoiceModel();
         $this->employessModel = new EmployeesModel();
+        $this->countryModel = new CountryModel();
     }
 
     public function customer()
@@ -42,12 +45,12 @@ class Customer extends BaseController
         //Get Provinces
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
-        $dataSales = $this->employessModel->getEmployeeSales();
+        $dataCountry = $this->countryModel->findAll();
 
         $data = [
             "dataProvinces" => $dataProvinces,
             "dataBanks" => $dataBanks,
-            "sales" => $dataSales
+            "dataCountry" => $dataCountry
         ];
 
         return view('Master/customer/index', $data);
@@ -63,7 +66,11 @@ class Customer extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $condition = [];
+        $condition = [
+            'tipe_customer' => $this->request->getGet('customerType'),
+            'customers.deletedAt' => null,
+            'customers.sales_id' => session()->get('login')->user_id
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -82,13 +89,15 @@ class Customer extends BaseController
         foreach ($customerData['data'] as $data) {
             array_push($dataCustomer, [
                 "no"            => $no++,
-                "id"            => $data->id,
+                "id"            => encrypt($data->id),
                 "kode"          => $data->kode,
                 "name"          => $data->name,
                 "phone"         => $data->phone,
                 "contact_person" => $data->contact_person,
                 "saldo"         => number_format($data->saldo),
                 "currencyName"  => $data->currencyName,
+                "countryName"   => $data->countryName,
+                "address"       => $data->address
             ]);
         }
 
@@ -97,7 +106,6 @@ class Customer extends BaseController
             "recordsTotal"      => $customerData['totalData'],
             "recordsFiltered"   => $customerData['totalFilteredData'],
             "data"              => $dataCustomer,
-            // "response" => $response,
             "payload"           => $payload
         ];
 
@@ -115,12 +123,7 @@ class Customer extends BaseController
                         'required' => 'Nama tidak boleh kosong'
                     ]
                 ],
-                "address" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Alamat tidak boleh kosong'
-                    ]
-                ],
+
                 "email" => [
                     "rules" => "permit_empty|valid_email",
                     'errors' => [
@@ -162,7 +165,9 @@ class Customer extends BaseController
                     "termin" => $this->request->getPost("termin"),
                     "piutang" => number_format($piutangValue, 2, '.', ''),
                     "currency" => $this->request->getPost("currency"),
-                    "sales_id" => $this->request->getPost("sales_id")
+                    "country_id" => $this->request->getPost('country_id'),
+                    "tipe_customer" => $this->request->getPost("tipe_customer"),
+                    "sales_id" => session()->get('login')->user_id
                 ];
                 // var_dump($values);
                 // exit;
@@ -208,12 +213,6 @@ class Customer extends BaseController
                         'required' => 'Nama tidak boleh kosong'
                     ]
                 ],
-                "address" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Alamat tidak boleh kosong'
-                    ]
-                ],
                 "email" => [
                     "rules" => "permit_empty|valid_email",
                     'errors' => [
@@ -236,7 +235,7 @@ class Customer extends BaseController
             if ($this->validate($rules)) {
                 $payload = '';
 
-                $id = $this->request->getPost("id");
+                $id = decrypt($this->request->getPost("id"));
 
                 $values = [
                     "company_id" => $this->this_company_id,
@@ -254,7 +253,9 @@ class Customer extends BaseController
                     "nik" => $this->request->getPost("nik"),
                     "termin" => $this->request->getPost("termin"),
                     "currency" => $this->request->getPost("currency"),
-                    "sales_id" => $this->request->getPost("sales_id")
+                    "country_id" => $this->request->getPost('country_id'),
+                    "tipe_customer" => $this->request->getPost("tipe_customer"),
+                    "sales_id" => session()->get('login')->user_id
                 ];
                 if ($this->CustomerModel->update($id, $values)) {
                     $data = [
@@ -290,7 +291,11 @@ class Customer extends BaseController
     public function getByIdCustomer($id = null)
     {
         if (!empty($id)) {
+            $id = decrypt($id);
             $res = $this->CustomerModel->get_by_id($id, '1');
+            $country =  $this->countryModel->where('id', $res[0]['country_id'])->first();
+            $res[0]['id'] = encrypt($res[0]['id']);
+            $res[0]['country_id'] = $country == null ? 0 : $country['id'];
 
             if (count($res) > 0) {
                 $data = [
@@ -319,7 +324,7 @@ class Customer extends BaseController
     public function deleteCustomer()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
 
             if (!empty($id)) {
                 $res_list = $this->ListAddressesModel->get_by_customer_id($id);

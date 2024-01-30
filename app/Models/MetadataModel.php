@@ -75,6 +75,7 @@ class MetadataModel extends Model
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND name = '" . $values["name"] . "' ");
 
+        $requete .= "AND deletedAt IS NULL ";
         if ($sortby != '')
             $requete .= "ORDER BY $sortby ";
         if ($limit >= 0)

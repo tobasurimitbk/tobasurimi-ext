@@ -34,6 +34,8 @@ class CustomerModel extends Model
         'saldo',
         'nik',
         'sales_id',
+        'country_id',
+        'tipe_customer',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -90,11 +92,14 @@ class CustomerModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "customers.*, 
-                      metadata.value AS currencyName";
+                      metadata.value AS currencyName,
+                      country.country_name AS countryName";
+
         $customerDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
+            ->join('country', 'country.id = customers.country_id', 'left')
             // ->groupBy(('customers.id'))
             ->orderBy($sort, $sortType);
 
@@ -105,7 +110,8 @@ class CustomerModel extends Model
         }
 
         if ($addCondition['search']) {
-            $customerDataQry->like('customers.name', $addCondition['search']);
+            $customerDataQry->like('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search']);
         }
 
         if ($addCondition['search']) {
