@@ -3,6 +3,7 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\DivisisModel;
 use App\Models\WarehousesModel;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
@@ -14,6 +15,7 @@ class Warehouse extends BaseController
     protected $WarehousesModel;
     protected $ProvincesModel;
     protected $EmployeesModel;
+    protected $DivisisModel;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class Warehouse extends BaseController
         $this->WarehousesModel = new WarehousesModel();
         $this->ProvincesModel = new ProvincesModel();
         $this->EmployeesModel = new EmployeesModel();
+        $this->DivisisModel = new DivisisModel();
     }
 
     public function warehouse()
@@ -29,11 +32,12 @@ class Warehouse extends BaseController
         //$dataWarehouses = $this->WarehousesModel->search_list(array("company_id" => $this->this_company_id), 'warehouse_name');
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $dataPic = $this->EmployeesModel->search_list(array(), 'name');
+        $dataDivisi = $this->DivisisModel->getDivisiAccess();
 
         $data = [
             "dataPic" => $dataPic,
-            //  "dataWarehouses" => $dataWarehouses,
-            "dataProvinces" => $dataProvinces
+            "dataProvinces" => $dataProvinces,
+            "dataDivisi" => $dataDivisi
         ];
 
         return view('Master/warehouse/index', $data);
@@ -54,11 +58,13 @@ class Warehouse extends BaseController
         $columnSortOrder = $temp[0]['dir']; // Column index
 
         $search = $this->request->getVar('search');
+        $divisiID = $this->request->getVar('divisi_search');
         //$searchValue = $temp['value']; // Column index
 
         $values = [
             "company_id"    => $this->this_company_id,
-            "search"        => $search
+            "search"        => $search,
+            "divisi_id"     => $divisiID
         ];
 
         $totalRecords = $this->WarehousesModel->total_list(array());
@@ -74,9 +80,10 @@ class Warehouse extends BaseController
 
             $data[] = array(
                 "no" => ($row + $i + 1),
-                "id" => $res[$i]["id"],
+                "id" => encrypt($res[$i]["id"]),
                 "code_warehouse" => $res[$i]["code_warehouse"],
                 "warehouse_name" => $res[$i]["warehouse_name"],
+                "divisi_name" => $res[$i]["divisi_name"],
                 "address" => $res[$i]["address"],
                 "province_id" => $res[$i]["province_id"],
                 "city_id" => $res[$i]["city_id"],
@@ -145,6 +152,7 @@ class Warehouse extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "email" => $this->request->getPost("email"),
                     "pic_id" => $this->request->getPost("pic_id"),
+                    "divisi_id" => $this->request->getPost("divisi_id")
                 ];
 
                 if ($this->WarehousesModel->insert($values)) {
@@ -218,7 +226,7 @@ class Warehouse extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+                $id = decrypt($this->request->getPost("id"));
 
                 $values = [
                     "code_warehouse" => $this->request->getPost("code_warehouse"),
@@ -230,6 +238,7 @@ class Warehouse extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "email" => $this->request->getPost("email"),
                     "pic_id" => $this->request->getPost("pic_id"),
+                    "divisi_id" => $this->request->getPost("divisi_id")
                 ];
 
                 if ($this->WarehousesModel->update($id, $values)) {
@@ -265,9 +274,10 @@ class Warehouse extends BaseController
     public function getByIdWarehouse($id = null)
     {
         if (!empty($id)) {
+            $id = decrypt($id);
             $res = $this->WarehousesModel->get_by_id($id);
-            $response = curl_request("GET", "/warehouses/$id", $this->token);
             if (count($res)) {
+                $res[0]['id'] = encrypt($res[0]['id']);
                 $data = [
                     "status"  => true,
                     "data"  => (object) $res[0],
@@ -294,7 +304,7 @@ class Warehouse extends BaseController
     public function deleteWarehouse()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
 
             if (!empty($id)) {
                 $values = [

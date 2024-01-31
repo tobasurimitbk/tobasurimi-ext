@@ -128,7 +128,7 @@ class Akses extends BaseController
                                 array_push($access, 'a');
                             }
                             if ($this->request->getPost("unposting_" . $child["id"]) !== null) {
-                                array_push($access, 'u');
+                                array_push($access, 'ua');
                             }
                             array_push(
                                 $result,
@@ -216,6 +216,7 @@ class Akses extends BaseController
                         $arr_companies = json_decode($res_user[0]["company_role"], true);
                         $in_company_id = implode(', ', array_column($arr_companies, 'company_id'));
                         $in_roles_id = implode(', ', array_column($arr_companies, 'role_id'));
+                        $arr_divisi_access_id = array_column($arr_companies, 'divisi_access_id');
 
                         $res_company = $this->CompaniesModel->get_by_in_id($in_company_id);
                         $res_roles = $this->RolesModel->get_by_in_id($in_roles_id);
@@ -227,6 +228,7 @@ class Akses extends BaseController
                                     if ($res_company[$i]["id"] == $arr_companies[$k]["company_id"] && $res_roles[$j]["id"] == $arr_companies[$k]["role_id"]) {
                                         $res_company[$i]["role_id"] = $res_roles[$j]["id"];
                                         $res_company[$i]["role_name"] = $res_roles[$j]["name"];
+                                        $res_company[$i]["divisi_access_id"] = $arr_divisi_access_id[$i];
                                         $check = 0;
                                         break;
                                     }
@@ -272,6 +274,7 @@ class Akses extends BaseController
                         }
 
                         $this_company_id = $res_company[0]["id"];
+                        $this_access_divisi_id = $res_company[0]["divisi_access_id"];
                         $this_company = $res_company[0]["company"];
                         $this_access = $arr;
                         $this_role_id = $res_roles[0]["id"];
@@ -285,6 +288,7 @@ class Akses extends BaseController
                             "username" => $res_user[0]["username"],
                             "this_role_id" => $this_role_id,
                             "this_role_name" => $this_role_name,
+                            "this_access_divisi_id" => $this_access_divisi_id,
                             //"company_role" => $data->company_role,
                             //"company_role" => $data->company_role,
                             "arr_company"   => $res_company,

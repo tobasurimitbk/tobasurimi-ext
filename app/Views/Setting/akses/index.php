@@ -201,10 +201,10 @@
                                 if (!child.access.includes('a')) {
                                     tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='approve_" + child.menu_url_id + "'  id='approve_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
-                                if (child.access.includes('u')) {
+                                if (child.access.includes('ua')) {
                                     tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='unposting_" + child.menu_url_id + "'  id='unposting_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
-                                if (!child.access.includes('u')) {
+                                if (!child.access.includes('ua')) {
                                     tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='unposting_" + child.menu_url_id + "'  id='unposting_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' id='" + child.menu_url_id + "' onchange='checkAll(" + child.menu_url_id + ")' /><span></span></label></td>";
