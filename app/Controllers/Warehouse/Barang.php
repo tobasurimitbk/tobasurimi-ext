@@ -121,7 +121,7 @@ class Barang extends BaseController
             'company_id' => $this->this_company_id,
             'satuan_id' => decrypt($this->request->getVar('satuan_id')),
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
-            'divisi_id' => decrypt($this->request->getVar('divisi_id')),
+            // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
@@ -135,7 +135,11 @@ class Barang extends BaseController
             $result[] = array(
                 'barang_master_id' => $barangMasterID,
                 'spesifikasi' => $_POST['spek'][$key],
-                // 'is_primer' => $_POST['primer'][$key] ? "true" : "false",
+                'satuan_1' => decrypt($_POST['satuan1_id'][$key]),
+                'satuan_2' => decrypt($_POST['satuan2_id'][$key]),
+                'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
+                'satuan_3' => decrypt($_POST['satuan3_id'][$key]),
+                'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
             );
         }
         $barangSpesifikasiModel->insertBatch($result);
@@ -160,7 +164,7 @@ class Barang extends BaseController
             'company_id' => $this->this_company_id,
             'satuan_id' => decrypt($this->request->getVar('satuan_id')),
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
-            'divisi_id' => decrypt($this->request->getVar('divisi_id')),
+            // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
@@ -178,7 +182,11 @@ class Barang extends BaseController
             $result[] = array(
                 'barang_master_id' => $id,
                 'spesifikasi' => $_POST['spek'][$key],
-                // 'is_primer' => $_POST['primer'][$key] ? "true" : "false",
+                'satuan_1' => decrypt($_POST['satuan1_id'][$key]),
+                'satuan_2' => decrypt($_POST['satuan2_id'][$key]),
+                'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
+                'satuan_3' => decrypt($_POST['satuan3_id'][$key]),
+                'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
             );
         }
         $barangSpesifikasiModel->insertBatch($result);
@@ -224,9 +232,7 @@ class Barang extends BaseController
         $res = $barangModel->where('id', $id)->where('deletedAt', null)->first();
         $res['id'] = encrypt($res['id']);
         $res['company_id'] = encrypt($res['company_id']);
-        $res['satuan_id'] = encrypt($res['satuan_id']);
         $res['parent_type_id'] = encrypt($res['parent_type_id']);
-        $res['divisi_id'] = encrypt($res['divisi_id']);
         $spekDetail = $barangSpesifikasiModel->getBarangSpesifikasiByBarangMasterID($id);
 
         return response()->setJSON([
