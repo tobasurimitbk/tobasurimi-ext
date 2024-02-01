@@ -128,6 +128,29 @@ class BarangMasterModel extends Model
         return $data;
     }
 
+    public function getBarangByTypeWithSpec($condition)
+    {
+        $selectQry = "barang_master.id, barang_master.kode_barang, barang_master.barang_name AS barang_name_master, barang_master.parent_type_id, 
+                    satuans.nama_satuan, 
+                    parent_barang.parent_name,
+                    barang_master_spesifikasi.id AS barang_master_spesifikasi_id, 
+                    barang_master_spesifikasi.spesifikasi,
+                    barang_master_spesifikasi.satuan_1,
+                    barang_master_spesifikasi.satuan_2,
+                    barang_master_spesifikasi.satuan_3";
+
+        $data = $this->select($selectQry)
+            ->join('parent_barang', 'barang_master.parent_type_id = parent_barang.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->join('satuans', 'barang_master_spesifikasi.satuan_1 = satuans.id', 'left')
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where($condition)
+            ->findAll();
+
+        return $data;
+    }
+
     public function getBySupplier($id)
     {
         $arrCondition = [

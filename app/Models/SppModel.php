@@ -22,7 +22,6 @@ class SppModel extends Model
         'spp_no',
         'spp_type',
         'divisi_id',
-        'total',
         'note',
         'is_posted',
         'request_status',
@@ -60,9 +59,7 @@ class SppModel extends Model
             'sppNo'            => 'purchase_requests.spp_no',
             'divisi'            => 'divisis.divisi',
             'company'            => 'companies.company',
-            'total'             => 'purchase_requests.total',
             'requestDate'      => 'purchase_requests.request_date',
-            'createdAt'         => 'purchase_requests.createdAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -91,7 +88,6 @@ class SppModel extends Model
         if ($addCondition['search']) {
             $purchaseRequestsDataQry
                 ->like('spp_no', $addCondition['search']);
-            // ->orLike('spp_type', $addCondition['search']);
         }
 
         if ($addCondition['spp_type']) {

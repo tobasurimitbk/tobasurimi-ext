@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Kelompok Barang</h1>
+        <h1>Kategori Barang</h1>
         <button class="btn btn-show-form btn-add float-right">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -27,7 +27,7 @@
             </ul>
             <div class="row justify-content-end mt-4">
                 <div class="col-md-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kelompok Barang" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kategori Barang" value="" />
                 </div>
             </div>
             <div class="row mt-3">
@@ -36,7 +36,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('parent_name')" class="sort">Kelompok Barang</th>
+                                <th onclick="changeSort('parent_name')" class="sort">Kategori Barang</th>
                                 <?php if ($type == "bahan_penolong") : ?>
                                     <th onclick="" class="sort">Kategori</th>
                                 <?php endif; ?>
@@ -219,7 +219,7 @@
 
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Kelompok Barang ' + parentName + '?',
+                title: 'Hapus Kategori Barang ' + parentName + '?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -272,7 +272,7 @@
             },
             messages: {
                 parentName: {
-                    required: "Kelompok Barang Wajib Diisi"
+                    required: "Kategori Barang Wajib Diisi"
                 },
             },
             errorElement: 'span',

@@ -8,14 +8,29 @@
         <div class="col-button-tambah-spp">
             <?php if (!empty($dataSPP)) { ?>
                 <?php if ($dataSPP->is_posted === "0") { ?>
-                    <button class="btn btn-hapus delete-parent float-right">
-                        Hapus
-                    </button>
+                    <?php if (can('Pembelian', 'SPP', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
                 <?php } ?>
 
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("spp/print/"); ?><?= $dataSPP->id ?>')">
+                <button class="btn btn-warning btn-print float-right" onclick="print('<?= encrypt($dataSPP->id) ?>')">
                     Print
                 </button>
+                <?php if ($dataSPP->is_posted == "0") : ?>
+                    <?php if (can('Pembelian', 'SPP', 'a')) : ?>
+                        <button onclick="updateStatusPosting('1')" class="btn btn-success posting-spp float-right posting-spp">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
+                        <button onclick="updateStatusPosting('0')" class="btn btn-success un-posting-spp float-right posting-spp">
+                            Un Posting
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
 
             <?php } ?>
 
@@ -44,39 +59,29 @@
                 </div>
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSPP) ? $dataSPP->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSPP) ? encrypt($dataSPP->id) : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataCompany)) {
-                                    foreach ($dataCompany as $company) {
-                                ?>
-                                        <option value="<?= $company["id"]; ?>" <?= !empty($dataSPP) ? ($dataSPP->company_id === $company["id"] ? "selected" : "") : ""; ?>><?= $company["company"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Company</label>
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= !empty($dataSPP) ? 'readonly' : '' ?> autocomplete="one-time-code" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <label for="floatingInput">No. SPP</label>
+                                </div>
+                                <div style="<?= !empty($dataSPP) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select onchange="changeDepartment()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataDivisi)) {
-                                    foreach ($dataDivisi as $divisi) {
-                                ?>
-                                        <option value="<?= $divisi->id; ?>" <?= !empty($dataSPP) ? ($dataSPP->divisi_id === $divisi->id ? "selected" : "") : ""; ?>><?= $divisi->divisi; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                <?php foreach ($dataDivisi as $d) : ?>
+                                    <option <?= !empty($dataSPP) ? ($dataSPP->divisi_id == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Departemen</label>
                         </div>
@@ -98,24 +103,11 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
-                                    <label for="floatingInput">No. SPP</label>
-                                </div>
-                                <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="hidden" class="form-control type" id="type" name="type" value="<?= !empty($dataSPP) ? $dataSPP->spp_type : "Import"; ?>">
-                            <input type="hidden" name="spp_type" value="Import">
-                            <select disabled onchange="changeTipeSPP()" <?= !empty($dataSPP) ? 'disabled="true"' : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
-                                <!-- <option value="Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "selected" : "") : ""; ?>>Lokal</option> -->
-                                <option selected value="Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Import" ? "selected" : "") : ""; ?>>Import Bahan Penolong</option>
+                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? 'disabled="true"' : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataSppType as $d) : ?>
+                                    <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['value'] ?>"><?= $d['value'] ?></option>
+                                <?php endforeach; ?>
                             </select>
 
                             <label for="floatingInput">Tipe SPP</label>
@@ -127,12 +119,6 @@
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataSPP) ? $dataSPP->createdByName : session()->get("login")->name; ?>">
-                            <label for="floatingInput">Order Oleh</label>
-                        </div>
-                    </div> -->
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -160,79 +146,22 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th style="width: 10px;">No</th>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
-                                <th>Harga Barang</th>
                                 <th>Qty</th>
-                                <th>Total Harga</th>
                                 <th>Keterangan</th>
-                                <th style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
+                                <th style="width:80px;<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none;" : "") : ""; ?>">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                            <?php
-                            $no = 1;
-                            $total_harga_barang = 0;
-                            $total_qty = 0;
-                            $total_harga = 0;
-                            if (!empty($dataSPP)) {
-                                foreach ($dataSPP->purchase_request_details as $details) {
-                                    $total_harga_barang = $total_harga_barang + ($details->price ? formatter(str_replace(",", "", $details->price), "STR_TO_FLOAT") : 0);
-                                    $total_qty = $total_qty + $details->qty;
-                                    $total_harga = $total_harga + ($details->totalPrice ? formatter(str_replace(",", "", $details->totalPrice), "STR_TO_FLOAT") : 0);
-                            ?>
-
-                                    <tr>
-                                        <?php if ($dataSPP->is_posted === "0") { ?>
-
-                                            <td><?= $no; ?></td>
-                                            <td><?= $details->kodeBarang; ?></td>
-                                            <td><?= $details->barangName; ?></td>
-                                            <td><?= $details->satuanName; ?></td>
-                                            <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
-                                            <td><?= "Rp " . number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= $details->note; ?></td>
-                                            <td>
-                                                <button data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
-                                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                                </button>
-                                                <button onclick="deleteRow('<?= $no; ?>')" class="btn btn-danger">
-                                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                                </button>
-                                            </td>
-
-                                        <?php } else { ?>
-
-                                            <td><?= $no; ?></td>
-                                            <td><?= $details->kodeBarang; ?></td>
-                                            <td><?= $details->barangName; ?></td>
-                                            <td><?= $details->satuanName; ?></td>
-                                            <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
-                                            <td><?= "Rp " . number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= $details->note; ?></td>
-
-                                        <?php } ?>
-
-                                    </tr>
-                            <?php
-                                    $no++;
-                                }
-                            } ?>
-                        </tbody>
-                        <tfoot class="foot-detail-table" id="foot-detail-table">
+                        <tbody class="body-detail-table" id="body-detail-table">
+                        <tfoot class="tfoot">
                             <tr>
-                                <td colspan="3"></td>
-                                <td><b>TOTAL</b></td>
-                                <td><b><?= "Rp " . number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td><b><?= $total_qty; ?></b></td>
-                                <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td colspan="2"></td>
+                                <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
                             </tr>
                         </tfoot>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -245,12 +174,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
-                <!-- <button type="button" onclick="alert('Menu master barang masih diperbarui')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button> -->
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input type="hidden" name="barang_spesifikasi_id" class="barang_spesifikasi_id" id="barang_spesifikasi_id">
+                    <input autocomplete="one-time-code" type="hidden" class="barang_detail_id" name="barang_detail_id" id="barang_detail_id" />
                     <input autocomplete="one-time-code" type="hidden" class="barang_id" name="barang_id" id="barang_id" />
+                    <input autocomplete="one-time-code" type="hidden" class="header_barang_name" name="header_barang_name" id="header_barang_name" />
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -271,10 +202,6 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <!-- <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Satuan</label> -->
                                 <input autocomplete="one-time-code" type="hidden" class="satuan_id" name="satuan_id">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" readonly="true" type="text" class="form-control satuan" id="satuan" name="satuan" placeholder="Satuan">
@@ -284,22 +211,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
-                                <label for="floatingInput">Harga Barang</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                                 <label for="floatingInput">Qty</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total Harga">
-                                <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
                     </div>
@@ -315,8 +228,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail" onclick="submitDetailForm()">Simpan</button>
             </div>
         </div>
     </div>
@@ -324,47 +236,9 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
+
     let list_items = [];
-    let list_delete = [];
-    var row = 0;
-    var total_harga_barang = 0;
-    var total_qty = 0;
-    var total_harga = 0;
-    var priceEdit = 0;
-    var totalPriceEdit = 0;
-
-    <?php if (!empty($dataSPP)) {
-        foreach ($dataSPP->purchase_request_details as $details) {
-    ?>
-
-            priceEdit = Number('<?= $details->price; ?>'.replaceAll(",", ""));
-            totalPriceEdit = Number('<?= $details->totalPrice; ?>'.replaceAll(",", ""));
-            row = row + 1;
-
-            total_harga_barang = total_harga_barang + priceEdit;
-            total_qty = total_qty + <?= $details->qty; ?>;
-            total_harga = total_harga + totalPriceEdit;
-
-            list_items.push({
-                id: <?= $details->id; ?>,
-                row: row,
-                barang_id: '<?= $details->barang_id; ?>',
-                kode_barang: '<?= $details->kodeBarang; ?>',
-                nama_barang: '<?= $details->barangName; ?>',
-                nama_satuan: '<?= $details->satuanName; ?>',
-                satuan: <?= $details->unit; ?>,
-                harga: '<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                qty: Number('<?= $details->qty; ?>'),
-                total: '<?= number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                keterangan: '<?= $details->note; ?>'
-            })
-        <?php
-        }
-        ?>
-    <?php
-    } ?>
-
-    console.log(list_items)
 
     var validator_detail = $(".detail-form").validate({
         rules: {
@@ -378,6 +252,9 @@
                 required: true
             },
             harga: {
+                required: true
+            },
+            satuan: {
                 required: true
             }
         },
@@ -393,6 +270,9 @@
             },
             harga: {
                 required: "Harga wajib diisi"
+            },
+            satuan: {
+                required: "Satuan wajib diisi"
             }
         },
         errorElement: 'span',
@@ -417,461 +297,304 @@
         },
     });
 
-    $(document).ready(function() {
-        $(".request_date").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        // SPESIFIKASI
-        // $('.spesifikasi').select2({
-        //     placeholder: "",
-        //     theme: "bootstrap-5",
-        //     dropdownParent: $(".detail-modal .modal-content")
-        // })
-
-        // COMPANY
-        $('.company_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.company_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.company_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.company_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // DIVISI
-        $('.divisi_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.divisi_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.divisi_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.divisi_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // KODE BARANG
-        $('.kode_barang').select2({
-            placeholder: "Pilih Kode Barang",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content"),
-            tags: false,
-            allowClear: true
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.kode_barang')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.kode_barang')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.kode_barang')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // SATUAN
-        // $('.satuan').select2({
-        //     placeholder: "",
-        //     theme: "bootstrap-5",
-        //     dropdownParent: $(".detail-modal .modal-content")
-        // })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.satuan')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.satuan')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.satuan')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        $('.icon-request-date').click(function() {
-            $(".request_date").focus();
-        });
-
-        var validator = $(".create-form").validate({
-            rules: {
-                request_date: {
-                    required: true
-                },
-                spp_no: {
-                    required: true
-                },
-                divisi_id: {
-                    required: true,
-                },
-                company_id: {
-                    required: true,
-                }
+    var validator = $(".create-form").validate({
+        rules: {
+            request_date: {
+                required: true
             },
-            messages: {
-                request_date: {
-                    required: "Tanggal Order wajib diisi"
-                },
-                spp_no: {
-                    required: "No. SPP wajib diisi"
-                },
-                divisi_id: {
-                    required: "Departemen wajib diisi"
-                },
-                company_id: {
-                    required: "Company wajib diisi"
-                }
+            spp_no: {
+                required: true
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
+            divisi_id: {
+                required: true,
             },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
+            spp_type: {
+                required: true,
+            }
+        },
+        messages: {
+            request_date: {
+                required: "Tanggal Order wajib diisi"
             },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
+            spp_no: {
+                required: "No. SPP wajib diisi"
             },
-        });
-
-        // $(".posting-spp").click(function() {
-        //     Swal.fire({
-        //         icon: 'question',
-        //         title: 'Yakin akan di Posting?',
-        //         confirmButtonColor: '#4e73df',
-        //         cancelButtonColor: '#d33',
-        //         showCancelButton: true,
-        //         reverseButtons: true,
-        //         confirmButtonText: 'Posting',
-        //         cancelButtonText: 'Batal',
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             const csrf = $(`[name="${csrfToken}"]`);
-        //             $.ajax({
-        //                 url: "<?= base_url("spp/update-status"); ?>",
-        //                 data: {
-        //                     id: $(".id").val()
-        //                 },
-        //                 beforeSend: function(xhr) {
-        //                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-        //                 },
-        //                 method: "POST",
-        //                 dataType: "json",
-        //                 success: function(response) {
-        //                     csrf.val(response.token);
-        //                     if (response.status) {
-        //                         stopLoading()
-        //                         Swal.fire({
-        //                                 icon: 'success',
-        //                                 title: response.message,
-        //                                 confirmButtonColor: '#4e73df',
-        //                             })
-        //                             .then(() => {
-        //                                 window.location.href = "<?= base_url("spp"); ?>";
-        //                             })
-        //                     } else {
-        //                         Swal.fire({
-        //                             icon: 'error',
-        //                             title: response.message,
-        //                             confirmButtonColor: '#4e73df',
-        //                         })
-        //                         stopLoading()
-        //                     }
-        //                 },
-        //                 onError: function(response) {
-        //                     csrf.val(response.token);
-        //                     Swal.fire({
-        //                         icon: 'error',
-        //                         title: 'Data Gagal Dihapus, coba Lagi',
-        //                         confirmButtonColor: '#4e73df',
-        //                     })
-        //                     stopLoading()
-        //                 }
-        //             });
-        //         }
-        //     })
-        // })
-
-        $(".btn-submit-parent").click(function() {
-            $(".detail-modal").modal("hide")
-
-            // CHECK IF NO BARANG
-            if (list_items.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Barang Tidak Boleh Kosong",
-                    confirmButtonColor: '#4e73df',
-                })
+            divisi_id: {
+                required: "Departemen wajib diisi"
+            },
+            spp_type: {
+                required: "Pilih Tipe SPP"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
             } else {
-                // CHECK IF NO BARANG
-                if (list_items.length > 6) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: "Maksimal barang yang diinput adalah 6",
-                        confirmButtonColor: '#4e73df',
-                    })
-                } else {
-                    if ($(".create-form").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const csrf = $(`[name="${csrfToken}"]`);
-                                setLoading()
-                                let data = new FormData(document.querySelector(".create-form"));
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-                                let update_list_items = [];
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
-                                if (list_delete.length !== 0) {
-                                    list_delete.map(obj => {
-                                        update_list_items.push({
-                                            id: obj.id ? Number(obj.id) : 0,
-                                            item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            item_code: obj.kode_barang,
-                                            item_name: obj.nama_barang,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            unit: obj.satuan ? Number(obj.satuan) : 0,
-                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                            note: obj.keterangan,
-                                            isDeleted: true
-                                        })
-                                    })
-                                }
+    $(".request_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
 
-                                list_items.map(obj => {
-                                    if (obj.id) {
-                                        update_list_items.push({
-                                            id: obj.id ? Number(obj.id) : 0,
-                                            item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            item_code: obj.kode_barang,
-                                            item_name: obj.nama_barang,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            unit: obj.satuan ? Number(obj.satuan) : 0,
-                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                            note: obj.keterangan
-                                        })
-                                    } else {
-                                        update_list_items.push({
-                                            item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            item_code: obj.kode_barang,
-                                            item_name: obj.nama_barang,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            unit: obj.satuan ? Number(obj.satuan) : 0,
-                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                            note: obj.keterangan
+    // DIVISI
+    $('.divisi_id').select2({
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5"
+    });
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.divisi_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.divisi_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.divisi_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    // PILIH TIPE SPP
+    $('.spp_type').select2({
+        placeholder: "Pilih SPP",
+        theme: "bootstrap-5"
+    });
+
+    $('.spp_type')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.spp_type')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.spp_type')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    // KODE BARANG
+    $('.kode_barang').select2({
+        placeholder: "Pilih Kode Barang",
+        theme: "bootstrap-5",
+        dropdownParent: $(".detail-modal .modal-content"),
+        tags: false,
+        allowClear: true
+    })
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.kode_barang')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.kode_barang')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.kode_barang')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    $('.icon-request-date').click(function() {
+        $(".request_date").focus();
+    });
+
+
+    $(".btn-submit-parent").click(function() {
+        $(".detail-modal").modal("hide")
+        if (list_items.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Barang masih kosong",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let id = $(".id").val();
+                        let formData = new FormData(document.querySelector('.create-form'));
+                        formData.append("items", JSON.stringify(list_items));
+
+                        if (id) {
+                            // UPDATE
+                            <?php if (can('Pembelian', 'SPP', 'u')) : ?>
+                                $.ajax({
+                                    url: "<?= base_url("spp/update"); ?>",
+                                    data: formData,
+                                    method: "POST",
+                                    dataType: "json",
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        setLoading();
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        if (response.status) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                reverseButtons: true,
+                                                confirmButtonText: 'Oke',
+                                            }).then((result) => {
+                                                location.reload();
+                                            })
+                                        }
+
+                                    }
+                                });
+                            <?php else : ?>
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: "Anda tidak memiliki akses update",
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            <?php endif; ?>
+                        } else {
+                            // CREATE
+                            $.ajax({
+                                url: "<?= base_url("spp/save"); ?>",
+                                data: formData,
+                                method: "POST",
+                                dataType: "json",
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    setLoading();
+                                },
+                                complete: function() {
+                                    stopLoading();
+                                },
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    if (response.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
+                                        }).then((result) => {
+                                            window.location.replace("<?= base_url('spp/id/') ?>" + response.id);
                                         })
                                     }
-                                })
-
-                                data.append("items", JSON.stringify(update_list_items))
-
-                                let id = $(".id").val();
-                                // UPDATE
-                                if (id) {
-                                    $.ajax({
-                                        url: "<?= base_url("spp/update"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            csrf.val(response.token);
-                                            if (response.status) {
-                                                stopLoading()
-                                                Swal.fire({
-                                                        icon: 'success',
-                                                        title: response.message,
-                                                        confirmButtonColor: '#4e73df',
-                                                    })
-                                                    .then(() => {
-                                                        window.location.href = "<?= base_url("spp"); ?>";
-                                                    })
-                                            } else {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                stopLoading()
-                                            }
-                                        },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Diubah, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    });
                                 }
-                                // CREATE
-                                else {
-                                    $.ajax({
-                                        url: "<?= base_url("spp/save"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            csrf.val(response.token);
-                                            if (response.status) {
-                                                stopLoading()
-                                                Swal.fire({
-                                                        icon: 'success',
-                                                        title: response.message,
-                                                        confirmButtonColor: '#4e73df',
-                                                    })
-                                                    .then(() => {
-                                                        window.location.href = "<?= base_url("spp"); ?>";
-                                                    })
-                                            } else {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                stopLoading()
-                                            }
-                                        },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Diubah, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    });
-                                }
-                            }
-                        })
+                            });
+                        }
                     }
-                }
+                })
             }
-        })
+        }
 
-        $(".btn-show-detail").click(function() {
-            $(".delete-detail").css('display', 'none');
+    })
 
-            $(".title-detail-name").text("Tambah");
-            $(".id_detail").val('');
+    $(".btn-show-detail").click(function() {
 
-            $(".kode").val('')
-            $(".nama_barang").val('')
-            $(".qty").val('')
-            $(".satuan").val('')
-            $(".satuan_id").val('')
-            $(".harga").val('')
-            $(".total").val('')
-            $(".keterangan").val('')
+        $(".title-detail-name").text("Tambah");
+        $(".barang_detail_id").val('');
 
-            validator_detail.resetForm();
-            validator_detail.reset();
+        $(".kode").val('')
+        $(".nama_barang").val('')
+        $(".qty").val('')
+        $(".satuan").val('')
+        $(".satuan_id").val('')
+        $(".harga").val('')
+        $(".total").val('')
+        $(".keterangan").val('')
+
+        validator_detail.resetForm();
+        validator_detail.reset();
+
+        var spp_type = $('.spp_type').val().trim();
+        var type = "";
+
+        if (spp_type === "Import BB" || spp_type === "Lokal BB") {
+            type = "bahan_baku";
+        } else {
+            type = "bahan_penolong";
+        }
+        if (spp_type) {
             $.ajax({
                 url: `<?= base_url("barang/dropdown/type"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    type: "bahan_penolong"
+                    type: type
                 },
                 success: function(res) {
-
                     $(".kode_barang").empty();
-
-                    $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
-
+                    $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                     res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                     })
-
                     $(".kode_barang").val("").change();
                     $(".detail-modal").modal("show");
                 }
             })
-        })
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih Tipe SPP Dahulu",
+                confirmButtonColor: '#4e73df',
+            })
+        }
 
         $(".btn-hide-detail").click(function() {
             $(".detail-modal").modal("hide")
@@ -883,736 +606,346 @@
                 let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
                 let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
                 let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
+                let barang_spesifikasi_id = $(".kode_barang option:selected").data("barang_spesifikasi_id") ? $(".kode_barang option:selected").data("barang_spesifikasi_id") : "";
+                let barang_name_master = $(".kode_barang option:selected").data("barang_name_master");
+                let spp_type = $('.spp_type').val().trim();
+
+
+                if (list_items.length === 0 && spp_type === "Lokal BB") {
+                    $('.header_barang_name').val(barang_name_master);
+                }
 
                 $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
                 $(".barang_id").val(barang_id);
+                $(".barang_spesifikasi_id").val(barang_spesifikasi_id);
                 $(".satuan").val(satuan);
                 $(".satuan_id").val(satuan_id);
             } else {
                 $(".kode").val("");
                 $(".nama_barang").val("");
                 $(".barang_id").val("");
+                $(".barang_spesifikasi_id").val("");
                 $(".satuan").val("");
                 $(".satuan_id").val("");
             }
         })
+    })
 
-        $(".harga, .qty").keyup(function() {
-            let harga = $(".harga").val() ? Number($(".harga").val()) : 0;
-            let qty = $(".qty").val() ? Number($(".qty").val()) : 0;
-
-            let total = (harga * qty);
-            $(".total").val(total);
-        })
-
-        // delete
-        $(".delete-parent").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $(".id").val();
-                    let tipe = $(".spp_type option:selected").val();
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("spp/delete"); ?>",
-                        data: {
-                            id: id,
-                            tipe: tipe
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("spp"); ?>"
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
+    // delete
+    $(".delete-parent").click(function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                let id = $(".id").val();
+                $.ajax({
+                    url: "<?= base_url("spp/delete"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
-
-        $(".btn-submit-detail").click(function() {
-            let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
-            let barang_id = $(".barang_id").val()
-            let kode_barang = $(".kode").val()
-            let nama_barang = $(".nama_barang").val()
-            let nama_satuan = $(".satuan").val()
-            let satuan = $(".satuan_id").val()
-            let harga = $(".harga").val()
-            let qty = $(".qty").val()
-            let total = $(".total").val()
-            let keterangan = $(".keterangan").val()
-
-            let validate_same = false;
-
-            list_items.map(item => {
-                if (barang_id !== '') {
-                    if (item.barang_id == barang_id) {
-                        // kalau edit barang, barang tidak ganti tidak kena validasi
-                        if (row_detail === item.row) {
-                            validate_same = false;
-                        } else {
-                            validate_same = true;
-                        }
-                    }
-                }
-            })
-
-            if (validate_same) {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Barang Sudah Ada",
-                    confirmButtonColor: '#4e73df',
-                })
-            } else {
-                // update detail
-                if (row_detail) {
-                    if ($(".detail-form").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                console.log(id)
-                                let new_list_items = []
-                                let tag_html = "";
-                                let tag_total = "";
-
-                                row = 0;
-
-                                $(".body-detail-table").empty()
-
-                                total_harga_barang = 0;
-                                total_qty = 0;
-                                total_harga = 0;
-
-                                list_items.map(item => {
-                                    if (item.row == row_detail) {
-                                        tag_html += `<tr>`;
-                                        tag_html += `<td>`;
-                                        tag_html += row + 1;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += kode_barang;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += nama_barang;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += nama_satuan;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        });
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += qty;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "Rp " + Number(total).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        });
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += keterangan;
-                                        tag_html += "</td>";
-                                        tag_html += "<td>";
-                                        tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">
-                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                        </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                        </button>`;
-                                        tag_html += "</td>";
-                                        tag_html += "</tr>";
-
-                                        new_list_items.push({
-                                            id: item.id,
-                                            row: row + 1,
-                                            barang_id: barang_id,
-                                            kode_barang: kode_barang,
-                                            nama_barang: nama_barang,
-                                            nama_satuan: nama_satuan,
-                                            satuan: satuan,
-                                            harga: Number(harga).toLocaleString(undefined, {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }),
-                                            qty: qty,
-                                            total: Number(total).toLocaleString(undefined, {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }),
-                                            keterangan: keterangan
-                                        });
-
-                                        row = row + 1;
-
-                                        total_harga_barang = total_harga_barang + Number(harga);
-                                        total_qty = total_qty + Number(qty);
-                                        total_harga = total_harga + Number(total);
-                                    } else {
-                                        tag_html += `<tr>`;
-                                        tag_html += `<td>`;
-                                        tag_html += row + 1;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.kode_barang;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.nama_barang;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.nama_satuan;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "Rp " + item.harga;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.qty;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "Rp " + item.total;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.keterangan;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
-                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                        </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                        </button>`;
-                                        tag_html += "</td>";
-                                        tag_html += "</tr>";
-
-                                        new_list_items.push(item);
-
-                                        row = row + 1;
-
-                                        total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                                        total_qty = total_qty + Number(item.qty);
-                                        total_harga = total_harga + Number(item.total.replaceAll(",", ""));
-                                    }
+                                .then(() => {
+                                    window.location.href = "<?= base_url("spp"); ?>"
                                 })
-
-                                list_items = [];
-
-                                list_items = new_list_items;
-
-                                $(".body-detail-table").append(tag_html)
-
-                                $(".foot-detail-table").empty()
-
-                                tag_total += `<tr>`;
-                                tag_total += "<td colspan='3'>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += "<b>TOTAL</b>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_qty}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td colspan='2'>";
-                                tag_total += "</td>";
-                                tag_total += "</tr>";
-
-                                $(".foot-detail-table").append(tag_total);
-
-                                $(".detail-modal").modal("hide")
-                            }
-                        })
-                    }
-                }
-                // create detail
-                else {
-                    if ($(".detail-form").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                list_items.push({
-                                    id: '',
-                                    row: row + 1,
-                                    barang_id: barang_id,
-                                    kode_barang: kode_barang,
-                                    nama_barang: nama_barang,
-                                    nama_satuan: nama_satuan,
-                                    satuan: satuan,
-                                    harga: Number(harga).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }),
-                                    qty: qty,
-                                    total: Number(total).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }),
-                                    keterangan: keterangan
-                                })
-
-                                total_harga_barang = total_harga_barang + Number(harga);
-                                total_qty = total_qty + Number(qty);
-                                total_harga = total_harga + Number(total);
-
-                                let tag_html = "";
-                                let tag_total = "";
-
-                                tag_html += `<tr>`;
-                                tag_html += `<td>`;
-                                tag_html += row + 1;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += kode_barang;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += nama_barang;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += nama_satuan;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += "Rp " + Number(harga).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                });
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += qty;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += "Rp " + Number(total).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                });
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += keterangan;
-                                tag_html += "</td>";
-                                tag_html += "<td>";
-                                tag_html += `
-                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">
-                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                </button>`;
-                                tag_html += "</td>";
-                                tag_html += "</tr>";
-                                $(".body-detail-table").append(tag_html)
-
-                                $(".foot-detail-table").empty()
-
-                                tag_total += `<tr>`;
-                                tag_total += "<td colspan='3'>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += "<b>TOTAL</b>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_qty}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td colspan='2'>";
-                                tag_total += "</td>";
-                                tag_total += "</tr>";
-
-                                $(".foot-detail-table").append(tag_total);
-
-                                $(".detail-modal").modal("hide")
-                                row = row + 1;
-                            }
-                        })
-                    }
-                }
-            }
-        })
-    })
-
-    const deleteRow = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                console.log(id)
-                let new_list_items = []
-                let tag_html = "";
-                let tag_total = "";
-
-                $(".body-detail-table").empty()
-
-                row = 0;
-
-                console.log(list_items)
-
-                total_harga_barang = 0;
-                total_qty = 0;
-                total_harga = 0;
-
-                list_items.map(item => {
-                    if (item.row != id) {
-                        tag_html += `<tr>`;
-                        tag_html += `<td>`;
-                        tag_html += row + 1;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.kode_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.nama_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.nama_satuan;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += "Rp " + item.harga;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.qty;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += "Rp " + item.total;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.keterangan;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += `<button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
-                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        </button>`;
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
-
-                        new_list_items.push({
-                            ...item,
-                            row: row + 1
-                        });
-
-                        row = row + 1;
-
-                        total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                        total_qty = total_qty + Number(item.qty);
-                        total_harga = total_harga + Number(item.total.replaceAll(",", ""));
-                    } else {
-                        // sent parameter isDelete if have customer id and id
-                        if (item.id) {
-                            list_delete.push(item)
                         }
-                    }
-                })
+                    },
 
-                list_items = [];
-
-                list_items = new_list_items;
-
-                $(".body-detail-table").append(tag_html)
-
-                $(".foot-detail-table").empty()
-
-                tag_total += `<tr>`;
-                tag_total += "<td colspan='3'>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += "<b>TOTAL</b>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_qty}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td colspan='2'>";
-                tag_total += "</td>";
-                tag_total += "</tr>";
-
-                $(".foot-detail-table").append(tag_total);
-
-                $(".detail-modal").modal("hide")
-            }
-        })
-    }
-
-    $(document).on('click', '.delete-detail', function() {
-        let id = $(".id_detail").val()
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let new_list_items = []
-                let tag_html = "";
-                let tag_total = "";
-
-                $(".body-detail-table").empty()
-
-                total_harga_barang = 0;
-                total_qty = 0;
-                total_harga = 0;
-
-                row = 0;
-
-                console.log(list_items)
-
-                list_items.map(item => {
-                    if (item.row != id) {
-                        tag_html += `<tr>`;
-                        tag_html += `<td>`;
-                        tag_html += row + 1;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.kode_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.nama_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.nama_satuan;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += "Rp " + item.harga;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.qty;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += "Rp " + item.total;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.keterangan;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += `<button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
-                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        </button>`;
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
-
-                        new_list_items.push({
-                            ...item,
-                            row: row + 1
-                        });
-
-                        row = row + 1;
-
-                        total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                        total_qty = total_qty + Number(item.qty);
-                        total_harga = total_harga + Number(item.total.replaceAll(",", ""));
-                    } else {
-                        // sent parameter isDelete if have customer id and id
-                        if (item.id) {
-                            list_delete.push(item)
-                        }
-                    }
-                })
-
-                list_items = [];
-
-                list_items = new_list_items;
-
-                $(".body-detail-table").append(tag_html)
-
-                $(".foot-detail-table").empty()
-
-                tag_total += `<tr>`;
-                tag_total += "<td colspan='3'>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += "<b>TOTAL</b>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_qty}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td colspan='2'>";
-                tag_total += "</td>";
-                tag_total += "</tr>";
-
-                $(".foot-detail-table").append(tag_total);
-
-                $(".detail-modal").modal("hide")
+                });
             }
         })
     })
 
     $(document).on('click', '.edit-table-detail', function(evt) {
         $(".title-detail-name").text("Update")
-        $(".delete-detail").css('display', '');
-        let barang_id = $(this).data('barang_id')
-        let kode_barang = $(this).data('kode_barang')
-        let nama_barang = $(this).data('nama_barang')
-        let satuan = $(this).data('satuan')
-        let harga = $(this).data('harga')
-        let qty = $(this).data('qty')
-        let keterangan = $(this).data('keterangan')
-        let rowid = $(this).data('row')
-        let id = $(this).data('id')
 
         validator_detail.resetForm();
         validator_detail.reset();
+        let barang_id = "";
+        let barang_spesifikasi_id = "";
+        let barang_detail_id = $(this).data('barang_detail_id');
 
-        $(".id_detail").val(rowid)
-        $(".kode").val(kode_barang)
-        $(".keterangan").val(keterangan)
+        $.each(list_items, function(i, v) {
+            if (v.barang_detail_id === barang_detail_id) {
+                $(".barang_detail_id").val(v.barang_detail_id);
+                $(".barang_id").val(v.barang_id);
+                $(".barang_spesifikasi_id").val(v.barang_spesifikasi_id);
+                $(".kode_barang").val(v.kode_barang);
+                $(".nama_barang").val(v.nama_barang);
+                $(".nama_satuan").val(v.nama_satuan);
+                $(".satuan_id").val(v.satuan_id);
+                $(".qty").val(v.qty);
+                $(".keterangan").val(v.keterangan);
 
-        $(".barang_id").val(barang_id)
-        $(".nama_barang").val(nama_barang)
+                barang_id = v.barang_id;
+                barang_spesifikasi_id = v.barang_spesifikasi_id;
+            }
+        });
 
-        $(".harga").val(harga.replaceAll(",", ""))
-        $(".qty").val(qty)
-        $(".total").val(Number(harga.replaceAll(",", "")) * Number(qty))
+        var spp_type = $('.spp_type').val().trim();
+        var type = "";
+        if (spp_type == "Import BB" || spp_type == "Lokal BB") {
+            type = "bahan_baku";
+        } else {
+            type = "bahan_penolong";
+        }
 
         $.ajax({
             url: `<?= base_url("barang/dropdown/type"); ?>`,
             method: "GET",
             dataType: "json",
             data: {
-                type: "bahan_penolong"
+                type: type
             },
             success: function(res) {
                 $(".kode_barang").empty();
-
-                $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
-
+                $(".kode_barang").append(`<option data-barang_name_master=""  data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                 res.data.forEach(function(item) {
-                    if (Number(barang_id) === Number(item.id)) {
-                        $(".satuan_id").val(item.satuan_id);
+                    if (barang_id === item.id && barang_spesifikasi_id === item.barang_master_spesifikasi_id) {
+                        $(".satuan_id").val(item.satuan_1);
                         $(".satuan").val(item.nama_satuan);
-                        $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        $(".kode_barang").append(`<option selected data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                     } else {
-                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                     }
                 })
 
                 $(".detail-modal").modal("show");
             }
         })
-    })
+    });
+
+    $('.btn-hide-detail').click(function() {
+        $('.detail-modal').modal('hide');
+        resetFormDetail();
+    });
+
+    const submitDetailForm = function() {
+        let barang_detail_id = $(".barang_detail_id").val();
+        let barang_id = $(".barang_id").val()
+        let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
+        let kode_barang = $(".kode_barang").val()
+        let nama_barang = $(".nama_barang").val()
+        let nama_satuan = $(".satuan").val()
+        let satuan_id = $(".satuan_id").val()
+        let qty = $(".qty").val()
+        let keterangan = $(".keterangan").val() ? $(".keterangan").val() : '-'
+
+        let header_barang_name = $('.header_barang_name').val();
+        let spp_type = $('.spp_type').val().trim();
+
+        let validate_same = false;
+        let validate_bahan_baku = false;
+
+        if (barang_detail_id === '') {
+            list_items.map(item => {
+                if (item.barang_id === barang_id && item.barang_spesifikasi_id === barang_spesifikasi_id) {
+                    validate_same = true
+                }
+            });
+        }
+
+        if (list_items.length >= 1 && spp_type === "Lokal BB") {
+            list_items.map(item => {
+                if (item.barang_id !== barang_id) {
+                    validate_bahan_baku = true;
+                }
+            });
+        }
+
+        validator_detail.resetForm();
+        validator_detail.reset();
+
+        if (validate_bahan_baku) {
+            Swal.fire({
+                icon: 'error',
+                title: "Header Barang Wajib " + header_barang_name.toUpperCase() + " (Karena ini merupakan PO Lokal Bahan Baku)",
+                confirmButtonColor: '#4e73df',
+            })
+        } else
+
+        if (validate_same) {
+            Swal.fire({
+                icon: 'error',
+                title: "Barang Sudah Ada",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+
+            if (barang_detail_id) {
+                if ($(".detail-form").valid()) {
+                    // UPDATE DETAIL
+                    $.each(list_items, function(i, v) {
+                        if (v.barang_detail_id === barang_detail_id) {
+                            list_items[i].barang_id = barang_id;
+                            list_items[i].barang_spesifikasi_id = barang_spesifikasi_id;
+                            list_items[i].kode_barang = kode_barang;
+                            list_items[i].nama_barang = nama_barang;
+                            list_items[i].nama_satuan = nama_satuan;
+                            list_items[i].satuan_id = satuan_id;
+                            list_items[i].qty = qty;
+                            list_items[i].keterangan = keterangan;
+                        }
+                    });
+                    drawTable();
+                    $(".detail-modal").modal("hide");
+                }
+            } else {
+                if ($(".detail-form").valid()) {
+                    // CREATE DETAIL
+                    if (barang_id !== "") {
+                        list_items.push({
+                            'barang_detail_id': getID(),
+                            'barang_id': barang_id,
+                            'barang_spesifikasi_id': barang_spesifikasi_id,
+                            'kode_barang': kode_barang,
+                            'nama_barang': nama_barang,
+                            'nama_satuan': nama_satuan,
+                            'satuan_id': satuan_id,
+                            'qty': qty,
+                            'keterangan': keterangan
+                        });
+                    }
+
+                    resetFormDetail();
+                    drawTable();
+                    $(".detail-modal").modal("hide");
+                }
+            }
+
+        }
+    }
+
+    const updateStatusPosting = function(status) {
+        Swal.fire({
+            icon: 'question',
+            title: status == '0' ? 'Unposting SPP ?' : 'Posting SPP ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("spp/update-status"); ?>",
+                    data: {
+                        id: "<?= !empty($dataSPP) ? encrypt($dataSPP->id) : '0' ?>",
+                        status: status
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    location.reload()
+                                })
+                        }
+                    },
+
+                });
+            }
+        })
+    }
 
     const changeTipeSPP = function() {
-        list_items = []
-        row = 0;
-        let tag_total = "";
-        $(".body-detail-table").empty()
-
-        $(".foot-detail-table").empty()
-
-        tag_total += `<tr>`;
-        tag_total += "<td colspan='3'>";
-        tag_total += "</td>";
-        tag_total += "<td>";
-        tag_total += "<b>TOTAL</b>";
-        tag_total += "</td>";
-        tag_total += "<td>";
-        tag_total += `<b>Rp 0.00</b>`;
-        tag_total += "</td>";
-        tag_total += "<td>";
-        tag_total += `<b>${total_qty}</b>`;
-        tag_total += "</td>";
-        tag_total += "<td>";
-        tag_total += `<b>Rp 0.00</b>`;
-        tag_total += "</td>";
-        tag_total += "<td colspan='2'>";
-        tag_total += "</td>";
-        tag_total += "</tr>";
-
-        $(".foot-detail-table").append(tag_total);
+        list_items = [];
+        drawTable();
     }
 
-    const addBarang = function(url) {
-        window.open(url, "_blank");
+    const drawTable = function() {
+        $('.body-detail-table').empty();
+        $('.tfoot').empty();
+        var row = '';
+        var no = 1;
+        if (list_items.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                    </tr>
+                `;
+            $('.tfoot').append(row);
+        } else {
+            list_items.map(item => {
+                row += '<tr style="color:whitesmoke;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.nama_barang + '</td>';
+                row += '<td>' + item.nama_satuan + '</td>';
+                row += '<td>' + item.qty + '</td>';
+                row += '<td>' + item.keterangan + '</td>';
+                <?php if (!empty($dataSPP)) : ?>
+                    <?php if ($dataSPP->is_posted == '0') : ?>
+                        row += '<td>' + `
+                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>` +
+                            '</td>';
+                    <?php endif; ?>
+                <?php else : ?>
+                    row += '<td>' + `
+                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>` +
+                        '</td>';
+                <?php endif; ?>
+
+                no++;
+            });
+            $('.body-detail-table').append(row);
+        }
     }
-    const print = function(url) {
-        window.open(url, "_blank");
+
+    const deleteRowDetail = function(id) {
+        const indexToRemove = list_items.findIndex(item => item.barang_detail_id === id);
+        if (indexToRemove !== -1) {
+            list_items.splice(indexToRemove, 1);
+        }
+        drawTable();
     }
 
     const changeDepartment = function() {
@@ -1657,5 +990,49 @@
             $(".spp_no").val("");
         }
     }
+    const resetFormDetail = function() {
+        $(".barang_detail_id").val('');
+        $(".barang_id").val('').val(null).change()
+        $(".barang_spesifikasi_id").val('');
+        $(".kode").val(null).change()
+        $(".nama_barang").val('')
+        $(".satuan").val('')
+        $(".satuan_id").val('')
+        $(".qty").val('')
+        $(".keterangan").val('')
+    }
+
+    const print = function(id) {
+        location.replace("<?= base_url('spp/print/') ?>" + id)
+    }
+
+    const getID = function() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
+
+    // Update
+    <?php if (!empty($dataSPP)) : ?>
+        <?php foreach ($dataSPPDetail as $i => $d) : ?>
+            list_items.push({
+                'barang_detail_id': getID(),
+                'barang_id': "<?= encrypt($d->barang1_id) ?>",
+                'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
+                'kode_barang': "<?= $d->kode_barang ?>",
+                'nama_barang': "<?= $d->nama_barang ?>",
+                'nama_satuan': "<?= $d->nama_satuan ?>",
+                'satuan_id': "<?= $d->unit ?>",
+                'qty': "<?= $d->qty ?>",
+                'keterangan': "<?= $d->note ?>"
+            });
+        <?php endforeach; ?>
+        drawTable();
+    <?php endif; ?>
 </script>
 <?= $this->endSection(); ?>

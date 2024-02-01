@@ -15,7 +15,7 @@ class RMImportPOModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'id', 'company_id', 'supplier_id', 'division_id', 'po_no', 'po_date', 'payment_date',
+        'id', 'purchase_request_id', 'company_id', 'supplier_id', 'division_id', 'po_no', 'po_date', 'payment_date',
         'currency',  'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin',
         'port_destination', 'location_transaction', 'shipment', 'latest_shipment_date', 'attn', 'createdBy', 'status_penerimaan', 'is_posted',
     ];

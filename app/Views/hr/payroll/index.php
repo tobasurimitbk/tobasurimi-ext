@@ -438,25 +438,25 @@
 
         if (monthYearGlobal == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Pilih periode payroll",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (startDateGlobal == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Tanggal mulai tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (finishDateGlobal == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Tanggal selesai tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (divisionGlobalID == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Pilih departemen dahulu",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
@@ -538,31 +538,31 @@
         var divisionID = $('#divisionID').val();
         if (monthYearPersonal == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Pilih periode absensi",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (divisionID == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Pilih departemen",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (employeeID == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Pilih karyawan",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (startDatePersonal == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Tanggal mulai tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (finishDatePersonal == '') {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Tanggal selesai tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
@@ -739,7 +739,7 @@
         var divisionID = $("#filterDivisiID").val();
         if (divisionID == "") {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: 'Pilih Departemen',
                 confirmButtonColor: '#4e73df',
             });

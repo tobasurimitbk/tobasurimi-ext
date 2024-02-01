@@ -59,7 +59,8 @@
                                 <th class="text-center" width="60">Update</th>
                                 <th class="text-center" width="60">Delete</th>
                                 <th class="text-center" width="60">Print</th>
-                                <th class="text-center" width="60">Approval</th>
+                                <th class="text-center" width="60">Posting</th>
+                                <th class="text-center" width="60">Un Posting</th>
                                 <th class="text-center" width="60">All</th>
                             </tr>
                         </thead>
@@ -200,6 +201,12 @@
                                 if (!child.access.includes('a')) {
                                     tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='approve_" + child.menu_url_id + "'  id='approve_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
+                                if (child.access.includes('ua')) {
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='unposting_" + child.menu_url_id + "'  id='unposting_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                }
+                                if (!child.access.includes('ua')) {
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='unposting_" + child.menu_url_id + "'  id='unposting_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                }
                                 tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' id='" + child.menu_url_id + "' onchange='checkAll(" + child.menu_url_id + ")' /><span></span></label></td>";
                                 tag_html += "</tr>";
                             })
@@ -234,6 +241,7 @@
             document.getElementById("delete_" + id).checked = true;
             document.getElementById("print_" + id).checked = true;
             document.getElementById("approve_" + id).checked = true;
+            document.getElementById("unposting_" + id).checked = true;
         } else {
             document.getElementById("create_" + id).checked = false;
             document.getElementById("read_" + id).checked = false;
@@ -241,6 +249,7 @@
             document.getElementById("delete_" + id).checked = false;
             document.getElementById("print_" + id).checked = false;
             document.getElementById("approve_" + id).checked = false;
+            document.getElementById("unposting_" + id).checked = false;
         }
     }
 

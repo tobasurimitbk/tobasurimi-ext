@@ -148,7 +148,7 @@
             success: function(res) {
                 if (res.data.status === false) {
                     Swal.fire({
-                        icon: 'warning',
+                        icon: 'error',
                         title: res.data.message,
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'

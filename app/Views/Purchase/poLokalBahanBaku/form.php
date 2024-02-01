@@ -1035,7 +1035,7 @@
             // CHECK IF NO BARANG
             if (list_items.length === 0) {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Barang Tidak Boleh Kosong",
                     confirmButtonColor: '#4e73df',
                 })
@@ -1058,13 +1058,13 @@
 
                 if (!lpb_otomatis) {
                     Swal.fire({
-                        icon: 'warning',
+                        icon: 'error',
                         title: "Lokasi warehouse wajib diisi",
                         confirmButtonColor: '#4e73df',
                     })
                 } else if (validate_item) {
                     Swal.fire({
-                        icon: 'warning',
+                        icon: 'error',
                         title: "Barang Tidak Boleh Kosong",
                         confirmButtonColor: '#4e73df',
                     })

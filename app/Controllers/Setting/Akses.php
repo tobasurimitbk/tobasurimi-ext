@@ -17,7 +17,7 @@ class Akses extends BaseController
     protected $AccessListsModel;
     protected $MenuUrlsModel;
     protected $UserModel;
-    
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -33,7 +33,7 @@ class Akses extends BaseController
         //Get Role
         $dataRole = [];
         $dataRole = $this->RolesModel->getRoleDropdown();
-         
+
         //Get Company
         $dataCompany = [];
         $dataCompany = $this->CompaniesModel->getCompanies();
@@ -52,17 +52,13 @@ class Akses extends BaseController
         $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
         $arr = [];
 
-        if($res_access_list)
-        {
-            foreach($res_access_list as $parent)
-            {
+        if ($res_access_list) {
+            foreach ($res_access_list as $parent) {
                 $arr_child = [];
                 $res_access_child = $this->MenuUrlsModel->get_menu_url($parent["id"]);
 
-                if($res_access_child)
-                {
-                    foreach($res_access_child as $child)
-                    {
+                if ($res_access_child) {
+                    foreach ($res_access_child as $child) {
                         $payload = [
                             "company_id" => $this->request->getGet("company_id"),
                             "role_id" => $this->request->getGet("role_id"),
@@ -97,7 +93,7 @@ class Akses extends BaseController
 
     public function saveAkses()
     {
-        try{
+        try {
             $role_id = formatter($this->request->getPost("role_id"), "STR_TO_INT");
             $company_id = formatter($this->request->getPost("company_id"), "STR_TO_INT");
 
@@ -106,16 +102,12 @@ class Akses extends BaseController
             //Get Access List
             $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
 
-            if($res_access_list)
-            {
-                foreach($res_access_list as $parent)
-                {
+            if ($res_access_list) {
+                foreach ($res_access_list as $parent) {
                     $res_access_child = $this->MenuUrlsModel->get_menu_url($parent["id"]);
 
-                    if($res_access_child)
-                    {
-                        foreach($res_access_child as $child)
-                        {
+                    if ($res_access_child) {
+                        foreach ($res_access_child as $child) {
                             $access = array();
                             if ($this->request->getPost("create_" . $child["id"]) !== null) {
                                 array_push($access, 'c');
@@ -134,6 +126,9 @@ class Akses extends BaseController
                             }
                             if ($this->request->getPost("approve_" . $child["id"]) !== null) {
                                 array_push($access, 'a');
+                            }
+                            if ($this->request->getPost("unposting_" . $child["id"]) !== null) {
+                                array_push($access, 'ua');
                             }
                             array_push(
                                 $result,
@@ -157,8 +152,7 @@ class Akses extends BaseController
                 // ];
                 // echo json_encode($data);
 
-                foreach($result as $item)
-                {
+                foreach ($result as $item) {
                     $payloadLoop = [
                         "company_id" => $this->request->getPost("company_id"),
                         "role_id" => $this->request->getPost("role_id"),
@@ -170,8 +164,7 @@ class Akses extends BaseController
                     $exist_access = $this->AccessListsModel->get_access($payloadLoop);
 
                     // update
-                    if($exist_access)
-                    {
+                    if ($exist_access) {
                         array_push($payloadFinal, $payloadLoop);
 
                         $updateAccess = $this->AccessListsModel->where(['id' => $exist_access->id])->set($payloadLoop)->update();
@@ -187,10 +180,8 @@ class Akses extends BaseController
                         }
                     }
                     // create
-                    else
-                    {
-                        if(sizeof($item["action"]) !== 0)
-                        {
+                    else {
+                        if (sizeof($item["action"]) !== 0) {
                             array_push($payloadFinal, $payloadLoop);
 
                             $createAccess = $this->AccessListsModel->insert($payloadLoop);
@@ -210,29 +201,26 @@ class Akses extends BaseController
 
                 // set new session if this account login have same access edited
                 $change_session = false;
-                foreach(session()->get("login")->arr_company as $allCompany)
-                {
+                foreach (session()->get("login")->arr_company as $allCompany) {
 
-                    if(formatter($this->request->getPost("company_id"), "STR_TO_INT") === formatter($allCompany["id"], "STR_TO_INT"))
-                    {
-                        if(formatter($this->request->getPost("role_id"), "STR_TO_INT") === formatter($allCompany["role_id"], "STR_TO_INT"))
-                        {
+                    if (formatter($this->request->getPost("company_id"), "STR_TO_INT") === formatter($allCompany["id"], "STR_TO_INT")) {
+                        if (formatter($this->request->getPost("role_id"), "STR_TO_INT") === formatter($allCompany["role_id"], "STR_TO_INT")) {
                             $change_session = true;
                         }
                     }
                 }
 
-                if($change_session)
-                {
+                if ($change_session) {
                     $res_user = $this->UserModel->get_by_username(session()->get("login")->username);
                     if (count($res_user) > 0) {
                         $arr_companies = json_decode($res_user[0]["company_role"], true);
                         $in_company_id = implode(', ', array_column($arr_companies, 'company_id'));
                         $in_roles_id = implode(', ', array_column($arr_companies, 'role_id'));
-    
+                        $arr_divisi_access_id = array_column($arr_companies, 'divisi_access_id');
+
                         $res_company = $this->CompaniesModel->get_by_in_id($in_company_id);
                         $res_roles = $this->RolesModel->get_by_in_id($in_roles_id);
-    
+
                         for ($i = 0; $i < count($res_company); $i++) {
                             $check = 1;
                             for ($j = 0; $j < count($res_roles); $j++) {
@@ -240,6 +228,7 @@ class Akses extends BaseController
                                     if ($res_company[$i]["id"] == $arr_companies[$k]["company_id"] && $res_roles[$j]["id"] == $arr_companies[$k]["role_id"]) {
                                         $res_company[$i]["role_id"] = $res_roles[$j]["id"];
                                         $res_company[$i]["role_name"] = $res_roles[$j]["name"];
+                                        $res_company[$i]["divisi_access_id"] = $arr_divisi_access_id[$i];
                                         $check = 0;
                                         break;
                                     }
@@ -247,7 +236,7 @@ class Akses extends BaseController
                                 if ($check == 0) break;
                             }
                         }
-    
+
                         $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
                         //$res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($res_roles[0]["id"], $res_company[0]["id"]);
                         $res_child_access = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_not_parent($res_roles[0]["id"], $res_company[0]["id"]);
@@ -263,9 +252,8 @@ class Akses extends BaseController
                                         "url"   => $res_child_access[$j]["url"],
                                         "access"    => $access
                                     ];
-                                    
-                                    if(sizeof($access) !== 0)
-                                    {
+
+                                    if (sizeof($access) !== 0) {
                                         array_push($arr_child, (object) $values);
                                     }
                                 }
@@ -280,13 +268,13 @@ class Akses extends BaseController
                                 "child"         => $arr_child
                             ];
 
-                            if(sizeof($arr_child) !== 0)
-                            {
+                            if (sizeof($arr_child) !== 0) {
                                 array_push($arr, (object) $values);
                             }
                         }
 
                         $this_company_id = $res_company[0]["id"];
+                        $this_access_divisi_id = $res_company[0]["divisi_access_id"];
                         $this_company = $res_company[0]["company"];
                         $this_access = $arr;
                         $this_role_id = $res_roles[0]["id"];
@@ -300,6 +288,7 @@ class Akses extends BaseController
                             "username" => $res_user[0]["username"],
                             "this_role_id" => $this_role_id,
                             "this_role_name" => $this_role_name,
+                            "this_access_divisi_id" => $this_access_divisi_id,
                             //"company_role" => $data->company_role,
                             //"company_role" => $data->company_role,
                             "arr_company"   => $res_company,
@@ -322,9 +311,7 @@ class Akses extends BaseController
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
-                }
-                else
-                {
+                } else {
                     $data = [
                         'refresh'   => false,
                         "status"            => true,
@@ -334,9 +321,7 @@ class Akses extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            }
-            else
-            {
+            } else {
                 $message = 'Menu berdasarkan role tidak ditemukan';
 
                 $data = [
@@ -347,9 +332,7 @@ class Akses extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

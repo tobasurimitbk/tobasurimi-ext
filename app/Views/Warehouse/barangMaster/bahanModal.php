@@ -476,93 +476,89 @@
                         console.log(data);
 
                         if (id) {
-                            <?php if (can('Master Barang', 'Barang Modal', 'u')) : ?>
-                                $.ajax({
-                                    url: "<?= base_url("barang-master/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    table.ajax.reload();
-                                                    $(".add-modal").modal("hide");
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'warning',
+                            $.ajax({
+                                url: "<?= base_url("barang-master/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                            }).then(() => {
-
-                                            });
-                                        }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload();
+                                                $(".add-modal").modal("hide");
+                                            })
+                                    } else {
                                         Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            icon: 'warning',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
+                                        }).then(() => {
+
+                                        });
                                     }
-                                });
-                            <?php endif; ?>
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                }
+                            });
                         } else {
-                            <?php if (can('Master Barang', 'Barang Modal', 'c')) : ?>
-                                $.ajax({
-                                    url: "<?= base_url("barang-master/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    table.ajax.reload();
-                                                    $(".add-modal").modal("hide");
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'warning',
+                            $.ajax({
+                                url: "<?= base_url("barang-master/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                            }).then(() => {
-
-                                            });
-                                        }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload();
+                                                $(".add-modal").modal("hide");
+                                            })
+                                    } else {
                                         Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            icon: 'warning',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
+                                        }).then(() => {
+
+                                        });
                                     }
-                                });
-                            <?php endif; ?>
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                }
+                            });
                         }
                     }
                 })

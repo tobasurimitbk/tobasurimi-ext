@@ -26,13 +26,30 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataDivisi)) {
+                                        foreach ($dataDivisi as $d) {
+                                    ?>
+                                            <option value="<?= $d["id"]; ?>"><?= $d["divisi"]; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Pilih Departemen</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Alamat (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
                                 <label for="floatingInput">Nomor Telepon (Opsional)</label>
@@ -102,7 +119,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php if (can('Master Data', 'Warehouse', 'd')) : ?>
+                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -113,14 +132,24 @@
 <section class="section">
     <div class="section-header">
         <h1>Warehouse</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Master Data', 'Warehouse', 'c')) : ?>
+            <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
+            <div class="row justify-content-end row-col-spp mb-3">
+                <div class="col-md-3">
+                    <select class="form-select divisi_search" name="divisi_search" id="divisi_search" aria-label="Floating label select example">
+                        <option value="">SEMUA DEPARTEMEN</option>
+                        <?php foreach ($dataDivisi as $d) : ?>
+                            <option value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -132,6 +161,7 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('code_warehouse')" class="sort">Kode Warehouse</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Nama Warehouse</th>
+                                <th onclick="changeSort('divisi_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
                                 <th onclick="changeSort('phone')" class="sort">Nomor Telepon</th>
                                 <th onclick="changeSort('email')" class="sort">Email</th>
@@ -175,6 +205,7 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.divisi_search = $(".divisi_search").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -198,6 +229,9 @@
             className: "text-center"
         }, {
             data: "warehouse_name",
+            className: "text-center"
+        }, {
+            data: "divisi_name",
             className: "text-center"
         }, {
             data: "address",
@@ -244,6 +278,9 @@
                 warehouse_name: {
                     required: true
                 },
+                divisi_id: {
+                    required: true
+                }
                 // address: {
                 //     required: true
                 // },
@@ -274,6 +311,9 @@
                 warehouse_name: {
                     required: "Nama wajib diisi"
                 },
+                divisi_id: {
+                    required: "Pilih Departemen"
+                }
                 // address: {
                 //     required: "Address wajib diisi"
                 // },
@@ -323,13 +363,6 @@
 
         $(".zip_code").mask("00000")
 
-        // PROVINCE
-        $('.province_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
         //CSS SELECT2 FLOATING LABEL
         $(".province_id")
             .parent('div')
@@ -347,6 +380,34 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".province_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // PROVINCE
+        $('.province_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".city_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".city_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".city_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -356,17 +417,17 @@
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
-        })
+        });
 
         //CSS SELECT2 FLOATING LABEL
-        $(".city_id")
+        $(".pic_id")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".city_id")
+        $(".pic_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -374,7 +435,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".city_id")
+        $(".pic_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -384,17 +445,17 @@
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
-        })
+        });
 
         //CSS SELECT2 FLOATING LABEL
-        $(".pic_id")
+        $(".divisi_id")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".pic_id")
+        $(".divisi_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -402,15 +463,26 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".pic_id")
+        $(".divisi_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        // PIC
+        $('.divisi_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        });
 
 
         $(".search").keyup(function() {
             table.ajax.reload();
         })
+
+        $(".divisi_search").change(function() {
+            table.ajax.reload();
+        });
 
         $(".dataTable_info").addClass("pt-0");
 
@@ -422,6 +494,7 @@
             $(".province_id").val("").change();
             $(".city_id").val("").change();
             $(".pic_id").val("").change();
+            $(".divisi_id").val(null).change();
 
             $(".city_id").empty()
             $(".city_id").append(`<option value=""></option>`)
@@ -468,6 +541,12 @@
             $.ajax({
                 url: "<?= base_url("warehouse/id"); ?>" + "/" + id,
                 method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
@@ -495,11 +574,18 @@
                         //     }
                         // })
                         $(".pic_id").val(res?.data?.pic_id).change()
+                        $(".divisi_id").val(res?.data?.divisi_id).change();
 
                         // AJAX GET CITY
                         $.ajax({
                             url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
                             method: "GET",
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             dataType: "json",
                             success: function(result) {
                                 $(".city_id").empty()
@@ -547,7 +633,11 @@
                             id: id
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -602,51 +692,106 @@
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form"));
-
                         let id = $(".id").val();
 
-                        $.ajax({
-                            url: id ? "<?= base_url("warehouse/update"); ?>" : "<?= base_url("warehouse/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
+                        if (id) {
+                            <?php if (can('Master Data', 'Warehouse', 'u')) : ?>
+
+                                $.ajax({
+                                    data: data,
+                                    url: "<?= base_url("warehouse/update"); ?>",
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    $(".add-modal").modal("hide")
+                                                    table.ajax.reload()
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                });
+                            <?php else : ?>
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Anda tidak punya akses untuk update',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            <?php endif; ?>
+
+                        } else {
+                            $.ajax({
+                                url: "<?= base_url("warehouse/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    setLoading();
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal").modal("hide")
+                                                table.ajax.reload()
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        .then(() => {
-                                            $(".add-modal").modal("hide")
-                                            table.ajax.reload()
-                                        })
-                                } else {
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
+                            });
+                        }
+
+
                     }
                 })
             }
@@ -660,6 +805,12 @@
                 url: `<?= base_url("city"); ?>/${id}`,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     $(".city_id").empty()
                     $(".city_id").val("").change()

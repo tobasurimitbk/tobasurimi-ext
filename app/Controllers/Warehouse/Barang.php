@@ -417,7 +417,18 @@ class Barang extends BaseController
         $barangModel = new BarangMasterModel();
 
         $type = $this->request->getGet("type");
-        $dataBarang = $barangModel->getBarangByType($type);
+        $condition = [
+            'barang_master.company_id' => $this->this_company_id,
+            'barang_master.type_barang' => $type,
+        ];
+        $dataBarang = $barangModel->getBarangByTypeWithSpec($condition);
+
+        for ($i = 0; $i < count($dataBarang); $i++) {
+            $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
+            $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
+            $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
+            $dataBarang[$i]['barang_name'] = strtoupper($dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi']);
+        }
 
         $data = [
             "data" => $dataBarang

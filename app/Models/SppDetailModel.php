@@ -16,10 +16,11 @@ class SppDetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         "purchase_request_id",
-        "barang_id",
+        "barang1_id",
+        "barang2_id",
+        "nama_barang",
         "qty",
         "unit",
-        "price",
         "note"
     ];
 
@@ -50,12 +51,8 @@ class SppDetailModel extends Model
     public function getSppDetailById($id)
     {
         $selectQry = "purchase_request_details.*,
-                        (purchase_request_details.qty * purchase_request_details.price) AS totalPrice,
-                        purchase_request_details.price AS price,
-                        barang_master.kode_barang AS kodeBarang,
-                        barang_master.barang_name AS barangName,
-                        satuans.nama_satuan AS satuanName
-                        ";
+                    barang_master.kode_barang,
+                    satuans.nama_satuan AS nama_satuan";
 
         $condition = [
             "purchase_request_id" => $id,
@@ -64,8 +61,8 @@ class SppDetailModel extends Model
         $sppDetailData = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('barang_master', 'purchase_request_details.barang_id = barang_master.id')
-            ->join('satuans', 'barang_master.satuan_id = satuans.id')
+            ->join('barang_master', 'purchase_request_details.barang1_id = barang_master.id', 'left')
+            ->join('satuans', 'purchase_request_details.unit = satuans.id', 'left')
             ->findAll();
 
         return $sppDetailData;

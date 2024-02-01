@@ -304,7 +304,7 @@
 
                     if (komponenGaji.length == 0 && response.divisi?.divisi != null) {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: 'Ups, Divisi ' + response.divisi.divisi + ' komponen gajinya belum diatur :)',
                             confirmButtonColor: '#4e73df',
                         });
@@ -758,7 +758,7 @@
 
                     if (komponenGaji.length == 0 && response.divisi?.divisi != null) {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: 'Ups, Divisi ' + response.divisi.divisi + ' komponen gajinya belum diatur :)',
                             confirmButtonColor: '#4e73df',
                         });
