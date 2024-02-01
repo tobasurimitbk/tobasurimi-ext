@@ -227,7 +227,7 @@
 
                     if (res.data.status === false) {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: res.data.message,
                             confirmButtonColor: '#4e73df',
                             confirmButtonText: 'Ok'
@@ -237,7 +237,7 @@
             });
         } else {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: "Pilih valuta dahulu",
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'

@@ -428,7 +428,7 @@
 
         if (dataIds.length == 0) {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: 'Cheklist minimal satu data penerimaan!',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
@@ -593,7 +593,7 @@
         if ($('.create-form').valid()) {
             if (list_penerimaan_selected.length == 0) {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: 'Penerimaan barang yang akan dibuat tanda terima masih kosong!',
                     confirmButtonColor: '#4e73df',
                     confirmButtonText: 'Ok'
@@ -714,7 +714,7 @@
                 });
             } else {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: 'Nomor faktur pajak sudah ada !',
                     confirmButtonColor: '#4e73df',
                     confirmButtonText: 'Ok'
@@ -1040,7 +1040,7 @@
                         $(".no_tanda_terima_faktur").val(res?.data);
                     } else {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })

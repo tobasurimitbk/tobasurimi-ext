@@ -296,7 +296,7 @@
                                     });
                                 } else {
                                     Swal.fire({
-                                        icon: 'warning',
+                                        icon: 'error',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                         confirmButtonText: 'Ok'

@@ -398,7 +398,7 @@
                     csrf.val(response.token);
                     if (response.data.detail == 0) {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: "List PO yang sudah diterima di warehouse tidak ditemukan",
                             confirmButtonColor: '#4e73df',
                         })
@@ -451,7 +451,7 @@
                 // VALIDASI BARANG LIST
                 if (listPoID.length == 0) {
                     Swal.fire({
-                        icon: 'warning',
+                        icon: 'error',
                         title: 'PO List Masih kosong',
                         confirmButtonColor: '#4e73df',
                     });

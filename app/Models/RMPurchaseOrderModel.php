@@ -20,6 +20,7 @@ class RMPurchaseOrderModel extends Model
         'id',
         'warehouse_id',
         'company_id',
+        'purchase_request_id',
         'bc_type',
         'po_no',
         'po_date',

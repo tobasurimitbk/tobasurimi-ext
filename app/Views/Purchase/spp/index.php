@@ -37,16 +37,17 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="col-md-3">
+                <div class="col-md-3">
                     <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="">Pilih Tipe SPP</option>
-                            <option value="Lokal">Lokal</option>
-                            <option value="Import">Import</option>
+                            <?php foreach ($dataSppType as $d) : ?>
+                                <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['value'] ?>"><?= $d['value'] ?></option>
+                            <?php endforeach; ?>
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
                     </div>
-                </div> -->
+                </div>
                 <div class="col mb-4">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No SPP" value="" />
                 </div>
@@ -56,18 +57,14 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
                                 <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
-                                <th onclick="changeSort('company')" class="sort">Company</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
-                                <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th>Jumlah Order</th>
-                                <th>Tanggal Order</th>
-                                <th>Tanggal Dibuat</th>
-                                <!-- <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th> -->
-                                <!-- <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th> -->
-                                <th>Actions</th>
+                                <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -88,7 +85,6 @@
     let search = $('.search').val();
     // let spp_type = $('.spp_type').val();
     let currentPage = 1;
-
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
@@ -143,15 +139,7 @@
                 className: "text-center"
             },
             {
-                data: "companyName",
-                className: "text-center"
-            },
-            {
                 data: "divisiName",
-                className: "text-center"
-            },
-            {
-                data: "total",
                 className: "text-center"
             },
             {
@@ -163,11 +151,11 @@
             {
                 data: "request_date",
                 className: "text-center",
-                sortable: false,
-                orderable: false,
+                sortable: true,
+                orderable: true,
             },
             {
-                data: "createdAt",
+                data: "status",
                 className: "text-center",
                 sortable: false,
                 orderable: false,
@@ -185,66 +173,61 @@
                     if (is_posted === "0") {
                         return `
                             <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                                <button onclick="remove(${id}, '${spp_type}')" class="btn btn-danger delete-parent">
-                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                </button>
+                                <?php if (can('Pembelian', 'SPP', 'p')) : ?>
+                                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                <?php endif; ?>
+                                <?php if (can('Pembelian', 'SPP', 'a')) : ?>
+                                    <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 1)" class="btn btn-success posting-spp">
+                                        <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                <?php endif; ?>
+
+                                <?php if (can('Pembelian', 'SPP', 'd')) : ?>
+                                    <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                <?php endif; ?>
+
                             </div>
                         `
                     }
                     if (is_posted === "1") {
-                        return `
-                            <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        var res = '';
+                        res += `
+                            <?php if (can('Pembelian', 'SPP', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
+                            <?php endif; ?>
+                        `;
+
+                        if (status != "CLOSED") {
+                            res += `
+                                <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
+                                    <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-success posting-spp">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    </button>
+                                <?php endif; ?>
+                            `;
+                        }
+
+                        return `
+                            <div class="mt-0">
+                                ${res}
                             </div>
                         `
                     }
                 }
             },
-            // {
-            //     data: "approvedByHeadwarehouseName",
-            //     className: "text-center actions",
-            //     orderable: false,
-            //     render: function(data, type, row) {
-            //         if (row.isApproveWarehouse) {
-            //             return `<input autocomplete="one-time-code" onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
-            //         }
-            //         if (data !== "false") {
-            //             return data;
-            //         }
-            //     }
-            // },
-            // {
-            //     data: "approvedByDirectorName",
-            //     className: "text-center actions",
-            //     orderable: false,
-            //     render: function(data, type, row) {
-            //         if (row.isApproveDirector) {
-            //             return `<input autocomplete="one-time-code" onchange="approveDirector('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_director_${row.id}"/>`
-            //         }
-            //         if (data !== "false") {
-            //             return data;
-            //         }
-            //     }
-            // },
-            // {
-            //     data: "approvedByHeadofPurchasingName",
-            //     className: "text-center actions",
-            //     orderable: false,
-            //     render: function(data, type, row) {
-            //         if (row.isApprovePurchasing) {
-            //             return `<input autocomplete="one-time-code" onchange="approveHeadPurchasing('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_head_of_purchasing_${row.id}"/>`
-            //         }
-            //         if (data !== "false") {
-            //             return data;
-            //         }
-            //     }
-            // }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -301,210 +284,51 @@
         })
     })
 
-    // const postingSpp = function(id) {
-    //     Swal.fire({
-    //         icon: 'question',
-    //         title: 'Yakin akan di Posting?',
-    //         confirmButtonColor: '#4e73df',
-    //         cancelButtonColor: '#d33',
-    //         showCancelButton: true,
-    //         reverseButtons: true,
-    //         confirmButtonText: 'Posting',
-    //         cancelButtonText: 'Batal',
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             const csrf = $(`[name="${csrfToken}"]`);
-    //             $.ajax({
-    //                 url: "<?= base_url("spp/update-status"); ?>",
-    //                 data: {
-    //                     id: id
-    //                 },
-    //                 beforeSend: function(xhr) {
-    //                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //                 },
-    //                 method: "POST",
-    //                 dataType: "json",
-    //                 success: function(response) {
-    //                     csrf.val(response.token);
-    //                     if (response.status) {
-    //                         Swal.fire({
-    //                                 icon: 'success',
-    //                                 title: response.message,
-    //                                 confirmButtonColor: '#4e73df',
-    //                             })
-    //                             .then(() => {
-    //                                 table.ajax.reload()
-    //                             })
-    //                     } else {
-    //                         Swal.fire({
-    //                             icon: 'error',
-    //                             title: response.message,
-    //                             confirmButtonColor: '#4e73df',
-    //                         })
-    //                     }
-    //                 },
-    //                 onError: function(response) {
-    //                     csrf.val(response.token);
-    //                     Swal.fire({
-    //                         icon: 'error',
-    //                         title: 'Data Gagal Disimpan, coba Lagi',
-    //                         confirmButtonColor: '#4e73df',
-    //                     })
-    //                 }
-    //             });
-    //         }
-    //     })
-    // }
-
-    // const approveHeadWarehouse = function(id) {
-    //     const csrf = $(`[name="${csrfToken}"]`);
-    //     let value = document.getElementById('approved_by_headwarehouse_' + id).checked ? true : false;
-
-    //     let data = {
-    //         id: id
-    //     }
-
-    //     if (value) {
-    //         data["status"] = true;
-    //     }
-
-    //     $.ajax({
-    //         url: "<?= base_url("spp/approve"); ?>",
-    //         data: data,
-    //         beforeSend: function(xhr) {
-    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //         },
-    //         method: "POST",
-    //         dataType: "json",
-    //         success: function(response) {
-    //             csrf.val(response.token);
-    //             if (response.status) {
-    //                 Swal.fire({
-    //                         icon: 'success',
-    //                         title: response.message,
-    //                         confirmButtonColor: '#4e73df',
-    //                     })
-    //                     .then(() => {
-    //                         table.ajax.reload()
-    //                     })
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: response.message,
-    //                     confirmButtonColor: '#4e73df',
-    //                 })
-    //             }
-    //         },
-    //         onError: function(response) {
-    //             csrf.val(response.token);
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Approve Gagal Diubah, coba Lagi',
-    //                 confirmButtonColor: '#4e73df',
-    //             })
-    //         }
-    //     });
-    // }
-
-    // const approveHeadPurchasing = function(id) {
-    //     const csrf = $(`[name="${csrfToken}"]`);
-    //     let value = document.getElementById('approved_by_head_of_purchasing_' + id).checked ? true : false;
-
-    //     let data = {
-    //         id: id
-    //     }
-
-    //     if (value) {
-    //         data["status"] = true;
-    //     }
-
-    //     $.ajax({
-    //         url: "<?= base_url("spp/approve"); ?>",
-    //         data: data,
-    //         beforeSend: function(xhr) {
-    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //         },
-    //         method: "POST",
-    //         dataType: "json",
-    //         success: function(response) {
-    //             csrf.val(response.token);
-    //             if (response.status) {
-    //                 Swal.fire({
-    //                         icon: 'success',
-    //                         title: response.message,
-    //                         confirmButtonColor: '#4e73df',
-    //                     })
-    //                     .then(() => {
-    //                         table.ajax.reload()
-    //                     })
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: response.message,
-    //                     confirmButtonColor: '#4e73df',
-    //                 })
-    //             }
-    //         },
-    //         onError: function(response) {
-    //             csrf.val(response.token);
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Approve Gagal Diubah, coba Lagi',
-    //                 confirmButtonColor: '#4e73df',
-    //             })
-    //         }
-    //     });
-    // }
-
-    // const approveDirector = function(id) {
-    //     const csrf = $(`[name="${csrfToken}"]`);
-    //     let value = document.getElementById('approved_by_director_' + id).checked ? true : false;
-
-    //     let data = {
-    //         id: id
-    //     }
-
-    //     if (value) {
-    //         data["status"] = true;
-
-    //         $.ajax({
-    //             url: "<?= base_url("spp/approve"); ?>",
-    //             data: data,
-    //             beforeSend: function(xhr) {
-    //                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //             },
-    //             method: "POST",
-    //             dataType: "json",
-    //             success: function(response) {
-    //                 csrf.val(response.token);
-    //                 if (response.status) {
-    //                     Swal.fire({
-    //                             icon: 'success',
-    //                             title: response.message,
-    //                             confirmButtonColor: '#4e73df',
-    //                         })
-    //                         .then(() => {
-    //                             table.ajax.reload()
-    //                         })
-    //                 } else {
-    //                     Swal.fire({
-    //                         icon: 'error',
-    //                         title: response.message,
-    //                         confirmButtonColor: '#4e73df',
-    //                     })
-    //                 }
-    //             },
-    //             onError: function(response) {
-    //                 csrf.val(response.token);
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Approve Gagal Diubah, coba Lagi',
-    //                     confirmButtonColor: '#4e73df',
-    //                 })
-    //             }
-    //         });
-    //     }
-    // }
+    const updateStatus = function(id, status) {
+        Swal.fire({
+            icon: 'question',
+            title: status == '1' ? 'Yakin akan diposting ?' : 'Batalkan Posting ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("spp/update-status"); ?>",
+                    data: {
+                        id: id,
+                        status: status
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
 
     const remove = function(id, tipe) {
         Swal.fire({
@@ -523,10 +347,13 @@
                     url: "<?= base_url("spp/delete"); ?>",
                     data: {
                         id: id,
-                        tipe: tipe
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -541,22 +368,8 @@
                                 .then(() => {
                                     table.ajax.reload()
                                 })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
                         }
                     },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Dihapus, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
                 });
             }
         })

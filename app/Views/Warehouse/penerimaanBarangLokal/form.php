@@ -2677,7 +2677,7 @@
                         $(".no_penerimaan_barang").val(res?.data);
                     } else {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })

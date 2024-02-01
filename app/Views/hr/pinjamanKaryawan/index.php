@@ -655,7 +655,7 @@
                                         })
                                 } else {
                                     Swal.fire({
-                                        icon: 'warning',
+                                        icon: 'error',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     }).then(() => {});
@@ -722,7 +722,7 @@
                                 $('#formGeneratePinjamanSingle')[0].reset();
                             } else {
                                 Swal.fire({
-                                    icon: 'warning',
+                                    icon: 'error',
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 }).then(() => {});
@@ -764,7 +764,7 @@
             });
             if (checkedValues.length == 0) {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Checklist minimal satu data karyawan",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
@@ -782,7 +782,7 @@
 
             if (statusPinjaman == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Pilih Status Pinjaman Dahulu",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
@@ -828,7 +828,7 @@
                                         });
                                 } else {
                                     Swal.fire({
-                                        icon: 'warning',
+                                        icon: 'error',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     }).then(() => {});
@@ -908,7 +908,7 @@
         var divisionID = $("select[name='filterDivisiID']").val();
         if (divisionID == "") {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: 'Pilih Departemen',
                 confirmButtonColor: '#4e73df',
             });

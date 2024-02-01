@@ -14,6 +14,7 @@
 
         .table-font-size {
             font-size: 11px !important;
+            text-align: center;
         }
 
         @page {
@@ -85,24 +86,22 @@
     <?php if (!empty($dataSPP)) { ?>
         <table class="mt-5">
             <tr>
-                <td>Tanggal Order: <?= date("d-m-Y", strtotime($dataSPP->request_date)) ?></td>
-                <td>Jenis Order: <?= $dataSPP->spp_type ?></td>
+                <td>Tanggal Order : <?= date("d-m-Y", strtotime($dataSPP->request_date)) ?></td>
+                <td>Jenis Order : <?= $dataSPP->spp_type ?></td>
             </tr>
             <tr>
                 <td>Departemen: <?= $dataSPP->divisiName ?></td>
                 <td>No Spp: <?= $dataSPP->spp_no ?></td>
             </tr>
-        </table>
+        </table><br>
         <table class="mt-5 table-border">
             <thead class="table-border">
                 <tr class="table-border">
-                    <td class="table-border" style="width: 5px;"><b class="table-font-size">No.</b></td>
+                    <td class="table-border" style="width: 5px;"><b class="table-font-size">No</b></td>
                     <td class="table-border" style="width: 105px;"><b class="table-font-size">Kode Barang</b></td>
                     <td class="table-border" style="width: 220px;"><b class="table-font-size">Nama Barang</b></td>
                     <td class="table-border" style="width: 90px;"><b class="table-font-size">Qty</b></td>
                     <td class="table-border" style="width: 10px;"><b class="table-font-size">Keterangan</b></td>
-                    <td class="table-border" style="width: 70px;"><b class="table-font-size">Harga</b></td>
-                    <td class="table-border"><b></b></td>
                 </tr>
             </thead>
             <tbody>
@@ -111,12 +110,10 @@
                 ?>
                     <tr>
                         <td class="table-border"><b class="table-font-size"><?= $detail->no ?></b></td>
-                        <td class="table-border"><b class="table-font-size"><?= $detail->kodeBarang ?></b></td>
-                        <td class="table-border"><b class="table-font-size"><?= $detail->barangName ?></b></td>
-                        <td class="table-border"><b class="table-font-size"><?= $detail->qty . " " . $detail->satuanName ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->kode_barang ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->nama_barang ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
                         <td class="table-border"><b class="table-font-size"><?= $detail->note ?></b></td>
-                        <td class="table-border"><b class="table-font-size"><?= "Rp " . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
-                        <td class="table-border"><b></b></td>
                     </tr>
                 <?php } ?>
             </tbody>
@@ -138,16 +135,19 @@
                 <tr>
                     <th>
                         <div class="sign-row txt-left">
+                            <br>
                             <div></div>
                         </div>
                     </th>
                     <th>
                         <div class="sign-row txt-left">
+                            <br>
                             <div></div>
                         </div>
                     </th>
                     <th>
                         <div class="sign-row txt-left">
+                            <br>
                             <div><?= $dataSPP->createdByName ?></div>
                         </div>
                     </th>

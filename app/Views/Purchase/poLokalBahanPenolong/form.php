@@ -592,7 +592,7 @@
                 }
                 if (isAdd) {
                     Swal.fire({
-                        icon: 'warning',
+                        icon: 'error',
                         title: 'Barang Sudah Ada',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
@@ -625,7 +625,7 @@
         if ($('.create-form').valid()) {
             if (listBarang.length == 0) {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: 'Barang masih kosong',
                     confirmButtonColor: '#4e73df',
                     cancelButtonColor: '#d33',

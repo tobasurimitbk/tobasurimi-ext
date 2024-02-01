@@ -392,7 +392,7 @@
                 success: function(res) {
                     if (res.data.length == 0) {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: 'Nomor tanda terima supplier tidak ada',
                             confirmButtonColor: '#4e73df',
                         });

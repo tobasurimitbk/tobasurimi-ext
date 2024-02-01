@@ -339,7 +339,7 @@
 
                 } else if (!response.status && response.code == 400) {
                     Swal.fire({
-                        icon: 'warning',
+                        icon: 'error',
                         title: response.message,
                         confirmButtonColor: '#4e73df',
                     });
@@ -524,7 +524,7 @@
                         });
                     } else {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: 'Nominal uang lembur yang diterima tidak boleh kosong',
                             confirmButtonColor: '#4e73df',
                         })

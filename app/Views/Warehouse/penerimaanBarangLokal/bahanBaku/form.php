@@ -533,7 +533,7 @@
         if ($('.create-form').valid()) {
             if (listData.length === 0) {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Pilih nomor PO dahulu",
                     confirmButtonColor: '#4e73df',
                 })
@@ -791,7 +791,7 @@
                         $(".no_penerimaan_barang").val(res?.data);
                     } else {
                         Swal.fire({
-                            icon: 'warning',
+                            icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })

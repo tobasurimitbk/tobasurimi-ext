@@ -670,19 +670,19 @@
 
             if (monthYearGlobal == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Pilih periode absensi",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
             } else if (startDateGlobal == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Tanggal mulai log absensi tidak boleh kosong",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
             } else if (finishDateGlobal == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Tanggal selesai log absensi tidak boleh kosong",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
@@ -761,31 +761,31 @@
 
             if (monthYearPersonal == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Pilih periode absensi",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
             } else if (divisionID == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Pilih divisi",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
             } else if (employeeID == null) {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Pilih karyawan",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
             } else if (startDatePersonal == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Tanggal mulai log absensi tidak boleh kosong",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
             } else if (finishDatePersonal == '') {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: "Tanggal selesai log absensi tidak boleh kosong",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
