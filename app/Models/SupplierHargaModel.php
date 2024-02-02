@@ -16,10 +16,12 @@ class SupplierHargaModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'divisi_id',
         'supplier_id',
         'bahan_baku_id',
-        'bagian_id',
+        'spesifikasi_id',
         'spesifikasi',
+        'nama_barang',
         'harga_umum',
         'harga_harian',
         'harga_bulanan',
@@ -57,6 +59,7 @@ class SupplierHargaModel extends Model
         $availableSort = [
             'bahan_baku_name'   => 'barang_master.barang_name',
             'spesifikasi'       => 'supplier_harga.spesifikasi',
+            'divisis.divisi'    => 'divisis.divisi',
             'harga_umum'        => 'supplier_harga.harga_umum',
             'harga_harian'      => 'supplier_harga.harga_harian',
             'harga_bulanan'     => 'supplier_harga.harga_bulanan',
@@ -68,20 +71,33 @@ class SupplierHargaModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'supplier_harga.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "supplier_harga.*, barang_master.barang_name AS bahan_baku_name, bagian.nama_bagian as nama_bagian";
+        $selectQry = "supplier_harga.*, 
+            barang_master.barang_name AS bahan_baku_name, 
+            divisis.divisi,
+            barang_master_spesifikasi.spesifikasi";
+
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
-            ->join('bagian', 'bagian.id = supplier_harga.bagian_id', 'left')
+            ->join('divisis', 'divisis.id = supplier_harga.divisi_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
 
         if ($addCondition['search']) {
-            $supplierDataQry->groupStart()
-                ->like('barang_master.barang_name', $addCondition['search'])
-                ->groupEnd();
+            $supplierDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $supplierDataQry->like('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $supplierDataQry->groupEnd();
         }
 
         $totalFilteredData = $supplierDataQry->countAllResults(false);
@@ -101,7 +117,10 @@ class SupplierHargaModel extends Model
             'supplier_harga.supplier_id' => $id
         ];
 
-        $builder = $this->db->table('supplier_harga')->select('supplier_harga.*, bagian.id as bagian_ids, bagian.nama_bagian as nama_bagian, supplier_harga.id as supplier_harga_id, barang_master.barang_name, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan');
+        // return $this->asArray()->select('supplier_harga.*, divisis.divisi, ')
+
+        $builder = $this->db->table('supplier_harga')
+            ->select('supplier_harga.*, d, supplier_harga.id as supplier_harga_id, barang_master.barang_name, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan');
         $builder->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
             ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
             ->join('bagian', 'bagian.id = supplier_harga.bagian_id', 'left')

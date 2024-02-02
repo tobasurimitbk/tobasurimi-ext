@@ -115,7 +115,8 @@ class BarangMasterModel extends Model
     {
         $arrCondition = [
             'barang_master.deletedAt' => null,
-            'barang_master.type_barang' => $type
+            'barang_master.type_barang' => $type,
+            'barang_master.company_id' => session()->get('login')->this_company_id
         ];
 
         $selectQry = "barang_master.*, satuans.nama_satuan, parent_barang.parent_name";
@@ -123,6 +124,7 @@ class BarangMasterModel extends Model
             ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
             ->join('parent_barang', 'barang_master.parent_type_id = parent_barang.id', 'left')
             ->where($arrCondition)
+            ->orderBy('barang_master.barang_name', "ASC")
             ->findAll();
 
         return $data;

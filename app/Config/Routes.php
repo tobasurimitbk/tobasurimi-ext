@@ -172,19 +172,19 @@ $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
 // SUPPLIER HARGA
-$routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
+// $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/all', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
-$routes->get('/supplier-harga/supplier/(:num)', 'Supplier\SupplierHarga::getByIdSupplier/$1', ['filter' => 'Auth']);
-$routes->get('/supplier-harga/barang-and-supplier', 'Supplier\SupplierHarga::getByBarangandSupplierId', ['filter' => 'Auth']);
-$routes->post('/supplier-harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
-$routes->get('/supplier-harga/id/(:num)', 'Supplier\SupplierHarga::getByIdSupplierHarga/$1', ['filter' => 'Auth']);
+// $routes->get('/supplier-harga/supplier/(:num)', 'Supplier\SupplierHarga::getByIdSupplier/$1', ['filter' => 'Auth']);
+// $routes->get('/supplier-harga/barang-and-supplier', 'Supplier\SupplierHarga::getByBarangandSupplierId', ['filter' => 'Auth']);
+// $routes->post('/supplier-harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
+// $routes->get('/supplier-harga/id/(:num)', 'Supplier\SupplierHarga::getByIdSupplierHarga/$1', ['filter' => 'Auth']);
 
 // BAGIAN
 $routes->get('/bagian/dropdown', 'Master\Bagian::getAllBagian', ['filter' => 'Auth']);
 
 // SUPPLIER
 $routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => 'Auth']);
-$routes->get('/supplier/id/(:num)', 'Supplier\Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
+$routes->get('/supplier/id/(:segment)', 'Supplier\Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
 $routes->get('/supplier/generate/(:segment)', 'Supplier\Supplier::supplierGenerate/$1', ['filter' => 'Auth']);
 $routes->post('/supplier/delete', 'Supplier\Supplier::deleteSupplier', ['filter' => 'Auth']);
 
@@ -195,6 +195,12 @@ $routes->get('/supplier-bahan-baku/all', 'Supplier\Supplier::allSupplierBahanBak
 $routes->post('/supplier-bahan-baku/save', 'Supplier\Supplier::saveSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/update', 'Supplier\Supplier::updateSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/print/(:segment)', 'Supplier\Supplier::printSupplierBahanBaku/$1', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku/spesifikasi-barang', 'Supplier\SupplierHarga::getListSpesifikasiBarang', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku/all-harga', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-baku/harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-baku/harga/update', 'Supplier\SupplierHarga::updateSupplierHarga', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-baku/harga/delete', 'Supplier\SupplierHarga::deleteSupplierHarga', ['filter' => 'Auth']);
+
 
 // BAHAN PENOLONG
 $routes->get('/supplier-bahan-penolong', 'Supplier\Supplier::supplierBahanPenolong', ['filter' => 'Auth']);
@@ -236,6 +242,7 @@ $routes->post('/po-lokal-bahan-baku/delete', 'Purchase\POLokalBahanBaku::deleteP
 $routes->get('/po-lokal-bahan-baku/print/(:segment)', 'Purchase\POLokalBahanBaku::print/$1', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/dropdown/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/histori-lpb', 'Purchase\POLokalBahanBaku::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);
