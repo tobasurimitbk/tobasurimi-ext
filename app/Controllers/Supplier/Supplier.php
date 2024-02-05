@@ -11,6 +11,7 @@ use App\Models\SupplierModel;
 use App\Models\SupplierHargaModel;
 use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
+use App\Models\DivisisModel;
 use App\Models\WarehousesModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
@@ -25,6 +26,7 @@ class Supplier extends BaseController
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
     protected $warehousesModel;
+    protected $divisiModel;
 
     public function __construct()
     {
@@ -40,6 +42,7 @@ class Supplier extends BaseController
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->divisiModel = new DivisisModel();
     }
 
     // bahan baku
@@ -64,30 +67,27 @@ class Supplier extends BaseController
 
     public function getSupplierBahanBakuHarga($id)
     {
+        $id = decrypt($id);
+
         $supplierData = $this->supplierModel->getSupplierById($id);
         $barangData = $this->barangMasterModel->getBarangByType('bahan_baku');
-        $bagianData =  $this->bagianModel
-            ->select('bagian.*,divisis.divisi')
-            ->join('divisis', 'divisis.id = bagian.division_id')
-            ->where('bagian.deletedAt', null)
-            ->where('divisis.deletedAt', null)
-            ->asObject()
-            ->findAll();
+        $divisi = $this->divisiModel->getDivisiAccess();
+
+        if ($supplierData == null) {
+            return redirect()->to('supplier-bahan-baku');
+        }
 
         $dataSupplier = [];
-        $dataSupplierHarga = [];
 
         if ($supplierData) {
             if ($supplierData->type === "BAHAN BAKU") {
                 $dataSupplier = $supplierData;
-                $dataSupplierHarga = $this->supplierHargaModel->getBySupplierId($id);
             }
         }
 
         $data = [
             "dataSupplier" => $dataSupplier,
-            "dataSupplierHarga" => $dataSupplierHarga,
-            "dataBagian" => $bagianData,
+            "dataDivisi" => $divisi,
             "dataBarang" => $barangData
         ];
 
@@ -106,7 +106,7 @@ class Supplier extends BaseController
         ];
 
         $condition = [
-            "suppliers.type"        => "BAHAN BAKU"
+            "suppliers.type"        => "BAHAN BAKU",
         ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
@@ -125,7 +125,7 @@ class Supplier extends BaseController
             array_push($dataSupplier, [
                 "no"            => $no++,
                 "kode"          => $data->kode,
-                "id"            => $data->id,
+                "id"            => encrypt($data->id),
                 "name"          => $data->name,
                 "address"       => $data->address,
                 "no_npwp"       => $data->no_npwp
@@ -303,7 +303,7 @@ class Supplier extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+                $id = decrypt($this->request->getPost("id"));
 
                 $payload = [
                     "name" => $this->request->getPost("name"),
@@ -795,6 +795,12 @@ class Supplier extends BaseController
 
     public function getByIdSupplier($id)
     {
+        if (is_numeric($id)) {
+            $id = $id;
+        } else {
+            $id = decrypt($id);
+        }
+
         $supplierData = $this->supplierModel->getSupplierById($id);
 
         if (!$supplierData) {
@@ -818,7 +824,11 @@ class Supplier extends BaseController
     public function deleteSupplier()
     {
         try {
-            $id = $this->request->getPost("id");
+            if (is_numeric($this->request->getPost('id'))) {
+                $id = $this->request->getPost("id");
+            } else {
+                $id = decrypt($this->request->getPost("id"));
+            }
 
             if (empty($id)) {
                 $data = [

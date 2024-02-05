@@ -11,10 +11,12 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
+use App\Models\DivisisModel;
 use App\Models\SatuansModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\SppModel;
 use App\Models\SupplierHargaModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
@@ -37,6 +39,8 @@ class POLokalBahanBaku extends BaseController
     protected $dompdf;
     protected $penerimaanBarangDetailModel;
     protected $jurnalController;
+    protected $sppModel;
+    protected $divisiModel;
 
     public function __construct()
     {
@@ -56,6 +60,8 @@ class POLokalBahanBaku extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->jurnalController = new JurnalUmum();
+        $this->sppModel = new SppModel();
+        $this->divisiModel = new DivisisModel();
     }
 
     public function poLokalBahanBaku()
@@ -66,11 +72,11 @@ class POLokalBahanBaku extends BaseController
     public function createPOLokalBahanBaku()
     {
         $dataBCType = $this->metadataModel->getBCUsed("po_lokal_bb");
-        $dataCompany =  $this->CompaniesModel->getCompanies();
+        $dataDivisi =  $this->divisiModel->getDivisiAccess();
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
-        $dataBagian = $this->BagianModel->where('deletedAt', null)->findAll();
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        // $dataBarang = $this->barangModel
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -80,9 +86,8 @@ class POLokalBahanBaku extends BaseController
             "dataBCType"    => $dataBCType,
             "today"         => date("d/m/Y"),
             "dataSatuan"    => $dataSatuan,
-            "dataBagian"    => $dataBagian,
             "dataSupplier"  => $dataSupplier,
-            "dataCompany"   => $dataCompany,
+            "dataDivisi"    => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
 
         ];
@@ -719,6 +724,23 @@ class POLokalBahanBaku extends BaseController
         $res = $this->warehousesModel->get_by_company_id($this->request->getVar('company_id'));
         return response()->setJSON([
             'data' => $res
+        ]);
+    }
+
+    public function dropdownGetSpp()
+    {
+        $id = $this->request->getVar('divisi_id');
+        $condition = [
+            'purchase_requests.deletedAt' => null,
+            'purchase_requests.divisi_id' => $id,
+            'purchase_requests.is_posted' => '1',
+            'purchase_requests.request_status' => 'waiting'
+        ];
+        $data = $this->sppModel->getSppList($condition, []);
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'data' => $data,
+            'status' => true
         ]);
     }
 }

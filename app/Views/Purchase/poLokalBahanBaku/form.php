@@ -110,6 +110,31 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataDivisi)) {
+                                    foreach ($dataDivisi as $d) {
+                                ?>
+                                        <option value="<?= $d["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataDivisi->divisi_id === $d["id"] ? "selected" : "") : ""; ?>><?= strtoupper($d["divisi"]); ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput">Departemen</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                            </select>
+                            <label for="floatingInput">SPP (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
@@ -127,23 +152,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataCompany)) {
-                                    foreach ($dataCompany as $company) {
-                                ?>
-                                        <option value="<?= $company["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->company_id === $company["id"] ? "selected" : "") : ""; ?>><?= strtoupper($company["company"]); ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Company</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select pph" id="pph" name="pph" aria-label="Floating label select example">
                                 <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "None" ? "selected" : "") : ""; ?> value="None">Pph tidak ditanggung</option>
                                 <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "Supplier" ? "selected" : "") : ""; ?> value="Supplier">Pph ditanggung supplier</option>
@@ -152,8 +160,6 @@
                             <label for="floatingInput">PPH</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya (Opsional)">
@@ -166,11 +172,20 @@
                             <label for="floatingInput">Cong Batasan (Opsional)</label>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
                             <label for="floatingInput">Tambahan Langsung (Opsional)</label>
                         </div>
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+                    <div class="col-md-4">
+
                     </div>
                 </div>
                 <div class="row">
@@ -237,25 +252,6 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example" disabled>
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataBagian)) {
-                                    foreach ($dataBagian as $bagian) {
-                                ?>
-                                        <option value="<?= $bagian["id"]; ?>"><?= $bagian["nama_bagian"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Bagian</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
@@ -271,48 +267,52 @@
                             <label for="floatingInput">Satuan</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="number" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="number" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan">
                             <label for="floatingInput">Harga Bulanan</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                             <label for="floatingInput">QTY</label>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
                             <label for="floatingInput">Total Harga</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control peti" name="peti" id="peti" placeholder="Peti">
                             <label for="floatingInput">Peti / Tong</label>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select quality" name="quality" id="quality" aria-label="Floating label select example">
@@ -322,9 +322,7 @@
                             <label for="floatingInput">Kualitas</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3">
                             <textarea autocomplete="one-time-code" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan (Opsional)"></textarea>
                             <label for="floatingInput">Keterangan (Opsional)</label>
@@ -638,19 +636,24 @@
 
         // WAREHOUSE
         $('.warehouse_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Warehouse (Departemen Required)",
             theme: "bootstrap-5"
         });
 
         // BC Type
         $('.bc_type').select2({
-            placeholder: "",
+            placeholder: "Pilih Dokumen Pabean",
+            theme: "bootstrap-5"
+        })
+
+        $('.spp_id').select2({
+            placeholder: "Pilih Nomor SPP",
             theme: "bootstrap-5"
         })
 
         // COMPANY ID
-        $('.company_id').select2({
-            placeholder: "",
+        $('.divisi_id').select2({
+            placeholder: "Pilih Departemen",
             theme: "bootstrap-5"
         }).change(function() {
             $.ajax({
@@ -683,34 +686,28 @@
             });
         });
 
-        // PURCHASE REQUEST ID
-        $('.purchase_request_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
         // BARANG ID
         $('.barang_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Bahan Baku",
             theme: "bootstrap-5"
         })
 
         // SPESIFIKASI
         $('.spesifikasi').select2({
-            placeholder: "Pilih Spesifikasi (Supplier & Bahan Baku required)",
+            placeholder: "Pilih Spesifikasi (Supplier & Barang Bahan Baku required)",
             theme: "bootstrap-5",
             allowClear: true
         })
 
         // SATUAN
         $('.satuan').select2({
-            placeholder: "Pilih Satuan",
+            placeholder: "Pilih Satuan (Spesifikasi Required)",
             theme: "bootstrap-5"
         })
 
         // SUPPLIER
         $('.supplier_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Supplier",
             theme: "bootstrap-5"
         })
 

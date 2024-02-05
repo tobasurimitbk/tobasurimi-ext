@@ -471,7 +471,7 @@
     </div>
 </div>
 
-<div class="modal harga-modal" id="harga_modal">
+<!-- <div class="modal harga-modal" id="harga_modal">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -508,7 +508,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -598,6 +598,27 @@
         autoclose: true
     })
 
+    //CSS SELECT2 FLOATING LABEL
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.form-select')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
     $('.laporan_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
@@ -652,27 +673,6 @@
         theme: "bootstrap-5",
         allowClear: true
     });
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.form-select')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 
     let table = $('#firstDataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -753,78 +753,78 @@
         }
     });
 
-    let secondTable = $('#secondDataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        processing: true,
-        serverSide: true,
-        ordering: true,
-        order: [
-            [2, 'desc']
-        ],
-        fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("supplier-harga/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.id = id_supplier;
-                data.search = $(".search-harga").val();
-                data.sort = sortHarga;
-                data.sortType = sortTypeHarga;
-            }
-        },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.secondDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        //responsive: true,
-        display: "stripe",
-        searching: false,
-        columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        }, {
-            data: "bahan_baku_name",
-            className: "text-center"
-        }, {
-            data: "createdAt",
-            className: "text-center"
-        }, {
-            data: "spesifikasi",
-            className: "text-center"
-        }, {
-            data: "bagian",
-            className: "text-center"
-        }, {
-            data: "harga_umum",
-            className: "text-center"
-        }, {
-            data: "harga_harian",
-            className: "text-center"
-        }, {
-            data: "harga_bulanan",
-            className: "text-center"
-        }],
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
+    // let secondTable = $('#secondDataTable').DataTable({
+    //     dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+    //     processing: true,
+    //     serverSide: true,
+    //     ordering: true,
+    //     order: [
+    //         [2, 'desc']
+    //     ],
+    //     fixedHeader: true,
+    //     lengthMenu: [
+    //         [25],
+    //         [25],
+    //     ],
+    //     pageLength: 25,
+    //     ajax: {
+    //         url: "<?= base_url("supplier-harga/all"); ?>",
+    //         dataSrc: "data",
+    //         data: function(data) {
+    //             data.id = id_supplier;
+    //             data.search = $(".search-harga").val();
+    //             data.sort = sortHarga;
+    //             data.sortType = sortTypeHarga;
+    //         }
+    //     },
+    //     // scrollX: true,
+    //     "initComplete": function(settings, json) {
+    //         $('.dataTables_length').empty();
+    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+    //         $('.secondDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+    //     },
+    //     //responsive: true,
+    //     display: "stripe",
+    //     searching: false,
+    //     columns: [{
+    //         data: "no",
+    //         className: "text-center",
+    //         sortable: false
+    //     }, {
+    //         data: "bahan_baku_name",
+    //         className: "text-center"
+    //     }, {
+    //         data: "createdAt",
+    //         className: "text-center"
+    //     }, {
+    //         data: "spesifikasi",
+    //         className: "text-center"
+    //     }, {
+    //         data: "bagian",
+    //         className: "text-center"
+    //     }, {
+    //         data: "harga_umum",
+    //         className: "text-center"
+    //     }, {
+    //         data: "harga_harian",
+    //         className: "text-center"
+    //     }, {
+    //         data: "harga_bulanan",
+    //         className: "text-center"
+    //     }],
+    //     columnDefs: [{
+    //         defaultContent: "-",
+    //         targets: "_all"
+    //     }],
+    //     language: {
+    //         emptyTable: "Tidak Ada Data",
+    //         lengthMenu: "Show _MENU_ entries",
+    //         paginate: {
+    //             previous: '<i class="fa fa-angle-left"></i>',
+    //             next: '<i class="fa fa-angle-right"></i>'
+    //         }
+    //     }
+    // });
 
     $(document).ready(function() {
         var validator = $(".create-form").validate({
@@ -1173,14 +1173,14 @@
         }
     }
 
-    let History = function(id) {
-        id_supplier = id;
-        $(".search-harga").val('')
-        sortHarga = "createdAt";
-        sortTypeHarga = "desc";
-        secondTable.ajax.reload()
-        $(".harga-modal").modal("show")
-    }
+    // let History = function(id) {
+    //     id_supplier = id;
+    //     $(".search-harga").val('')
+    //     sortHarga = "createdAt";
+    //     sortTypeHarga = "desc";
+    //     secondTable.ajax.reload()
+    //     $(".harga-modal").modal("show")
+    // }
 
     let printLaporan = function(val) {
 
