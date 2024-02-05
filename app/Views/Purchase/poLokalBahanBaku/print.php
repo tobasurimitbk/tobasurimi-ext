@@ -270,6 +270,12 @@
 <body>
     <?php if (!empty($dataPO) && !empty($dataPODetail)) { ?>
         <div class="pagebreak">
+            <div class="w-100 d-flex content-between">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                    <?= $dataPO->companyName ?><br>
+                    <?= $dataPO->companyAddress ?>
+                </div>
+            </div><br>
             <table class="w-100">
                 <tr>
                     <td class="txt-underline txt-bold">PO LOKAL BAHAN BAKU</td>
