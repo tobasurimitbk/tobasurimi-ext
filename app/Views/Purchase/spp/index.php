@@ -169,6 +169,7 @@
                     let id = row?.id;
                     let is_posted = row?.is_posted;
                     let spp_type = row.spp_type;
+                    let status = row.status;
 
                     if (is_posted === "0") {
                         return `
