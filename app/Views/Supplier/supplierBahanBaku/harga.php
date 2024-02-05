@@ -52,41 +52,28 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select divisi_id" name="divisi_id" id="divisi_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataDivisi as $d) : ?>
-                                    <option value="<?= $d['id']; ?>">
-                                        <?= $d['divisi']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Pilih Departemen</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                             </select>
                             <label for="floatingInput">Pilih Spesifikasi</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
@@ -113,7 +100,7 @@
             <div class="row">
                 <div class="row justify-content-end mb-3">
                     <div class="col-md-4">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Barang / Spesifikasi / Departemen" value="" />
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Barang / Spesifikasi" value="" />
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -123,7 +110,6 @@
                                 <th width="10">No</th>
                                 <th>Barang</th>
                                 <th>Spesifikasi</th>
-                                <th>Departemen</th>
                                 <th>Harga Umum</th>
                                 <th>Harga Harian</th>
                                 <th>Harga Bulanan</th>
@@ -189,9 +175,6 @@
                 data: "spesifikasi",
                 className: "text-center"
             }, {
-                data: "divisi",
-                className: "text-center"
-            }, {
                 data: "harga_umum",
                 className: "text-center"
             },
@@ -211,7 +194,6 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let bahan_baku = row?.bahan_baku;
-                    let divisi_id = row?.divisi_id;
                     let spesifikasi_id = row?.spesifikasi_id;
                     let harga_umum = row?.harga_umum_normal;
                     let harga_bulanan = row?.harga_bulanan_normal;
@@ -221,7 +203,6 @@
                         <button class="btn btn-warning posting-spp mr-1 edit-table-detail" 
                         data-id="${id}" 
                         data-bahan_baku="${bahan_baku}"
-                        data-divisi_id="${divisi_id}"
                         data-spesifikasi_id="${spesifikasi_id}"
                         data-harga_umum="${harga_umum}"
                         data-harga_bulanan="${harga_bulanan}"
@@ -253,7 +234,6 @@
         $(document).on('click', '.edit-table-detail', function() {
             var id = $(this).data('id');
             var bahan_baku = $(this).data('bahan_baku');
-            var divisi_id = $(this).data('divisi_id');
             var harga_umum = $(this).data('harga_umum');
             var harga_bulanan = $(this).data('harga_bulanan');
             var harga_harian = $(this).data('harga_harian');
@@ -261,7 +241,6 @@
 
             $('.id').val(id);
             $('.bahan_baku').val(bahan_baku).change();
-            $('.divisi_id').val(divisi_id).change();
             $('.spesifikasi_id_hidden').val(spesifikasi_id);
             $('.harga_umum').val(harga_umum);
             $('.harga_bulanan').val(harga_bulanan);
@@ -278,13 +257,6 @@
         var id = $(this).val();
         getSpesifikasiBarang(id);
     });
-
-
-    $('.divisi_id').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        allowClear: true
-    })
 
     $('.spesifikasi_id').select2({
         placeholder: "Pilih Spesifikasi",
@@ -322,9 +294,6 @@
             bahan_baku: {
                 required: true
             },
-            divisi_id: {
-                required: true
-            },
             spesifikasi_id: {
                 required: true
             },
@@ -341,9 +310,6 @@
         messages: {
             bahan_baku: {
                 required: "Bahan Baku wajib diisi"
-            },
-            divisi_id: {
-                required: "Departemen wajib diisi"
             },
             spesifikasi_id: {
                 required: "Spesifikasi wajib diisi"

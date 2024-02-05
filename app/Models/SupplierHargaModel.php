@@ -16,7 +16,6 @@ class SupplierHargaModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'divisi_id',
         'supplier_id',
         'bahan_baku_id',
         'spesifikasi_id',
@@ -59,7 +58,6 @@ class SupplierHargaModel extends Model
         $availableSort = [
             'bahan_baku_name'   => 'barang_master.barang_name',
             'spesifikasi'       => 'supplier_harga.spesifikasi',
-            'divisis.divisi'    => 'divisis.divisi',
             'harga_umum'        => 'supplier_harga.harga_umum',
             'harga_harian'      => 'supplier_harga.harga_harian',
             'harga_bulanan'     => 'supplier_harga.harga_bulanan',
@@ -73,14 +71,12 @@ class SupplierHargaModel extends Model
 
         $selectQry = "supplier_harga.*, 
             barang_master.barang_name AS bahan_baku_name, 
-            divisis.divisi,
             barang_master_spesifikasi.spesifikasi";
 
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
-            ->join('divisis', 'divisis.id = supplier_harga.divisi_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id', 'left')
             ->orderBy($sort, $sortType);
 
@@ -92,8 +88,7 @@ class SupplierHargaModel extends Model
 
         if ($addCondition['search']) {
             $supplierDataQry->like('barang_master.barang_name', $addCondition['search'])
-                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search']);
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search']);
         }
 
         if ($addCondition['search']) {
@@ -110,57 +105,38 @@ class SupplierHargaModel extends Model
         ];
     }
 
-    public function getBySupplierId($id)
+    public function getDetailSpesifikasi($barang_id, $supplier_id, $spesifikasi_id)
     {
-        $arrCondition = [
-            'supplier_harga.deletedAt' => null,
-            'supplier_harga.supplier_id' => $id
-        ];
-
-        // return $this->asArray()->select('supplier_harga.*, divisis.divisi, ')
-
-        $builder = $this->db->table('supplier_harga')
-            ->select('supplier_harga.*, d, supplier_harga.id as supplier_harga_id, barang_master.barang_name, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan');
-        $builder->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
-            ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
-            ->join('bagian', 'bagian.id = supplier_harga.bagian_id', 'left')
-            ->where($arrCondition)
-            ->orderBy('supplier_harga.createdAt', 'desc');
-        $query = $builder->get();
-
-        return $query->getResultArray();
-    }
-
-    public function getByBarangandSupplier($barang_id, $supplier_id)
-    {
-        $arrCondition = [
+        $condition = [
             'supplier_harga.deletedAt' => null,
             'supplier_harga.supplier_id' => $supplier_id,
-            'supplier_harga.bahan_baku_id' => $barang_id
+            'supplier_harga.bahan_baku_id' => $barang_id,
+            'supplier_harga.spesifikasi_id' => $spesifikasi_id,
         ];
-
-        $builder = $this->db->table('supplier_harga')->select('supplier_harga.*, bagian.id as bagian_ids, bagian.nama_bagian as nama_bagian, supplier_harga.id as supplier_harga_id, barang_master.barang_name, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan');
-        $builder->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
-            ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
-            ->join('bagian', 'bagian.id = supplier_harga.bagian_id', 'left')
-            ->where($arrCondition)
-            ->orderBy('supplier_harga.updatedAt', 'desc');
-        $query = $builder->get();
-
-        return $query->getResultArray();
+        return $this->asArray()->where($condition)->first();
     }
 
-    public function supplierHargaUnique($bagianID, $supplierID, $bahanBakuID, $spesifikasi, $hargaUmum, $hargaHarian, $hargaBulanan)
+    public function getSupplierHarga($supplier_id, $bahan_baku_id)
     {
-        $res = $this->asArray()->where('bagian_id', $bagianID)
-            ->where('supplier_id', $supplierID)
-            ->where('bahan_baku_id', $bahanBakuID)
-            ->where('spesifikasi', $spesifikasi)
-            ->where('harga_umum', $hargaUmum)
-            ->where('harga_harian', $hargaHarian)
-            ->where('harga_bulanan', $hargaBulanan)
-            ->first();
+        $satuanModel = new SatuansModel();
 
-        return ($res == null) ? true : false;
+        $condition = [
+            'deletedAt' => null,
+            'supplier_id' => $supplier_id,
+            'bahan_baku_id' => $bahan_baku_id
+        ];
+        $result = $this->asArray()->where($condition)->findAll();
+        for ($i = 0; $i < count($result); $i++) {
+            $spesifikaiDetail = $satuanModel->select('satuans.*')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.satuan_1 = satuans.id')
+                ->where('barang_master_spesifikasi.id', $result[0]['spesifikasi_id'])
+                ->first();
+
+            $result[$i]['satuan_id'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['id'] : '';
+            $result[$i]['nama_satuan'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['nama_satuan'] : '';
+            $result[$i]['kode_satuan'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['kode_satuan'] : '';
+        }
+
+        return $result;
     }
 }

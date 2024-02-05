@@ -290,7 +290,7 @@
             <table class="item-table">
                 <tr>
                     <th>PETI / TONG</th>
-                    <th>BAGIAN</th>
+                    <th>DEPARTEMEN</th>
                     <th>KETERANGAN</th>
                     <th class="txt-right">QTY (KG)</th>
                     <th class="txt-right">HARGA @</th>
@@ -307,7 +307,7 @@
                 ?>
                     <tr>
                         <td><?= $detail->peti ?></td>
-                        <td><?= $detail->nama_bagian ?></td>
+                        <td><?= $dataPO->divisi ?></td>
                         <td><?= $detail->note ?></td>
                         <td class="txt-right"><?= $detail->qty ?></td>
                         <?php if ($dataPO->pph === "None") {

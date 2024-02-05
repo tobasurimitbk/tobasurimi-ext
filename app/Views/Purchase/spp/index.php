@@ -206,8 +206,8 @@
                         if (status != "CLOSED") {
                             res += `
                                 <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
-                                    <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-success posting-spp">
-                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-danger posting-spp">
+                                        <i class="fa-solid fa-ban"></i>    
                                     </button>
                                 <?php endif; ?>
                             `;

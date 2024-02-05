@@ -11,11 +11,13 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\SatuansModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\SppDetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierHargaModel;
 use App\Models\WarehousesModel;
@@ -30,6 +32,7 @@ class POLokalBahanBaku extends BaseController
     protected $CompaniesModel;
     protected $SupplierModel;
     protected $barangModel;
+    protected $barangSpesifikasiModel;
     protected $metadataModel;
     protected $BagianModel;
     protected $SatuansModel;
@@ -40,6 +43,7 @@ class POLokalBahanBaku extends BaseController
     protected $penerimaanBarangDetailModel;
     protected $jurnalController;
     protected $sppModel;
+    protected $sppDetailModel;
     protected $divisiModel;
 
     public function __construct()
@@ -50,6 +54,7 @@ class POLokalBahanBaku extends BaseController
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->SupplierModel = new SupplierModel();
         $this->barangModel = new BarangMasterModel();
+        $this->barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->metadataModel = new MetadataModel();
         $this->BagianModel = new BagianModel();
         $this->CompaniesModel = new CompaniesModel();
@@ -61,7 +66,9 @@ class POLokalBahanBaku extends BaseController
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->jurnalController = new JurnalUmum();
         $this->sppModel = new SppModel();
+        $this->sppDetailModel = new SppDetailModel();
         $this->divisiModel = new DivisisModel();
+        $this->sppModel = new SppModel();
     }
 
     public function poLokalBahanBaku()
@@ -76,7 +83,7 @@ class POLokalBahanBaku extends BaseController
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
-        // $dataBarang = $this->barangModel
+        $dataBarang = $this->barangModel->getBarangByType("bahan_baku");
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -89,6 +96,7 @@ class POLokalBahanBaku extends BaseController
             "dataSupplier"  => $dataSupplier,
             "dataDivisi"    => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
+            "dataBarang"    => $dataBarang
 
         ];
 
@@ -97,12 +105,11 @@ class POLokalBahanBaku extends BaseController
 
     public function getByIdPOLokalBahanBaku($id = null)
     {
-        $dataCompany =  $this->CompaniesModel->getCompanies();
+        $id = decrypt($id);
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
-        $dataBagian = $this->BagianModel->where('deletedAt', null)->findAll();
-        $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
+        $dataDivisi =  $this->divisiModel->getDivisiAccess();
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -110,23 +117,24 @@ class POLokalBahanBaku extends BaseController
 
         $data = [
             "today" => date("d/m/Y"),
-            "dataSatuan"    => $dataSatuan,
-            "dataBagian"    => $dataBagian,
-            "dataCompany" => $dataCompany,
             "dataSupplier" => $dataSupplier,
             "dataWarehouse" => $dataWarehouse,
             "dataBCType"    => $dataBCType,
-
+            "dataDivisi"    => $dataDivisi,
         ];
 
-        $spesifikasi = [];
 
         if (!empty($id)) {
             $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
+            if ($dataBBLokal == null) {
+                return redirect()->to('po-lokal-bahan-baku');
+            }
             $dataBBLokalDetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
             $dataBarang = $this->barangModel->getBySupplier($dataBBLokal->supplier_id);
-            $spesifikasi = $this->SupplierHargaModel->getByBarangandSupplier($dataBBLokal->barang_id, $dataBBLokal->supplier_id);
-            $data["dataSpesifikasi"] = $spesifikasi;
+
+            $data["dataSpesifikasi"] = $this->SupplierHargaModel->getSupplierHarga($dataBBLokal->supplier_id, $dataBBLokal->barang_id);
+            $data["dataSPP"] = $this->sppModel->find($dataBBLokal->purchase_request_id);
+            $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $dataBBLokal->divisi_id)->where('deletedAt', null)->findAll();
             $data["dataBarang"] = $dataBarang;
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
@@ -169,7 +177,8 @@ class POLokalBahanBaku extends BaseController
         foreach ($poData['data'] as $data) {
             array_push($dataPOLokal, [
                 "no"            => $no++,
-                "id"            => $data->id,
+                "id"            => encrypt($data->id),
+                "divisi"        => $data->divisi,
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
                 "po_no"         => $data->po_no,
                 "companyName"   => $data->companyName,
@@ -195,250 +204,126 @@ class POLokalBahanBaku extends BaseController
 
     public function savePOLokalBahanBaku()
     {
-        try {
-            $rules = [
-                "po_date" => [
-                    "rules" => "required"
-                ],
-                "po_no" => [
-                    "rules" => "required"
-                ],
-                "supplier_id" => [
-                    "rules" => "required"
-                ],
-                "barang_id" => [
-                    "rules" => "required"
-                ],
-                "company_id" => [
-                    "rules" => "required"
-                ],
-                "pph" => [
-                    "rules" => "required"
-                ],
-                // "subsidi_langsung" => [
-                //     "rules" => "required"
-                // ],
-                // "cong_sebenarnya" => [
-                //     "rules" => "required"
-                // ],
-                // "cong_batasan" => [
-                //     "rules" => "required"
-                // ]
-            ];
+        $id = $this->RMPurchaseOrderModel->insert([
+            'company_id' => $this->this_company_id,
+            "warehouse_id" => $this->request->getVar("warehouse_id"),
+            "purchase_request_id" => $this->request->getVar('spp_id'),
+            "supplier_id" => $this->request->getVar("supplier_id"),
+            "barang_id" => $this->request->getVar("barang_id"),
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "bc_type" => $this->request->getVar("bc_type"),
+            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
+            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
+            "pph" => $this->request->getVar("pph"),
+            "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
+            "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
+            "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
+            "total" => $this->request->getVar("total") ? formatter($this->request->getVar("total"), "STR_TO_INT") : 0,
+            "is_posted" => false,
+            "createdBy" => session()->get("login")->user_id,
+        ]);
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
+        $this->sppModel->update($this->request->getVar('spp_id'), [
+            'request_status' => 'finished'
+        ]);
 
-            if ($this->validate($rules)) {
-                $insertData = [
-                    "warehouse_id" => $this->request->getVar("warehouse_id"),
-                    "company_id" => $this->request->getVar("company_id"),
-                    "bc_type" => $this->request->getVar("bc_type"),
-                    "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
-                    "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
-                    "supplier_id" => $this->request->getVar("supplier_id"),
-                    "barang_id" => $this->request->getVar("barang_id"),
-                    "pph" => $this->request->getVar("pph"),
-                    "is_posted" => false,
-                    "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
-                    "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
-                    "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
-                    "createdBy" => session()->get("login")->user_id,
-                    "items" =>  json_decode($this->request->getVar("items"))
-                ];
-
-                $totalPrice = 0;
-
-                foreach ($insertData["items"] as $value) {
-                    $totalPrice += $value->qty * ($value->general_price + $value->daily_price + $value->monthly_price);
-                };
-
-                $insertData["total"] = $totalPrice;
-
-                $payload = json_encode($insertData);
-
-                $insert = $this->RMPurchaseOrderModel->insert($insertData);
-
-                foreach ($insertData["items"] as $value) {
-                    $value->rm_purchase_order_id = $insert;
-                    $value->remaining_qty = $value->qty;
-                }
-
-                $this->RMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
-
-                if ($insert) {
-                    $data = [
-                        "id" => $insert,
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Gagal Disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        foreach (json_decode($this->request->getVar("items")) as $r) {
+            $this->RMPurchaseOrderDetailModel->insert([
+                'rm_purchase_order_id' => $id,
+                'supplier_harga_id' => $r->supplier_harga_id,
+                'barang1_id' =>  $this->request->getVar("barang_id"),
+                'barang2_id' => $r->spesifikasi_id,
+                'satuan_id' => $r->satuan_id,
+                'peti' => $r->peti,
+                'quality' => $r->quality,
+                'note' => $r->keterangan,
+                'qty' => $r->qty,
+                'qty_diterima' => 0,
+                'remeaining_qty' => $r->qty,
+                'general_price' => $r->harga,
+                'daily_price' => $r->daily_price,
+                'monthly_price' => $r->monthly_price
+            ]);
         }
-        return;
+
+        return response()->setJSON([
+            'message' => "PO Lokal Bahan Baku Berhasil Disimpan",
+            'token' => csrf_hash(),
+            'id' => encrypt($id),
+            'status' => true
+        ]);
     }
 
     public function updatePOLokalBahanBaku()
     {
-        try {
-            $rules = [
-                "po_date" => [
-                    "rules" => "required"
-                ],
-                "po_no" => [
-                    "rules" => "required"
-                ],
-                "supplier_id" => [
-                    "rules" => "required"
-                ],
-                "barang_id" => [
-                    "rules" => "required"
-                ],
-                "company_id" => [
-                    "rules" => "required"
-                ],
-                "pph" => [
-                    "rules" => "required"
-                ],
-                // "subsidi_langsung" => [
-                //     "rules" => "required"
-                // ],
-                // "cong_sebenarnya" => [
-                //     "rules" => "required"
-                // ],
-                // "cong_batasan" => [
-                //     "rules" => "required"
-                // ]
-            ];
+        $id = decrypt($this->request->getVar('id'));
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
+        $firstData = $this->RMPurchaseOrderModel->find($id);
 
-            if ($this->validate($rules)) {
-                $id = $this->request->getVar("id");
+        $this->sppModel->update($firstData['purchase_request_id'], [
+            'request_status' => 'waiting'
+        ]);
 
-                $insertData = [
-                    "warehouse_id" => $this->request->getVar("warehouse_id"),
-                    "company_id" => $this->request->getVar("company_id"),
-                    "bc_type" => $this->request->getVar("bc_type"),
-                    "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
-                    "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
-                    "supplier_id" => $this->request->getVar("supplier_id"),
-                    "barang_id" => $this->request->getVar("barang_id"),
-                    "pph" => $this->request->getVar("pph"),
-                    "is_posted" => false,
-                    "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
-                    "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
-                    "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
-                    "createdBy" => session()->get("login")->user_id,
-                    "items" =>  json_decode($this->request->getVar("items"))
-                ];
+        $this->RMPurchaseOrderModel->update($id, [
+            'company_id' => $this->this_company_id,
+            "warehouse_id" => $this->request->getVar("warehouse_id"),
+            "purchase_request_id" => $this->request->getVar('spp_id') ?  $this->request->getVar('spp_id') :  $firstData['purchase_request_id'],
+            "supplier_id" => $this->request->getVar("supplier_id"),
+            "barang_id" => $this->request->getVar("barang_id"),
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "bc_type" => $this->request->getVar("bc_type"),
+            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
+            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
+            "pph" => $this->request->getVar("pph"),
+            "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
+            "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
+            "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
+            "total" => $this->request->getVar("total") ? formatter($this->request->getVar("total"), "STR_TO_INT") : 0,
+            "createdBy" => session()->get("login")->user_id,
+        ]);
 
-                $totalPrice = 0;
+        $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->delete();
 
-                foreach ($insertData["items"] as $value) {
-                    if (empty($value->isDeleted)) {
-                        $totalPrice += $value->qty * ($value->general_price + $value->daily_price + $value->monthly_price);
-                    }
-                };
+        $this->sppModel->update($this->request->getVar('spp_id'), [
+            'request_status' => 'finished'
+        ]);
 
-                $insertData["total"] = $totalPrice;
-
-                if ($insertData) {
-                    $this->RMPurchaseOrderModel->update($id, $insertData);
-
-                    foreach ($insertData["items"] as $value) {
-                        $value->rm_purchase_order_id = $id;
-
-                        if (!empty($value->isDeleted)) {
-                            $this->RMPurchaseOrderDetailModel->where('id', $value->id)->delete();
-                        }
-
-                        $dataDetail = [
-                            "id" => $value->id ?? null,
-                            "rm_purchase_order_id" => $this->request->getVar("id"),
-                            "supplier_harga_id" => $value->supplier_harga_id,
-                            "satuan_id" => $value->satuan_id,
-                            "bagian" => $value->bagian,
-                            "peti" => $value->peti,
-                            "quality" => $value->quality,
-                            "note" => $value->note,
-                            "qty" => $value->qty,
-                            // "remaining_qty" => $value->remaining_qty,
-                            "general_price" => $value->general_price,
-                            "daily_price" => $value->daily_price,
-                            "monthly_price" => $value->monthly_price,
-                        ];
-
-                        $this->RMPurchaseOrderDetailModel->upsert($dataDetail);
-                    }
-
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   =>  json_encode($insertData),
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => 'Data Gagal Diubah',
-                        "payload"   =>  json_encode($insertData),
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        foreach (json_decode($this->request->getVar("items")) as $r) {
+            $this->RMPurchaseOrderDetailModel->insert([
+                'rm_purchase_order_id' => $id,
+                'supplier_harga_id' => $r->supplier_harga_id,
+                'barang1_id' =>  $this->request->getVar("barang_id"),
+                'barang2_id' => $r->spesifikasi_id,
+                'satuan_id' => $r->satuan_id,
+                'peti' => $r->peti,
+                'quality' => $r->quality,
+                'note' => $r->keterangan,
+                'qty' => $r->qty,
+                'qty_diterima' => 0,
+                'remeaining_qty' => $r->qty,
+                'general_price' => $r->harga,
+                'daily_price' => $r->daily_price,
+                'monthly_price' => $r->monthly_price
+            ]);
         }
-        return;
+
+        return response()->setJSON([
+            'message' => "PO Lokal Bahan Baku Berhasil Diupdate",
+            'token' => csrf_hash(),
+            'id' => encrypt($id),
+            'status' => true
+        ]);
     }
 
     public function closePOLokalBahanBaku()
     {
         try {
-            $id = $this->request->getVar("id");
+            $id = $this->request->getVar('id');
+            if (is_numeric($id)) {
+                $id = $id;
+            } else {
+                $id = decrypt($id);
+            }
 
             $payload = [
                 "status_penerimaan" => true
@@ -477,24 +362,31 @@ class POLokalBahanBaku extends BaseController
     public function updateStatusPOLokalBahanBaku()
     {
         try {
-            $id = $this->request->getVar("id");
+
+            $id = $this->request->getVar('id');
+            if (is_numeric($id)) {
+                $id = $id;
+            } else {
+                $id = decrypt($id);
+            }
 
             // po posting
             $payload = [
-                "is_posted" => "1"
+                "is_posted" => $this->request->getVar('status_posting')
             ];
 
-            $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
-
-            // cek if warehouse_id != null
-            if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
-                $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
+            if ($payload['is_posted']) {
+                $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
+                // cek if warehouse_id != null
+                if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
+                    $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
+                }
             }
 
             if (!empty($id)) {
                 $data = [
                     "status"    => true,
-                    "message"   => "Data PO Lokal BB Berhasil diposting",
+                    "message"   => "Status Posting PO Berhasil Diperbaruhi",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];
@@ -532,37 +424,38 @@ class POLokalBahanBaku extends BaseController
 
     public function deletePOLokalBahanBaku()
     {
-        try {
-            $id = $this->request->getVar("id");
+        $id = $this->request->getVar('id');
+        if (is_numeric($id)) {
+            $id = $id;
+        } else {
+            $id = decrypt($id);
+        }
 
-            if (empty($id)) {
-                $data = [
-                    "status"     => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token'      => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
+        $firstData = $this->RMPurchaseOrderModel->find($id);
 
-            $this->RMPurchaseOrderModel->delete($id);
-            $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->delete();
+        $this->sppModel->update($firstData['purchase_request_id'], [
+            'request_status' => 'waiting'
+        ]);
 
+        if (empty($id)) {
             $data = [
-                "status"    => true,
-                "message"   => "Data Berhasil dihapus",
-                'token'     => csrf_hash()
+                "status"     => false,
+                "message"    => "Data Gagal Dihapus",
+                'token'      => csrf_hash()
             ];
             echo json_encode($data);
             return;
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
         }
+
+        $this->RMPurchaseOrderModel->delete($id);
+        $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->delete();
+
+        $data = [
+            "status"    => true,
+            "message"   => "Data Berhasil dihapus",
+            'token'     => csrf_hash()
+        ];
+        echo json_encode($data);
         return;
     }
 
@@ -591,8 +484,6 @@ class POLokalBahanBaku extends BaseController
                 $pph = 0.00;
                 $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
 
-
-
                 $objPph = [
                     "None" => 0,
                     "Supplier" => 1,
@@ -600,21 +491,7 @@ class POLokalBahanBaku extends BaseController
                 ];
 
                 $pphTax *= $objPph[$dataPO->pph];
-                // echo '<pre>';
-                // print_r($dataPODetail);
-                // echo '</pre>';
-                // exit;
 
-                // if (!empty($dataPO->supplierNPWP) && $dataPO->pph === "Company") {
-                //     $dataPO->nilai_pph = 1.00 - 0.0025;
-                //     $dataPO->nilai_pph2 = 0.0025;
-                // } else if (!empty($dataPO->supplierNPWP) && $dataPO->pph !== "Company") {
-                //     $dataPO->nilai_pph = 1.00 - 0.005;
-                //     $dataPO->nilai_pph2 = 0.005;
-                // } else {
-                //     $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
-                //     $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
-                // }
                 $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
                 $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
 
@@ -661,7 +538,7 @@ class POLokalBahanBaku extends BaseController
 
     public function dropdownHistoriPenerimaanBarang()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $listBarang = $this->RMPurchaseOrderDetailModel
             ->select('rm_purchase_order_details.qty_diterima AS diterima, rm_purchase_order_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, rm_purchase_order_details.qty')
             ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id')
@@ -721,26 +598,133 @@ class POLokalBahanBaku extends BaseController
 
     public function dropdownWarehouse()
     {
-        $res = $this->warehousesModel->get_by_company_id($this->request->getVar('company_id'));
+        $id = $this->request->getVar('divisi_id');
+        $res = $this->warehousesModel->where('deletedAt', null)->where('divisi_id', $id)->findAll();
         return response()->setJSON([
-            'data' => $res
+            'data' => $res,
+            'token' => csrf_hash(),
+            'status' => true
         ]);
     }
 
     public function dropdownGetSpp()
     {
         $id = $this->request->getVar('divisi_id');
+        $spp_type = $this->request->getVar('spp_type');
         $condition = [
             'purchase_requests.deletedAt' => null,
             'purchase_requests.divisi_id' => $id,
             'purchase_requests.is_posted' => '1',
-            'purchase_requests.request_status' => 'waiting'
+            'purchase_requests.request_status' => 'waiting',
+            'purchase_requests.spp_type' => $spp_type
         ];
-        $data = $this->sppModel->getSppList($condition, []);
+        $data = $this->sppModel->where($condition)->findAll();
         return response()->setJSON([
             'token' => csrf_hash(),
             'data' => $data,
             'status' => true
+        ]);
+    }
+
+    public function dropdownGetSppDetail()
+    {
+        $id = $this->request->getVar('spp_id');
+        $supplier_id = $this->request->getVar('supplier_id');
+
+        $condition = [
+            'purchase_request_details.purchase_request_id' => $id,
+            'purchase_request_details.deletedAt' => null
+        ];
+
+        $selectQry = "
+            purchase_request_details.*,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            satuans.kode_satuan
+        ";
+
+        $spp = $this->sppModel->find($id);
+
+        if ($spp == null) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => 'Spp tidak ada'
+            ]);
+        }
+
+        $sppDetail = $this->sppDetailModel->select($selectQry)
+            ->join('barang_master', 'purchase_request_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'purchase_request_details.barang2_id=barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = purchase_request_details.unit', 'left')
+            ->where($condition)->findAll();
+
+        $result = [];
+
+        foreach ($sppDetail as $s) {
+            $supplierHarga = $this->SupplierHargaModel->getDetailSpesifikasi(
+                $s['barang1_id'],
+                $supplier_id,
+                $s['barang2_id'],
+                $spp['divisi_id']
+            );
+
+            if ($supplierHarga == null) {
+                // create new
+                $this->SupplierHargaModel->insert([
+                    'supplier_id' => $supplier_id,
+                    'bahan_baku_id' => $s['barang1_id'],
+                    'spesifikasi_id' => $s['barang2_id'],
+                    'nama_barang' => $s['barang_name'] . ' ' . $s['spesifikasi'],
+                    'spesifikasi' => $s['spesifikasi'],
+                    'harga_umum' => 0,
+                    'harga_harian' => 0,
+                    'harga_bulanan' => 0,
+                ]);
+
+                $supplierHarga = $this->SupplierHargaModel->getDetailSpesifikasi(
+                    $s['barang1_id'],
+                    $supplier_id,
+                    $s['barang2_id'],
+                    $spp['divisi_id']
+                );
+            }
+
+            $result[] = [
+                'supplier_harga_id' => $supplierHarga['id'],
+                'barang1_id' => $s['barang1_id'],
+                'barang2_id' => $s['barang2_id'],
+                'spesifikasi' => $s['spesifikasi'],
+                'satuan_id' => $s['unit'],
+                'satuan_name' => $s['kode_satuan'],
+                'harga_umum' => $supplierHarga['harga_umum'],
+                'harga_harian' => $supplierHarga['harga_harian'],
+                'harga_bulanan' => $supplierHarga['harga_bulanan'],
+                'keterangan' => $s['note'],
+                'qty' => $s['qty'],
+                'peti' => '-',
+                'kualitas' => 'Baik',
+                'total' => ($supplierHarga['harga_umum'] + $supplierHarga['harga_harian'] + $supplierHarga['harga_bulanan']) * $s['qty']
+            ];
+        }
+
+        return response()->setJSON([
+            'barang_master_id' => $sppDetail[0]['barang1_id'],
+            'sppDetail' => $result,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function getBarangAndSupplier()
+    {
+        $supplier_id = $this->request->getVar('supplier_id');
+        $bahan_baku_id = $this->request->getVar('barang_id');
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'data' => $this->SupplierHargaModel->getSupplierHarga($supplier_id, $bahan_baku_id)
         ]);
     }
 }

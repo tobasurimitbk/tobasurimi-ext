@@ -55,8 +55,6 @@ class SupplierHarga extends BaseController
                 "id"                => encrypt($data->id),
                 "bahan_baku"        => $data->bahan_baku_id,
                 "spesifikasi_id"    => $data->spesifikasi_id,
-                "divisi_id"         => $data->divisi_id,
-                "divisi"         => $data->divisi,
                 "bahan_baku_name"   => $data->bahan_baku_name,
                 "spesifikasi"       => $data->spesifikasi,
                 "harga_umum_normal" => $data->harga_umum,
@@ -84,7 +82,7 @@ class SupplierHarga extends BaseController
 
     public function saveSupplierHarga()
     {
-        $checkDuplicate = $this->SupplierHargaModel->where('divisi_id', $this->request->getVar('divisi_id'))
+        $checkDuplicate = $this->SupplierHargaModel
             ->where('bahan_baku_id', $this->request->getVar('bahan_baku'))
             ->where('spesifikasi_id', $this->request->getVar('spesifikasi_id'))
             ->where('supplier_id', $this->request->getVar('supplier_id'))
@@ -111,7 +109,6 @@ class SupplierHarga extends BaseController
         }
 
         $this->SupplierHargaModel->insert([
-            'divisi_id' => $this->request->getVar('divisi_id'),
             'supplier_id' => $this->request->getVar('supplier_id'),
             'bahan_baku_id' => $this->request->getVar('bahan_baku'),
             'spesifikasi_id' => $this->request->getVar('spesifikasi_id'),
@@ -145,7 +142,6 @@ class SupplierHarga extends BaseController
 
 
         $this->SupplierHargaModel->update($id, [
-            'divisi_id' => $this->request->getVar('divisi_id'),
             'supplier_id' => $this->request->getVar('supplier_id'),
             'bahan_baku_id' => $this->request->getVar('bahan_baku'),
             'spesifikasi_id' => $this->request->getVar('spesifikasi_id'),
