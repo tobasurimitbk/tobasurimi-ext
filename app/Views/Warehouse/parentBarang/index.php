@@ -22,6 +22,9 @@
                     <a class="nav-link <?= $type == "bahan_jadi" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_jadi') ?>">Barang Jadi</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link <?= $type == "bahan_scrap" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_scrap') ?>">Barang Scrap</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <?= $type == "bahan_modal" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_modal') ?>">Barang Modal</a>
                 </li>
             </ul>

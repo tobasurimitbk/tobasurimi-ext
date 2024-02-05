@@ -110,7 +110,7 @@
                                                     <div class="row">
                                                         <div class="col-sm-12" style="padding:0px!important;">
                                                             <div class="form-floating">
-                                                                <select class="form-select" name="satuan1_id[]" id="satuan1_id" title="Satuan terkecil dari produk. Cth: PCS">
+                                                                <select class="form-select" name="satuan1_id[]" id="satuan1_id" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText()">
                                                                     <option value=""></option>
                                                                     <?php foreach ($satuanBarang as $sb) : ?>
                                                                         <option value="<?= encrypt($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -354,6 +354,9 @@
                 success: function(res) {
                     $('.delete-btn').show();
                     $('.title-name').text("Update Bahan Baku");
+                    <?php if (!can('Master Barang', 'Barang Baku', 'u')) : ?>
+                        $('.btn-submit-form').hide();
+                    <?php endif; ?>
                     $('input[name="kode_barang"]').attr('readonly', true);
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
@@ -363,6 +366,7 @@
                     $('input[name="minimum_stock"]').val(res.data.minimum_stock).change();
                     $('input[name="id"]').val(res.data.id);
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
+
 
                     // Iterate through dataSpekDetail and append rows to the table
                     if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
@@ -381,7 +385,7 @@
                                 '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\')"><i class="far fa-trash-alt"></i></button></td>' +
                                 '</tr>' +
                                 '<tr>' +
-                                '<td style="width: 15%;"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan1_id[]" id="satuan1_id_' + counter + '" title="Satuan terkecil dari produk. Cth: PCS"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 1</label></div></div></div></td>' +
+                                '<td style="width: 15%;"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan1_id[]" id="satuan1_id_' + counter + '" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText(' + counter + ')"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 1</label></div></div></div></td>' +
                                 '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan2_id[]" id="satuan2_id_' + counter + '" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 2</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_2[]_${counter}" class="form-control" value="' + item.konversi_satuan_2 + '"><div class="input-group-append"><span class="input-group-text satuan_${counter}">-</span></div></div></div></div></td>' +
                                 '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan3_id[]" id="satuan3_id_' + counter + '" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 3</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_3[]" class="form-control" value="' + item.konversi_satuan_3 + '"><div class="input-group-append"><span class="input-group-text satuan_${counter}">-</span></div></div></div></div></td>' +
                                 '</tr>';
@@ -389,11 +393,8 @@
                             $(`#satuan1_id_${counter} option`).each(function() {
                                 if ($(this).val() == satuan1Id) {
                                     $(this).prop('selected', true);
+                                    changeSpanText(counter);
                                 }
-                                var selectedText = $(this).find('option:selected').text();
-                                var spanText = $(`.satuan_${counter}`);
-                                // Ubah konten span sesuai dengan nilai yang dipilih
-                                spanText.text(selectedText ? selectedText : '-');
                             });
                             $(`#satuan2_id_${counter} option`).each(function() {
                                 if ($(this).val() == satuan2Id) {
@@ -430,18 +431,9 @@
                                 allowClear: true,
                                 dropdownParent: $(".add-modal .modal-content")
                             });
-
-                            $(`#satuan1_id_${counter}`).change(function() {
-                                var selectedText = $(this).find('option:selected').text();
-                                var spanText = $(`.satuan_${counter}`);
-
-                                // Ubah konten span sesuai dengan nilai yang dipilih
-                                spanText.text(selectedText ? selectedText : '-');
-                            });
                             counter++;
                         });
                     }
-
                     $('.add-modal').modal('show');
                 }
             })
@@ -606,14 +598,23 @@
                 }
             })
         });
-        $('#satuan1_id').change(function() {
-            var selectedText = $(this).find('option:selected').text();
-            var spanText = $('.satuan1');
-
-            // Ubah konten span sesuai dengan nilai yang dipilih
-            spanText.text(selectedText ? selectedText : '-');
-        });
     });
+
+    function changeSpanText(counter = null) {
+        if (counter) {
+            var selectedText = $(`#satuan1_id_${counter}`).find('option:selected').text();
+            var spanText = $(`.satuan_${counter}`);
+            console.log('masuk SINI');
+        } else {
+            var selectedText = $('#satuan1_id').find('option:selected').text();
+            var spanText = $(`.satuan1`);
+            console.log('masuk SANA');
+        }
+        console.log(selectedText);
+        console.log(spanText.text().trim());
+        // Ubah konten span sesuai dengan nilai yang dipilih
+        spanText.text(selectedText ? selectedText : '-');
+    }
 
     var counter = 2; // Counter variable for rowspan
 
@@ -639,7 +640,7 @@
                 <div class="row">
                     <div class="col-sm-12" style="padding:0px!important;">
                         <div class="form-floating">
-                            <select class="form-select" name="satuan1_id[]" id="satuan1_id_${counter}" title="Satuan terkecil dari produk. Cth: PCS">
+                            <select class="form-select" name="satuan1_id[]" id="satuan1_id_${counter}" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText(${counter})">
                                 <option value=""></option>
                                 <?php foreach ($satuanBarang as $sb) : ?>
                                     <option value="<?= encrypt($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -722,13 +723,6 @@
             dropdownParent: $(".add-modal .modal-content")
         });
 
-        $(`#satuan1_id_${counter}`).change(function() {
-            var selectedText = $(this).find('option:selected').text();
-            var spanText = $(`.satuan_${counter}`);
-
-            // Ubah konten span sesuai dengan nilai yang dipilih
-            spanText.text(selectedText ? selectedText : '-');
-        });
         counter++;
         // rows++;
     }
@@ -748,16 +742,27 @@
                 if (null != chkbox && true == chkbox.checked) {
                     isChecked = true;
                     table.deleteRow(i);
-                    rowCount--;
+                    table.deleteRow(i - 1); // Remove the previous row as well
+                    rowCount -= 2; // Reduce rowCount by 2
                     i--;
                 }
             }
 
-            // If no checkbox is checked, remove the last row
+            // If no checkbox is checked, remove the last two rows
             if (!isChecked && rowCount > 1) {
                 table.deleteRow(rowCount - 1);
-                rowCount--;
+                table.deleteRow(rowCount - 2);
+                rowCount -= 2;
             }
+            // Reset counter based on the remaining rows
+            // counter = rowCount > 1 ? currentCount : 2;
+            // Get the last row in the table
+            var lastRow = table.rows[rowCount - 2];
+
+            // Update the value of the span with the updated counter value
+            var currentCount = lastRow.querySelector('#nomber').innerText;
+
+            counter = currentCount;
         } catch (e) {
             alert(e);
         }
