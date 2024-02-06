@@ -327,8 +327,9 @@ class Barang extends BaseController
             ->where('type_barang', $type)
             ->where('deletedAt', null)
             ->like('kode_barang', $codeName . '-____')
-            ->orderBy('createdAt', 'DESC')
+            ->orderBy('kode_barang', 'DESC')
             ->first();
+
 
         if (empty($lastBarang)) {
             return response()->setJSON([
@@ -336,7 +337,6 @@ class Barang extends BaseController
                 'token' => csrf_hash(),
             ]);
         }
-
         try {
 
             $lastCode = $lastBarang->kode_barang;
