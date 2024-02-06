@@ -89,7 +89,7 @@
                                     <input autocomplete="one-time-code" <?= !empty($poDetail) ? ($poDetail['is_posted'] === "1" ? 'disabled=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" <?= !empty($poDetail) ?  ' value="' . $poDetail['po_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. PO</label>
                                 </div>
-                                <div <?= !empty($poDetail) ? ($poDetail['is_posted'] === "1" ? 'style="display:none;"' : '') : ''; ?> class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div <?= !empty($poDetail) ? 'style="display:none;"' : ''; ?> class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>

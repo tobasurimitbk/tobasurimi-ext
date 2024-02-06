@@ -16,7 +16,7 @@ class RMImportPODetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id', 'rm_import_po_id', 'barang_id', 'note', 'unit', 'qty', 'price',
-        'disc', 'additional_cost', 'remaining_qty', 'qty_diterima', 'total'
+        'disc', 'additional_cost', 'remaining_qty', 'qty_diterima', 'total', 'spesifikasi_id'
     ];
 
     // Dates

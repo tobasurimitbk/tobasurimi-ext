@@ -401,6 +401,12 @@ class POLokalBahanPenolong extends BaseController
     {
         $id = decrypt($this->request->getVar("id"));
 
+        $firstData = $this->aMPurchaseOrderModel->find($id);
+
+        $this->sppModel->update($firstData['purchase_request_id'], [
+            'request_status' => 'waiting'
+        ]);
+
         $this->aMPurchaseOrderModel->delete($id);
         $this->aMPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
 

@@ -156,6 +156,7 @@ class POLokalBahanBaku extends BaseController
         ];
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_order_details.deletedAt' => null
         ];
 
@@ -625,13 +626,14 @@ class POLokalBahanBaku extends BaseController
             'purchase_requests.divisi_id' => $id,
             'purchase_requests.is_posted' => '1',
             'purchase_requests.request_status' => 'waiting',
-            'purchase_requests.spp_type' => $spp_type
+            // 'purchase_requests.spp_type' => $spp_type
         ];
-        $data = $this->sppModel->where($condition)->findAll();
+        $data = $this->sppModel->where($condition)->like('purchase_requests.spp_type', $spp_type)->findAll();
         return response()->setJSON([
             'token' => csrf_hash(),
             'data' => $data,
-            'status' => true
+            'status' => true,
+            'spp_type' => $spp_type
         ]);
     }
 

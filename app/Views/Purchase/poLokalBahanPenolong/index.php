@@ -337,10 +337,10 @@
         })
     })
 
-    const posting = function(id, purchase_request_id) {
+    const posting = function(id, status) {
         Swal.fire({
             icon: 'question',
-            title: 'Yakin akan di Posting?',
+            title: status == '0' ? 'UnPosting PO ?' : 'Posting PO ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -354,7 +354,7 @@
                     url: "<?= base_url("po-lokal-bahan-penolong/update-status"); ?>",
                     data: {
                         id: id,
-                        status: purchase_request_id
+                        status: status
                     },
                     beforeSend: function(xhr) {
                         setLoading();
