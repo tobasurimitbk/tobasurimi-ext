@@ -471,7 +471,7 @@ class POLokalBahanPenolong extends BaseController
 
     public function dropdownHistoriPenerimaanBarang()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $listBarang = $this->aMPurchaseOrderDetailModel
             ->select('am_purchase_order_details.qty_diterima AS diterima, am_purchase_order_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, am_purchase_order_details.qty')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
