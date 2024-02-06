@@ -14,45 +14,56 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-lokal-bahan-baku"); ?>">
                 Batal
             </a>
-            <?php if (!empty($dataPOLokal)) { ?>
+            <?php if (!empty($dataPOLokal)) : ?>
 
-                <?php if ($dataPOLokal->is_posted === "0") { ?>
-                    <button class="btn btn-hapus delete-parent float-right">
-                        Hapus
+                <?php if ($dataPOLokal->is_posted === "0") : ?>
+                    <?php if (can('Pembelian', 'PO Lokal BB', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <?php if (can('Pembelian', 'PO Lokal BB', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-lokal-bahan-baku/print/"); ?><?= encrypt($dataPOLokal->id) ?>')">
+                        Print
                     </button>
-                <?php } ?>
+                <?php endif; ?>
 
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-lokal-bahan-baku/print/"); ?><?= $dataPOLokal->id ?>')">
-                    Print
-                </button>
+                <?php if ($dataPOLokal->is_posted === "0") : ?>
+                    <?php if (can('Pembelian', 'PO Lokal BB', 'a')) : ?>
+                        <button class="btn btn-success posting-spp float-right posting-po" data-status_posting="1">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
 
-                <?php if ($dataPOLokal->is_posted === "0") { ?>
-                    <button class="btn btn-success posting-spp float-right posting-po">
-                        Posting
-                    </button>
-                <?php } ?>
-
-                <?php if ($dataPOLokal->is_posted === "1") {
-                    if ($dataPOLokal->status_penerimaan === "0") { ?>
+                <?php if ($dataPOLokal->is_posted === "1") : ?>
+                    <?php if (can('Pembelian', 'PO Lokal BB', 'ua') && $dataPOLokal->status_penerimaan === "0") : ?>
+                        <button class="btn btn-success posting-spp float-right posting-po" data-status_posting="0">
+                            Un Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if ($dataPOLokal->status_penerimaan === "0") : ?>
                         <button class="btn btn-hapus close-parent float-right">
                             Close PO
                         </button>
-                <?php }
-                } ?>
+                    <?php endif; ?>
+                <?php endif; ?>
 
-            <?php } ?>
+            <?php endif; ?>
 
-            <?php if (!empty($dataPOLokal)) {
-                if ($dataPOLokal->is_posted === "0") { ?>
+            <?php if (!empty($dataPOLokal)) : ?>
+                <?php if ($dataPOLokal->is_posted === "0") : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
-                <?php }
-            } else { ?>
+                <?php endif; ?>
+            <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
                 </button>
-            <?php } ?>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -63,7 +74,7 @@
                 </div>
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOLokal) ? $dataPOLokal->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOLokal) ? encrypt($dataPOLokal->id) : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -116,7 +127,7 @@
                                 if (!empty($dataDivisi)) {
                                     foreach ($dataDivisi as $d) {
                                 ?>
-                                        <option value="<?= $d["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataDivisi->divisi_id === $d["id"] ? "selected" : "") : ""; ?>><?= strtoupper($d["divisi"]); ?></option>
+                                        <option value="<?= $d["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->divisi_id === $d["id"] ? "selected" : "") : ""; ?>><?= strtoupper($d["divisi"]); ?></option>
                                 <?php
                                     }
                                 }
@@ -126,12 +137,18 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating " style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
+                                <?php if (!empty($dataListSPP)) : ?>
+                                    <?php foreach ($dataListSPP as $d) : ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['spp_no'] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">SPP (Opsional)</label>
                         </div>
+                        <small class="mb-3"><i><?= !empty($dataPOLokal) ? 'Nomor SPP: ' . ($dataSPP != null ? $dataSPP['spp_no'] : '-')  : '' ?></i></small>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -150,6 +167,10 @@
                             <label for="floatingInput">Barang Bahan Baku</label>
                         </div>
                     </div>
+
+
+                </div>
+                <div class="row mt-2">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select pph" id="pph" name="pph" aria-label="Floating label select example">
@@ -172,7 +193,6 @@
                             <label for="floatingInput">Cong Batasan (Opsional)</label>
                         </div>
                     </div>
-
                 </div>
                 <div class="row">
                     <div class="col md-4">
@@ -230,18 +250,17 @@
                 </div>
             </div>
             <form class="detail-form" role="form" method="POST" enctype="multipart/form-data" style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
-                <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
                             <select onchange="changeSpesifikasi()" class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSpesifikasi)) {
                                     foreach ($dataSpesifikasi as $spesifikasi) {
                                 ?>
-                                        <option data-satuan="<?= $spesifikasi["id_satuan"]; ?>" data-bagian="<?= $spesifikasi["bagian_id"]; ?>" data-umum="<?= number_format($spesifikasi["harga_umum"], 2, '.', ','); ?>" data-harian="<?= number_format($spesifikasi["harga_harian"], 2, '.', ','); ?>" data-bulanan="<?= number_format($spesifikasi["harga_bulanan"], 2, '.', ','); ?>" data-barang_id="<?= $spesifikasi["bahan_baku_id"]; ?>" data-nama="<?= $spesifikasi["barang_name"]; ?>" value="<?= $spesifikasi["supplier_harga_id"]; ?>"><?= $spesifikasi["spesifikasi"]; ?></option>
+                                        <option data-spesifikasi_id="<?= $spesifikasi['spesifikasi_id'] ?>" data-nama_satuan="<?= $spesifikasi['nama_satuan'] ?>" data-kode_satuan="<?= $spesifikasi['kode_satuan'] ?>" data-satuan_id="<?= $spesifikasi['satuan_id'] ?>" data-umum="<?= $spesifikasi['harga_umum'] ?>" data-harian="<?= $spesifikasi['harga_harian'] ?>" data-bulanan="<?= $spesifikasi['harga_bulanan'] ?>" value="<?= $spesifikasi["id"]; ?>"><?= $spesifikasi["spesifikasi"]; ?></option>
                                 <?php
                                     }
                                 }
@@ -252,19 +271,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataSatuan)) {
-                                    foreach ($dataSatuan as $satuan) {
-                                ?>
-                                        <option value="<?= $satuan["id"]; ?>"><?= $satuan["nama_satuan"]; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Satuan</label>
+                            <input autocomplete="one-time-code" type="satuan" class="form-control satuan" name="satuan" id="satuan" placeholder="Satuan Barang" readonly>
+                            <label for="floatingInput">Satuan Barang</label>
                         </div>
                     </div>
                 </div>
@@ -339,7 +347,7 @@
                         <button class="btn btn-add btn-block float-right btn-submit-detail">
                             <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                         </button>
-                        <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="setBarang()">
+                        <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="resetDetailForm()">
                             <i class="fa-solid fa-rotate-right mr-1"></i> Reset
                         </button>
                     </div>
@@ -350,9 +358,8 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th>Spesifikasi</th>
-                                <th>Bagian</th>
                                 <th>Satuan</th>
                                 <th>Umum</th>
                                 <th>Harian</th>
@@ -364,73 +371,15 @@
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                            <?php
-                            $total_harga = 0;
-                            $total_harian = 0;
-                            $total_bulanan = 0;
-                            $total_qty = 0;
-                            $row = 0;
-
-                            if (!empty($dataPOLokal)) {
-                                foreach ($dataPOLokal->rm_purchase_order_details as $details) {
-                                    $total_harga = $total_harga + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0);
-                                    $total_qty = $total_qty + $details->qty;
-                                    $total = (($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0) + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0) + ($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0)) * formatter($details->qty, "STR_TO_FLOAT");
-                                    $total_harian = $total_harian + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0);
-                                    $total_bulanan = $total_bulanan + ($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0);
-                            ?>
-                                    <tr>
-                                        <td>
-                                            <?= $row = $row + 1; ?>
-                                        </td>
-                                        <td>
-                                            <?= $details->spesifikasi; ?>
-                                        </td>
-                                        <td>
-                                            <?= $details->nama_bagian; ?>
-                                        </td>
-                                        <td>
-                                            <?= $details->nama_satuan; ?>
-                                        </td>
-                                        <td>
-                                            <?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                        </td>
-                                        <td>
-                                            <?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                        </td>
-                                        <td>
-                                            <?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>
-                                        </td>
-                                        <td>
-                                            <?= formatter($details->qty, "STR_TO_FLOAT"); ?>
-                                        </td>
-                                        <td>
-                                            <?= $details->peti; ?>
-                                        </td>
-                                        <td>
-                                            <?= $details->quality; ?>
-                                        </td>
-                                        <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>">
-                                            <?php if ($dataPOLokal->is_posted === "0") { ?>
-                                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="<?= $details->id_satuan; ?>" data data-spesifikasi="<?= $details->supplier_harga_id; ?>" data-harga="<?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-daily="<?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-monthly="<?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-bagian="<?= $details->bagian; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-total="<?= number_format(formatter($total, "STR_TO_FLOAT"), 2, '.', ',') ?>" data-keterangan="<?= $details->note; ?>" data-peti="<?= $details->peti; ?>" data-quality="<?= $details->quality; ?>" data-id="<?= $details->id; ?>" data-row="<?= $row; ?>">
-                                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                                </button><button class="btn btn-danger" onclick="deleteRow(<?= $row; ?>)">
-                                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                                </button>
-                                            <?php } ?>
-                                        </td>
-                                    </tr>
-                            <?php }
-                            } ?>
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="3"></td>
+                                <td colspan="2"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b><?= "" . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td><b><?= "" . number_format(formatter($total_harian, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td><b><?= "" . number_format(formatter($total_bulanan, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td><b><?= $total_qty; ?></b></td>
+                                <td><b>0.00</b></td>
+                                <td><b>0.00</b></td>
+                                <td><b>0.00</b></td>
+                                <td><b>0.00</b></td>
                                 <td colspan="2"></td>
                                 <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                             </tr>
@@ -468,51 +417,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let list_items = [];
-    let list_delete = [];
-    var row = 0;
-    var total_qty = 0;
-    var total_harga = 0;
-    var total_harian = 0;
-    var total_bulanan = 0;
-    var priceEdit = 0;
-    let trigger = true
-
-    <?php if (!empty($dataPOLokal)) {
-        foreach ($dataPOLokal->rm_purchase_order_details as $details) {
-    ?>
-            priceEdit = Number('<?= $details->general_price; ?>'.replaceAll(",", ""));
-            harianEdit = Number('<?= $details->daily_price; ?>'.replaceAll(",", ""));
-            bulananEdit = Number('<?= $details->monthly_price; ?>'.replaceAll(",", ""));
-            row = row + 1;
-
-            total_qty = total_qty + <?= $details->qty; ?>;
-            total_harga = total_harga + priceEdit;
-            total_harian = total_harian + harianEdit;
-            total_bulanan = total_bulanan + bulananEdit;
-
-            list_items.push({
-                id: <?= $details->id; ?>,
-                row: row,
-                satuan: '<?= $details->id_satuan; ?>',
-                satuanName: '<?= $details->nama_satuan; ?>',
-                spesifikasi: '<?= $details->supplier_harga_id; ?>',
-                spesifikasiName: '<?= $details->spesifikasi; ?>',
-                harga: '<?= number_format(formatter($details->general_price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                qty: Number('<?= $details->qty; ?>'),
-                total: '<?= number_format((($details->monthly_price ? formatter(str_replace(",", "", $details->monthly_price), "STR_TO_FLOAT") : 0) + ($details->daily_price ? formatter(str_replace(",", "", $details->daily_price), "STR_TO_FLOAT") : 0) + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_FLOAT") : 0)) * formatter($details->qty, "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                keterangan: '<?= $details->note; ?>',
-                bagian_id: '<?= $details->bagian; ?>',
-                bagian_name: '<?= $details->nama_bagian; ?>',
-                peti: '<?= $details->peti; ?>',
-                quality: '<?= $details->quality; ?>',
-                daily_price: '<?= number_format(formatter($details->daily_price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
-                monthly_price: '<?= number_format(formatter($details->monthly_price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
-            })
-        <?php
-        }
-        ?>
-    <?php
-    } ?>
+    let total = 0;
 
     var validator_detail = $(".detail-form").validate({
         rules: {
@@ -596,33 +501,36 @@
     });
 
     const changeSpesifikasi = function() {
-        if (trigger) {
-            if ($(".spesifikasi option:selected").val()) {
-                let bagian = $(".spesifikasi option:selected").data("bagian") ? $(".spesifikasi option:selected").data("bagian") : "";
-                let umum = $(".spesifikasi option:selected").data("umum") ? $(".spesifikasi option:selected").data("umum") : "";
-                let harian = $(".spesifikasi option:selected").data("harian") ? $(".spesifikasi option:selected").data("harian") : "";
-                let bulanan = $(".spesifikasi option:selected").data("bulanan") ? $(".spesifikasi option:selected").data("bulanan") : "";
-                let satuan = $(".spesifikasi option:selected").data("satuan") ? $(".spesifikasi option:selected").data("satuan") : "";
+        if ($(".spesifikasi option:selected").val()) {
+            let nama_satuan = $(".spesifikasi option:selected").data("nama_satuan") ? $(".spesifikasi option:selected").data("nama_satuan") : "";
+            let kode_satuan = $(".spesifikasi option:selected").data("kode_satuan") ? $(".spesifikasi option:selected").data("kode_satuan") : "";
+            let satuan_id = $(".spesifikasi option:selected").data("satuan_id") ? $(".spesifikasi option:selected").data("satuan_id") : "";
+            let umum = $(".spesifikasi option:selected").data("umum") ? $(".spesifikasi option:selected").data("umum") : "";
+            let harian = $(".spesifikasi option:selected").data("harian") ? $(".spesifikasi option:selected").data("harian") : "";
+            let bulanan = $(".spesifikasi option:selected").data("bulanan") ? $(".spesifikasi option:selected").data("bulanan") : "";
+            let satuan = $(".spesifikasi option:selected").data("wq") ? $(".spesifikasi option:selected").data("satuan") : "";
 
-                $(".bagian").val(Number(bagian)).change();
-                $(".harga").val(parseInt(umum.replaceAll(",", "")));
-                $(".daily_price").val(parseInt(harian.replaceAll(",", "")));
-                $(".monthly_price").val(parseInt(bulanan.replaceAll(",", "")));
-                $(".satuan").val(satuan).change();
-                $(".qty").val("");
-                $(".total").val("");
-            } else {
-                $(".bagian").val("").change();
-                $(".harga").val("");
-                $(".daily_price").val("");
-                $(".monthly_price").val("");
-                $(".satuan").val("").change();
-                $(".qty").val("");
-                $(".total").val("");
-            }
+            $(".satuan").val(nama_satuan);
+            $(".satuan").attr("satuan_id", satuan_id);
+            $(".satuan").attr("nama_satuan", nama_satuan);
+            $(".satuan").attr("kode_satuan", kode_satuan);
+            $(".harga").val(parseInt(umum.toString().replaceAll(",", "")));
+            $(".daily_price").val(parseInt(harian.toString().replaceAll(",", "")));
+            $(".monthly_price").val(parseInt(bulanan.toString().replaceAll(",", "")));
+
+            $(".qty").val("");
+            $(".total").val("");
         } else {
-            trigger = true
+            $(".satuan").val("");
+            $(".satuan").attr("satuan_id", "");
+            $(".satuan").attr("nama_satuan", "");
+            $(".harga").val("");
+            $(".daily_price").val("");
+            $(".monthly_price").val("");
+            $(".qty").val("");
+            $(".total").val("");
         }
+
     }
 
     $(document).ready(function() {
@@ -649,48 +557,42 @@
         $('.spp_id').select2({
             placeholder: "Pilih Nomor SPP",
             theme: "bootstrap-5"
-        })
+        }).change(function() {
+            var supplier_id = $('.supplier_id').val();
+            if (supplier_id !== '') {
+                getDetailSPP();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Pilih nama supplier",
+                    confirmButtonColor: '#4e73df',
+                });
+            }
+        });
 
         // COMPANY ID
         $('.divisi_id').select2({
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5"
         }).change(function() {
-            $.ajax({
-                url: "<?= base_url("po-lokal-bahan-baku/dropdown/warehouse"); ?>",
-                data: {
-                    company_id: $(this).val()
-                },
-                method: "GET",
-                success: function(response) {
-                    var employeeSelect = $("select[name='warehouse_id']");
-                    employeeSelect.empty();
-
-                    var emptyOption = $("<option></option>")
-                        .attr("value", "")
-                        .text("Pilih Warehouse");
-
-                    employeeSelect.append(emptyOption);
-
-                    $.each(response.data, function(index, data) {
-                        var option = $("<option data-nip=" + data.id + "></option>")
-                            .attr("value", data.id)
-                            .text(data.warehouse_name.toUpperCase());
-                        employeeSelect.append(option);
-                    });
-
-                },
-                onError: function(response) {
-                    alert("ERROR")
-                }
-            });
+            // GET SPP
+            getListSPP();
+            // GET DEPARTEMEN
+            getListDepartemen();
+            var spp = $(".spp_id").val();
+            list_items = [];
+            drawTable();
+            $('.barang_id').val(null).change();
+            $(".barang_id").attr("disabled", false);
         });
 
         // BARANG ID
         $('.barang_id').select2({
             placeholder: "Pilih Bahan Baku",
             theme: "bootstrap-5"
-        })
+        }).change(function() {
+
+        });
 
         // SPESIFIKASI
         $('.spesifikasi').select2({
@@ -699,17 +601,13 @@
             allowClear: true
         })
 
-        // SATUAN
-        $('.satuan').select2({
-            placeholder: "Pilih Satuan (Spesifikasi Required)",
-            theme: "bootstrap-5"
-        })
-
         // SUPPLIER
         $('.supplier_id').select2({
             placeholder: "Pilih Supplier",
             theme: "bootstrap-5"
-        })
+        }).change(function() {
+            getDetailSPP();
+        });
 
         // BAGIAN
         $('.bagian').select2({
@@ -777,15 +675,6 @@
                 pph: {
                     required: true
                 },
-                // subsidi_langsung: {
-                //     required: true
-                // },
-                // cong_sebenarnya: {
-                //     required: true
-                // },
-                // cong_batasan: {
-                //     required: true
-                // }
             },
             messages: {
                 po_date: {
@@ -806,15 +695,6 @@
                 pph: {
                     required: "PPH wajib diisi"
                 },
-                // subsidi_langsung: {
-                //     required: "Subsidi Langsung wajib diisi"
-                // },
-                // cong_sebenarnya: {
-                //     required: "Cong Sebenarnya wajib diisi"
-                // },
-                // cong_batasan: {
-                //     required: "Cong Batasan wajib diisi"
-                // }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -838,10 +718,16 @@
             },
         });
 
-        $(".barang_id").change(function() {
+        $(".barang_id,.supplier_id").change(function() {
             $.ajax({
-                url: `<?= base_url("supplier-harga/barang-and-supplier"); ?>`,
+                url: `<?= base_url("po-lokal-bahan-baku/get-spesifikasi-barang-supplier"); ?>`,
                 method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 data: {
                     barang_id: $(".barang_id option:selected").val(),
                     supplier_id: $(".supplier_id option:selected").val()
@@ -850,180 +736,53 @@
                 success: function(res) {
                     $(".spesifikasi").empty();
 
-                    $(".spesifikasi").append(`<option data-satuan="" data-bagian="" data-umum="" data-harian="" data-bulanan="" data-nama="" value=""></option>`);
+                    $(".spesifikasi").append(`<option data-nama_satuan="" data-kode_satuan="" data-satuan_id="" data-umum="" data-harian="" data-bulanan="" value=""></option>`);
 
                     res.data.forEach(function(item) {
-                        $(".spesifikasi").append(`<option data-satuan="${item.id_satuan}" data-bagian="${item.bagian_id}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" value="${item.supplier_harga_id}">${item.spesifikasi}</option>`);
+                        $(".spesifikasi").append(`<option
+                        data-spesifikasi_id="${item.spesifikasi_id}" 
+                        data-nama_satuan="${item.nama_satuan}" 
+                        data-kode_satuan="${item.kode_satuan}" 
+                        data-satuan_id="${item.satuan_id}" 
+                        data-umum="${Number(item.harga_umum).toLocaleString(undefined, {minimumFractionDigits: 2, maximumSignificantDigits: 2})}" 
+                        data-harian=" ${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                        data-bulanan=" ${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                        value="${item.id}">
+                        ${item.spesifikasi}
+                        </option>`);
                     })
 
                     $(".spesifikasi").val("").change();
+
+                    drawTable();
                 }
             })
-
-            list_items.map((item) => {
-                if (item.id) {
-                    list_delete.push(item);
-                }
-            })
-
-            $(".body-detail-table").empty()
-
-            row = 0;
-
-            total_qty = 0;
-            total_harga = 0;
-            total_harian = 0;
-            total_bulanan = 0;
-
-            list_items = []
-
-            $(".foot-detail-table").empty()
-
-            let tag_total = ""
-
-            tag_total += `<tr>`;
-            tag_total += "<td colspan='3'>";
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += "<b>TOTAL</b>";
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${total_qty}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td colspan='3'>";
-            tag_total += "</td>";
-            tag_total += "</tr>";
-
-            $(".foot-detail-table").append(tag_total);
-        })
-
-        $(".supplier_id").change(function() {
-            $(".spesifikasi").empty();
-
-            $(".spesifikasi").append(`<option data-bagian="" data-umum="" data-harian="" data-bulanan="" data-nama="" value=""></option>`);
-
-            $(".spesifikasi").val("").change();
-
-            list_items.map((item) => {
-                if (item.id) {
-                    list_delete.push(item);
-                }
-            })
-
-            $(".body-detail-table").empty()
-
-            row = 0;
-
-            total_qty = 0;
-            total_harga = 0;
-            total_harian = 0;
-            total_bulanan = 0;
-
-            list_items = []
-
-            $(".foot-detail-table").empty()
-
-            let tag_total = ""
-
-            tag_total += `<tr>`;
-            tag_total += "<td colspan='3'>";
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += "<b>TOTAL</b>";
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td>";
-            tag_total += `<b>${total_qty}</b>`;
-            tag_total += "</td>";
-            tag_total += "<td colspan='3'>";
-            tag_total += "</td>";
-            tag_total += "</tr>";
-
-            $(".foot-detail-table").append(tag_total);
-
-            if ($(".supplier_id option:selected").val()) {
-                $.ajax({
-                    url: `<?= base_url("barang/supplier"); ?>/` + $(".supplier_id option:selected").val(),
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        $(".barang_id").val('').change()
-                        $(".barang_id").empty()
-                        $(".barang_id").append(`<option value=""></option>`)
-                        res?.data?.map((item) => {
-                            $(".barang_id").append(`<option value="${item?.id}">${item?.barang_name}</option>`)
-                        })
-                    }
-                })
-            } else {
-                $(".barang_id").val('').change()
-                $(".barang_id").empty()
-                $(".barang_id").append(`<option value=""></option>`)
-            }
         })
 
         $(".qty, .harga, .daily_price, .monthly_price").keyup(function() {
             var qty = $(".qty").val() ? Number($(".qty").val()) : 0;
-
             var gabungan_harga = Number($(".harga").val()) + Number($(".daily_price").val()) + Number($(".monthly_price").val());
-
             let total = (gabungan_harga * qty);
-            $(".total").val(total);
+            $(".total").val(formatRupiah(total));
         })
 
         $(document).on('click', '.edit-table-detail', function(evt) {
-            $(".title-detail-name").text("Update")
-            $(".delete-detail").css('display', '');
-            let harga = $(this).data('harga')
-            let daily = $(this).data('daily')
-            let monthly = $(this).data('monthly')
-            let bagian = $(this).data('bagian')
-            let satuan = $(this).data('satuan')
-            let qty = $(this).data('qty')
-            let total = $(this).data('total')
-            let peti = $(this).data('peti')
-            let quality = $(this).data('quality')
-            let keterangan = $(this).data('keterangan')
-            let spesifikasi = $(this).data('spesifikasi')
-            let rowid = $(this).data('row')
-            let id = $(this).data('id')
+            var id_detail = $(this).data("id");
+            for (let i = 0; i < list_items.length; i++) {
+                if (list_items[i].id_detail === id_detail) {
+                    $(".id_detail").val(list_items[i].id_detail);
+                    $(".spesifikasi").val(list_items[i].supplier_harga_id).change();
+                    $(".harga").val(list_items[i].harga);
+                    $(".daily_price").val(list_items[i].daily_price);
+                    $(".monthly_price").val(list_items[i].monthly_price).keyup();
+                    $(".qty").val(list_items[i].qty).keyup();
+                    $(".peti").val(list_items[i].peti);
+                    $(".quality").val(list_items[i].quality).change();
+                    $(".keterangan").val(list_items[i].keterangan);
+                    break;
+                }
+            }
 
-            validator_detail.resetForm();
-            validator_detail.reset();
-
-            $(".id_detail").val(rowid);
-
-            $(".qty").val(Number(qty))
-            $(".harga").val(harga.replaceAll(",", ""))
-            $(".daily_price").val(daily.replaceAll(",", ""))
-            $(".monthly_price").val(monthly.replaceAll(",", ""))
-            $(".quality").val(quality)
-            $(".peti").val(peti)
-            $(".total").val(Number(total.replaceAll(",", "")))
-            $(".keterangan").val(keterangan)
-            trigger = false;
-            $(".spesifikasi").val(Number(spesifikasi)).change();
-
-            $(".bagian").val(Number(bagian)).change();
-            $(".satuan").val(Number(satuan)).change();
-            trigger = true;
         })
 
         $(".btn-submit-parent").click(function() {
@@ -1080,62 +839,11 @@
                             if (result.isConfirmed) {
                                 const csrf = $(`[name="${csrfToken}"]`);
                                 let data = new FormData(document.querySelector(".create-form"));
-
-                                let update_list_items = [];
-
-                                if (list_delete.length !== 0) {
-                                    list_delete.map(obj => {
-                                        update_list_items.push({
-                                            id: obj.id ? Number(obj.id) : 0,
-                                            satuan_id: obj.satuan ? Number(obj.satuan) : 0,
-                                            supplier_harga_id: obj.spesifikasi ? Number(obj.spesifikasi) : 0,
-                                            bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
-                                            peti: obj.peti,
-                                            quality: obj.quality,
-                                            note: obj.keterangan,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            daily_price: obj.daily_price ? Number(obj.daily_price.replaceAll(",", "")) : 0,
-                                            monthly_price: obj.monthly_price ? Number(obj.monthly_price.replaceAll(",", "")) : 0,
-                                            general_price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                            isDeleted: true
-                                        })
-                                    })
-                                }
-
-                                list_items.map(obj => {
-                                    if (obj.id) {
-                                        update_list_items.push({
-                                            id: obj.id ? Number(obj.id) : 0,
-                                            satuan_id: obj.satuan ? Number(obj.satuan) : 0,
-                                            supplier_harga_id: obj.spesifikasi ? Number(obj.spesifikasi) : 0,
-                                            bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
-                                            peti: obj.peti,
-                                            quality: obj.quality,
-                                            note: obj.keterangan,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            daily_price: obj.daily_price ? Number(obj.daily_price.replaceAll(",", "")) : 0,
-                                            monthly_price: obj.monthly_price ? Number(obj.monthly_price.replaceAll(",", "")) : 0,
-                                            general_price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0
-                                        })
-                                    } else {
-                                        update_list_items.push({
-                                            supplier_harga_id: obj.spesifikasi ? Number(obj.spesifikasi) : 0,
-                                            satuan_id: obj.satuan ? Number(obj.satuan) : 0,
-                                            bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
-                                            peti: obj.peti,
-                                            quality: obj.quality,
-                                            note: obj.keterangan,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            daily_price: obj.daily_price ? Number(obj.daily_price.replaceAll(",", "")) : 0,
-                                            monthly_price: obj.monthly_price ? Number(obj.monthly_price.replaceAll(",", "")) : 0,
-                                            general_price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0
-                                        })
-                                    }
-                                })
-
-                                data.append("items", JSON.stringify(update_list_items))
-
+                                data.append("items", JSON.stringify(list_items))
+                                data.append("barang_id", $('.barang_id').val());
+                                data.append("total", total);
                                 let id = $(".id").val();
+
                                 // UPDATE
                                 if (id) {
                                     $.ajax({
@@ -1143,10 +851,10 @@
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-
+                                            setLoading();
                                         },
                                         complete: function() {
-
+                                            stopLoading();
                                         },
                                         method: "POST",
                                         dataType: "json",
@@ -1172,15 +880,7 @@
                                                 stopLoading()
                                             }
                                         },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Diubah, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
+
                                     });
                                 }
                                 // CREATE
@@ -1189,11 +889,11 @@
                                         url: "<?= base_url("po-lokal-bahan-baku/save"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
-
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            setLoading();
                                         },
                                         complete: function() {
-
+                                            stopLoading();
                                         },
                                         method: "POST",
                                         dataType: "json",
@@ -1220,15 +920,7 @@
                                                 stopLoading()
                                             }
                                         },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Disimpan, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
+
                                     });
                                 }
                             }
@@ -1253,9 +945,10 @@
                     confirmButtonColor: '#4e73df',
                 })
             } else {
+                var status_posting = $(this).data('status_posting');
                 Swal.fire({
                     icon: 'question',
-                    title: 'Yakin akan di Posting?',
+                    title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
                     confirmButtonColor: '#4e73df',
                     cancelButtonColor: '#d33',
                     showCancelButton: true,
@@ -1268,10 +961,15 @@
                         $.ajax({
                             url: "<?= base_url("po-lokal-bahan-baku/update-status"); ?>",
                             data: {
-                                id: $(".id").val()
+                                id: $(".id").val(),
+                                status_posting: status_posting
                             },
                             beforeSend: function(xhr) {
+                                setLoading();
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            complete: function() {
+                                stopLoading();
                             },
                             method: "POST",
                             dataType: "json",
@@ -1284,31 +982,62 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
+                                            location.reload();
                                         })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
                                 }
                             },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Diubah, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
+
                         });
                     }
                 })
             }
-        })
+        });
+
+        $(".close-parent").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: "Close PO ?",
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Iya',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("po-lokal-bahan-baku/close-po"); ?>",
+                        data: {
+                            id: $(".id").val(),
+                        },
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+
+                    });
+                }
+            })
+        });
 
         // delete
         $(".delete-parent").click(function() {
@@ -1332,7 +1061,11 @@
                             id: id
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -1371,14 +1104,12 @@
         })
 
         $(".btn-submit-detail").click(function() {
-            let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
-
-            let bagian = $(".bagian option:selected").val()
-            let bagianName = $(".bagian option:selected").text()
-            let spesifikasi = $(".spesifikasi option:selected").val()
-            let spesifikasiName = $(".spesifikasi option:selected").text()
-            let satuan = $(".satuan option:selected").val()
-            let satuanName = $(".satuan option:selected").text()
+            let id_detail = $('.id_detail').val();
+            let supplier_harga_id = $(".spesifikasi option:selected").val();
+            let spesifikasi_id = $(".spesifikasi option:selected").data("spesifikasi_id");
+            let spesifikasi_name = $(".spesifikasi option:selected").text().trim();
+            let satuan_id = $(".spesifikasi option:selected").data("satuan_id");
+            let kode_satuan = $(".spesifikasi option:selected").data("kode_satuan");
             let peti = $(".peti").val()
             let quality = $(".quality").val()
             let harga = $(".harga").val()
@@ -1387,491 +1118,77 @@
             let total = $(".total").val()
             let monthly_price = $(".monthly_price").val()
             let keterangan = $(".keterangan").val()
-
             let validate_same = false;
 
-            list_items.map(item => {
-                if (spesifikasi !== '') {
-                    if (item.spesifikasi == spesifikasi) {
-                        // kalau edit barang, barang tidak ganti tidak kena validasi
-                        if (row_detail === item.row) {
-                            validate_same = false;
-                        } else {
-                            validate_same = true;
-                        }
+            if ($(".detail-form").valid()) {
+                list_items.map((item, index) => {
+                    if (item.supplier_harga_id === supplier_harga_id && id_detail === "") {
+                        validate_same = true;
                     }
-                }
-            })
+                });
 
-            if (validate_same) {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Spesifikasi Sudah Ada",
-                    confirmButtonColor: '#4e73df',
-                })
-            } else {
-                if ($(".detail-form").valid()) {
+                if (validate_same) {
                     Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
+                        icon: 'error',
+                        title: "Spesifikasi Sudah Ada",
                         confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // update detail
-                            if (row_detail) {
-                                let new_list_items = []
-                                let tag_html = "";
-                                let tag_total = "";
-
-                                row = 0;
-
-                                $(".body-detail-table").empty()
-
-                                total_qty = 0;
-                                total_harga = 0;
-                                total_harian = 0;
-                                total_bulanan = 0;
-
-                                list_items.map(item => {
-                                    if (item.row == row_detail) {
-                                        tag_html += `<tr>`;
-                                        tag_html += `<td>`;
-                                        tag_html += row + 1;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += spesifikasiName;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += bagianName;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += satuanName;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "" + Number(harga).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        });
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "" + Number(daily_price).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        });
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "" + Number(monthly_price).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        });
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += qty;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += peti;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += quality;
-                                        tag_html += "</td>";
-                                        tag_html += "<td>";
-                                        tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${satuan}" data-spesifikasi="${spesifikasi}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
-                                        data-daily="${Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-monthly="${Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bagian="${bagian}" data-qty="${qty}" data-total="${Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-keterangan="${keterangan}" data-peti="${peti}" data-quality="${quality}" data-id="" data-row="${row + 1}">
-                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                        </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                        </button>`;
-                                        tag_html += "</td>";
-                                        tag_html += "</tr>";
-
-                                        new_list_items.push({
-                                            id: item.id,
-                                            row: row + 1,
-                                            spesifikasi: spesifikasi,
-                                            spesifikasiName: spesifikasiName,
-                                            satuan: satuan,
-                                            satuanName: satuanName,
-                                            bagian_id: bagian,
-                                            bagian_name: bagianName,
-                                            harga: Number(harga).toLocaleString(undefined, {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }),
-                                            daily_price: Number(daily_price).toLocaleString(undefined, {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }),
-                                            monthly_price: Number(monthly_price).toLocaleString(undefined, {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }),
-                                            qty: qty,
-                                            total: Number(total).toLocaleString(undefined, {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }),
-                                            peti: peti,
-                                            quality: quality,
-                                            keterangan: keterangan
-                                        });
-
-                                        row = row + 1;
-
-                                        total_qty = total_qty + Number(qty);
-                                        total_harga = total_harga + Number(harga);
-                                        total_harian = total_harian + Number(daily_price);
-                                        total_bulanan = total_bulanan + Number(monthly_price);
-                                    } else {
-                                        tag_html += `<tr>`;
-                                        tag_html += `<td>`;
-                                        tag_html += row + 1;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.spesifikasiName;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.bagian_name;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.satuanName;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "" + item.harga;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "" + item.daily_price;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += "" + item.monthly_price;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.qty;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.peti;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.quality;
-                                        tag_html += "</td>";
-                                        tag_html += "<td>";
-                                        tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" 
-                                        data-daily="${item.daily_price}" data-monthly="${item.monthly_price}" data-bagian="${item.bagian_id}" data-qty="${item.qty}" data-total="${item.total}" data-keterangan="${item.keterangan}" data-peti="${item.peti}" data-quality="${item.quality}" data-id="${item.id}" data-row="${row + 1}">
-                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                        </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                        </button>`;
-                                        tag_html += "</td>";
-                                        tag_html += "</tr>";
-
-                                        new_list_items.push(item);
-
-                                        row = row + 1;
-
-                                        total_qty = total_qty + Number(item.qty);
-                                        total_harga = total_harga + Number(item.harga.replaceAll(",", ""));
-                                        total_harian = total_harian + Number(item.daily_price.replaceAll(",", ""));
-                                        total_bulanan = total_bulanan + Number(item.monthly_price.replaceAll(",", ""));
-                                    }
-                                })
-
-                                list_items = [];
-
-                                list_items = new_list_items;
-
-                                $(".body-detail-table").append(tag_html)
-
-                                $(".foot-detail-table").empty()
-
-                                tag_total += `<tr>`;
-                                tag_total += "<td colspan='3'>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += "<b>TOTAL</b>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_qty}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td colspan='3'>";
-                                tag_total += "</td>";
-                                tag_total += "</tr>";
-
-                                $(".foot-detail-table").append(tag_total);
-
-                                reset()
-                            }
-                            // create detail
-                            else {
-                                if ($(".detail-form").valid()) {
-                                    list_items.push({
-                                        id: '',
-                                        row: row + 1,
-                                        spesifikasi: spesifikasi,
-                                        spesifikasiName: spesifikasiName,
-                                        satuan: satuan,
-                                        satuanName: satuanName,
-                                        bagian_id: bagian,
-                                        bagian_name: bagianName,
-                                        harga: Number(harga).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        }),
-                                        daily_price: Number(daily_price).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        }),
-                                        monthly_price: Number(monthly_price).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        }),
-                                        qty: qty,
-                                        total: Number(total).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        }),
-                                        peti: peti,
-                                        quality: quality,
-                                        keterangan: keterangan
-                                    })
-
-                                    total_qty = total_qty + Number(qty);
-                                    total_harga = total_harga + Number(harga);
-                                    total_harian = total_harian + Number(daily_price);
-                                    total_bulanan = total_bulanan + Number(monthly_price);
-
-                                    let tag_html = "";
-                                    let tag_total = "";
-
-                                    tag_html += `<tr>`;
-                                    tag_html += `<td>`;
-                                    tag_html += row + 1;
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += spesifikasiName;
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += bagianName;
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += satuanName;
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += "" + Number(harga).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    });
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += "" + Number(daily_price).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    });
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += "" + Number(monthly_price).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    });
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += qty;
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += peti;
-                                    tag_html += "</td>";
-                                    tag_html += `<td>`;
-                                    tag_html += quality;
-                                    tag_html += "</td>";
-                                    tag_html += "<td>";
-                                    tag_html += `
-                                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${satuan}" data-spesifikasi="${spesifikasi}" data-harga="${Number(harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
-                                    data-daily="${Number(daily_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-monthly="${Number(monthly_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bagian="${bagian}" data-qty="${qty}" data-total="${Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-keterangan="${keterangan}" data-peti="${peti}" data-quality="${quality}" data-id="" data-row="${row + 1}">
-                                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                                    </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                    </button>`;
-                                    tag_html += "</td>";
-                                    tag_html += "</tr>";
-                                    $(".body-detail-table").append(tag_html)
-
-                                    $(".foot-detail-table").empty()
-
-                                    tag_total += `<tr>`;
-                                    tag_total += "<td colspan='3'>";
-                                    tag_total += "</td>";
-                                    tag_total += "<td>";
-                                    tag_total += "<b>TOTAL</b>";
-                                    tag_total += "</td>";
-                                    tag_total += "<td>";
-                                    tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                    tag_total += "</td>";
-                                    tag_total += "<td>";
-                                    tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                    tag_total += "</td>";
-                                    tag_total += "<td>";
-                                    tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                                    tag_total += "</td>";
-                                    tag_total += "<td>";
-                                    tag_total += `<b>${total_qty}</b>`;
-                                    tag_total += "</td>";
-                                    tag_total += "<td colspan='3'>";
-                                    tag_total += "</td>";
-                                    tag_total += "</tr>";
-
-                                    $(".foot-detail-table").append(tag_total);
-
-                                    reset()
-                                    row = row + 1;
-                                }
-                            }
-                        }
                     })
+                } else {
+                    if (id_detail) {
+                        list_items.map((item, index) => {
+                            //UPDATE
+                            if (item.id_detail === id_detail) {
+                                list_items[index].supplier_harga_id = supplier_harga_id;
+                                list_items[index].spesifikasi_id = spesifikasi_id;
+                                list_items[index].nama_spesifikasi = spesifikasi_name;
+                                list_items[index].satuan_id = satuan_id;
+                                list_items[index].kode_satuan = kode_satuan;
+                                list_items[index].peti = peti;
+                                list_items[index].quality = quality;
+                                list_items[index].harga = harga;
+                                list_items[index].daily_price = daily_price;
+                                list_items[index].qty = qty;
+                                list_items[index].total = total;
+                                list_items[index].monthly_price = monthly_price;
+                                list_items[index].keterangan = keterangan;
+                            }
+                        });
+
+                    } else {
+                        //CREATE
+                        list_items.push({
+                            id_detail: getID(),
+                            supplier_harga_id: supplier_harga_id,
+                            spesifikasi_id: spesifikasi_id,
+                            nama_spesifikasi: spesifikasi_name,
+                            satuan_id: satuan_id,
+                            kode_satuan: kode_satuan,
+                            peti: peti,
+                            quality: quality,
+                            harga: harga,
+                            daily_price: daily_price,
+                            qty: qty,
+                            total: total,
+                            monthly_price: monthly_price,
+                            keterangan: keterangan
+                        });
+                    }
+
                 }
+
+                drawTable();
+                resetDetailForm();
             }
+
         })
     })
 
-    const deleteRow = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                console.log(id)
-                let new_list_items = []
-                let tag_html = "";
-                let tag_total = "";
-
-                $(".body-detail-table").empty()
-
-                row = 0;
-
-                console.log(list_items)
-
-                total_qty = 0;
-                total_harga = 0;
-                total_harian = 0;
-                total_bulanan = 0;
-
-                list_items.map(item => {
-                    if (item.row != id) {
-                        tag_html += `<tr>`;
-                        tag_html += `<td>`;
-                        tag_html += row + 1;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.spesifikasiName;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.bagian_name;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.satuanName;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += "" + item.harga;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += "" + item.daily_price;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += "" + item.monthly_price;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.qty;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.peti;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
-                        tag_html += item.quality;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += `
-                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" 
-                        data-daily="${item.daily_price}" data-monthly="${item.monthly_price}" data-bagian="${item.bagian_id}" data-qty="${item.qty}" data-total="${item.total}" data-keterangan="${item.keterangan}" data-peti="${item.peti}" data-quality="${item.quality}" data-id="${item.id}" data-row="${row + 1}">
-                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        </button>`;
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
-
-                        new_list_items.push({
-                            ...item,
-                            row: row + 1
-                        });
-
-                        row = row + 1;
-
-                        total_qty = total_qty + Number(item.qty);
-                        total_harga = total_harga + Number(item.harga.replaceAll(",", ""));
-                        total_harian = total_harian + Number(item.daily_price.replaceAll(",", ""));
-                        total_bulanan = total_bulanan + Number(item.monthly_price.replaceAll(",", ""));
-                    } else {
-                        // sent parameter isDelete if have customer id and id
-                        if (item.id) {
-                            list_delete.push(item)
-                        }
-                    }
-                })
-
-                list_items = [];
-
-                list_items = new_list_items;
-
-                $(".body-detail-table").append(tag_html)
-
-                $(".foot-detail-table").empty()
-
-                tag_total += `<tr>`;
-                tag_total += "<td colspan='3'>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += "<b>TOTAL</b>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${"" + Number(total_harga).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${"" + Number(total_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${"" + Number(total_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_qty}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td colspan='3'>";
-                tag_total += "</td>";
-                tag_total += "</tr>";
-
-                $(".foot-detail-table").append(tag_total);
-
-                reset()
-            }
-        })
+    const deleteRowDetail = function(id) {
+        const indexToRemove = list_items.findIndex(item => item.id_detail === id);
+        if (indexToRemove !== -1) {
+            list_items.splice(indexToRemove, 1);
+        }
+        drawTable();
     }
 
     const changeStatus = function() {
@@ -1886,31 +1203,299 @@
         }
     }
 
-    let reset = function() {
+    const resetDetailForm = function() {
         $(".id_detail").val('');
-
-        $(".qty").val('')
+        $(".spesifikasi").val("").change()
+        $(".satuan").val("").change()
         $(".harga").val('')
         $(".daily_price").val('')
         $(".monthly_price").val('')
-        $(".quality").val('Baik')
-        $(".peti").val('')
+        $(".qty").val('')
         $(".total").val('')
+        $(".peti").val('')
+        $(".quality").val('Baik')
         $(".keterangan").val('')
-        $(".satuan").val("").change()
-        $(".spesifikasi").val("").change()
-        $(".bagian").val('').change()
 
         validator_detail.resetForm();
         validator_detail.reset();
     }
 
-    const setBarang = function() {
-        reset()
+    const getDetailSPP = function() {
+        var spp_id = $('.spp_id').val();
+        var supplier_id = $('.supplier_id').val();
+
+        if (spp_id !== '' && supplier_id !== '') {
+            $.ajax({
+                url: "<?= base_url("po-lokal-bahan-baku/dropdown/get-detail-barang-spp"); ?>",
+                data: {
+                    spp_id: spp_id,
+                    supplier_id: supplier_id,
+                },
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                success: function(response) {
+                    $('.barang_id').val(response.barang_master_id).change();
+                    list_items = [];
+                    $.each(response.sppDetail, function(i, v) {
+                        list_items.push({
+                            id_detail: getID(),
+                            supplier_harga_id: v.supplier_harga_id,
+                            spesifikasi_id: v.barang2_id,
+                            nama_spesifikasi: v.spesifikasi,
+                            satuan_id: v.satuan_id,
+                            kode_satuan: v.satuan_name,
+                            peti: v.peti,
+                            quality: v.kualitas,
+                            harga: v.harga_umum,
+                            daily_price: v.harga_harian,
+                            qty: v.qty,
+                            total: v.total,
+                            monthly_price: v.harga_bulanan,
+                            keterangan: v.keterangan
+                        });
+                    });
+                    $(".barang_id").attr("disabled", true);
+                    drawTable();
+                },
+                onError: function(response) {
+                    alert("ERROR")
+                }
+            });
+        }
+
     }
+
+    const getListDepartemen = function() {
+        $.ajax({
+            url: "<?= base_url("po-lokal-bahan-baku/dropdown/warehouse"); ?>",
+            data: {
+                divisi_id: $('.divisi_id').val()
+            },
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(response) {
+                var warehouseSelect = $("select[name='warehouse_id']");
+                warehouseSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Warehouse");
+                warehouseSelect.append(emptyOption);
+                $.each(response.data, function(index, data) {
+                    var option = $("<option data-nip=" + data.id + "></option>")
+                        .attr("value", data.id)
+                        .text(data.warehouse_name.toUpperCase());
+                    warehouseSelect.append(option);
+                });
+
+            },
+            onError: function(response) {
+                alert("ERROR")
+            }
+        });
+    }
+
+    const getListSPP = function() {
+        $.ajax({
+            url: "<?= base_url("po-lokal-bahan-baku/dropdown/get-spp"); ?>",
+            data: {
+                divisi_id: $('.divisi_id').val(),
+                spp_type: "Lokal BB"
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "GET",
+            success: function(response) {
+                var sppSelect = $("select[name='spp_id']");
+                sppSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Nomor SPP");
+                sppSelect.append(emptyOption);
+                $.each(response.data, function(index, data) {
+                    var option = $("<option></option>")
+                        .attr("value", data.id)
+                        .text(data.spp_no.toUpperCase());
+                    sppSelect.append(option);
+                });
+
+            },
+            onError: function(response) {
+                alert("ERROR")
+            }
+        });
+    }
+
+    const getListSpesifikasiBarang = function() {
+        $.ajax({
+            url: "<?= base_url("po-lokal-bahan-baku/dropdown/get-spp"); ?>",
+            data: {
+                divisi_id: $('.divisi_id').val(),
+                spp_type: "Lokal BB"
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "GET",
+            success: function(response) {
+                var sppSelect = $("select[name='spp_id']");
+                sppSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Nomor SPP");
+                sppSelect.append(emptyOption);
+                $.each(response.data, function(index, data) {
+                    var option = $("<option></option>")
+                        .attr("value", data.id)
+                        .text(data.spp_no.toUpperCase());
+                    sppSelect.append(option);
+                });
+
+            },
+            onError: function(response) {
+                alert("ERROR")
+            }
+        });
+    }
+
+    const drawTable = function() {
+        $('.body-detail-table').empty();
+        $('.foot-detail-table').empty();
+
+        var row = '';
+        var row_detail = '';
+        var no = 1;
+        var umumTotal = 0;
+        var harianTotal = 0;
+        var bulananTotal = 0;
+        var qtyTotal = 0;
+
+        console.log(list_items);
+
+        // LIST
+        list_items.map(item => {
+            row += '<tr style="color:whitesmoke;">';
+            row += '<td>' + no + '</td>';
+            row += '<td>' + item.nama_spesifikasi + '</td>';
+            row += '<td>' + item.kode_satuan + '</td>';
+            row += '<td>' + formatRupiah(item.harga) + '</td>';
+            row += '<td>' + formatRupiah(item.daily_price) + '</td>';
+            row += '<td>' + formatRupiah(item.monthly_price) + '</td>';
+            row += '<td>' + item.qty + '</td>';
+            row += '<td>' + item.peti + '</td>';
+            row += '<td>' + item.quality + '</td>';
+            <?php if (!empty($dataPOLokal)) : ?>
+                <?php if ($dataPOLokal->is_posted == '0') : ?>
+                    row += '<td>' + `
+                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-id="${item.id_detail}" >
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.id_detail}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>` +
+                        '</td>';
+                <?php endif; ?>
+            <?php else : ?>
+                row += '<td>' + `
+                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-id="${item.id_detail}" >
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.id_detail}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>` +
+                    '</td>';
+            <?php endif; ?>
+
+            umumTotal += Number(item.harga.replace(",", ""));
+            harianTotal += Number(item.daily_price.replace(",", ""));
+            bulananTotal += Number(item.monthly_price.replace(",", ""));
+            qtyTotal += Number(item.qty);
+            no++;
+        });
+
+        // FOOTER
+        row_detail += `
+                    <tr>
+                        <td colspan="2"></td>
+                        <td><b>TOTAL</b></td>
+                        <td><b>${formatRupiah(umumTotal)}</b></td>
+                        <td><b>${formatRupiah(harianTotal)}</b></td>
+                        <td><b>${formatRupiah(bulananTotal)}</b></td>
+                        <td><b>${formatRupiah(qtyTotal)}</b></td>
+                        <td colspan="2"></td>
+                        <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
+                    </tr>
+                `;
+        total = umumTotal + harianTotal + bulananTotal;
+
+        $('.body-detail-table').append(row);
+        $('.foot-detail-table').append(row_detail);
+
+    }
+
+    const getID = function() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
+
 
     const print = function(url) {
         window.open(url, "_blank");
     }
+
+    const formatRupiah = function(number) {
+        return number ? Number(number).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumSignificantDigits: 2
+        }) : 0
+    }
+    const reformatRupiah = function(number) {
+        return number ? Number(number.replaceAll(",", "")) : 0;
+    }
+
+    <?php if (!empty($dataPOLokal)) : ?>
+        <?php foreach ($dataPOLokal->rm_purchase_order_details as $detail) : ?>
+            list_items.push({
+                id_detail: getID(),
+                supplier_harga_id: "<?= $detail->supplier_harga_id ?>",
+                spesifikasi_id: "<?= $detail->barang2_id ?>",
+                nama_spesifikasi: "<?= $detail->spesifikasi ?>",
+                satuan_id: "<?= $detail->satuan_id ?>",
+                kode_satuan: "<?= $detail->kode_satuan ?>",
+                peti: "<?= $detail->peti ?>",
+                quality: "<?= $detail->quality ?>",
+                harga: "<?= $detail->general_price ?>",
+                daily_price: "<?= $detail->daily_price ?>",
+                qty: "<?= $detail->qty ?>",
+                total: "<?= ($detail->general_price + $detail->daily_price + $detail->monthly_price) * $detail->qty ?>",
+                monthly_price: "<?= $detail->monthly_price ?>",
+                keterangan: "<?= $detail->note ?>",
+            });
+        <?php endforeach; ?>
+        drawTable();
+    <?php endif; ?>
 </script>
 <?= $this->endSection(); ?>

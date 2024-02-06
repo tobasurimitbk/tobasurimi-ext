@@ -20,6 +20,7 @@ class RMPurchaseOrderModel extends Model
         'id',
         'warehouse_id',
         'company_id',
+        'divisi_id',
         'purchase_request_id',
         'bc_type',
         'po_no',
@@ -98,7 +99,7 @@ class RMPurchaseOrderModel extends Model
         $availableSort = [
             'poDate'            => 'rm_purchase_orders.po_date',
             'poNo'              => 'rm_purchase_orders.po_no',
-            'companyName'       => 'companies.company',
+            'divisi'       => 'divisis.divisi',
             'supplier'          => 'suppliers.name',
             'createdAt'         => 'rm_purchase_orders.createdAt',
             'statusPenerimaan'  => 'rm_purchase_orders.status_penerimaan',
@@ -112,6 +113,7 @@ class RMPurchaseOrderModel extends Model
         $selectQry = "rm_purchase_orders.*, 
             suppliers.name AS supplierName,
             companies.company AS companyName,
+            divisis.divisi,
             COUNT(rm_purchase_order_details.id) AS itemCount";
 
         $bbLokalDataQry = $this->asObject()
@@ -120,6 +122,7 @@ class RMPurchaseOrderModel extends Model
             ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
             ->join('companies', 'rm_purchase_orders.company_id = companies.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
             ->groupBy(('rm_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 
@@ -162,6 +165,7 @@ class RMPurchaseOrderModel extends Model
                             suppliers.address AS supplierAddress,
                             suppliers.phone AS supplierPhone,
                             suppliers.no_npwp AS supplierNPWP,
+                            divisis.divisi,
                             users.name AS createdBy,
                             barang_master.barang_name AS barangName
                             ";
@@ -172,6 +176,7 @@ class RMPurchaseOrderModel extends Model
             ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
             ->find($id);
 
         return $poBBLokalData;

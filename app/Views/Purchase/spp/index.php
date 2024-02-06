@@ -169,6 +169,7 @@
                     let id = row?.id;
                     let is_posted = row?.is_posted;
                     let spp_type = row.spp_type;
+                    let status = row.status;
 
                     if (is_posted === "0") {
                         return `
@@ -206,8 +207,8 @@
                         if (status != "CLOSED") {
                             res += `
                                 <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
-                                    <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-success posting-spp">
-                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-danger posting-spp">
+                                        <i class="fa-solid fa-ban"></i>    
                                     </button>
                                 <?php endif; ?>
                             `;
