@@ -108,7 +108,7 @@ class POLokalBahanBaku extends BaseController
         $id = decrypt($id);
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
-        $dataBCType = $this->metadataModel->get_by_name('jenis_dok_aju');
+        $dataBCType = $this->metadataModel->getBCUsed("po_lokal_bb");
         $dataDivisi =  $this->divisiModel->getDivisiAccess();
 
         foreach (array_keys($dataSupplier) as $key) {
@@ -204,6 +204,7 @@ class POLokalBahanBaku extends BaseController
 
     public function savePOLokalBahanBaku()
     {
+
         $id = $this->RMPurchaseOrderModel->insert([
             'company_id' => $this->this_company_id,
             "warehouse_id" => $this->request->getVar("warehouse_id"),
@@ -212,7 +213,11 @@ class POLokalBahanBaku extends BaseController
             "barang_id" => $this->request->getVar("barang_id"),
             "divisi_id" => $this->request->getVar('divisi_id'),
             "bc_type" => $this->request->getVar("bc_type"),
-            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
+            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
+                date('m'),
+                date('Y'),
+                getLastDay()
+            ) : $this->request->getVar("po_no"),
             "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
             "pph" => $this->request->getVar("pph"),
             "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
@@ -272,7 +277,11 @@ class POLokalBahanBaku extends BaseController
             "barang_id" => $this->request->getVar("barang_id"),
             "divisi_id" => $this->request->getVar('divisi_id'),
             "bc_type" => $this->request->getVar("bc_type"),
-            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getVar("po_no"),
+            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
+                date('m'),
+                date('Y'),
+                getLastDay()
+            ) : $this->request->getVar("po_no"),
             "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
             "pph" => $this->request->getVar("pph"),
             "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,

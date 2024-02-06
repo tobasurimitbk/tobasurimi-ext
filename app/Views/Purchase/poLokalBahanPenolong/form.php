@@ -11,23 +11,37 @@
             </a>
             <?php if (!empty($poDetail)) : ?>
                 <?php if (!$poDetail['is_posted']) : ?>
-                    <button class="btn btn-hapus delete-parent float-right">
-                        Hapus
-                    </button>
+                    <?php if (can('Pembelian', 'PO Lokal BP', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
                 <?php endif ?>
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-lokal-bahan-penolong/print/"); ?><?= $poDetail['id'] ?>')">
-                    Print
-                </button>
-                <?php if (!$poDetail['is_posted']) : ?>
-                    <button class="btn btn-success posting-spp float-right posting-po">
-                        Posting
+                <?php if (can('Pembelian', 'PO Lokal BP', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-lokal-bahan-penolong/print/"); ?><?= encrypt($poDetail['id']) ?>')">
+                        Print
                     </button>
+                <?php endif; ?>
+                <?php if (!$poDetail['is_posted']) : ?>
+                    <?php if (can('Pembelian', 'PO Lokal BP', 'a')) : ?>
+                        <button data-status="1" class="btn btn-success posting-spp float-right posting-po">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <?php if (can('Pembelian', 'PO Lokal BP', 'ua') && !$poDetail['status_penerimaan']) : ?>
+                        <button data-status="0" class="btn btn-success posting-spp float-right posting-po">
+                            Un Posting
+                        </button>
+                    <?php endif; ?>
                 <?php endif ?>
                 <?php if ($poDetail['is_posted']) : ?>
                     <?php if (!$poDetail['status_penerimaan']) : ?>
-                        <button class="btn btn-hapus close-parent float-right">
-                            Close PO
-                        </button>
+                        <?php if (can('Pembelian', 'PO Lokal BP', 'a')) : ?>
+                            <button class="btn btn-hapus close-parent float-right">
+                                Close PO
+                            </button>
+                        <?php endif; ?>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php endif ?>
@@ -52,7 +66,7 @@
                 </div>
             </div>
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" <?= !empty($poDetail) ? 'value="' . $poDetail['id'] . '"' : '' ?> />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" <?= !empty($poDetail) ? 'value="' . encrypt($poDetail['id']) . '"' : '' ?> />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -72,10 +86,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" <?= !empty($poDetail) ?  'readonly value="' . $poDetail['po_no'] . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" <?= !empty($poDetail) ? ($poDetail['is_posted'] === "1" ? 'disabled=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" <?= !empty($poDetail) ?  ' value="' . $poDetail['po_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. PO</label>
                                 </div>
-                                <div style="<?= !empty($poDetail) ? 'display:none;' : '' ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div <?= !empty($poDetail) ? ($poDetail['is_posted'] === "1" ? 'style="display:none;"' : '') : ''; ?> class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -83,26 +97,20 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($company as $c) : ?>
-                                    <option <?= !empty($poDetail) ? (($poDetail['company_id'] == $c['id']) ? 'selected' : '') : '' ?> value="<?= $c['id'] ?>"><?= strtoupper($c['company']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Pilih Company</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select division_id" id="division_id" name="division_id" aria-label="Floating label select example">
                                 <option value=""></option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option <?= !empty($poDetail) ? ($poDetail['division_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Departemen</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -115,9 +123,22 @@
                             <label for="floatingInput" style="z-index: 1;">Pilih Supplier</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php if (!empty($dataListSPP)) : ?>
+                                    <?php foreach ($dataListSPP as $d) : ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['spp_no'] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">SPP (Opsional)</label>
+                        </div>
+                        <small class="mb-3 mt-1"><i><?= !empty($poDetail) ? ($poDetail['spp_no'] != null ? "Nomor SPP : " . $poDetail['spp_no'] : '')  : ' -' ?></i></small>
+
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -130,7 +151,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" value="<?= !empty($poDetail) ? $poDetail['note'] : '' ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
@@ -139,7 +162,7 @@
                 </div>
             </form>
             <div class="col-subtitle-modal">
-                <div class="row mt-3">
+                <div class="row mt-1">
                     <div class="col-md-6">
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                     </div>
@@ -150,30 +173,33 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
-                                <option value=""></option>
+                                <option data-parent_name="" data-spesifikasi_id="" data-spesifikasi_name="" data-satuan_id="" data-nama_barang="" data-kode_barang="" value=""></option>
                                 <?php foreach ($barang as $s) : ?>
-                                    <option data-parent_name="<?= $s['parent_name'] ?>" data-satuan_id="<?= $s['satuan_id'] ?>" data-nama_barang="<?= strtoupper($s['barang_name']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['id'] ?>">
-                                        <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['parent_name']) . " ) ( " . strtoupper($s['barang_name']) . " )" ?>
+                                    <option data-parent_name="<?= $s['parent_name'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" data-spesifikasi_name="<?= strtoupper($s['spesifikasi'])  ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['id'] ?>">
+                                        <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . " " . strtoupper($s['spesifikasi']) . " )" ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Kode Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <input type="hidden" name="barang_update_id" id="barang_update_id" class="barang_update_id">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang">
                             <label for="floatingInput">Nama Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" class="form-control nama_kategori" id="nama_kategori" name="nama_kategori">
-                            <label for="floatingInput">Nama Kategori</label>
+                            <label for="floatingInput">Kategori Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-2">
+
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select disabled class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -186,8 +212,6 @@
                             <label for="floatingInput">Satuan</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="number" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan">
@@ -200,21 +224,22 @@
                             <label for="floatingInput">QTY</label>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" min="0" max="100" type="number" class="form-control diskon" required value="0" name="diskon" id="diskon" placeholder="Discount (%)">
                             <label for="floatingInput">Diskon (%)</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="number" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan">
                             <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" readonly class="form-control total" name="total" id="total" placeholder="Total">
                             <label for="floatingInput">Total</label>
@@ -222,13 +247,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -241,7 +266,7 @@
                             <label for="floatingInput">Pilih PPN (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -351,19 +376,31 @@
     });
 
     $('#division_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
 
     });
 
+    $('#spp_id').select2({
+        placeholder: "Pilih Nomor SPP",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        getDetailSPP();
+    });
+
     $('#supplier_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
 
+    });
+
+    $('#division_id, #supplier_id').change(function() {
+        getListSPP();
     });
 
     $('#barang_id').select2({
@@ -371,7 +408,7 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        $('#nama_barang').val($(this).find("option:selected").data("nama_barang"));
+        $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " " + $(this).find("option:selected").data("spesifikasi_name"));
         $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
         $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
 
@@ -552,39 +589,39 @@
     $('.btn-submit-detail').click(function() {
         if ($('.detail-form').valid()) {
             var barang_update_id = $('#barang_update_id').val();
+            var spesifikasiID = $('#barang_id').find("option:selected").data("spesifikasi_id");
+
             if (barang_update_id != "") {
                 // UPDATE
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Update barang ?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        console.log(barang_update_id);
-                        var indexToRemove = -1;
-                        for (var i = 0; i < listBarang.length; i++) {
-                            if (listBarang[i].barang_id === barang_update_id) {
-                                indexToRemove = i;
-                                break;
-                            }
-                        }
-                        if (indexToRemove !== -1) {
-                            listBarang.splice(indexToRemove, 1);
-                            insertList();
-                            resetForm();
+                if (spesifikasiID == '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Spesifikasi barang tidak ada',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true,
+                        confirmButtonText: 'Oke',
+                    })
+                } else {
+                    var indexToRemove = -1;
+                    for (var i = 0; i < listBarang.length; i++) {
+                        if (listBarang[i].barang_id === barang_update_id) {
+                            indexToRemove = i;
+                            break;
                         }
                     }
-                });
+                    if (indexToRemove !== -1) {
+                        listBarang.splice(indexToRemove, 1);
+                        insertList();
+                        resetForm();
+                    }
+                }
+
             } else {
                 // TAMBAH
                 var isAdd = false;
                 for (var i = 0; i < listBarang.length; i++) {
-                    if (listBarang[i].barang_id === $('#barang_id').val()) {
+                    if (listBarang[i].barang_id === $('#barang_id').val() && listBarang[i].spesifikasi_id === spesifikasiID) {
                         indexToRemove = i;
                         isAdd = true;
                         break;
@@ -599,21 +636,17 @@
                         reverseButtons: true,
                         confirmButtonText: 'Oke',
                     })
-                } else {
+                } else if (spesifikasiID == '') {
                     Swal.fire({
-                        icon: 'question',
-                        title: 'Tambah barang ?',
+                        icon: 'error',
+                        title: 'Spesifikasi barang tidak ada',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
-                        showCancelButton: true,
                         reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            insertList();
-                        }
+                        confirmButtonText: 'Oke',
                     })
+                } else {
+                    insertList();
                 }
 
             }
@@ -650,17 +683,17 @@
                             var id = $('#id').val();
                             var poDate = $('#po_date').val();
                             var poNo = $('#po_no').val();
-                            var companyID = $('#company_id').val();
                             var divisionID = $('#division_id').val();
                             var supplierID = $('#supplier_id').val();
                             var paymentDate = $('#payment_date').val();
+                            var sppID = $('#spp_id').val();
                             var note = $('#note').val();
                             // append
                             var formData = new FormData();
                             formData.append("id", id);
+                            formData.append("spp_id", sppID);
                             formData.append("poDate", poDate);
                             formData.append("poNo", poNo);
-                            formData.append("companyID", companyID);
                             formData.append("divisionID", divisionID);
                             formData.append("supplierID", supplierID);
                             formData.append("paymentDate", paymentDate);
@@ -714,16 +747,16 @@
                         if (result.isConfirmed) {
                             var poDate = $('#po_date').val();
                             var poNo = $('#po_no').val();
-                            var companyID = $('#company_id').val();
                             var divisionID = $('#division_id').val();
                             var supplierID = $('#supplier_id').val();
                             var paymentDate = $('#payment_date').val();
+                            var sppID = $('#spp_id').val();
                             var note = $('#note').val();
                             // append
                             var formData = new FormData();
                             formData.append("poDate", poDate);
+                            formData.append("spp_id", sppID);
                             formData.append("poNo", poNo);
-                            formData.append("companyID", companyID);
                             formData.append("divisionID", divisionID);
                             formData.append("supplierID", supplierID);
                             formData.append("paymentDate", paymentDate);
@@ -771,11 +804,11 @@
     function insertList() {
         listBarang.push({
             barang_id: $('#barang_id').val(),
+            spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id"),
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
             nama_barang: $('#nama_barang').val(),
             satuan_id: $('#satuan_id').val(),
             nama_satuan: $('#satuan_id').find("option:selected").data("nama_satuan"),
-            harga_satuan: $('#harga_satuan').val(),
             qty: $('#qty').val(),
             diskon: $('#diskon').val(),
             harga_satuan: $('#harga_satuan').val() || 0,
@@ -791,7 +824,6 @@
         // reset update flag
         $('#barang_update_id').val("")
         drawTabel(listBarang);
-        console.log(listBarang);
     }
 
     function drawTabel(listBarang) {
@@ -800,7 +832,7 @@
         table.find('tbody').empty();
         totalHarga = 0;
         $.each(listBarang, function(i, v) {
-            var newRow = $('<tr>');
+            var newRow = $('<tr style="color:whitesmoke;">');
             newRow.append($('<td style="text-align:center;">').text(no++));
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
@@ -860,31 +892,19 @@
     }
 
     function deleteRow(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Barang ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var indexToRemove = -1;
-                for (var i = 0; i < listBarang.length; i++) {
-                    if (listBarang[i].barang_id === id) {
-                        indexToRemove = i;
-                        break;
-                    }
-                }
-                if (indexToRemove !== -1) {
-                    listBarang.splice(indexToRemove, 1);
-                }
-                drawTabel(listBarang);
-                resetForm();
+
+        var indexToRemove = -1;
+        for (var i = 0; i < listBarang.length; i++) {
+            if (listBarang[i].barang_id === id) {
+                indexToRemove = i;
+                break;
             }
-        })
+        }
+        if (indexToRemove !== -1) {
+            listBarang.splice(indexToRemove, 1);
+        }
+        drawTabel(listBarang);
+        resetForm();
 
     }
 
@@ -938,6 +958,87 @@
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
         return "" + ribuanFormatted + ',' + desimal;
     }
+
+    function getListSPP() {
+        $.ajax({
+            url: "<?= base_url("po-lokal-bahan-penolong/dropdown/get-spp"); ?>",
+            data: {
+                divisi_id: $('.division_id').val(),
+                spp_type: "Lokal BP"
+            },
+            // beforeSend: function() {
+            //     setLoading();
+            // },
+            // complete: function() {
+            //     stopLoading();
+            // },
+            method: "GET",
+            success: function(response) {
+                var sppSelect = $("select[name='spp_id']");
+                sppSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Nomor SPP");
+                sppSelect.append(emptyOption);
+                $.each(response.data, function(index, data) {
+                    var option = $("<option></option>")
+                        .attr("value", data.id)
+                        .text(data.spp_no.toUpperCase());
+                    sppSelect.append(option);
+                });
+
+            },
+            onError: function(response) {
+                alert("ERROR")
+            }
+        });
+    }
+
+    function getDetailSPP() {
+        var spp_id = $('.spp_id').val();
+
+        if (spp_id !== '') {
+            $.ajax({
+                url: "<?= base_url("po-lokal-bahan-penolong/dropdown/get-detail-barang-spp"); ?>",
+                data: {
+                    spp_id: spp_id,
+                },
+                method: "GET",
+                // beforeSend: function() {
+                //     setLoading();
+                // },
+                // complete: function() {
+                //     stopLoading();
+                // },
+                success: function(response) {
+                    $.each(response.data, function(i, v) {
+                        listBarang.push({
+                            barang_id: v.barang_id,
+                            spesifikasi_id: v.spesifikasi_id,
+                            kode_barang: v.kode_barang,
+                            nama_barang: v.nama_barang,
+                            satuan_id: v.satuan_id,
+                            nama_satuan: v.nama_satuan,
+                            qty: v.qty,
+                            diskon: v.diskon,
+                            harga_satuan: v.harga_satuan,
+                            biaya_tambahan: v.biaya_tambahan,
+                            total: v.total,
+                            keterangan: v.keterangan,
+                            ppn: v.ppn,
+                            pph: v.pph
+                        });
+                    });
+                    drawTabel(listBarang);
+                },
+                onError: function(response) {
+                    alert("ERROR")
+                }
+            });
+        }
+
+    }
 </script>
 <!-- Edit Script -->
 <?php if (!empty($poDetail)) : ?>
@@ -947,14 +1048,14 @@
         <?php foreach ($listBarang as $l) : ?>
             listBarang.push({
                 barang_id: "<?= $l['barang_id'] ?>",
+                spesifikasi_id: "<?= $l['spesifikasi_name'] ?>",
                 kode_barang: "<?= $l['kode_barang'] ?>",
-                nama_barang: "<?= str_replace('"', '\"', $l['nama_barang'])  ?>",
+                nama_barang: "<?= str_replace('"', '\"', $l['nama_barang']) . " " . $l['spesifikasi_name']  ?>",
                 satuan_id: "<?= $l['satuan_id'] ?>",
                 nama_satuan: "<?= $l['nama_satuan'] ?>",
                 harga_satuan: "<?= $l['harga_satuan'] ?>",
                 qty: "<?= $l['qty'] ?>",
                 diskon: "<?= $l['diskon'] ?>",
-                harga_satuan: "<?= $l['harga_satuan'] ?>",
                 biaya_tambahan: "<?= $l['biaya_tambahan'] ?>",
                 total: formatRupiah("<?= (($l['harga_satuan'] * $l['qty']) - (($l['diskon'] / 100) * ($l['harga_satuan'] * $l['qty']))) + $l['biaya_tambahan'] ?>"),
                 keterangan: "<?= $l['keterangan'] ?>",
@@ -1011,9 +1112,10 @@
 
         //POSTING
         $('.posting-po').click(function() {
+            var status = $(this).data('status');
             Swal.fire({
                 icon: 'question',
-                title: 'Yakin akan posting PO ?',
+                title: status == '1' ? 'Posting PO ?' : 'Unposting PO ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -1025,6 +1127,8 @@
                     var formData = new FormData();
                     var id = $('#id').val();
                     formData.append("id", id);
+                    formData.append("status", status);
+
                     $.ajax({
                         url: "<?= base_url("po-lokal-bahan-penolong/update-status"); ?>",
                         data: formData,

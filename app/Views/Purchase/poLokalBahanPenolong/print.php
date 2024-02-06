@@ -290,9 +290,9 @@
 
             </table>
             <br>
-            <div style="text-align:center">
+            <!-- <div style="text-align:center">
                 <b>Jatuh Tempo : <?= $dataPOLokal->jatuhTempoHari ?> hari setelah tanda terima</b>
-            </div>
+            </div> -->
             <br>
 
         </div>

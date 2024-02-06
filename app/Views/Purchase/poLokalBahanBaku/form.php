@@ -1389,8 +1389,6 @@
         var bulananTotal = 0;
         var qtyTotal = 0;
 
-        console.log(list_items);
-
         // LIST
         list_items.map(item => {
             row += '<tr style="color:whitesmoke;">';
