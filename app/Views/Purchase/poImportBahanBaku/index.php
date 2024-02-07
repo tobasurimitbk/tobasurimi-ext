@@ -38,9 +38,9 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th>Tanggal Dibuat</th>
-                                <th onclick="changeSort('companyName')" class="sort">Company</th>
+                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                                 <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                                 <th onclick="changeSort('total')" class="sort">Total</th>
@@ -164,7 +164,7 @@
                 orderable: false,
             },
             {
-                data: "companyName",
+                data: "divisi",
                 className: "text-center"
             },
             {
@@ -208,15 +208,21 @@
                     if (status !== "1") {
                         return `
                             <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button onclick="posting(${id}, ${purchase_request_id})" class="btn btn-success posting-spp">
-                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button onclick="remove(${id})" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
+                            <?php if (can('Pembelian', 'PO Import BB', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Pembelian', 'PO Import BB', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Pembelian', 'PO Import BB', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
                             </div>
                         `
                     } else {
@@ -224,26 +230,39 @@
                         if (status_penerimaan !== "CLOSED") {
                             return `
                                 <div class="mt-0">
-                                    <button onclick="displayHistory(${id})" class="btn btn-success posting-spp">
+                                    <?php if (can('Pembelian', 'PO Lokal BB', 'ua')) : ?>
+                                        <button  data-toggle="tooltip" title="Un-Posting" onclick="posting('${id}', 0)" class="btn btn-danger posting-spp">
+                                            <i class="fa-solid fa-ban"></i>    
+                                        </button>
+                                    <?php endif; ?>
+                                    <button data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                                         <i class="fa-solid fa-clock-rotate-left"></i>
                                     </button>
-                                    <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <button onclick="closePO(${id})" class="btn btn-danger delete-parent">
-                                        <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
-                                    </button>
+                                    <?php if (can('Pembelian', 'PO Import BB', 'p')) : ?>
+                                        <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if (can('Pembelian', 'PO Import BB', 'a')) : ?>
+                                        <button data-toggle="tooltip" title="Close PO" onclick="closePO('${id}')" class="btn btn-danger delete-parent">
+                                            <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             `
                         } else {
                             return `
                                 <div class="mt-0">
-                                    <button onclick="displayHistory(${id})" class="btn btn-success posting-spp">
-                                        <i class="fa-solid fa-clock-rotate-left"></i>
-                                    </button>
-                                    <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                    </button>
+                                    <?php if (can('Pembelian', 'PO Import BB', 'a')) : ?>
+                                        <button data-toggle="tooltip" title="Close PO" onclick="closePO('${id}')" class="btn btn-danger delete-parent">
+                                            <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if (can('Pembelian', 'PO Import BB', 'p')) : ?>
+                                        <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             `
                         }
@@ -319,10 +338,10 @@
         })
     })
 
-    const posting = function(id, purchase_request_id) {
+    const posting = function(id, status) {
         Swal.fire({
             icon: 'question',
-            title: 'Yakin akan di Posting?',
+            title: status == '0' ? 'UnPosting PO ?' : 'Posting PO ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -336,10 +355,14 @@
                     url: "<?= base_url("po-import-bahan-baku/update-status"); ?>",
                     data: {
                         id: id,
-                        spp: purchase_request_id
+                        status: status
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -395,6 +418,10 @@
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -450,6 +477,10 @@
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -504,6 +535,13 @@
             url: "<?= base_url("po-import-bahan-baku/histori-lpb"); ?>",
             data: {
                 id: id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
             },
             method: "GET",
             success: function(response) {

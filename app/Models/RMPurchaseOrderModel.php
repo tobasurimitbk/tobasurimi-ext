@@ -5,6 +5,7 @@ namespace App\Models;
 use CodeIgniter\I18n\Time;
 
 use CodeIgniter\Model;
+use Exception;
 
 class RMPurchaseOrderModel extends Model
 {
@@ -234,6 +235,32 @@ class RMPurchaseOrderModel extends Model
 
         return $generatedPoNo;
     }
+
+    public function get_new_no_po($bln, $thn, $last_day)
+    {
+        $head = "PO/LBB-" . $bln . $thn . '/';
+        $lastPO = $this->select('po_no')
+            ->like('po_no', "PO/LBB-")
+            ->where('rm_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
+            ->where('rm_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->orderBy('po_no', "DESC")
+            ->first();
+
+        $counterFirst = '000001';
+        if ($lastPO == null) {
+            return $head . '' . $counterFirst;
+        } else {
+            try {
+                $last = explode('/', $lastPO['po_no']);
+                $poLastDigit = $last[2];
+                $counterFirst = str_pad((int) $poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
+                return $head . '' . $counterFirst;
+            } catch (Exception $e) {
+                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            }
+        }
+    }
+
 
     public function getPoBBLokalForSupplierReport($startDate, $finishDate, $supplier, $bahanBaku, $warehouse)
     {

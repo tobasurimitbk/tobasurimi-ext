@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use Exception;
 
 class RMImportPOModel extends Model
 {
@@ -16,7 +17,7 @@ class RMImportPOModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id', 'purchase_request_id', 'company_id', 'supplier_id', 'division_id', 'po_no', 'po_date', 'payment_date',
-        'currency',  'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin',
+        'currency',  'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin', 'potongan_harga',
         'port_destination', 'location_transaction', 'shipment', 'latest_shipment_date', 'attn', 'createdBy', 'status_penerimaan', 'is_posted',
     ];
 
@@ -55,7 +56,7 @@ class RMImportPOModel extends Model
             'createdAt'         => 'rm_import_pos.createdAt',
             'updatedAt'         => 'rm_import_pos.updatedAt',
             'statusPenerimaan'  => 'rm_import_pos.status_penerimaan',
-            'companyName'       => 'companies.company'
+            'divisi'       => 'divisis.divisi'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -63,6 +64,7 @@ class RMImportPOModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "rm_import_pos.*, 
+                      divisis.divisi,
                       suppliers.name AS supplierName, 
                       metadata.value AS currencyName,
                       companies.company AS companyName,
@@ -70,6 +72,7 @@ class RMImportPOModel extends Model
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
+            ->join('divisis', 'divisis.id = rm_import_pos.division_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
             ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
             ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
@@ -194,5 +197,31 @@ class RMImportPOModel extends Model
         $generatedNo =  $lastStr . '-' . $lastPO . '/' . $divisi . '/TOBA/' . $thn2;
 
         return $generatedNo;
+    }
+
+
+    public function get_new_no_po($bln, $thn, $last_day)
+    {
+        $head = "PO/IBB-" . $bln . $thn . '/';
+        $lastPO = $this->select('po_no')
+            ->like('po_no', "PO/IBB-")
+            ->where('rm_import_pos.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
+            ->where('rm_import_pos.createdAt <=', $last_day . " 23:59:59")
+            ->orderBy('po_no', "DESC")
+            ->first();
+
+        $counterFirst = '000001';
+        if ($lastPO == null) {
+            return $head . '' . $counterFirst;
+        } else {
+            try {
+                $last = explode('/', $lastPO['po_no']);
+                $poLastDigit = $last[2];
+                $counterFirst = str_pad((int) $poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
+                return $head . '' . $counterFirst;
+            } catch (Exception $e) {
+                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            }
+        }
     }
 }

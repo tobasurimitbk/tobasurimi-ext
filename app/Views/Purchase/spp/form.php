@@ -103,10 +103,10 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? 'disabled="true"' : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
+                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '')  : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataSppType as $d) : ?>
-                                    <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['value'] ?>"><?= $d['value'] ?></option>
+                                    <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == trim($d['value']) ? 'selected' : '') : '') ?> value="<?= trim($d['value']) ?>"><?= $d['value'] ?></option>
                                 <?php endforeach; ?>
                             </select>
 

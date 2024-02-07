@@ -174,7 +174,7 @@ class SPP extends BaseController
             'company_id' => $this->this_company_id,
             "request_date" => $this->request->getVar("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("request_date")))) : "",
             'spp_no' => $this->request->getVar('spp_no'),
-            'spp_type' => $this->request->getVar('spp_type'),
+            'spp_type' => trim($this->request->getVar('spp_type')),
             'divisi_id' => $this->request->getVar('divisi_id'),
             'note' => $this->request->getVar('note'),
             'createdBy' =>  session()->get("login")->user_id,
@@ -211,6 +211,7 @@ class SPP extends BaseController
             "request_date" => $this->request->getVar("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("request_date")))) : "",
             'spp_no' => $this->request->getVar('spp_no'),
             'divisi_id' => $this->request->getVar('divisi_id'),
+            'spp_type' => trim($this->request->getVar('spp_type')),
             'note' => $this->request->getVar('note'),
         ]);
 

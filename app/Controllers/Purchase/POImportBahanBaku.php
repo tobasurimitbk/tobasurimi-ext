@@ -14,6 +14,8 @@ use App\Models\SupplierModel;
 use App\Models\DivisisModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SatuansModel;
+use App\Models\SppDetailModel;
+use App\Models\SppModel;
 use Dompdf\Dompdf;
 
 class POImportBahanBaku extends BaseController
@@ -33,6 +35,8 @@ class POImportBahanBaku extends BaseController
     protected $penerimaanBarangModel;
     protected $dompdf;
     protected $jurnalController;
+    protected $sppModel;
+    protected $sppDetailModel;
 
     public function __construct()
     {
@@ -50,6 +54,8 @@ class POImportBahanBaku extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->dompdf = new Dompdf();
         $this->jurnalController = new JurnalUmum();
+        $this->sppModel = new SppModel();
+        $this->sppDetailModel = new SppDetailModel();
     }
 
     public function poImportBahanBaku()
@@ -60,31 +66,41 @@ class POImportBahanBaku extends BaseController
     public function createPOImportBahanBaku()
     {
         $data = [
-            "dataCompany" => $this->companyModel->getCompanies(),
+            "divisi" => $this->divisisModel->getDivisiAccess(),
             "today" => date("d/m/Y"),
             "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
-            "barang" => $this->barangMasterModel->getBarangByType("bahan_baku"),
-            "satuan" => $this->satuanModel->getSatuanAll(),
+            "barang" => $this->barangMasterModel->getBarangByTypeWithSpec([
+                'barang_master.type_barang'  => 'bahan_baku',
+            ]),            "satuan" => $this->satuanModel->getSatuanAll(),
             "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
             "dataShipment" => $this->metadataModel->get_by_name('Shipment')
         ];
+
 
         return view('Purchase/poImportBahanBaku/form', $data);
     }
 
     public function getByIdPOImportBahanBaku($id = null)
     {
+        $id = decrypt($id);
         $data = [
+            "divisi" => $this->divisisModel->getDivisiAccess(),
             "dataCompany" => $this->companyModel->getCompanies(),
             "today" => date("d/m/Y"),
             "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
-            "barang" => $this->barangMasterModel->getBarangByType("bahan_baku"),
+            "barang" => $this->barangMasterModel->getBarangByTypeWithSpec([
+                'barang_master.type_barang'  => 'bahan_baku',
+            ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
             "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
             "dataShipment" => $this->metadataModel->get_by_name('Shipment'),
             "dataPOImport" => $this->rmImportPOModel->getPOById($id),
             "dataPOImportDetail" => $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id)
         ];
+
+        if ($data["dataPOImport"] == null) {
+            return redirect()->to('po-import-bahan-baku');
+        }
 
         return view('Purchase/poImportBahanBaku/form', $data);
     }
@@ -125,10 +141,10 @@ class POImportBahanBaku extends BaseController
         foreach ($poImportData['data'] as $data) {
             array_push($dataPOImport, [
                 "no"            => $no++,
-                "id"            => $data->id,
+                "id"            => encrypt($data->id),
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
                 "po_no"         => $data->po_no,
-                "companyName"   => strtoupper($data->companyName),
+                "divisi"        => strtoupper($data->divisi),
                 "supplierName"  => strtoupper($data->supplierName),
                 "total"         => number_format($data->total),
                 "currencyName"  => $data->currencyName,
@@ -153,32 +169,26 @@ class POImportBahanBaku extends BaseController
 
     public function savePOImportBahanBaku()
     {
-        $divisi = $this->divisisModel->get_by_id(
-            $this->request->getVar('divisionID')
-        );
-
         if ($this->request->getVar('poNo') != "AUTO GENERATE") {
             $noPoNew = $this->request->getVar('poNo');
         } else {
-            $noPoNew =  $this->rmImportPOModel->get_no(
-                date('d'),
+            $noPoNew =  $this->rmImportPOModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                $divisi[0]['divisi'],
-                date('y'),
-                $this->request->getPost("divisionID"),
                 getLastDay()
             );
         }
 
         // create new po
         $poID = $this->rmImportPOModel->insert([
-            'company_id' => $this->request->getVar('companyID'),
+            'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),
             'po_no' => $noPoNew,
+            'purchase_request_id' => $this->request->getVar('spp_id'),
             'po_date' => $this->request->getPost("poDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("poDate")))) : "",
             'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
             'supplier_id' => $this->request->getVar('supplierID'),
+            'potongan_harga' => $this->request->getVar('potongan_harga'),
             'total' => $this->request->getVar('total'),
             'payment_term' => $this->request->getVar('paymentTerm'),
             'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
@@ -201,6 +211,7 @@ class POImportBahanBaku extends BaseController
             $this->rmImportPODetailModel->insert([
                 'rm_import_po_id' => $poID,
                 'barang_id' => $b->barang_id,
+                'spesifikasi_id' => $b->spesifikasi_id,
                 'unit' => $b->satuan_id,
                 'qty' => $b->qty,
                 'price' => $b->harga_satuan,
@@ -212,23 +223,47 @@ class POImportBahanBaku extends BaseController
             ]);
         }
 
+        $this->sppModel->update($this->request->getVar('spp_id'), [
+            'request_status' => 'finished'
+        ]);
+
+
         return response()->setJSON([
             "status" => true,
             "message" => "Data PO Import BB Berhasil Disimpan",
+            'id' => encrypt($poID),
             'token' => csrf_hash()
         ]);
     }
 
     public function updatePOImportBahanBaku()
     {
-        $id = $this->request->getPost("id");
+        $id = decrypt($this->request->getPost("id"));
+
+        if ($this->request->getVar('poNo') != "AUTO GENERATE") {
+            $noPoNew = $this->request->getVar('poNo');
+        } else {
+            $noPoNew =  $this->rmImportPOModel->get_new_no_po(
+                date('m'),
+                date('Y'),
+                getLastDay()
+            );
+        }
+
+        $firstData = $this->rmImportPOModel->find($id);
+
+        $this->sppModel->update($firstData['purchase_request_id'], [
+            'request_status' => 'waiting'
+        ]);
 
         $this->rmImportPOModel->update($id, [
-            'company_id' => $this->request->getVar('companyID'),
+            'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),
+            'po_no' => $noPoNew,
             'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
             'supplier_id' => $this->request->getVar('supplierID'),
             'total' => $this->request->getVar('total'),
+            'potongan_harga' => $this->request->getVar('potongan_harga'),
             'payment_term' => $this->request->getVar('paymentTerm'),
             'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
             'note' => $this->request->getVar('note'),
@@ -252,6 +287,7 @@ class POImportBahanBaku extends BaseController
             $this->rmImportPODetailModel->insert([
                 'rm_import_po_id' => $id,
                 'barang_id' => $b->barang_id,
+                'spesifikasi_id' => $b->spesifikasi_id,
                 'unit' => $b->satuan_id,
                 'qty' => $b->qty,
                 'price' => $b->harga_satuan,
@@ -262,6 +298,11 @@ class POImportBahanBaku extends BaseController
                 'total' => repairDouble($b->total),
             ]);
         }
+
+        $this->sppModel->update($this->request->getVar('spp_id'), [
+            'request_status' => 'finished'
+        ]);
+
 
         return response()->setJSON([
             "status" => true,
@@ -274,11 +315,11 @@ class POImportBahanBaku extends BaseController
     {
         $data = [
             "status"    => true,
-            "message"   => "Data PO Import BB Berhasil Diposting",
+            "message"   => "Status Posting PO Import BB Berhasil Diupdate",
             'token'     => csrf_hash()
         ];
 
-        $result = $this->jurnalController->insertDataPembelian($this->request->getVar('id'), "BAHAN BAKU", "IMPORT", "pembelian");
+        $result = $this->jurnalController->insertDataPembelian(decrypt($this->request->getVar('id')), "BAHAN BAKU", "IMPORT", "pembelian");
 
         if ($result) {
             $responseBody = json_decode($result->getBody(), true);
@@ -288,14 +329,14 @@ class POImportBahanBaku extends BaseController
                 $data["token"] = csrf_hash();
             }
         } else {
-            $this->rmImportPOModel->update($this->request->getVar('id'), ['is_posted' => 1]);
+            $this->rmImportPOModel->update(decrypt($this->request->getVar('id')), ['is_posted' => $this->request->getVar('status')]);
         }
         return response()->setJSON($data);
     }
 
     public function closePOImportBahanBaku()
     {
-        $this->rmImportPOModel->update($this->request->getVar('id'), ['status_penerimaan' => 1]);
+        $this->rmImportPOModel->update(decrypt($this->request->getVar('id')), ['status_penerimaan' => 1]);
         return response()->setJSON([
             "status" => true,
             "message" => "Close PO Berhasil",
@@ -305,7 +346,14 @@ class POImportBahanBaku extends BaseController
 
     public function deletePOImportBahanBaku()
     {
-        $id = $this->request->getPost("id");
+        $id = decrypt($this->request->getPost("id"));
+
+        $firstData = $this->rmImportPOModel->find($id);
+
+        $this->sppModel->update($firstData['purchase_request_id'], [
+            'request_status' => 'waiting'
+        ]);
+
         $this->rmImportPOModel->delete($id);
         $this->rmImportPODetailModel->where('rm_import_po_id', $id)->delete();
         return response()->setJSON([
@@ -320,6 +368,7 @@ class POImportBahanBaku extends BaseController
         if ($id) {
             $filename = "PO Import Bahan Baku";
 
+            $id = decrypt($id);
             $data = [];
             $dataPO = $this->rmImportPOModel->getPOById($id);
 
@@ -401,7 +450,7 @@ class POImportBahanBaku extends BaseController
 
     public function dropdownHistoriPenerimaanBarang()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $listBarang = $this->rmImportPODetailModel
             ->select('rm_import_po_details.qty_diterima AS diterima, rm_import_po_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, rm_import_po_details.qty')
             ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id')
@@ -427,6 +476,65 @@ class POImportBahanBaku extends BaseController
             'po_detail' => $poDetail,
             'list_barang' => $listBarang,
             'token' => csrf_hash()
+        ]);
+    }
+
+    public function dropdownGetSppDetail()
+    {
+        $id = $this->request->getVar('spp_id');
+        $spp = $this->sppModel->find($id);
+
+        if ($spp == null) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => 'Spp tidak ada'
+            ]);
+        }
+
+        $condition = [
+            'purchase_request_details.purchase_request_id' => $id,
+            'purchase_request_details.deletedAt' => null
+        ];
+
+        $selectQry = "
+            purchase_request_details.*,
+            barang_master.barang_name,
+            barang_master.kode_barang,
+            barang_master_spesifikasi.spesifikasi,
+            satuans.kode_satuan
+        ";
+
+        $sppDetail = $this->sppDetailModel->select($selectQry)
+            ->join('barang_master', 'purchase_request_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'purchase_request_details.barang2_id=barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = purchase_request_details.unit', 'left')
+            ->where($condition)->findAll();
+
+        $result = [];
+
+        foreach ($sppDetail as $s) {
+
+            $result[] = [
+                'barang_id' => $s['barang1_id'],
+                'kode_barang' => $s['kode_barang'],
+                'spesifikasi_id' => $s['barang2_id'],
+                'nama_barang' => $s['nama_barang'],
+                'satuan_id' => $s['unit'],
+                'nama_satuan' => $s['kode_satuan'],
+                'qty' => $s['qty'],
+                'diskon' => '0',
+                'harga_satuan' => '0',
+                'biaya_tambahan' => '0',
+                'total' => '0',
+                'keterangan' => $s['note'],
+            ];
+        }
+
+        return response()->setJSON([
+            'data' => $result,
+            'token' => csrf_hash(),
+            'status' => true
         ]);
     }
 }

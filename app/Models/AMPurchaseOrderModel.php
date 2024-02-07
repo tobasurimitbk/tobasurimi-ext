@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use Exception;
 
 class AMPurchaseOrderModel extends Model
 {
@@ -143,7 +144,7 @@ class AMPurchaseOrderModel extends Model
     {
         $availableSort = [
             'poDate'           => 'am_purchase_orders.po_date',
-            'companyName'      => 'companies.company',
+            'divisiName'      => 'divisis.divisi',
             'poNo'             => 'am_purchase_orders.po_no',
             'supplierName'      => 'suppliers.name',
             'divisis'             => 'am_purchase_orders.total',
@@ -159,6 +160,7 @@ class AMPurchaseOrderModel extends Model
         $selectQry = "am_purchase_orders.*, 
                       suppliers.name AS supplierName, 
                       companies.company AS companyName,
+                      divisis.divisi,
                       COUNT(am_purchase_order_details.id) AS itemCount";
 
         $poDataQry = $this->asObject()
@@ -166,6 +168,7 @@ class AMPurchaseOrderModel extends Model
             ->where($condition)
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
             ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->groupBy(('am_purchase_orders.id'))
             ->orderBy($sort, $sortType);
@@ -218,7 +221,6 @@ class AMPurchaseOrderModel extends Model
         users.name AS createdByName,
         companies.company as companyName,
         metadata.value as currencyName,
-        FORMAT(CEILING(am_purchase_orders.dpp), 'N', 'en-us') AS dpp,
         ";
 
         $sppData = $this->asObject()
@@ -308,6 +310,32 @@ class AMPurchaseOrderModel extends Model
 
         return $generatedNo;
     }
+
+    public function get_new_no_po($bln, $thn, $last_day)
+    {
+        $head = "PO/LBP-" . $bln . $thn . '/';
+        $lastPO = $this->select('po_no')
+            ->like('po_no', "PO/LBP-")
+            ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
+            ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->orderBy('po_no', "DESC")
+            ->first();
+
+        $counterFirst = '000001';
+        if ($lastPO == null) {
+            return $head . '' . $counterFirst;
+        } else {
+            try {
+                $last = explode('/', $lastPO['po_no']);
+                $poLastDigit = $last[2];
+                $counterFirst = str_pad((int) $poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
+                return $head . '' . $counterFirst;
+            } catch (Exception $e) {
+                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            }
+        }
+    }
+
 
     public function historiHargaPOBahanPenolong($condition, $addCondition, $limit = 10, $offset = 0)
     {
