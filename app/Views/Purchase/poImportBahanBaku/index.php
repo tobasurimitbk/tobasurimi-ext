@@ -253,11 +253,9 @@
                         } else {
                             return `
                                 <div class="mt-0">
-                                    <?php if (can('Pembelian', 'PO Import BB', 'a')) : ?>
-                                        <button data-toggle="tooltip" title="Close PO" onclick="closePO('${id}')" class="btn btn-danger delete-parent">
-                                            <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
-                                        </button>
-                                    <?php endif; ?>
+                                    <button data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    </button>
                                     <?php if (can('Pembelian', 'PO Import BB', 'p')) : ?>
                                         <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
                                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -270,6 +268,12 @@
                 }
             }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -537,7 +541,6 @@
                 id: id
             },
             beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                 setLoading();
             },
             complete: function() {

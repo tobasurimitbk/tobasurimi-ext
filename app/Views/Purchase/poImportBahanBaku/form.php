@@ -21,7 +21,7 @@
                 <?php } ?>
 
                 <?php if (can("Pembelian", "PO Import BB", 'p')) : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?><?= $dataPOImport->id; ?>')">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?><?= encrypt($dataPOImport->id); ?>')">
                         Print
                     </button>
                 <?php endif; ?>
@@ -44,7 +44,7 @@
 
                 <?php }
                 } ?>
-                <?php if (can('Pembelian', 'PO Import BB', 'ua') && $dataPOImport->status_penerimaan == "1") : ?>
+                <?php if (can('Pembelian', 'PO Import BB', 'ua') && $dataPOImport->status_penerimaan != "1" && $dataPOImport->is_posted === "1") : ?>
                     <button data-status="0" class="btn btn-success posting-spp float-right posting-po">
                         Un Posting
                     </button>
@@ -117,12 +117,18 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
+                                <?php if (!empty($dataListSPP)) : ?>
+                                    <?php foreach ($dataListSPP as $d) : ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['spp_no'] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">SPP (Opsional)</label>
                         </div>
+                        <small class="mb-3 mt-1"><i><?= !empty($dataPOImport) ? ($dataPOImport->spp_no != null ? "Nomor SPP : " . $dataPOImport->spp_no : '')  : ' -' ?></i></small>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -169,7 +175,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->potongan_harga : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" placeholder="Termin (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" value="<?= !empty($dataPOImport) ? $dataPOImport->potongan_harga : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" placeholder="Termin (Opsional)">
                             <label for="floatingInput">Potongan Harga</label>
                         </div>
                     </div>
@@ -940,7 +946,7 @@
     function insertList() {
         listBarang.push({
             barang_id: $('#barang_id').find("option:selected").data("barang_id"),
-            spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id"),
+            spesifikasi_id: $('#barang_id').val(),
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
             nama_barang: $('#barang_id').find("option:selected").data("nama_barang"),
             satuan_id: $('#satuan_id').val(),
@@ -1026,36 +1032,21 @@
         newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHarga) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
-
-        totalHarga = totalHarga - potongan;
     }
 
     function deleteRow(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Barang ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var indexToRemove = -1;
-                for (var i = 0; i < listBarang.length; i++) {
-                    if (listBarang[i].spesifikasi_id === id) {
-                        indexToRemove = i;
-                        break;
-                    }
-                }
-                if (indexToRemove !== -1) {
-                    listBarang.splice(indexToRemove, 1);
-                }
-                drawTabel(listBarang);
-                resetForm();
+        var indexToRemove = -1;
+        for (var i = 0; i < listBarang.length; i++) {
+            if (listBarang[i].spesifikasi_id === id) {
+                indexToRemove = i;
+                break;
             }
-        })
+        }
+        if (indexToRemove !== -1) {
+            listBarang.splice(indexToRemove, 1);
+        }
+        drawTabel(listBarang);
+        resetForm();
 
     }
 
@@ -1201,7 +1192,7 @@
                 barang_id: "<?= $d['barang_id'] ?>",
                 spesifikasi_id: "<?= $d['spesifikasi_id'] ?>",
                 kode_barang: "<?= $d['kode_barang'] ?>",
-                nama_barang: <?= json_encode($d['nama_barang']) ?>,
+                nama_barang: <?= json_encode($d['nama_barang'] . " " . $d['spesifikasi']) ?>,
                 satuan_id: <?= $d['unit'] ?>,
                 nama_satuan: "<?= $d['nama_satuan'] ?>",
                 qty: <?= $d['qty'] ?>,

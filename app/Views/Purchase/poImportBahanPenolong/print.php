@@ -216,8 +216,12 @@
                 </tr>
             <?php endforeach; ?>
             <tr>
+                <td colspan="4" style="text-align: center;">DISCOUNT</td>
+                <td style="text-align: center;"><?= number_format(formatter(($dataPO->potongan_harga), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+            </tr>
+            <tr>
                 <td colspan="4" style="text-align: center;">TOTAL</td>
-                <td style="text-align: center;"><?= number_format(formatter(($totalPrice), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                <td style="text-align: center;"><?= number_format(formatter(($dataPO->total), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
             </tr>
         </tbody>
     </table>

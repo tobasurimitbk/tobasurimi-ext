@@ -125,7 +125,8 @@ class RMImportPOModel extends Model
         suppliers.no_npwp AS supplierNPWP,
         users.name AS createdByName,
         companies.company as companyName,
-        metadata.value as currencyName
+        metadata.value as currencyName,
+        purchase_requests.spp_no
         ";
 
         $sppData = $this->asObject()
@@ -135,6 +136,7 @@ class RMImportPOModel extends Model
             ->join('users', 'users.id = rm_import_pos.createdBy', 'left')
             ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
             ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id', 'lefy')
             ->find($id);
 
         return $sppData;
