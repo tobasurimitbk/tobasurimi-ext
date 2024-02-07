@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 use App\Models\ProvincesModel;
 use App\Models\CustomerModel;
 use App\Models\BanksModel;
+use App\Models\CompaniesModel;
 use App\Models\CountryModel;
 use App\Models\EmployeesModel;
 use App\Models\ListAddressesModel;
@@ -24,6 +25,7 @@ class Customer extends BaseController
     protected $SalesOrderModel;
     protected $employessModel;
     protected $soInvModel;
+    protected $CompanyModel;
     protected $countryModel;
 
     public function __construct()
@@ -38,6 +40,7 @@ class Customer extends BaseController
         $this->soInvModel = new SalesOrderInvoiceModel();
         $this->employessModel = new EmployeesModel();
         $this->countryModel = new CountryModel();
+        $this->CompanyModel = new CompaniesModel();
     }
 
     public function customer()
@@ -50,7 +53,8 @@ class Customer extends BaseController
         $data = [
             "dataProvinces" => $dataProvinces,
             "dataBanks" => $dataBanks,
-            "dataCountry" => $dataCountry
+            "dataCountry" => $dataCountry,
+            "dataCompany" => $this->CompanyModel->where('deletedAt', null)->orderBy('company', "ASC")->findAll()
         ];
 
         return view('Master/customer/index', $data);
@@ -69,13 +73,13 @@ class Customer extends BaseController
         $condition = [
             'tipe_customer' => $this->request->getGet('customerType'),
             'customers.deletedAt' => null,
-            'customers.sales_id' => session()->get('login')->user_id
         ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType")
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->request->getGet("company_id"),
         ];
 
         $limit = $this->request->getGet("length");
@@ -91,6 +95,8 @@ class Customer extends BaseController
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "kode"          => $data->kode,
+                "companyName"   => $data->companyName,
+                "namaSales"     => $data->namaSales,
                 "name"          => $data->name,
                 "phone"         => $data->phone,
                 "contact_person" => $data->contact_person,

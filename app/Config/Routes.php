@@ -493,6 +493,23 @@ $routes->group('master-barang-internasional', ['filter' => 'Auth'], function ($r
     $routes->post('generate-new-code', 'SalesInternasional\Barang::generateNewCode');
 });
 
+// Customer Lokal
+$routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);
+$routes->get('/customer-lokal/all', 'SalesLokal\Customer::all', ['filter' => 'Auth']);
+$routes->get('/customer-lokal/id/(:segment)', 'Master\Customer::getByIdCustomer/$1', ['filter' => 'Auth']);
+$routes->post('/customer-lokal/save', 'Master\Customer::saveCustomer', ['filter' => 'Auth']);
+$routes->post('/customer-lokal/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
+$routes->post('/customer-lokal/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
+
+// Customer Ekspor
+$routes->get('/customer-ekspor', 'SalesInternasional\Customer::index', ['filter' => 'Auth']);
+$routes->get('/customer-ekspor/all', 'SalesInternasional\Customer::all', ['filter' => 'Auth']);
+$routes->get('/customer-ekspor/id/(:segment)', 'Master\Customer::getByIdCustomer/$1', ['filter' => 'Auth']);
+$routes->post('/customer-ekspor/save', 'Master\Customer::saveCustomer', ['filter' => 'Auth']);
+$routes->post('/customer-ekspor/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
+$routes->post('/customer-ekspor/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
+
+
 // PRODUKSI
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
