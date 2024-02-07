@@ -119,15 +119,12 @@ class Barang extends BaseController
 
         $barangMasterID = $barangModel->insert([
             'company_id' => $this->this_company_id,
-            'satuan_id' => decrypt($this->request->getVar('satuan_id')),
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
             // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
-            'harga_pokok' => $this->request->getVar('harga_pokok') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_pokok'))) : 0,
-            'harga_jual' => $this->request->getVar('harga_jual') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_jual'))) : 0,
         ]);
 
         foreach ($spek as $key => $value) {
@@ -164,14 +161,11 @@ class Barang extends BaseController
 
         $barangModel->update($id, [
             'company_id' => $this->this_company_id,
-            'satuan_id' => decrypt($this->request->getVar('satuan_id')),
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
             // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
-            'harga_pokok' => $this->request->getVar('harga_pokok') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_pokok'))) : 0,
-            'harga_jual' => $this->request->getVar('harga_jual') ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getVar('harga_jual'))) : 0,
         ]);
         $check = $barangSpesifikasiModel->asObject()->where('barang_master_id', $id)->findAll();
         if ($check) {
@@ -189,6 +183,8 @@ class Barang extends BaseController
                 'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
                 'satuan_3' => decrypt($_POST['satuan3_id'][$key]),
                 'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
+                'harga_pokok' => $_POST['harga_pokok'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key])) : 0,
+                'harga_jual' => $_POST['harga_jual'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key])) : 0,
             );
         }
         $barangSpesifikasiModel->insertBatch($result);

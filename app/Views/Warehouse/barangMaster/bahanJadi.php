@@ -556,10 +556,10 @@
                                 '<tr>' +
                                 '<td colspan="3">' +
                                 '<div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating">' +
-                                '<input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, "");" onchange="this.value = formatRupiah(this.value);"><label for="floatingInput">Harga Pokok</label>' +
+                                '<input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, "");" onchange="this.value = formatRupiah(this.value);" value="' + item.harga_pokok + '"><label for="floatingInput">Harga Pokok</label>' +
                                 '</div></div>' +
                                 '<div class = "col-sm-6" style = "padding:0px!important;" ><div class = "form-floating" >' +
-                                '<input autocomplete = "one-time-code" type = "text" class = "form-control" name = "harga_jual[]" id = "harga_jual" onkeyup = "this.value = this.value.replace(/[^0-9,]/g, "");" onchange = "this.value = formatRupiah(this.value);" ><label for = "floatingInput" > Harga Jual < /label> ' +
+                                '<input autocomplete = "one-time-code" type = "text" class = "form-control" name = "harga_jual[]" id = "harga_jual" onkeyup = "this.value = this.value.replace(/[^0-9,]/g, "");" onchange = "this.value = formatRupiah(this.value);"  value="' + item.harga_jual + '"><label for = "floatingInput" > Harga Jual </label> ' +
                                 '</div></div></div>' +
                                 '</td>' +
                                 '</tr>' +
