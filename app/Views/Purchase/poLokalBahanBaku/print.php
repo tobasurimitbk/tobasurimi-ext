@@ -271,8 +271,8 @@
     <?php if (!empty($dataPO) && !empty($dataPODetail)) { ?>
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    <?= $dataPO->companyName ?><br>
+                <div style="width: 60%;padding: 0.5rem;">
+                    PT TOBASURIMI INDUSTRIES<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
             </div><br>
