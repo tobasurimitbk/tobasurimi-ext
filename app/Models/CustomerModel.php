@@ -77,6 +77,8 @@ class CustomerModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'companyName'       => 'companies.company',
+            'namaSales'         => 'users.name',
             'kode'              => 'customers.kode',
             'name'              => 'customers.name',
             'contact_person'    => 'customers.contact_person',
@@ -92,6 +94,8 @@ class CustomerModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "customers.*, 
+                    users.name as namaSales,
+                    companies.company as companyName,
                       metadata.value AS currencyName,
                       country.country_name AS countryName";
 
@@ -100,21 +104,28 @@ class CustomerModel extends Model
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
+            ->join('users', 'users.id = customers.sales_id', 'LEFT')
+            ->join('companies', 'companies.id = customers.company_id', 'LEFT')
             // ->groupBy(('customers.id'))
             ->orderBy($sort, $sortType);
 
         $totalData = $customerDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['company_id']) {
             $customerDataQry->groupStart();
         }
 
         if ($addCondition['search']) {
             $customerDataQry->like('customers.name', $addCondition['search'])
+                ->orLike('users.name', $addCondition['search'])
                 ->orLike('customers.kode', $addCondition['search']);
         }
 
-        if ($addCondition['search']) {
+        if ($addCondition['company_id']) {
+            $customerDataQry->where('company_id', $addCondition['company_id']);
+        }
+
+        if ($addCondition['search'] || $addCondition['company_id']) {
             $customerDataQry->groupEnd();
         }
 
