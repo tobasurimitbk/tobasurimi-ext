@@ -395,8 +395,15 @@
             <td rowspan="2" style="padding:0px!important;text-align:center;">
                 <span id="nomber">1</span>
             </td>
-            <td colspan="3" style="padding:0px!important;">
-                <input type="text" name="spek[]" id="spek" class="form-control">
+            <td colspan="3">
+                <div class="row">
+                    <div class="col-sm-12" style="padding:0px!important;">
+                        <div class="form-floating">
+                            <input type="text" name="spek[]" id="spek" class="form-control">
+                            <label for="floatingInput">Spesifikasi</label>
+                        </div>
+                    </div>
+                </div>
             </td>
             <td rowspan="2" style="padding:0px!important;text-align:center;">
                 <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
@@ -582,7 +589,7 @@
                             var satuan3Id = item.satuan_3;
                             var newRow = '<tr>' +
                                 '<td rowspan="2" style="padding:0px!important;text-align:center;"><span id="nomber">' + counter + '</span></td>' +
-                                '<td colspan="3" style="padding:0px!important;"><input type="text" name="spek[]" id="spek" class="form-control" value="' + item.spesifikasi + '"></td>' +
+                                '<td colspan="3"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><input type="text" name="spek[]" id="spek" class="form-control"  value="' + item.spesifikasi + '"><label for="floatingInput">Spesifikasi</label></div></div></div></td>' +
                                 '<td rowspan="2" style="padding:0px!important;text-align:center;"><button type="button" class="btn btn-primary" onclick="addRow(\'tbody2\')"><i class="fas fa-plus"></i></button>' +
                                 '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\')"><i class="far fa-trash-alt"></i></button></td>' +
                                 '</tr>' +
@@ -967,8 +974,15 @@
         <td rowspan="2" style="padding:0px!important;text-align:center;">
             <span id="nomber">${counter}</span>
         </td>
-        <td colspan="3" style="padding:0px!important;">
-            <input type="text" name="spek[]" id="spek" class="form-control">
+        <td colspan="3">
+            <div class="row">
+                <div class="col-sm-12" style="padding:0px!important;">
+                    <div class="form-floating">
+                        <input type="text" name="spek[]" id="spek" class="form-control">
+                        <label for="floatingInput">Spesifikasi</label>
+                    </div>
+                </div>
+            </div>
         </td>
         <td rowspan="2" style="padding:0px!important;text-align:center;">
             <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>

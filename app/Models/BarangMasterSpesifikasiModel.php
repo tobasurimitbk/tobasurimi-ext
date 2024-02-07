@@ -24,6 +24,8 @@ class BarangMasterSpesifikasiModel extends Model
         'konversi_satuan_2',
         'satuan_3',
         'konversi_satuan_3',
+        'harga_pokok',
+        'harga_jual',
         'createdAt',
         'updatedAt',
         'deletedAt',

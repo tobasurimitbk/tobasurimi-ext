@@ -140,6 +140,8 @@ class Barang extends BaseController
                 'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
                 'satuan_3' => decrypt($_POST['satuan3_id'][$key]),
                 'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
+                'harga_pokok' => $_POST['harga_pokok'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key])) : 0,
+                'harga_jual' => $_POST['harga_jual'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key])) : 0,
             );
         }
         $barangSpesifikasiModel->insertBatch($result);
