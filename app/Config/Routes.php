@@ -446,6 +446,16 @@ $routes->post('/retur/save', 'SalesLokal\Retur::save', ['filter' => 'Auth']);
 $routes->post('/retur/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
 $routes->post('/retur/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
 
+// Master Barang Lokal
+$routes->get('master-barang-lokal', 'SalesLokal\Barang::bahanJadiView', ['filter' => 'Auth']);
+$routes->group('master-barang-lokal', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('all', 'SalesLokal\Barang::all');
+    $routes->post('get', 'SalesLokal\Barang::get');
+    $routes->post('save', 'SalesLokal\Barang::create');
+    $routes->post('update', 'SalesLokal\Barang::update');
+    $routes->post('delete', 'SalesLokal\Barang::delete');
+    $routes->post('generate-new-code', 'SalesLokal\Barang::generateNewCode');
+});
 
 // SALES INTERNASIONAL
 // Sales Kontrak
@@ -469,6 +479,17 @@ $routes->get('/order-form-internasional/print/(:segment)', 'SalesInternasional\O
 $routes->get('/order-form-internasional/all', 'SalesInternasional\OrderForm::all', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update-status', 'SalesInternasional\OrderForm::updateStatus', ['filter' => 'Auth']);
+
+// Master Barang Internasional
+$routes->get('master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);
+$routes->group('master-barang-internasional', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('all', 'SalesInternasional\Barang::all');
+    $routes->post('get', 'SalesInternasional\Barang::get');
+    $routes->post('save', 'SalesInternasional\Barang::create');
+    $routes->post('update', 'SalesInternasional\Barang::update');
+    $routes->post('delete', 'SalesInternasional\Barang::delete');
+    $routes->post('generate-new-code', 'SalesInternasional\Barang::generateNewCode');
+});
 
 // PRODUKSI
 // Production Result
