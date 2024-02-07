@@ -292,6 +292,8 @@ $routes->post('/po-import-bahan-penolong/close-po', 'Purchase\POImportBahanPenol
 $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolong::deletePOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-penolong/find-divisi', 'Purchase\POLokalBahanPenolong::getDivisionByCompany', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/histori-lpb', 'Purchase\POImportBahanPenolong::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/dropdown/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/dropdown/get-detail-barang-spp', 'Purchase\POImportBahanBaku::dropdownGetSppDetail', ['filter' => 'Auth']);
 
 // TANDA TERIMA FAKTUR LOKAL BB
 $routes->get('/tanda-terima-faktur-lokal-bp', 'Purchase\TandaTerimaSupBB::index', ['filter' => 'Auth']);

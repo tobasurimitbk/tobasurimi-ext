@@ -173,9 +173,9 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
-                                <option data-parent_name="" data-spesifikasi_id="" data-spesifikasi_name="" data-satuan_id="" data-nama_barang="" data-kode_barang="" value=""></option>
+                                <option data-barang_id="" data-parent_name="" data-spesifikasi_id="" data-spesifikasi_name="" data-satuan_id="" data-nama_barang="" data-kode_barang="" value=""></option>
                                 <?php foreach ($barang as $s) : ?>
-                                    <option data-parent_name="<?= $s['parent_name'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" data-spesifikasi_name="<?= strtoupper($s['spesifikasi'])  ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['id'] ?>">
+                                    <option data-barang_id="<?= $s['id'] ?>" data-parent_name="<?= $s['parent_name'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" data-spesifikasi_name="<?= strtoupper($s['spesifikasi'])  ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['barang_master_spesifikasi_id'] ?>">
                                         <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . " " . strtoupper($s['spesifikasi']) . " )" ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -339,41 +339,7 @@
     // init barang list
     var listBarang = [];
     var totalHarga = 0;
-    // init select2
-    $('#company_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        var companyID = $(this).val();
-        var formData = new FormData();
-        formData.append("companyID", companyID);
-        $.ajax({
-            url: "<?= base_url("po-lokal-bahan-penolong/find-divisi"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            complete: function() {
-
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                csrf.val(response.token);
-                $("#division_id").empty();
-                $("#division_id").append(`<option value=""></option>`);
-                response.data.forEach(function(item) {
-                    $("#division_id").append(`<option  value="${item.id}">${item.divisi}</option>`);
-                });
-                <?php if (!empty($poDetail)) : ?>
-                    $('#division_id').val("<?= $poDetail['division_id'] ?>").change();
-                <?php endif; ?>
-            }
-        });
-    });
+    // init select
 
     $('#division_id').select2({
         placeholder: "Pilih Departemen",
@@ -404,7 +370,7 @@
     });
 
     $('#barang_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Barang",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -450,7 +416,6 @@
         var biayaTambahan = parseInt($('#biaya_tambahan').val()) || 0;
         var diskon = parseInt($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
-        console.log(diskonHarga);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
         $('#total').val(formatRupiah(total));
@@ -590,6 +555,7 @@
         if ($('.detail-form').valid()) {
             var barang_update_id = $('#barang_update_id').val();
             var spesifikasiID = $('#barang_id').find("option:selected").data("spesifikasi_id");
+            var barang_id = $('#barang_id').find("option:selected").data("barang_id");
 
             if (barang_update_id != "") {
                 // UPDATE
@@ -605,7 +571,7 @@
                 } else {
                     var indexToRemove = -1;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].barang_id === barang_update_id) {
+                        if (listBarang[i].spesifikasi_id === barang_update_id) {
                             indexToRemove = i;
                             break;
                         }
@@ -621,7 +587,7 @@
                 // TAMBAH
                 var isAdd = false;
                 for (var i = 0; i < listBarang.length; i++) {
-                    if (listBarang[i].barang_id === $('#barang_id').val() && listBarang[i].spesifikasi_id === spesifikasiID) {
+                    if (listBarang[i].barang_id === barang_id && listBarang[i].spesifikasi_id === spesifikasiID) {
                         indexToRemove = i;
                         isAdd = true;
                         break;
@@ -803,8 +769,8 @@
 
     function insertList() {
         listBarang.push({
-            barang_id: $('#barang_id').val(),
-            spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id"),
+            barang_id: $('#barang_id').find("option:selected").data("barang_id"),
+            spesifikasi_id: $('#barang_id').val(),
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
             nama_barang: $('#nama_barang').val(),
             satuan_id: $('#satuan_id').val(),
@@ -846,9 +812,9 @@
                 <?php if (!$poDetail['is_posted']) : ?>
                     newRow.append($('<td>').html(
                         `
-                            <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.barang_id}')">
+                            <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.spesifikasi_id}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button class="btn btn-danger" onclick="deleteRow('${v.barang_id}')">
+                            </button><button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         `
@@ -859,9 +825,9 @@
             <?php else : ?>
                 newRow.append($('<td>').html(
                     `
-                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.barang_id}')">
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.spesifikasi_id}')">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button><button class="btn btn-danger" onclick="deleteRow('${v.barang_id}')">
+                        </button><button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
                     `
@@ -895,7 +861,7 @@
 
         var indexToRemove = -1;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].barang_id === id) {
+            if (listBarang[i].spesifikasi_id === id) {
                 indexToRemove = i;
                 break;
             }
@@ -911,12 +877,12 @@
     function detailRow(id) {
         var item = null;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].barang_id === id) {
+            if (listBarang[i].spesifikasi_id === id) {
                 item = listBarang[i];
                 break;
             }
         }
-        $('#barang_id, #barang_update_id').val(item.barang_id).change();
+        $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
         $('#harga_satuan').val(item.harga_satuan);
         $('#qty').val(item.qty);
         $('#diskon').val(item.diskon);
@@ -928,7 +894,6 @@
         $('#total').val(item.total);
         // attr barang_id disabled
         $('#barang_id').attr('disabled', true);
-        console.log(item);
     }
 
     function resetForm() {

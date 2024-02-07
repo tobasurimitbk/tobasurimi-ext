@@ -102,6 +102,8 @@ class POImportBahanBaku extends BaseController
             return redirect()->to('po-import-bahan-baku');
         }
 
+        $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $data['dataPOImport']->division_id)->where('deletedAt', null)->findAll();
+
         return view('Purchase/poImportBahanBaku/form', $data);
     }
 
@@ -189,7 +191,7 @@ class POImportBahanBaku extends BaseController
             'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
             'supplier_id' => $this->request->getVar('supplierID'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
-            'total' => $this->request->getVar('total'),
+            'total' => $this->request->getVar('total') - $this->request->getVar('potongan_harga'),
             'payment_term' => $this->request->getVar('paymentTerm'),
             'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
             'note' => $this->request->getVar('note'),
@@ -252,7 +254,13 @@ class POImportBahanBaku extends BaseController
 
         $firstData = $this->rmImportPOModel->find($id);
 
-        $this->sppModel->update($firstData['purchase_request_id'], [
+        if (empty($this->request->getVar('spp_id'))) {
+            $sppID = $firstData['purchase_request_id'];
+        } else {
+            $sppID = $this->request->getVar('spp_id');
+        }
+
+        $this->sppModel->update($sppID, [
             'request_status' => 'waiting'
         ]);
 
@@ -262,7 +270,7 @@ class POImportBahanBaku extends BaseController
             'po_no' => $noPoNew,
             'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
             'supplier_id' => $this->request->getVar('supplierID'),
-            'total' => $this->request->getVar('total'),
+            'total' => $this->request->getVar('total') - $this->request->getVar('potongan_harga'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'payment_term' => $this->request->getVar('paymentTerm'),
             'payment_date' =>  $this->request->getPost("paymentDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
@@ -299,7 +307,7 @@ class POImportBahanBaku extends BaseController
             ]);
         }
 
-        $this->sppModel->update($this->request->getVar('spp_id'), [
+        $this->sppModel->update($sppID, [
             'request_status' => 'finished'
         ]);
 
@@ -371,6 +379,10 @@ class POImportBahanBaku extends BaseController
             $id = decrypt($id);
             $data = [];
             $dataPO = $this->rmImportPOModel->getPOById($id);
+
+            if ($dataPO == null) {
+                return redirect()->to('po-import-bahan-baku');
+            }
 
             if ($dataPO) {
                 $dataPODetail = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);

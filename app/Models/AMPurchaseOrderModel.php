@@ -43,7 +43,8 @@ class AMPurchaseOrderModel extends Model
         'location_transaction',
         'shipment',
         'latest_shipment_date',
-        'attn'
+        'attn',
+        'potongan_harga'
     ];
 
     // Dates
@@ -75,7 +76,7 @@ class AMPurchaseOrderModel extends Model
         $availableSort = [
             'poDate'           => 'am_purchase_orders.po_date',
             'poNo'             => 'am_purchase_orders.po_no',
-            'companyName'      => 'companies.company',
+            'divisi'            => 'divisis.divisi',
             'supplierName'      => 'suppliers.name',
             'total'             => 'am_purchase_orders.total',
             'currencyName'      => 'metadata.value',
@@ -92,13 +93,14 @@ class AMPurchaseOrderModel extends Model
                       suppliers.name AS supplierName, 
                       metadata.value AS currencyName,
                       companies.company AS companyName,
+                      divisis.divisi,
                       COUNT(am_purchase_order_details.id) AS itemCount";
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
             ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
-            // ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->groupBy(('am_purchase_orders.id'))
@@ -221,6 +223,7 @@ class AMPurchaseOrderModel extends Model
         users.name AS createdByName,
         companies.company as companyName,
         metadata.value as currencyName,
+        purchase_requests.spp_no
         ";
 
         $sppData = $this->asObject()
@@ -230,6 +233,7 @@ class AMPurchaseOrderModel extends Model
             ->join('users', 'users.id = am_purchase_orders.createdBy', 'left')
             ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
             ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
             ->find($id);
 
         return $sppData;
@@ -316,6 +320,31 @@ class AMPurchaseOrderModel extends Model
         $head = "PO/LBP-" . $bln . $thn . '/';
         $lastPO = $this->select('po_no')
             ->like('po_no', "PO/LBP-")
+            ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
+            ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->orderBy('po_no', "DESC")
+            ->first();
+
+        $counterFirst = '000001';
+        if ($lastPO == null) {
+            return $head . '' . $counterFirst;
+        } else {
+            try {
+                $last = explode('/', $lastPO['po_no']);
+                $poLastDigit = $last[2];
+                $counterFirst = str_pad((int) $poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
+                return $head . '' . $counterFirst;
+            } catch (Exception $e) {
+                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            }
+        }
+    }
+
+    public function get_new_no_po_import($bln, $thn, $last_day)
+    {
+        $head = "PO/IBP-" . $bln . $thn . '/';
+        $lastPO = $this->select('po_no')
+            ->like('po_no', "PO/IBP-")
             ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
             ->orderBy('po_no', "DESC")
