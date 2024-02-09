@@ -275,7 +275,6 @@
             $('.title-name').text("Tambah Master Barang");
             $(".create-form :input:not([name='type'])").val('');
             $('select[name="parent_type_id"]').val(null).change();
-            $('select[name="satuan_id"]').val(null).change();
             $('select[name="divisi_id"]').val(null).change();
 
             $('.delete-btn').hide();
@@ -393,6 +392,7 @@
                 .css('z-index', '1');
             $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
                 theme: "bootstrap-5",
+                placeholder: 'Pilih Satuan',
                 allowClear: true,
                 dropdownParent: $(".add-modal .modal-content")
             });
@@ -557,6 +557,7 @@
 
                             $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
                                 theme: "bootstrap-5",
+                                placeholder: 'Pilih Satuan',
                                 allowClear: true,
                                 dropdownParent: $(".add-modal .modal-content")
                             });
@@ -918,6 +919,7 @@
 
         $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
             theme: "bootstrap-5",
+            placeholder: 'Pilih Satuan',
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         });
@@ -1086,6 +1088,7 @@
         .css('z-index', '1');
     $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
         theme: "bootstrap-5",
+        placeholder: 'Pilih Satuan',
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });

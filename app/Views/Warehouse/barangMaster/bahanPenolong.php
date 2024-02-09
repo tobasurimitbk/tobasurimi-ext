@@ -391,7 +391,6 @@
             $('.title-name').text("Tambah Bahan Penolong");
             $(".create-form :input:not([name='type'])").val('');
             $('select[name="parent_type_id"]').val(null).change();
-            $('select[name="satuan_id"]').val(null).change();
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
@@ -491,6 +490,7 @@
             $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
                 theme: "bootstrap-5",
                 allowClear: true,
+                placeholder: 'Pilih Satuan',
                 dropdownParent: $(".add-modal .modal-content")
             });
         });
@@ -583,11 +583,8 @@
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
-                    $('select[name="satuan_id"]').val(res.data.satuan_id).change();
                     $('input[name="barang_name"]').val(res.data.barang_name);
-                    $('input[name="minimum_stock"]').val(res.data.minimum_stock).change();
                     $('input[name="id"]').val(res.data.id);
-                    $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
 
                     // Iterate through dataSpekDetail and append rows to the table
                     if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
@@ -650,6 +647,7 @@
                             $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
                                 theme: "bootstrap-5",
                                 allowClear: true,
+                                placeholder: 'Pilih Satuan',
                                 dropdownParent: $(".add-modal .modal-content")
                             });
                             counter++;
@@ -1134,6 +1132,7 @@
         $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
             theme: "bootstrap-5",
             allowClear: true,
+            placeholder: 'Pilih Satuan',
             dropdownParent: $(".add-modal .modal-content")
         });
 
@@ -1290,6 +1289,7 @@
     $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
         theme: "bootstrap-5",
         allowClear: true,
+        placeholder: 'Pilih Satuan',
         dropdownParent: $(".add-modal .modal-content")
     });
     const changeSort = function(val) {
