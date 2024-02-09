@@ -116,7 +116,7 @@ class RMPurchaseOrderDetailModel extends Model
             ->where($condition)
             ->join('supplier_harga', 'rm_purchase_order_details.supplier_harga_id = supplier_harga.id', 'left')
             ->join('satuans', 'rm_purchase_order_details.satuan_id = satuans.id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
             ->findAll();
 
         return $poBBLokalDetailData;

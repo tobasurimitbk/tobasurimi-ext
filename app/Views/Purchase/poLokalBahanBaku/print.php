@@ -271,7 +271,7 @@
     <?php if (!empty($dataPO) && !empty($dataPODetail)) { ?>
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
-                <div style="width: 60%;padding: 0.5rem;">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
                     PT TOBASURIMI INDUSTRIES<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -387,7 +387,7 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    <?= $dataPO->companyName ?><br>
+                    PT TOBASURIMI INDUSTRIES<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
                 <div style="padding: 0.5rem">
@@ -451,7 +451,7 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    <?= $dataPO->companyName ?><br>
+                    PT TOBASURIMI INDUSTRIES<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
                 <div style="padding: 0.5rem">
