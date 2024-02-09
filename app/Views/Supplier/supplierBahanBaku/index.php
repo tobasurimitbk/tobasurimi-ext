@@ -733,9 +733,7 @@
                         <a class="btn btn-warning" href="<?= base_url(); ?>supplier-bahan-baku/harga/${id}" style="box-shadow: none !important;">
                             Set Harga
                         </a>
-                        <button class="btn btn-success" onclick="History(${id})" style="box-shadow: none !important;">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                        </a>
+                       
                     `
             }
         }],
