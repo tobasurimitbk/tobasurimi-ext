@@ -70,7 +70,7 @@
                                     <label for="floatingInput">No. SPP</label>
                                 </div>
                                 <div style="<?= !empty($dataSPP) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -239,6 +239,12 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     let list_items = [];
+
+    <?php if (empty($dataSPP)) : ?>
+        $(document).ready(function() {
+            changeStatus();
+        });
+    <?php endif; ?>
 
     var validator_detail = $(".detail-form").validate({
         rules: {
@@ -784,7 +790,8 @@
         if (validate_bahan_baku) {
             Swal.fire({
                 icon: 'error',
-                title: "Header Barang Wajib " + header_barang_name.toUpperCase() + " (Karena ini merupakan PO Lokal Bahan Baku)",
+                title: 'Barang harus sejenis',
+                // title: "Header Barang Wajib " + header_barang_name.toUpperCase() + " (Karena ini merupakan PO Lokal Bahan Baku)",
                 confirmButtonColor: '#4e73df',
             })
         } else
