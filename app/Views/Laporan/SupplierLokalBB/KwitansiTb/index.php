@@ -138,7 +138,7 @@
         var parts = tanggal.split('/');
         var newDateFormat = parts[2] + '-' + parts[1] + '-' + parts[0];
 
-        window.open("<?= base_url('kwitansi-tb/print/') ?>" + id + '/' + yearMonth + '/' + newDateFormat + '/' + noKwitansi, "_blank");
+        window.open("<?= base_url('laporan-supplier-lokal-bb/kwitansi-tb/print/') ?>" + id + '/' + yearMonth + '/' + newDateFormat + '/' + noKwitansi, "_blank");
     });
 </script>
 

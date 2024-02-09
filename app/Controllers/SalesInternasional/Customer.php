@@ -53,7 +53,8 @@ class Customer extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType")
+            "sortType"      => $this->request->getGet("sortType"),
+            'company_id' => ''
         ];
 
         $limit = $this->request->getGet("length");
