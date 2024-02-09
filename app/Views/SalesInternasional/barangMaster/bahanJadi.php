@@ -102,7 +102,7 @@
                                 </thead>
                                 <tbody class="body-table" id="tbody2" style="cursor: pointer;">
                                     <tr>
-                                        <td rowspan="3" style="padding:0px!important;text-align:center;">
+                                        <td rowspan="2" style="padding:0px!important;text-align:center;">
                                             <span id="nomber">1</span>
                                         </td>
                                         <td colspan="3">
@@ -121,7 +121,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td rowspan="3" style="padding:0px!important;text-align:center;">
+                                        <td rowspan="2" style="padding:0px!important;text-align:center;">
                                             <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
                                             <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
                                         </td>
@@ -308,7 +308,7 @@
 
             // Create cells with appropriate colspan
             row.innerHTML = `
-            <td rowspan="3" style="padding:0px!important;text-align:center;">
+            <td rowspan="2" style="padding:0px!important;text-align:center;">
                 <span id="nomber">1</span>
             </td>
             <td colspan="3">
@@ -327,7 +327,7 @@
                     </div>
                 </div>
             </td>
-            <td rowspan="3" style="padding:0px!important;text-align:center;">
+            <td rowspan="2" style="padding:0px!important;text-align:center;">
                 <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
                 <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
             </td>`;
@@ -523,9 +523,9 @@
                             var satuan2Id = item.satuan_2;
                             var satuan3Id = item.satuan_3;
                             var newRow = '<tr>' +
-                                '<td rowspan="3" style="padding:0px!important;text-align:center;"><span id="nomber">' + counter + '</span></td>' +
+                                '<td rowspan="2" style="padding:0px!important;text-align:center;"><span id="nomber">' + counter + '</span></td>' +
                                 '<td colspan="3"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><input type="text" name="spek[]" id="spek" class="form-control"  value="' + item.spesifikasi + '"><label for="floatingInput">Spesifikasi</label></div></div><div class = "col-sm-6" style = "padding:0px!important;" ><div class = "form-floating" ><input autocomplete = "one-time-code" type = "text" class = "form-control" name = "harga_jual[]" id = "harga_jual" onkeyup = "this.value = this.value.replace(/[^0-9,]/g, "");" onchange = "this.value = formatRupiah(this.value);"  value="' + item.harga_jual + '"><label for = "floatingInput" > Harga Jual </label></div></div></div></td>' +
-                                '<td rowspan="3" style="padding:0px!important;text-align:center;"><button type="button" class="btn btn-primary" onclick="addRow(\'tbody2\')"><i class="fas fa-plus"></i></button>' +
+                                '<td rowspan="2" style="padding:0px!important;text-align:center;"><button type="button" class="btn btn-primary" onclick="addRow(\'tbody2\')"><i class="fas fa-plus"></i></button>' +
                                 '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\')"><i class="far fa-trash-alt"></i></button></td>' +
                                 '</tr>' +
                                 // '<tr>' +
@@ -826,7 +826,7 @@
 
         // Create cells with appropriate colspan
         row.innerHTML = `
-        <td rowspan="3" style="padding:0px!important;text-align:center;">
+        <td rowspan="2" style="padding:0px!important;text-align:center;">
             <span id="nomber">${counter}</span>
         </td>
         <td colspan="3">
@@ -845,7 +845,7 @@
                 </div>
             </div>
         </td>
-        <td rowspan="3" style="padding:0px!important;text-align:center;">
+        <td rowspan="2" style="padding:0px!important;text-align:center;">
             <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
             <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
         </td>`;
