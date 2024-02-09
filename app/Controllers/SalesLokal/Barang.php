@@ -74,6 +74,16 @@ class Barang extends BaseController
 
         foreach ($spek as $key => $value) {
             // var_dump($_POST['primer'][$key]);
+            if (isset($_POST['harga_pokok'][$key])) {
+                $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key]));
+            } else {
+                $harga_pokok = 0.0;
+            }
+            if (isset($_POST['harga_jual'][$key])) {
+                $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key]));
+            } else {
+                $harga_jual = 0.0;
+            }
             $result[] = array(
                 'barang_master_sales_id' => $barangMasterID,
                 'spesifikasi' => $_POST['spek'][$key],
@@ -82,8 +92,8 @@ class Barang extends BaseController
                 'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
                 'satuan_3' => ($_POST['satuan3_id'][$key]),
                 'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
-                'harga_pokok' => $_POST['harga_pokok'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key])) : 0,
-                'harga_jual' => $_POST['harga_jual'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key])) : 0,
+                'harga_pokok' => $harga_pokok,
+                'harga_jual' => $harga_jual,
             );
         }
         $barangSpesifikasiModel->insertBatch($result);
@@ -121,6 +131,16 @@ class Barang extends BaseController
         }
 
         foreach ($spek as $key => $value) {
+            if (isset($_POST['harga_pokok'][$key])) {
+                $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key]));
+            } else {
+                $harga_pokok = 0.0;
+            }
+            if (isset($_POST['harga_jual'][$key])) {
+                $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key]));
+            } else {
+                $harga_jual = 0.0;
+            }
             $result[] = array(
                 'barang_master_sales_id' => $id,
                 'spesifikasi' => $_POST['spek'][$key],
@@ -129,8 +149,8 @@ class Barang extends BaseController
                 'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
                 'satuan_3' => ($_POST['satuan3_id'][$key]),
                 'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
-                'harga_pokok' => $_POST['harga_pokok'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key])) : 0,
-                'harga_jual' => $_POST['harga_jual'][$key] ?  (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key])) : 0,
+                'harga_pokok' => $harga_pokok,
+                'harga_jual' => $harga_jual,
             );
         }
         $barangSpesifikasiModel->insertBatch($result);

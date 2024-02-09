@@ -22,7 +22,6 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('parent_barang.parent_name')" class="sort">Kelompok</th>
                                 <th onclick="changeSort('barang_master.kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_master.barang_name')" class="sort">Nama Barang</th>
                             </tr>
@@ -47,7 +46,7 @@
                 <form class="create-form" role="form" method="POST">
                     <input type="hidden" name="id" id="id">
                     <input type="hidden" name="type" value="<?= $type ?>">
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select" name="parent_type_id" id="parent_type_id">
@@ -59,7 +58,7 @@
                                 <label for="floatingInput">Kelompok Barang</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -82,6 +81,16 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-12" style="font-size: 12px;">
+                            Note : <br>
+                            <ul>
+                                <li style="height: 15px;">Satuan 1 adalah Satuan terkecil dari produk. Cth: PCS</li>
+                                <li style="height: 15px;">Satuan 2 adalah Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)</li>
+                                <li style="height: 15px;">Satuan 3 adalah Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
@@ -98,10 +107,16 @@
                                         </td>
                                         <td colspan="3">
                                             <div class="row">
-                                                <div class="col-sm-12" style="padding:0px!important;">
+                                                <div class="col-sm-6" style="padding:0px!important;">
                                                     <div class="form-floating">
                                                         <input type="text" name="spek[]" id="spek" class="form-control">
                                                         <label for="floatingInput">Spesifikasi</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6" style="padding:0px!important;">
+                                                    <div class="form-floating">
+                                                        <input autocomplete="one-time-code" type="text" class="form-control" name="harga_jual[]" id="harga_jual" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+                                                        <label for="floatingInput">Harga Jual</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -111,7 +126,7 @@
                                             <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <!-- <tr>
                                         <td colspan="3">
                                             <div class="row">
                                                 <div class="col-sm-6" style="padding:0px!important;">
@@ -128,7 +143,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                    </tr>
+                                    </tr> -->
                                     <tr>
                                         <td style="width: 15%;">
                                             <div class="row">
@@ -149,7 +164,7 @@
                                             <div class="row">
                                                 <div class="col-sm-6" style="padding:0px!important;">
                                                     <div class="form-floating">
-                                                        <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)">
+                                                        <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="changeSpanText()">
                                                             <option value=""></option>
                                                             <?php foreach ($satuanBarang as $sb) : ?>
                                                                 <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -172,7 +187,7 @@
                                             <div class="row">
                                                 <div class="col-sm-6" style="padding:0px!important;">
                                                     <div class="form-floating">
-                                                        <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)">
+                                                        <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="changeSpanText()">
                                                             <option value=""></option>
                                                             <?php foreach ($satuanBarang as $sb) : ?>
                                                                 <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -248,9 +263,6 @@
                     className: "text-center",
                     sortable: false,
                     width: "5%"
-                }, {
-                    data: "kelompok_barang",
-                    className: "text-center",
                 },
                 {
                     data: "kode_barang",
@@ -289,13 +301,13 @@
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
-            $('#generate_new_code').prop('checked', false).show();
+            $('#generate_new_code').prop('checked', true).change().show();
             $('.add-modal').modal('show');
             $('#tbody2').empty();
             var table = document.getElementById('tbody2');
             var row = table.insertRow();
             var row2 = table.insertRow();
-            var row3 = table.insertRow();
+            // var row3 = table.insertRow();
 
             // Create cells with appropriate colspan
             row.innerHTML = `
@@ -304,25 +316,10 @@
             </td>
             <td colspan="3">
                 <div class="row">
-                    <div class="col-sm-12" style="padding:0px!important;">
+                    <div class="col-sm-6" style="padding:0px!important;">
                         <div class="form-floating">
                             <input type="text" name="spek[]" id="spek" class="form-control">
                             <label for="floatingInput">Spesifikasi</label>
-                        </div>
-                    </div>
-                </div>
-            </td>
-            <td rowspan="3" style="padding:0px!important;text-align:center;">
-                <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
-                <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-            </td>`;
-            row2.innerHTML = `
-            <td colspan="3">
-                <div class="row">
-                    <div class="col-sm-6" style="padding:0px!important;">
-                        <div class="form-floating">
-                            <input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
-                            <label for="floatingInput">HPP</label>
                         </div>
                     </div>
                     <div class="col-sm-6" style="padding:0px!important;">
@@ -332,8 +329,29 @@
                         </div>
                     </div>
                 </div>
+            </td>
+            <td rowspan="3" style="padding:0px!important;text-align:center;">
+                <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
+                <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
             </td>`;
-            row3.innerHTML = `
+            // row2.innerHTML = `
+            // <td colspan="3">
+            //     <div class="row">
+            //         <div class="col-sm-6" style="padding:0px!important;">
+            //             <div class="form-floating">
+            //                 <input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+            //                 <label for="floatingInput">HPP</label>
+            //             </div>
+            //         </div>
+            //         <div class="col-sm-6" style="padding:0px!important;">
+            //             <div class="form-floating">
+            //                 <input autocomplete="one-time-code" type="text" class="form-control" name="harga_jual[]" id="harga_jual" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+            //                 <label for="floatingInput">Harga Jual</label>
+            //             </div>
+            //         </div>
+            //     </div>
+            // </td>`;
+            row2.innerHTML = `
             <td style="width: 15%;">
                 <div class="row">
                     <div class="col-sm-12" style="padding:0px!important;">
@@ -353,7 +371,7 @@
                 <div class="row">
                     <div class="col-sm-6" style="padding:0px!important;">
                         <div class="form-floating">
-                            <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)">
+                            <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="changeSpanText()">
                                 <option value=""></option>
                                 <?php foreach ($satuanBarang as $sb) : ?>
                                     <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -376,7 +394,7 @@
                 <div class="row">
                     <div class="col-sm-6" style="padding:0px!important;">
                         <div class="form-floating">
-                            <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)">
+                            <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="changeSpanText()">
                                 <option value=""></option>
                                 <?php foreach ($satuanBarang as $sb) : ?>
                                     <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -508,24 +526,24 @@
                             var satuan3Id = item.satuan_3;
                             var newRow = '<tr>' +
                                 '<td rowspan="3" style="padding:0px!important;text-align:center;"><span id="nomber">' + counter + '</span></td>' +
-                                '<td colspan="3"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><input type="text" name="spek[]" id="spek" class="form-control"  value="' + item.spesifikasi + '"><label for="floatingInput">Spesifikasi</label></div></div></div></td>' +
+                                '<td colspan="3"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><input type="text" name="spek[]" id="spek" class="form-control"  value="' + item.spesifikasi + '"><label for="floatingInput">Spesifikasi</label></div></div><div class = "col-sm-6" style = "padding:0px!important;" ><div class = "form-floating" ><input autocomplete = "one-time-code" type = "text" class = "form-control" name = "harga_jual[]" id = "harga_jual" onkeyup = "this.value = this.value.replace(/[^0-9,]/g, "");" onchange = "this.value = formatRupiah(this.value);"  value="' + item.harga_jual + '"><label for = "floatingInput" > Harga Jual </label></div></div></div></td>' +
                                 '<td rowspan="3" style="padding:0px!important;text-align:center;"><button type="button" class="btn btn-primary" onclick="addRow(\'tbody2\')"><i class="fas fa-plus"></i></button>' +
                                 '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\')"><i class="far fa-trash-alt"></i></button></td>' +
                                 '</tr>' +
-                                '<tr>' +
-                                '<td colspan="3">' +
-                                '<div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating">' +
-                                '<input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, "");" onchange="this.value = formatRupiah(this.value);" value="' + item.harga_pokok + '"><label for="floatingInput">HPP</label>' +
-                                '</div></div>' +
-                                '<div class = "col-sm-6" style = "padding:0px!important;" ><div class = "form-floating" >' +
-                                '<input autocomplete = "one-time-code" type = "text" class = "form-control" name = "harga_jual[]" id = "harga_jual" onkeyup = "this.value = this.value.replace(/[^0-9,]/g, "");" onchange = "this.value = formatRupiah(this.value);"  value="' + item.harga_jual + '"><label for = "floatingInput" > Harga Jual </label> ' +
-                                '</div></div></div>' +
-                                '</td>' +
-                                '</tr>' +
+                                // '<tr>' +
+                                // '<td colspan="3">' +
+                                // '<div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating">' +
+                                // '<input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, "");" onchange="this.value = formatRupiah(this.value);" value="' + item.harga_pokok + '"><label for="floatingInput">HPP</label>' +
+                                // '</div></div>' +
+                                // '<div class = "col-sm-6" style = "padding:0px!important;" ><div class = "form-floating" ><input autocomplete = "one-time-code" type = "text" class = "form-control" name = "harga_jual[]" id = "harga_jual" onkeyup = "this.value = this.value.replace(/[^0-9,]/g, "");" onchange = "this.value = formatRupiah(this.value);"  value="' + item.harga_jual + '"><label for = "floatingInput" > Harga Jual </label></div></div>' +
+                                // '<input autocomplete = "one-time-code" type = "text" class = "form-control" name = "harga_jual[]" id = "harga_jual" onkeyup = "this.value = this.value.replace(/[^0-9,]/g, "");" onchange = "this.value = formatRupiah(this.value);"  value="' + item.harga_jual + '"><label for = "floatingInput" > Harga Jual </label> ' +
+                                // '</div></div></div>' +
+                                // '</td>' +
+                                // '</tr>' +
                                 '<tr>' +
                                 '<td style="width: 15%;"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan1_id[]" id="satuan1_id_' + counter + '" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText(' + counter + ')"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 1</label></div></div></div></td>' +
-                                '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan2_id[]" id="satuan2_id_' + counter + '" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 2</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_2[]" class="form-control" value="' + item.konversi_satuan_2 + '"><div class="input-group-append"><span class="input-group-text satuan_' + counter + '">-</span></div></div></div></div></td>' +
-                                '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan3_id[]" id="satuan3_id_' + counter + '" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 3</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_3[]" class="form-control" value="' + item.konversi_satuan_3 + '"><div class="input-group-append"><span class="input-group-text satuan_' + counter + '">-</span></div></div></div></div></td>' +
+                                '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan2_id[]" id="satuan2_id_' + counter + '" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="changeSpanText(' + counter + ')"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 2</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_2[]" class="form-control" value="' + item.konversi_satuan_2 + '"><div class="input-group-append"><span class="input-group-text satuan_' + counter + '">-</span></div></div></div></div></td>' +
+                                '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan3_id[]" id="satuan3_id_' + counter + '" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="changeSpanText(' + counter + ')"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 3</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_3[]" class="form-control" value="' + item.konversi_satuan_3 + '"><div class="input-group-append"><span class="input-group-text satuan_' + counter + '">-</span></div></div></div></div></td>' +
                                 '</tr>';
                             $('#tbody2').append(newRow);
                             $(`#satuan1_id_${counter} option`).each(function() {
@@ -740,12 +758,60 @@
     });
 
     function changeSpanText(counter = null) {
+        var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
+
         if (counter) {
-            var selectedText = $(`#satuan1_id_${counter}`).find('option:selected').text();
-            var spanText = $(`.satuan_${counter}`);
+            selectedText = $(`#satuan1_id_${counter}`).find('option:selected').text();
+            selectedSatuan1Val = $(`#satuan1_id_${counter}`).val();
+            selectedSatuan2Val = $(`#satuan2_id_${counter}`).val();
+            selectedSatuan3Val = $(`#satuan3_id_${counter}`).val();
+            spanText = $(`.satuan_${counter}`);
         } else {
-            var selectedText = $('#satuan1_id').find('option:selected').text();
-            var spanText = $(`.satuan1`);
+            selectedText = $('#satuan1_id').find('option:selected').text();
+            selectedSatuan1Val = $('#satuan1_id').val();
+            selectedSatuan2Val = $('#satuan2_id').val();
+            selectedSatuan3Val = $('#satuan3_id').val();
+            spanText = $('.satuan1');
+        }
+
+        if (selectedSatuan1Val === selectedSatuan2Val && selectedSatuan1Val !== "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Satuan 2 tidak boleh sama dengan satuan 1',
+                confirmButtonColor: '#4e73df',
+            }).then(() => {
+                if (counter) {
+                    $(`#satuan2_id_${counter}`).val('').change();
+                } else {
+                    $('#satuan2_id').val('').change();
+                }
+            });
+        }
+        if (selectedSatuan1Val === selectedSatuan3Val && selectedSatuan1Val !== "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Satuan 3 tidak boleh sama dengan satuan 1',
+                confirmButtonColor: '#4e73df',
+            }).then(() => {
+                if (counter) {
+                    $(`#satuan3_id_${counter}`).val('').change();
+                } else {
+                    $('#satuan3_id').val('').change();
+                }
+            });
+        }
+        if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Satuan 3 tidak boleh sama dengan satuan 2',
+                confirmButtonColor: '#4e73df',
+            }).then(() => {
+                if (counter) {
+                    $(`#satuan3_id_${counter}`).val('').change();
+                } else {
+                    $('#satuan3_id').val('').change();
+                }
+            });
         }
         // Ubah konten span sesuai dengan nilai yang dipilih
         spanText.text(selectedText ? selectedText : '-');
@@ -757,7 +823,7 @@
         var table = document.getElementById(tableID);
         var row = table.insertRow();
         var row2 = table.insertRow();
-        var row3 = table.insertRow();
+        // var row3 = table.insertRow();
 
         // Create cells with appropriate colspan
         row.innerHTML = `
@@ -766,10 +832,16 @@
         </td>
         <td colspan="3">
             <div class="row">
-                <div class="col-sm-12" style="padding:0px!important;">
+                <div class="col-sm-6" style="padding:0px!important;">
                     <div class="form-floating">
                         <input type="text" name="spek[]" id="spek" class="form-control">
                         <label for="floatingInput">Spesifikasi</label>
+                    </div>
+                </div>
+                <div class="col-sm-6" style="padding:0px!important;">
+                    <div class="form-floating">
+                        <input autocomplete="one-time-code" type="text" class="form-control" name="harga_jual[]" id="harga_jual" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+                        <label for="floatingInput">Harga Jual</label>
                     </div>
                 </div>
             </div>
@@ -778,24 +850,24 @@
             <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
             <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
         </td>`;
+        // row2.innerHTML = `
+        //     <td colspan="3">
+        //         <div class="row">
+        //             <div class="col-sm-6" style="padding:0px!important;">
+        //                 <div class="form-floating">
+        //                     <input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+        //                     <label for="floatingInput">HPP</label>
+        //                 </div>
+        //             </div>
+        //             <div class="col-sm-6" style="padding:0px!important;">
+        //                 <div class="form-floating">
+        //                     <input autocomplete="one-time-code" type="text" class="form-control" name="harga_jual[]" id="harga_jual" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
+        //                     <label for="floatingInput">Harga Jual</label>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     </td>`;
         row2.innerHTML = `
-            <td colspan="3">
-                <div class="row">
-                    <div class="col-sm-6" style="padding:0px!important;">
-                        <div class="form-floating">
-                            <input autocomplete="one-time-code" type="text" class="form-control" name="harga_pokok[]" id="harga_pokok" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
-                            <label for="floatingInput">HPP</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6" style="padding:0px!important;">
-                        <div class="form-floating">
-                            <input autocomplete="one-time-code" type="text" class="form-control" name="harga_jual[]" id="harga_jual" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);">
-                            <label for="floatingInput">Harga Jual</label>
-                        </div>
-                    </div>
-                </div>
-            </td>`;
-        row3.innerHTML = `
         <td style="width: 15%;">
             <div class="row">
                 <div class="col-sm-12" style="padding:0px!important;">
@@ -815,7 +887,7 @@
             <div class="row">
                 <div class="col-sm-6" style="padding:0px!important;">
                     <div class="form-floating">
-                        <select class="form-select" name="satuan2_id[]" id="satuan2_id_${counter}" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)">
+                        <select class="form-select" name="satuan2_id[]" id="satuan2_id_${counter}" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="changeSpanText(${counter})">
                             <option value=""></option>
                             <?php foreach ($satuanBarang as $sb) : ?>
                                 <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -838,7 +910,7 @@
             <div class="row">
                 <div class="col-sm-6" style="padding:0px!important;">
                     <div class="form-floating">
-                        <select class="form-select" name="satuan3_id[]" id="satuan3_id_${counter}" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)">
+                        <select class="form-select" name="satuan3_id[]" id="satuan3_id_${counter}" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="changeSpanText(${counter})">
                             <option value=""></option>
                             <?php foreach ($satuanBarang as $sb) : ?>
                                 <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
@@ -909,10 +981,9 @@
             }
 
             // If no checkbox is checked, remove the last two rows
-            if (!isChecked && rowCount > 3) {
+            if (!isChecked && rowCount > 2) {
                 table.deleteRow(rowCount - 1);
                 table.deleteRow(rowCount - 2);
-                table.deleteRow(rowCount - 3);
                 rowCount -= 3;
             } else {
                 Swal.fire({
@@ -924,7 +995,7 @@
             // Reset counter based on the remaining rows
             // counter = rowCount > 1 ? currentCount : 2;
             // Get the last row in the table
-            var lastRow = table.rows[rowCount - 3];
+            var lastRow = table.rows[rowCount - 2];
 
             // Update the value of the span with the updated counter value
             var currentCount = parseInt(lastRow.querySelector('#nomber').innerText);

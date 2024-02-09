@@ -93,6 +93,16 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-12" style="font-size: 12px;">
+                            Note : <br>
+                            <ul>
+                                <li style="height: 15px;">Satuan 1 adalah Satuan terkecil dari produk. Cth: PCS</li>
+                                <li style="height: 15px;">Satuan 2 adalah Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)</li>
+                                <li style="height: 15px;">Satuan 3 adalah Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
@@ -281,7 +291,7 @@
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
-            $('#generate_new_code').prop('checked', false).show();
+            $('#generate_new_code').prop('checked', true).change().show();
             $('.add-modal').modal('show');
             $('#tbody2').empty();
             var table = document.getElementById('tbody2');
