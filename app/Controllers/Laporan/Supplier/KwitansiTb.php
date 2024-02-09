@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Supplier;
+namespace App\Controllers\Laporan\Supplier;
 
 use App\Controllers\BaseController;
 use App\Models\CompaniesModel;
@@ -49,8 +49,9 @@ class KwitansiTb extends BaseController
                 ];
             }
         }
+        dd($res);
 
-        return view('SalesLokal/KwitansiTb/index', [
+        return view('Laporan/SupplierLokalBB/KwitansiTb/index', [
             'year' => $year,
             'month' => $month,
             'data' => $res
@@ -82,7 +83,7 @@ class KwitansiTb extends BaseController
             'provinsi' => $provinsiModel->where('id', $company['province_id'])->first()
         ];
 
-        $dompdf->loadHtml(view('SalesLokal/KwitansiTb/print', $data));
+        $dompdf->loadHtml(view('Laporan/SupplierLokalBB/KwitansiTb/print', $data));
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Cetak Kwitansi TB ", array("Attachment" => false));

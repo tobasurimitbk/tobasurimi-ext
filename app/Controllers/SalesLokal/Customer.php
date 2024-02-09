@@ -37,7 +37,7 @@ class Customer extends BaseController
             "dataBanks" => $dataBanks,
         ];
 
-        return view('SalesLokal/customer/index', $data);
+        return view('SalesLokal/Customer/index', $data);
     }
 
     public function all()
@@ -60,7 +60,8 @@ class Customer extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType")
+            "sortType"      => $this->request->getGet("sortType"),
+            'company_id' => ''
         ];
 
         $limit = $this->request->getGet("length");
