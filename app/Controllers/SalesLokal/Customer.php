@@ -37,7 +37,7 @@ class Customer extends BaseController
             "dataBanks" => $dataBanks,
         ];
 
-        return view('SalesLokal/customer/index', $data);
+        return view('SalesLokal/Customer/index', $data);
     }
 
     public function all()

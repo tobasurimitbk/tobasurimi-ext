@@ -30,7 +30,7 @@ class Customer extends BaseController
             "dataCountry" => $dataCountry
         ];
 
-        return view('SalesInternasional/customer/index', $data);
+        return view('SalesInternasional/Customer/index', $data);
     }
 
     public function all()
