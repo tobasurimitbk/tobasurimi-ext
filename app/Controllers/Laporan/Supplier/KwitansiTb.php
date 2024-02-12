@@ -75,10 +75,15 @@ class KwitansiTb extends BaseController
         $condition = [
             "suppliers.type"        => "BAHAN BAKU",
         ];
+
+        $month = $this->request->getVar('month');
+        $year = $this->request->getVar('year');
+
         $addCondition = [
-            "search"    => $this->request->getGet("search"),
+            "search"    => $this->request->getGet("supplier_search"),
             "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType")
+            "sortType"  => $this->request->getGet("sortType"),
+            "tb_search" => $this->request->getGet("tb_search")
         ];
 
         $limit = $this->request->getGet("length");
@@ -89,16 +94,61 @@ class KwitansiTb extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($supplierData['data'] as $data) {
-            array_push($dataSupplier, [
-                "no"            => $no++,
-                "id"            => encrypt($data->id),
-                "name"          => $data->name,
-                "total"         => "",
-                "no_kwitansi"   => "",
-                "tanggal"       => "",
-                "is_print"      => ""
-            ]);
+        $noKwitansi = '';
+        foreach ($supplierData['data'] as $i => $data) {
+            // GET KWITANSI TB
+            $kwitansiTB = $this->supplierModel->getKwitansiTBBySupplier(
+                $data->id,
+                $this->request->getVar('year'),
+                $this->request->getVar('month')
+            );
+
+            if ($kwitansiTB['total'] != 0) {
+                if ($i == 0) {
+                    $noKwitansi = "001/KTB/$month/$year";
+                } else {
+                    $noKwitansi = generateNoKwitansiTB($noKwitansi, $month, $year);
+                }
+            }
+
+            if ($addCondition['tb_search'] == "1") {
+                if ($kwitansiTB['total'] != 0) {
+                    array_push($dataSupplier, [
+                        "no"            => $no++,
+                        "id"            => encrypt($data->id),
+                        "name"          => $data->name,
+                        "no_kwitansi_hash" => encrypt($noKwitansi),
+                        "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total']),
+                        "no_kwitansi"   => $kwitansiTB['total'] == 0 ? '-' : $noKwitansi,
+                        "tanggal"       => $kwitansiTB['total'] == 0 ? '-' : $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
+                        "is_print"      => $kwitansiTB['total'] == 0 ? '0' : '1',
+                    ]);
+                }
+            } elseif ($addCondition['tb_search'] == "0") {
+                if ($kwitansiTB['total'] == 0) {
+                    array_push($dataSupplier, [
+                        "no"            => $no++,
+                        "id"            => encrypt($data->id),
+                        "name"          => $data->name,
+                        "no_kwitansi_hash" => encrypt($noKwitansi),
+                        "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total']),
+                        "no_kwitansi"   => $kwitansiTB['total'] == 0 ? '-' : $noKwitansi,
+                        "tanggal"       => $kwitansiTB['total'] == 0 ? '-' : $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
+                        "is_print"      => $kwitansiTB['total'] == 0 ? '0' : '1',
+                    ]);
+                }
+            } else {
+                array_push($dataSupplier, [
+                    "no"            => $no++,
+                    "id"            => encrypt($data->id),
+                    "name"          => $data->name,
+                    "no_kwitansi_hash" => encrypt($noKwitansi),
+                    "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total']),
+                    "no_kwitansi"   => $kwitansiTB['total'] == 0 ? '-' : $noKwitansi,
+                    "tanggal"       => $kwitansiTB['total'] == 0 ? '-' : $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
+                    "is_print"      => $kwitansiTB['total'] == 0 ? '0' : '1',
+                ]);
+            }
         }
 
         $data = [
@@ -120,12 +170,23 @@ class KwitansiTb extends BaseController
         $supplierModel = new SupplierModel();
         $provinsiModel = new ProvincesModel();
 
+        $supplierID = decrypt($supplierID);
+        $noKwitansi = decrypt($noKwitansi);
+
         $yearMonthSplit = explode('-', $yearMonth);
         $year = $yearMonthSplit[0];
         $month = $yearMonthSplit[1];
         $noKwitansi = \str_replace('-', '/', $noKwitansi);
 
-        $kwitansiTB = $supplierModel->getKwitansiTB($supplierID, $year, $month);
+        $kwitansiTB = $supplierModel->getKwitansiTBBySupplier(
+            $supplierID,
+            $year,
+            $month
+        );
+
+
+        // dd($kwitansiTB);
+
         $company = $companyModel->where('id', $this->this_company_id)->where('deletedAt', null)->first();
 
         $data = [
@@ -134,7 +195,7 @@ class KwitansiTb extends BaseController
             'tanggal' => $tanggal,
             'noKwitansi' => $noKwitansi,
             'company' => $company,
-            'kwitansi' => $kwitansiTB,
+            'kwitansis' => $kwitansiTB,
             'provinsi' => $provinsiModel->where('id', $company['province_id'])->first()
         ];
 
