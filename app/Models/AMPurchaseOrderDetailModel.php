@@ -72,6 +72,7 @@ class AMPurchaseOrderDetailModel extends Model
             am_purchase_order_details.price AS price,
             am_purchase_order_details.additional_cost AS additional_cost,
             barang_master.barang_name as nama_barang, 
+            barang_master_spesifikasi.spesifikasi,
             am_purchase_order_details.note AS spp_note,
             barang_master.kode_barang,
             taxppn.tax_value as ppnValue, 
@@ -82,6 +83,7 @@ class AMPurchaseOrderDetailModel extends Model
 
         $builder = $this->db->table('am_purchase_order_details')
             ->select($selectQry)
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')

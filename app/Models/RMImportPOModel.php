@@ -136,7 +136,7 @@ class RMImportPOModel extends Model
             ->join('users', 'users.id = rm_import_pos.createdBy', 'left')
             ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
             ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
-            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id', 'lefy')
+            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id', 'left')
             ->find($id);
 
         return $sppData;

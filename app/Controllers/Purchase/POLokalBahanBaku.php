@@ -292,30 +292,76 @@ class POLokalBahanBaku extends BaseController
             "createdBy" => session()->get("login")->user_id,
         ]);
 
-        $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->delete();
-
         $this->sppModel->update($this->request->getVar('spp_id'), [
             'request_status' => 'finished'
         ]);
 
+        // get all id detail
+        $id_detail_all = [];
+
         foreach (json_decode($this->request->getVar("items")) as $r) {
-            $this->RMPurchaseOrderDetailModel->insert([
-                'rm_purchase_order_id' => $id,
-                'supplier_harga_id' => $r->supplier_harga_id,
-                'barang1_id' =>  $this->request->getVar("barang_id"),
-                'barang2_id' => $r->spesifikasi_id,
-                'satuan_id' => $r->satuan_id,
-                'peti' => $r->peti,
-                'quality' => $r->quality,
-                'note' => $r->keterangan,
-                'qty' => $r->qty,
-                'qty_diterima' => 0,
-                'remeaining_qty' => $r->qty,
-                'general_price' => $r->harga,
-                'daily_price' => $r->daily_price,
-                'monthly_price' => $r->monthly_price
-            ]);
+            $check = $this->RMPurchaseOrderDetailModel
+                ->where('rm_purchase_order_id', $id)
+                ->where('supplier_harga_id', $r->supplier_harga_id)
+                ->where('barang2_id', $r->spesifikasi_id)
+                ->where('barang1_id', $this->request->getVar('barang_id'))
+                ->first();
+
+            if ($check != null) {
+                // UPDATE
+                $this->RMPurchaseOrderDetailModel->update($check['id'], [
+                    'rm_purchase_order_id' => $id,
+                    'supplier_harga_id' => $r->supplier_harga_id,
+                    'barang1_id' =>  $this->request->getVar("barang_id"),
+                    'barang2_id' => $r->spesifikasi_id,
+                    'satuan_id' => $r->satuan_id,
+                    'peti' => $r->peti,
+                    'quality' => $r->quality,
+                    'note' => $r->keterangan,
+                    'qty' => $r->qty,
+                    'qty_diterima' => 0,
+                    'remeaining_qty' => $r->qty,
+                    'general_price' => $r->harga,
+                    'daily_price' => $r->daily_price,
+                    'monthly_price' => $r->monthly_price
+                ]);
+                array_push($id_detail_all, $check['id']);
+            } else {
+                // NEW BARANG
+                // DELETE
+                $this->RMPurchaseOrderDetailModel
+                    ->where('rm_purchase_order_id', $id)
+                    ->where('supplier_harga_id', $r->supplier_harga_id)
+                    ->where('barang2_id', $r->spesifikasi_id)
+                    ->where('barang1_id', $this->request->getVar('barang_id'))
+                    ->delete();
+
+                // INSERT NEW
+                $id_detail_new = $this->RMPurchaseOrderDetailModel->insert([
+                    'rm_purchase_order_id' => $id,
+                    'supplier_harga_id' => $r->supplier_harga_id,
+                    'barang1_id' =>  $this->request->getVar("barang_id"),
+                    'barang2_id' => $r->spesifikasi_id,
+                    'satuan_id' => $r->satuan_id,
+                    'peti' => $r->peti,
+                    'quality' => $r->quality,
+                    'note' => $r->keterangan,
+                    'qty' => $r->qty,
+                    'qty_diterima' => 0,
+                    'remeaining_qty' => $r->qty,
+                    'general_price' => $r->harga,
+                    'daily_price' => $r->daily_price,
+                    'monthly_price' => $r->monthly_price
+                ]);
+
+                array_push($id_detail_all, $id_detail_new);
+            }
         }
+
+        $this->RMPurchaseOrderDetailModel
+            ->where('rm_purchase_order_id', $id)
+            ->whereNotIn('id', $id_detail_all)
+            ->delete();
 
         return response()->setJSON([
             'message' => "PO Lokal Bahan Baku Berhasil Diupdate",

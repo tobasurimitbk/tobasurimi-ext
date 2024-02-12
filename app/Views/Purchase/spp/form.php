@@ -25,7 +25,7 @@
                         </button>
                     <?php endif; ?>
                 <?php else : ?>
-                    <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
+                    <?php if (can('Pembelian', 'SPP', 'ua') && $dataSPP->request_status != "finished") : ?>
                         <button onclick="updateStatusPosting('0')" class="btn btn-success un-posting-spp float-right posting-spp">
                             Un Posting
                         </button>
@@ -856,7 +856,7 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Hapus',
+            confirmButtonText: status == '0' ? 'Unposting' : 'Posting',
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {

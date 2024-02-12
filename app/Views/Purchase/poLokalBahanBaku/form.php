@@ -94,11 +94,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOLokal) ? $dataPOLokal->po_no : ""; ?>">
+                                    <input readonly autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOLokal) ? $dataPOLokal->po_no : ""; ?>">
                                     <label for="floatingInput">No. PO</label>
                                 </div>
                                 <div style="<?= !empty($dataPOLokal) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -410,7 +410,13 @@
         </script>
     <?php endif; ?>
 
-<?php endif ?>
+<?php else : ?>
+    <script>
+        $(document).ready(function() {
+            changeStatus();
+        });
+    </script>
+<?php endif; ?>
 
 
 
@@ -948,12 +954,12 @@
                 var status_posting = $(this).data('status_posting');
                 Swal.fire({
                     icon: 'question',
-                    title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+                    title: status_posting == "1" ? "Posting PO ?" : "Unposting PO ?",
                     confirmButtonColor: '#4e73df',
                     cancelButtonColor: '#d33',
                     showCancelButton: true,
                     reverseButtons: true,
-                    confirmButtonText: 'Posting',
+                    confirmButtonText: status_posting == '0' ? 'Unposting' : 'Posting',
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
