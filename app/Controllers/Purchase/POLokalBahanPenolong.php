@@ -386,7 +386,10 @@ class POLokalBahanPenolong extends BaseController
             }
         }
 
-        $this->aMPurchaseOrderDetailModel->whereNotIn('id', $id_detail_all)->delete();
+        $this->aMPurchaseOrderDetailModel
+            ->where('am_purchase_order_id', $id)
+            ->whereNotIn('id', $id_detail_all)
+            ->delete();
 
         return response()->setJSON([
             'message' => "PO Bahan penolong berhasil diubah",

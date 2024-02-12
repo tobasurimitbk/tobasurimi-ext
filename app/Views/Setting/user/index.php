@@ -299,7 +299,25 @@
                 return false;
             }
         });
+        $(".employee_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
+        $(".employee_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".employee_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
         $('.employee_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
@@ -320,25 +338,7 @@
 
         //CSS SELECT2 FLOATING LABEL
 
-        $(".employee_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
 
-        $(".employee_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".employee_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
         $(".company_id")
             .parent('div')

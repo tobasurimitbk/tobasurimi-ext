@@ -148,7 +148,7 @@ class EmployeesModel extends Model
     {
         $requete = "SELECT employees.*, divisis.divisi as divisionName FROM employees ";
         $requete .= "LEFT JOIN divisis ON (employees.division_id = divisis.id) ";
-        $requete .= "WHERE employees.deletedAt IS NULL";
+        $requete .= "WHERE employees.deletedAt IS NULL AND divisis.deletedAt IS NULL";
 
         if (isset($values["name"])) {
             $requete .= ($values["name"] == "") ? "" : " AND UPPER(employees.name) LIKE '%" . strtoupper($values["name"]) . "%'";
@@ -213,13 +213,15 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            //'users.id' => null,
+            'divisis.deletedAt' => null,
+            'bagian.deletedAt' => null,
             'employees.status' => "Aktif"
         ];
 
         $builder = $this->db->table('employees')
             ->select("employees.*, users.id as users_id, users.name as users_name, bagian.nama_bagian")
             ->join('users', 'users.employee_id = employees.id', 'left')
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
             ->join('bagian', 'employees.bagian_id = bagian.id', 'left');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
