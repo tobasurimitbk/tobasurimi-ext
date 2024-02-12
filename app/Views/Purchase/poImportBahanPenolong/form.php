@@ -1253,7 +1253,7 @@
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Simpan',
+                confirmButtonText: status == '0' ? 'Unposting' : 'Posting',
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {

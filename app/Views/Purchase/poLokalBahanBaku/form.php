@@ -954,12 +954,12 @@
                 var status_posting = $(this).data('status_posting');
                 Swal.fire({
                     icon: 'question',
-                    title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+                    title: status_posting == "1" ? "Posting PO ?" : "Unposting PO ?",
                     confirmButtonColor: '#4e73df',
                     cancelButtonColor: '#d33',
                     showCancelButton: true,
                     reverseButtons: true,
-                    confirmButtonText: 'Posting',
+                    confirmButtonText: status_posting == '0' ? 'Unposting' : 'Posting',
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
