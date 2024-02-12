@@ -116,8 +116,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
-                                <label for="floatingInput">Limit Piutang (Opsional)</label>
+                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <label for="floatingInput">Limit Piutang</label>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent-lokal">Simpan</button>
-                <?php if (can('Master Data', 'Customer', 'd')) : ?>
+                <?php if (can('Penjualan Lokal', 'Customer', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
                 <?php endif; ?>
             </div>
@@ -312,7 +312,7 @@
         $('.currency').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
+            allowClear: false,
             dropdownParent: $(".add-modal .modal-content")
         });
 
@@ -470,6 +470,9 @@
                 },
                 email: {
                     email: true
+                },
+                piutang: {
+                    required: true
                 }
             },
             messages: {
@@ -489,6 +492,9 @@
                 },
                 email: {
                     email: "Email Harus Valid"
+                },
+                piutang: {
+                    required: "Limit piutang wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -548,6 +554,12 @@
                 data: {
                     name: 'termin'
                 },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(result) {
                     $(".termin").empty()
@@ -566,6 +578,12 @@
                 data: {
                     name: 'Valuta'
                 },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(result) {
                     $(".currency").empty()
@@ -574,7 +592,7 @@
                         $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
                     })
 
-                    $(".currency").val("").change();
+                    $(".currency").attr("disabled", true).val("30").change();
                 }
             })
 
@@ -583,6 +601,12 @@
                 method: "GET",
                 data: {
                     name: 'tipe_pelanggan'
+                },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
                 },
                 dataType: "json",
                 success: function(result) {
@@ -613,6 +637,12 @@
                 url: "<?= base_url("customer-lokal/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     if (res.data) {
                         $(".id").val(id);
@@ -639,6 +669,12 @@
                             data: {
                                 name: 'termin'
                             },
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             dataType: "json",
                             success: function(result) {
                                 $(".termin").empty()
@@ -657,6 +693,12 @@
                             data: {
                                 name: 'Valuta'
                             },
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             dataType: "json",
                             success: function(result) {
                                 $(".currency").empty()
@@ -665,7 +707,7 @@
                                     $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
                                 })
 
-                                $(".currency").val(res?.data?.currency).change();
+                                $(".currency").attr('disabled', true).val(res?.data?.currency).change();
                             }
                         })
 
@@ -673,6 +715,12 @@
                         $.ajax({
                             url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
                             method: "GET",
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             dataType: "json",
                             success: function(result) {
                                 $(".city_parent_id").empty()
@@ -689,6 +737,12 @@
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,
                             method: "GET",
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             data: {
                                 name: 'tipe_pelanggan'
                             },
@@ -786,6 +840,7 @@
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form-lokal"));
+                        data.append("currency", "30");
                         let id = $(".id").val();
 
                         if (id) {
@@ -902,6 +957,12 @@
                 url: `<?= base_url("city"); ?>/${id}`,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     $(".city_parent_id").empty()
                     $(".city_parent_id").val("").change()

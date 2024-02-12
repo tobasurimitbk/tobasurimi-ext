@@ -116,8 +116,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
-                                <label for="floatingInput">Limit Piutang (Opsional)</label>
+                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <label for="floatingInput">Limit Piutang</label>
                             </div>
                         </div>
                     </div>
@@ -528,7 +528,7 @@
         $('.currency').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
+            allowClear: false,
             dropdownParent: $(".add-modal .modal-content")
         });
 
@@ -686,6 +686,9 @@
                 },
                 email: {
                     email: true
+                },
+                piutang: {
+                    required: true
                 }
             },
             messages: {
@@ -705,6 +708,9 @@
                 },
                 email: {
                     email: "Email Harus Valid"
+                },
+                piutang: {
+                    required: "Limit Piutang Wajib Diisi"
                 }
             },
             errorElement: 'span',
@@ -816,6 +822,12 @@
                 data: {
                     name: 'termin'
                 },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(result) {
                     $(".termin").empty()
@@ -834,6 +846,12 @@
                 data: {
                     name: 'Valuta'
                 },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(result) {
                     $(".currency").empty()
@@ -842,7 +860,7 @@
                         $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
                     })
 
-                    $(".currency").val("").change();
+                    $(".currency").attr("disabled", true).val("30").change();
                 }
             })
 
@@ -851,6 +869,12 @@
                 method: "GET",
                 data: {
                     name: 'tipe_pelanggan'
+                },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
                 },
                 dataType: "json",
                 success: function(result) {
@@ -881,6 +905,12 @@
                 url: "<?= base_url("customer/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     if (res.data) {
                         $(".internasional_id").val(id);
@@ -915,6 +945,12 @@
                 url: "<?= base_url("customer/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     if (res.data) {
                         $(".id").val(id);
@@ -938,6 +974,12 @@
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,
                             method: "GET",
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             data: {
                                 name: 'termin'
                             },
@@ -956,6 +998,12 @@
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,
                             method: "GET",
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             data: {
                                 name: 'Valuta'
                             },
@@ -967,7 +1015,7 @@
                                     $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
                                 })
 
-                                $(".currency").val(res?.data?.currency).change();
+                                $(".currency").attr('disabled', true).val(res?.data?.currency).change();
                             }
                         })
 
@@ -976,6 +1024,12 @@
                             url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
                             method: "GET",
                             dataType: "json",
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
                             success: function(result) {
                                 $(".city_parent_id").empty()
                                 $(".city_parent_id").val("").change()
@@ -993,6 +1047,12 @@
                             method: "GET",
                             data: {
                                 name: 'tipe_pelanggan'
+                            },
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
                             },
                             dataType: "json",
                             success: function(result) {
@@ -1144,6 +1204,7 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form-lokal"));
                         let id = $(".id").val();
+                        data.append("currency", "30");
 
                         if (id) {
                             <?php if (can('Master Data', 'Customer Global', 'u')) : ?>
@@ -1403,6 +1464,12 @@
             $.ajax({
                 url: `<?= base_url("city"); ?>/${id}`,
                 method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(res) {
                     $(".city_parent_id").empty()

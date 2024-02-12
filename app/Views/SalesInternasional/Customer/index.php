@@ -58,7 +58,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent-internasional">Simpan</button>
-                <?php if (can('Master Data', 'Customer', 'd')) : ?>
+                <?php if (can('Penjualan Ekspor', 'Customer', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-btn delete-form-internasional">Hapus</button>
                 <?php endif; ?>
             </div>
@@ -267,6 +267,12 @@
                 url: "<?= base_url("customer-ekspor/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     if (res.data) {
                         $(".internasional_id").val(id);
