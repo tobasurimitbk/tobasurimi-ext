@@ -168,6 +168,7 @@ class Barang extends BaseController
         $result = array();
         $type = $this->request->getVar('type');
         $spek = $this->request->getPost('spek');
+        $idSpek = $this->request->getPost('id_spek');
 
         $barangModel->update($id, [
             'company_id' => $this->this_company_id,
@@ -177,38 +178,60 @@ class Barang extends BaseController
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);
-        $check = $barangSpesifikasiModel->asObject()->where('barang_master_id', $id)->findAll();
-        if ($check) {
-            foreach ($check as $value) {
-                $barangSpesifikasiModel->delete($value->id);
+
+
+        if ($idSpek) {
+            foreach ($idSpek as $key => $value) {
+                if (isset($_POST['harga_pokok_old'][$key])) {
+                    $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok_old'][$key]));
+                } else {
+                    $harga_pokok = 0.0;
+                }
+                if (isset($_POST['harga_jual_old'][$key])) {
+                    $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual_old'][$key]));
+                } else {
+                    $harga_jual = 0.0;
+                }
+                $barangSpesifikasiModel->update($_POST['id_spek'][$key], [
+                    'spesifikasi' => $_POST['spek_old'][$key],
+                    'satuan_1' => ($_POST['satuan1_id_old'][$key]),
+                    'satuan_2' => ($_POST['satuan2_id_old'][$key]),
+                    'konversi_satuan_2' => $_POST['konversi_satuan_2_old'][$key],
+                    'satuan_3' => ($_POST['satuan3_id_old'][$key]),
+                    'konversi_satuan_3' => $_POST['konversi_satuan_3_old'][$key],
+                    'harga_pokok' => $harga_pokok,
+                    'harga_jual' => $harga_jual,
+                ]);
             }
         }
 
-        foreach ($spek as $key => $value) {
-            // var_dump($_POST['primer'][$key]);
-            if (isset($_POST['harga_pokok'][$key])) {
-                $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key]));
-            } else {
-                $harga_pokok = 0.0;
+        if ($spek) {
+            foreach ($spek as $key => $value) {
+                // var_dump($_POST['primer'][$key]);
+                if (isset($_POST['harga_pokok'][$key])) {
+                    $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key]));
+                } else {
+                    $harga_pokok = 0.0;
+                }
+                if (isset($_POST['harga_jual'][$key])) {
+                    $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key]));
+                } else {
+                    $harga_jual = 0.0;
+                }
+                $result[] = array(
+                    'barang_master_id' => $id,
+                    'spesifikasi' => $_POST['spek'][$key],
+                    'satuan_1' => ($_POST['satuan1_id'][$key]),
+                    'satuan_2' => ($_POST['satuan2_id'][$key]),
+                    'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
+                    'satuan_3' => ($_POST['satuan3_id'][$key]),
+                    'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
+                    'harga_pokok' => $harga_pokok,
+                    'harga_jual' => $harga_jual,
+                );
             }
-            if (isset($_POST['harga_jual'][$key])) {
-                $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key]));
-            } else {
-                $harga_jual = 0.0;
-            }
-            $result[] = array(
-                'barang_master_id' => $id,
-                'spesifikasi' => $_POST['spek'][$key],
-                'satuan_1' => ($_POST['satuan1_id'][$key]),
-                'satuan_2' => ($_POST['satuan2_id'][$key]),
-                'konversi_satuan_2' => $_POST['konversi_satuan_2'][$key],
-                'satuan_3' => ($_POST['satuan3_id'][$key]),
-                'konversi_satuan_3' => $_POST['konversi_satuan_3'][$key],
-                'harga_pokok' => $harga_pokok,
-                'harga_jual' => $harga_jual,
-            );
+            $barangSpesifikasiModel->insertBatch($result);
         }
-        $barangSpesifikasiModel->insertBatch($result);
 
         return response()->setJSON([
             'status' => true,
