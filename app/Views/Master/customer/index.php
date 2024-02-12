@@ -142,7 +142,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent-lokal">Simpan</button>
-                <?php if (can('Master Data', 'Customer', 'd')) : ?>
+                <?php if (can('Master Data', 'Customer Global', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
                 <?php endif; ?>
             </div>
@@ -206,7 +206,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent-internasional">Simpan</button>
-                <?php if (can('Master Data', 'Customer', 'd')) : ?>
+                <?php if (can('Master Data', 'Customer Global', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-btn delete-form-internasional">Hapus</button>
                 <?php endif; ?>
             </div>
@@ -234,7 +234,7 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="lokal" role="tabpanel" aria-labelledby="lokal-tab">
                     <div class="collapse-lokal-list show" id="collapseLokalList">
-                        <?php if (can('Master Data', 'Customer', 'c')) : ?>
+                        <?php if (can('Master Data', 'Customer Global', 'c')) : ?>
                             <button class="btn btn-show-form btn-add mb-1 float-right btn-show-form-lokal" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
@@ -277,7 +277,7 @@
 
                 <div class="tab-pane fade" id="internasional" role="tabpanel" aria-labelledby="lokal-tab">
                     <div class="collapse-internasional-list show" id="collapseInternasionalList">
-                        <?php if (can('Master Data', 'Customer', 'c')) : ?>
+                        <?php if (can('Master Data', 'Customer Global', 'c')) : ?>
                             <button class="btn btn-show-form btn-add float-right mb-1 btn-show-form-internasional" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
@@ -1146,7 +1146,7 @@
                         let id = $(".id").val();
 
                         if (id) {
-                            <?php if (can('Master Data', 'Customer', 'u')) : ?>
+                            <?php if (can('Master Data', 'Customer Global', 'u')) : ?>
                                 $.ajax({
                                     url: "<?= base_url("customer/update"); ?>",
                                     data: data,
@@ -1290,7 +1290,7 @@
                     let id = $(".internasional_id").val();
 
                     if (id) {
-                        <?php if (can('Master Data', 'Customer', 'u')) : ?>
+                        <?php if (can('Master Data', 'Customer Global', 'u')) : ?>
                             $.ajax({
                                 url: "<?= base_url("customer/update"); ?>",
                                 data: data,
