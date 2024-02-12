@@ -25,7 +25,7 @@
                         </button>
                     <?php endif; ?>
                 <?php else : ?>
-                    <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
+                    <?php if (can('Pembelian', 'SPP', 'ua') && $dataSPP->request_status != "finished") : ?>
                         <button onclick="updateStatusPosting('0')" class="btn btn-success un-posting-spp float-right posting-spp">
                             Un Posting
                         </button>

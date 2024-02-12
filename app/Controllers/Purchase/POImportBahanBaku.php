@@ -285,32 +285,69 @@ class POImportBahanBaku extends BaseController
             'attn' => $this->request->getVar('attn'),
         ]);
 
-        // Delete First
-        $this->rmImportPODetailModel->where('rm_import_po_id', $id)->delete();
-        // Insert Again
+        // get all id detail
+        $id_detail_all = [];
+
         $barang = json_decode($this->request->getVar("listBarang"));
 
         foreach ($barang as $b) {
+            $check = $this->rmImportPODetailModel
+                ->where('rm_import_po_details.rm_import_po_id', $id)
+                ->where('spesifikasi_id', $b->spesifikasi_id)
+                ->where('barang_id', $b->barang_id)
+                ->first();
 
-            $this->rmImportPODetailModel->insert([
-                'rm_import_po_id' => $id,
-                'barang_id' => $b->barang_id,
-                'spesifikasi_id' => $b->spesifikasi_id,
-                'unit' => $b->satuan_id,
-                'qty' => $b->qty,
-                'price' => $b->harga_satuan,
-                'disc' => $b->diskon,
-                'additional_cost' => $b->biaya_tambahan,
-                'remaining_qty' => $b->qty,
-                'note' => $b->keterangan,
-                'total' => repairDouble($b->total),
-            ]);
+            if ($check != null) {
+                // UPDATE
+                $this->rmImportPODetailModel->update($check['id'], [
+                    'rm_import_po_id' => $id,
+                    'barang_id' => $b->barang_id,
+                    'spesifikasi_id' => $b->spesifikasi_id,
+                    'unit' => $b->satuan_id,
+                    'qty' => $b->qty,
+                    'price' => $b->harga_satuan,
+                    'disc' => $b->diskon,
+                    'additional_cost' => $b->biaya_tambahan,
+                    'remaining_qty' => $b->qty,
+                    'note' => trim($b->keterangan),
+                    'total' => repairDouble($b->total),
+                ]);
+                array_push($id_detail_all, $check['id']);
+            } else {
+                // NEW BARANG
+                // DELETE
+                $this->rmImportPODetailModel
+                    ->where('rm_import_po_details.rm_import_po_id', $id)
+                    ->where('spesifikasi_id', $b->spesifikasi_id)
+                    ->where('barang_id', $b->barang_id)
+                    ->delete();
+
+                // INSERT NEW
+                $id_detail_new = $this->rmImportPODetailModel->insert([
+                    'rm_import_po_id' => $id,
+                    'barang_id' => $b->barang_id,
+                    'spesifikasi_id' => $b->spesifikasi_id,
+                    'unit' => $b->satuan_id,
+                    'qty' => $b->qty,
+                    'price' => $b->harga_satuan,
+                    'disc' => $b->diskon,
+                    'additional_cost' => $b->biaya_tambahan,
+                    'remaining_qty' => $b->qty,
+                    'note' => trim($b->keterangan),
+                    'total' => repairDouble($b->total),
+                ]);
+                array_push($id_detail_all, $id_detail_new);
+            }
         }
 
         $this->sppModel->update($sppID, [
             'request_status' => 'finished'
         ]);
 
+        $this->rmImportPODetailModel
+            ->where('rm_import_po_id', $id)
+            ->whereNotIn('id', $id_detail_all)
+            ->delete();
 
         return response()->setJSON([
             "status" => true,

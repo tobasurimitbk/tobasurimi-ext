@@ -288,31 +288,68 @@ class POImportBahanPenolong extends BaseController
             'attn' => $this->request->getVar('attn'),
         ]);
 
-        // Delete First
-        $this->amPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
         // Insert Again
         $barang = json_decode($this->request->getVar("listBarang"));
+        // get all id detail
+        $id_detail_all = [];
 
         foreach ($barang as $b) {
+            // UPDATE
+            $check = $this->amPurchaseOrderDetailModel
+                ->where('am_purchase_order_details.am_purchase_order_id', $id)
+                ->where('spesifikasi_id', $b->spesifikasi_id)
+                ->where('barang_id', $b->barang_id)
+                ->first();
 
-            $this->amPurchaseOrderDetailModel->insert([
-                'am_purchase_order_id' => $id,
-                'barang_id' => $b->barang_id,
-                'spesifikasi_id' => $b->spesifikasi_id,
-                'unit' => $b->satuan_id,
-                'qty' => $b->qty,
-                'price' => $b->harga_satuan,
-                'disc' => $b->diskon,
-                'additional_cost' => $b->biaya_tambahan,
-                'remaining_qty' => $b->qty,
-                'total' => repairDouble($b->total),
-            ]);
+            if ($check != null) {
+                // UPDATE
+                $this->amPurchaseOrderDetailModel->update($check['id'], [
+                    'am_purchase_order_id' => $id,
+                    'barang_id' => $b->barang_id,
+                    'spesifikasi_id' => $b->spesifikasi_id,
+                    'unit' => $b->satuan_id,
+                    'qty' => $b->qty,
+                    'price' => $b->harga_satuan,
+                    'disc' => $b->diskon,
+                    'additional_cost' => $b->biaya_tambahan,
+                    'remaining_qty' => $b->qty,
+                    'total' => repairDouble($b->total),
+                ]);
+                array_push($id_detail_all, $check['id']);
+            } else {
+                // NEW BARANG
+                // DELETE
+                $this->amPurchaseOrderDetailModel
+                    ->where('am_purchase_order_details.am_purchase_order_id', $id)
+                    ->where('spesifikasi_id', $b->spesifikasi_id)
+                    ->where('barang_id', $b->barang_id)
+                    ->delete();
+
+                // INSERT NEW
+                $id_detail_new = $this->amPurchaseOrderDetailModel->insert([
+                    'am_purchase_order_id' => $id,
+                    'barang_id' => $b->barang_id,
+                    'spesifikasi_id' => $b->spesifikasi_id,
+                    'unit' => $b->satuan_id,
+                    'qty' => $b->qty,
+                    'price' => $b->harga_satuan,
+                    'disc' => $b->diskon,
+                    'additional_cost' => $b->biaya_tambahan,
+                    'remaining_qty' => $b->qty,
+                    'total' => repairDouble($b->total),
+                ]);
+                array_push($id_detail_all, $id_detail_new);
+            }
         }
 
         $this->sppModel->update($sppID, [
             'request_status' => 'finished'
         ]);
 
+        $this->amPurchaseOrderDetailModel
+            ->where('am_purchase_order_id', $id)
+            ->whereNotIn('id', $id_detail_all)
+            ->delete();
 
         return response()->setJSON([
             "status" => true,

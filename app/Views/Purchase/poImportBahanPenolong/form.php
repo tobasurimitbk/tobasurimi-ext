@@ -12,7 +12,7 @@
 
             <?php if (!empty($dataPOImport)) { ?>
 
-                <?php if ($dataPOImport->is_posted === "0") { ?>
+                <?php if ($dataPOImport->is_posted == "0") { ?>
                     <?php if (can("Pembelian", "PO Import BP", 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right">
                             Hapus
@@ -26,7 +26,7 @@
                     </button>
                 <?php endif; ?>
 
-                <?php if ($dataPOImport->is_posted === "0") { ?>
+                <?php if ($dataPOImport->is_posted == "0") { ?>
                     <?php if (can('Pembelian', 'PO Import BP', 'a')) : ?>
                         <button data-status="1" class="btn btn-success posting-spp float-right posting-po">
                             Posting
@@ -34,8 +34,8 @@
                     <?php endif; ?>
                 <?php } ?>
 
-                <?php if ($dataPOImport->is_posted === "1") {
-                    if ($dataPOImport->status_penerimaan === "0") { ?>
+                <?php if ($dataPOImport->is_posted == "1") {
+                    if ($dataPOImport->status_penerimaan == "0") { ?>
                         <?php if (can('Pembelian', 'PO Import BP', 'a')) : ?>
                             <button class="btn btn-hapus close-parent float-right">
                                 Close PO
@@ -43,7 +43,7 @@
                         <?php endif; ?>
                 <?php }
                 } ?>
-                <?php if (can('Pembelian', 'PO Import BP', 'ua') && $dataPOImport->status_penerimaan != "1" && $dataPOImport->is_posted === "1") : ?>
+                <?php if (can('Pembelian', 'PO Import BP', 'ua') && $dataPOImport->status_penerimaan != "1" && $dataPOImport->is_posted == "1") : ?>
                     <button data-status="0" class="btn btn-success posting-spp float-right posting-po">
                         Un Posting
                     </button>
@@ -51,7 +51,7 @@
             <?php } ?>
 
             <?php if (!empty($dataPOImport)) {
-                if ($dataPOImport->is_posted === "0") { ?>
+                if ($dataPOImport->is_posted == "0") { ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
@@ -78,7 +78,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? ($dataPOImport->po_date ? date("d/m/Y", strtotime($dataPOImport->po_date)) : "")  : $today; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? ($dataPOImport->po_date ? date("d/m/Y", strtotime($dataPOImport->po_date)) : "")  : $today; ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -95,14 +95,14 @@
                                     <label for="floatingInput">No. PO</label>
                                 </div>
                                 <div style="<?= !empty($dataPOImport) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select division_id" id="division_id" name="division_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select division_id" id="division_id" name="division_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= !empty($dataPOImport) ? ($dataPOImport->division_id == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -117,7 +117,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataListSPP)) : ?>
                                     <?php foreach ($dataListSPP as $d) : ?>
@@ -131,10 +131,10 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataSupplier as $supplier) : ?>
-                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= strtoupper($supplier["name"]); ?></option>
+                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id == $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= strtoupper($supplier["name"]); ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Supplier</label>
@@ -144,7 +144,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran" value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "")  : ""; ?>">
+                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran" value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "")  : ""; ?>">
                                     <label for="floatingInput">Tanggal Pembayaran</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -157,10 +157,10 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataValuta as $valuta) : ?>
-                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) === formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) == formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Valas</label>
@@ -168,13 +168,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
                             <label for="floatingInput">Termin (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" value="<?= !empty($dataPOImport) ? $dataPOImport->potongan_harga : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" placeholder="Termin (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="number" value="<?= !empty($dataPOImport) ? $dataPOImport->potongan_harga : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" placeholder="Termin (Opsional)">
                             <label for="floatingInput">Potongan Harga</label>
                         </div>
                     </div>
@@ -187,19 +187,19 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->shipper : ""; ?>" type="text" class="form-control shipper" id="shipper" name="shipper" placeholder="Shipper (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->shipper : ""; ?>" type="text" class="form-control shipper" id="shipper" name="shipper" placeholder="Shipper (Opsional)">
                             <label for="floatingInput">Shipper (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->consigne : ""; ?>" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->consigne : ""; ?>" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne (Opsional)">
                             <label for="floatingInput">Consigne (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->port_origin : ""; ?>" type="text" class="form-control port_origin" id="port_origin" name="port_origin" placeholder="Port Of Origin">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->port_origin : ""; ?>" type="text" class="form-control port_origin" id="port_origin" name="port_origin" placeholder="Port Of Origin">
                             <label for="floatingInput">Port Of Origin</label>
                         </div>
                     </div>
@@ -207,22 +207,22 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->port_destination : ""; ?>" type="text" class="form-control port_destination" id="port_destination" name="port_destination" placeholder="Port Of Destination">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->port_destination : ""; ?>" type="text" class="form-control port_destination" id="port_destination" name="port_destination" placeholder="Port Of Destination">
                             <label for="floatingInput">Port Of Destination</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->location_transaction : ""; ?>" type="text" class="form-control location_transaction" id="location_transaction" name="location_transaction" placeholder="Lokasi Transaksi (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->location_transaction : ""; ?>" type="text" class="form-control location_transaction" id="location_transaction" name="location_transaction" placeholder="Lokasi Transaksi (Opsional)">
                             <label for="floatingInput">Lokasi Transaksi (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select shipment" id="shipment" name="shipment" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select shipment" id="shipment" name="shipment" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataShipment as $shipment) : ?>
-                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->shipment ? formatter($dataPOImport->shipment, "STR_TO_INT") : 0) === formatter($shipment["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $shipment["id"]; ?>"><?= $shipment["value"]; ?></option>
+                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->shipment ? formatter($dataPOImport->shipment, "STR_TO_INT") : 0) == formatter($shipment["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $shipment["id"]; ?>"><?= $shipment["value"]; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Shipment</label>
@@ -234,7 +234,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker latest_shipment_date" id="latest_shipment_date" name="latest_shipment_date" placeholder="Latest Shipment" value="<?= !empty($dataPOImport) ? ($dataPOImport->latest_shipment_date ? date("d/m/Y", strtotime($dataPOImport->latest_shipment_date)) : "")  : ""; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker latest_shipment_date" id="latest_shipment_date" name="latest_shipment_date" placeholder="Latest Shipment" value="<?= !empty($dataPOImport) ? ($dataPOImport->latest_shipment_date ? date("d/m/Y", strtotime($dataPOImport->latest_shipment_date)) : "")  : ""; ?>">
                                     <label for="floatingInput">Latest Shipment Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -245,13 +245,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->attn : ""; ?>" type="text" class="form-control attn" id="attn" name="attn" placeholder="ATTN">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->attn : ""; ?>" type="text" class="form-control attn" id="attn" name="attn" placeholder="ATTN">
                             <label for="floatingInput">ATTN</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
@@ -406,6 +406,14 @@
         </div>
     </div>
 </div>
+
+<?php if (empty($dataPOImport)) : ?>
+    <script>
+        $(document).ready(function() {
+            changeStatus();
+        });
+    </script>
+<?php endif; ?>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -888,7 +896,7 @@
                     // UPDATE
                     var indexToRemove = -1;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].spesifikasi_id === barang_update_id) {
+                        if (listBarang[i].spesifikasi_id == barang_update_id) {
                             indexToRemove = i;
                             break;
                         }
@@ -904,7 +912,7 @@
                     // TAMBAH
                     var isAdd = false;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].barang_id === barang_id && listBarang[i].spesifikasi_id === spesifikasi_id) {
+                        if (listBarang[i].barang_id == barang_id && listBarang[i].spesifikasi_id == spesifikasi_id) {
                             indexToRemove = i;
                             isAdd = true;
                             break;
@@ -1022,7 +1030,7 @@
     function deleteRow(id) {
         var indexToRemove = -1;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].barang_id === id) {
+            if (listBarang[i].barang_id == id) {
                 indexToRemove = i;
                 break;
             }
@@ -1038,7 +1046,7 @@
     function detailRow(id) {
         var item = null;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].spesifikasi_id === id) {
+            if (listBarang[i].spesifikasi_id == id) {
                 item = listBarang[i];
                 break;
             }
@@ -1074,7 +1082,7 @@
     }
 
     function formatRupiah(angka) {
-        if (angka === null) {
+        if (angka == null) {
             angka = 0;
         }
 
@@ -1174,7 +1182,7 @@
                 barang_id: "<?= $d['barang_id'] ?>",
                 spesifikasi_id: "<?= $d['spesifikasi_id'] ?>",
                 kode_barang: "<?= $d['kode_barang'] ?>",
-                nama_barang: <?= json_encode($d['nama_barang']) ?>,
+                nama_barang: <?= json_encode($d['nama_barang'] . " " . $d['spesifikasi']) ?>,
                 satuan_id: <?= $d['unit'] ?>,
                 nama_satuan: "<?= $d['nama_satuan'] ?>",
                 qty: <?= $d['qty'] ?>,
@@ -1209,6 +1217,10 @@
                         dataType: "json",
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,
@@ -1257,6 +1269,10 @@
                         dataType: "json",
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,
@@ -1310,6 +1326,10 @@
                         dataType: "json",
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,
