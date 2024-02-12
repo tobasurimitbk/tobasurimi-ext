@@ -319,8 +319,8 @@ class Barang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "Lokal", $this->this_company_id);
-            $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "Import", $this->this_company_id);
+            $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Lokal", $this->this_company_id);
+            $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Import", $this->this_company_id);
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
