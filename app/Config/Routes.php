@@ -1162,6 +1162,7 @@ $routes->get('/laporan-accounting/neracasaldo/printExcel/(:segment)/(:segment)',
 // Supplier Lokal BB
 $routes->get('/laporan-supplier-lokal-bb', 'Laporan\Supplier\LaporanSupplierLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\KwitansiTB::index', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/all', 'Laporan\Supplier\KwitansiTB::all', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/print/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Supplier\KwitansiTb::exportPDFKwitansiTB/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 /*

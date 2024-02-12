@@ -86,11 +86,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($poDetail) ? ($poDetail['is_posted'] === "1" ? 'disabled=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" <?= !empty($poDetail) ?  ' value="' . $poDetail['po_no'] . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" <?= !empty($poDetail) ? ($poDetail['is_posted'] == "1" ? 'disabled=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" <?= !empty($poDetail) ?  ' value="' . $poDetail['po_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. PO</label>
                                 </div>
                                 <div <?= !empty($poDetail) ? 'style="display:none;"' : ''; ?> class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -333,6 +333,14 @@
     </div>
 </section>
 
+<?php if (empty($poDetail)) : ?>
+    <script>
+        $(document).ready(function() {
+            changeStatus();
+        });
+    </script>
+<?php endif; ?>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
@@ -381,7 +389,14 @@
         $.ajax({
             url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
             data: {
-                id: $('#barang_id').val()
+                id: $('#barang_id').find("option:selected").data("barang_id"),
+                spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id")
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
             },
             method: "GET",
             success: function(response) {
@@ -571,7 +586,7 @@
                 } else {
                     var indexToRemove = -1;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].spesifikasi_id === barang_update_id) {
+                        if (listBarang[i].spesifikasi_id == barang_update_id) {
                             indexToRemove = i;
                             break;
                         }
@@ -587,7 +602,7 @@
                 // TAMBAH
                 var isAdd = false;
                 for (var i = 0; i < listBarang.length; i++) {
-                    if (listBarang[i].barang_id === barang_id && listBarang[i].spesifikasi_id === spesifikasiID) {
+                    if (listBarang[i].barang_id == barang_id && listBarang[i].spesifikasi_id == spesifikasiID) {
                         indexToRemove = i;
                         isAdd = true;
                         break;
@@ -674,10 +689,10 @@
                                 dataType: "json",
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-
+                                    setLoading();
                                 },
                                 complete: function() {
-
+                                    stopLoading();
                                 },
                                 processData: false,
                                 contentType: false,
@@ -737,10 +752,10 @@
                                 dataType: "json",
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-
+                                    setLoading();
                                 },
                                 complete: function() {
-
+                                    stopLoading();
                                 },
                                 processData: false,
                                 contentType: false,
@@ -753,7 +768,7 @@
                                             reverseButtons: true,
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
-                                            window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
+                                            window.location.href = "<?= base_url('po-lokal-bahan-penolong/id/') ?>" + response.id
 
                                         })
                                     }
@@ -861,7 +876,7 @@
 
         var indexToRemove = -1;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].spesifikasi_id === id) {
+            if (listBarang[i].spesifikasi_id == id) {
                 indexToRemove = i;
                 break;
             }
@@ -877,7 +892,7 @@
     function detailRow(id) {
         var item = null;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].spesifikasi_id === id) {
+            if (listBarang[i].spesifikasi_id == id) {
                 item = listBarang[i];
                 break;
             }
@@ -909,7 +924,7 @@
     }
 
     function formatRupiah(angka) {
-        if (angka === null) {
+        if (angka == null) {
             angka = 0;
         }
 
@@ -931,12 +946,20 @@
                 divisi_id: $('.division_id').val(),
                 spp_type: "Lokal BP"
             },
-            // beforeSend: function() {
-            //     setLoading();
-            // },
-            // complete: function() {
-            //     stopLoading();
-            // },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
             method: "GET",
             success: function(response) {
                 var sppSelect = $("select[name='spp_id']");
@@ -970,12 +993,20 @@
                     spp_id: spp_id,
                 },
                 method: "GET",
-                // beforeSend: function() {
-                //     setLoading();
-                // },
-                // complete: function() {
-                //     stopLoading();
-                // },
+                beforeSend: function() {
+                    $.LoadingOverlay("show", {
+                        image: "",
+                        fontawesomeColor: "#222FCC",
+                        fontawesome: "fa fa-cog fa-spin"
+                    });
+                },
+                complete: function() {
+                    $.LoadingOverlay("hide", {
+                        image: "",
+                        fontawesomeColor: "#222FCC",
+                        fontawesome: "fa fa-cog fa-spin"
+                    });
+                },
                 success: function(response) {
                     $.each(response.data, function(i, v) {
                         listBarang.push({
@@ -1013,7 +1044,7 @@
         <?php foreach ($listBarang as $l) : ?>
             listBarang.push({
                 barang_id: "<?= $l['barang_id'] ?>",
-                spesifikasi_id: "<?= $l['spesifikasi_name'] ?>",
+                spesifikasi_id: "<?= $l['spesifikasi_id'] ?>",
                 kode_barang: "<?= $l['kode_barang'] ?>",
                 nama_barang: "<?= str_replace('"', '\"', $l['nama_barang']) . " " . $l['spesifikasi_name']  ?>",
                 satuan_id: "<?= $l['satuan_id'] ?>",
@@ -1053,6 +1084,10 @@
                         dataType: "json",
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,
@@ -1100,7 +1135,11 @@
                         method: "POST",
                         dataType: "json",
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading()
                         },
                         processData: false,
                         contentType: false,
@@ -1154,6 +1193,10 @@
                         dataType: "json",
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,

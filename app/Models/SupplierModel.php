@@ -283,6 +283,7 @@ class SupplierModel extends Model
         ];
     }
 
+
     public function getSupplierForJurnal($supplierID)
     {
         $select =   "suppliers.*";

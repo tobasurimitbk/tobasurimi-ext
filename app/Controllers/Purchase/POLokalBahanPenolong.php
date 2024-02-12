@@ -152,6 +152,7 @@ class POLokalBahanPenolong extends BaseController
         return response()->setJSON([
             'message' => "PO Bahan penolong berhasil ditambah",
             'status' => true,
+            'id' => encrypt($poID)
         ]);
     }
 
@@ -234,6 +235,7 @@ class POLokalBahanPenolong extends BaseController
 
         $selectQryPurchaseOrderDetail = "
             am_purchase_order_details.barang_id,
+            am_purchase_order_details.spesifikasi_id,
             am_purchase_order_details.additional_cost AS biaya_tambahan,
             am_purchase_order_details.disc AS diskon,
             am_purchase_order_details.price AS harga_satuan,
@@ -282,7 +284,6 @@ class POLokalBahanPenolong extends BaseController
         ];
 
         $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $poDetail['division_id'])->where('deletedAt', null)->findAll();
-
         return view('Purchase/poLokalBahanPenolong/form', $data);
     }
 
@@ -312,7 +313,7 @@ class POLokalBahanPenolong extends BaseController
             'po_type' => "Lokal",
             'purchase_request_id' => $this->request->getVar('spp_id'),
             'supplier_id' => $this->request->getVar('supplierID'),
-            'company_id' => $this->request->getVar('companyID'),
+            'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),
             'total' => $this->request->getVar('total'),
             'note' => $this->request->getVar('note'),
@@ -325,28 +326,67 @@ class POLokalBahanPenolong extends BaseController
             'request_status' => 'finished'
         ]);
 
-        // deleteAllDetail
-        $this->aMPurchaseOrderDetailModel->where('am_purchase_order_details.am_purchase_order_id', $id)->delete();
         // insert again
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
+        // get all id detail
+        $id_detail_all = [];
 
         foreach ($aMPurchaseOrderDetailData as $d) {
-            $this->aMPurchaseOrderDetailModel->insert([
-                'am_purchase_order_id' => $id,
-                'barang_id' => $d->barang_id,
-                'spesifikasi_id' => $d->spesifikasi_id,
-                'note' => $d->keterangan,
-                'unit' => $d->satuan_id,
-                'qty' => $d->qty,
-                'price' => $d->harga_satuan,
-                'disc' => $d->diskon,
-                'additional_cost' => $d->biaya_tambahan,
-                'ppn' => $d->ppn,
-                'pph' => $d->pph,
-                'total' => repairDouble($d->total),
-                'remaining_qty' => $d->qty
-            ]);
+            // UPDATE
+            $check = $this->aMPurchaseOrderDetailModel
+                ->where('am_purchase_order_details.am_purchase_order_id', $id)
+                ->where('spesifikasi_id', $d->spesifikasi_id)
+                ->where('barang_id', $d->barang_id)
+                ->first();
+
+            if ($check != null) {
+                // UPDATE
+                $this->aMPurchaseOrderDetailModel->update($check['id'], [
+                    'am_purchase_order_id' => $id,
+                    'barang_id' => $d->barang_id,
+                    'spesifikasi_id' => $d->spesifikasi_id,
+                    'note' => $d->keterangan,
+                    'unit' => $d->satuan_id,
+                    'qty' => $d->qty,
+                    'price' => $d->harga_satuan,
+                    'disc' => $d->diskon,
+                    'additional_cost' => $d->biaya_tambahan,
+                    'ppn' => $d->ppn,
+                    'pph' => $d->pph,
+                    'total' => repairDouble($d->total),
+                    'remaining_qty' => $d->qty
+                ]);
+                array_push($id_detail_all, $check['id']);
+            } else {
+                // NEW BARANG
+                // DELETE
+                $this->aMPurchaseOrderDetailModel
+                    ->where('am_purchase_order_details.am_purchase_order_id', $id)
+                    ->where('spesifikasi_id', $d->spesifikasi_id)
+                    ->where('barang_id', $d->barang_id)
+                    ->delete();
+
+                // INSERT NEW
+                $id_detail_new = $this->aMPurchaseOrderDetailModel->insert([
+                    'am_purchase_order_id' => $id,
+                    'barang_id' => $d->barang_id,
+                    'spesifikasi_id' => $d->spesifikasi_id,
+                    'note' => $d->keterangan,
+                    'unit' => $d->satuan_id,
+                    'qty' => $d->qty,
+                    'price' => $d->harga_satuan,
+                    'disc' => $d->diskon,
+                    'additional_cost' => $d->biaya_tambahan,
+                    'ppn' => $d->ppn,
+                    'pph' => $d->pph,
+                    'total' => repairDouble($d->total),
+                    'remaining_qty' => $d->qty
+                ]);
+                array_push($id_detail_all, $id_detail_new);
+            }
         }
+
+        $this->aMPurchaseOrderDetailModel->whereNotIn('id', $id_detail_all)->delete();
 
         return response()->setJSON([
             'message' => "PO Bahan penolong berhasil diubah",
@@ -471,7 +511,12 @@ class POLokalBahanPenolong extends BaseController
     public function getHistoriHarga()
     {
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
-        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($this->request->getVar('id'), "Lokal", $this->this_company_id);
+        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst(
+            $this->request->getVar('id'),
+            $this->request->getVar('spesifikasi_id'),
+            "Lokal",
+            $this->this_company_id
+        );
         return response()->setJSON(['res' => $res]);
     }
 

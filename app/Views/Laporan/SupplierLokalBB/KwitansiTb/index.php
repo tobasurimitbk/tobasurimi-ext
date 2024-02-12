@@ -5,6 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Kwitansi Bulanan PO Bahan Baku</h1>
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
+                Batal
+            </a>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -67,28 +72,7 @@
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
-                            <?php $no = 1; ?>
-                            <?php foreach ($data as $d) : ?>
-                                <tr style="text-align: center;">
-                                    <td><?= $no++; ?></td>
-                                    <td><?= $d['supplier'] ?></td>
-                                    <td><?= "Rp " . number_format($d['total'], 2, ',', '.') ?></td>
-                                    <td><?= $d['noKwitansi'] ?></td>
-                                    <td style="width: 150px;">
-                                        <div class="form-floating">
-                                            <input data-id="<?= $d['id'] ?>" autocomplete="one-time-code" value="<?= date('d/m/Y', strtotime($d['tanggal'])) ?>" name="tanggal" type="text" required class="form-control target input-picker tanggal">
-                                            <label>Tanggal Kwitansi</label>
-                                        </div>
-                                    </td>
-                                    <td style="width: 100px;">
-                                        <div class="mt-0">
-                                            <button data-id="<?= $d['id'] ?>" data-no_kwitansi="<?= str_replace('/', '-', $d['noKwitansi']); ?>" class="btn btn-warning btn-print" style="box-shadow: none !important;">
-                                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+
                         </tbody>
                     </table>
                 </div>
@@ -104,21 +88,85 @@
     var row = 0;
 
     $('.dataTable').DataTable({
-        ordering: false,
-        //responsive: true,
-        display: 'stripe',
-        searching: true,
-        lengthChange: false,
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
         pageLength: 25,
-        columnDefs: [{
-            defaultContent: '-',
-            targets: '_all'
-        }],
+        ajax: {
+            url: "<?= base_url("laporan-supplier-lokal-bb/kwitansi-tb/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        // scrollX: true,
         "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
+            data: "name",
+            className: "text-center"
+        }, {
+            data: "total",
+            searchable: false,
+            sortable: false,
+            className: "text-center"
+        }, {
+            data: "no_kwitansi",
+            searchable: false,
+            sortable: false,
+            className: "text-center"
+        }, {
+            data: "tanggal",
+            searchable: false,
+            sortable: false,
+            className: "text-center"
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                return `
+                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                    </button>
+                       
+                    `
+            }
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
         language: {
-            emptyTable: "Tidak ada pembelian pada supplier "
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
         }
     })
 
