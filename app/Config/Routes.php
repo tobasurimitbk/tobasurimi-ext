@@ -638,6 +638,14 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);
+// MASTER KEMASAN
+$routes->get('/kemasan', 'Warehouse\Kemasan::index', ['filter' => 'Auth']);
+$routes->post('/kemasan/save', 'Warehouse\Kemasan::create', ['filter' => 'Auth']);
+$routes->post('/kemasan/update', 'Warehouse\Kemasan::update', ['filter' => 'Auth']);
+$routes->post('/kemasan/delete', 'Warehouse\Kemasan::delete', ['filter' => 'Auth']);
+$routes->post('/kemasan/get', 'Warehouse\Kemasan::get', ['filter' => 'Auth']);
+$routes->get('/kemasan/all', 'Warehouse\Kemasan::all', ['filter' => 'Auth']);
+$routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode', ['filter' => 'Auth']);
 
 // $routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
 //     $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');
