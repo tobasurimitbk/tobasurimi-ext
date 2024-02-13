@@ -25,39 +25,9 @@ class KwitansiTb extends BaseController
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getGet("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getGet("month");
 
-        $supplierModel = new SupplierModel();
-
-        $res = [];
-        $supplierModel = new SupplierModel();
-        $supplier = $supplierModel->getSupplierByType('BAHAN BAKU');
-
-        $noKwitansi = '';
-        foreach ($supplier as $i => $s) {
-            $kwitansiTB = $supplierModel->getKwitansiTB($s['id'], $year, $month);
-
-            if ($kwitansiTB['hargaBulananWithQtyPphTotal'] != 0) {
-                if ($i == 0) {
-                    $noKwitansi = "001/KTB/$month/$year";
-                } else {
-                    $noKwitansi = generateNoKwitansiTB($noKwitansi, $month, $year);
-                }
-                $noKwitansi = sprintf($noKwitansi);
-                $res[] = [
-                    'id' => $s['id'],
-                    'supplier' => $s['name'],
-                    'total' => $kwitansiTB['hargaBulananWithQtyPphTotal'],
-                    'noKwitansi' => $noKwitansi,
-                    "tanggal" => $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
-                ];
-            }
-        }
-
-
-
         return view('Laporan/SupplierLokalBB/KwitansiTb/index', [
             'year' => $year,
             'month' => $month,
-            'data' => $res
         ]);
     }
 
