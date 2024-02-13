@@ -25,7 +25,10 @@
                                 <th onclick="changeSort('kelompok_barang')" class="sort">Kategori</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('satuan')" class="sort">Satuan</th>
+                                <th class="sort">Satuan 1</th>
+                                <th class="sort">Satuan 2</th>
+                                <th class="sort">Satuan 3</th>
+                                <th class="sort">Akun COA</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -254,8 +257,30 @@
                 {
                     data: "satuan",
                     className: "text-center",
+                    sortable: false,
                 },
-
+                {
+                    data: "satuan2",
+                    className: "text-center",
+                    sortable: false,
+                },
+                {
+                    data: "satuan3",
+                    className: "text-center",
+                    sortable: false,
+                },
+                {
+                    data: "akun_coa", // Assuming "akun_coa" is the field name in your data source
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        // If "akun_coa" exists and is not empty, display a checkbox
+                        if (data && data !== "") {
+                            return "<i class='fa fa-check-circle' aria-hidden='true'></i>";
+                        } else { // Otherwise, display a dash "-"
+                            return "<i class='fa fa-minus-circle' aria-hidden='true'></i>";
+                        }
+                    }
+                }
             ],
             columnDefs: [{
                 defaultContent: "-",

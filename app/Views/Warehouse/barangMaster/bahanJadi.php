@@ -300,7 +300,7 @@
                     render: function(data, type, row) {
                         // If "akun_coa" exists and is not empty, display a checkbox
                         if (data && data !== "") {
-                            return "<i class='fa fa-check-circle-o' aria-hidden='true'></i>";
+                            return "<i class='fa fa-check-circle' aria-hidden='true'></i>";
                         } else { // Otherwise, display a dash "-"
                             return "<i class='fa fa-minus-circle' aria-hidden='true'></i>";
                         }
