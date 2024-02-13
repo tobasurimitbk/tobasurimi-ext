@@ -146,71 +146,142 @@
             width: 100%;
             height: 90px;
         }
+
+        .page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 
 <body>
-    <div style="text-align: right;">
-        <b>
-            <u>
-                Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
-            </u>
-        </b><br><br>
-        Kwitansi <br>
-        No. Nota : <?= $noKwitansi ?>
-    </div>
-    <div class="w-50 d-flex content-between" style="margin-top: -40px;">
-        <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-            <?= $company['company'] ?><br>
-            <?= $company['address'] ?>
-        </div>
+    <?php foreach ($kwitansis['all'] as $i => $kwitansi) : ?>
+        <?php if ($i == 0) : ?>
+            <div style="text-align: right;">
+                <b>
+                    <u>
+                        Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
+                    </u>
+                </b><br><br>
+                Kwitansi <br>
+                No. Nota : <?= $noKwitansi ?>
+            </div>
+            <div class="w-50 d-flex content-between" style="margin-top: -40px;">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                    <?= $company['company'] ?><br>
+                    <?= $company['address'] ?>
+                </div>
 
-    </div>
+            </div>
 
-    <table class="w-100 mt-2">
-        <tr>
-            <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
-            <td style="vertical-align: top;">: </td>
-            <td style="vertical-align: top; width: 55%;"><?= strtoupper($company['company']) ?></td>
-        </tr>
-        <tr>
-            <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
-            <td style="vertical-align: top;">: </td>
-            <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($kwitansi['hargaBulananWithQtyPphTotal']), "STR_TO_FLOAT"))) ?></td>
-        </tr>
-        <tr>
-            <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
-            <td style="vertical-align: top;">: </td>
-            <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['barangName'] ?> SEBANYAK <?= $kwitansi['qtyTotal'] ?> KG DARI <?= $kwitansi['supplierName'] ?></td>
-        </tr>
-    </table>
+            <table class="w-100 mt-2">
+                <tr>
+                    <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
+                    <td style="vertical-align: top;">: </td>
+                    <td style="vertical-align: top; width: 55%;"><?= strtoupper($company['company']) ?></td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
+                    <td style="vertical-align: top;">: </td>
+                    <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($kwitansi['harga_bulanan_pph']), "STR_TO_FLOAT"))) ?></td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
+                    <td style="vertical-align: top;">: </td>
+                    <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= $kwitansi['qty'] ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
+                </tr>
+            </table>
 
-    <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-        <tr>
-            <td>Bruto</td>
-            <td>Rp.</td>
-            <td class="txt-right"><?= number_format(formatter($kwitansi['hargaBulananTotal'], "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-        </tr>
-        <tr>
-            <td>PPh</td>
-            <td>Rp.</td>
-            <td class="txt-right"><?= number_format($kwitansi['hargaBulananWithQtyTotal'], 2, '.', ',') ?></td>
-        </tr>
-        <tr>
-            <td>Dibayarkan</td>
-            <td>Rp.</td>
-            <td class="txt-right"><?= number_format($kwitansi['hargaBulananWithQtyPphTotal'], 2, '.', ',') ?></td>
-        </tr>
-    </table>
+            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
+                <tr>
+                    <td>Bruto</td>
+                    <td>Rp.</td>
+                    <td class="txt-right"><?= number_format(formatter($kwitansi['harga_bulanan'], "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                </tr>
+                <tr>
+                    <td>PPh</td>
+                    <td>Rp.</td>
+                    <td class="txt-right"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
+                </tr>
+                <tr>
+                    <td>Dibayarkan</td>
+                    <td>Rp.</td>
+                    <td class="txt-right"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
+                </tr>
+            </table>
 
-    <div class="w-100" style="margin-top: -20px;text-align:center;">
-        <div style="text-align: right;">
-            <div><?= $provinsi['province_name'] ?>, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
-            <div>yang Menerima</div><br><br>
-            <div class="mt-2">(<?= $kwitansi['supplierName'] ?>)</div>
-        </div>
-    </div>
+            <div class="w-100" style="margin-top: -20px;text-align:center;">
+                <div style="text-align: right;">
+                    <div><?= $provinsi['province_name'] ?>, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
+                    <div>yang Menerima</div><br><br>
+                    <div class="mt-2">(<?= $kwitansis['supplier']['name'] ?>)</div>
+                </div>
+            </div>
+        <?php else : ?>
+            <div class="page-break">
+                <div style="text-align: right;">
+                    <b>
+                        <u>
+                            Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
+                        </u>
+                    </b><br><br>
+                    Kwitansi <br>
+                    No. Nota : <?= $noKwitansi ?>
+                </div>
+                <div class="w-50 d-flex content-between" style="margin-top: -40px;">
+                    <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                        <?= $company['company'] ?><br>
+                        <?= $company['address'] ?>
+                    </div>
 
+                </div>
+
+                <table class="w-100 mt-2">
+                    <tr>
+                        <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
+                        <td style="vertical-align: top;">: </td>
+                        <td style="vertical-align: top; width: 55%;"><?= strtoupper($company['company']) ?></td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
+                        <td style="vertical-align: top;">: </td>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($kwitansi['harga_bulanan_pph']), "STR_TO_FLOAT"))) ?></td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
+                        <td style="vertical-align: top;">: </td>
+                        <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= $kwitansi['qty'] ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
+                    </tr>
+                </table>
+
+                <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
+                    <tr>
+                        <td>Bruto</td>
+                        <td>Rp.</td>
+                        <td class="txt-right"><?= number_format(formatter($kwitansi['harga_bulanan'], "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td>PPh</td>
+                        <td>Rp.</td>
+                        <td class="txt-right"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td>Dibayarkan</td>
+                        <td>Rp.</td>
+                        <td class="txt-right"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
+                    </tr>
+                </table>
+
+                <div class="w-100" style="margin-top: -20px;text-align:center;">
+                    <div style="text-align: right;">
+                        <div><?= $provinsi['province_name'] ?>, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
+                        <div>yang Menerima</div><br><br>
+                        <div class="mt-2">(<?= $kwitansis['supplier']['name'] ?>)</div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+    <?php endforeach; ?>
 </body>
 
 </html>

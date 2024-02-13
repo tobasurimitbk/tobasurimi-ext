@@ -283,6 +283,85 @@ class SupplierModel extends Model
         ];
     }
 
+    public function getKwitansiTBBySupplier($supplierID, $year, $month)
+    {
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $supplierModel = new SupplierModel();
+
+        $supplierDet = $supplierModel->where('id', $supplierID)->first();
+
+        $condition = [
+            'MONTH(rm_purchase_orders.po_date)' => $month,
+            'YEAR(rm_purchase_orders.po_date)' => $year,
+            'rm_purchase_orders.supplier_id' => $supplierID,
+            'rm_purchase_orders.is_posted' => 1,
+            // 'rm_purchase_orders.status_penerimaan' => 1,
+            'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_order_details.deletedAt' => null,
+        ];
+
+        $selectQry = "
+            rm_purchase_orders.pph,
+            rm_purchase_orders.po_date,
+            rm_purchase_order_details.*,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            SUM(qty) AS qty_total,
+            satuans.kode_satuan
+        ";
+
+        $res = $rmPurchaseOrderModel
+            ->asObject()
+            ->select($selectQry)
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
+            ->join('satuans', 'barang_master_spesifikasi.satuan_1 = satuans.id', 'left')
+            ->where($condition)
+            ->groupBy('rm_purchase_order_details.barang1_id')
+            ->groupBy('rm_purchase_order_details.barang2_id')
+            ->findAll();
+
+        $finalRes = [];
+        $total = 0;
+
+        foreach ($res as $r) {
+            if ($r->pph == "None") {
+                // tidak ada pph
+                $pph = 0;
+            } else {
+                if ($supplierDet['no_npwp'] != "") {
+                    // ada npwp
+                    $pph = $r->monthly_price * 0.0025;
+                } else {
+                    // tidak ada npwp
+                    $pph = $r->monthly_price * 0.005;
+                }
+            }
+
+            $hargaBulananPph = ($r->monthly_price * $r->qty_total) + $pph;
+            $hargaBulanan =  ($r->monthly_price * $r->qty_total);
+
+            $total += $hargaBulananPph;
+
+            $finalRes[] = [
+                'nama_barang' => $r->barang_name,
+                'spesifikasi' => $r->spesifikasi,
+                'kode_satuan' => $r->kode_satuan,
+                'qty'          => $r->qty_total,
+                'harga_bulanan' =>  $hargaBulanan,
+                'pph'   => $pph,
+                'harga_bulanan_pph' => $hargaBulananPph
+            ];
+        }
+
+        return [
+            'all' => $finalRes,
+            'supplier' => $supplierDet,
+            'total' => $total
+        ];
+    }
+
 
     public function getSupplierForJurnal($supplierID)
     {

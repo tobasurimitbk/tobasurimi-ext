@@ -12,13 +12,12 @@ class ParentBarangModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
         'company_id',
         'parent_type',
         'parent_name',
-        'kategori',
         'deletedAt',
         'ap_id',
         'ar_id'

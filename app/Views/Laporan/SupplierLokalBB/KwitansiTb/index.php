@@ -15,8 +15,8 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-page-list-attendance">
                 <div class="col-6 mb-2">
-                    <form id="search_form" action="<?= base_url('kwitansi-tb?year=' . $year . '&month=' . $month) ?>" name="search_form" class="kt-form kt-form--fit kt-margin-b-20">
-                        <select required name="month" id="month">
+                    <form id="search_form" action="#" name="search_form" class="kt-form kt-form--fit kt-margin-b-20">
+                        <select required name="month" class="month" id="month">
                             <?php
                             for ($i = 1; $i <= 12; $i++) {
                                 $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
@@ -27,7 +27,7 @@
                             }
                             ?>
                         </select>
-                        <select required name="year" id="year">
+                        <select required name="year" class="year" id="year">
                             <?php
                             for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) {
                                 $checked = ($year == $i) ? "selected" : "";
@@ -37,7 +37,7 @@
                             }
                             ?>
                         </select>
-                        <button type="submit" class="btn btn-primary btn-brand--icon" id="filterYearMonth">
+                        <button type="submit" class="btn btn-primary btn-brand--icon filterBulan" id="">
                             <span>
                                 <i class="la la-print"></i>
                                 <span>Cari</span>
@@ -56,7 +56,18 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <?= csrf_field() ?>
-
+                <div class="row justify-content-end row-col-spp mb-3">
+                    <div class="col-md-3">
+                        <select class="form-select tb_search" name="tb_search" id="tb_search" aria-label="Floating label select example">
+                            <option value="" selected>SEMUA SUPPLIER</option>
+                            <option value="1">SUPPLIER PUNYA NILAI TB</option>
+                            <option value="0">SUPPLIER TIDAK PUNYA NILAI TB</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input autocomplete="one-time-code" class="form-control search supplier_search form-out-search" placeholder="Cari Supplier" value="" />
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -87,7 +98,7 @@
     let sortType = "asc";
     var row = 0;
 
-    $('.dataTable').DataTable({
+    var table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
@@ -105,9 +116,26 @@
             url: "<?= base_url("laporan-supplier-lokal-bb/kwitansi-tb/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search").val();
+                data.year = $(".year").val();
+                data.month = $(".month").val();
+                data.tb_search = $(".tb_search").val();
+                data.supplier_search = $(".supplier_search").val();
                 data.sort = sort;
                 data.sortType = sortType;
+            },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
             }
         },
         // scrollX: true,
@@ -140,7 +168,20 @@
             data: "tanggal",
             searchable: false,
             sortable: false,
-            className: "text-center"
+            className: "text-center",
+            render: function(data, type, row) {
+                if (row.is_print == "0") {
+                    return "-";
+                } else {
+                    let inputId = "tanggal_" + row.id;
+                    return `
+                        <div class="mt-0">
+                            <input id="${inputId}" class="tanggal form-control search form-out-search" data-id="${row.id}" type="date" value="${row.tanggal}">
+                        </div>
+                    `;
+                }
+
+            }
         }, {
             data: "id",
             className: "text-center actions",
@@ -148,14 +189,31 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-                return `
-                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                    </button>
-                       
-                    `
+                let no_kwitansi_hash = row?.no_kwitansi_hash;
+                let tanggal = row?.tanggal;
+                let year = $(".year").val();
+                let month = $(".month").val();
+
+
+                if (row?.is_print == "0") {
+                    return '-';
+                } else {
+
+                    return `
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('laporan-supplier-lokal-bb/kwitansi-tb/print/${id}/${year}-${month}/${no_kwitansi_hash}', '${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `;
+                }
+
             }
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -170,24 +228,27 @@
         }
     })
 
-    $(".tanggal").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
+    $(".filterBulan").click(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
     });
 
-    $('.btn-print').click(function() {
-        var id = $(this).data('id');
-        var yearMonth = "<?= $year . '-' . $month ?>";
-        var tanggal = $('.tanggal[data-id="' + id + '"]').val();
-        var noKwitansi = $(this).data('no_kwitansi');
-
-        var parts = tanggal.split('/');
-        var newDateFormat = parts[2] + '-' + parts[1] + '-' + parts[0];
-
-        window.open("<?= base_url('laporan-supplier-lokal-bb/kwitansi-tb/print/') ?>" + id + '/' + yearMonth + '/' + newDateFormat + '/' + noKwitansi, "_blank");
+    $('.tb_search').change(function() {
+        table.ajax.reload();
     });
+
+    $(".supplier_search").change(function() {
+        table.ajax.reload();
+    })
+
+    const print = function(url, id) {
+        let inputId = "tanggal_" + id;
+        let element = $('#' + inputId);
+        let splitData = url.split("/");
+        let res = splitData[0] + '/' + splitData[1] + '/' + splitData[2] + '/' + splitData[3] + '/' + splitData[4] + '/' + element.val() + '/' + splitData[5];
+
+        window.open("<?= base_url('/') ?>" + res, "_blank");
+    }
 </script>
 
 <?= $this->endSection(); ?>
