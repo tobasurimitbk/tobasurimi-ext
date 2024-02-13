@@ -121,17 +121,38 @@ class SupplierHargaModel extends Model
         $satuanModel = new SatuansModel();
 
         $condition = [
-            'deletedAt' => null,
+            'supplier_harga.deletedAt' => null,
             'supplier_id' => $supplier_id,
             'bahan_baku_id' => $bahan_baku_id
         ];
-        $result = $this->asArray()->where($condition)->findAll();
+
+        $selectQry = "
+            supplier_harga.id,
+            supplier_harga.supplier_id,
+            supplier_harga.bahan_baku_id,
+            supplier_harga.spesifikasi_id,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master.barang_name,
+            supplier_harga.harga_umum,
+            supplier_harga.harga_harian,
+            supplier_harga.harga_bulanan
+        ";
+
+        $result = $this
+            ->asArray()
+            ->select($selectQry)
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id')
+            ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id', 'left')
+            ->where($condition)
+            ->findAll();
+
         for ($i = 0; $i < count($result); $i++) {
             $spesifikaiDetail = $satuanModel->select('satuans.*')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.satuan_1 = satuans.id')
                 ->where('barang_master_spesifikasi.id', $result[0]['spesifikasi_id'])
                 ->first();
 
+            $result[$i]['nama_barang'] = $result[$i]['barang_name'] . " " . $result[$i]['spesifikasi'];
             $result[$i]['satuan_id'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['id'] : '';
             $result[$i]['nama_satuan'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['nama_satuan'] : '';
             $result[$i]['kode_satuan'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['kode_satuan'] : '';
