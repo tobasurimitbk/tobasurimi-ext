@@ -3,6 +3,8 @@
 namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
+use App\Controllers\Master\Satuan;
+use App\Models\AccountBarangModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
@@ -308,6 +310,8 @@ class Barang extends BaseController
 
         $barangMasterModel = new BarangMasterModel();
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $satuanModel = new SatuansModel();
+        $accountBarangModel = new AccountBarangModel();
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
@@ -321,14 +325,21 @@ class Barang extends BaseController
         foreach ($res['data'] as $data) {
             $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Lokal", $this->this_company_id);
             $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Import", $this->this_company_id);
+            $satuan1 = $satuanModel->asObject()->where('id', $data['satuan_1'])->where('deletedAt', null)->first();
+            $satuan2 = $satuanModel->asObject()->where('id', $data['satuan_2'])->where('deletedAt', null)->first();
+            $satuan3 = $satuanModel->asObject()->where('id', $data['satuan_3'])->where('deletedAt', null)->first();
+            $accountBarang = $accountBarangModel->asObject()->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
                 "kelompok_barang"       => $data['kelompok_barang'],
                 "kode_barang"           => $data['kode_barang'],
-                "barang_name"           => $data['barang_name'],
-                "satuan"                => $data['satuan'],
-                "harga_terakhir_lokal"   => $lokalDetail['hargaTerakhir'],
+                "barang_name"           => $data['barang_name'] . " - " . $data['spesifikasi'],
+                "satuan"                => $satuan1 ? $satuan1->kode_satuan : "-", // Adjust 'some_property' to the actual property you want to display
+                "satuan2"               => $satuan2 ? $satuan2->kode_satuan . " (" . $data['konversi_satuan_2'] . " " . $satuan1->kode_satuan . ")" : "-",
+                "satuan3"               => $satuan3 ? $satuan3->kode_satuan . " (" . $data['konversi_satuan_3'] . " " . $satuan1->kode_satuan . ")" : "-",
+                "akun_coa"               => $accountBarang ? $accountBarang : "",
+                "harga_terakhir_lokal"  => $lokalDetail['hargaTerakhir'],
                 "supplier_terakhir_lokal" => $lokalDetail['supplierTerakhir'],
                 "harga_terakhir_import" => $importDetail['hargaTerakhir'],
                 "supplier_terakhir_import" => $importDetail['supplierTerakhir']
