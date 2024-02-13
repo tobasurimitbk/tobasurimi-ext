@@ -138,20 +138,20 @@
                 data.sort = sort;
                 data.sortType = sortType;
             },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            }
+            // beforeSend: function() {
+            //     $.LoadingOverlay("show", {
+            //         image: "",
+            //         fontawesomeColor: "#222FCC",
+            //         fontawesome: "fa fa-cog fa-spin"
+            //     });
+            // },
+            // complete: function() {
+            //     $.LoadingOverlay("hide", {
+            //         image: "",
+            //         fontawesomeColor: "#222FCC",
+            //         fontawesome: "fa fa-cog fa-spin"
+            //     });
+            // }
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -198,7 +198,7 @@
         }
     });
 
-    $(".search").change(function() {
+    $(".search").keyup(function() {
         table.ajax.reload();
     });
 

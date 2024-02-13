@@ -536,8 +536,6 @@
             }
         };
 
-        console.log(select2categori_id_header);
-
         const select2header_id_sub = {
             dropdownParent: $("#add_modal_sub"),
             ajax: {
@@ -840,8 +838,7 @@
                         //     }
                         // })
                         $('.kelompok_akun_id_kategori').select2(select2kelompok_akun);
-                        console.log(res?.data);
-                        const $apOption = $("<option selected='selected'></option>").val(id).text(res?.data?.meta_name);
+                        const $apOption = $("<option selected='selected'></option>").val(res?.data?.kelompok_id).text(res?.data?.meta_name);
                         $(".kelompok_akun_id_kategori").append($apOption).trigger('change');
                         $(".add-modal-kategori").modal("show")
 
@@ -878,7 +875,7 @@
 
                         $('.category_id_header').select2(select2categori_id_header);
 
-                        const $apOption = $("<option selected='selected'></option>").val(id).text(res?.data?.nama_kategori);
+                        const $apOption = $("<option selected='selected'></option>").val(res.data.kategori_id).text(res?.data?.nama_kategori);
                         $(".category_id_header").append($apOption).trigger('change');
                         $(".add-modal-header").modal("show")
                     } else {
