@@ -4,9 +4,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Kategori Barang</h1>
-        <button class="btn btn-show-form btn-add float-right">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can("Master Barang", "Kategori Barang", "c")) : ?>
+            <button class="btn btn-show-form btn-add float-right">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -27,9 +29,12 @@
                 <li class="nav-item">
                     <a class="nav-link <?= $type == "bahan_modal" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_modal') ?>">Barang Modal</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= $type == "kemasan" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=kemasan') ?>">Kemasan</a>
+                </li>
             </ul>
             <div class="row justify-content-end mt-4">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kategori Barang" value="" />
                 </div>
             </div>
@@ -39,10 +44,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('parent_name')" class="sort">Kategori Barang</th>
-                                <?php if ($type == "bahan_penolong") : ?>
-                                    <th onclick="" class="sort">Kategori</th>
-                                <?php endif; ?>
+                                <th onclick="changeSort('parent_name')" class="sort">Kategori</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -68,27 +70,16 @@
                     <?= csrf_field() ?>
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Kelompok" id="parentName" name="parentName">
-                        <label for="floatingInput">Nama Kelompok</label>
+                        <label for="floatingInput">Nama Kategori</label>
                     </div>
-                    <?php if ($type == "bahan_penolong") : ?>
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select" id="kategori" name="kategori">
-                                <option value="">Pilih Kategori</option>
-                                <?php foreach ($kategoriBP as $k) : ?>
-                                    <option value="<?= encrypt($k['value']) ?>">
-                                        <?= $k['value'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Pilih Kategori (Opsional)</label>
-                        </div>
-                    <?php endif; ?>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="button" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php if (can('Master Barang', 'Kategori Barang', 'd')) : ?>
+                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -131,20 +122,14 @@
             display: "stripe",
             searching: false,
             columns: [{
-                    data: "no",
-                    className: "text-center",
-                    sortable: false,
-                    width: "5%"
-                }, {
-                    data: "parent_name",
-                    className: "text-center",
-                },
-                <?php if ($type == "bahan_penolong") : ?> {
-                        data: "kategori",
-                        className: "text-center"
-                    },
-                <?php endif; ?>
-            ],
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "parent_name",
+                className: "text-center",
+            }, ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -193,6 +178,10 @@
                 data: formData,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
                 },
                 method: "POST",
                 dataType: "json",
@@ -240,6 +229,10 @@
                         },
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -319,60 +312,76 @@
                         let data = new FormData(document.querySelector(".create-form"));
 
                         if (id) {
-                            $.ajax({
-                                url: "<?= base_url("parent-barang/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    $('#id').val('');
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
+                            <?php if (can('Master Barang', 'Kategori Barang', 'u')) : ?>
+                                $.ajax({
+                                    url: "<?= base_url("parent-barang/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        $('#id').val('');
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    table.ajax.reload();
+                                                    $('#parentName').val(null);
+                                                    $('#kategori').val('').trigger("change");
+                                                    $(".add-modal").modal("hide");
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload();
+                                            }).then(() => {
                                                 $('#parentName').val(null);
                                                 $('#kategori').val('').trigger("change");
-                                                $(".add-modal").modal("hide");
-                                            })
-                                    } else {
+                                                $(".add-modal").modal("hide")
+                                            });
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            $('#parentName').val(null);
-                                            $('#kategori').val('').trigger("change");
                                             $(".add-modal").modal("hide")
                                         });
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    }).then(() => {
-                                        $(".add-modal").modal("hide")
-                                    });
-                                }
-                            });
+                                });
+                            <?php else : ?>
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Anda tidak punya akses update',
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            <?php endif; ?>
                         } else {
                             $.ajax({
                                 url: "<?= base_url("parent-barang/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
+                                    setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
                                 },
                                 method: "POST",
                                 dataType: "json",

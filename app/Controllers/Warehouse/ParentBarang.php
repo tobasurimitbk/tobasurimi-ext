@@ -3,7 +3,6 @@
 namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
-use App\Models\MetadataModel;
 use App\Models\ParentBarangModel;
 
 class ParentBarang extends BaseController
@@ -17,8 +16,6 @@ class ParentBarang extends BaseController
 
     public function index()
     {
-        $metaDataModel = new MetadataModel();
-
         $type = "bahan_baku";
 
         if (!empty(@$_GET['type'])) {
@@ -27,7 +24,6 @@ class ParentBarang extends BaseController
 
         $data = [
             'type' => $type,
-            'kategoriBP' => $metaDataModel->where('name', 'Kelompok BP')->findAll()
         ];
         return view('Warehouse/parentBarang/index', $data);
     }
@@ -38,9 +34,8 @@ class ParentBarang extends BaseController
 
         $type = $this->request->getVar('type');
         $parentName = $this->request->getVar('parentName');
-        $kategori = $this->request->getVar('kategori');
 
-        if ($parentBarangModel->where('parent_name', $parentName)->where('kategori', $kategori)->where('parent_type', $type)->where('deletedAt', null)->first() != null) {
+        if ($parentBarangModel->where('parent_name', $parentName)->where('parent_type', $type)->where('deletedAt', null)->first() != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'status' => false,
@@ -51,7 +46,6 @@ class ParentBarang extends BaseController
         $parentBarangModel->insert([
             'parent_type' => ($type == "") ? "bahan_baku" : $type,
             'parent_name' => $parentName,
-            'kategori' => decrypt($kategori),
             'company_id' => $this->this_company_id
         ]);
 
@@ -66,16 +60,14 @@ class ParentBarang extends BaseController
     {
         $parentBarangModel = new ParentBarangModel();
         $parentName = $this->request->getVar('parentName');
-        $kategori = $this->request->getVar('kategori');
         $id = decrypt($this->request->getVar('id'));
 
         $parentBarangModel->update($id, [
             'parent_name' => $parentName,
-            'kategori' => decrypt($kategori)
         ]);
 
         return response()->setJSON([
-            'token' => \csrf_hash(),
+            'token' => csrf_hash(),
             'status' => true,
             'message' => "Kelompok Barang $parentName Berhasil Diupdate"
         ]);
@@ -87,9 +79,7 @@ class ParentBarang extends BaseController
         $id = decrypt($this->request->getVar('id'));
 
         $rememberName = $parentBarangModel->where('id', $id)->first()['parent_name'];
-        $parentBarangModel->update($id, [
-            'deletedAt' => date('Y-m-d H:i:s')
-        ]);
+        $parentBarangModel->delete($id);
 
         return response()->setJSON([
             'token' => csrf_hash(),
@@ -103,7 +93,6 @@ class ParentBarang extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $parentBarangModel = new ParentBarangModel();
         $res = $parentBarangModel->where('id', $id)->first();
-        $res['kategori'] = encrypt($res['kategori']);
         $res['id'] = encrypt($res['id']);
 
         return response()->setJSON([
@@ -151,7 +140,6 @@ class ParentBarang extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
                 "parent_name"           => $data['parent_name'],
-                "kategori"              => $data['kategori'] == null ? "-" : $data['kategori'],
             ]);
         }
 
