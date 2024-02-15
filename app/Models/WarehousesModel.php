@@ -42,7 +42,7 @@ class WarehousesModel extends Model
 
     public function get_by_company_id($company_id)
     {
-        $requete = "SELECT * FROM warehouses WHERE warehouses.deletedAt is null and company_id='" . $company_id . "'";
+        $requete = "SELECT * FROM warehouses WHERE warehouses.deletedAt is null and divisi_id is not null and company_id='" . $company_id . "'";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();

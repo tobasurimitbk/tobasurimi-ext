@@ -167,12 +167,6 @@
     });
 
     $(document).ready(function() {
-        $('.unit').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
         //CSS SELECT2 FLOATING LABEL
         $('.unit')
             .parent('div')
@@ -193,6 +187,12 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        $('.unit').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        });
 
         var validator = $(".create-form").validate({
             rules: {

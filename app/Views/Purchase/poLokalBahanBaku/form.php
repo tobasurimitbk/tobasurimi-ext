@@ -241,6 +241,35 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 form-lpb" style="height: 50px;">
+                            <select class="form-select kemasan_id" id="kemasan_id" name="kemasan_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataKemasan as $kemasan) : ?>
+                                    <option <?= !empty($dataPOLokal) ? ($dataPOLokal->kemasan_id == $kemasan['id'] ? 'checked' : "") : '' ?> value="<?= $kemasan["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->kemasan_id === $kemasan["id"] ? "selected" : "") : ""; ?>><?= $kemasan["name"]; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Kemasan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 form-lpb" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->jumlah_kemasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_kemasan" name="jumlah_kemasan" id="jumlah_kemasan" placeholder="Jumlah Kemasan">
+                            <label for="floatingInput">Jumlah Kemasan</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 form-lpb" style="height: 50px;">
+                            <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->kemasan_tambahan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" type="kemasan_tambahan" class="form-control kemasan_tambahan" name="kemasan_tambahan" id="kemasan_tambahan" placeholder="Kemasan Tambahan">
+                            <label for="floatingInput">Kemasan Tambahan (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
             </form>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
@@ -405,6 +434,7 @@
     <?php if ($dataPOLokal->is_posted === "1") : ?>
         <script>
             $('#warehouse_id').attr('disabled', true);
+            $('#kemasan_id').attr('disabled', true);
             $('#bc_type').attr('disabled', true);
             $('#lpb_otomatis').attr('disabled', true);
         </script>
@@ -560,6 +590,12 @@
             theme: "bootstrap-5"
         })
 
+        // JENIS KEMASAN
+        $('.kemasan_id').select2({
+            placeholder: "Pilih Jenis Kemasan",
+            theme: "bootstrap-5"
+        })
+
         $('.spp_id').select2({
             placeholder: "Pilih Nomor SPP",
             theme: "bootstrap-5"
@@ -653,6 +689,9 @@
             } else {
                 $('#warehouse_id').val("");
                 $('#bc_type').val("");
+                $("#kemasan_id").val(null).change();
+                $('#jumlah_kemasan').val(null);
+                $('#kemasan_tambahan').val(null);
 
                 $('#warehouse_id').change();
                 $('#bc_type').change();
@@ -805,7 +844,8 @@
                 // validate input
                 let validate_item = false;
                 let lpb_otomatis = true;
-                let tanggal_diterima = true;
+                let kemasan_id = true;
+                let jumlah_kemasan = true;
 
                 if (list_items.length === 0) {
                     validate_item = true;
@@ -815,6 +855,10 @@
                 if ($('#lpb_otomatis').prop('checked')) {
                     if ($('#warehouse_id').val() == "") {
                         lpb_otomatis = false;
+                    } else if ($('#kemasan_id').val() == "") {
+                        kemasan_id = false;
+                    } else if ($('#jumlah_kemasan').val() == "" || $('#jumlah_kemasan').val() == "0") {
+                        jumlah_kemasan = false;
                     }
                 }
 
@@ -822,6 +866,18 @@
                     Swal.fire({
                         icon: 'error',
                         title: "Lokasi warehouse wajib diisi",
+                        confirmButtonColor: '#4e73df',
+                    })
+                } else if (!kemasan_id) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Jenis kemasan wajib diisi",
+                        confirmButtonColor: '#4e73df',
+                    })
+                } else if (!jumlah_kemasan) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Jumlah kemasan wajib diisi",
                         confirmButtonColor: '#4e73df',
                     })
                 } else if (validate_item) {

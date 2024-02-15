@@ -13,6 +13,7 @@ use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
+use App\Models\KemasanModel;
 use App\Models\SatuansModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
@@ -22,6 +23,7 @@ use App\Models\SppModel;
 use App\Models\SupplierHargaModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class POLokalBahanBaku extends BaseController
 {
@@ -45,6 +47,7 @@ class POLokalBahanBaku extends BaseController
     protected $sppModel;
     protected $sppDetailModel;
     protected $divisiModel;
+    protected $kemasanModel;
 
     public function __construct()
     {
@@ -69,6 +72,7 @@ class POLokalBahanBaku extends BaseController
         $this->sppDetailModel = new SppDetailModel();
         $this->divisiModel = new DivisisModel();
         $this->sppModel = new SppModel();
+        $this->kemasanModel = new KemasanModel();
     }
 
     public function poLokalBahanBaku()
@@ -84,6 +88,7 @@ class POLokalBahanBaku extends BaseController
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataBarang = $this->barangModel->getBarangByType("bahan_baku");
+        $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -96,7 +101,8 @@ class POLokalBahanBaku extends BaseController
             "dataSupplier"  => $dataSupplier,
             "dataDivisi"    => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
-            "dataBarang"    => $dataBarang
+            "dataBarang"    => $dataBarang,
+            "dataKemasan"   => $dataKemasan
 
         ];
 
@@ -110,6 +116,7 @@ class POLokalBahanBaku extends BaseController
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataBCType = $this->metadataModel->getBCUsed("po_lokal_bb");
         $dataDivisi =  $this->divisiModel->getDivisiAccess();
+        $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -121,6 +128,7 @@ class POLokalBahanBaku extends BaseController
             "dataWarehouse" => $dataWarehouse,
             "dataBCType"    => $dataBCType,
             "dataDivisi"    => $dataDivisi,
+            "dataKemasan"   => $dataKemasan
         ];
 
 
@@ -214,6 +222,9 @@ class POLokalBahanBaku extends BaseController
             "barang_id" => $this->request->getVar("barang_id"),
             "divisi_id" => $this->request->getVar('divisi_id'),
             "bc_type" => $this->request->getVar("bc_type"),
+            "kemasan_id" => $this->request->getVar('kemasan_id'),
+            "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
+            "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
             "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
                 date('m'),
                 date('Y'),
@@ -277,6 +288,9 @@ class POLokalBahanBaku extends BaseController
             "supplier_id" => $this->request->getVar("supplier_id"),
             "barang_id" => $this->request->getVar("barang_id"),
             "divisi_id" => $this->request->getVar('divisi_id'),
+            "kemasan_id" => $this->request->getVar('kemasan_id'),
+            "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
+            "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
             "bc_type" => $this->request->getVar("bc_type"),
             "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
                 date('m'),
@@ -467,7 +481,7 @@ class POLokalBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
