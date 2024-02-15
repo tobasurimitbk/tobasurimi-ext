@@ -634,6 +634,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->post('save', 'Warehouse\Barang::create');
     $routes->post('update', 'Warehouse\Barang::update');
     $routes->post('delete', 'Warehouse\Barang::delete');
+    $routes->post('delete-spek', 'Warehouse\Barang::deleteSpek');
     $routes->post('generate-new-code', 'Warehouse\Barang::generateNewCode');
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
