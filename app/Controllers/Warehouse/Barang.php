@@ -268,6 +268,21 @@ class Barang extends BaseController
         ]);
     }
 
+    public function deleteSpek()
+    {
+        $id = ($this->request->getVar('id'));
+        $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $barangSpesifikasiModel->update($id, [
+            'deletedAt' => date('Y-m-d H:i:s')
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Spesifikasi berhasil dihapus",
+            'token' => csrf_hash()
+        ]);
+    }
+
     public function get()
     {
         $barangModel = new BarangMasterModel();
@@ -299,7 +314,8 @@ class Barang extends BaseController
         $condition = [
             "barang_master.company_id"  => $this->this_company_id,
             "barang_master.type_barang" => $this->request->getGet('parent_type'),
-            "barang_master.deletedAt" => NULL
+            "barang_master.deletedAt" => NULL,
+            "barang_master_spesifikasi.deletedAt" => NULL,
         ];
 
         $addCondition = [
