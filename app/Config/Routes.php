@@ -456,6 +456,7 @@ $routes->group('master-barang-lokal', ['filter' => 'Auth'], function ($routes) {
     $routes->post('save', 'SalesLokal\Barang::create');
     $routes->post('update', 'SalesLokal\Barang::update');
     $routes->post('delete', 'SalesLokal\Barang::delete');
+    $routes->post('delete-spek', 'SalesLokal\Barang::deleteSpek');
     $routes->post('generate-new-code', 'SalesLokal\Barang::generateNewCode');
 });
 
@@ -490,6 +491,7 @@ $routes->group('master-barang-internasional', ['filter' => 'Auth'], function ($r
     $routes->post('save', 'SalesInternasional\Barang::create');
     $routes->post('update', 'SalesInternasional\Barang::update');
     $routes->post('delete', 'SalesInternasional\Barang::delete');
+    $routes->post('delete-spek', 'SalesInternasional\Barang::deleteSpek');
     $routes->post('generate-new-code', 'SalesInternasional\Barang::generateNewCode');
 });
 

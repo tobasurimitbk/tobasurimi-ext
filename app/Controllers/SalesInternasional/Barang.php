@@ -240,7 +240,8 @@ class Barang extends BaseController
         $condition = [
             "barang_master_sales.company_id"  => $this->this_company_id,
             "barang_master_sales.type_barang" => $this->request->getGet('parent_type'),
-            "barang_master_sales.deletedAt" => NULL
+            "barang_master_sales.deletedAt" => NULL,
+            "barang_master_sales_spesifikasi.deletedAt" => NULL,
         ];
 
         $addCondition = [
@@ -251,6 +252,7 @@ class Barang extends BaseController
 
         $barangMasterModel = new BarangMasterSalesModel();
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $satuanModel = new SatuansModel();
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
@@ -264,12 +266,19 @@ class Barang extends BaseController
         foreach ($res['data'] as $data) {
             $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Lokal", $this->this_company_id);
             $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Import", $this->this_company_id);
+            $satuan1 = $satuanModel->asObject()->where('id', $data['satuan_1'])->where('deletedAt', null)->first();
+            $satuan2 = $satuanModel->asObject()->where('id', $data['satuan_2'])->where('deletedAt', null)->first();
+            $satuan3 = $satuanModel->asObject()->where('id', $data['satuan_3'])->where('deletedAt', null)->first();
+            // $accountBarang = $accountBarangModel->asObject()->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
                 "kelompok_barang"       => $data['kelompok_barang'],
                 "kode_barang"           => $data['kode_barang'],
-                "barang_name"           => $data['barang_name'],
+                "barang_name"           => $data['barang_name'] . " - " . $data['spesifikasi'],
+                "satuan"                => $satuan1 ? $satuan1->kode_satuan : "-", // Adjust 'some_property' to the actual property you want to display
+                "satuan2"               => $satuan2 ? $satuan2->kode_satuan . " (" . $data['konversi_satuan_2'] . " " . $satuan1->kode_satuan . ")" : "-",
+                "satuan3"               => $satuan3 ? $satuan3->kode_satuan . " (" . $data['konversi_satuan_3'] . " " . $satuan1->kode_satuan . ")" : "-",
                 "harga_terakhir_lokal"   => $lokalDetail['hargaTerakhir'],
                 "supplier_terakhir_lokal" => $lokalDetail['supplierTerakhir'],
                 "harga_terakhir_import" => $importDetail['hargaTerakhir'],
@@ -286,6 +295,21 @@ class Barang extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function deleteSpek()
+    {
+        $id = ($this->request->getVar('id'));
+        $barangSpesifikasiModel = new BarangMasterSalesSpesifikasiModel();
+        $barangSpesifikasiModel->update($id, [
+            'deletedAt' => date('Y-m-d H:i:s')
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Spesifikasi berhasil dihapus",
+            'token' => csrf_hash()
+        ]);
     }
 
     public function generateNewCode()

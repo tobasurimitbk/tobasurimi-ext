@@ -552,9 +552,9 @@
                             var satuan3Id = item.satuan_3;
                             var newRow = '<tr>' +
                                 '<td rowspan="3" style="padding:0px!important;text-align:center;"><span id="nomber">' + counter + '</span></td>' +
-                                '<td colspan="3"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><input type="text" name="spek_old[]" id="spek" class="form-control"  value="' + item.spesifikasi + '"><input type="hidden" name="id_spek[]" id="id_spek" value="' + item.id + '"><label for="floatingInput">Spesifikasi</label></div></div></div></td>' +
+                                '<td colspan="3"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><input type="text" name="spek_old[]" id="spek" class="form-control"  value="' + item.spesifikasi + '"><input type="hidden" name="id_spek[]" id="id_spek_' + counter + '" value="' + item.id + '"><label for="floatingInput">Spesifikasi</label></div></div></div></td>' +
                                 '<td rowspan="3" style="padding:0px!important;text-align:center;"><button type="button" class="btn btn-primary" onclick="addRow(\'tbody2\')"><i class="fas fa-plus"></i></button>' +
-                                '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\')"><i class="far fa-trash-alt"></i></button></td>' +
+                                '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\',' + counter + ')"><i class="far fa-trash-alt"></i></button></td>' +
                                 '</tr>' +
                                 '<tr>' +
                                 '<td colspan="3">' +
