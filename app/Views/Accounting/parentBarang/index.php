@@ -143,7 +143,7 @@
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
             serverSide: true,
-            ordering: true,
+            ordering: false,
             order: [
                 [1, 'asc']
             ],
@@ -179,12 +179,15 @@
             }, {
                 data: "parent_name",
                 className: "text-center",
+                sortable: false,
             }, {
                 data: "ap_id",
                 className: "text-center",
+                sortable: false,
             }, {
                 data: "ar_id",
                 className: "text-center",
+                sortable: false,
             }, ],
             columnDefs: [{
                 defaultContent: "-",
