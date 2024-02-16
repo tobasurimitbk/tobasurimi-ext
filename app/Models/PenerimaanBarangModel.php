@@ -19,6 +19,7 @@ class PenerimaanBarangModel extends Model
         'company_id',
         'supplier_id',
         'warehouse_id',
+        'divisi_id',
         'tanggal',
         'bc_type',
         'no_penerimaan_barang',
@@ -71,18 +72,20 @@ class PenerimaanBarangModel extends Model
             'supplier_name'             => 'suppliers.name',
             'createdAt'                 => 'penerimaan_barang.createdAt',
             'updatedAt'                 => 'penerimaan_barang.updatedAt',
+            'divisi'                    => 'divisis.divisi'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "penerimaan_barang.*, warehouses.warehouse_name, suppliers.name as supplier_name, COUNT(penerimaan_barang_detail.id) AS itemCount";
+        $selectQry = "penerimaan_barang.*, warehouses.warehouse_name, suppliers.name as supplier_name, COUNT(penerimaan_barang_detail.id) AS itemCount, divisis.divisi";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
             ->orderBy($sort, $sortType);

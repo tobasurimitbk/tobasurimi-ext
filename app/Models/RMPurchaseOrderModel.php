@@ -65,14 +65,15 @@ class RMPurchaseOrderModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getNoPenerimaanBarang($supplier_id, $company_id)
+    public function getNoPenerimaanBarang($supplier_id, $company_id, $divisi_id)
     {
         $arrCondition = [
             'deletedAt' => null,
             'supplier_id' => $supplier_id,
             'is_posted' => 1,
             'status_penerimaan' => 0,
-            'company_id' => $company_id
+            'company_id' => $company_id,
+            'divisi_id' => $divisi_id
         ];
 
         $builder = $this->db->table('rm_purchase_orders');

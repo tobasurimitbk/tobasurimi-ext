@@ -641,8 +641,13 @@ class POLokalBahanBaku extends BaseController
     public function dropdownPOLokalBahanBaku()
     {
         $id = formatter($this->request->getVar("id"), "STR_TO_INT");
+        $divisi_id = $this->request->getVar('divisi_id');
 
-        $dataPOLokal = $this->RMPurchaseOrderModel->getNoPenerimaanBarang($id, $this->this_company_id);
+        $dataPOLokal = $this->RMPurchaseOrderModel->getNoPenerimaanBarang(
+            $id,
+            $this->this_company_id,
+            $divisi_id
+        );
 
         $data = [
             "data" => $dataPOLokal
