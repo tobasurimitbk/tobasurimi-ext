@@ -106,6 +106,7 @@ class TipeBarang extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
+            "filter_coa"        => $this->request->getGet("filter_coa"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];
