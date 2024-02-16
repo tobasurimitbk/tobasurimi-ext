@@ -35,7 +35,7 @@
                             <option value="belum" data-code="">Belum Punya COA</option>
                             <option value="sudah" data-code="">Sudah Punya COA</option>
                         </select>
-                        <label for="floatingInput">Filter</label>
+                        <label for="floatingInput">Filter Akun</label>
                     </div>
                 </div>
                 <div class="col-md-3">
