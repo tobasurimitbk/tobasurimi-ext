@@ -64,13 +64,14 @@ class BarangMasterSalesModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master_sales.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "barang_master_sales.*,
+        $selectQry = "barang_master_sales.*, barang_master_sales_spesifikasi.spesifikasi, barang_master_sales_spesifikasi.satuan_1, barang_master_sales_spesifikasi.satuan_2, barang_master_sales_spesifikasi.konversi_satuan_2, barang_master_sales_spesifikasi.satuan_3, barang_master_sales_spesifikasi.konversi_satuan_3,
                     parent_barang.parent_name AS kelompok_barang";
 
         $barangDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
             ->join('parent_barang', 'parent_barang.id = barang_master_sales.parent_type_id', 'left')
+            ->join('barang_master_sales_spesifikasi', 'barang_master_sales_spesifikasi.barang_master_sales_id = barang_master_sales.id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $barangDataQry->countAllResults(false);
