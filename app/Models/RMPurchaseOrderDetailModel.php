@@ -187,34 +187,75 @@ class RMPurchaseOrderDetailModel extends Model
             $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
             $sisaDiterima = $b['qty'] - $jmlMasukAll;
 
-            $res[] = [
-                'rm_purchase_order_details_id' => $b['id'],
-                'rm_purchase_order_id' => $b['rm_purchase_order_id'],
-                'kode_barang' => $b['kode_barang'],
-                'nama_barang' => $b['nama_barang'] . ' (' . $b['spesifikasi'] . ')',
-                'po_no' => $b['po_no'],
-                'satuan' => $b['kode_satuan'],
-                'jml_order' => $b['qty'],
-                'jml_diterima_lpb' => $inLPB,
-                'jml_diterima_total' => $jmlMasukAll,
-                'sisa_total' => $sisaDiterima,
-                'harga_umum' => $b['general_price'],
-                'harga_harian' => $b['daily_price'],
-                'harga_bulanan' => $b['monthly_price'],
-                'harga_sum' => ($b['general_price'] + $b['daily_price'] + $b['monthly_price']),
-                'sub_total' => ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price'])),
-                'keterangan' => $b['note']
-            ];
+            if ($penerimaanBarangID == null) {
+                // CREATE
+                if ($sisaDiterima != 0) {
+                    $res[] = [
+                        'rm_purchase_order_details_id' => $b['id'],
+                        'rm_purchase_order_id' => $b['rm_purchase_order_id'],
+                        'kode_barang' => $b['kode_barang'],
+                        'nama_barang' => $b['nama_barang'] . ' (' . $b['spesifikasi'] . ')',
+                        'spesifikasi_name' => $b['spesifikasi'],
+                        'nama_barang_master' => $b['nama_barang'],
+                        'po_no' => $b['po_no'],
+                        'satuan' => $b['kode_satuan'],
+                        'jml_order' => $b['qty'],
+                        'jml_diterima_lpb' => $inLPB,
+                        'jml_diterima_total' => $jmlMasukAll,
+                        'sisa_total' => $sisaDiterima,
+                        'harga_umum' => $b['general_price'],
+                        'harga_harian' => $b['daily_price'],
+                        'harga_bulanan' => $b['monthly_price'],
+                        'harga_sum' => ($b['general_price'] + $b['daily_price'] + $b['monthly_price']),
+                        'sub_total' => ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price'])),
+                        'keterangan' => $b['note']
+                    ];
 
-            $jmlOrderTotal += $b['qty'];
-            $jmlDiterimaInTotal += $inLPB;
-            $jmlDiterimaTotal +=   $jmlMasukAll;
-            $sisaDiterimaTotal += $sisaDiterima;
-            $hargaHarianTotal += $b['daily_price'];
-            $hargaBulananTotal += $b['monthly_price'];
-            $hargaUmumTotal += $b['general_price'];
-            $hargaSumTotal +=  ($b['general_price'] + $b['daily_price'] + $b['monthly_price']);
-            $subTotal += ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price']));
+                    $jmlOrderTotal += $b['qty'];
+                    $jmlDiterimaInTotal += $inLPB;
+                    $jmlDiterimaTotal +=   $jmlMasukAll;
+                    $sisaDiterimaTotal += $sisaDiterima;
+                    $hargaHarianTotal += $b['daily_price'];
+                    $hargaBulananTotal += $b['monthly_price'];
+                    $hargaUmumTotal += $b['general_price'];
+                    $hargaSumTotal +=  ($b['general_price'] + $b['daily_price'] + $b['monthly_price']);
+                    $subTotal += ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price']));
+                }
+            } else {
+                // UPDATE
+                if ($inLPB != 0) {
+                    $res[] = [
+                        'rm_purchase_order_details_id' => $b['id'],
+                        'rm_purchase_order_id' => $b['rm_purchase_order_id'],
+                        'kode_barang' => $b['kode_barang'],
+                        'nama_barang' => $b['nama_barang'] . ' (' . $b['spesifikasi'] . ')',
+                        'spesifikasi_name' => $b['spesifikasi'],
+                        'nama_barang_master' => $b['nama_barang'],
+                        'po_no' => $b['po_no'],
+                        'satuan' => $b['kode_satuan'],
+                        'jml_order' => $b['qty'],
+                        'jml_diterima_lpb' => $inLPB,
+                        'jml_diterima_total' => $jmlMasukAll,
+                        'sisa_total' => $sisaDiterima,
+                        'harga_umum' => $b['general_price'],
+                        'harga_harian' => $b['daily_price'],
+                        'harga_bulanan' => $b['monthly_price'],
+                        'harga_sum' => ($b['general_price'] + $b['daily_price'] + $b['monthly_price']),
+                        'sub_total' => ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price'])),
+                        'keterangan' => $b['note']
+                    ];
+
+                    $jmlOrderTotal += $b['qty'];
+                    $jmlDiterimaInTotal += $inLPB;
+                    $jmlDiterimaTotal +=   $jmlMasukAll;
+                    $sisaDiterimaTotal += $sisaDiterima;
+                    $hargaHarianTotal += $b['daily_price'];
+                    $hargaBulananTotal += $b['monthly_price'];
+                    $hargaUmumTotal += $b['general_price'];
+                    $hargaSumTotal +=  ($b['general_price'] + $b['daily_price'] + $b['monthly_price']);
+                    $subTotal += ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price']));
+                }
+            }
         }
 
         return [

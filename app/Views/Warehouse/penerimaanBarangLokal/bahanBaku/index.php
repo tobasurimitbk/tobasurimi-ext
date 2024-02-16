@@ -44,8 +44,8 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
+                                <th>No</th>
+                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                                 <th>No. PO</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
@@ -109,7 +109,7 @@
                 orderable: false
             },
             {
-                data: "tipe_bahan",
+                data: "divisi",
                 className: "text-center"
             },
             {
