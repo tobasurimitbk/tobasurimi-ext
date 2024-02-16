@@ -166,7 +166,9 @@
             },
             {
                 data: "totalBagian",
-                className: "text-center"
+                className: "text-center",
+                searchable: false,
+                sortable: false,
             }, {
                 data: "id",
                 className: "text-center actions",

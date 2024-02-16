@@ -153,30 +153,44 @@
                     if (status == "WAITING") {
                         return `
                         <div class="mt-0">
-                        <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
-                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                        </button>
-                        <button onclick="posting(${id})" class="btn btn-success posting-spp">
-                            <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                        </button>
-                        <button onclick="remove(${id})" class="btn btn-danger delete-parent">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        </button>
+                            <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Warehouse', 'P. Barang Lokal BB', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Warehouse', 'P. Barang Lokal BB', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
                         </div>
                     `
                     } else {
                         return `
-                        <div class="mt-0" style="text-align:center;">
-                        <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
-                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                        </button>
-                        </div>
+                        <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
+                            <div class="mt-0" style="text-align:center;">
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     `
                     }
 
                 }
             }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
