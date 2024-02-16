@@ -601,8 +601,8 @@
 
                             $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
                                 theme: "bootstrap-5",
-                                allowClear: true,
                                 placeholder: 'Pilih Satuan',
+                                allowClear: true,
                                 dropdownParent: $(".add-modal .modal-content")
                             });
                             counter++;
@@ -1195,7 +1195,7 @@
                 } else {
                     table.deleteRow(rowCount - 1);
                     table.deleteRow(rowCount - 2);
-                    rowCount -= 3;
+                    rowCount -= 2;
                 }
             } else {
                 Swal.fire({
