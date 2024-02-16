@@ -144,8 +144,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran" value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "")  : ""; ?>">
-                                    <label for="floatingInput">Tanggal Pembayaran</label>
+                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran" value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date != "0000-00-00" ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "")  : ""; ?>">
+                                    <label for="floatingInput">Tanggal Pembayaran (Opsional)</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-payment-date"></i>
@@ -169,7 +169,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
-                            <label for="floatingInput">Termin (Opsional)</label>
+                            <label for="floatingInput">Termin</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -598,8 +598,11 @@
             supplier_id: {
                 required: true,
             },
-            payment_date: {
-                required: true,
+            // payment_date: {
+            //     required: true,
+            // },
+            payment_term: {
+                required: true
             },
             currency: {
                 required: true
@@ -620,7 +623,9 @@
                 required: true
             },
             potongan_harga: {
-                required: true
+                required: true,
+                number: true,
+                min: 0
             }
         },
         messages: {
@@ -636,8 +641,11 @@
             supplier_id: {
                 required: "Pilih supplier"
             },
-            payment_date: {
-                required: "Tanggal pembayaran wajib diisi"
+            // payment_date: {
+            //     required: "Tanggal pembayaran wajib diisi"
+            // },
+            payment_term: {
+                required: "Payment term wajib diisi"
             },
             currency: {
                 required: "Pilih mata uang"
@@ -658,7 +666,9 @@
                 required: "ATTN wajib diisi"
             },
             potongan_harga: {
-                required: "Isikan angka 0 jika tidak ada potongan"
+                required: "Isikan angka 0 jika tidak ada potongan",
+                number: "Isikan hanya angka",
+                min: "Masukkan minimal 0"
             },
         },
         errorElement: 'span',

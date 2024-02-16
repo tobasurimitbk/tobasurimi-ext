@@ -209,7 +209,7 @@
             },
             messages: {
                 divisi: {
-                    required: "Divisi wajib diisi"
+                    required: "Departemen wajib diisi"
                 },
                 jam_kerja_id: {
                     required: "Jam Kerja wajib diisi"
