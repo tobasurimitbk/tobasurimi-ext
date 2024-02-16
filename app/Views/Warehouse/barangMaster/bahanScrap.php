@@ -10,9 +10,21 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
+            <div class="row justify-content-end">
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_coa" name="filter_coa" id="filter_coa">
+                            <option value="" data-code=""></option>
+                            <option value="belum" data-code="">Belum Punya COA</option>
+                            <option value="sudah" data-code="">Sudah Punya COA</option>
+                        </select>
+                        <label for="floatingInput">Filter Akun</label>
+                    </div>
+                </div>
                 <div class="col-md-3 col mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
+                    <div class="form-group mb-3">
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" style="height: 50px;" />
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -226,6 +238,7 @@
                     data.sort = sort;
                     data.sortType = sortType;
                     data.parent_type = "<?= $type ?>";
+                    data.filter_coa = $(".filter_coa").val();
                 }
             },
             "initComplete": function(settings, json) {
@@ -293,6 +306,10 @@
         });
 
         $(".search").keyup(function() {
+            table.ajax.reload();
+        });
+
+        $(".filter_coa").change(function() {
             table.ajax.reload();
         });
 
@@ -1195,6 +1212,33 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
+
+    $('.filter_coa').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.filter_coa')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.filter_coa')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.filter_coa')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
     $("#satuan1_id, #satuan2_id, #satuan3_id")
         .parent('div')

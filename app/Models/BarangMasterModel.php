@@ -94,6 +94,19 @@ class BarangMasterModel extends Model
             $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
         }
 
+
+        if ($addCondition['filter_coa']) {
+            $barangDataQry->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left');
+        }
+
+        if ($addCondition['filter_coa'] == "belum") {
+            $barangDataQry->where('account_barang.ap_id', NULL);
+        }
+
+        if ($addCondition['filter_coa'] == "sudah") {
+            $barangDataQry->where('account_barang.ap_id !=', NULL);
+        }
+
         if ($addCondition['search']) {
             $barangDataQry->groupEnd();
         }
