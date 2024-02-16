@@ -373,7 +373,7 @@
 
     });
 
-    $('#division_id, #supplier_id').change(function() {
+    $('#division_id').change(function() {
         getListSPP();
     });
 

@@ -598,9 +598,13 @@
 
         $('.spp_id').select2({
             placeholder: "Pilih Nomor SPP",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            allowClear: true
         }).change(function() {
             var supplier_id = $('.supplier_id').val();
+            var spp_id = $('.spp_id').val();
+
+            console.log(spp_id);
             if (supplier_id !== '') {
                 getDetailSPP();
             } else {
@@ -648,6 +652,8 @@
             placeholder: "Pilih Supplier",
             theme: "bootstrap-5"
         }).change(function() {
+            list_items = [];
+            drawTable();
             getDetailSPP();
         });
 
