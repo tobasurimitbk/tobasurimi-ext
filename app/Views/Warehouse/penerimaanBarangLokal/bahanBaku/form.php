@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataPenerimaanBarang)) : ?>
@@ -87,6 +87,7 @@
                             </select>
                             <label for="floatingInput">Departemen</label>
                         </div>
+                        <small class="mb-3"><i>Hanya menampilkan departemen yang nomor PO nya belum sepenuhnya diterima</i></small>
                     </div>
                 </div>
                 <div class="row">
@@ -153,7 +154,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataAJU as $aju) : ?>
@@ -162,6 +163,7 @@
                             </select>
                             <label for="floatingInput">Dokumen Pabean (Opsional)</label>
                         </div>
+                        <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
                     </div>
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
@@ -598,6 +600,9 @@
                 number: true,
                 min: 0
             },
+            divisi_id: {
+                required: true
+            },
             tanggal_penerimaan_lpb: {
                 required: true
             }
@@ -623,6 +628,9 @@
             ongkos_kirim: {
                 number: "Masukkan hanya angka",
                 min: "Tidak boleh minus"
+            },
+            divisi_id: {
+                required: "Departemen wajib diisi"
             },
             tanggal_penerimaan_lpb: {
                 required: "Tanggal barang diterima wajib diisi"

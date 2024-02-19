@@ -263,6 +263,10 @@
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -305,6 +309,10 @@
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",

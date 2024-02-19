@@ -45,7 +45,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
+                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                                 <th>No. PO</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
@@ -109,7 +109,7 @@
                 orderable: false
             },
             {
-                data: "tipe_bahan",
+                data: "divisi",
                 className: "text-center"
             },
             {
@@ -153,30 +153,44 @@
                     if (status == "WAITING") {
                         return `
                         <div class="mt-0">
-                        <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
-                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                        </button>
-                        <button onclick="posting(${id})" class="btn btn-success posting-spp">
-                            <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                        </button>
-                        <button onclick="remove(${id})" class="btn btn-danger delete-parent">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        </button>
+                            <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Warehouse', 'P. Barang Lokal BP', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Warehouse', 'P. Barang Lokal BP', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
                         </div>
                     `
                     } else {
                         return `
-                        <div class="mt-0" style="text-align:center;">
-                        <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
-                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                        </button>
-                        </div>
+                        <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
+                            <div class="mt-0" style="text-align:center;">
+                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     `
                     }
 
                 }
             }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -249,6 +263,10 @@
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -291,6 +309,10 @@
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
