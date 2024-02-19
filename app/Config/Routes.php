@@ -737,6 +737,9 @@ $routes->post('/penerimaan-barang-import-bb/update', 'Warehouse\PenerimaanBarang
 $routes->get('/penerimaan-barang-import-bb/print/(:segment)', 'Warehouse\PenerimaanBarangImportBB::print/$1', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-import-bb/delete', 'Warehouse\PenerimaanBarangImportBB::delete', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-import-bb/posting', 'Warehouse\PenerimaanBarangImportBB::posting', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bb/get-divisi', 'Warehouse\PenerimaanBarangImportBB::dropdownDivisiPOLokalBP', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bb/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+
 
 // PENERIMAAN BARANG IMPORT BP
 $routes->get('/penerimaan-barang-import-bp', 'Warehouse\PenerimaanBarangImportBP::index', ['filter' => 'Auth']);

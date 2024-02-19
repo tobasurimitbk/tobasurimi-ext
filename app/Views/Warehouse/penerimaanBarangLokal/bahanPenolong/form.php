@@ -1005,7 +1005,11 @@
                             id: $('.id').val()
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -1044,7 +1048,11 @@
                             id: $('.id').val()
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",

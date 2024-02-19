@@ -186,6 +186,7 @@ class PenerimaanBarangLokalBP extends BaseController
             'kemasan_id' => $this->request->getVar('kemasan_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
+            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
             'acceptance_type' => $this->request->getVar('acceptance_type'),
             'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
             'multiple_po_no' => $this->request->getVar('multiple_po_no'),
@@ -228,7 +229,7 @@ class PenerimaanBarangLokalBP extends BaseController
         }
 
         return response()->setJSON([
-            'message' => "Penerimaan barang BP berhasil disimpan",
+            'message' => "Penerimaan barang Lokal BP berhasil disimpan",
             'token' => csrf_hash(),
             'status' => true,
             'id' => encrypt($penerimaanBarangID)
@@ -275,6 +276,7 @@ class PenerimaanBarangLokalBP extends BaseController
             'supplier_id' => $this->request->getVar('supplier_id'),
             'divisi_id' => $this->request->getVar('divisi_id'),
             'kemasan_id' => $this->request->getVar('kemasan_id'),
+            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
             'acceptance_type' => $this->request->getVar('acceptance_type'),
@@ -330,7 +332,7 @@ class PenerimaanBarangLokalBP extends BaseController
                     ->first();
 
                 $this->amPurchaseOrderDetailModel
-                    ->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
+                    ->where('id', $b->am_purchase_order_details_id)
                     ->where('am_purchase_order_id', $b->am_purchase_order_id)
                     ->set('remaining_qty', $last['remaining_qty'] +  $b->jml_diterima_lpb)
                     ->set('qty_diterima', $last['qty_diterima'] - $b->jml_diterima_lpb)
@@ -345,7 +347,7 @@ class PenerimaanBarangLokalBP extends BaseController
         }
 
         return response()->setJSON([
-            'message' => "Berhasil update penerimaan barang BP",
+            'message' => "Berhasil update penerimaan barang lokal BP",
             'token' => csrf_hash(),
             'status' => true
         ]);

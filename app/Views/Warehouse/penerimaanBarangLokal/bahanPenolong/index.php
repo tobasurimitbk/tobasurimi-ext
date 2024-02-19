@@ -174,7 +174,7 @@
                         return `
                         <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
                             <div class="mt-0" style="text-align:center;">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             </div>
