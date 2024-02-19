@@ -9,21 +9,29 @@
                 Batal
             </a>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?><?= $dataPenerimaanBarang['id']; ?>')">
-                    Print
-                </button>
+                <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?><?= encrypt($dataPenerimaanBarang['id']); ?>')">
+                        Print
+                    </button>
+                <?php endif; ?>
             <?php endif; ?>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
                 <?php if ($dataPenerimaanBarang['status_post'] === "WAITING") : ?>
-                    <button class="btn btn-hapus delete-parent float-right">
-                        Hapus
-                    </button>
-                    <button class="btn btn-success posting-spp float-right posting-lpb">
-                        Posting
-                    </button>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                        Simpan
-                    </button>
+                    <?php if (can('Warehouse', 'P. Barang Lokal BB', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Warehouse', 'P. Barang Lokal BB', 'a')) : ?>
+                        <button class="btn btn-success posting-spp float-right posting-lpb">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Warehouse', 'P. Barang Lokal BB', 'u')) : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                            Simpan
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -121,7 +129,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['jumlah_kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="jumlah_kemasan" name="jumlah_kemasan" placeholder="Jumlah Kemasan">
+                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['jumlah_kemasan'] : ""; ?>" type="number" class="form-control kemasan" id="jumlah_kemasan" name="jumlah_kemasan" placeholder="Jumlah Kemasan">
                             <label for="floatingInput">Jumlah Kemasan</label>
                         </div>
                     </div>
@@ -152,18 +160,24 @@
                                     <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
+                            <label for="floatingInput">Dokumen Pabean (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : date('d/m/Y'); ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
                                 <label for="floatingInput">Tanggal Barang Diterima</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
                                 <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['ongkos_kirim'] : ""; ?>" class="form-control ongkos_kirim" type="number" id="ongkos_kirim" name="ongkos_kirim" placeholder="Ongkos Kirim">
+                            <label for="floatingInput">Ongkos Kirim (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -306,13 +320,13 @@
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly autocomplete="one-time-code" type="text" class="form-control nama_barang_dokumen" id="nama_barang_dokumen" name="nama_barang_dokumen" placeholder="Nama Barang di dokumen">
-                                <label for="floatingInput">Nama Barang di dokumen</label>
+                                <label for="floatingInput">Nama Barang di dokumen (Bea Cukai)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly autocomplete="one-time-code" type="text" class="form-control harga" id="harga" name="harga" placeholder="Harga">
-                                <label for="floatingInput">Harga</label>
+                                <label for="floatingInput">Harga Satuan<label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -580,6 +594,10 @@
                 number: true,
                 min: 0
             },
+            ongkos_kirim: {
+                number: true,
+                min: 0
+            },
             tanggal_penerimaan_lpb: {
                 required: true
             }
@@ -599,6 +617,10 @@
             },
             jumlah_kemasan: {
                 required: "Jumlah kemasan wajib diisi",
+                number: "Masukkan hanya angka",
+                min: "Tidak boleh minus"
+            },
+            ongkos_kirim: {
                 number: "Masukkan hanya angka",
                 min: "Tidak boleh minus"
             },
@@ -893,6 +915,12 @@
                 data: {
                     warehouseID: $('#warehouse_id').val()
                 },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
@@ -964,7 +992,11 @@
                             id: $('.id').val()
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -1003,7 +1035,11 @@
                             id: $('.id').val()
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",

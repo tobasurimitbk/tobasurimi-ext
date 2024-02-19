@@ -180,6 +180,7 @@ class PenerimaanBarangLokalBB extends BaseController
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
             'no_invoice' => $this->request->getVar('no_invoice'),
             "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
+            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
             "tipe_bahan" => "BAKU",
             "status_post" => "WAITING",
             "status_penerimaan" => "LOKAL",
@@ -273,6 +274,7 @@ class PenerimaanBarangLokalBB extends BaseController
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
             'no_invoice' => $this->request->getVar('no_invoice'),
+            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
             "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
         ]);
 
@@ -346,6 +348,7 @@ class PenerimaanBarangLokalBB extends BaseController
 
     public function print($id)
     {
+        $id = decrypt($id);
         if ($id) {
             $filename = "Penerimaan Barang Lokal";
 
@@ -363,7 +366,7 @@ class PenerimaanBarangLokalBB extends BaseController
 
     public function delete()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
 
         $this->penerimaanBarangModel->where('id', $id)->delete();
         $penerimaanBarangList = $this->penerimaanBarangDetailModel->asObject()->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();

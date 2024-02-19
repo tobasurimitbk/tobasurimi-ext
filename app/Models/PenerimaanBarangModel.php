@@ -34,6 +34,7 @@ class PenerimaanBarangModel extends Model
         'jumlah_kemasan',
         'no_surat_jalan',
         'no_invoice',
+        'ongkos_kirim',
         'createdAt',
         'updatedAt',
         'deletedAt',
@@ -492,7 +493,7 @@ class PenerimaanBarangModel extends Model
             return;
         }
 
-        $poIDArr = json_decode(json_decode($penerimaanFirst['multiple_po_id']));
+        $poIDArr = json_decode(($penerimaanFirst['multiple_po_id']));
 
         if ($penerimaanFirst['status_penerimaan'] == "LOKAL" && $penerimaanFirst['tipe_bahan'] == "PENOLONG") {
             // PO LOKAL BAHAN PENOLONG

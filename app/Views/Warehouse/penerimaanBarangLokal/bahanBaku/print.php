@@ -140,7 +140,7 @@
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == 0) ? "Non Pabean - 0" : $dataPenerimaanBarang->bc_type ?></span></div>
+                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == 0) ? "Non Pabean" : $dataPenerimaanBarang->bc_type ?></span></div>
                 </td>
                 <td>
                     <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
