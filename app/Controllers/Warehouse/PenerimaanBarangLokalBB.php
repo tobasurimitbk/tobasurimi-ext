@@ -221,7 +221,7 @@ class PenerimaanBarangLokalBB extends BaseController
         }
 
         return response()->setJSON([
-            'message' => "Penerimaan barang BB berhasil disimpan",
+            'message' => "Penerimaan barang lokal BB berhasil disimpan",
             'token' => csrf_hash(),
             'status' => true,
             'id' => encrypt($penerimaanBarangID)
@@ -343,7 +343,7 @@ class PenerimaanBarangLokalBB extends BaseController
         }
 
         return response()->setJSON([
-            'message' => "Berhasil update penerimaan barang BB",
+            'message' => "Berhasil update penerimaan barang lokal BB",
             'token' => csrf_hash(),
             'status' => true
         ]);

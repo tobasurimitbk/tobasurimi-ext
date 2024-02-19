@@ -7,6 +7,8 @@ use App\Models\PenerimaanBarangModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\BarangMasterModel;
+use App\Models\DivisisModel;
+use App\Models\KemasanModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\RMPurchaseOrderModel;
@@ -35,6 +37,8 @@ class PenerimaanBarangImportBP extends BaseController
     protected $supplierHargaModel;
     protected $stockDetailModel;
     protected $warehouseModel;
+    protected $divisiModel;
+    protected $kemasanModel;
     protected $dompdf;
 
     public function __construct()
@@ -55,6 +59,8 @@ class PenerimaanBarangImportBP extends BaseController
         $this->stockDetailModel = new StockDetailModel();
         $this->supplierHargaModel = new SupplierHargaModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->divisiModel = new DivisisModel();
+        $this->kemasanModel = new KemasanModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -106,14 +112,15 @@ class PenerimaanBarangImportBP extends BaseController
         foreach ($penerimaanBarangData['data'] as $data) {
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
-                "id"                    => $data->id,
+                "id"                    => encrypt($data->id),
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
                 "warehouse_name"        => $data->warehouse_name,
                 "tipe_bahan"            => $data->tipe_bahan,
+                "divisi"            => $data->divisi,
                 "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
-                "multiple_po_no"        => str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no),
+                "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
             ]);
         }
@@ -137,12 +144,16 @@ class PenerimaanBarangImportBP extends BaseController
         $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataSatuan = $this->satuanModel->asObject()->find();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
 
         $data = [
             "dataSatuan" => $dataSatuan,
             "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
-            "dataAJU" => $dataAJU
+            "dataAJU" => $dataAJU,
+            "dataDivisi" => $dataDivisi,
+            "dataKemasan" => $dataKemasan
         ];
 
         return view('Warehouse/penerimaanBarangImport/bahanPenolong/form', $data);
@@ -152,18 +163,36 @@ class PenerimaanBarangImportBP extends BaseController
     {
         $barangs = $this->request->getVar('barangs');
 
+        // Cek Kekosongan
+        $jml_diterima_lpb = 0;
+        foreach (json_decode($barangs) as $b) {
+            $jml_diterima_lpb += $b->jml_diterima_lpb;
+        }
+
+        if ($jml_diterima_lpb == 0) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Isikan minimal satu item barang yang akan diterima",
+                'status' => false
+            ]);
+        }
+
         $penerimaanBarangID = $this->penerimaanBarangModel->insert([
             'company_id' => $this->this_company_id,
             'bc_type' => $this->request->getVar('aju_document_type'),
             'supplier_id' => $this->request->getVar('supplier_id'),
+            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
+            'kemasan_id' => $this->request->getVar('kemasan_id'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
             'acceptance_type' => $this->request->getVar('acceptance_type'),
-            'multiple_po_id' => json_encode($this->request->getVar('multiple_po_id')),
-            'multiple_po_no' => json_encode($this->request->getVar('multiple_po_no')),
+            'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
+            'multiple_po_no' => $this->request->getVar('multiple_po_no'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
+            'no_invoice' => $this->request->getVar('no_invoice'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             "tipe_bahan" => "PENOLONG",
             "status_post" => "WAITING",
@@ -182,6 +211,7 @@ class PenerimaanBarangImportBP extends BaseController
                 'purchase_order_details_id' => $b->am_purchase_order_details_id,
                 'penerimaan_barang_id' => $penerimaanBarangID,
                 'barang_id' => $barang == null ? 0 : $barang['id'],
+                'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
                 'unit' => $poDetail == null ? 0 : $poDetail['unit'],
                 'harga' => $b->harga,
                 'sub_total' => $b->sub_total,
@@ -200,23 +230,33 @@ class PenerimaanBarangImportBP extends BaseController
             'message' => "Penerimaan barang Import BP berhasil disimpan",
             'token' => csrf_hash(),
             'status' => true,
-            'id' => $penerimaanBarangID
+            'id' => encrypt($penerimaanBarangID)
         ]);
     }
 
     public function update($id)
     {
+        $id = decrypt($id);
+
+        if ($this->penerimaanBarangModel->find($id) == null) {
+            return redirect()->to('penerimaan-barang-import-bp');
+        }
+
         $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
         $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataSatuan = $this->satuanModel->asObject()->find();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
 
         $data = [
             "dataSatuan" => $dataSatuan,
             "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
             "dataAJU" => $dataAJU,
-            "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first()
+            "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first(),
+            "dataKemasan"   => $dataKemasan,
+            "dataDivisi" => $dataDivisi,
         ];
 
         return view('Warehouse/penerimaanBarangImport/bahanPenolong/form', $data);
@@ -224,7 +264,7 @@ class PenerimaanBarangImportBP extends BaseController
 
     public function updateAction()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $barangs = $this->request->getVar('barangs');
 
         $this->penerimaanBarangModel->update($id, [
@@ -232,11 +272,15 @@ class PenerimaanBarangImportBP extends BaseController
             'bc_type' => $this->request->getVar('aju_document_type'),
             'supplier_id' => $this->request->getVar('supplier_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
+            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
+            'kemasan_id' => $this->request->getVar('kemasan_id'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
             'acceptance_type' => $this->request->getVar('acceptance_type'),
-            'multiple_po_id' => json_encode($this->request->getVar('multiple_po_id')),
+            'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
             'multiple_po_no' => json_encode($this->request->getVar('multiple_po_no')),
-            'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+            'multiple_po_no' => $this->request->getVar('multiple_po_no'),
+            'no_invoice' => $this->request->getVar('no_invoice'),
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
@@ -244,7 +288,7 @@ class PenerimaanBarangImportBP extends BaseController
         ]);
 
         // delete first in penerimaan_barang_detail
-        $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
+        // $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
 
         foreach (json_decode($barangs) as $b) {
             $poDetail = $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->first();
@@ -252,27 +296,55 @@ class PenerimaanBarangImportBP extends BaseController
             if ($poDetail != null) {
                 $barang = $this->barangMasterModel->where('id', $poDetail['barang_id'])->first();
             }
-            $this->penerimaanBarangDetailModel->insert([
-                'purchase_order_id' => $b->am_purchase_order_id,
-                'purchase_order_details_id' => $b->am_purchase_order_details_id,
-                'penerimaan_barang_id' => $id,
-                'barang_id' => $barang == null ? 0 : $barang['id'],
-                'unit' => $poDetail == null ? 0 : $poDetail['unit'],
-                'harga' => $b->harga,
-                'sub_total' => $b->sub_total,
-                'qty' => $b->jml_order,
-                'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
-                'jml_masuk' => $b->jml_diterima_lpb,
-            ]);
-            // update remeaning di detail po
-            $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
-                ->set('remaining_qty', $b->sisa_total)
-                ->set('qty_diterima', $b->jml_diterima_total)
-                ->update();
+
+            if ($b->jml_diterima_lpb != 0) {
+                $penerimaanBarangDetailFirst = $this->penerimaanBarangDetailModel
+                    ->where('penerimaan_barang_id', $id)
+                    ->where('purchase_order_id', $b->am_purchase_order_id)
+                    ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
+                    ->first();
+
+                $this->penerimaanBarangDetailModel->update($penerimaanBarangDetailFirst['id'], [
+                    'purchase_order_id' => $b->am_purchase_order_id,
+                    'purchase_order_details_id' => $b->am_purchase_order_details_id,
+                    'penerimaan_barang_id' => $id,
+                    'barang_id' => $barang == null ? 0 : $barang['id'],
+                    'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
+                    'unit' => $poDetail == null ? 0 : $poDetail['unit'],
+                    'harga' => $b->harga,
+                    'sub_total' => $b->sub_total,
+                    'qty' => $b->jml_order,
+                    'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
+                    'jml_masuk' => $b->jml_diterima_lpb,
+                ]);
+                // update remeaning di detail po
+                $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
+                    ->set('remaining_qty', $b->sisa_total)
+                    ->set('qty_diterima', $b->jml_diterima_total)
+                    ->update();
+            } else {
+                $last = $this->amPurchaseOrderDetailModel
+                    ->where('id',  $b->am_purchase_order_details_id)
+                    ->where('am_purchase_order_id', $b->am_purchase_order_id)
+                    ->first();
+
+                $this->amPurchaseOrderDetailModel
+                    ->where('id', $b->am_purchase_order_details_id)
+                    ->where('am_purchase_order_id', $b->am_purchase_order_id)
+                    ->set('remaining_qty', $last['remaining_qty'] +  $b->jml_diterima_lpb)
+                    ->set('qty_diterima', $last['qty_diterima'] - $b->jml_diterima_lpb)
+                    ->update();
+
+                $this->penerimaanBarangDetailModel
+                    ->where('penerimaan_barang_id', $id)
+                    ->where('purchase_order_id', $b->am_purchase_order_id)
+                    ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
+                    ->delete();
+            }
         }
 
         return response()->setJSON([
-            'message' => "Berhasil update penerimaan barang",
+            'message' => "Berhasil update penerimaan barang import BP",
             'token' => csrf_hash(),
             'status' => true
         ]);
@@ -280,6 +352,8 @@ class PenerimaanBarangImportBP extends BaseController
 
     public function print($id)
     {
+        $id = decrypt($id);
+
         if ($id) {
             $filename = "Penerimaan Barang Import";
 
@@ -297,7 +371,7 @@ class PenerimaanBarangImportBP extends BaseController
 
     public function delete()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
 
         $this->penerimaanBarangModel->where('id', $id)->delete();
         $penerimaanBarangList = $this->penerimaanBarangDetailModel->asObject()->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
@@ -324,7 +398,7 @@ class PenerimaanBarangImportBP extends BaseController
 
     public function posting()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $this->penerimaanBarangModel
             ->where(['id' => $id])
             ->set(['status_post' => 'FINISH'])
@@ -333,7 +407,7 @@ class PenerimaanBarangImportBP extends BaseController
         $penerimaanBarangFirst = $this->penerimaanBarangModel->where('id', $id)->first();
         $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
 
-        $test = $this->penerimaanBarangModel->autoClosePO($id);
+        $this->penerimaanBarangModel->autoClosePO($id);
 
         foreach ($penerimaanBarangList as $b) {
             $this->stockDetailModel->addOrReduceStock(
@@ -355,9 +429,38 @@ class PenerimaanBarangImportBP extends BaseController
 
     public function listBarangLPB()
     {
-        $penerimaanBarangID = empty($this->request->getVar('penerimaan_barang_id')) ? null : $this->request->getVar('penerimaan_barang_id');
+        $penerimaanBarangID = empty($this->request->getVar('penerimaan_barang_id')) ? null : decrypt($this->request->getVar('penerimaan_barang_id'));
         $amPurchaseOrderID = json_decode($this->request->getVar('am_purchase_order_id'));
 
         return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, $penerimaanBarangID));
+    }
+
+    public function dropdownDivisiPOImportBP()
+    {
+        // Dapatkan divisi yang ada nomor PO nya
+        $supplierID = $this->request->getVar('id');
+        $condition = [
+            'am_purchase_orders.deletedAt' => null,
+            'am_purchase_orders.supplier_id' => $supplierID,
+            'am_purchase_orders.is_posted' => '1',
+            'am_purchase_orders.status_penerimaan' => '0',
+            'am_purchase_orders.po_type' => 'Import',
+            'divisis.company_id' => $this->this_company_id,
+            'divisis.deletedAt' => null
+        ];
+
+        $selectQry = "divisis.*";
+        $result = $this->divisiModel->select($selectQry)
+            ->join('am_purchase_orders', 'am_purchase_orders.division_id = divisis.id', 'left')
+            ->whereIn('divisis.id', session()->get('login')->this_access_divisi_id)
+            ->where($condition)
+            ->groupBy('divisis.id')
+            ->findAll();
+
+        return response()->setJSON([
+            'data' => $result,
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
     }
 }

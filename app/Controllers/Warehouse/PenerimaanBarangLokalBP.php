@@ -463,6 +463,7 @@ class PenerimaanBarangLokalBP extends BaseController
             'am_purchase_orders.supplier_id' => $supplierID,
             'am_purchase_orders.is_posted' => '1',
             'am_purchase_orders.status_penerimaan' => '0',
+            'am_purchase_orders.po_type' => 'Lokal',
             'divisis.company_id' => $this->this_company_id,
             'divisis.deletedAt' => null
         ];

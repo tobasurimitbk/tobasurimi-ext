@@ -3,27 +3,35 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Penerimaan Barang Import Bahan Penolong</h1>
+        <h1 class="title-name"><?= !empty($dataPenerimaanBarang) ? "Update Penerimaan Barang Import Bahan Penolong" : "Tambah Penerimaan Barang Import Bahan Penolong" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-import-bp"); ?>">
                 Batal
             </a>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import-bp/print/"); ?><?= $dataPenerimaanBarang['id']; ?>')">
-                    Print
-                </button>
+                <?php if (can('Warehouse', 'P. Barang Import BP', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import-bp/print/"); ?><?= encrypt($dataPenerimaanBarang['id']); ?>')">
+                        Print
+                    </button>
+                <?php endif; ?>
             <?php endif; ?>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
                 <?php if ($dataPenerimaanBarang['status_post'] === "WAITING") : ?>
-                    <button class="btn btn-hapus delete-parent float-right">
-                        Hapus
-                    </button>
-                    <button class="btn btn-success posting-spp float-right posting-lpb">
-                        Posting
-                    </button>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                        Simpan
-                    </button>
+                    <?php if (can('Warehouse', 'P. Barang Import BP', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Warehouse', 'P. Barang Import BP', 'a')) : ?>
+                        <button class="btn btn-success posting-spp float-right posting-lpb">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Warehouse', 'P. Barang Import BP', 'u')) : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                            Simpan
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -35,7 +43,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['id'] : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? encrypt($dataPenerimaanBarang['id']) : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row mb-1">
                     <div class="col-md-4">
@@ -50,7 +58,7 @@
                                     <input readonly autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : "LPB//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                                     <label for="floatingInput">No. Penerimaan</label>
                                 </div>
-                                <div style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($dataPenerimaanBarang) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -68,58 +76,84 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                        <div class="form-floating" style="height: 50px;">
+                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataPenerimaanBarang)) : ?>
-                                    <?php foreach (json_decode(json_decode($dataPenerimaanBarang['multiple_po_id'])) as $i => $id) : ?>
-                                        <option selected value="<?= $id ?>"><?= json_decode(json_decode($dataPenerimaanBarang['multiple_po_no']))[$i] ?></option>
+                                    <?php foreach ($dataDivisi as $divisi) : ?>
+                                        <option value="<?= $divisi["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['divisi_id'] === $divisi["id"] ? "selected" : "") : ""; ?>><?= strtoupper($divisi["divisi"]); ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput">No. PO</label>
-
+                            <label for="floatingInput">Departemen</label>
                         </div>
+                        <small class="mb-3"><i>Hanya menampilkan departemen yang nomor PO nya belum sepenuhnya diterima</i></small>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                                <option value=""></option>
+                                <?php if (!empty($dataPenerimaanBarang)) : ?>
+                                    <?php foreach (json_decode(($dataPenerimaanBarang['multiple_po_id'])) as $i => $id) : ?>
+                                        <option selected value="<?= $id ?>"><?= json_decode(($dataPenerimaanBarang['multiple_po_no']))[$i] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput">No. PO</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php foreach ($dataWarehouse as $warehouse) : ?>
-                                    <option value="<?= $warehouse["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['warehouse_id'] === $warehouse["id"] ? "selected" : "") : ""; ?>><?= strtoupper($warehouse["warehouse_name"]); ?></option>
-                                <?php endforeach; ?>
+                                <?php if (!empty($dataPenerimaanBarang)) : ?>
+                                    <?php foreach ($dataWarehouse as $warehouse) : ?>
+                                        <option value="<?= $warehouse["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['warehouse_id'] === $warehouse["id"] ? "selected" : "") : ""; ?>><?= strtoupper($warehouse["warehouse_name"]); ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Pilih Warehouse</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
-                            <label for="floatingInput">Kemasan (Opsional)</label>
+                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select kemasan_id" id="kemasan_id" name="kemasan_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataKemasan as $kemasan) : ?>
+                                    <option value="<?= $kemasan["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['kemasan_id'] === $kemasan["id"] ? "selected" : "") : ""; ?>><?= strtoupper($kemasan["name"]); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Kemasan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['jumlah_kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="jumlah_kemasan" name="jumlah_kemasan" placeholder="Jumlah Kemasan">
-                            <label for="floatingInput">Jumlah Kemasan (Opsional)</label>
+                            <label for="floatingInput">Jumlah Kemasan</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
+                            <label for="floatingInput">Kemasan Tambahan (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_surat_jalan'] : ""; ?>" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="Nomor Surat Jalan">
                             <label for="floatingInput">Nomor Surat Jalan (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_invoice'] : ""; ?>" type="text" class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="Nomor Invoice">
                             <label for="floatingInput">Nomor Invoice (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataAJU as $aju) : ?>
@@ -128,8 +162,9 @@
                             </select>
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
                         </div>
+                        <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : date('d/m/Y', strtotime(date('Y-m-d'))); ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
@@ -140,13 +175,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['ongkos_kirim'] : ""; ?>" class="form-control ongkos_kirim" type="number" id="ongkos_kirim" name="ongkos_kirim" placeholder="Ongkos Kirim">
+                            <label for="floatingInput">Ongkos Kirim (Opsional)</label>
+                        </div>
+                    </div>
                 </div>
             </form>
 
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                        <label class="form-label font-weight-bold modal-sub-title">List Barang <?= !empty($dataPenerimaanBarang) ? "(Hanya Menampilkan Barang berdasarkan data yang sudah disimpan sebelumnya)" : "(Hanya Menampilkan Barang yang Belum Diterima Full)" ?></label>
                     </div>
                 </div>
             </div>
@@ -273,7 +314,7 @@
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <h5 class="title-tambah-barang">Detail Barang di Dokumen</h5>
+                            <h5 class="title-tambah-barang">Detail Barang di Dokumen (Bea Cukai)</h5>
                         </div>
                     </div>
                     <div class="row">
@@ -349,20 +390,27 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
+        // GET DIVISI
         $.ajax({
-            url: `<?= base_url('penerimaan-barang-import-bp/get-po'); ?>`,
+            url: `<?= base_url('penerimaan-barang-import-bp/get-divisi'); ?>`,
             method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
             data: {
-                id: $(".supplier_id option:selected").val()
+                id: $(".supplier_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
-                $(".multiple_po_id").empty()
-                $(".multiple_po_id").append(`<option value=""></option>`)
+                $(".divisi_id").empty()
+                $(".divisi_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                    $(".divisi_id").append(`<option value="${item.id}">${item.divisi}</option>`)
                 })
-                $(".multiple_po_id").val([]);
+                $(".divisi_id").val();
             }
         });
     });
@@ -390,8 +438,71 @@
         }
     });
 
+    $('.divisi_id').select2({
+        placeholder: "Pilih Departemen Purchase Order",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // GET PO
+        $.ajax({
+            url: `<?= base_url('penerimaan-barang-import-bp/get-po'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                id: $(".supplier_id option:selected").val(),
+                divisi_id: $(".divisi_id option:selected").val()
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".multiple_po_id").empty()
+                $(".multiple_po_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                })
+                $(".multiple_po_id").val([]);
+            }
+        });
+        // GET WAREHOUSES
+        $.ajax({
+            url: `<?= base_url('penerimaan-barang-import-bp/warehouse'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $(".divisi_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".warehouse_id").empty()
+                $(".warehouse_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
+                $(".warehouse_id").val();
+            }
+        });
+
+    });
+
+    $('.kemasan_id').select2({
+        placeholder: "Pilih Jenis Kemasan",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+
+    });
+
     $('.btn-discard').click(function() {
-        $('.detail-modal').hide();
+        $('.detail-modal').modal('hide');
     })
 
     $('.aju_document_type').select2({
@@ -400,14 +511,14 @@
         allowClear: true
     });
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -415,7 +526,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -477,6 +588,21 @@
             warehouse_id: {
                 required: true
             },
+            kemasan_id: {
+                required: true
+            },
+            jumlah_kemasan: {
+                required: true,
+                number: true,
+                min: 0
+            },
+            ongkos_kirim: {
+                number: true,
+                min: 0
+            },
+            divisi_id: {
+                required: true
+            },
             tanggal_penerimaan_lpb: {
                 required: true
             }
@@ -490,6 +616,21 @@
             },
             warehouse_id: {
                 required: "Warehouse wajib diisi"
+            },
+            kemasan_id: {
+                required: "Jenis kemasan wajib diisi"
+            },
+            jumlah_kemasan: {
+                required: "Jumlah kemasan wajib diisi",
+                number: "Masukkan hanya angka",
+                min: "Tidak boleh minus"
+            },
+            ongkos_kirim: {
+                number: "Masukkan hanya angka",
+                min: "Tidak boleh minus"
+            },
+            divisi_id: {
+                required: "Departemen wajib diisi"
             },
             tanggal_penerimaan_lpb: {
                 required: "Tanggal barang diterima wajib diisi"
@@ -560,7 +701,11 @@
                                 processData: false,
                                 contentType: false,
                                 beforeSend: function(xhr) {
+                                    setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
                                 },
                                 success: function(response) {
                                     csrf.val(response.token);
@@ -572,6 +717,12 @@
                                         }).then(() => {
                                             location.reload();
                                         });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
                                     }
                                 }
                             });
@@ -584,7 +735,11 @@
                                 processData: false,
                                 contentType: false,
                                 beforeSend: function(xhr) {
+                                    setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
                                 },
                                 success: function(response) {
                                     csrf.val(response.token);
@@ -596,6 +751,12 @@
                                         }).then(() => {
                                             window.location.href = "<?= base_url("penerimaan-barang-import-bp"); ?>" + '/id/' + response.id;
                                         });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
                                     }
                                 }
                             });
@@ -611,31 +772,18 @@
     $('.btn-submit-detail').click(function(e) {
         e.preventDefault();
         if ($(".detail-form").valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var indexToRemove = -1;
-                    for (var i = 0; i < listData.result.length; i++) {
-                        if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
-                            listData.result[i].jml_diterima_lpb = Number($('.jml_diterima_lpb').val());
-                            listData.result[i].jml_diterima_total = Number($('.jml_diterima_total').val());
-                            listData.result[i].sisa_total = Number($('.sisa_total').val());
-                            listData.result[i].sub_total = Number(formatCurrency($('.sub_total').val()));
-                            drawTable(listData);
-                            $('.detail-modal').hide();
-                            break;
-                        }
-                    }
+            var indexToRemove = -1;
+            for (var i = 0; i < listData.result.length; i++) {
+                if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
+                    listData.result[i].jml_diterima_lpb = Number($('.jml_diterima_lpb').val());
+                    listData.result[i].jml_diterima_total = Number($('.jml_diterima_total').val());
+                    listData.result[i].sisa_total = Number($('.sisa_total').val());
+                    listData.result[i].sub_total = Number(formatCurrency($('.sub_total').val()));
+                    drawTable(listData);
+                    $('.detail-modal').modal('hide');
+                    break;
                 }
-            });
+            }
         }
     });
 
@@ -735,7 +883,7 @@
     }
 
     function editModal(am_purchase_order_id, am_purchase_order_details_id) {
-        $('.detail-modal').show();
+        $('.detail-modal').modal('show');
         $('.title-detail-name').text("Update Penerimaan ");
 
         var item = null;
@@ -757,9 +905,9 @@
         $('.jml_diterima_lpb').val(item.jml_diterima_lpb);
         $('.jml_diterima_total').val(item.jml_diterima_total);
         $('.sisa_total').val(item.sisa_total);
-        $('.nama_barang_dokumen').val(item.nama_barang);
-        $('.harga_satuan').val("Rp " + formatRupiah(Number(item.harga) || 0));
-        $('.sub_total').val("Rp " + formatRupiah(Number(item.sub_total) || 0));
+        $('.nama_barang_dokumen').val(item.nama_barang_master);
+        $('.harga_satuan').val("" + formatRupiah(Number(item.harga) || 0));
+        $('.sub_total').val("" + formatRupiah(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
     }
 
@@ -844,7 +992,11 @@
                             id: $('.id').val()
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
@@ -883,7 +1035,11 @@
                             id: $('.id').val()
                         },
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",

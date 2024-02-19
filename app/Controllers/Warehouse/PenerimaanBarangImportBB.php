@@ -256,7 +256,7 @@ class PenerimaanBarangImportBB extends BaseController
 
     public function updateAction()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $barangs = $this->request->getVar('barangs');
 
         $this->penerimaanBarangModel->update($id, [
@@ -269,8 +269,8 @@ class PenerimaanBarangImportBB extends BaseController
             'divisi_id' => $this->request->getVar('divisi_id'),
             'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
             'acceptance_type' => $this->request->getVar('acceptance_type'),
-            'multiple_po_id' => json_encode($this->request->getVar('multiple_po_id')),
-            'multiple_po_no' => json_encode($this->request->getVar('multiple_po_no')),
+            'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
+            'multiple_po_no' => $this->request->getVar('multiple_po_no'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             'kemasan' => $this->request->getVar('kemasan'),
             'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
@@ -425,7 +425,7 @@ class PenerimaanBarangImportBB extends BaseController
         return response()->setJSON($this->rmImportPoDetail->getListLPBBahanBaku($rmPurchaseOrderID, $penerimaanBarangID));
     }
 
-    public function dropdownDivisiPOLokalBP()
+    public function dropdownDivisiPOImportBB()
     {
         // Dapatkan divisi yang ada nomor PO nya
         $supplierID = $this->request->getVar('id');

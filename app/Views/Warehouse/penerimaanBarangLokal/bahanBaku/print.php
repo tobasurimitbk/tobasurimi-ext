@@ -170,7 +170,7 @@
                 ?>
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= strtoupper($detail["nama_barang"] . ' (' . $detail['spesifikasi'] . ')'); ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= strtoupper($detail["nama_barang"] . " " . $detail['spesifikasi']); ?></td>
                     <td class="txt-right" style="text-align:center;"><?= $detail["jml_masuk"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
                     <td class="txt-right" style="text-align:center;"><?= number_format(($detail['harga'] + $detail['harga_harian'] + $detail['harga_bulanan']), 2, '.', ',') ?></td>
