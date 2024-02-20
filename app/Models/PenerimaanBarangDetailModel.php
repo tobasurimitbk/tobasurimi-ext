@@ -250,8 +250,9 @@ class PenerimaanBarangDetailModel extends Model
 
     public function getPenerimaanBarangPenolongDetail($id)
     {
-        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, am_purchase_orders.po_no, am_purchase_order_details.note as keterangan, am_purchase_order_details.total as total_po, am_purchase_orders.currency as currency')
+        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, am_purchase_orders.po_no, am_purchase_order_details.note as keterangan, am_purchase_order_details.total as total_po, am_purchase_orders.currency as currency, barang_master_spesifikasi.spesifikasi')
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
             ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id')
             ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id')
@@ -262,8 +263,9 @@ class PenerimaanBarangDetailModel extends Model
 
     public function getPenerimaanBarangBakuDetail($id)
     {
-        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, rm_purchase_orders.po_no, rm_purchase_order_details.note as keterangan, supplier_harga.spesifikasi, rm_purchase_order_details.qty as qty_barang_po, rm_purchase_order_details.general_price as total_barang_po')
+        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, rm_purchase_orders.po_no, rm_purchase_order_details.note as keterangan, supplier_harga.spesifikasi, rm_purchase_order_details.qty as qty_barang_po, rm_purchase_order_details.general_price as total_barang_po, barang_master_spesifikasi.spesifikasi')
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id')
@@ -275,8 +277,9 @@ class PenerimaanBarangDetailModel extends Model
 
     public function getPenerimaanBarangImportBakuDetail($id)
     {
-        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, rm_import_pos.po_no, rm_import_po_details.note as keterangan, rm_import_po_details.total as total_po, rm_import_pos.currency as currency')
+        return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, rm_import_pos.po_no, rm_import_po_details.note as keterangan, rm_import_po_details.total as total_po, rm_import_pos.currency as currency, barang_master_spesifikasi.spesifikasi')
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
             ->join('rm_import_pos', 'rm_import_pos.id = penerimaan_barang_detail.purchase_order_id')
             ->join('rm_import_po_details', 'rm_import_po_details.id = penerimaan_barang_detail.purchase_order_details_id')

@@ -146,6 +146,8 @@ class AMPurchaseOrderDetailModel extends Model
             am_purchase_order_details.*,
             barang_master.barang_name AS nama_barang,
             barang_master.kode_barang,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master_spesifikasi.id AS spesifikasi_id,
             satuans.kode_satuan
         ";
 
@@ -159,6 +161,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->join('barang_master_spesifikasi', 'am_purchase_order_details.spesifikasi_id = barang_master_spesifikasi.id', 'left')
             ->findAll();
 
 
@@ -196,28 +199,65 @@ class AMPurchaseOrderDetailModel extends Model
             $diskonHarga = ($b['disc'] / 100) * ($b['price']);
             $harga = ($b['price'] - $diskonHarga) + $b['additional_cost'];
 
-            $res[] = [
-                'am_purchase_order_details_id' => $b['id'],
-                'am_purchase_order_id' => $b['am_purchase_order_id'],
-                'kode_barang' => $b['kode_barang'],
-                'nama_barang' => $b['nama_barang'],
-                'po_no' => $b['po_no'],
-                'satuan' => $b['kode_satuan'],
-                'jml_order' => $b['qty'],
-                'jml_diterima_lpb' => $inLPB,
-                'jml_diterima_total' => $jmlMasukAll,
-                'sisa_total' => $sisaDiterima,
-                'harga' => $harga,
-                'sub_total' => ($inLPB * $harga),
-                'keterangan' => $b['note']
-            ];
+            if ($penerimaanBarangID == null) {
+                // CREATE
+                if ($sisaDiterima != 0) {
+                    // TAMPILKAN YANG MASIH ADA SISA AJA
+                    $res[] = [
+                        'am_purchase_order_details_id' => $b['id'],
+                        'am_purchase_order_id' => $b['am_purchase_order_id'],
+                        'kode_barang' => $b['kode_barang'],
+                        'nama_barang' => $b['nama_barang'] . ' (' . $b['spesifikasi'] . ')',
+                        'spesifikasi_name' => $b['spesifikasi'],
+                        'nama_barang_master' => $b['nama_barang'],
+                        'po_no' => $b['po_no'],
+                        'satuan' => $b['kode_satuan'],
+                        'jml_order' => $b['qty'],
+                        'jml_diterima_lpb' => $inLPB,
+                        'jml_diterima_total' => $jmlMasukAll,
+                        'sisa_total' => $sisaDiterima,
+                        'harga' => $harga,
+                        'sub_total' => ($inLPB * $harga),
+                        'keterangan' => $b['note']
+                    ];
 
-            $jmlOrderTotal += $b['qty'];
-            $jmlDiterimaInTotal += $inLPB;
-            $jmlDiterimaTotal +=   $jmlMasukAll;
-            $sisaDiterimaTotal += $sisaDiterima;
-            $hargaPerBarangTotal += $harga;
-            $subTotal += ($inLPB * $harga);
+                    $jmlOrderTotal += $b['qty'];
+                    $jmlDiterimaInTotal += $inLPB;
+                    $jmlDiterimaTotal +=   $jmlMasukAll;
+                    $sisaDiterimaTotal += $sisaDiterima;
+                    $hargaPerBarangTotal += $harga;
+                    $subTotal += ($inLPB * $harga);
+                }
+            } else {
+                // UPDATE
+                if ($inLPB != 0) {
+                    // TAMPILKAN YANG MASIH ADA SISA SAJA
+                    $res[] = [
+                        'am_purchase_order_details_id' => $b['id'],
+                        'am_purchase_order_id' => $b['am_purchase_order_id'],
+                        'kode_barang' => $b['kode_barang'],
+                        'nama_barang' => $b['nama_barang'] . ' (' . $b['spesifikasi'] . ')',
+                        'spesifikasi_name' => $b['spesifikasi'],
+                        'nama_barang_master' => $b['nama_barang'],
+                        'po_no' => $b['po_no'],
+                        'satuan' => $b['kode_satuan'],
+                        'jml_order' => $b['qty'],
+                        'jml_diterima_lpb' => $inLPB,
+                        'jml_diterima_total' => $jmlMasukAll,
+                        'sisa_total' => $sisaDiterima,
+                        'harga' => $harga,
+                        'sub_total' => ($inLPB * $harga),
+                        'keterangan' => $b['note']
+                    ];
+
+                    $jmlOrderTotal += $b['qty'];
+                    $jmlDiterimaInTotal += $inLPB;
+                    $jmlDiterimaTotal +=   $jmlMasukAll;
+                    $sisaDiterimaTotal += $sisaDiterima;
+                    $hargaPerBarangTotal += $harga;
+                    $subTotal += ($inLPB * $harga);
+                }
+            }
         }
 
         return [

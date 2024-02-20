@@ -109,7 +109,7 @@ class PenerimaanBarangLokalBB extends BaseController
                 "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
-                "multiple_po_no"        => str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no),
+                "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
             ]);
         }
@@ -221,7 +221,7 @@ class PenerimaanBarangLokalBB extends BaseController
         }
 
         return response()->setJSON([
-            'message' => "Penerimaan barang BB berhasil disimpan",
+            'message' => "Penerimaan barang lokal BB berhasil disimpan",
             'token' => csrf_hash(),
             'status' => true,
             'id' => encrypt($penerimaanBarangID)
@@ -293,6 +293,7 @@ class PenerimaanBarangLokalBB extends BaseController
             }
 
             if ($b->jml_diterima_lpb != 0) {
+                // UPDATE
                 $penerimaanBarangDetailFirst = $this->penerimaanBarangDetailModel
                     ->where('penerimaan_barang_id', $id)
                     ->where('purchase_order_id', $b->rm_purchase_order_id)
@@ -305,13 +306,14 @@ class PenerimaanBarangLokalBB extends BaseController
                         'purchase_order_details_id' => $b->rm_purchase_order_details_id,
                         'penerimaan_barang_id' => $id,
                         'barang_id' => $supplierHarga == null ? 0 : $supplierHarga['id'],
+                        'spesifikasi_id' => $supplierHarga == null ? 0 : $supplierHarga['spesifikasi_id'],
                         'unit' => $poDetail == null ? 0 : $poDetail['satuan_id'],
                         'harga' => $b->harga_umum,
                         'harga_harian' => $b->harga_harian,
                         'harga_bulanan' => $b->harga_bulanan,
                         'sub_total' => $b->sub_total,
                         'qty' => $b->jml_order,
-                        'nama_barang_dok' => $supplierHarga == null ? 0 : $supplierHarga['barang_name'] . ' (' . $supplierHarga['spesifikasi'] . ')',
+                        'nama_barang_dok' => $supplierHarga == null ? 0 : $supplierHarga['barang_name'],
                         'jml_masuk' => $b->jml_diterima_lpb,
                     ]);
                 // update remeaning di detail po
@@ -320,6 +322,7 @@ class PenerimaanBarangLokalBB extends BaseController
                     ->set('qty_diterima', $b->jml_diterima_total)
                     ->update();
             } else {
+                // DELETE
                 $last = $this->rmPurchaseOrderDetailModel
                     ->where('id', $b->rm_purchase_order_details_id)
                     ->where('rm_purchase_order_id', $b->rm_purchase_order_id)
@@ -340,7 +343,7 @@ class PenerimaanBarangLokalBB extends BaseController
         }
 
         return response()->setJSON([
-            'message' => "Berhasil update penerimaan barang BB",
+            'message' => "Berhasil update penerimaan barang lokal BB",
             'token' => csrf_hash(),
             'status' => true
         ]);
