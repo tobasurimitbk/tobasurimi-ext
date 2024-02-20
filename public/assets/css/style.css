@@ -6386,3 +6386,24 @@ table.dataTable tbody tr td .btn {
   .select2-selection__rendered {
   padding-left: 0;
 }
+
+.mark {
+  background-color: #d7ffe7 !important;
+}
+
+.mark .gsearch {
+  font-size: 20px;
+}
+
+.unmark {
+  background-color: #e8e8e8 !important;
+}
+
+.unmark .gsearch {
+  font-size: 10px;
+}
+
+.marktext {
+  font-weight: bold;
+  background-color: antiquewhite;
+}

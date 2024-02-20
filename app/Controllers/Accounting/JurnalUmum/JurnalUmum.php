@@ -122,7 +122,7 @@ class JurnalUmum extends BaseController
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' => $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
-                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
+                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
                         'debit' => $debitValue,
                         'kredit' => $kreditValue,
                         'keterangan' => $_POST['ket'][$key],
@@ -133,7 +133,7 @@ class JurnalUmum extends BaseController
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
                         'id_coa' =>  $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
-                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
+                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
                         'debit' => $debitValue,
                         'kredit' => $kreditValue,
                         'keterangan' => $_POST['ket'][$key],
@@ -154,11 +154,12 @@ class JurnalUmum extends BaseController
             $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
             $dataTransaksiJurnal = [
                 'no_transaksi' => $no_transaksi_jurnal,
-                'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getPost('tgl_transaksi')))),
+                'tanggal_transaksi' => date('Y-m-d'),
                 'total_debit' => $total_debit,
                 'total_kredit' => $total_credit,
                 'metode_input' => 'manual',
                 'type_transaksi' => $this->encrypter->decrypt(hex2bin($this->request->getPost('type_transaksi'))),
+                'no_bukti' => $this->request->getPost('no_bukti'),
             ];
             $this->jurnalUmumModel->insertJurnalBatch($result);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
@@ -169,6 +170,25 @@ class JurnalUmum extends BaseController
         }
         return redirect()->to('jurnal');
     }
+
+    public function searchSubAkun()
+    {
+        $query = $this->request->getPost('query');
+
+        $subAkunModel = new Sub_AkunsModel();
+        $subAkuns = $subAkunModel->searchSubAkun($query);
+
+        $output = array(); // Menggunakan array untuk menyimpan data
+        foreach ($subAkuns as $sub_akun) {
+            $sub_akun['hexid'] = bin2hex($this->encrypter->encrypt($sub_akun['id'])); // Menyimpan nilai yang dienkripsi dengan kunci 'hexid'
+            $output[] = $sub_akun; // Menambahkan $sub_akun ke dalam array $output
+        }
+
+        // Mengembalikan output dalam format JSON
+        echo json_encode($output);
+        return;
+    }
+
 
     public function insertDataPembelian($poID, $type, $kategori, $module)
     {

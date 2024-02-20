@@ -103,4 +103,9 @@ class Sub_AkunsModel extends Model
 
         return $query->getResult();
     }
+
+    public function searchSubAkun($query)
+    {
+        return $this->like('nama_sub', $query)->orLike('no_sub', $query)->where('deletedAt', null)->findAll();
+    }
 }

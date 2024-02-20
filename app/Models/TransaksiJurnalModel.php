@@ -25,6 +25,7 @@ class TransaksiJurnalModel extends Model
         'kategori_barang',
         'po_id',
         'type_transaksi',
+        'no_bukti',
     ];
 
     // Dates

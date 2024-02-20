@@ -4,12 +4,12 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-    <form action="<?= base_url('jurnal/addJurnal') ?>" method="post" onsubmit="return validateForm();">
+    <form action="<?= base_url('jurnal-penyesuaian/addJurnal') ?>" method="post" onsubmit="return validateForm();">
 
         <input type="hidden" class="id" name="id" id="id" />
         <?= csrf_field() ?>
         <div class="section-header">
-            <h1>Jurnal Umum</h1>
+            <h1>Jurnal Penyesuaian</h1>
             <button class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </button>
@@ -30,21 +30,6 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group col-sm-3">
-                        <label class="col-form-label">Type Transaksi</label>
-                        <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" required="">
-                            <option value="" data-code=""></option>
-                            <?php
-                            if (!empty($dataMetadataTipeTransaksi)) {
-                                foreach ($dataMetadataTipeTransaksi as $Tipe) {
-                            ?>
-                                    <option value="<?= $Tipe->hexid; ?>"><?= $Tipe->value; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                    </div>
                     <div class="form-group col-sm-3">
                         <label class="col-form-label">No Bukti</label>
                         <input autocomplete="one-time-code" class="form-control input-picker" id="no_bukti" name="no_bukti" placeholder="No. Bukti">
