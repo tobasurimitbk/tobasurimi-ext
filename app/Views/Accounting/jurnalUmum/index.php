@@ -129,7 +129,7 @@
         });
 
         //search coa
-        $('#gsearchsimple').keyup(function() {
+        $('#gsearchsimple').on('keyup input', function() {
             let csrfToken = '<?= csrf_token() ?>';
             var query = $('#gsearchsimple').val();
             let csrf = $(`[name="${csrfToken}"]`);
@@ -152,7 +152,7 @@
                         data.forEach(function(item) {
                             var subAkunId = item.hexid;
                             var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
-                            var listItem = '<li class="list-group-item contsearch"><a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;">' + noSubNamaSub + '</a></li>';
+                            var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
                             $('#searchResults').append(listItem); // Tambahkan item ke daftar hasil pencarian
                         });
                     }
@@ -252,7 +252,7 @@
         var counters = 0;
 
         //search coa
-        $(`#gsearchsimple_${counter}`).keypress(function() {
+        $(`#gsearchsimple_${counter}`).on('keyup input', function() {
             let csrfToken = '<?= csrf_token() ?>';
             var query = $(this).val();
             counters = $(this).data('counters');
@@ -277,7 +277,7 @@
                         data.forEach(function(item) {
                             var subAkunId = item.hexid;
                             var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
-                            var listItem = '<li class="list-group-item contsearch"><a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;">' + noSubNamaSub + '</a></li>';
+                            var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
                             $(searchResultsId).append(listItem); // Tambahkan item ke daftar hasil pencarian
                         });
                     }

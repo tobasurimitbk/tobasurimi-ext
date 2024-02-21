@@ -33,6 +33,12 @@
                     <div class="form-group col-sm-3">
                         <label class="col-form-label">No Bukti</label>
                         <input autocomplete="one-time-code" class="form-control input-picker" id="no_bukti" name="no_bukti" placeholder="No. Bukti">
+                        <input type="hidden" name="id_transaksi" id="id_transaksi" />
+
+                        <ul class="list-group position-absolute" id="searchResultsNoBukti" style="z-index: 1000;">
+
+                        </ul>
+                        <div id="localSearchSimpleNoBukti"></div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -114,7 +120,7 @@
         });
 
         //search coa
-        $('#gsearchsimple').keyup(function() {
+        $('#gsearchsimple').on('keyup input', function() {
             let csrfToken = '<?= csrf_token() ?>';
             var query = $('#gsearchsimple').val();
             let csrf = $(`[name="${csrfToken}"]`);
@@ -123,7 +129,7 @@
             $('#searchResults').css('display', 'block');
             if (query.length >= 2) {
                 $.ajax({
-                    url: "<?= base_url("jurnal/getSubAkuns"); ?>",
+                    url: "<?= base_url("jurnal-penyesuaian/getSubAkuns"); ?>",
                     method: "POST",
                     data: {
                         query: query
@@ -137,7 +143,7 @@
                         data.forEach(function(item) {
                             var subAkunId = item.hexid;
                             var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
-                            var listItem = '<li class="list-group-item contsearch"><a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;">' + noSubNamaSub + '</a></li>';
+                            var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
                             $('#searchResults').append(listItem); // Tambahkan item ke daftar hasil pencarian
                         });
                     }
@@ -161,6 +167,55 @@
             $('#searchResults').css('display', 'none');
         });
         //end search coa
+
+        //search no bukti
+        $('#no_bukti').on('keyup input', function() {
+            let csrfToken = '<?= csrf_token() ?>';
+            var query = $('#no_bukti').val();
+            let csrf = $(`[name="${csrfToken}"]`);
+            var inputWidth = $(this).outerWidth();
+            $('#searchResultsNoBukti').css('width', inputWidth);
+            $('#searchResultsNoBukti').css('display', 'block');
+            if (query.length >= 2) {
+                $.ajax({
+                    url: "<?= base_url("jurnal-penyesuaian/getNoBukti"); ?>",
+                    method: "POST",
+                    data: {
+                        query: query
+                    },
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    success: function(data) {
+                        $('#searchResultsNoBukti').html('');
+                        data.forEach(function(item) {
+                            var transaksiId = item.hexid;
+                            var noBukti = item.no_bukti;
+                            var listItem = '<a href="javascript:void(0)" class="gsearchNoBukti" data-transaksi_id="' + transaksiId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noBukti + '</li></a>';
+                            $('#searchResultsNoBukti').append(listItem); // Tambahkan item ke daftar hasil pencarian
+                        });
+                    }
+                })
+            }
+            if (query.length == 0) {
+                $('#searchResultsNoBukti').css('display', 'none');
+            }
+        });
+
+        $('#localSearchSimpleNoBukti').jsLocalSearch({
+            action: "Show",
+            html_search: true,
+            mark_text: "marktext"
+        });
+        $('#searchResultsNoBukti').on('click', '.gsearchNoBukti', function() {
+            var noBukti = $(this).text();
+            var transaksiId = $(this).data('transaksi_id');
+            $('#no_bukti').val(noBukti);
+            $('#id_transaksi').val(transaksiId);
+            $('#searchResultsNoBukti').css('display', 'none');
+        });
+        //end search no bukti
     });
 
     function getItems() {
@@ -237,7 +292,7 @@
         var counters = 0;
 
         //search coa
-        $(`#gsearchsimple_${counter}`).keypress(function() {
+        $(`#gsearchsimple_${counter}`).on('keyup input', function() {
             let csrfToken = '<?= csrf_token() ?>';
             var query = $(this).val();
             counters = $(this).data('counters');
@@ -262,7 +317,7 @@
                         data.forEach(function(item) {
                             var subAkunId = item.hexid;
                             var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
-                            var listItem = '<li class="list-group-item contsearch"><a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;">' + noSubNamaSub + '</a></li>';
+                            var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
                             $(searchResultsId).append(listItem); // Tambahkan item ke daftar hasil pencarian
                         });
                     }

@@ -107,4 +107,9 @@ class TransaksiJurnalModel extends Model
             return $transaksi_format . "001"; // Handle the case where no transactions are found
         }
     }
+
+    public function searchNoBukti($query)
+    {
+        return $this->like('no_bukti', $query)->where('deleted_at', null)->findAll();
+    }
 }

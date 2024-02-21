@@ -118,45 +118,47 @@ class JurnalPenyesuaian extends BaseController
 
     public function save()
     {
-        try {
-            $nm = $this->request->getPost('cari');
-            $total_debit = 0;
-            $total_credit = 0;
-            $result = array();
+        // try {
+        $nm = $this->request->getPost('cari');
+        $idTransaksi = $this->request->getPost('id_transaksi') ? $this->encrypter->decrypt(hex2bin($this->request->getPost('id_transaksi'))) : null;
+        $total_debit = 0;
+        $total_credit = 0;
+        $result = array();
 
-            $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
-            foreach ($nm as $key => $val) {
-                $debitValue = isset($_POST['debit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['debit'][$key])) : 0;
-                $kreditValue = isset($_POST['kredit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['kredit'][$key])) : 0;
+        $id_transaksi_jurnal = $idTransaksi ? $idTransaksi : $this->transaksiJurnalModel->getIdTransaksiLast();
+        foreach ($nm as $key => $val) {
+            $debitValue = isset($_POST['debit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['debit'][$key])) : 0;
+            $kreditValue = isset($_POST['kredit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['kredit'][$key])) : 0;
 
-                if ($debitValue == 0) {
-                    $result[] = array(
-                        'id_transaksi' => $id_transaksi_jurnal,
-                        'id_coa' => $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
-                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
-                        'debit' => $debitValue,
-                        'kredit' => $kreditValue,
-                        'keterangan' => $_POST['ket'][$key],
-                        'id_inputer' => session()->get("login")->user_id
-                    );
-                    $total_credit += $kreditValue;
-                } elseif ($kreditValue == 0) {
-                    $result[] = array(
-                        'id_transaksi' => $id_transaksi_jurnal,
-                        'id_coa' =>  $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
-                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
-                        'debit' => $debitValue,
-                        'kredit' => $kreditValue,
-                        'keterangan' => $_POST['ket'][$key],
-                        'id_inputer' => session()->get("login")->user_id
-                    );
-                    $total_debit += $debitValue;
-                }
+            if ($debitValue == 0) {
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' => $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
+                    'debit' => $debitValue,
+                    'kredit' => $kreditValue,
+                    'keterangan' => $_POST['ket'][$key],
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $total_credit += $kreditValue;
+            } elseif ($kreditValue == 0) {
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $this->encrypter->decrypt(hex2bin($_POST['cari'][$key])),
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
+                    'debit' => $debitValue,
+                    'kredit' => $kreditValue,
+                    'keterangan' => $_POST['ket'][$key],
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $total_debit += $debitValue;
             }
+        }
+        if (!$idTransaksi) {
             $kodeTransaksi = "";
             $dataMetadataTipeTransaksi = $this->MetadataModel
                 ->asObject()
-                ->where('id', $this->encrypter->decrypt(hex2bin($this->request->getPost('type_transaksi'))))
+                ->where('id', 1424)
                 ->findAll();
             foreach ($dataMetadataTipeTransaksi as $val) {
                 $kodeTransaksi = $val->description;
@@ -169,16 +171,18 @@ class JurnalPenyesuaian extends BaseController
                 'total_debit' => $total_debit,
                 'total_kredit' => $total_credit,
                 'metode_input' => 'manual',
-                'type_transaksi' => $this->encrypter->decrypt(hex2bin($this->request->getPost('type_transaksi'))),
+                'type_transaksi' => 1424,
                 'no_bukti' => $this->request->getPost('no_bukti'),
             ];
-            $this->jurnalUmumModel->insertJurnalBatch($result);
-
-            session()->setFlashdata('success_message', 'Data Berhasil disimpan');
-        } catch (\Exception $e) {
-            session()->setFlashdata('error_message', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
         }
-        return redirect()->to('jurnal');
+        $this->jurnalUmumModel->insertJurnalBatch($result);
+
+        session()->setFlashdata('success_message', 'Data Berhasil disimpan');
+        // } catch (\Exception $e) {
+        //     session()->setFlashdata('error_message', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        // }
+        return redirect()->to('jurnal-penyesuaian');
     }
 
     public function searchSubAkun()
@@ -188,15 +192,32 @@ class JurnalPenyesuaian extends BaseController
         $subAkunModel = new Sub_AkunsModel();
         $subAkuns = $subAkunModel->searchSubAkun($query);
 
-        $output = '';
+        $output = array(); // Menggunakan array untuk menyimpan data
         foreach ($subAkuns as $sub_akun) {
-            $sub_akun['hexid'] = bin2hex($this->encrypter->encrypt($sub_akun['id']));
-            $output .= '
-                <li class="list-group-item contsearch">
-                    <a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' . $sub_akun['hexid'] . '" style="color:#333;text-decoration:none;">' . $sub_akun['no_sub'] . ' ' . $sub_akun['nama_sub'] . '</a>
-                </li>';
+            $sub_akun['hexid'] = bin2hex($this->encrypter->encrypt($sub_akun['id'])); // Menyimpan nilai yang dienkripsi dengan kunci 'hexid'
+            $output[] = $sub_akun; // Menambahkan $sub_akun ke dalam array $output
         }
 
-        echo $output;
+        // Mengembalikan output dalam format JSON
+        echo json_encode($output);
+        return;
+    }
+
+    public function searchNoBukti()
+    {
+        $query = $this->request->getPost('query');
+
+        $transaksiJurnalModel = new TransaksiJurnalModel();
+        $transaksiJurnal = $transaksiJurnalModel->searchNoBukti($query);
+
+        $output = array(); // Menggunakan array untuk menyimpan data
+        foreach ($transaksiJurnal as $transaksi_jurnal) {
+            $transaksi_jurnal['hexid'] = bin2hex($this->encrypter->encrypt($transaksi_jurnal['id'])); // Menyimpan nilai yang dienkripsi dengan kunci 'hexid'
+            $output[] = $transaksi_jurnal; // Menambahkan $sub_akun ke dalam array $output
+        }
+
+        // Mengembalikan output dalam format JSON
+        echo json_encode($output);
+        return;
     }
 }
