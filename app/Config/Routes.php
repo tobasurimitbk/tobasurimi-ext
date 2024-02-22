@@ -700,6 +700,7 @@ $routes->get('/stock-list/kategori-barang', 'Warehouse\ParentBarang::dropdownKat
 $routes->get('/stock-list/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/stock-list/id/(:segment)', 'Inventori\StokList::detail/$1', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-dokumen-bc', 'Inventori\StokList::allStokPerDokumen', ['filter' => 'Auth']);
+$routes->get('/stock-list/stock-filtered', 'Inventori\StokList::allStokFiltered', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);

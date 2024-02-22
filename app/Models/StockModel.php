@@ -502,6 +502,8 @@ class StockModel extends Model
             // DETAIL BARANG STOCK BARANG
             $selectQry = "
             CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
             barang_master.kode_barang AS kode,
             satuans.kode_satuan,
             parent_barang.parent_type,
