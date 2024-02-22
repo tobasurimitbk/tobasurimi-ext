@@ -863,6 +863,7 @@
                             formData.append("locationTransaction", locationTransaction);
                             formData.append("note", note);
                             formData.append("total", totalHarga);
+                            formData.append("direktur", direktur);
                             formData.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({

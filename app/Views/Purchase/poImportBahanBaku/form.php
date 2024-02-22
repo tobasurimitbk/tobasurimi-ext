@@ -849,6 +849,7 @@
                             var attn = $('#attn').val();
                             var spp_id = $("#spp_id").val();
                             var potongan = $("#potongan_harga").val();
+                            var direktur = $('#direktur').val();
                             // optional form
                             var paymentTerm = $('#payment_term').val();
                             var shipper = $('#shipper').val();
@@ -876,6 +877,7 @@
                             formData.append("locationTransaction", locationTransaction);
                             formData.append("note", note);
                             formData.append("total", totalHarga);
+                            formData.append("direktur", direktur);
                             formData.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({
