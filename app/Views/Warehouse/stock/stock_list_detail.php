@@ -95,7 +95,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_per_dokumen" id="bc_id_stok_per_dokumen" name="bc_id_stok_per_dokumen" aria-label="Floating label select example">
                             <option value=""></option>
@@ -110,9 +110,9 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search_stok_per_dokumen" id="search_stok_per_dokumen" name="search_stok_per_dokumen" aria-label="Floating label select example" />
+                        <input placeholder="" class="form-control search_no_aju_stok_per_dokumen" id="search_no_aju_stok_per_dokumen" name="search_no_aju_stok_per_dokumen" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Aju </label>
                     </div>
                 </div>
@@ -140,6 +140,50 @@
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Data Inisiasi Stok</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select bc_id_stok_inisasi" id="bc_id_stok_inisasi" name="bc_id_stok_inisasi" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($jenisDokAju as $j) : ?>
+                                <option value="<?= $j->id ?>">
+                                    <?= $j->value ?>
+                                </option>
+                            <?php endforeach; ?>
+                            <option value="0">NON PABEAN</option>
+
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search_no_aju_stok_inisasi" id="search_no_aju_stok_inisasi" name="search_no_aju_stok_inisasi" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Aju </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-dokumen-bc-table" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="changeSort('bc_id')">Dokumen Pabean</th>
+                                <th onclick="changeSort('no_aju')">No Aju</th>
+                                <th onclick="changeSort('stok_total')">Stok Awal Satuan 1</th>
+                                <th>Stok Awal Satuan 2</th>
+                                <th>Stok Awal Satuan 3</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -201,7 +245,7 @@
             dataSrc: "data",
             data: function(data) {
                 data.bc_id = $("#bc_id_stok_per_dokumen option:selected").val();
-                data.no_aju = $("#search_stok_per_dokumen").val();
+                data.no_aju = $("#search_no_aju_stok_per_dokumen").val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>"
                 data.sort = sort;
                 data.sortType = sortType;
@@ -289,11 +333,20 @@
         stokTableDokumenBC.ajax.reload();
     });
 
-    $('#search_stok_per_dokumen').change(function() {
+    $('#bc_id_stok_inisasi').select2({
+        placeholder: "Pilih Dokumen Pabean",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {});
+
+    $('#search_no_aju_stok_per_dokumen').change(function() {
         stokTableDokumenBC.ajax.reload();
     });
 
-    $("#bc_id_stok_per_dokumen")
+    $('#search_no_aju_stok_inisasi').change(function() {});
+
+
+    $("#bc_id_stok_per_dokumen, #bc_id_stok_inisasi")
         .parent('div')
         .children('span')
         .children('span')

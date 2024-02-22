@@ -445,6 +445,12 @@
                                     }).then((result) => {
                                         location.reload();
                                     })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
                                 }
                             }
                         });

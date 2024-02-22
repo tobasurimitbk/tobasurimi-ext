@@ -300,7 +300,7 @@ class StockModel extends Model
         return $result;
     }
 
-    public function isDefinedStock(
+    public function isDefinedStockMaster(
         $company_id,
         $warehouse_id,
         $divisi_id,
@@ -340,6 +340,91 @@ class StockModel extends Model
         }
     }
 
+    public function isDefinedStockSubDetail(
+        $company_id,
+        $warehouse_id,
+        $divisi_id,
+        $type_barang,
+        $barang_id,
+        $spesifikasi_id,
+        $bc_id,
+        $no_aju,
+        $stock_id
+    ) {
+        if ($type_barang == "kemasan") {
+            $stockFirst = $this->asArray()
+                ->join('stock_details2', 'stock_details2.stock_id = stock.id')
+                ->where('company_id', $company_id)
+                ->where('warehouse_id', $warehouse_id)
+                ->where('divisi_id', $divisi_id)
+                ->where('kemasan_id', $spesifikasi_id)
+                ->where('bc_id', $bc_id)
+                ->where('no_aju', $no_aju)
+                ->where('stock_id', $stock_id)
+                ->where('stock.deletedAt', null)
+                ->where('stock_details2.deletedAt', null)
+                ->first();
+
+            if ($stockFirst == null) {
+                return null;
+            } else {
+                return $stockFirst;
+            }
+        } else {
+            $stockFirst = $this->asArray()
+                ->join('stock_details2', 'stock_details2.stock_id = stock.id')
+                ->where('company_id', $company_id)
+                ->where('warehouse_id', $warehouse_id)
+                ->where('divisi_id', $divisi_id)
+                ->where('barang1_id', $barang_id)
+                ->where('barang2_id', $spesifikasi_id)
+                ->where('bc_id', $bc_id)
+                ->where('no_aju', $no_aju)
+                ->where('stock_id', $stock_id)
+                ->where('stock.deletedAt', null)
+                ->where('stock_details2.deletedAt', null)
+                ->first();
+
+            if ($stockFirst == null) {
+                return null;
+            } else {
+                return $stockFirst;
+            }
+        }
+    }
+
+    public function getStokMaster(
+        $company_id,
+        $warehouse_id,
+        $divisi_id,
+        $type_barang,
+        $barang_id,
+        $spesifikasi_id
+    ) {
+        if ($type_barang == "kemasan") {
+            $stockFirst = $this->asArray()
+                ->where('company_id', $company_id)
+                ->where('warehouse_id', $warehouse_id)
+                ->where('divisi_id', $divisi_id)
+                ->where('kemasan_id', $spesifikasi_id)
+                ->where('deletedAt', null)
+                ->first();
+
+            return $stockFirst;
+        } else {
+            $stockFirst = $this->asArray()
+                ->where('company_id', $company_id)
+                ->where('warehouse_id', $warehouse_id)
+                ->where('divisi_id', $divisi_id)
+                ->where('barang1_id', $barang_id)
+                ->where('barang2_id', $spesifikasi_id)
+                ->where('deletedAt', null)
+                ->first();
+
+            return $stockFirst;
+        }
+    }
+
     public function insertStok(
         $company_id,
         $warehouse_id,
@@ -349,7 +434,7 @@ class StockModel extends Model
         $spesifikasi_id,
         $qtyTotal
     ) {
-        if ($this->isDefinedStock(
+        if ($this->isDefinedStockMaster(
             $company_id,
             $warehouse_id,
             $divisi_id,

@@ -169,7 +169,7 @@ class StokList extends BaseController
                         "barang"                => $data->name,
                         "divisi"                => $data->divisi,
                         "warehouse"             => $data->warehouse,
-                        "stok_1"                => number_format($data->qty . " " .  $satuan1['kode_satuan']),
+                        "stok_1"                => number_format($data->qty) . " " . $satuan1['kode_satuan'],
                     ]);
                 } else {
                     if ($addCondition['status_stok'] == 1) {
@@ -183,7 +183,7 @@ class StokList extends BaseController
                                 "barang"                => $data->name,
                                 "divisi"                => $data->divisi,
                                 "warehouse"             => $data->warehouse,
-                                "stok_1"                => number_format($data->qty . " " .  $satuan1['kode_satuan']),
+                                "stok_1"                => number_format($data->qty) . " " .  $satuan1['kode_satuan'],
                             ]);
                         }
                     } else {
@@ -196,7 +196,7 @@ class StokList extends BaseController
                             "barang"                => $data->name,
                             "divisi"                => $data->divisi,
                             "warehouse"             => $data->warehouse,
-                            "stok_1"                => number_format($data->qty . " " .  $satuan1['kode_satuan']),
+                            "stok_1"                => number_format($data->qty) . " " .  $satuan1['kode_satuan'],
                         ]);
                     }
                 }
@@ -258,6 +258,67 @@ class StokList extends BaseController
         } else {
             $barang_id = $this->barangMasterSpesifikasiModel->find($spesifikasi_id)['barang_master_id'];
         }
+
+        if (
+            $this->stockModel->isDefinedStockMaster(
+                $this->this_company_id,
+                $warehouse_id,
+                $divisi_id,
+                $type_barang,
+                $barang_id,
+                $spesifikasi_id
+            )
+        ) {
+            // ADA STOK MASTER
+            $stokMaster = $this->stockModel->getStokMaster(
+                $this->this_company_id,
+                $warehouse_id,
+                $divisi_id,
+                $type_barang,
+                $barang_id,
+                $spesifikasi_id
+            );
+
+            foreach (json_decode($this->request->getVar('list_stock')) as $l) {
+                $stokSubDetail = $this->stockModel->isDefinedStockSubDetail(
+                    $this->this_company_id,
+                    $warehouse_id,
+                    $divisi_id,
+                    $type_barang,
+                    $barang_id,
+                    $spesifikasi_id,
+                    $l->bc_id,
+                    $l->no_aju,
+                    $stokMaster['id']
+                );
+
+                if ($stokSubDetail != null) {
+                    if ($type_barang == "kemasan") {
+                        $barangFirst = $this->kemasanModel->select('kemasan.name AS barang')
+                            ->find($stokMaster['kemasan_id']);
+                    } else {
+                        $barangFirst = $this->barangMasterSpesifikasiModel
+                            ->select("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang")
+                            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
+                            ->where('barang_master_spesifikasi.id', $stokMaster['barang2_id'])
+                            ->first();
+                    }
+
+                    $bcDetail = $this->metaDataModel->find($stokSubDetail['bc_id']);
+                    $bcDetailName = $bcDetail == null ? "NON PABEAN" : $bcDetail['value'];
+                    $noAju = $bcDetail == null ? "" : $l->no_aju;
+
+                    return response()->setJSON([
+                        'status' => false,
+                        'token' => csrf_hash(),
+                        'message' => 'Gagal inisiasi stok dikarenakan barang ' . $barangFirst['barang'] . ' dengan dokumen ' . $bcDetailName . '. dengan nomor aju ' . $noAju . ' sudah pernah diinisiasi'
+                    ]);
+                    break;
+                }
+            }
+        }
+
+        // STOK SIAP DI INISIASI
 
         $stok = $this->stockModel->insertStok(
             $this->this_company_id,
@@ -394,5 +455,9 @@ class StokList extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function allStokFiltered()
+    {
     }
 }

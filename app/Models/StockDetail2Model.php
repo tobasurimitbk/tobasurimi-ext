@@ -70,6 +70,7 @@ class StockDetail2Model extends Model
             ->where($condition)
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.stock_id')
+            ->groupBy('stock_details2.no_aju')
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
