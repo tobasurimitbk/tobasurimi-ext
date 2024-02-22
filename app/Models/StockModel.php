@@ -387,4 +387,88 @@ class StockModel extends Model
             return $stok;
         }
     }
+
+    public function detailStock($stock_id)
+    {
+        $stockDetailModel = new StockDetailModel();
+
+        $stock = $this->find($stock_id);
+        if ($stock['kemasan_id'] != 0) {
+            // DETAIL BARANG STOCK KEMASAN
+            $selectQry = "
+                kemasan.kode AS kode,
+                kemasan.name AS barang,
+                satuans.kode_satuan,
+                parent_barang.parent_type,
+                parent_barang.parent_name,
+                divisis.divisi,
+                warehouses.warehouse_name AS warehouse,
+                stock.qty
+            
+            ";
+            $detailBarang = $this->select($selectQry)
+                ->join('kemasan', 'kemasan.id = stock.kemasan_id')
+                ->join('satuans', 'satuans.id = kemasan.satuan_id')
+                ->join('parent_barang', 'parent_barang.id = kemasan.parent_type_id')
+                ->join('divisis', 'divisis.id = stock.divisi_id')
+                ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+                ->first();
+        } else {
+            // DETAIL BARANG STOCK BARANG
+            $selectQry = "
+            CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang,
+            barang_master.kode_barang AS kode,
+            satuans.kode_satuan,
+            parent_barang.parent_type,
+            parent_barang.parent_name,
+            divisis.divisi,
+            warehouses.warehouse_name AS warehouse,
+            stock.qty
+        ";
+
+            $detailBarang = $this->select($selectQry)
+                ->join('barang_master', 'barang_master.id = stock.barang1_id')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+                ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+                ->join('divisis', 'divisis.id = stock.divisi_id')
+                ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+                ->first();
+        }
+
+        $selectQry = '
+        (SUM(CASE WHEN stock_details.status = "In" 
+        THEN stock_details.qty ELSE 0 END) - 
+        SUM(CASE WHEN stock_details.status = "Out" 
+        THEN stock_details.qty ELSE 0 END)) 
+        AS stokSekarang, 
+        SUM(CASE WHEN stock_details.status = "In" 
+        THEN stock_details.qty ELSE 0 END)
+        AS stokMasuk,
+        SUM(CASE WHEN stock_details.status = "Out" 
+        THEN stock_details.qty ELSE 0 END)
+        AS stokKeluar';
+
+        $detailStock = $stockDetailModel->select($selectQry)
+            ->where('deletedAt', null)
+            ->where('stock_details.stock_id', $stock_id)
+            ->groupBy('stock_details.stock_id')
+            ->findAll();
+
+        $selectQry = '
+            SUM(stock_details.qty) AS qty
+        ';
+
+        $stokInisiasi = $stockDetailModel->select($selectQry)
+            ->where('deletedAt', null)
+            ->where('stock_details.stock_id', $stock_id)
+            ->groupBy('stock_details.stock_id')
+            ->findAll();
+
+        return [
+            'barang' => $detailBarang,
+            'stok' => $detailStock[0],
+            'stokInisiasi' => $stokInisiasi[0]
+        ];
+    }
 }

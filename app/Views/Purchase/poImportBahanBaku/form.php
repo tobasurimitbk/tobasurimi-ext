@@ -256,6 +256,12 @@
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->direktur : ""; ?>" type="text" class="form-control direktur" name="direktur" id="direktur" placeholder="Direktur">
+                            <label for="floatingInput">Direktur</label>
+                        </div>
+                    </div>
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -639,6 +645,9 @@
                 required: true,
                 number: true,
                 min: 0
+            },
+            direktur: {
+                required: true,
             }
         },
         messages: {
@@ -683,7 +692,9 @@
                 number: "Isikan hanya angka",
                 min: "Masukkan minimal 0"
             },
-
+            direktur: {
+                required: "Direktur wajib diisi",
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -754,6 +765,7 @@
                             var consigne = $('#consigne').val();
                             var locationTransaction = $('#location_transaction').val();
                             var note = $('#note').val();
+                            var direktur = $('#direktur').val();
                             // append
                             var formData = new FormData();
                             formData.append("id", id);
@@ -776,6 +788,7 @@
                             formData.append("locationTransaction", locationTransaction);
                             formData.append("note", note);
                             formData.append("total", totalHarga);
+                            formData.append("direktur", direktur);
                             formData.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({
