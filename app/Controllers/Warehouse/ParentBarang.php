@@ -153,4 +153,16 @@ class ParentBarang extends BaseController
 
         return response()->setJSON($data);
     }
+
+    public function dropdownKategoriBarang()
+    {
+        $parentBarangModel = new ParentBarangModel();
+
+        $parent_type = $this->request->getVar('parent_type');
+        return response()->setJSON([
+            'data' => $parentBarangModel->where('parent_type', $parent_type)->findAll(),
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
 }

@@ -18,6 +18,7 @@ class RMImportPOModel extends Model
     protected $allowedFields    = [
         'id', 'purchase_request_id', 'company_id', 'supplier_id', 'division_id', 'po_no', 'po_date', 'payment_date',
         'currency',  'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin', 'potongan_harga',
+        'direktur',
         'port_destination', 'location_transaction', 'shipment', 'latest_shipment_date', 'attn', 'createdBy', 'status_penerimaan', 'is_posted',
     ];
 

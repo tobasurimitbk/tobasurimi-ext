@@ -44,7 +44,8 @@ class AMPurchaseOrderModel extends Model
         'shipment',
         'latest_shipment_date',
         'attn',
-        'potongan_harga'
+        'potongan_harga',
+        'direktur'
     ];
 
     // Dates

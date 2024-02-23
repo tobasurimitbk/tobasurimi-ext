@@ -676,10 +676,10 @@ $routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode'
 
 // WAREHOUSE
 // MASTER STOCK
-$routes->get('/stock', 'Warehouse\Stock::index', ['filter' => 'Auth']);
-$routes->get('/stock/all', 'Warehouse\Stock::allStock', ['filter' => 'Auth']);
-$routes->get('/stock/(:num)/(:num)', 'Warehouse\Stock::getStockInfo/$1/$2', ['filter' => 'Auth']);
-$routes->post('/stock/save', 'Warehouse\Stock::addNewStock', ['filter' => 'Auth']);
+// $routes->get('/stock', 'Warehouse\Stock::index', ['filter' => 'Auth']);
+// $routes->get('/stock/all', 'Warehouse\Stock::allStock', ['filter' => 'Auth']);
+// $routes->get('/stock/(:num)/(:num)', 'Warehouse\Stock::getStockInfo/$1/$2', ['filter' => 'Auth']);
+// $routes->post('/stock/save', 'Warehouse\Stock::addNewStock', ['filter' => 'Auth']);
 // INVENTORI
 // STOCK SAFETY
 $routes->get('/stock-safety', 'Inventori\Inventori::stockSafetyView', ['filter' => 'Auth']);
@@ -689,8 +689,18 @@ $routes->get('/stock-safety/all', 'Inventori\Inventori::stockSafetyAll', ['filte
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\Inventori::stockHistoriView', ['filter' => 'Auth']);
 $routes->get('/stock-histori/all', 'Inventori\Inventori::stockHistoriAll', ['filter' => 'Auth']);
-$routes->get('/stock-list', 'Inventori\Inventori::stockListView', ['filter' => 'Auth']);
-$routes->get('/stock-list/all', 'Inventori\Inventori::stockListAll', ['filter' => 'Auth']);
+// STOK LIST
+$routes->get('/stock-list', 'Inventori\StokList::index', ['filter' => 'Auth']);
+$routes->get('/stock-list/create', 'Inventori\StokList::create', ['filter' => 'Auth']);
+$routes->get('/stock-list/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/stock-list/get-barang-not-init', 'Inventori\StokList::getListBarangNotInit', ['filter' => 'Auth']);
+$routes->post('/stock-list/create', 'Inventori\StokList::createInitStok', ['filter' => 'Auth']);
+$routes->get('/stock-list/all', 'Inventori\StokList::all', ['filter' => 'Auth']);
+$routes->get('/stock-list/kategori-barang', 'Warehouse\ParentBarang::dropdownKategoriBarang', ['filter' => 'Auth']);
+$routes->get('/stock-list/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/stock-list/id/(:segment)', 'Inventori\StokList::detail/$1', ['filter' => 'Auth']);
+$routes->get('/stock-list/stock-dokumen-bc', 'Inventori\StokList::allStokPerDokumen', ['filter' => 'Auth']);
+$routes->get('/stock-list/stock-filtered', 'Inventori\StokList::allStokFiltered', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);

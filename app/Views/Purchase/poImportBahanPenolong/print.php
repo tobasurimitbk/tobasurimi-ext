@@ -245,7 +245,7 @@
                 <?= strtoupper($dataPO->shipper) ?> <br>
                 <br><br><br><br>
 
-                <b><u><?= strtoupper(session()->get("login")->name); ?></u></b><br>
+                <b><u><?= $dataPO->direktur == "-" ? "" : strtoupper($dataPO->direktur); ?></u></b><br>
                 DIRECTOR
             </td>
         </tr>

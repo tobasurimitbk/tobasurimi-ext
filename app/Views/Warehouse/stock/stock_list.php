@@ -1,411 +1,350 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+
 <section class="section">
     <div class="section-header">
-        <h1>Stok List</h1>
+        <h1>Stock List</h1>
+        <?php if (can("Inventori", "Stok List", "c")) : ?>
+            <a href="<?= base_url('stock-list/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Inisiasi Stok
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
-            <ul class="nav nav-tabs">
-                <?php foreach ($typeAll as $t) : ?>
-                    <li class="nav-item">
-                        <a class="nav-link <?= $t['description'] == $typeSelected ? 'active' : '' ?>" href="<?= base_url('stock-list?type=' . $t['description']) ?>"><?= $t['value'] ?></a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <div class="row mb-4">
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select" name="parent_type" id="parent_type" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($tipeBarang as $t) : ?>
+                                <option value="<?= $t['description'] ?>">
+                                    <?= strtoupper($t['value']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Tipe Barang</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select parent_name" id="parent_name" name="parent_name" aria-label="Floating label select example">
+                            <option value=""></option>
+                        </select>
+                        <label style="z-index: 1;">Kategori Barang</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($dataDivisi as $divisi) : ?>
+                                <option value="<?= $divisi["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['divisi_id'] === $divisi["id"] ? "selected" : "") : ""; ?>><?= strtoupper($divisi["divisi"]); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Departemen</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
 
-            <div class="row justify-content-end mb-3 mt-3">
-                <div class="col-md-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                        </select>
+                        <label style="z-index: 1;">Warehouse</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select status_stok" id="status_stok" name="status_stok" aria-label="Floating label select example">
+                            <option value="ALL">SEMUA</option>
+                            <option value="1">ADA</option>
+                            <option value="0">HABIS</option>
+                        </select>
+                        <label style="z-index: 1;">Status Stok</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Kode / Nama Barang </label>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <?php if ($typeSelected == "bahan_baku") : ?>
-                                <tr>
-                                    <th>No.</th>
-                                    <th onclick="changeSort('companies.company')">Company</th>
-                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
-                                    <th onclick="changeSort('barang_master.parent_type_id')">Kelompok</th>
-                                    <th onclick="changeSort('barang_master.barang_name')">Barang</th>
-                                    <th>Stok Minimal</th>
-                                    <th>Stok Gudang</th>
-                                    <th>Status</th>
-                                </tr>
-                            <?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi") : ?>
-                                <tr>
-                                    <th>No.</th>
-                                    <th onclick="changeSort('companies.company')">Company</th>
-                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
-                                    <th onclick="changeSort('barang_master.parent_type_id')">Kelompok</th>
-                                    <th onclick="changeSort('barang_master.barang_name')">Barang</th>
-                                    <th onclick="changeSort('satuans.nama_satuan')">Satuan</th>
-                                    <th>Stok Minimal</th>
-                                    <th>Stok Gudang</th>
-                                    <th>Status</th>
-                                </tr>
-                            <?php elseif ($typeSelected == "bahan_scrap") : ?>
-                                <tr>
-                                    <th>No.</th>
-                                    <th onclick="changeSort('companies.company')">Company</th>
-                                    <th onclick="changeSort('stock_details.warehouse_id')">Warehouse</th>
-                                    <th onclick="changeSort('barang_master.barang_name')">Barang</th>
-                                    <th onclick="changeSort('satuans.nama_satuan')">Satuan</th>
-                                    <th>Stok Minimal</th>
-                                    <th>Stok Gudang</th>
-                                    <th>Status</th>
-                                </tr>
-                            <?php endif; ?>
-                        </thead>
-                        <tbody class="body-table" id="body-table">
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>No</th>
+                            <th onclick="changeSort('parent_barang.parent_type')">Tipe Barang</th>
+                            <th onclick="changeSort('parent_barang.parent_name')">Kategori</th>
+                            <th onclick="changeSort('barang_master.kode_barang')">Kode</th>
+                            <th onclick="changeSort('barang_master.barang_name')">Barang</th>
+                            <th onclick="changeSort('divisis.divisi')">Departemen</th>
+                            <th onclick="changeSort('warehouses.warehouse_name')">Warehouse</th>
+                            <th onclick="changeSort('stock.qty')">Stok Satuan 1</th>
+                            <th>Stok Satuan 2</th>
+                            <th>Stok Satuan 3</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="body-table" id="body-table">
+                    </tbody>
+                </table>
             </div>
+
         </div>
     </div>
 </section>
 
+
+
 <script>
-    const csrfToken = '<?= csrf_token() ?>';
-    let sort = "stock_details.id";
+    let sort = "createdAt";
     let sortType = "desc";
-    let table = null;
-</script>
-<?php if ($typeSelected == "bahan_baku") : ?>
-    <script>
-        table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: true,
-            order: [
-                [1, 'asc']
-            ],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("stock-list/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                    data.sort = sort;
-                    data.sortType = sortType;
-                    data.typeBarang = "<?= $typeSelected ?>"
-                }
-            },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                    sortable: false,
-                    width: "5%"
-                }, {
-                    data: "company",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "warehouse",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "kelompok",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "barang",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "minimumStock",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "stok",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "statusStock",
-                    className: "text-center",
-                    width: "10%",
-                    render: function(data, type, row) {
-                        var status = row?.statusStock;
-                        if (status == "Safety") {
-                            return `
-                            <div class="text-success">
-                            <b>${data}</b>
-                            </div>
-                        `
-                        } else {
-                            return `
-                            <div class="text-danger">
-                            <b>${data}</b>
-                            </div>
-                        `
-                        }
 
-                    }
-                }
-            ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak ada stok histori bahan baku",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [4, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.parent_type = $("#parent_type option:selected").val();
+                data.parent_name = $("#parent_name option:selected").val();
+                data.divisi_id = $("#divisi_id option:selected").val();
+                data.warehouse_id = $("#warehouse_id option:selected").val();
+                data.status_stok = $("#status_stok option:selected").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            }
+        },
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                orderable: false
+            },
+            {
+                data: "parent_type",
+                className: "text-center"
+            },
+            {
+                data: "parent_name",
+                className: "text-center"
+            },
+            {
+                data: "kode_barang",
+                className: "text-center"
+            },
+            {
+                data: "barang",
+                className: "text-center"
+            },
+            {
+                data: "divisi",
+                className: "text-center",
+
+            },
+            {
+                data: "warehouse",
+                className: "text-center"
+            },
+            {
+                data: "stok_1",
+                className: "text-center"
+            },
+            {
+                data: "stok_2",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "stok_3",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `
+                        <div class="mt-0 actions">
+                            <button onclick="stokDetail('${id}')" data-toggle="tooltip" title="Detail Stok" class="btn btn-success posting-spp actions">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    `
                 }
             }
-        });
-    </script>
-<?php elseif ($typeSelected == "bahan_penolong" || $typeSelected == "bahan_jadi") : ?>
-    <script>
-        table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: true,
-            order: [
-                [1, 'asc']
-            ],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("stock-list/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                    data.sort = sort;
-                    data.sortType = sortType;
-                    data.typeBarang = "<?= $typeSelected ?>"
-                }
-            },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                    sortable: false,
-                    width: "5%"
-                }, {
-                    data: "company",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "warehouse",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "kelompok",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "barang",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "satuan",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "minimumStock",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "stok",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "statusStock",
-                    className: "text-center",
-                    width: "10%",
-                    render: function(data, type, row) {
-                        var status = row?.statusStock;
-                        if (status == "Safety") {
-                            return `
-                            <div class="text-success">
-                            <b>${data}</b>
-                            </div>
-                        `
-                        } else {
-                            return `
-                            <div class="text-danger">
-                            <b>${data}</b>
-                            </div>
-                        `
-                        }
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
-                    }
-                }
-            ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak ada stok histori " + "<?= str_replace('_', ' ', $typeSelected) ?>",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
+    $('#parent_type').select2({
+        placeholder: "Pilih Tipe Barang",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // GET KATEGORI BARANG
+        $.ajax({
+            url: `<?= base_url('stock-list/kategori-barang'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                parent_type: $(this).val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".parent_name").empty()
+                $(".parent_name").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".parent_name").append(`<option value="${item.id}">${item.parent_name}</option>`)
+                })
+                $(".parent_name").val();
             }
         });
-    </script>
-<?php elseif ($typeSelected == "bahan_scrap") : ?>
-    <script>
-        table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: true,
-            order: [
-                [1, 'asc']
-            ],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("stock-list/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                    data.sort = sort;
-                    data.sortType = sortType;
-                    data.typeBarang = "<?= $typeSelected ?>"
-                }
-            },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                    sortable: false,
-                    width: "5%"
-                }, {
-                    data: "company",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "warehouse",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "barang",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "minimumStock",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "stok",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "satuan",
-                    className: "text-center",
-                    width: "10%"
-                },
-                {
-                    data: "statusStock",
-                    className: "text-center",
-                    width: "10%",
-                    render: function(data, type, row) {
-                        var status = row?.statusStock;
-                        if (status == "Safety") {
-                            return `
-                            <div class="text-success">
-                            <b>${data}</b>
-                            </div>
-                        `
-                        } else {
-                            return `
-                            <div class="text-danger">
-                            <b>${data}</b>
-                            </div>
-                        `
-                        }
+        table.ajax.reload();
 
-                    }
-                }
-            ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak ada stok histori " + "<?= str_replace('_', ' ', $typeSelected) ?>",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-    </script>
-<?php endif; ?>
-<script>
-    $(".search").keyup(function() {
+    });
+
+    $('#parent_name').select2({
+        placeholder: "Pilih Kategori Barang",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
         table.ajax.reload();
     });
+
+    $('#divisi_id').select2({
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // GET WAREHOUSES
+        $.ajax({
+            url: `<?= base_url('stock-list/warehouse'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $(".divisi_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".warehouse_id").empty()
+                $(".warehouse_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
+                $(".warehouse_id").val();
+            }
+        });
+        table.ajax.reload();
+    });
+
+    $('#warehouse_id').select2({
+        placeholder: "Pilih Warehouse",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        table.ajax.reload();
+    });
+
+    $('#status_stok').select2({
+        placeholder: "Pilih Status Stok",
+        theme: "bootstrap-5",
+    }).change(function() {
+        table.ajax.reload();
+    });
+
+    $('.search').change(function() {
+        table.ajax.reload();
+    });
+
+    $("#parent_type,#divisi_id,#warehouse_id,#parent_name,#status_stok")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    const stokDetail = function(id) {
+
+        window.open("<?= base_url('stock-list/id/') ?>" + id, "_blank");
+    }
+
     const changeSort = function(val) {
         if (sort !== val) {
-            sortType = "ASC";
+            sortType = "asc";
             sort = val;
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
 </script>
+
 <?= $this->endSection(); ?>
