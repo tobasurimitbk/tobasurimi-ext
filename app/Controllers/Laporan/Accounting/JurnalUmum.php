@@ -106,6 +106,7 @@ class JurnalUmum extends BaseController
             ->groupBy('trans_id')
             ->findAll();
         // var_dump($dataJurnalUmumWithGroup);
+        // var_dump($dataJurnalUmum);
 
         $data = [
             "dataMetadata" => $dataMetadata,

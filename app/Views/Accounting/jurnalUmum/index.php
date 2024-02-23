@@ -68,8 +68,8 @@
                                     <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi[]" placeholder="Pilih Tanggal">
                                 </td>
                                 <td>
-                                    <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" />
-                                    <input type="hidden" name="cari[]" id="id_coa" />
+                                    <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" required />
+                                    <input type="hidden" name="cari[]" id="id_coa" required />
 
                                     <ul class="list-group position-absolute" id="searchResults" style="z-index: 1000;">
 
@@ -220,8 +220,8 @@
             <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi_${counter}" name="tgl_transaksi[]" placeholder="Pilih Tanggal">
         </td>
         <td>
-            <input type="text" id="gsearchsimple_${counter}" data-counters="${counter}" class="form-control" placeholder="Search Akun" />
-            <input type="hidden" name="cari[]" id="id_coa_${counter}" />
+            <input type="text" id="gsearchsimple_${counter}" data-counters="${counter}" class="form-control" placeholder="Search Akun"  required />
+            <input type="hidden" name="cari[]" id="id_coa_${counter}" required />
             <ul class="list-group position-absolute" id="searchResults_${counter}" data-counters="${counter}" style="z-index: 1000;"></ul>
             <div id="localSearchSimple_${counter}"></div>
         </td>
@@ -361,18 +361,32 @@
         var jumlahDebet = parseFloat(hilang_titik(document.getElementById('jumlahDebet').value)) || 0;
         var jumlahKredit = parseFloat(hilang_titik(document.getElementById('jumlahKredit').value)) || 0;
 
+        // Check if jumlahDebet and jumlahKredit are equal
         if (jumlahDebet !== jumlahKredit) {
-            // alert("Jumlah Debet dan Kredit harus sama.");
             Swal.fire({
                 icon: 'error',
                 title: 'Debit dan Kredit Tidak Balance',
                 confirmButtonColor: '#4e73df',
-            })
+            });
             return false; // Prevent form submission
+        }
+
+        // Check if any 'cari[]' fields are empty
+        var cariInputs = document.getElementsByName('cari[]');
+        for (var i = 0; i < cariInputs.length; i++) {
+            if (cariInputs[i].value.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pastikan Akun COA Sudah Terpilih',
+                    confirmButtonColor: '#4e73df',
+                });
+                return false; // Prevent form submission
+            }
         }
 
         return true; // Allow form submission
     }
+
 
     getItems();
     getItems2();

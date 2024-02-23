@@ -166,7 +166,7 @@ class JurnalUmum extends BaseController
 
             session()->setFlashdata('success_message', 'Data Berhasil disimpan');
         } catch (\Exception $e) {
-            session()->setFlashdata('error_message', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            session()->setFlashdata('error_message', 'Gagal Coba Cek Kembali Semua Field');
         }
         return redirect()->to('jurnal');
     }

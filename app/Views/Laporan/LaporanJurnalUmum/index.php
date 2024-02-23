@@ -48,9 +48,11 @@
                                     <button type="submit" name="cariTanggal" class="btn btn-primary" value="cari">Cari</button>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi">
+                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" onchange="changeFilter()">
                                         <option value="" data-code=""></option>
                                         <?php
                                         if (!empty($dataMetadataTipeTransaksi)) {
@@ -62,7 +64,41 @@
                                         }
                                         ?>
                                     </select>
-                                    <label for="floatingInput">Filter</label>
+                                    <label for="floatingInput">Tipe Transaksi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select no_bukti" name="no_bukti" id="no_bukti" onchange="changeFilter()">
+                                        <option value="" data-code=""></option>
+                                        <?php
+                                        if (!empty($dataTransaksiJurnal)) {
+                                            foreach ($dataTransaksiJurnal as $transaksiJurnal) {
+                                        ?>
+                                                <option value="<?= $transaksiJurnal->tipe_transaksi_hex; ?>"><?= $transaksiJurnal->no_bukti; ?></option>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                    <label for="floatingInput">No Bukti</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select subs_akun" name="subs_akun" id="subs_akun">
+                                        <option value="" data-code=""></option>
+                                        <?php
+                                        if (!empty($dataSubAkuns)) {
+                                            foreach ($dataSubAkuns as $subs) {
+                                        ?>
+                                                <option value="<?= $subs->id; ?>"><?= $subs->nama_sub; ?></option>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                    <label for="floatingInput">Akun COA</label>
                                 </div>
                             </div>
                         </div>
@@ -75,10 +111,10 @@
                     <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th colspan="2">Tanggal</th>
-                                <th colspan="2">Desc</th>
-                                <th>Debit</th>
-                                <th>Kredit</th>
+                                <th data-sortable="false" colspan="2">Tanggal</th>
+                                <th data-sortable="false" colspan="2">Desc</th>
+                                <th data-sortable="false">Debit</th>
+                                <th data-sortable="false">Kredit</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,9 +130,9 @@
                                     foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
                                         if ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                             ?>
-                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>">
+                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
                                                 <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)); ?></td>
-                                                <td colspan="4"><?= $jurnalUmumWithGroupData->no_transaksi . " " . $jurnalUmumWithGroupData->value; ?></td>
+                                                <td colspan="4"><?= $jurnalUmumWithGroupData->no_bukti . " " . $jurnalUmumWithGroupData->keterangan; ?></td>
                                             </tr>
                                         <?php
                                         endif;
@@ -110,7 +146,7 @@
                                         $total_kredit += $jurnalUmumData->kredit;
                                         if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                                         ?>
-                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>">
+                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
                                                 <td colspan="2"></td>
                                                 <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
                                                 <td class="yy"><?= format_ribuan($jurnalUmumData->debit); ?></td>
@@ -177,19 +213,19 @@
         // Set nilai awal dateStart pada saat dokumen siap (document ready)
         $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
 
-        $('.type_transaksi').select2({
-            placeholder: "Filter",
+        $('.type_transaksi, .no_bukti, .subs_akun').select2({
+            placeholder: "Filter Jurnal",
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.type_transaksi')
+        $('.type_transaksi, .no_bukti, .subs_akun')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.type_transaksi')
+        $('.type_transaksi, .no_bukti, .subs_akun')
             .parent('div')
             .children('span')
             .children('span')
@@ -197,7 +233,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.type_transaksi')
+        $('.type_transaksi, .no_bukti, .subs_akun')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -214,22 +250,27 @@
             }
             $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
         });
+    });
 
-        $("#type_transaksi").change(function() {
-            var selectedValue = $(this).val();
-            var inputsDebit = 0;
-            var inputsKredit = 0;
+    const changeFilter = function() {
+        var selectedValueTypeTransaksi = $("#type_transaksi").val();
+        var selectedValueNoBukti = $("#no_bukti").val();
 
-            // Check if the selected value is empty
-            if (!selectedValue) {
-                // Reset totalInputs menjadi 0 setiap kali dropdown berubah
-                totalInputsDebit = 0;
-                totalInputsKredit = 0;
-                // Reset data-header-id and show all rows
-                $("tbody tr").each(function() {
-                    if ($(this).attr('data-header-id')) {
-                        $(this).show();
-                    }
+        console.log(selectedValueTypeTransaksi);
+        console.log(selectedValueNoBukti);
+        var inputsDebit = 0;
+        var inputsKredit = 0;
+
+        // Check if the selected value is empty
+        if (selectedValueTypeTransaksi || selectedValueNoBukti) {
+            // Reset totalInputs menjadi 0 setiap kali dropdown berubah
+            totalInputsDebit = 0;
+            totalInputsKredit = 0;
+
+            $("tbody tr").each(function() {
+                var headerIdValue = $(this).data('header-id');
+                var transaksiIdValue = $(this).data('transaksi-id');
+                if (headerIdValue === selectedValueTypeTransaksi && !selectedValueNoBukti) {
                     inputsDebit = $(this).find('.yy');
                     inputsDebit.each(function() {
                         var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
@@ -240,38 +281,60 @@
                         var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
                         totalInputsKredit += inputValue;
                     });
+                    $(this).show();
+                } else if (transaksiIdValue === selectedValueNoBukti && !selectedValueTypeTransaksi) {
+                    inputsDebit = $(this).find('.yy');
+                    inputsDebit.each(function() {
+                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        totalInputsDebit += inputValue;
+                    });
+                    inputsKredit = $(this).find('.xx');
+                    inputsKredit.each(function() {
+                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        totalInputsKredit += inputValue;
+                    });
+                    $(this).show();
+                } else if (headerIdValue === selectedValueTypeTransaksi && transaksiIdValue === selectedValueNoBukti) {
+                    inputsDebit = $(this).find('.yy');
+                    inputsDebit.each(function() {
+                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        totalInputsDebit += inputValue;
+                    });
+                    inputsKredit = $(this).find('.xx');
+                    inputsKredit.each(function() {
+                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        totalInputsKredit += inputValue;
+                    });
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
+            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
+        } else {
+            // Reset totalInputs menjadi 0 setiap kali dropdown berubah
+            totalInputsDebit = 0;
+            totalInputsKredit = 0;
+            // Reset data-header-id and show all rows
+            $("tbody tr").each(function() {
+                if ($(this).attr('data-header-id')) {
+                    $(this).show();
+                }
+                inputsDebit = $(this).find('.yy');
+                inputsDebit.each(function() {
+                    var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                    totalInputsDebit += inputValue;
                 });
-                $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
-                $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
-            } else {
-                // Reset totalInputs menjadi 0 setiap kali dropdown berubah
-                totalInputsDebit = 0;
-                totalInputsKredit = 0;
-
-                $("tbody tr").each(function() {
-                    var headerIdValue = $(this).data('header-id');
-                    if (headerIdValue === selectedValue) {
-                        inputsDebit = $(this).find('.yy');
-                        inputsDebit.each(function() {
-                            var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
-                            totalInputsDebit += inputValue;
-                        });
-                        inputsKredit = $(this).find('.xx');
-                        inputsKredit.each(function() {
-                            var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
-                            totalInputsKredit += inputValue;
-                        });
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
+                inputsKredit = $(this).find('.xx');
+                inputsKredit.each(function() {
+                    var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                    totalInputsKredit += inputValue;
                 });
-                $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
-                $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
-            }
-        });
-
-
+            });
+            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
+            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
+        }
 
         function formatRupiah(angka) {
             angka = angka.replace(/\./g, ',');
@@ -283,7 +346,8 @@
             var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
             return 'Rp. ' + ribuanFormatted + ',' + desimal;
         }
-    });
+    }
+
     const convertDateFormat = function(dateString) {
         // Memisahkan tanggal, bulan, dan tahun dari string
         var dateParts = dateString.split("/");
