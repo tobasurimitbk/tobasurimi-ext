@@ -42,7 +42,7 @@ class JurnalUmum extends BaseController
         $dateStart = $this->request->getPost('dateStart');
         $dateEnd = $this->request->getPost('dateEnd');
 
-        if ($this->request->getPost('cariTanggal') != "" && $dateStart != "" && $dateEnd != "") {
+        if ($dateEnd) {
             $condition = [
                 'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
                 'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
