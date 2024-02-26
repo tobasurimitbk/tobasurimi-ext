@@ -30,15 +30,24 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group col-sm-3">
-                        <label class="col-form-label">No Bukti</label>
-                        <input autocomplete="one-time-code" class="form-control input-picker" id="no_bukti" name="no_bukti" placeholder="No. Bukti">
-                        <input type="hidden" name="id_transaksi" id="id_transaksi" />
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti" id="no_bukti" name="no_bukti" placeholder="No. Bukti" value="">
+                                    <input type="hidden" name="id_transaksi" id="id_transaksi" />
 
-                        <ul class="list-group position-absolute" id="searchResultsNoBukti" style="z-index: 1000;">
+                                    <ul class="list-group position-absolute" id="searchResultsNoBukti" style="z-index: 1000;">
 
-                        </ul>
-                        <div id="localSearchSimpleNoBukti"></div>
+                                    </ul>
+                                    <div id="localSearchSimpleNoBukti"></div>
+                                    <label for="floatingInput">No. Bukti</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="generateNewCode()">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -100,6 +109,24 @@
 
 <script>
     $(document).ready(function() {
+        $("#type_transaksi").focus();
+        $("#type_transaksi").change(function(e) {
+            var noBukti = $("#no_bukti").val();
+            if (noBukti) {
+                $("#no_bukti").attr("readonly", false);
+                $("#no_bukti").val('');
+                $("#auto_generate").prop('checked', false);
+                $("#no_bukti").focus();
+            } else {
+                $("#no_bukti").focus();
+            }
+            if ($(this).val()) {
+                $(".input-generate").css('display', '')
+            } else {
+                $(".input-generate").css('display', 'none')
+            }
+        });
+
         $("#akun_coa_1").select2({
             placeholder: "Pilih Akun",
             theme: "bootstrap-5"
@@ -110,6 +137,12 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
+        }).change(function(e) {
+            if ($('#gsearchsimple').val()) {
+                $('#tgl_transaksi').focus();
+            } else {
+                $('#gsearchsimple').focus();
+            }
         });
 
         $('#ket, #debit, #kredit').keypress(function(e) {
@@ -282,7 +315,7 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
-        });
+        }).focus();
         $(`#ket_${counter}, #debit_${counter}, #kredit_${counter}`).keypress(function(e) {
             if (e.which == 13) {
                 e.preventDefault();
@@ -379,6 +412,33 @@
         }
     }
 
+    function generateNewCode() {
+        let csrfToken = '<?= csrf_token() ?>';
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        let csrf = $(`[name="${csrfToken}"]`);
+        if (value) {
+            $("input[name='kode_barang']").attr("readonly", true);
+            $.ajax({
+                url: `<?= base_url("jurnal-penyesuaian/generate-no-bukti"); ?>`,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                method: "POST",
+                success: function(res) {
+                    csrf.val(res.token);
+                    $("input[name='no_bukti']").attr("readonly", true);
+                    $("input[name='no_bukti']").val(res.codeNew);
+                    $("#id_transaksi").val('');
+                    $('#searchResultsNoBukti').css('display', 'none');
+                    $("#tgl_transaksi").focus();
+                }
+            })
+        } else {
+            $("input[name='no_bukti']").attr("readonly", false);
+            $("input[name='no_bukti']").val("");
+        }
+    }
+
 
     function formatRupiah(angka) {
         angka = angka.replace(/\./g, ',');
@@ -401,14 +461,40 @@
         var jumlahDebet = parseFloat(hilang_titik(document.getElementById('jumlahDebet').value)) || 0;
         var jumlahKredit = parseFloat(hilang_titik(document.getElementById('jumlahKredit').value)) || 0;
 
+        // Check if jumlahDebet and jumlahKredit are equal
         if (jumlahDebet !== jumlahKredit) {
-            // alert("Jumlah Debet dan Kredit harus sama.");
             Swal.fire({
                 icon: 'error',
                 title: 'Debit dan Kredit Tidak Balance',
                 confirmButtonColor: '#4e73df',
-            })
+            });
             return false; // Prevent form submission
+        }
+
+        // Check if any 'cari[]' fields are empty
+        var cariInputs = document.getElementsByName('cari[]');
+        for (var i = 0; i < cariInputs.length; i++) {
+            if (cariInputs[i].value.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pastikan Akun COA Sudah Terpilih',
+                    confirmButtonColor: '#4e73df',
+                });
+                return false; // Prevent form submission
+            }
+        }
+
+        // Check if any 'cari[]' fields are empty
+        var tglInputs = document.getElementsByName('tgl_transaksi[]');
+        for (var i = 0; i < tglInputs.length; i++) {
+            if (tglInputs[i].value.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pastikan Tanggal Sudah Terisi',
+                    confirmButtonColor: '#4e73df',
+                });
+                return false; // Prevent form submission
+            }
         }
 
         return true; // Allow form submission

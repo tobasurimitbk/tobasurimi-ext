@@ -30,24 +30,39 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group col-sm-3">
-                        <label class="col-form-label">Type Transaksi</label>
-                        <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" required="">
-                            <option value="" data-code=""></option>
-                            <?php
-                            if (!empty($dataMetadataTipeTransaksi)) {
-                                foreach ($dataMetadataTipeTransaksi as $Tipe) {
-                            ?>
-                                    <option value="<?= $Tipe->hexid; ?>"><?= $Tipe->value; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" required="">
+                                        <option value="" data-code=""></option>
+                                        <?php
+                                        if (!empty($dataMetadataTipeTransaksi)) {
+                                            foreach ($dataMetadataTipeTransaksi as $Tipe) {
+                                        ?>
+                                                <option value="<?= $Tipe->hexid; ?>"><?= $Tipe->value; ?></option>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                    <label for="floatingInput">Type Transaksi</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group col-sm-3">
-                        <label class="col-form-label">No Bukti</label>
-                        <input autocomplete="one-time-code" class="form-control input-picker" id="no_bukti" name="no_bukti" placeholder="No. Bukti">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti" id="no_bukti" name="no_bukti" placeholder="No. Bukti" value="">
+                                    <label for="floatingInput">No. Bukti</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center" style="display: none;">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="generateNewCode()">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -65,7 +80,7 @@
                         <tbody class="body-table" id="tbody2" style="cursor: pointer;">
                             <tr>
                                 <td>
-                                    <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi[]" placeholder="Pilih Tanggal">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi[]" placeholder="Pilih Tanggal" required>
                                 </td>
                                 <td>
                                     <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" required />
@@ -109,6 +124,24 @@
 
 <script>
     $(document).ready(function() {
+        $("#type_transaksi").focus();
+        $("#type_transaksi").change(function(e) {
+            var noBukti = $("#no_bukti").val();
+            if (noBukti) {
+                $("#no_bukti").attr("readonly", false);
+                $("#no_bukti").val('');
+                $("#auto_generate").prop('checked', false);
+                $("#no_bukti").focus();
+            } else {
+                $("#no_bukti").focus();
+            }
+            if ($(this).val()) {
+                $(".input-generate").css('display', '')
+            } else {
+                $(".input-generate").css('display', 'none')
+            }
+        });
+
         $("#akun_coa_1").select2({
             placeholder: "Pilih Akun",
             theme: "bootstrap-5"
@@ -119,6 +152,12 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
+        }).change(function(e) {
+            if ($('#gsearchsimple').val()) {
+                $('#tgl_transaksi').focus();
+            } else {
+                $('#gsearchsimple').focus();
+            }
         });
 
         $('#ket, #debit, #kredit').keypress(function(e) {
@@ -217,7 +256,7 @@
         // Create cells with appropriate colspan
         row.innerHTML = `
         <td>
-            <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi_${counter}" name="tgl_transaksi[]" placeholder="Pilih Tanggal">
+            <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi_${counter}" name="tgl_transaksi[]" placeholder="Pilih Tanggal" required>
         </td>
         <td>
             <input type="text" id="gsearchsimple_${counter}" data-counters="${counter}" class="form-control" placeholder="Search Akun"  required />
@@ -339,6 +378,34 @@
         }
     }
 
+    function generateNewCode() {
+        let csrfToken = '<?= csrf_token() ?>';
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        let type = document.getElementById('type_transaksi').value;
+        let csrf = $(`[name="${csrfToken}"]`);
+        if (value) {
+            $("input[name='kode_barang']").attr("readonly", true);
+            $.ajax({
+                url: `<?= base_url("jurnal/generate-no-bukti"); ?>`,
+                data: {
+                    transaksi: type
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                method: "POST",
+                success: function(res) {
+                    csrf.val(res.token);
+                    $("input[name='no_bukti']").attr("readonly", true);
+                    $("input[name='no_bukti']").val(res.codeNew);
+                    $("#tgl_transaksi").focus();
+                }
+            })
+        } else {
+            $("input[name='no_bukti']").attr("readonly", false);
+            $("input[name='no_bukti']").val("");
+        }
+    }
 
     function formatRupiah(angka) {
         angka = angka.replace(/\./g, ',');
@@ -378,6 +445,19 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Pastikan Akun COA Sudah Terpilih',
+                    confirmButtonColor: '#4e73df',
+                });
+                return false; // Prevent form submission
+            }
+        }
+
+        // Check if any 'cari[]' fields are empty
+        var tglInputs = document.getElementsByName('tgl_transaksi[]');
+        for (var i = 0; i < tglInputs.length; i++) {
+            if (tglInputs[i].value.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pastikan Tanggal Sudah Terisi',
                     confirmButtonColor: '#4e73df',
                 });
                 return false; // Prevent form submission

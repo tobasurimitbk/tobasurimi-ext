@@ -23,6 +23,7 @@ use App\Models\LocalPOPaymentModel;
 use App\Models\LocalPOPaymentDetailModel;
 use App\Models\ImportPOPaymentModel;
 use App\Models\PenerimaanBarangModel;
+use Exception;
 
 class JurnalPenyesuaian extends BaseController
 {
@@ -219,5 +220,33 @@ class JurnalPenyesuaian extends BaseController
         // Mengembalikan output dalam format JSON
         echo json_encode($output);
         return;
+    }
+
+    public function generateNoBukti()
+    {
+        $kodeTransaksi = "";
+        $no_transaksi_jurnal = "";
+        try {
+            $dataMetadataTipeTransaksi = $this->MetadataModel
+                ->asObject()
+                ->where('id', '1424')
+                ->findAll();
+            foreach ($dataMetadataTipeTransaksi as $val) {
+                $kodeTransaksi = $val->description;
+            }
+
+            $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+
+            return response()->setJSON([
+                'codeNew' => $no_transaksi_jurnal,
+                'token' => csrf_hash(),
+
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'codeNew' => $no_transaksi_jurnal . "-????",
+                'token' => csrf_hash()
+            ]);
+        }
     }
 }

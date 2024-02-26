@@ -23,6 +23,7 @@ use App\Models\LocalPOPaymentModel;
 use App\Models\LocalPOPaymentDetailModel;
 use App\Models\ImportPOPaymentModel;
 use App\Models\PenerimaanBarangModel;
+use Exception;
 
 class JurnalUmum extends BaseController
 {
@@ -189,6 +190,33 @@ class JurnalUmum extends BaseController
         return;
     }
 
+    public function generateNoBukti()
+    {
+        $kodeTransaksi = "";
+        $no_transaksi_jurnal = "";
+        try {
+            $dataMetadataTipeTransaksi = $this->MetadataModel
+                ->asObject()
+                ->where('id', $this->encrypter->decrypt(hex2bin($this->request->getPost('transaksi'))))
+                ->findAll();
+            foreach ($dataMetadataTipeTransaksi as $val) {
+                $kodeTransaksi = $val->description;
+            }
+
+            $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+
+            return response()->setJSON([
+                'codeNew' => $no_transaksi_jurnal,
+                'token' => csrf_hash(),
+
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'codeNew' => $no_transaksi_jurnal . "-????",
+                'token' => csrf_hash()
+            ]);
+        }
+    }
 
     public function insertDataPembelian($poID, $type, $kategori, $module)
     {

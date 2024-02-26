@@ -1116,6 +1116,7 @@ $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filt
 //Accounting
 //Jurnal
 $routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 'Auth']);
+$routes->post('/jurnal/generate-no-bukti', 'Accounting\JurnalUmum\JurnalUmum::generateNoBukti', ['filter' => 'Auth']);
 $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
 //Jurnal Penyesuaian
@@ -1123,6 +1124,7 @@ $routes->get('/jurnal-penyesuaian', 'Accounting\JurnalPenyesuaian\JurnalPenyesua
 $routes->post('/jurnal-penyesuaian/addJurnal', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::save', ['filter' => 'Auth']);
 $routes->post('/jurnal-penyesuaian/getSubAkuns', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal-penyesuaian/getNoBukti', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::searchNoBukti', ['filter' => 'Auth']);
+$routes->post('/jurnal-penyesuaian/generate-no-bukti', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::generateNoBukti', ['filter' => 'Auth']);
 //Module Account
 $routes->get('/account-module', 'Accounting\AccountModule\AccountModule::index', ['filter' => 'Auth']);
 $routes->get('/account-module/all', 'Accounting\AccountModule\AccountModule::allAccountModule', ['filter' => 'Auth']);
