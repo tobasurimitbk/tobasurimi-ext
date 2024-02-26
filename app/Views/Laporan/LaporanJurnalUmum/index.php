@@ -24,85 +24,77 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-12">
-                    <form method="post" action="<?= base_url('/laporan-accounting/jurnalumum') ?>">
-                        <?= csrf_field(); ?>
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <div class="input-group">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" readonly>
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="input-group">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir" value="<?= $dateEnd; ?>">
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <div class="input-group">
-                                    <button type="submit" name="cariTanggal" class="btn btn-primary" value="cari">Cari</button>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="input-group" style="height: 50px;">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" disabled style="height: 50px;">
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" onchange="changeFilter()">
-                                        <option value="" data-code=""></option>
-                                        <?php
-                                        if (!empty($dataMetadataTipeTransaksi)) {
-                                            foreach ($dataMetadataTipeTransaksi as $Tipe) {
-                                        ?>
-                                                <option value="<?= $Tipe->hexid; ?>"><?= $Tipe->value; ?></option>
-                                        <?php
-                                            }
-                                        }
-                                        ?>
-                                    </select>
-                                    <label for="floatingInput">Tipe Transaksi</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select no_bukti" name="no_bukti" id="no_bukti" onchange="changeFilter()">
-                                        <option value="" data-code=""></option>
-                                        <?php
-                                        if (!empty($dataTransaksiJurnal)) {
-                                            foreach ($dataTransaksiJurnal as $transaksiJurnal) {
-                                        ?>
-                                                <option value="<?= $transaksiJurnal->tipe_transaksi_hex; ?>"><?= $transaksiJurnal->no_bukti; ?></option>
-                                        <?php
-                                            }
-                                        }
-                                        ?>
-                                    </select>
-                                    <label for="floatingInput">No Bukti</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select subs_akun" name="subs_akun" id="subs_akun">
-                                        <option value="" data-code=""></option>
-                                        <?php
-                                        if (!empty($dataSubAkuns)) {
-                                            foreach ($dataSubAkuns as $subs) {
-                                        ?>
-                                                <option value="<?= $subs->id; ?>"><?= $subs->nama_sub; ?></option>
-                                        <?php
-                                            }
-                                        }
-                                        ?>
-                                    </select>
-                                    <label for="floatingInput">Akun COA</label>
+                        <div class="col-md-3">
+                            <div class="input-group" style="height: 50px;">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir" value="<?= $dateEnd; ?>" style="height: 50px;">
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" onchange="changeFilter()">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($dataMetadataTipeTransaksi)) {
+                                        foreach ($dataMetadataTipeTransaksi as $Tipe) {
+                                    ?>
+                                            <option value="<?= $Tipe->hexid; ?>"><?= $Tipe->value; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Tipe Transaksi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-select no_bukti" name="no_bukti" id="no_bukti" onchange="changeFilter()">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($dataTransaksiJurnal)) {
+                                        foreach ($dataTransaksiJurnal as $transaksiJurnal) {
+                                    ?>
+                                            <option value="<?= $transaksiJurnal->tipe_transaksi_hex; ?>"><?= $transaksiJurnal->no_bukti; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">No Bukti</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-select subs_akun" name="subs_akun" id="subs_akun">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($dataSubAkuns)) {
+                                        foreach ($dataSubAkuns as $subs) {
+                                    ?>
+                                            <option value="<?= $subs->id; ?>"><?= $subs->nama_sub; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Akun COA</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -214,7 +206,7 @@
         $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
 
         $('.type_transaksi, .no_bukti, .subs_akun').select2({
-            placeholder: "Filter Jurnal",
+            placeholder: "",
             theme: "bootstrap-5",
             allowClear: true
         });
@@ -250,6 +242,8 @@
             }
             $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
         });
+
+        // $('#myTable').DataTable({})
     });
 
     const changeFilter = function() {
