@@ -116,8 +116,17 @@ class JurnalUmum extends BaseController
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
             foreach ($nm as $key => $val) {
-                $debitValue = isset($_POST['debit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['debit'][$key])) : 0;
-                $kreditValue = isset($_POST['kredit'][$key]) ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['kredit'][$key])) : 0;
+                if (isset($_POST['debit'][$key])) {
+                    $debitValue = ($_POST['debit'][$key] != "") ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['debit'][$key])) : 0;
+                } else {
+                    $debitValue = 0;
+                }
+
+                if (isset($_POST['kredit'][$key])) {
+                    $kreditValue = ($_POST['kredit'][$key] != "") ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['kredit'][$key])) : 0;
+                } else {
+                    $kreditValue = 0;
+                }
 
                 if ($debitValue == 0) {
                     $result[] = array(

@@ -95,10 +95,10 @@
                                     <input type="text" name="ket[]" id="ket" class="form-control">
                                 </td>
                                 <td>
-                                    <input type="text" name="debit[]" id="debit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
+                                    <input type="text" name="debit[]" id="debit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');checkValueDebitKredit();" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
                                 </td>
                                 <td>
-                                    <input type="text" name="kredit[]" id="kredit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems2();" class="form-control xx">
+                                    <input type="text" name="kredit[]" id="kredit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');checkValueDebitKredit();" onchange="this.value = formatRupiah(this.value);getItems2();" class="form-control xx">
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
@@ -268,10 +268,10 @@
             <input type="text" name="ket[]" id="ket_${counter}" class="form-control">
         </td>
         <td>
-            <input type="text" name="debit[]" id="debit_${counter}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
+            <input type="text" name="debit[]" id="debit_${counter}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');checkValueDebitKredit('${counter}');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
         </td>
         <td>
-            <input type="text" name="kredit[]" id="kredit_${counter}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems2();" class="form-control xx">
+            <input type="text" name="kredit[]" id="kredit_${counter}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');checkValueDebitKredit('${counter}');" onchange="this.value = formatRupiah(this.value);getItems2();" class="form-control xx">
         </td>
         <td>
             <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
@@ -408,14 +408,18 @@
     }
 
     function formatRupiah(angka) {
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return 'Rp. ' + ribuanFormatted + ',' + desimal;
+        if (angka.length) {
+            angka = angka.replace(/\./g, ',');
+            angka = angka.replace(/[^\d,]/g, '');
+            var parts = angka.split(',');
+            var ribuan = parts[0];
+            var desimal = parts[1] || '00';
+            var reverse = ribuan.toString().split('').reverse().join('');
+            var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+            return 'Rp. ' + ribuanFormatted + ',' + desimal;
+        } else {
+            return "";
+        }
     }
 
     function hilang_titik(string) {
@@ -467,6 +471,38 @@
         return true; // Allow form submission
     }
 
+    function checkValueDebitKredit(counter) {
+        if (counter) {
+            console.log(counter);
+            var debit = $(`#debit_${counter}`).val();
+            var kredit = $(`#kredit_${counter}`).val();
+
+            if (debit) {
+                $(`#kredit_${counter}`).attr('readonly', true);
+            } else {
+                $(`#kredit_${counter}`).attr('readonly', false);
+            }
+            if (kredit) {
+                $(`#debit_${counter}`).attr('readonly', true);
+            } else {
+                $(`#debit_${counter}`).attr('readonly', false);
+            }
+        } else {
+            var debit = $('#debit').val();
+            var kredit = $('#kredit').val();
+
+            if (debit) {
+                $('#kredit').attr('readonly', true);
+            } else {
+                $('#kredit').attr('readonly', false);
+            }
+            if (kredit) {
+                $('#debit').attr('readonly', true);
+            } else {
+                $('#debit').attr('readonly', false);
+            }
+        }
+    }
 
     getItems();
     getItems2();

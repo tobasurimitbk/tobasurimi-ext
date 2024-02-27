@@ -125,7 +125,7 @@
                                     foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
                                         if ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                             ?>
-                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
+                                            <tr onclick="updateJurnal()" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
                                                 <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)); ?></td>
                                                 <td colspan="4"><?= $jurnalUmumWithGroupData->no_bukti . " " . $jurnalUmumWithGroupData->keterangan; ?></td>
                                             </tr>
@@ -141,7 +141,7 @@
                                         $total_kredit += $jurnalUmumData->kredit;
                                         if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                                         ?>
-                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
+                                            <tr onclick="updateJurnal()" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
                                                 <td colspan="2"></td>
                                                 <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
                                                 <td class="yy"><?= format_ribuan($jurnalUmumData->debit); ?></td>
@@ -346,6 +346,11 @@
             return 'Rp. ' + ribuanFormatted + ',' + desimal;
         }
     }
+
+    const updateJurnal = function() {
+        console.log('masuk');
+    }
+
 
     const convertDateFormat = function(dateString) {
         // Memisahkan tanggal, bulan, dan tahun dari string
