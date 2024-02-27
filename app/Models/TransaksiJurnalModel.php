@@ -26,6 +26,8 @@ class TransaksiJurnalModel extends Model
         'po_id',
         'type_transaksi',
         'no_bukti',
+        'valas',
+        'exchange_rate',
     ];
 
     // Dates

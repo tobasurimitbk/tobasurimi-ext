@@ -131,6 +131,8 @@ class Pembelian extends BaseController
                                 $exchangeTransaksi = $kursData->nilai_kurs;
                             }
                         }
+                    } else {
+                        $valasTransaksi = $value['currencyValue'];
                     }
                     $nominalTransaksi += $value['total_po'];
                 }
@@ -149,6 +151,8 @@ class Pembelian extends BaseController
                                 $exchangeTransaksi = $kursData->nilai_kurs;
                             }
                         }
+                    } else {
+                        $valasTransaksi = $value['currencyValue'];
                     }
                     // var_dump($valasTransaksi);
                     // var_dump($exchangeTransaksi);

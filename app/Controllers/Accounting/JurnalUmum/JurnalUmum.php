@@ -22,6 +22,7 @@ use App\Models\RMImportPODetailModel;
 use App\Models\LocalPOPaymentModel;
 use App\Models\LocalPOPaymentDetailModel;
 use App\Models\ImportPOPaymentModel;
+use App\Models\KursModel;
 use App\Models\PenerimaanBarangModel;
 use Exception;
 
@@ -50,6 +51,8 @@ class JurnalUmum extends BaseController
     protected $localPOPaymentDetailModel;
     protected $importPOPaymentModel;
     protected $penerimaanBarangModel;
+    protected $metadataModel;
+    protected $kursModel;
 
     public function __construct()
     {
@@ -76,6 +79,8 @@ class JurnalUmum extends BaseController
         $this->localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
         $this->importPOPaymentModel = new ImportPOPaymentModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->metadataModel = new MetadataModel();
+        $this->kursModel = new KursModel();
     }
 
     public function index()
@@ -257,13 +262,6 @@ class JurnalUmum extends BaseController
                         $dataPOBBDetail = $this->rMPurchaseOrderDetailModel->asObject()->where('deletedAt', null)->where('rm_purchase_order_id', $dataBB->id)->findAll();
                         $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembelian')->findAll();
 
-                        // $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
-
-                        // start inisialisasi account
-                        // foreach ($dataDepartment as $value) {
-                        //     $KasAP = $value->ap_id;
-                        //     $KasAR = $value->ar_id;
-                        // }
                         foreach ($dataSupplier as $value) {
                             foreach ($dataAccountSupplier as $valueAccount) {
                                 if ($value->id == $valueAccount->supplier_id) {
@@ -279,7 +277,6 @@ class JurnalUmum extends BaseController
                             }
                         }
                         // end inisialisasi account
-
 
                         // start inisialisasi kode transaksi
                         foreach ($dataMetadataTipeTransaksi as $val) {
@@ -367,6 +364,9 @@ class JurnalUmum extends BaseController
                             'kategori_barang' => $kategori,
                             'po_id' => $poID,
                             'type_transaksi' => $idTransaksi,
+                            'no_bukti' => $no_transaksi_jurnal,
+                            'valas' => 'IDR',
+                            'exchange_rate' => 1,
                         );
 
                         $resultTransaksiPembelian[] = array(
@@ -395,8 +395,18 @@ class JurnalUmum extends BaseController
                         $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
                         $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
                         $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
-                        // var_dump($dataAccountModule);
-                        // exit;
+                        $kursData = $this->kursModel->getByMetaId($dataBB->currency, $dataBB->po_date);
+                        $metaValuta = $this->metadataModel->get_by_name('Valuta');
+                        foreach ($metaValuta as $valueValuta) {
+                            if ($dataBB->currency == $valueValuta['id']) {
+                                $valasTransaksi = $valueValuta['value'];
+                                if ($kursData) {
+                                    $exchangeTransaksi = $kursData->nilai_kurs;
+                                } else {
+                                    $exchangeTransaksi = 1;
+                                }
+                            }
+                        }
 
                         $dataPOBBDetail = $this->rmImportPODetailModel->asObject()->where('deletedAt', null)->where('rm_import_po_id', $dataBB->id)->findAll();
                         $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembelian')->findAll();
@@ -440,6 +450,9 @@ class JurnalUmum extends BaseController
                             'kategori_barang' => $kategori,
                             'po_id' => $poID,
                             'type_transaksi' => $idTransaksi,
+                            'no_bukti' => $no_transaksi_jurnal,
+                            'valas' => $valasTransaksi,
+                            'exchange_rate' => $exchangeTransaksi,
                         );
 
                         // ambil id dari transaksi jurnal untuk jurnal umum
@@ -464,7 +477,7 @@ class JurnalUmum extends BaseController
                                     'id_transaksi' => $id_transaksi_jurnal,
                                     'id_coa' =>  $barangAP,
                                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                    'debit' => repairDouble($dataBBDetail->total),
+                                    'debit' => repairDouble($dataBBDetail->total) * $exchangeTransaksi,
                                     'kredit' => 0,
                                     'keterangan' => $dataBB->po_no,
                                     'id_inputer' => session()->get("login")->user_id
@@ -493,7 +506,7 @@ class JurnalUmum extends BaseController
                             'id_coa' =>  $UtangAP,
                             'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
                             'debit' => 0,
-                            'kredit' => $totalPO,
+                            'kredit' => $totalPO * $exchangeTransaksi,
                             'keterangan' => $dataBB->po_no,
                             'id_inputer' => session()->get("login")->user_id
                         );
@@ -525,8 +538,18 @@ class JurnalUmum extends BaseController
                     $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
                     $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
                     $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
-                    // var_dump($dataAccountModule);
-                    // exit;
+                    $kursData = $this->kursModel->getByMetaId($dataBP->currency, $dataBP->po_date);
+                    $metaValuta = $this->metadataModel->get_by_name('Valuta');
+                    foreach ($metaValuta as $valueValuta) {
+                        if ($dataBP->currency == $valueValuta['id']) {
+                            $valasTransaksi = $valueValuta['value'];
+                            if ($kursData) {
+                                $exchangeTransaksi = $kursData->nilai_kurs;
+                            } else {
+                                $exchangeTransaksi = 1;
+                            }
+                        }
+                    }
 
                     $dataPOBPDetail = $this->aMPurchaseOrderDetailModel->asObject()->where('deletedAt', null)->where('am_purchase_order_id', $dataBP->id)->findAll();
                     $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembelian')->findAll();
@@ -571,6 +594,9 @@ class JurnalUmum extends BaseController
                         'kategori_barang' => $kategori,
                         'po_id' => $poID,
                         'type_transaksi' => $idTransaksi,
+                        'no_bukti' => $no_transaksi_jurnal,
+                        'valas' => $valasTransaksi,
+                        'exchange_rate' => $exchangeTransaksi,
                     );
 
                     // ambil id dari transaksi jurnal untuk jurnal umum
@@ -595,7 +621,7 @@ class JurnalUmum extends BaseController
                                 'id_transaksi' => $id_transaksi_jurnal,
                                 'id_coa' =>  $barangAP,
                                 'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
-                                'debit' => repairDouble($dataBPDetail->total),
+                                'debit' => repairDouble($dataBPDetail->total) * $exchangeTransaksi,
                                 'kredit' => 0,
                                 'keterangan' => $dataBP->po_no,
                                 'id_inputer' => session()->get("login")->user_id
@@ -626,7 +652,7 @@ class JurnalUmum extends BaseController
                         'id_coa' =>  $UtangAP,
                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
                         'debit' => 0,
-                        'kredit' => $totalPO,
+                        'kredit' => $totalPO * $exchangeTransaksi,
                         'keterangan' => $dataBP->po_no,
                         'id_inputer' => session()->get("login")->user_id
                     );
@@ -638,9 +664,7 @@ class JurnalUmum extends BaseController
                         'tgl_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
                     );
                 }
-                // var_dump($result);
-                // var_dump($resultTransaksiPembelian);
-                // exit;
+
                 $this->jurnalUmumModel->insertJurnalBatch($result);
                 $this->transaksiPembelianModel->insertBatchTransaksiPembelian($resultTransaksiPembelian);
             }

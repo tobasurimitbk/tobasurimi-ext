@@ -98,7 +98,7 @@ class JurnalUmum extends BaseController
             ->findAll();
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
             ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id')
+            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id, transaksi_jurnal.valas as valas, transaksi_jurnal.exchange_rate as exchange_rate')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
@@ -200,7 +200,7 @@ class JurnalUmum extends BaseController
             ->findAll();
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
             ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id')
+            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id, transaksi_jurnal.valas as valas, transaksi_jurnal.exchange_rate as exchange_rate')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
@@ -301,7 +301,7 @@ class JurnalUmum extends BaseController
             ->findAll();
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
             ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id')
+            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id, transaksi_jurnal.valas as valas, transaksi_jurnal.exchange_rate as exchange_rate')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
@@ -348,93 +348,6 @@ class JurnalUmum extends BaseController
                 endforeach;
             endforeach;
         endforeach;
-
-
-
-        // $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition);
-        // $metaValuta = $this->metadataModel->get_by_name('Valuta');
-
-        // $rdata = [];
-
-        // $no = 1;
-        // $column = 2;
-        // foreach ($res['data'] as $data) {
-        //     $tglTransaksi = $data->tanggal_penerimaan;
-        //     $dokumenTransaksi = $data->BC23_AJU ? "BC 2.3/" . $data->BC23_AJU : ($data->BC40_AJU ? "BC 4.0/" . $data->BC40_AJU : "-");
-        //     $buktiTransaksi = $data->no_penerimaan_barang;
-        //     $invoiceTransaksi = $data->no_invoice;
-        //     $tglInvoiceTransaksi = $data->tanggal_penerimaan;
-        //     $taxInvoiceTransaksi = "";
-        //     $poNumberTransaksi = str_replace(',', ", ", str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no));
-        //     $supplierTransaksi = $data->supplier_name;
-        //     $valasTransaksi = "IDR";
-        //     $exchangeTransaksi = 1.0;
-        //     $nominalTransaksi = 0.0;
-        //     $nominalIdrTransaksi = 0.0;
-        //     $paidIdrTransaksi = 0.0;
-        //     $totalHargaAll = 0.0;
-        //     $lokalbb = "";
-        //     $importbb = "";
-        //     $bp = "";
-        //     if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
-        //         $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
-        //         foreach ($lokalbb as $value) {
-        //             $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-        //             $nominalTransaksi += $totalxqty;
-        //         }
-        //         $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-        //         $nominalIdrTransaksi += $totalHargaAll;
-        //     } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
-        //         $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
-        //         foreach ($importbb as $value) {
-        //             $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-        //             if ($kursData) {
-        //                 foreach ($metaValuta as $valueValuta) {
-        //                     if ($value['currency'] == $valueValuta['id']) {
-        //                         $valasTransaksi = $valueValuta['value'];
-        //                         $exchangeTransaksi = $kursData->nilai_kurs;
-        //                     }
-        //                 }
-        //             }
-        //             $nominalTransaksi += $value['total_po'];
-        //         }
-        //         $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-        //         $nominalIdrTransaksi += $totalHargaAll;
-        //     } else if ($data->tipe_bahan == "PENOLONG") {
-        //         $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
-        //         foreach ($bp as $value) {
-        //             $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-        //             if ($kursData) {
-        //                 foreach ($metaValuta as $valueValuta) {
-        //                     if ($value['currency'] == $valueValuta['id']) {
-        //                         $valasTransaksi = $valueValuta['value'];
-        //                         $exchangeTransaksi = $kursData->nilai_kurs;
-        //                     }
-        //                 }
-        //             }
-        //             $nominalTransaksi += $value['total_po'];
-        //         }
-        //         $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-        //         $nominalIdrTransaksi += $totalHargaAll;
-        //     }
-        //     $spreadsheet->setActiveSheetIndex(0)
-        //         ->setCellValue('A' . $column, $no++)
-        //         ->setCellValue('B' . $column, $tglTransaksi)
-        //         ->setCellValue('C' . $column, $dokumenTransaksi)
-        //         ->setCellValue('D' . $column, $buktiTransaksi)
-        //         ->setCellValue('E' . $column, $invoiceTransaksi)
-        //         ->setCellValue('F' . $column, $tglInvoiceTransaksi)
-        //         ->setCellValue('G' . $column, $taxInvoiceTransaksi)
-        //         ->setCellValue('H' . $column, $poNumberTransaksi)
-        //         ->setCellValue('I' . $column, $supplierTransaksi)
-        //         ->setCellValue('J' . $column, $valasTransaksi)
-        //         ->setCellValue('K' . $column, number_format(floatval($exchangeTransaksi), 2, ',', '.'))
-        //         ->setCellValue('L' . $column, number_format(floatval($nominalTransaksi), 2, ',', '.'))
-        //         ->setCellValue('M' . $column, number_format(floatval($nominalIdrTransaksi), 2, ',', '.'))
-        //         ->setCellValue('N' . $column, $paidIdrTransaksi);
-
-        //     $column++;
-        // }
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'Laporan-Jurnal';
