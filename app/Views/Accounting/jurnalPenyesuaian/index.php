@@ -11,7 +11,7 @@
         <div class="section-header">
             <h1>Jurnal Penyesuaian</h1>
             <button class="btn btn-show-form btn-add float-right">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Simpan Jurnal
             </button>
         </div>
         <!-- Check and display success message -->
