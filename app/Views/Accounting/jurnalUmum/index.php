@@ -34,7 +34,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" required="">
+                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi">
                                         <option value="" data-code=""></option>
                                         <?php
                                         if (!empty($dataMetadataTipeTransaksi)) {
@@ -80,11 +80,11 @@
                         <tbody class="body-table" id="tbody2" style="cursor: pointer;">
                             <tr>
                                 <td>
-                                    <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi[]" placeholder="Pilih Tanggal" required>
+                                    <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi[]" placeholder="Pilih Tanggal">
                                 </td>
                                 <td>
-                                    <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" required />
-                                    <input type="hidden" name="cari[]" id="id_coa" required />
+                                    <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" />
+                                    <input type="hidden" name="cari[]" id="id_coa" />
 
                                     <ul class="list-group position-absolute" id="searchResults" style="z-index: 1000;">
 
@@ -106,7 +106,11 @@
                             </tr>
                         </tbody>
                         <tfoot>
-                            <td scope="col"></td>
+                            <td scope="col">
+                                <button class="btn btn-show-form btn-add">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Simpan Jurnal
+                                </button>
+                            </td>
                             <td scope="col"></td>
                             <td scope="col"></td>
                             <td scope="col"><input type="text" name="jumlahDebet" id="jumlahDebet" class="form-control" readonly></td>
@@ -256,11 +260,11 @@
         // Create cells with appropriate colspan
         row.innerHTML = `
         <td>
-            <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi_${counter}" name="tgl_transaksi[]" placeholder="Pilih Tanggal" required>
+            <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi_${counter}" name="tgl_transaksi[]" placeholder="Pilih Tanggal" >
         </td>
         <td>
-            <input type="text" id="gsearchsimple_${counter}" data-counters="${counter}" class="form-control" placeholder="Search Akun"  required />
-            <input type="hidden" name="cari[]" id="id_coa_${counter}" required />
+            <input type="text" id="gsearchsimple_${counter}" data-counters="${counter}" class="form-control" placeholder="Search Akun" />
+            <input type="hidden" name="cari[]" id="id_coa_${counter}"  />
             <ul class="list-group position-absolute" id="searchResults_${counter}" data-counters="${counter}" style="z-index: 1000;"></ul>
             <div id="localSearchSimple_${counter}"></div>
         </td>
@@ -444,21 +448,20 @@
 
         // Check if any 'cari[]' fields are empty
         var cariInputs = document.getElementsByName('cari[]');
+        var tglInputs = document.getElementsByName('tgl_transaksi[]');
+        var debitInputs = document.getElementsByName('debit[]');
+        var kreditInputs = document.getElementsByName('kredit[]');
         for (var i = 0; i < cariInputs.length; i++) {
-            if (cariInputs[i].value.trim() === '') {
+            if (cariInputs[i].value.trim() === '' && tglInputs[i].value.trim() === '' && debitInputs[i].value.trim() === '' && kreditInputs[i].value.trim() === '') {
+                deleteRow('tbody2')
+            } else if (cariInputs[i].value.trim() === '') {
                 Swal.fire({
                     icon: 'error',
                     title: 'Pastikan Akun COA Sudah Terpilih',
                     confirmButtonColor: '#4e73df',
                 });
                 return false; // Prevent form submission
-            }
-        }
-
-        // Check if any 'cari[]' fields are empty
-        var tglInputs = document.getElementsByName('tgl_transaksi[]');
-        for (var i = 0; i < tglInputs.length; i++) {
-            if (tglInputs[i].value.trim() === '') {
+            } else if (tglInputs[i].value.trim() === '') {
                 Swal.fire({
                     icon: 'error',
                     title: 'Pastikan Tanggal Sudah Terisi',
