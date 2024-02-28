@@ -182,7 +182,9 @@ class JurnalPenyesuaian extends BaseController
                 'total_kredit' => $total_credit,
                 'metode_input' => 'manual',
                 'type_transaksi' => 1424,
-                'no_bukti' => $this->request->getPost('no_bukti'),
+                'no_bukti' => $this->request->getPost('no_bukti') ? $this->request->getPost('no_bukti') : $no_transaksi_jurnal,
+                'valas' => 'IDR',
+                'exchange_rate' => 1,
             ];
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
         }

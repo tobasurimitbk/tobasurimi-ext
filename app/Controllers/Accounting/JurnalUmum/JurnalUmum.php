@@ -174,7 +174,9 @@ class JurnalUmum extends BaseController
                 'total_kredit' => $total_credit,
                 'metode_input' => 'manual',
                 'type_transaksi' => $this->encrypter->decrypt(hex2bin($this->request->getPost('type_transaksi'))),
-                'no_bukti' => $this->request->getPost('no_bukti'),
+                'no_bukti' => $this->request->getPost('no_bukti') ? $this->request->getPost('no_bukti') : $no_transaksi_jurnal,
+                'valas' => 'IDR',
+                'exchange_rate' => 1,
             ];
             $this->jurnalUmumModel->insertJurnalBatch($result);
             $this->transaksiJurnalModel->insertTransaksiJurnal($dataTransaksiJurnal);
