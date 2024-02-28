@@ -49,8 +49,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? "disabled" : "" ?> class="form-select " name="po_type" id="po_type">
                                 <option disabled selected value=""></option>
-                                <option value="BAKU" <?= (!empty($paymentData) && $paymentData['po_type'] == 'BAKU') ? 'selected' : '' ?>>BAHAN BAKU</option>
-                                <option value="PENOLONG" <?= (!empty($paymentData) && $paymentData['po_type'] == 'PENOLONG') ? 'selected' : '' ?>>BAHAN PENOLONG</option>
+                                <option value="BAHAN BAKU" <?= (!empty($paymentData) && $paymentData['po_type'] == 'BAHAN BAKU') ? 'selected' : '' ?>>BAHAN BAKU</option>
+                                <option value="BAHAN PENOLONG" <?= (!empty($paymentData) && $paymentData['po_type'] == 'BAHAN PENOLONG') ? 'selected' : '' ?>>BAHAN PENOLONG</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Tipe Purchase Order</label>
                         </div>
@@ -149,6 +149,30 @@
                                 <option value="LC" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'LC') ? 'selected' : '' ?>>LC</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Debit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -272,6 +296,12 @@
 
     $('#supplier_id').select2({
         placeholder: "Pilih Nama Supplier",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+    $('#akun_kas, #akun_selisih').select2({
+        placeholder: "",
         theme: "bootstrap-5",
         allowClear: true
     });

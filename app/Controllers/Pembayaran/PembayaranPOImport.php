@@ -9,6 +9,8 @@ use App\Models\RMImportPOModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\KursModel;
 use App\Models\MetadataModel;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
+use App\Models\Sub_AkunsModel;
 
 class PembayaranPOImport extends BaseController
 {
@@ -20,6 +22,7 @@ class PembayaranPOImport extends BaseController
     protected $rmImportPOModel; // Import BB
     protected $amPurchaseOrderModel; // Import BP - Lokal BP
     protected $metaDataModel;
+    protected $jurnalController;
 
     public function __construct()
     {
@@ -31,6 +34,7 @@ class PembayaranPOImport extends BaseController
         $this->rmImportPOModel = new RMImportPOModel();
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->metaDataModel = new MetadataModel();
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function pembayaranPOImport()
@@ -40,8 +44,14 @@ class PembayaranPOImport extends BaseController
 
     public function createPembayaranPOImportView()
     {
+        $Sub_AkunsModel = new Sub_AkunsModel();
+
+        $subAkunsModel = $Sub_AkunsModel->asObject()
+            ->where('deletedAt', null)
+            ->findAll();
         $data = [
-            'supplierList' => $this->supplierModel->asObject()->where('deletedAt', null)->where('type', "INTERNASIONAL")->findAll()
+            'supplierList' => $this->supplierModel->asObject()->where('deletedAt', null)->where('type', "INTERNASIONAL")->findAll(),
+            "subsAkuns" => $subAkunsModel
         ];
         return view('Pembayaran/pembayaranPOImport/form', $data);
     }
@@ -49,11 +59,17 @@ class PembayaranPOImport extends BaseController
     public function updatePembayaranPOImportView($id)
     {
         $id = decrypt($id);
+        $Sub_AkunsModel = new Sub_AkunsModel();
+
+        $subAkunsModel = $Sub_AkunsModel->asObject()
+            ->where('deletedAt', null)
+            ->findAll();
         $data = [
             'supplierList' => $this->supplierModel->asObject()->where('deletedAt', null)->where('type', "INTERNASIONAL")->findAll(),
             'paymentData' => $this->importPOPaymentModel->asArray()->find($id),
             'poDetail' => null,
             'sisaBayar' => 0,
+            "subsAkuns" => $subAkunsModel
         ];
 
 
@@ -61,7 +77,7 @@ class PembayaranPOImport extends BaseController
             return redirect()->to('pembayaran-po-import');
         }
 
-        if ($data['paymentData']['po_type'] == "BAKU") {
+        if ($data['paymentData']['po_type'] == "BAKU" || $data['paymentData']['po_type'] == "BAHAN BAKU") {
             $data['poDetail'] = $this->rmImportPOModel->asObject()->find($data['paymentData']['po_id']);
         } else {
             $data['poDetail'] = $this->amPurchaseOrderModel->asObject()->find($data['paymentData']['po_id']);
@@ -151,8 +167,12 @@ class PembayaranPOImport extends BaseController
             'termin' => $this->request->getVar('termin'),
             'payment_method' => $this->request->getVar('payment_method'),
             'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
-            'note' => $this->request->getVar('note')
+            'note' => $this->request->getVar('note'),
+            'akun_kas' => $this->request->getVar('akun_kas'),
+            'akun_selisih' => $this->request->getVar('akun_selisih'),
         ]);
+
+        $result = $this->jurnalController->insertDataPembayaran($id, "IMPORT");
 
         return response()->setJSON([
             'id' => encrypt($id),
@@ -188,7 +208,9 @@ class PembayaranPOImport extends BaseController
             'termin' => $this->request->getVar('termin'),
             'payment_method' => $this->request->getVar('payment_method'),
             'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
-            'note' => $this->request->getVar('note')
+            'note' => $this->request->getVar('note'),
+            'akun_kas' => $this->request->getVar('akun_kas'),
+            'akun_selisih' => $this->request->getVar('akun_selisih'),
         ]);
 
         return response()->setJSON([
@@ -237,7 +259,7 @@ class PembayaranPOImport extends BaseController
 
     public function listPembayaranPOBelumLunas()
     {
-        $poType = $this->request->getVar('po_type');
+        $poType = str_replace('BAHAN ', '', $this->request->getVar('po_type'));
         $supplierID = $this->request->getVar('supplier_id');
 
         $poList = $this->getPOList($supplierID ?? 0, $poType ?? "");
@@ -250,7 +272,7 @@ class PembayaranPOImport extends BaseController
                 ->findAll();
 
             if ($totalBayar[0]['total_dibayar'] < $p->total) {
-                $nilaiKurs = $this->kursModel->getKursCurrent($p->currency_id, date('Y-m-d'));
+                $nilaiKurs = $this->kursModel->getKursCurrent($p->currency_id, $p->po_date);
                 $poListBelumLunas[] = [
                     'id' => encrypt($p->id),
                     'po_no' => $p->po_no,
@@ -281,7 +303,7 @@ class PembayaranPOImport extends BaseController
         $responseData = [];
 
         $condition = [
-            'po_type' => $this->request->getVar('po_type') == "BAKU" ? "BAKU" : "PENOLONG",
+            'po_type' => $this->request->getVar('po_type') == "BAHAN BAKU" ? "BAKU" : "PENOLONG",
             'deletedAt' => null,
             'company_id' => $this->this_company_id,
             'po_id' => decrypt($this->request->getVar('po_id'))
@@ -338,7 +360,7 @@ class PembayaranPOImport extends BaseController
         $responseData = [];
 
         $addCondition = [
-            'po_type' => $this->request->getVar('po_type')
+            'po_type' => $this->request->getVar('po_type') == "BAHAN BAKU" ? "BAKU" : "PENOLONG",
         ];
 
         if ($addCondition['po_type'] == "BAKU") {

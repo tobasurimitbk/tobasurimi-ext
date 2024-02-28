@@ -29,6 +29,8 @@ class ImportPOPaymentModel extends Model
         'payment_date',
         'termin',
         'payment_method',
+        'akun_kas',
+        'akun_selisih',
         'note'
     ];
 

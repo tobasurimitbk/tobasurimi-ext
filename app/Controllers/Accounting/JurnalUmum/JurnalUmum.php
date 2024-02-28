@@ -443,8 +443,8 @@ class JurnalUmum extends BaseController
                         $resultTransaksiJurnal = array(
                             'no_transaksi' => $no_transaksi_jurnal,
                             'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                            'total_debit' => $totalPO,
-                            'total_kredit' => $totalPO,
+                            'total_debit' => $totalPO * $exchangeTransaksi,
+                            'total_kredit' => $totalPO * $exchangeTransaksi,
                             'metode_input' => 'system',
                             'tipe_barang' => $type,
                             'kategori_barang' => $kategori,
@@ -587,8 +587,8 @@ class JurnalUmum extends BaseController
                     $resultTransaksiJurnal = array(
                         'no_transaksi' => $no_transaksi_jurnal,
                         'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
-                        'total_debit' => $totalPO,
-                        'total_kredit' => $totalPO,
+                        'total_debit' => $totalPO * $exchangeTransaksi,
+                        'total_kredit' => $totalPO * $exchangeTransaksi,
                         'metode_input' => 'system',
                         'tipe_barang' => $type,
                         'kategori_barang' => $kategori,
@@ -724,6 +724,9 @@ class JurnalUmum extends BaseController
                     'total_kredit' => $POlocal->amount,
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => 'IDR',
+                    'exchange_rate' => 1,
                 );
 
                 // ambil id dari transaksi jurnal untuk jurnal umum
@@ -756,16 +759,20 @@ class JurnalUmum extends BaseController
         } else {
             $POimport = $this->importPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
             if ($POimport) {
+                $totalPO = 0;
                 $dataSupplier = $this->supplierModel->getSupplierForJurnal($POimport->supplier_id);
                 $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
                 $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
                 $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembayaran')->findAll();
 
-                $dataPenerimaan = $this->penerimaanBarangModel->asObject()
-                    ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
-                    ->where('penerimaan_barang.id', $POimport->penerimaan_barang_id)
-                    ->where('penerimaan_barang.deletedAt', null)
-                    ->where('penerimaan_barang_detail.deletedAt', null)
+                $rmImportPO = $this->rmImportPOModel->asObject()
+                    ->where('rm_import_pos.id', $POimport->po_id)
+                    ->where('rm_import_pos.deletedAt', null)
+                    ->findAll();
+                $rmImportPODetail = $this->rmImportPODetailModel->asObject()
+                    ->where('rm_import_po_details.rm_import_po_id', $POimport->po_id)
+                    ->where('rm_import_po_details.deletedAt', null)
                     ->findAll();
                 foreach ($dataSupplier as $value) {
                     foreach ($dataAccountSupplier as $valueAccount) {
@@ -792,25 +799,29 @@ class JurnalUmum extends BaseController
                 $resultTransaksiJurnal = array(
                     'no_transaksi' => $no_transaksi_jurnal,
                     'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
-                    'total_debit' => $POimport->amount,
-                    'total_kredit' => $POimport->amount,
+                    'total_debit' => repairDouble($POimport->payment_amt)  * repairDouble($POimport->current_exchange_rate),
+                    'total_kredit' => repairDouble($POimport->payment_amt)  * repairDouble($POimport->current_exchange_rate),
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => $POimport->currency,
+                    'exchange_rate' => $POimport->current_exchange_rate,
                 );
 
                 // ambil id dari transaksi jurnal untuk jurnal umum
                 $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
                 //untuk insert ke jurnal umum
 
-                foreach ($dataPenerimaan as $value) {
-                    $dataPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                foreach ($rmImportPO as $value) {
+                    $dataPO = str_replace(['[', ']', '"', "\\"], '', $value->po_no);
                 }
+
                 $result[] = array(
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' =>  $POimport->akun_kas,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
                     'debit' => 0,
-                    'kredit' => repairDouble($POimport->amount),
+                    'kredit' => repairDouble($POimport->payment_amt) * repairDouble($POimport->current_exchange_rate),
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -818,7 +829,7 @@ class JurnalUmum extends BaseController
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' =>  $POimport->akun_selisih == 0 || $POimport->akun_selisih == NULL ? $UtangAR : $POimport->akun_selisih,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
-                    'debit' => repairDouble($POimport->amount),
+                    'debit' => repairDouble($POimport->payment_amt) * repairDouble($POimport->current_exchange_rate),
                     'kredit' => 0,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
