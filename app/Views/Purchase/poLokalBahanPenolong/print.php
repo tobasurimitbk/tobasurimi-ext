@@ -148,6 +148,11 @@
                                 <td>:</td>
                                 <td><?= $dataPOLokal->note ?></td>
                             </tr>
+                            <tr>
+                                <td>Nomor SPP</td>
+                                <td>:</td>
+                                <td><?= $dataPOLokal->spp_no ? $dataPOLokal->spp_no : "-" ?></td>
+                            </tr>
                         </table>
                     </div>
 
