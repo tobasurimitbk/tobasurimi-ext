@@ -9,8 +9,10 @@ use App\Models\SppDetailModel;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\CompaniesModel;
+use App\Models\ParentBarangModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMPurchaseOrderModel;
+use App\Models\SatuansModel;
 use Dompdf\Dompdf;
 
 class SPP extends BaseController
@@ -58,11 +60,15 @@ class SPP extends BaseController
     {
         $dataSppType =  $this->MetadataModel->get_by_name("Tipe SPP");
         $dataDivisi = $this->DivisisModel->getDivisiAccess();
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
 
         $data = [
             "today"       => date("d/m/Y"),
             "dataSppType" => $dataSppType,
-            "dataDivisi"  => $dataDivisi
+            "dataDivisi"  => $dataDivisi,
+            'kelompokBarang' => $parentBarangModel->where('deletedAt', null)->findAll(),
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
         return view('Purchase/spp/form', $data);

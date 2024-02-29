@@ -87,6 +87,7 @@ class JurnalUmum extends BaseController
             ->findAll();
         foreach ($dataTransaksiJurnal as $val) {
             $val->tipe_transaksi_hex = bin2hex($this->encrypter->encrypt($val->type_transaksi));
+            $val->id_transaksi_hex = bin2hex($this->encrypter->encrypt($val->id));
         }
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()

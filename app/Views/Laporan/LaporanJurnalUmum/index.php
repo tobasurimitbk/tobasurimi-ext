@@ -125,7 +125,7 @@
                                     foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
                                         if ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                             ?>
-                                            <tr onclick="updateJurnal(<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>)" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
+                                            <tr onclick="updateJurnal('<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->id_transaksi_hex : 0; ?>')" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
                                                 <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)); ?></td>
                                                 <td colspan="4">
                                                     <span class="badge badge-primary">
@@ -151,7 +151,7 @@
                                         $total_kredit += $jurnalUmumData->kredit;
                                         if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                                         ?>
-                                            <tr onclick="updateJurnal(<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>)" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
+                                            <tr onclick="updateJurnal('<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->id_transaksi_hex : 0; ?>')" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
                                                 <td colspan="2"></td>
                                                 <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
                                                 <td class="yy"><?= format_ribuan($jurnalUmumData->debit); ?></td>
@@ -359,6 +359,7 @@
 
     const updateJurnal = function(transaksiId) {
         console.log(transaksiId);
+        window.location.href = '<?= base_url("jurnal/update") ?>/' + transaksiId;
     }
 
 

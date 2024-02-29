@@ -36,7 +36,7 @@ class Barang extends BaseController
         $data = [
             'type' => "bahan_baku",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_baku")->where('deletedAt', null)->findAll(),
-            'satuanBarang' => $satuanModel->findAll()
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
         return view('Warehouse/barangMaster/bahanBaku', $data);
@@ -49,7 +49,7 @@ class Barang extends BaseController
         $data = [
             'type' => "bahan_penolong",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_penolong")->where('deletedAt', null)->findAll(),
-            'satuanBarang' => $satuanModel->findAll()
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
         return view('Warehouse/barangMaster/bahanPenolong', $data);
@@ -66,7 +66,7 @@ class Barang extends BaseController
             'type' => "bahan_jadi",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_jadi")->where('deletedAt', null)->findAll(),
             'divisi' => $divisisModelData,
-            'satuanBarang' => $satuanModel->findAll()
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
         return view('Warehouse/barangMaster/bahanJadi', $data);
@@ -79,7 +79,7 @@ class Barang extends BaseController
         $data = [
             'type' => "bahan_scrap",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_scrap")->where('deletedAt', null)->findAll(),
-            'satuanBarang' => $satuanModel->findAll()
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
         return view('Warehouse/barangMaster/bahanScrap', $data);
@@ -92,7 +92,7 @@ class Barang extends BaseController
         $data = [
             'type' => "bahan_modal",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_modal")->where('deletedAt', null)->findAll(),
-            'satuanBarang' => $satuanModel->findAll()
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
         return view('Warehouse/barangMaster/bahanModal', $data);
@@ -121,7 +121,7 @@ class Barang extends BaseController
 
         $barangMasterID = $barangModel->insert([
             'company_id' => $this->this_company_id,
-            'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
+            'parent_type_id' => decrypt($this->request->getVar('parent_type_id')) == 0 ? $this->request->getVar('parent_type_id') : decrypt($this->request->getVar('parent_type_id')),
             // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),

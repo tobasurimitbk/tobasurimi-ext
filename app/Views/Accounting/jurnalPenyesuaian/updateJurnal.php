@@ -5,8 +5,6 @@
 <!-- Begin Page Content -->
 <section class="section">
     <form action="<?= base_url('jurnal-penyesuaian/addJurnal') ?>" method="post" onsubmit="return validateForm();">
-
-        <input type="hidden" class="id" name="id" id="id" />
         <?= csrf_field() ?>
         <div class="section-header">
             <h1>Update Jurnal</h1>
@@ -35,7 +33,7 @@
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" class="form-control no_bukti" id="no_bukti" name="no_bukti" placeholder="No. Bukti" value="">
-                                    <input type="hidden" name="id_transaksi" id="id_transaksi" />
+                                    <input type="text" name="id_transaksi" id="id_transaksi" />
 
                                     <ul class="list-group position-absolute" id="searchResultsNoBukti" style="z-index: 1000;">
 
@@ -69,7 +67,7 @@
                                 </td>
                                 <td>
                                     <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" />
-                                    <input type="hidden" name="cari[]" id="id_coa" />
+                                    <input type="text" name="cari[]" id="id_coa" />
 
                                     <ul class="list-group position-absolute" id="searchResults" style="z-index: 1000;">
 
@@ -294,7 +292,7 @@
         </td>
         <td>
             <input type="text" id="gsearchsimple_${counter}" data-counters="${counter}" class="form-control" placeholder="Search Akun" />
-            <input type="hidden" name="cari[]" id="id_coa_${counter}" />
+            <input type="text" name="cari[]" id="id_coa_${counter}" />
             <ul class="list-group position-absolute" id="searchResults_${counter}" data-counters="${counter}" style="z-index: 1000;"></ul>
             <div id="localSearchSimple_${counter}"></div>
         </td>

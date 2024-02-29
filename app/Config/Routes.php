@@ -638,6 +638,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'Warehouse\Barang::delete');
     $routes->post('delete-spek', 'Warehouse\Barang::deleteSpek');
     $routes->post('generate-new-code', 'Warehouse\Barang::generateNewCode');
+    $routes->get('generate-new-code', 'Warehouse\Barang::generateNewCode');
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);
@@ -1125,6 +1126,9 @@ $routes->post('/jurnal-penyesuaian/addJurnal', 'Accounting\JurnalPenyesuaian\Jur
 $routes->post('/jurnal-penyesuaian/getSubAkuns', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal-penyesuaian/getNoBukti', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::searchNoBukti', ['filter' => 'Auth']);
 $routes->post('/jurnal-penyesuaian/generate-no-bukti', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::generateNoBukti', ['filter' => 'Auth']);
+//Jurnal Update
+$routes->get('/jurnal/update/(:segment)', 'Accounting\JurnalPenyesuaian\JurnalUpdate::index/$1', ['filter' => 'Auth']);
+$routes->post('/jurnal/update/updateJurnal', 'Accounting\JurnalPenyesuaian\JurnalUpdate::save', ['filter' => 'Auth']);
 //Module Account
 $routes->get('/account-module', 'Accounting\AccountModule\AccountModule::index', ['filter' => 'Auth']);
 $routes->get('/account-module/all', 'Accounting\AccountModule\AccountModule::allAccountModule', ['filter' => 'Auth']);
