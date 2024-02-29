@@ -443,19 +443,38 @@ class StockModel extends Model
             $spesifikasi_id
         )) {
             // SUDAH DIDEFINISIKAN SEBELUMNYA
-            $stok =  $this->asArray()
-                ->where('company_id', $company_id)
-                ->where('warehouse_id', $warehouse_id)
-                ->where('divisi_id', $divisi_id)
-                ->where('barang1_id', $barang_id)
-                ->where('barang2_id', $spesifikasi_id)
-                ->where('deletedAt', null)
-                ->first();
+            if ($type_barang != "kemasan") {
+                // BARANG
+                $stok =  $this->asArray()
+                    ->where('company_id', $company_id)
+                    ->where('warehouse_id', $warehouse_id)
+                    ->where('divisi_id', $divisi_id)
+                    ->where('barang1_id', $barang_id)
+                    ->where('barang2_id', $spesifikasi_id)
+                    ->where('deletedAt', null)
+                    ->first();
 
-            // UPDATE QTY
-            $this->update($stok['id'], [
-                'qty' => $stok['qty'] + $qtyTotal
-            ]);
+                // UPDATE QTY
+                $this->update($stok['id'], [
+                    'qty' => $stok['qty'] + $qtyTotal
+                ]);
+            } else {
+                // KEMASAN
+                $stok =  $this->asArray()
+                    ->where('company_id', $company_id)
+                    ->where('warehouse_id', $warehouse_id)
+                    ->where('divisi_id', $divisi_id)
+                    ->where('barang1_id', $barang_id)
+                    ->where('kemasan_id', $spesifikasi_id)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                // UPDATE QTY
+                $this->update($stok['id'], [
+                    'qty' => $stok['qty'] + $qtyTotal
+                ]);
+            }
+
             return $stok['id'];
         } else {
             // BELUM ADA
@@ -548,6 +567,7 @@ class StockModel extends Model
 
         $stokInisiasi = $stockDetailModel->select($selectQry)
             ->where('deletedAt', null)
+            ->where('stock_details.sumber', "INISIASI")
             ->where('stock_details.stock_id', $stock_id)
             ->groupBy('stock_details.stock_id')
             ->findAll();

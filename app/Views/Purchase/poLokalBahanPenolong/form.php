@@ -363,6 +363,9 @@
         allowClear: true
     }).change(function() {
         getDetailSPP();
+        listBarang = [];
+        totalHarga = 0;
+        drawTabel(listBarang);
     });
 
     $('#supplier_id').select2({
