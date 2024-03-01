@@ -4,12 +4,12 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-    <form action="<?= base_url('jurnal-penyesuaian/addJurnal') ?>" method="post" onsubmit="return validateForm();">
+    <form action="<?= base_url('jurnal/update/updateJurnal') ?>" method="post" onsubmit="return validateForm();">
         <?= csrf_field() ?>
         <div class="section-header">
             <h1>Update Jurnal</h1>
             <button class="btn btn-show-form btn-add float-right">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Update Jurnal
             </button>
         </div>
         <!-- Check and display success message -->
@@ -32,17 +32,9 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti" id="no_bukti" name="no_bukti" placeholder="No. Bukti" value="">
-                                    <input type="text" name="id_transaksi" id="id_transaksi" />
-
-                                    <ul class="list-group position-absolute" id="searchResultsNoBukti" style="z-index: 1000;">
-
-                                    </ul>
-                                    <div id="localSearchSimpleNoBukti"></div>
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti" id="no_bukti" name="no_bukti" placeholder="No. Bukti" value="<?= $transaksiJurnal->no_bukti ?>" readonly>
+                                    <input type="hidden" name="id_transaksi" id="id_transaksi" value="<?= $transaksiJurnal->hexid ?>" />
                                     <label for="floatingInput">No. Bukti</label>
-                                </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="generateNewCode()">
                                 </div>
                             </div>
                         </div>
@@ -61,32 +53,35 @@
                             </tr>
                         </thead>
                         <tbody class="body-table" id="tbody2" style="cursor: pointer;">
-                            <tr>
-                                <td>
-                                    <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi[]" placeholder="Pilih Tanggal">
-                                </td>
-                                <td>
-                                    <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" />
-                                    <input type="text" name="cari[]" id="id_coa" />
+                            <?php foreach ($jurnalUmum as $valueJurnal) : ?>
+                                <tr>
+                                    <td>
+                                        <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi" name="tgl_transaksi_old[]" placeholder="Pilih Tanggal" value="<?= date('d/m/Y', strtotime($valueJurnal->tanggal_jurnal)) ?>" <?= $valueJurnal->header_id == "1" ? "readonly" : "" ?> />
+                                        <input type="hidden" name="id_jurnal_old[]" id="id_jurnal" value="<?= $valueJurnal->hexid ?>" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="gsearchsimple" class="form-control" placeholder="Search Akun" value="<?= $valueJurnal->no_sub . " " . $valueJurnal->nama_sub ?>" <?= $valueJurnal->header_id == "1" ? "readonly" : "" ?> />
+                                        <input type="hidden" name="cari_old[]" id="id_coa" value="<?= $valueJurnal->hexid_coa ?>" />
 
-                                    <ul class="list-group position-absolute" id="searchResults" style="z-index: 1000;">
+                                        <ul class="list-group position-absolute" id="searchResults" style="z-index: 1000;">
 
-                                    </ul>
-                                    <div id="localSearchSimple"></div>
-                                </td>
-                                <td>
-                                    <input type="text" name="ket[]" id="ket" class="form-control">
-                                </td>
-                                <td>
-                                    <input type="text" name="debit[]" id="debit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
-                                </td>
-                                <td>
-                                    <input type="text" name="kredit[]" id="kredit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems2();" class="form-control xx">
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
+                                        </ul>
+                                        <div id="localSearchSimple"></div>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="ket_old[]" id="ket" class="form-control" value="<?= $valueJurnal->keterangan ?>">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="debit_old[]" id="debit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy" value="<?= str_replace('.', ',', $valueJurnal->debit) ?>" <?= $valueJurnal->header_id == "1" ? "readonly" : "" ?>>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="kredit_old[]" id="kredit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);getItems2();" class="form-control xx" value="<?= str_replace('.', ',', $valueJurnal->kredit) ?>" <?= $valueJurnal->header_id == "1" ? "readonly" : "" ?>>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
                         <tfoot>
                             <td scope="col"></td>
@@ -107,6 +102,9 @@
 
 <script>
     $(document).ready(function() {
+
+        // Menonaktifkan datepicker saat input memiliki atribut readonly
+        $(".tgl_transaksi[readonly]").datepicker("destroy");
         $("#type_transaksi").focus();
         $("#type_transaksi").change(function(e) {
             var noBukti = $("#no_bukti").val();
@@ -130,7 +128,7 @@
             theme: "bootstrap-5"
         });
 
-        $("#tgl_transaksi").datepicker({
+        $(".tgl_transaksi").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -289,6 +287,7 @@
         row.innerHTML = `
         <td>
             <input autocomplete="one-time-code" class="form-control input-picker tgl_transaksi" id="tgl_transaksi_${counter}" name="tgl_transaksi[]" placeholder="Pilih Tanggal">
+            <input type="text" name="id_jurnal[]" id="id_jurnal" />
         </td>
         <td>
             <input type="text" id="gsearchsimple_${counter}" data-counters="${counter}" class="form-control" placeholder="Search Akun" />
@@ -483,7 +482,8 @@
         }
 
         // Check if any 'cari[]' fields are empty
-        var tglInputs = document.getElementsByName('tgl_transaksi[]');
+        var tglInputs = document.getElementsByName('tgl_transaksi_old[]');
+        console.log(tglInputs.length);
         for (var i = 0; i < tglInputs.length; i++) {
             if (tglInputs[i].value.trim() === '') {
                 Swal.fire({
