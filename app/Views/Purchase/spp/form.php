@@ -239,7 +239,7 @@
     </div>
 </div>
 
-<div class="modal add-modal m-t-bahan-baku" id="add_modal" tabindex="-1">
+<!-- <div class="modal add-modal m-t-bahan-baku" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
@@ -393,7 +393,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -1185,795 +1185,795 @@
 
         return randomString;
     };
-    $(document).ready(function() {
-        $('.btn-add-barang').click(function() {
-            $(".detail-modal").modal("hide")
-            $('.title-name').text("Tambah Bahan Baku");
-            $(".create-form :input:not([name='type'])").val('');
-            var spp_type = $('.spp_type_bypass').val();
-            $("#type").val(spp_type);
-            if (spp_type) {
-                $.ajax({
-                    url: `<?= base_url("stock-list/kategori-barang"); ?>`,
-                    method: "GET",
-                    dataType: "json",
-                    data: {
-                        parent_type: spp_type
-                    },
-                    success: function(res) {
-                        // $(".parent_type_id").empty();
-                        // $(".parent_type_id").append(`<option value=""></option>`);
-                        res.data.forEach(function(item) {
-                            $("#parent_type_id").append(`<option value="${item.id}">${item.parent_name}</option>`);
-                        })
-                        // $(".parent_type_id").val("").change();
-                    }
-                })
-            }
+    // $(document).ready(function() {
+    //     $('.btn-add-barang').click(function() {
+    //         $(".detail-modal").modal("hide")
+    //         $('.title-name').text("Tambah Bahan Baku");
+    //         $(".create-form :input:not([name='type'])").val('');
+    //         var spp_type = $('.spp_type_bypass').val();
+    //         $("#type").val(spp_type);
+    //         if (spp_type) {
+    //             $.ajax({
+    //                 url: `<?= base_url("stock-list/kategori-barang"); ?>`,
+    //                 method: "GET",
+    //                 dataType: "json",
+    //                 data: {
+    //                     parent_type: spp_type
+    //                 },
+    //                 success: function(res) {
+    //                     // $(".parent_type_id").empty();
+    //                     // $(".parent_type_id").append(`<option value=""></option>`);
+    //                     res.data.forEach(function(item) {
+    //                         $("#parent_type_id").append(`<option value="${item.id}">${item.parent_name}</option>`);
+    //                     })
+    //                     // $(".parent_type_id").val("").change();
+    //                 }
+    //             })
+    //         }
 
-            $('.delete-btn').hide();
-            $('input[name="kode_barang"]').attr('readonly', false);
-            $('#generate_new_code').prop('checked', true).change().show();
-            $('.add-modal').modal('show');
-            $('#tbody2').empty();
-            var table = document.getElementById('tbody2');
-            var row = table.insertRow();
-            var row2 = table.insertRow();
-            row.innerHTML = `
-                                <td rowspan="2" style="padding:0px!important;text-align:center;">
-                                    <span id="nomber">1</span>
-                                </td>
-                                <td colspan="3">
-                                    <div class="row">
-                                        <div class="col-sm-12" style="padding:0px!important;">
-                                            <div class="form-floating">
-                                                <input type="text" name="spek[]" id="spek" class="form-control">
-                                                <label for="floatingInput">Spesifikasi</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td rowspan="2" style="padding:0px!important;text-align:center;">
-                                    <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
-                                    <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-                                </td>`;
-            row2.innerHTML = `
-                                <td style="width: 15%;">
-                                    <div class="row">
-                                        <div class="col-sm-12" style="padding:0px!important;">
-                                            <div class="form-floating">
-                                                <select class="form-select" name="satuan1_id[]" id="satuan1_id" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText()">
-                                                    <option value=""></option>
-                                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <label for="floatingInput">Satuan 1</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td style="width: 30%;">
-                                    <div class="row">
-                                        <div class="col-sm-6" style="padding:0px!important;">
-                                            <div class="form-floating">
-                                                <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2()">
-                                                    <option value=""></option>
-                                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <label for="floatingInput">Satuan 2</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6" style="padding:0px!important;">
-                                            <div class="input-group ">
-                                                <input type="text" name="konversi_satuan_2[]" onchange="checkValueKonversi()" id="konversi_satuan_2" class="form-control" onkeypress="return isNumberKey(event)">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text satuan1">-</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td style="width: 30%;">
-                                    <div class="row">
-                                        <div class="col-sm-6" style="padding:0px!important;">
-                                            <div class="form-floating">
-                                                <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3()">
-                                                    <option value=""></option>
-                                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <label for="floatingInput">Satuan 3</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6" style="padding:0px!important;">
-                                            <div class="input-group ">
-                                                <input type="text" name="konversi_satuan_3[]" onchange="checkValueKonversi()" id="konversi_satuan_3" class="form-control" onkeypress="return isNumberKey(event)">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text satuan1">-</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>`;
-            changeSpanText();
-            $("#satuan1_id, #satuan2_id, #satuan3_id")
-                .parent('div')
-                .find('label')
-                .css('z-index', '1');
-            $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
-                theme: "bootstrap-5",
-                allowClear: true,
-                placeholder: 'Pilih Satuan',
-                dropdownParent: $(".add-modal .modal-content")
-            });
-        });
+    //         $('.delete-btn').hide();
+    //         $('input[name="kode_barang"]').attr('readonly', false);
+    //         $('#generate_new_code').prop('checked', true).change().show();
+    //         $('.add-modal').modal('show');
+    //         $('#tbody2').empty();
+    //         var table = document.getElementById('tbody2');
+    //         var row = table.insertRow();
+    //         var row2 = table.insertRow();
+    //         row.innerHTML = `
+    //                             <td rowspan="2" style="padding:0px!important;text-align:center;">
+    //                                 <span id="nomber">1</span>
+    //                             </td>
+    //                             <td colspan="3">
+    //                                 <div class="row">
+    //                                     <div class="col-sm-12" style="padding:0px!important;">
+    //                                         <div class="form-floating">
+    //                                             <input type="text" name="spek[]" id="spek" class="form-control">
+    //                                             <label for="floatingInput">Spesifikasi</label>
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+    //                             </td>
+    //                             <td rowspan="2" style="padding:0px!important;text-align:center;">
+    //                                 <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
+    //                                 <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
+    //                             </td>`;
+    //         row2.innerHTML = `
+    //                             <td style="width: 15%;">
+    //                                 <div class="row">
+    //                                     <div class="col-sm-12" style="padding:0px!important;">
+    //                                         <div class="form-floating">
+    //                                             <select class="form-select" name="satuan1_id[]" id="satuan1_id" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText()">
+    //                                                 <option value=""></option>
+    //                                                 <?php foreach ($satuanBarang as $sb) : ?>
+    //                                                     <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+    //                                                 <?php endforeach; ?>
+    //                                             </select>
+    //                                             <label for="floatingInput">Satuan 1</label>
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+    //                             </td>
+    //                             <td style="width: 30%;">
+    //                                 <div class="row">
+    //                                     <div class="col-sm-6" style="padding:0px!important;">
+    //                                         <div class="form-floating">
+    //                                             <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2()">
+    //                                                 <option value=""></option>
+    //                                                 <?php foreach ($satuanBarang as $sb) : ?>
+    //                                                     <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+    //                                                 <?php endforeach; ?>
+    //                                             </select>
+    //                                             <label for="floatingInput">Satuan 2</label>
+    //                                         </div>
+    //                                     </div>
+    //                                     <div class="col-sm-6" style="padding:0px!important;">
+    //                                         <div class="input-group ">
+    //                                             <input type="text" name="konversi_satuan_2[]" onchange="checkValueKonversi()" id="konversi_satuan_2" class="form-control" onkeypress="return isNumberKey(event)">
+    //                                             <div class="input-group-append">
+    //                                                 <span class="input-group-text satuan1">-</span>
+    //                                             </div>
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+    //                             </td>
+    //                             <td style="width: 30%;">
+    //                                 <div class="row">
+    //                                     <div class="col-sm-6" style="padding:0px!important;">
+    //                                         <div class="form-floating">
+    //                                             <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3()">
+    //                                                 <option value=""></option>
+    //                                                 <?php foreach ($satuanBarang as $sb) : ?>
+    //                                                     <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+    //                                                 <?php endforeach; ?>
+    //                                             </select>
+    //                                             <label for="floatingInput">Satuan 3</label>
+    //                                         </div>
+    //                                     </div>
+    //                                     <div class="col-sm-6" style="padding:0px!important;">
+    //                                         <div class="input-group ">
+    //                                             <input type="text" name="konversi_satuan_3[]" onchange="checkValueKonversi()" id="konversi_satuan_3" class="form-control" onkeypress="return isNumberKey(event)">
+    //                                             <div class="input-group-append">
+    //                                                 <span class="input-group-text satuan1">-</span>
+    //                                             </div>
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+    //                             </td>`;
+    //         changeSpanText();
+    //         $("#satuan1_id, #satuan2_id, #satuan3_id")
+    //             .parent('div')
+    //             .find('label')
+    //             .css('z-index', '1');
+    //         $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
+    //             theme: "bootstrap-5",
+    //             allowClear: true,
+    //             placeholder: 'Pilih Satuan',
+    //             dropdownParent: $(".add-modal .modal-content")
+    //         });
+    //     });
 
-        $('.btn-discard').click(function() {
-            $('.add-modal').modal('hide');
-        });
+    //     $('.btn-discard').click(function() {
+    //         $('.add-modal').modal('hide');
+    //     });
 
-        var validator = $(".create-form-barang").validate({
-            rules: {
-                parent_type_id: {
-                    required: true
-                },
-                barang_name: {
-                    required: true
-                },
-                kode_barang: {
-                    required: true
-                },
-                satuan_id: {
-                    required: true
-                },
-                minimum_stock: {
-                    required: true
-                },
-            },
-            messages: {
-                parent_type_id: {
-                    required: "Kategori Barang Wajib Diisi"
-                },
-                barang_name: {
-                    required: "Nama Barang Wajib Diisi"
-                },
-                kode_barang: {
-                    required: "Kode Barang Wajib Diisi"
-                },
-                satuan_id: {
-                    required: "Satuan Barang Wajib Diisi"
-                },
-                minimum_stock: {
-                    required: "Minimal stock harus diisi",
-                    number: "Masukkan angka valid"
-                }
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
+    //     var validator = $(".create-form-barang").validate({
+    //         rules: {
+    //             parent_type_id: {
+    //                 required: true
+    //             },
+    //             barang_name: {
+    //                 required: true
+    //             },
+    //             kode_barang: {
+    //                 required: true
+    //             },
+    //             satuan_id: {
+    //                 required: true
+    //             },
+    //             minimum_stock: {
+    //                 required: true
+    //             },
+    //         },
+    //         messages: {
+    //             parent_type_id: {
+    //                 required: "Kategori Barang Wajib Diisi"
+    //             },
+    //             barang_name: {
+    //                 required: "Nama Barang Wajib Diisi"
+    //             },
+    //             kode_barang: {
+    //                 required: "Kode Barang Wajib Diisi"
+    //             },
+    //             satuan_id: {
+    //                 required: "Satuan Barang Wajib Diisi"
+    //             },
+    //             minimum_stock: {
+    //                 required: "Minimal stock harus diisi",
+    //                 number: "Masukkan angka valid"
+    //             }
+    //         },
+    //         errorElement: 'span',
+    //         errorClass: 'text-danger',
+    //         errorPlacement: function(error, element) {
+    //             var elem = $(element);
+    //             if (elem.hasClass("select2-hidden-accessible")) {
+    //                 element = $("#select2-" + elem.attr("id") + "-container").parent();
+    //                 error.insertAfter(element);
+    //             } else {
+    //                 error.insertAfter(element);
+    //             }
+    //         },
+    //         highlight: function(element) {
+    //             $(element).closest('.form-group').addClass('has-error');
+    //             $(element).addClass('select-class');
 
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-        $('.btn-submit-form').click(function(e) {
-            e.preventDefault();
-            if ($(".create-form-barang").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let id = $('input[name="id"]').val();
-                        let csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.querySelector(".create-form-barang"));
-                        console.log(data);
+    //         },
+    //         unhighlight: function(element) {
+    //             $(element).closest('.form-group').removeClass('has-error');
+    //             $(element).removeClass('select-class');
+    //         },
+    //     });
+    //     $('.btn-submit-form').click(function(e) {
+    //         e.preventDefault();
+    //         if ($(".create-form-barang").valid()) {
+    //             Swal.fire({
+    //                 icon: 'question',
+    //                 title: 'Simpan Data?',
+    //                 confirmButtonColor: '#4e73df',
+    //                 cancelButtonColor: '#d33',
+    //                 showCancelButton: true,
+    //                 reverseButtons: true,
+    //                 confirmButtonText: 'Simpan',
+    //                 cancelButtonText: 'Batal',
+    //             }).then((result) => {
+    //                 if (result.isConfirmed) {
+    //                     let id = $('input[name="id"]').val();
+    //                     let csrf = $(`[name="${csrfToken}"]`);
+    //                     let data = new FormData(document.querySelector(".create-form-barang"));
+    //                     console.log(data);
 
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("barang-master/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload();
-                                                $(".add-modal").modal("hide");
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        }).then(() => {
+    //                     if (id) {
+    //                         $.ajax({
+    //                             url: "<?= base_url("barang-master/update"); ?>",
+    //                             data: data,
+    //                             beforeSend: function(xhr) {
+    //                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //                             },
+    //                             method: "POST",
+    //                             dataType: "json",
+    //                             processData: false,
+    //                             contentType: false,
+    //                             success: function(response) {
+    //                                 csrf.val(response.token);
+    //                                 if (response.status) {
+    //                                     Swal.fire({
+    //                                             icon: 'success',
+    //                                             title: response.message,
+    //                                             confirmButtonColor: '#4e73df',
+    //                                         })
+    //                                         .then(() => {
+    //                                             table.ajax.reload();
+    //                                             $(".add-modal").modal("hide");
+    //                                         })
+    //                                 } else {
+    //                                     Swal.fire({
+    //                                         icon: 'error',
+    //                                         title: response.message,
+    //                                         confirmButtonColor: '#4e73df',
+    //                                     }).then(() => {
 
-                                        });
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        } else {
-                            $.ajax({
-                                url: "<?= base_url("barang-master/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload();
-                                                $(".add-modal").modal("hide");
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        }).then(() => {
+    //                                     });
+    //                                 }
+    //                             },
+    //                             onError: function(response) {
+    //                                 csrf.val(response.token);
+    //                                 Swal.fire({
+    //                                     icon: 'error',
+    //                                     title: 'Data Gagal Disimpan, coba Lagi',
+    //                                     confirmButtonColor: '#4e73df',
+    //                                 })
+    //                             }
+    //                         });
+    //                     } else {
+    //                         $.ajax({
+    //                             url: "<?= base_url("barang-master/save"); ?>",
+    //                             data: data,
+    //                             beforeSend: function(xhr) {
+    //                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //                             },
+    //                             method: "POST",
+    //                             dataType: "json",
+    //                             processData: false,
+    //                             contentType: false,
+    //                             success: function(response) {
+    //                                 csrf.val(response.token);
+    //                                 if (response.status) {
+    //                                     Swal.fire({
+    //                                             icon: 'success',
+    //                                             title: response.message,
+    //                                             confirmButtonColor: '#4e73df',
+    //                                         })
+    //                                         .then(() => {
+    //                                             table.ajax.reload();
+    //                                             $(".add-modal").modal("hide");
+    //                                         })
+    //                                 } else {
+    //                                     Swal.fire({
+    //                                         icon: 'error',
+    //                                         title: response.message,
+    //                                         confirmButtonColor: '#4e73df',
+    //                                     }).then(() => {
 
-                                        });
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        }
-                        $('.add-modal').modal('hide');
-                    }
-                })
+    //                                     });
+    //                                 }
+    //                             },
+    //                             onError: function(response) {
+    //                                 csrf.val(response.token);
+    //                                 Swal.fire({
+    //                                     icon: 'error',
+    //                                     title: 'Data Gagal Disimpan, coba Lagi',
+    //                                     confirmButtonColor: '#4e73df',
+    //                                 })
+    //                             }
+    //                         });
+    //                     }
+    //                     $('.add-modal').modal('hide');
+    //                 }
+    //             })
 
-            }
-        });
-        $(".delete-btn").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $("#id").val();
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("barang-master/delete"); ?>",
-                        data: {
-                            id: id
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        table.ajax.reload()
-                                        $(".add-modal").modal("hide")
-                                    });
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    });
-                }
-            })
-        });
-    });
+    //         }
+    //     });
+    //     $(".delete-btn").click(function() {
+    //         Swal.fire({
+    //             icon: 'question',
+    //             title: 'Hapus Data?',
+    //             confirmButtonColor: '#4e73df',
+    //             cancelButtonColor: '#d33',
+    //             showCancelButton: true,
+    //             reverseButtons: true,
+    //             confirmButtonText: 'Hapus',
+    //             cancelButtonText: 'Batal',
+    //         }).then((result) => {
+    //             if (result.isConfirmed) {
+    //                 const csrf = $(`[name="${csrfToken}"]`);
+    //                 let id = $("#id").val();
+    //                 setLoading()
+    //                 $.ajax({
+    //                     url: "<?= base_url("barang-master/delete"); ?>",
+    //                     data: {
+    //                         id: id
+    //                     },
+    //                     beforeSend: function(xhr) {
+    //                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //                     },
+    //                     method: "POST",
+    //                     dataType: "json",
+    //                     success: function(response) {
+    //                         csrf.val(response.token);
+    //                         if (response.status) {
+    //                             stopLoading()
+    //                             Swal.fire({
+    //                                     icon: 'success',
+    //                                     title: response.message,
+    //                                     confirmButtonColor: '#4e73df',
+    //                                 })
+    //                                 .then(() => {
+    //                                     table.ajax.reload()
+    //                                     $(".add-modal").modal("hide")
+    //                                 });
+    //                         }
+    //                     },
+    //                     onError: function(response) {
+    //                         csrf.val(response.token);
+    //                         Swal.fire({
+    //                             icon: 'error',
+    //                             title: 'Data Gagal Disimpan, coba Lagi',
+    //                             confirmButtonColor: '#4e73df',
+    //                         })
+    //                     }
+    //                 });
+    //             }
+    //         })
+    //     });
+    // });
 
-    var counter = 2; // Counter variable for rowspan
+    // var counter = 2; // Counter variable for rowspan
 
-    function addRow(tableID) {
-        var table = document.getElementById(tableID);
-        var row = table.insertRow();
-        var row2 = table.insertRow();
+    // function addRow(tableID) {
+    //     var table = document.getElementById(tableID);
+    //     var row = table.insertRow();
+    //     var row2 = table.insertRow();
 
-        // Create cells with appropriate colspan
-        row.innerHTML = `
-    <td rowspan="2" style="padding:0px!important;text-align:center;">
-        <span id="nomber">${counter}</span>
-    </td>
-    <td colspan="3">
-        <div class="row">
-            <div class="col-sm-12" style="padding:0px!important;">
-                <div class="form-floating">
-                    <input type="text" name="spek[]" id="spek" class="form-control">
-                    <label for="floatingInput">Spesifikasi</label>
-                </div>
-            </div>
-        </div>
-    </td>
-    <td rowspan="2" style="padding:0px!important;text-align:center;">
-        <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
-        <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-    </td>`;
-        row2.innerHTML = `
-    <td style="width: 15%;">
-        <div class="row">
-            <div class="col-sm-12" style="padding:0px!important;">
-                <div class="form-floating">
-                    <select class="form-select" name="satuan1_id[]" id="satuan1_id_${counter}" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText(${counter})">
-                        <option value=""></option>
-                        <?php foreach ($satuanBarang as $sb) : ?>
-                            <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="floatingInput">Satuan 1</label>
-                </div>
-            </div>
-        </div>
-    </td>
-    <td style="width: 30%;">
-        <div class="row">
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="form-floating">
-                    <select class="form-select" name="satuan2_id[]" id="satuan2_id_${counter}" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2(${counter})">
-                        <option value=""></option>
-                        <?php foreach ($satuanBarang as $sb) : ?>
-                            <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="floatingInput">Satuan 2</label>
-                </div>
-            </div>
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="input-group ">
-                    <input type="text" name="konversi_satuan_2[]" id="konversi_satuan_2_${counter}" onchange="checkValueKonversi(${counter})" class="form-control" onkeypress="return isNumberKey(event)">
-                    <div class="input-group-append">
-                        <span class="input-group-text satuan_${counter}">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </td>
-    <td style="width: 30%;">
-        <div class="row">
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="form-floating">
-                    <select class="form-select" name="satuan3_id[]" id="satuan3_id_${counter}" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3(${counter})">
-                        <option value=""></option>
-                        <?php foreach ($satuanBarang as $sb) : ?>
-                            <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="floatingInput">Satuan 3</label>
-                </div>
-            </div>
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="input-group ">
-                    <input type="text" name="konversi_satuan_3[]" id="konversi_satuan_3_${counter}" onchange="checkValueKonversi(${counter})" class="form-control" onkeypress="return isNumberKey(event)">
-                    <div class="input-group-append">
-                        <span class="input-group-text satuan_${counter}">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </td>`;
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    //     // Create cells with appropriate colspan
+    //     row.innerHTML = `
+    // <td rowspan="2" style="padding:0px!important;text-align:center;">
+    //     <span id="nomber">${counter}</span>
+    // </td>
+    // <td colspan="3">
+    //     <div class="row">
+    //         <div class="col-sm-12" style="padding:0px!important;">
+    //             <div class="form-floating">
+    //                 <input type="text" name="spek[]" id="spek" class="form-control">
+    //                 <label for="floatingInput">Spesifikasi</label>
+    //             </div>
+    //         </div>
+    //     </div>
+    // </td>
+    // <td rowspan="2" style="padding:0px!important;text-align:center;">
+    //     <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
+    //     <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
+    // </td>`;
+    //     row2.innerHTML = `
+    // <td style="width: 15%;">
+    //     <div class="row">
+    //         <div class="col-sm-12" style="padding:0px!important;">
+    //             <div class="form-floating">
+    //                 <select class="form-select" name="satuan1_id[]" id="satuan1_id_${counter}" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText(${counter})">
+    //                     <option value=""></option>
+    //                     <?php foreach ($satuanBarang as $sb) : ?>
+    //                         <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+    //                     <?php endforeach; ?>
+    //                 </select>
+    //                 <label for="floatingInput">Satuan 1</label>
+    //             </div>
+    //         </div>
+    //     </div>
+    // </td>
+    // <td style="width: 30%;">
+    //     <div class="row">
+    //         <div class="col-sm-6" style="padding:0px!important;">
+    //             <div class="form-floating">
+    //                 <select class="form-select" name="satuan2_id[]" id="satuan2_id_${counter}" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2(${counter})">
+    //                     <option value=""></option>
+    //                     <?php foreach ($satuanBarang as $sb) : ?>
+    //                         <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+    //                     <?php endforeach; ?>
+    //                 </select>
+    //                 <label for="floatingInput">Satuan 2</label>
+    //             </div>
+    //         </div>
+    //         <div class="col-sm-6" style="padding:0px!important;">
+    //             <div class="input-group ">
+    //                 <input type="text" name="konversi_satuan_2[]" id="konversi_satuan_2_${counter}" onchange="checkValueKonversi(${counter})" class="form-control" onkeypress="return isNumberKey(event)">
+    //                 <div class="input-group-append">
+    //                     <span class="input-group-text satuan_${counter}">-</span>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </div>
+    // </td>
+    // <td style="width: 30%;">
+    //     <div class="row">
+    //         <div class="col-sm-6" style="padding:0px!important;">
+    //             <div class="form-floating">
+    //                 <select class="form-select" name="satuan3_id[]" id="satuan3_id_${counter}" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3(${counter})">
+    //                     <option value=""></option>
+    //                     <?php foreach ($satuanBarang as $sb) : ?>
+    //                         <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+    //                     <?php endforeach; ?>
+    //                 </select>
+    //                 <label for="floatingInput">Satuan 3</label>
+    //             </div>
+    //         </div>
+    //         <div class="col-sm-6" style="padding:0px!important;">
+    //             <div class="input-group ">
+    //                 <input type="text" name="konversi_satuan_3[]" id="konversi_satuan_3_${counter}" onchange="checkValueKonversi(${counter})" class="form-control" onkeypress="return isNumberKey(event)">
+    //                 <div class="input-group-append">
+    //                     <span class="input-group-text satuan_${counter}">-</span>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </div>
+    // </td>`;
+    //     $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
+    //         .parent('div')
+    //         .children('span')
+    //         .children('span')
+    //         .children('span')
+    //         .css('height', ' calc(3.5rem + 2px)');
 
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    //     $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
+    //         .parent('div')
+    //         .children('span')
+    //         .children('span')
+    //         .children('span')
+    //         .children('span')
+    //         .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    //     $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
+    //         .parent('div')
+    //         .find('label')
+    //         .css('z-index', '1');
 
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
-            theme: "bootstrap-5",
-            allowClear: true,
-            placeholder: 'Pilih Satuan',
-            dropdownParent: $(".add-modal .modal-content")
-        });
+    //     $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
+    //         theme: "bootstrap-5",
+    //         allowClear: true,
+    //         placeholder: 'Pilih Satuan',
+    //         dropdownParent: $(".add-modal .modal-content")
+    //     });
 
-        counter++;
-        // rows++;
-    }
+    //     counter++;
+    //     // rows++;
+    // }
 
-    function deleteRow(tableID, counters = null) {
-        try {
-            var table = document.getElementById(tableID);
-            var rowCount = table.rows.length;
-            let csrfToken = '<?= csrf_token() ?>';
+    // function deleteRow(tableID, counters = null) {
+    //     try {
+    //         var table = document.getElementById(tableID);
+    //         var rowCount = table.rows.length;
+    //         let csrfToken = '<?= csrf_token() ?>';
 
-            // Variable to track whether any checkbox is checked
-            var isChecked = false;
+    //         // Variable to track whether any checkbox is checked
+    //         var isChecked = false;
 
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                var chkbox = row.cells[0].childNodes[0];
+    //         for (var i = 0; i < rowCount; i++) {
+    //             var row = table.rows[i];
+    //             var chkbox = row.cells[0].childNodes[0];
 
-                if (null != chkbox && true == chkbox.checked) {
-                    isChecked = true;
-                    table.deleteRow(i);
-                    table.deleteRow(i - 1); // Remove the previous row as well
-                    rowCount -= 2; // Reduce rowCount by 2
-                    i--;
-                }
-            }
+    //             if (null != chkbox && true == chkbox.checked) {
+    //                 isChecked = true;
+    //                 table.deleteRow(i);
+    //                 table.deleteRow(i - 1); // Remove the previous row as well
+    //                 rowCount -= 2; // Reduce rowCount by 2
+    //                 i--;
+    //             }
+    //         }
 
-            // If no checkbox is checked, remove the last two rows
-            if (!isChecked && rowCount > 2) {
-                if (counters) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Hapus Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Hapus',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            let idSpek = document.getElementById('id_spek_' + counters).value;
-                            setLoading()
-                            $.ajax({
-                                url: "<?= base_url("barang-master/delete-spek"); ?>",
-                                data: {
-                                    id: idSpek
-                                },
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                $('.dataTable').DataTable().ajax.reload()
-                                                $("#add_modal").modal("hide")
-                                            });
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        }
-                    })
+    //         // If no checkbox is checked, remove the last two rows
+    //         if (!isChecked && rowCount > 2) {
+    //             if (counters) {
+    //                 Swal.fire({
+    //                     icon: 'question',
+    //                     title: 'Hapus Data?',
+    //                     confirmButtonColor: '#4e73df',
+    //                     cancelButtonColor: '#d33',
+    //                     showCancelButton: true,
+    //                     reverseButtons: true,
+    //                     confirmButtonText: 'Hapus',
+    //                     cancelButtonText: 'Batal',
+    //                 }).then((result) => {
+    //                     if (result.isConfirmed) {
+    //                         const csrf = $(`[name="${csrfToken}"]`);
+    //                         let idSpek = document.getElementById('id_spek_' + counters).value;
+    //                         setLoading()
+    //                         $.ajax({
+    //                             url: "<?= base_url("barang-master/delete-spek"); ?>",
+    //                             data: {
+    //                                 id: idSpek
+    //                             },
+    //                             beforeSend: function(xhr) {
+    //                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //                             },
+    //                             method: "POST",
+    //                             dataType: "json",
+    //                             success: function(response) {
+    //                                 csrf.val(response.token);
+    //                                 if (response.status) {
+    //                                     stopLoading()
+    //                                     Swal.fire({
+    //                                             icon: 'success',
+    //                                             title: response.message,
+    //                                             confirmButtonColor: '#4e73df',
+    //                                         })
+    //                                         .then(() => {
+    //                                             $('.dataTable').DataTable().ajax.reload()
+    //                                             $("#add_modal").modal("hide")
+    //                                         });
+    //                                 }
+    //                             },
+    //                             onError: function(response) {
+    //                                 csrf.val(response.token);
+    //                                 Swal.fire({
+    //                                     icon: 'error',
+    //                                     title: 'Data Gagal Disimpan, coba Lagi',
+    //                                     confirmButtonColor: '#4e73df',
+    //                                 })
+    //                             }
+    //                         });
+    //                     }
+    //                 })
 
-                } else {
-                    table.deleteRow(rowCount - 1);
-                    table.deleteRow(rowCount - 2);
-                    rowCount -= 2;
-                }
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Baris terakhir tidak boleh dihapus!!!',
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-            var lastRow = table.rows[rowCount - 2];
-            var currentCount = parseInt(lastRow.querySelector('#nomber').innerText);
-            counter = currentCount + 1;
+    //             } else {
+    //                 table.deleteRow(rowCount - 1);
+    //                 table.deleteRow(rowCount - 2);
+    //                 rowCount -= 2;
+    //             }
+    //         } else {
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Baris terakhir tidak boleh dihapus!!!',
+    //                 confirmButtonColor: '#4e73df',
+    //             })
+    //         }
+    //         var lastRow = table.rows[rowCount - 2];
+    //         var currentCount = parseInt(lastRow.querySelector('#nomber').innerText);
+    //         counter = currentCount + 1;
 
-        } catch (e) {
-            alert(e);
-        }
-    }
+    //     } catch (e) {
+    //         alert(e);
+    //     }
+    // }
 
-    const generateNewCode = function() {
-        let value = document.getElementById('generate_new_code').checked ? true : false;
+    // const generateNewCode = function() {
+    //     let value = document.getElementById('generate_new_code').checked ? true : false;
 
-        var spp_type = $('.spp_type_bypass').val();
-        if (value) {
-            $("input[name='kode_barang']").attr("readonly", true);
-            $.ajax({
-                url: `<?= base_url("barang-master/generate-new-code"); ?>`,
-                data: {
-                    type: spp_type
-                },
-                method: "GET",
-                success: function(res) {
-                    csrf.val(res.token);
-                    $("input[name='kode_barang']").attr("readonly", true);
-                    $("input[name='kode_barang']").val(res.codeNew);
-                }
-            })
-        } else {
-            $("input[name='kode_barang']").attr("readonly", false);
-            $("input[name='kode_barang']").val("");
-        }
-    }
+    //     var spp_type = $('.spp_type_bypass').val();
+    //     if (value) {
+    //         $("input[name='kode_barang']").attr("readonly", true);
+    //         $.ajax({
+    //             url: `<?= base_url("barang-master/generate-new-code"); ?>`,
+    //             data: {
+    //                 type: spp_type
+    //             },
+    //             method: "GET",
+    //             success: function(res) {
+    //                 csrf.val(res.token);
+    //                 $("input[name='kode_barang']").attr("readonly", true);
+    //                 $("input[name='kode_barang']").val(res.codeNew);
+    //             }
+    //         })
+    //     } else {
+    //         $("input[name='kode_barang']").attr("readonly", false);
+    //         $("input[name='kode_barang']").val("");
+    //     }
+    // }
 
-    function changeSpanText(counter = null) {
-        var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
+    // function changeSpanText(counter = null) {
+    //     var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
 
-        if (counter) {
-            selectedText = $(`#satuan1_id_${counter}`).find('option:selected').text();
-            selectedSatuan1Val = $(`#satuan1_id_${counter}`).val();
-            selectedSatuan2Val = $(`#satuan2_id_${counter}`).val();
-            selectedSatuan3Val = $(`#satuan3_id_${counter}`).val();
-            spanText = $(`.satuan_${counter}`);
-        } else {
-            selectedText = $('#satuan1_id').find('option:selected').text();
-            selectedSatuan1Val = $('#satuan1_id').val();
-            selectedSatuan2Val = $('#satuan2_id').val();
-            selectedSatuan3Val = $('#satuan3_id').val();
-            spanText = $('.satuan1');
-        }
+    //     if (counter) {
+    //         selectedText = $(`#satuan1_id_${counter}`).find('option:selected').text();
+    //         selectedSatuan1Val = $(`#satuan1_id_${counter}`).val();
+    //         selectedSatuan2Val = $(`#satuan2_id_${counter}`).val();
+    //         selectedSatuan3Val = $(`#satuan3_id_${counter}`).val();
+    //         spanText = $(`.satuan_${counter}`);
+    //     } else {
+    //         selectedText = $('#satuan1_id').find('option:selected').text();
+    //         selectedSatuan1Val = $('#satuan1_id').val();
+    //         selectedSatuan2Val = $('#satuan2_id').val();
+    //         selectedSatuan3Val = $('#satuan3_id').val();
+    //         spanText = $('.satuan1');
+    //     }
 
-        if (selectedSatuan1Val === selectedSatuan2Val && selectedSatuan1Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 2 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan2_id_${counter}`).val('').change();
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan2_id').val('').change();
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan1Val === selectedSatuan3Val && selectedSatuan1Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 2',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
+    //     if (selectedSatuan1Val === selectedSatuan2Val && selectedSatuan1Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 2 tidak boleh sama dengan satuan 1',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
+    //                 $(`#satuan2_id_${counter}`).val('').change();
+    //                 $(`#satuan3_id_${counter}`).val('').change();
+    //             } else {
+    //                 $('#satuan2_id').val('').change();
+    //                 $('#satuan3_id').val('').change();
+    //             }
+    //         });
+    //     } else if (selectedSatuan1Val === selectedSatuan3Val && selectedSatuan1Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 3 tidak boleh sama dengan satuan 1',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
+    //                 $(`#satuan3_id_${counter}`).val('').change();
+    //             } else {
+    //                 $('#satuan3_id').val('').change();
+    //             }
+    //         });
+    //     } else if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 3 tidak boleh sama dengan satuan 2',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
 
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        } else {
-            if (selectedSatuan1Val == "") {
-                if (counter) {
+    //                 $(`#satuan3_id_${counter}`).val('').change();
+    //             } else {
+    //                 $('#satuan3_id').val('').change();
+    //             }
+    //         });
+    //     } else {
+    //         if (selectedSatuan1Val == "") {
+    //             if (counter) {
 
-                    $('#satuan2_id_' + counter + '').val('').change();
-                    $(`#konversi_satuan_2_${counter}`).val('');
-                    $(`#satuan3_id_${counter}`).val('').change();
-                    $(`#konversi_satuan_3_${counter}`).val('');
-                } else {
-                    $('#satuan2_id').val('').change();
-                    $(`#konversi_satuan_2`).val('');
-                    $('#satuan3_id').val('').change();
-                    $(`#konversi_satuan_3`).val('');
-                }
-            }
-        }
-        // Ubah konten span sesuai dengan nilai yang dipilih
-        spanText.text(selectedText ? selectedText : '-');
-    }
+    //                 $('#satuan2_id_' + counter + '').val('').change();
+    //                 $(`#konversi_satuan_2_${counter}`).val('');
+    //                 $(`#satuan3_id_${counter}`).val('').change();
+    //                 $(`#konversi_satuan_3_${counter}`).val('');
+    //             } else {
+    //                 $('#satuan2_id').val('').change();
+    //                 $(`#konversi_satuan_2`).val('');
+    //                 $('#satuan3_id').val('').change();
+    //                 $(`#konversi_satuan_3`).val('');
+    //             }
+    //         }
+    //     }
+    //     // Ubah konten span sesuai dengan nilai yang dipilih
+    //     spanText.text(selectedText ? selectedText : '-');
+    // }
 
-    function checkSatuan2(counter = null) {
-        var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
+    // function checkSatuan2(counter = null) {
+    //     var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
 
-        if (counter) {
-            selectedSatuan1Val = $(`#satuan1_id_${counter}`).val();
-            selectedSatuan2Val = $(`#satuan2_id_${counter}`).val();
-            selectedSatuan3Val = $(`#satuan3_id_${counter}`).val();
-            spanText = $(`.satuan_${counter}`);
-        } else {
-            selectedSatuan1Val = $('#satuan1_id').val();
-            selectedSatuan2Val = $('#satuan2_id').val();
-            selectedSatuan3Val = $('#satuan3_id').val();
-            spanText = $('.satuan1');
-        }
+    //     if (counter) {
+    //         selectedSatuan1Val = $(`#satuan1_id_${counter}`).val();
+    //         selectedSatuan2Val = $(`#satuan2_id_${counter}`).val();
+    //         selectedSatuan3Val = $(`#satuan3_id_${counter}`).val();
+    //         spanText = $(`.satuan_${counter}`);
+    //     } else {
+    //         selectedSatuan1Val = $('#satuan1_id').val();
+    //         selectedSatuan2Val = $('#satuan2_id').val();
+    //         selectedSatuan3Val = $('#satuan3_id').val();
+    //         spanText = $('.satuan1');
+    //     }
 
-        if (selectedSatuan2Val === selectedSatuan1Val && selectedSatuan2Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 2 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan2_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan2_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 2 tidak boleh sama dengan satuan 3',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan2_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan2_id').val('').change();
-                }
-            });
-        } else {
-            if (selectedSatuan2Val == "") {
-                if (counter) {
-                    $(`#konversi_satuan_2_${counter}`).val('');
-                    $(`#satuan3_id_${counter}`).val('').change();
-                    $(`#konversi_satuan_3_${counter}`).val('');
-                } else {
-                    $(`#konversi_satuan_2`).val('');
-                    $('#satuan3_id').val('').change();
-                    $(`#konversi_satuan_3`).val('');
-                }
-            }
-        }
-    }
+    //     if (selectedSatuan2Val === selectedSatuan1Val && selectedSatuan2Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 2 tidak boleh sama dengan satuan 1',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
+    //                 $(`#satuan2_id_${counter}`).val('').change();
+    //             } else {
+    //                 $('#satuan2_id').val('').change();
+    //             }
+    //         });
+    //     } else if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 2 tidak boleh sama dengan satuan 3',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
+    //                 $(`#satuan2_id_${counter}`).val('').change();
+    //             } else {
+    //                 $('#satuan2_id').val('').change();
+    //             }
+    //         });
+    //     } else {
+    //         if (selectedSatuan2Val == "") {
+    //             if (counter) {
+    //                 $(`#konversi_satuan_2_${counter}`).val('');
+    //                 $(`#satuan3_id_${counter}`).val('').change();
+    //                 $(`#konversi_satuan_3_${counter}`).val('');
+    //             } else {
+    //                 $(`#konversi_satuan_2`).val('');
+    //                 $('#satuan3_id').val('').change();
+    //                 $(`#konversi_satuan_3`).val('');
+    //             }
+    //         }
+    //     }
+    // }
 
-    function checkSatuan3(counter = null) {
-        var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
+    // function checkSatuan3(counter = null) {
+    //     var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
 
-        if (counter) {
-            selectedSatuan1Val = $(`#satuan1_id_${counter}`).val();
-            selectedSatuan2Val = $(`#satuan2_id_${counter}`).val();
-            selectedSatuan3Val = $(`#satuan3_id_${counter}`).val();
-            spanText = $(`.satuan_${counter}`);
-        } else {
-            selectedSatuan1Val = $('#satuan1_id').val();
-            selectedSatuan2Val = $('#satuan2_id').val();
-            selectedSatuan3Val = $('#satuan3_id').val();
-            spanText = $('.satuan1');
-        }
+    //     if (counter) {
+    //         selectedSatuan1Val = $(`#satuan1_id_${counter}`).val();
+    //         selectedSatuan2Val = $(`#satuan2_id_${counter}`).val();
+    //         selectedSatuan3Val = $(`#satuan3_id_${counter}`).val();
+    //         spanText = $(`.satuan_${counter}`);
+    //     } else {
+    //         selectedSatuan1Val = $('#satuan1_id').val();
+    //         selectedSatuan2Val = $('#satuan2_id').val();
+    //         selectedSatuan3Val = $('#satuan3_id').val();
+    //         spanText = $('.satuan1');
+    //     }
 
-        if (selectedSatuan3Val === selectedSatuan1Val && selectedSatuan3Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan3Val === selectedSatuan2Val && selectedSatuan3Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 2',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        }
-    }
+    //     if (selectedSatuan3Val === selectedSatuan1Val && selectedSatuan3Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 3 tidak boleh sama dengan satuan 1',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
+    //                 $(`#satuan3_id_${counter}`).val('').change();
+    //             } else {
+    //                 $('#satuan3_id').val('').change();
+    //             }
+    //         });
+    //     } else if (selectedSatuan3Val === selectedSatuan2Val && selectedSatuan3Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 3 tidak boleh sama dengan satuan 2',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
+    //                 $(`#satuan3_id_${counter}`).val('').change();
+    //             } else {
+    //                 $('#satuan3_id').val('').change();
+    //             }
+    //         });
+    //     }
+    // }
 
-    function checkValueKonversi(counter = null) {
-        var selectedSatuan2Val, selectedSatuan3Val;
+    // function checkValueKonversi(counter = null) {
+    //     var selectedSatuan2Val, selectedSatuan3Val;
 
-        if (counter) {
-            selectedSatuan2Val = $(`#konversi_satuan_2_${counter}`).val();
-            selectedSatuan3Val = $(`#konversi_satuan_3_${counter}`).val();
-        } else {
-            selectedSatuan2Val = $('#konversi_satuan_2').val();
-            selectedSatuan3Val = $('#konversi_satuan_3').val();
-        }
+    //     if (counter) {
+    //         selectedSatuan2Val = $(`#konversi_satuan_2_${counter}`).val();
+    //         selectedSatuan3Val = $(`#konversi_satuan_3_${counter}`).val();
+    //     } else {
+    //         selectedSatuan2Val = $('#konversi_satuan_2').val();
+    //         selectedSatuan3Val = $('#konversi_satuan_3').val();
+    //     }
 
-        if (Number(selectedSatuan3Val) <= Number(selectedSatuan2Val) && selectedSatuan3Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 harus lebih besar dari satuan 2',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#konversi_satuan_3_${counter}`).val('').change();
-                } else {
-                    $('#konversi_satuan_3').val('').change();
-                }
-            });
-        }
-    }
+    //     if (Number(selectedSatuan3Val) <= Number(selectedSatuan2Val) && selectedSatuan3Val !== "") {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Satuan 3 harus lebih besar dari satuan 2',
+    //             confirmButtonColor: '#4e73df',
+    //         }).then(() => {
+    //             if (counter) {
+    //                 $(`#konversi_satuan_3_${counter}`).val('').change();
+    //             } else {
+    //                 $('#konversi_satuan_3').val('').change();
+    //             }
+    //         });
+    //     }
+    // }
 
     // Update
     <?php if (!empty($dataSPP)) : ?>
@@ -1993,7 +1993,7 @@
         drawTable();
     <?php endif; ?>
 </script>
-<script>
+<!-- <script>
     $("select[name='parent_type_id']")
         .parent('div')
         .children('span')
@@ -2019,5 +2019,5 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
-</script>
+</script> -->
 <?= $this->endSection(); ?>

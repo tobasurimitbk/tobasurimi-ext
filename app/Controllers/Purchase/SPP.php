@@ -80,11 +80,15 @@ class SPP extends BaseController
 
         $dataSppType =  $this->MetadataModel->get_by_name("Tipe SPP");
         $dataDivisi = $this->DivisisModel->getDivisiAccess();
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
 
         $data = [
             "today"         => date("d/m/Y"),
             "dataSppType" => $dataSppType,
-            "dataDivisi" => $dataDivisi
+            "dataDivisi" => $dataDivisi,
+            'kelompokBarang' => $parentBarangModel->where('deletedAt', null)->findAll(),
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
         if (!empty($id)) {
@@ -92,6 +96,8 @@ class SPP extends BaseController
             $dataSppDetail = $this->SppDetailModel->getSppDetailById($id);
             $data["dataSPP"] = $dataSPP;
             $data["dataSPPDetail"] = $dataSppDetail;
+            $data["kelompokBarang"] = $parentBarangModel->where('deletedAt', null)->findAll();
+            $data["satuanBarang"] = $satuanModel->where('deletedAt', null)->findAll();
         }
 
         if ($data["dataSPP"] == null) {
