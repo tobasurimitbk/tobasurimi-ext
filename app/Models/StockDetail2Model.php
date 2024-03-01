@@ -75,9 +75,9 @@ class StockDetail2Model extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['bc_id'] || $addCondition['no_aju']) {
+        if ($addCondition['bc_id'] || $addCondition['no_aju'] || $addCondition['bc_id'] == 0) {
             $dataQry->groupStart();
-            if ($addCondition['bc_id']) {
+            if ($addCondition['bc_id'] || $addCondition['bc_id'] == 0) {
                 $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
             }
 
@@ -97,20 +97,21 @@ class StockDetail2Model extends Model
         ];
     }
 
-
     public function insertStokDetail2(
         $bc_id,
         $stok_id,
         $stok_detail_id,
         $qty,
-        $no_aju
+        $no_aju,
+        $no_dokumen
     ) {
         $stokDetail2 = $this->insert([
             'bc_id' => $bc_id,
             'stock_id' => $stok_id,
             'stock_detail_id' => $stok_detail_id,
             'qty' => $qty,
-            'no_aju' => $no_aju
+            'no_aju' => $no_aju,
+            'no_dokumen' => $no_dokumen
         ]);
 
         return $stokDetail2;

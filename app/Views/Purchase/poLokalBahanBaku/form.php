@@ -230,7 +230,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3 form-lpb" style="height: 50px;">
+                        <div class="form-floating form-lpb" style="height: 50px;">
                             <select class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataBCType as $aju) : ?>
@@ -239,6 +239,7 @@
                             </select>
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
                         </div>
+                        <small class="mb-3"><i>Kosongkan jika PO tidak memerlukan dokumen pabean</i></small>
                     </div>
                 </div>
                 <div class="row">
@@ -1052,6 +1053,13 @@
                                         .then(() => {
                                             location.reload();
                                         })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+
                                 }
                             },
 

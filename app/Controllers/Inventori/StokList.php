@@ -347,7 +347,8 @@ class StokList extends BaseController
                 $stok,
                 $stokDetail,
                 $l->qty,
-                $l->no_aju
+                $l->no_aju,
+                '-'
             );
         }
 

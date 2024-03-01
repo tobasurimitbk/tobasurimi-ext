@@ -15,8 +15,8 @@
         <div class="card-body">
             <div class="row">
                 <div class="col mb-3">
-                    <div class="alert alert-success">
-                        <label class="form-label font-weight-bold text-white lable-title">DETAIL BARANG</label>
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DETAIL BARANG</label>
                     </div>
                 </div>
             </div>
@@ -47,8 +47,8 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= "(" . $detail['barang']['kode'] . ")" . "  " . $detail['barang']['barang_name'] . " - " . $detail['barang']['spesifikasi'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">(Kode) Nama Barang - Spesifikasi</label>
+                        <input disabled autocomplete="one-time-code" value="<?= "(" . $detail['barang']['kode'] . ")" . "  " . ($detail['barang']['parent_type'] != "kemasan" ? $detail['barang']['barang_name'] : $detail['barang']['barang']) .  ($detail['barang']['parent_type'] != "kemasan" ? " - " . $detail['barang']['spesifikasi'] : "") ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <label for="floatingInput">(Kode) Nama Barang <?= $detail['barang']['parent_type'] == "kemasan" ? "" : "- Spesifikasi" ?></label>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -61,40 +61,42 @@
 
             <div class="row">
                 <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Stok Sekarang</label>
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA STOK SEKARANG</label>
+                    </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stokInisiasi']['qty']) ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Stok Awal</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokMasuk']) ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokMasuk']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Stok Masuk</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokKeluar']) ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokKeluar']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Stok Keluar</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokSekarang']) ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokSekarang']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Stok Akhir</label>
                     </div>
                 </div>
             </div>
 
-            <div class="row mt-5">
+            <div class="row">
                 <div class="col mb-3">
-                    <div class="alert alert-success">
-                        <label class="form-label font-weight-bold text-white lable-title">DATA STOK PER DOKUMEN</label>
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA STOK PER DOKUMEN</label>
                     </div>
                 </div>
             </div>
@@ -137,14 +139,24 @@
                         <tbody class="body-detail-table" id="body-detail-table">
 
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td style="float: right;"><b>TOTAL</b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
 
-            <div class="row mt-5">
+            <div class="row mt-3">
                 <div class="col mb-3">
-                    <div class="alert alert-success">
-                        <label class="form-label font-weight-bold text-white lable-title">DATA INISIASI STOK</label>
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA INISIASI STOK</label>
                     </div>
                 </div>
             </div>
@@ -189,17 +201,53 @@
                         <tbody class="body-detail-table" id="body-detail-table">
 
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td style="float: right;"><b>TOTAL</b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
-            <!-- 
-            <div class="row">
+
+            <div class="row mt-3">
                 <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Pemasukkan Barang</label>
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PEMASUKKAN BARANG PER DOKUMEN</label>
+                    </div>
                 </div>
             </div>
 
             <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-penerimaan-table" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="">Purchase Order</th>
+                                <th onclick="">Nomor LPB</th>
+                                <th onclick="">Dokumen</th>
+                                <th>Supplier</th>
+                                <th>Barang - Spesifikasi</th>
+                                <th>Qty Satuan 1</th>
+                                <th>Qty Satuan 2</th>
+                                <th>Qty Satuan 3</th>
+                                <th>Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- <div class="row">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Data Dari Adjusment</label>
                 </div>

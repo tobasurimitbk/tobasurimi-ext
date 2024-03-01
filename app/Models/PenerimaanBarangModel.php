@@ -404,9 +404,107 @@ class PenerimaanBarangModel extends Model
         $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $supplierHargaModel = new SupplierHargaModel();
         $stockDetailModel = new StockDetailModel();
+        $barangMasterModel = new BarangMasterModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $stockModel = new StockModel();
+        $stockDetail2Model = new StockDetail2Model();
+        $kemasanModel = new KemasanModel();
 
         $rmDetail =  $rmPurchaseOrder->where('id', $poID)->first();
         $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
+
+        // MASUKKAN STOK BARANG DAN KEMASAN JIKA NON PABEAN 
+        // (JIKA ADA BC MASUK KE INVENTORI DI MODUL BEA CUKAI)
+        if ($rmDetail['bc_type'] == 0) {
+
+            foreach ($rmBarangDetail as $r) {
+                // HANDLE STOK BARANG
+                $barang = $barangMasterModel->find($r['barang1_id']);
+                $spesifikasi = $barangMasterSpesifikasiModel->find($r['barang2_id']);
+
+                // CHECK STOK BARANG HEADER
+                $stok = $stockModel->getStokMaster(
+                    $rmDetail['company_id'],
+                    $rmDetail['warehouse_id'],
+                    $rmDetail['divisi_id'],
+                    "bahan_baku",
+                    $r['barang1_id'],
+                    $r['barang2_id'],
+                );
+
+                if ($stok == null) {
+                    return response()->setJSON([
+                        'message' => "Gagal Posting LPB dikarenakan Barang " . $barang['barang_name'] . " (" . $spesifikasi['spesifikasi'] . ") belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
+                        'token' => csrf_hash(),
+                        'status' => false
+                    ]);
+                    break;
+                }
+
+                // CHECK STOK DETAIL
+                if (
+                    $stockModel->isDefinedStockSubDetail(
+                        $rmDetail['company_id'],
+                        $rmDetail['warehouse_id'],
+                        $rmDetail['divisi_id'],
+                        "bahan_baku",
+                        $r['barang1_id'],
+                        $r['barang2_id'],
+                        $rmDetail['bc_type'],
+                        "-",
+                        $stok['id']
+                    ) == null
+                ) {
+                    return response()->setJSON([
+                        'message' => "Gagal Posting LPB dikarenakan Barang " . $barang['barang_name'] . " (" . $spesifikasi['spesifikasi'] . ") belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
+                        'token' => csrf_hash(),
+                        'status' => false
+                    ]);
+                }
+            }
+
+            // CHECK STOK KEMASAN HEADER
+            $stok = $stockModel->getStokMaster(
+                $rmDetail['company_id'],
+                $rmDetail['warehouse_id'],
+                $rmDetail['divisi_id'],
+                "kemasan",
+                $rmDetail['bc_type'],
+                $rmDetail['kemasan_id'],
+            );
+
+            $kemasan = $kemasanModel->find($rmDetail['kemasan_id']);
+
+            if ($stok == null) {
+                return response()->setJSON([
+                    'message' => "Gagal Posting LPB dikarenakan Kemasan " . $kemasan['name'] . " belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+
+            // CHECK STOK KEMASAN DETAIL
+            if (
+                $stockModel->isDefinedStockSubDetail(
+                    $rmDetail['company_id'],
+                    $rmDetail['warehouse_id'],
+                    $rmDetail['divisi_id'],
+                    "kemasan",
+                    0,
+                    $rmDetail['kemasan_id'],
+                    $rmDetail['bc_type'],
+                    "-",
+                    $stok['id']
+                ) == null
+            ) {
+                return response()->setJSON([
+                    'message' => "Gagal Posting LPB dikarenakan Kemasan " . $kemasan['name'] . " belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+        }
+
 
         // no lpb
         $warehouseModel = new WarehousesModel();
@@ -465,16 +563,91 @@ class PenerimaanBarangModel extends Model
                 'qty_diterima' => $r['qty'],
                 'remaining_qty' => 0
             ]);
+        }
 
-            $stockDetailModel->addOrReduceStock(
-                $barang['bahan_baku_id'],
-                $warehouseID,
-                'New',
-                $r['qty'],
-                'IN',
-                $barang['spesifikasi']
+        // TAMBAJKAN STOK DISINI
+        $penerimaanBarang = $penerimaanBarangModel->where('id', $lpbID)->first();
+        $penerimaanBarangList = $penerimaanBarangDetailModel->where('penerimaan_barang_id', $lpbID)->where('deletedAt', null)->findAll();
+
+        // NON PABEAN LANGSUNG INPUTKAN STOK NYA
+        if ($penerimaanBarang['bc_type'] == 0) {
+            // STOK BARANG DIINPUT
+            foreach ($penerimaanBarangList as $p) {
+                // HEADER
+                $stok = $stockModel->insertStok(
+                    $penerimaanBarang['company_id'],
+                    $penerimaanBarang['warehouse_id'],
+                    $penerimaanBarang['divisi_id'],
+                    "bahan_baku",
+                    $p['barang_id'],
+                    $p['spesifikasi_id'],
+                    $p['jml_masuk']
+                );
+
+                // DETAIL
+                $stokDetail = $stockDetailModel->insertStokDetail(
+                    $stok,
+                    $p['jml_masuk'],
+                    'In',
+                    date('Y-m-d'),
+                    $rmDetail['createdBy'],
+                    "LPB",
+                    $penerimaanBarang['no_penerimaan_barang'],
+                    "-",
+                );
+
+                // GET PURCHASE ORDER
+                $po = $rmPurchaseOrder->find($p['purchase_order_id']);
+                // SUB DETAIL
+                $stockDetail2Model->insertStokDetail2(
+                    $penerimaanBarang['bc_type'],
+                    $stok,
+                    $stokDetail,
+                    $p['qty'],
+                    "-",
+                    $po['po_no']
+                );
+            }
+
+            // KEMASAN
+            // HEADER
+            $stok = $stockModel->insertStok(
+                $penerimaanBarang['company_id'],
+                $penerimaanBarang['warehouse_id'],
+                $penerimaanBarang['divisi_id'],
+                "kemasan",
+                0,
+                $penerimaanBarang['kemasan_id'],
+                $penerimaanBarang['jumlah_kemasan']
+            );
+
+
+            // DETAIL
+            $stokDetail = $stockDetailModel->insertStokDetail(
+                $stok,
+                $penerimaanBarang['jumlah_kemasan'],
+                "In",
+                date('Y-m-d'),
+                $rmDetail['createdBy'],
+                "LPB",
+                $penerimaanBarang['no_penerimaan_barang'],
+                "-",
+            );
+
+            // SUB DETAIL
+            $stockDetail2Model->insertStokDetail2(
+                $penerimaanBarang['bc_type'],
+                $stok,
+                $stokDetail,
+                $penerimaanBarang['jumlah_kemasan'],
+                "-",
+                $penerimaanBarang['no_penerimaan_barang'],
             );
         }
+
+        $this->autoClosePO($lpbID);
+
+        return '';
     }
 
     public function autoClosePO($penerimaanBarangID)
