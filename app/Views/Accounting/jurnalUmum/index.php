@@ -9,7 +9,7 @@
         <input type="hidden" class="id" name="id" id="id" />
         <?= csrf_field() ?>
         <div class="section-header">
-            <h1>Jurnal Umum</h1>
+            <h1>Jurnal</h1>
             <button class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Simpan Jurnal
             </button>

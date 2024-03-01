@@ -530,6 +530,8 @@ class JurnalUmum extends BaseController
                 $result = array();
                 $resultTransaksiJurnal = "";
                 $resultTransaksiPembelian = array();
+                $valasTransaksi = "IDR";
+                $exchangeTransaksi = 1;
                 foreach ($dataPOBP as $dataBP) {
                     $totalPO = 0;
                     $kodeTransaksi = "";

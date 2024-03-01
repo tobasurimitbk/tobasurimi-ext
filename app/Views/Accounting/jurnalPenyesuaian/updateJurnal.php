@@ -8,7 +8,10 @@
         <?= csrf_field() ?>
         <div class="section-header">
             <h1>Update Jurnal</h1>
-            <button class="btn btn-show-form btn-add float-right">
+            <button class="btn btn-discard btn-cancel mr-5" onclick="kembaliJurnal()">
+                Batal
+            </button>
+            <button class="btn btn-show-form btn-add">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Update Jurnal
             </button>
         </div>
@@ -496,6 +499,10 @@
         }
 
         return true; // Allow form submission
+    }
+
+    const kembaliJurnal = function() {
+        window.location.href = '<?= base_url("laporan-accounting/jurnalumum") ?>';
     }
 
     getItems();
