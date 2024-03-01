@@ -118,6 +118,7 @@ class JurnalUmum extends BaseController
             "dataJurnalUmum" => $dataJurnalUmum,
             "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
             "dataMetadataTipeTransaksi" => $dataMetadataTipeTransaksi,
+            "dateStart" => $dateStart ? $dateStart : date('01/m/Y'),
             "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
         ];
         return view('Laporan/LaporanJurnalUmum/index', $data);

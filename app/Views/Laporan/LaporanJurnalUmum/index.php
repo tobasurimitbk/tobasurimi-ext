@@ -29,7 +29,7 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="input-group" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" readonly style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" value="<?= $dateStart; ?>" readonly style="height: 50px;">
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                     </div>
@@ -183,6 +183,8 @@
     $(document).ready(function() {
         // Mendapatkan tanggal saat ini
         var currentDate = new Date();
+        $(".dateStart[readonly]").datepicker("destroy");
+        $(".dateEnd[readonly]").datepicker("destroy");
 
         // Inisialisasi datepicker untuk dateStart dengan nilai default tanggal 1 di bulan berjalan
         $(".dateStart").datepicker({
@@ -191,11 +193,11 @@
             orientation: "bottom auto",
             autoclose: true,
             // Atur nilai awal menjadi tanggal 1 di bulan berjalan
-            defaultViewDate: {
-                year: currentDate.getFullYear(),
-                month: currentDate.getMonth(),
-                day: 1
-            }
+            // defaultViewDate: {
+            //     year: currentDate.getFullYear(),
+            //     month: currentDate.getMonth(),
+            //     day: 1
+            // }
         });
 
         // Inisialisasi datepicker untuk dateEnd
@@ -216,7 +218,7 @@
         });
 
         // Set nilai awal dateStart pada saat dokumen siap (document ready)
-        $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+        // $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
 
         $('.type_transaksi, .no_bukti, .subs_akun').select2({
             placeholder: "",
