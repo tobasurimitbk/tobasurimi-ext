@@ -539,7 +539,7 @@ class PenerimaanBarangLokalBB extends BaseController
                         $penerimaanBarang['bc_type'],
                         $stok,
                         $stokDetail,
-                        $p['qty'],
+                        $p['jml_masuk'],
                         "-",
                         $po['po_no']
                     );
