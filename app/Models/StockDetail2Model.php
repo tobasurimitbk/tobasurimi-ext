@@ -116,4 +116,62 @@ class StockDetail2Model extends Model
 
         return $stokDetail2;
     }
+
+    public function getListStokLog($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'stock_details2.no_dokumen' => 'stock_details2.no_dokumen',
+            'stock_details.no_dokumen' => 'stock_details.no_dokumen',
+            'stock_details2.bc_id' => 'stock_details2.bc_id',
+            'stock.barang1_id' => 'stock.barang1_id',
+            'stock_details2.qty' => 'stock_details2.qty'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_details2.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        // no_dokumen1 => LPB / NO_PRODUKSI
+        // no_dokumen2 => PO
+
+        $selectQry = '
+            stock_details2.no_dokumen AS no_dokumen1, 
+            stock_details.no_dokumen AS no_dokumen2,
+            stock.barang1_id,
+            stock.barang2_id,
+            stock_details2.qty
+        ';
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock', 'stock.id = stock_details2.stock_id')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if ($addCondition['no_dokumen']) {
+            $dataQry->groupStart();
+        }
+
+        if ($addCondition['no_dokumen']) {
+            $dataQry->like('stock_details2.no_dokumen', $addCondition['no_dokumen'])
+                ->orLike('stock_details.no_dokumen', $addCondition['no_dokumen']);
+        }
+
+        if ($addCondition['no_dokumen']) {
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

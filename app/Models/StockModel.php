@@ -516,6 +516,7 @@ class StockModel extends Model
                 ->join('parent_barang', 'parent_barang.id = kemasan.parent_type_id')
                 ->join('divisis', 'divisis.id = stock.divisi_id')
                 ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+                ->where('kemasan.id', $stock['kemasan_id'])
                 ->first();
         } else {
             // DETAIL BARANG STOCK BARANG
@@ -539,6 +540,7 @@ class StockModel extends Model
                 ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
                 ->join('divisis', 'divisis.id = stock.divisi_id')
                 ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+                ->where('barang_master_spesifikasi.id', $stock['barang2_id'])
                 ->first();
         }
 

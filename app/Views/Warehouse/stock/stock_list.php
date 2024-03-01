@@ -333,8 +333,7 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
     const stokDetail = function(id) {
-
-        window.open("<?= base_url('stock-list/id/') ?>" + id, "_blank");
+        location.replace("<?= base_url('stock-list/id/') ?>" + id, "");
     }
 
     const changeSort = function(val) {
