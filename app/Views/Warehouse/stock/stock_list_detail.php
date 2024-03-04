@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= $detail['barang']['divisi'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= $divisi['divisi'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Departemen</label>
                     </div>
                 </div>
@@ -70,25 +70,25 @@
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Awal</label>
+                        <label for="floatingInput">Qty Awal</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokMasuk']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Masuk</label>
+                        <label for="floatingInput">Qty Masuk</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokKeluar']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Keluar</label>
+                        <label for="floatingInput">Qty Keluar</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokSekarang']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Akhir</label>
+                        <label for="floatingInput">Qty Akhir</label>
                     </div>
                 </div>
             </div>
@@ -131,9 +131,10 @@
                                 <th>No</th>
                                 <th onclick="changeSortStokPerDokumen('bc_id')">Dokumen Pabean</th>
                                 <th onclick="changeSortStokPerDokumen('no_aju')">No Aju</th>
-                                <th onclick="changeSortStokPerDokumen('stok_total')">Stok Satuan 1</th>
-                                <th>Stok Satuan 2</th>
-                                <th>Stok Satuan 3</th>
+                                <th>Barang - Spesifikasi</th>
+                                <th onclick="changeSortStokPerDokumen('stok_total')">Qty Satuan 1</th>
+                                <th>Qty Satuan 2</th>
+                                <th>Qty Satuan 3</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -141,10 +142,9 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td></td>
-                                <td></td>
+                                <td colspan="3"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b></b></td>
+                                <td><b><?= number_format($total['totalPerDokumen']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -156,7 +156,7 @@
             <div class="row mt-3">
                 <div class="col mb-3">
                     <div class="alert alert-secondary">
-                        <label class="form-label font-weight-bold text-black lable-title">DATA INISIASI STOK</label>
+                        <label class="form-label font-weight-bold text-black lable-title">DATA INISIASI STOK (STOK AWAL)</label>
                     </div>
                 </div>
             </div>
@@ -193,9 +193,10 @@
                                 <th>No</th>
                                 <th onclick="changeSortStokInisasi('bc_id')">Dokumen Pabean</th>
                                 <th onclick="changeSortStokInisasi('no_aju')">No Aju</th>
-                                <th onclick="changeSortStokInisasi('stok_total')">Stok Awal Satuan 1</th>
-                                <th>Stok Awal Satuan 2</th>
-                                <th>Stok Awal Satuan 3</th>
+                                <th>Barang - Spesifikasi</th>
+                                <th onclick="changeSortStokInisasi('stok_total')">Qty Satuan 1</th>
+                                <th>Qty Satuan 2</th>
+                                <th>Qty Satuan 3</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -203,10 +204,9 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td></td>
-                                <td></td>
+                                <td colspan="3"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b></b></td>
+                                <td><b><?= number_format($total['totalPerInit']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -218,29 +218,64 @@
             <div class="row mt-3">
                 <div class="col mb-3">
                     <div class="alert alert-secondary">
-                        <label class="form-label font-weight-bold text-black lable-title">DATA PEMASUKKAN BARANG PER DOKUMEN</label>
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PEMASUKKAN BARANG PER DOKUMEN (PURCHASE ORDER)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_pemasukkan_barang" name="bc_id_stok_inisasi" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($jenisDokAju as $j) : ?>
+                                <option value="<?= $j->id ?>">
+                                    <?= $j->value ?>
+                                </option>
+                            <?php endforeach; ?>
+                            <option value="0">NON PABEAN</option>
+
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search_no_aju_stok_pemasukkan_barang" id="search_no_aju_stok_pemasukkan_barang" name="search_no_aju_stok_pemasukkan_barang" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor PO / LPB / No Aju </label>
                     </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-penerimaan-table" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-pemasukkan-barang-table" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="">Dokumen</th>
-                                <th onclick="">Dokumen Pabean</th>
-                                <th onclick="">Barang - Spesifikasi</th>
-                                <th onclick="">Qty Satuan 1</th>
-                                <th onclick="">Qty Satuan 2</th>
-                                <th onclick="">Qty Satuan 3</th>
-                                <th onclick="">Stok</th>
+                                <th onclick="changeSortPemasukkanBarang('stock_details2.no_dokumen')">Purchase Order</th>
+                                <th onclick="changeSortPemasukkanBarang('stock_details.no_dokumen')">Dokumen</th>
+                                <th>Supplier</th>
+                                <th onclick="changeSortPemasukkanBarang('stock.barang1_id')">Barang - Spesifikasi</th>
+                                <th onclick="changeSortPemasukkanBarang('stock_details2.qty')">Qty Satuan 1</th>
+                                <th>Qty Satuan 2</th>
+                                <th>Qty Satuan 3</th>
+                                <th>Harga</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
 
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4"></td>
+                                <td style="float: right;"><b>TOTAL</b></td>
+                                <td><b><?= number_format($total['totalPerPemasukkan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -280,6 +315,9 @@
 
     let sortStokInisasi = "createdAt";
     let sortTypeInisasi = "DESC";
+
+    let sortStokPemasukkanBarang = "createdAt";
+    let sortTypePemasukkanBarang = "DESC";
 
     const stokTableDokumenBC = $('.stok-dokumen-bc-table').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -340,6 +378,12 @@
             {
                 data: "no_aju",
                 className: "text-center"
+            },
+            {
+                data: "barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
             },
             {
                 data: "stok_1",
@@ -441,6 +485,12 @@
                 className: "text-center"
             },
             {
+                data: "barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
                 data: "stok_1",
                 className: "text-center"
             },
@@ -478,6 +528,122 @@
         }
     });
 
+    const stokTablePemasukkanBarang = $('.stok-pemasukkan-barang-table').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [4, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/stock-log-pemasukkan-barang-lpb"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.bc_id = $("#bc_id_stok_pemasukkan_barang option:selected").val();
+                data.search = $("#search_no_aju_stok_pemasukkan_barang").val();
+                data.stok_id = "<?= encrypt($stok['id']) ?>";
+                data.sumber = "LPB";
+
+                data.sort = sortStokPemasukkanBarang;
+                data.sortType = sortTypePemasukkanBarang;
+            },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "po",
+                className: "text-center"
+            },
+            {
+                data: "dokumen",
+                className: "text-center"
+            },
+            {
+                data: "supplier",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "barang",
+                className: "text-center",
+            },
+            {
+                data: "stok_1",
+                className: "text-center"
+            },
+            {
+                data: "stok_2",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "stok_3",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "harga",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     $('#bc_id_stok_per_dokumen').select2({
         placeholder: "Pilih Dokumen Pabean",
@@ -495,6 +661,14 @@
         stokTableInisiasi.ajax.reload();
     });
 
+    $('#bc_id_stok_pemasukkan_barang').select2({
+        placeholder: "Pilih Dokumen Pabean",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        stokTablePemasukkanBarang.ajax.reload();
+    });
+
     $('#search_no_aju_stok_per_dokumen').change(function() {
         stokTableDokumenBC.ajax.reload();
     });
@@ -503,8 +677,11 @@
         stokTableInisiasi.ajax.reload();
     });
 
+    $('#search_no_aju_stok_pemasukkan_barang').change(function() {
+        stokTablePemasukkanBarang.ajax.reload();
+    });
 
-    $("#bc_id_stok_per_dokumen, #bc_id_stok_inisasi")
+    $("#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang")
         .parent('div')
         .children('span')
         .children('span')
@@ -528,6 +705,16 @@
             sortStokInisasi = val;
         } else {
             sortTypeInisasi = sortTypeInisasi === "asc" ? "desc" : "asc";
+        }
+        stokTableInisiasi.ajax.reload();
+    }
+
+    const changeSortPemasukkanBarang = function(val) {
+        if (sortStokPemasukkanBarang !== val) {
+            sortTypePemasukkanBarang = "asc";
+            sortStokPemasukkanBarang = val;
+        } else {
+            sortTypePemasukkanBarang = sortTypePemasukkanBarang === "asc" ? "desc" : "asc";
         }
         stokTableInisiasi.ajax.reload();
     }

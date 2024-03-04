@@ -75,9 +75,9 @@ class StockDetail2Model extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['bc_id'] || $addCondition['no_aju'] || $addCondition['bc_id'] == 0) {
+        if ($addCondition['bc_id'] != "" || $addCondition['no_aju'] != "") {
             $dataQry->groupStart();
-            if ($addCondition['bc_id'] || $addCondition['bc_id'] == 0) {
+            if ($addCondition['bc_id'] || $addCondition['bc_id'] == 0 && $addCondition['bc_id'] != "") {
                 $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
             }
 
@@ -136,11 +136,14 @@ class StockDetail2Model extends Model
         // no_dokumen2 => PO
 
         $selectQry = '
-            stock_details2.no_dokumen AS no_dokumen1, 
-            stock_details.no_dokumen AS no_dokumen2,
+            stock_details2.no_dokumen AS no_dokumen2, 
+            stock_details.no_dokumen AS no_dokumen1,
             stock.barang1_id,
             stock.barang2_id,
-            stock_details2.qty
+            stock_details2.qty AS stok_total,
+            stock_details2.bc_id,
+            stock_details2.no_aju,
+            stock_details.stock_date,
         ';
 
         $dataQry = $this->asObject()
@@ -152,16 +155,21 @@ class StockDetail2Model extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['no_dokumen']) {
+        if ($addCondition['search'] || $addCondition['bc_id'] != "") {
             $dataQry->groupStart();
         }
 
-        if ($addCondition['no_dokumen']) {
-            $dataQry->like('stock_details2.no_dokumen', $addCondition['no_dokumen'])
-                ->orLike('stock_details.no_dokumen', $addCondition['no_dokumen']);
+        if ($addCondition['bc_id'] || $addCondition['bc_id'] != "") {
+            $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
         }
 
-        if ($addCondition['no_dokumen']) {
+        if ($addCondition['search']) {
+            $dataQry->like('stock_details2.no_dokumen', $addCondition['search'])
+                ->orLike('stock_details.no_dokumen', $addCondition['search'])
+                ->orLike('stock_details2.no_aju', $addCondition['search']);
+        }
+
+        if ($addCondition['search'] || $addCondition['bc_id'] != "") {
             $dataQry->groupEnd();
         }
 
@@ -173,5 +181,30 @@ class StockDetail2Model extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+
+    public function getTotalStockLog($condition)
+    {
+        $selectQry = '
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,   
+    ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock', 'stock.id = stock_details.stock_id')
+            ->where($condition)
+            ->groupBy('stock_details.stock_id')
+            ->findAll();
+
+        if (count($dataQry) == 0) {
+            return 0;
+        } else {
+            return $dataQry[0]['stok_total'];
+        }
     }
 }

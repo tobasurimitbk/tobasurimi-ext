@@ -81,9 +81,9 @@
                             <th onclick="changeSort('barang_master.barang_name')">Barang</th>
                             <th onclick="changeSort('divisis.divisi')">Departemen</th>
                             <th onclick="changeSort('warehouses.warehouse_name')">Warehouse</th>
-                            <th onclick="changeSort('stock.qty')">Stok Satuan 1</th>
-                            <th>Stok Satuan 2</th>
-                            <th>Stok Satuan 3</th>
+                            <th onclick="changeSort('stock.qty')">Qty Satuan 1</th>
+                            <th>Qty Satuan 2</th>
+                            <th>Qty Satuan 3</th>
                             <th>Action</th>
                         </tr>
                     </thead>
