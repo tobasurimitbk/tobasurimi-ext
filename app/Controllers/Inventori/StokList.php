@@ -409,16 +409,18 @@ class StokList extends BaseController
         $totalStokPerDokumen = $this->stockDetail2Model->getTotalStockLog($conditionPerDokumen);
         $totalStokInit = $this->stockDetail2Model->getTotalStockLog($conditionInisiasi);
         $totalStokPemasukkanBarang = $this->stockDetail2Model->getTotalStockLog($conditionPemasukkanBarang);
+        $stok =  $this->stockModel->find($id);
 
         $data = [
             'jenisDokAju' => $this->metaDataModel->getByName("jenis_dok_aju"),
-            'stok' => $this->stockModel->find($id),
+            'stok' => $stok,
             'detail' => $this->stockModel->detailStock($id),
             'total' => [
                 'totalPerDokumen' => $totalStokPerDokumen,
                 'totalPerInit' => $totalStokInit,
                 'totalPerPemasukkan' => $totalStokPemasukkanBarang
             ],
+            'divisi' => $this->divisiModel->find($stok['divisi_id'])
         ];
 
         return view('Warehouse/stock/stock_list_detail', $data);

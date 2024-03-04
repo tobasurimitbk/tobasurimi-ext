@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= $detail['barang']['divisi'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= $divisi['divisi'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Departemen</label>
                     </div>
                 </div>
