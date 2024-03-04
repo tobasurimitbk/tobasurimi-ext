@@ -204,7 +204,7 @@ class StockDetail2Model extends Model
         if (count($dataQry) == 0) {
             return 0;
         } else {
-            return number_format($dataQry[0]['stok_total']);
+            return $dataQry[0]['stok_total'];
         }
     }
 }

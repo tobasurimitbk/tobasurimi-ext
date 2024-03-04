@@ -634,9 +634,11 @@ class StokList extends BaseController
         if ($stok['kemasan_id'] == 0) {
             // BARANG
             $barang = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
+            $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
         } else {
             // KEMASAN
             $barang = $this->kemasanModel->find($stok['kemasan_id']);
+            $satuan_1 = $this->satuanModel->find($barang['satuan_id']);
         }
 
         foreach ($dataQry['data'] as $data) {
