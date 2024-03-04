@@ -243,7 +243,7 @@
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label></h5>
+                <h5 class="modal-title"><label class="title-name">Tambah Barang</label></h5>
             </div>
             <div class="modal-body">
                 <?= csrf_field() ?>
@@ -1188,7 +1188,7 @@
     $(document).ready(function() {
         $('.btn-add-barang').click(function() {
             $(".detail-modal").modal("hide")
-            $('.title-name').text("Tambah Bahan Baku");
+            // $('.title-name').text("Tambah Bahan Baku");
             $(".create-form-barang :input:not([name='type'])").val('');
             var spp_type = $('.spp_type_bypass').val();
             $("#type").val(spp_type);
