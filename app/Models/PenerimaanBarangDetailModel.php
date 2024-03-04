@@ -290,7 +290,12 @@ class PenerimaanBarangDetailModel extends Model
             ->findAll();
     }
 
-    public function getPenerimaanBarangImportPenolongDetail()
+    public function getHargaTotalPenerimaan($penerimaan_barang_id)
     {
+        return $this->asArray()->select('SUM(penerimaan_barang_detail.sub_total) AS harga')
+            ->where('deletedAt', null)
+            ->where('penerimaan_barang_id', $penerimaan_barang_id)
+            ->groupBy('penerimaan_barang_id')
+            ->findAll();
     }
 }
