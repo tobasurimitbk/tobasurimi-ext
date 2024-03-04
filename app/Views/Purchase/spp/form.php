@@ -1201,8 +1201,8 @@
                         parent_type: spp_type
                     },
                     success: function(res) {
-                        // $(".parent_type_id").empty();
-                        // $(".parent_type_id").append(`<option value=""></option>`);
+                        $("#parent_type_id").empty();
+                        $("#parent_type_id").append(`<option value=""></option>`);
                         res.data.forEach(function(item) {
                             $("#parent_type_id").append(`<option value="${item.id}">${item.parent_name}</option>`);
                         })
