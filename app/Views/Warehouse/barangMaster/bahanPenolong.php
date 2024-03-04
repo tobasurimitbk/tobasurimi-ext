@@ -534,13 +534,9 @@
                 kode_barang: {
                     required: true
                 },
-                satuan_id: {
+                'satuan1_id[]': {
                     required: true
-                },
-                minimum_stock: {
-                    required: true,
-                    number: true
-                },
+                }
             },
             messages: {
                 parent_type_id: {
@@ -552,12 +548,8 @@
                 kode_barang: {
                     required: "Kode Barang Wajib Diisi"
                 },
-                satuan_id: {
-                    required: "Satuan Barang Wajib Diisi"
-                },
-                minimum_stock: {
-                    required: "Minimal stock harus diisi",
-                    number: "Masukkan angka valid"
+                'satuan1_id[]': {
+                    required: "Satuan 1 Wajib Diisi"
                 }
             },
             errorElement: 'span',

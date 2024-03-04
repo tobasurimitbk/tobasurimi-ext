@@ -482,17 +482,19 @@
                 kode_barang: {
                     required: true
                 },
-                satuan_id: {
+                'harga_pokok[]': {
                     required: true
                 },
-                minimum_stock: {
-                    required: true,
-                    number: true
+                'harga_jual[]': {
+                    required: true
                 },
+                'satuan1_id[]': {
+                    required: true
+                }
             },
             messages: {
                 parent_type_id: {
-                    required: "Kelompok Barang Wajib Diisi"
+                    required: "Kategori Barang Wajib Diisi"
                 },
                 barang_name: {
                     required: "Nama Barang Wajib Diisi"
@@ -500,12 +502,14 @@
                 kode_barang: {
                     required: "Kode Barang Wajib Diisi"
                 },
-                satuan_id: {
-                    required: "Satuan Barang Wajib Diisi"
+                'harga_pokok[]': {
+                    required: "Harga Pokok Wajib Diisi"
                 },
-                minimum_stock: {
-                    required: "Minimal stock harus diisi",
-                    number: "Masukkan angka valid"
+                'harga_jual[]': {
+                    required: "Harga Jual Wajib Diisi"
+                },
+                'satuan1_id[]': {
+                    required: "Satuan 1 Wajib Diisi"
                 }
             },
             errorElement: 'span',
