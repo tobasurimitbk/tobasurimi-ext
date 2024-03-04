@@ -168,8 +168,8 @@
                         <tfoot>
                             <tr>
                                 <td colspan="4"><strong>Total Transaksi</strong></td>
-                                <td id="jumlahDebet"><?= ($flag != 0) ? format_ribuan($total_debit) :  format_ribuan(0); ?></td>
-                                <td id="jumlahKredit"><?= ($flag != 0) ? format_ribuan($total_kredit) : format_ribuan(0); ?></td>
+                                <td id="jumlahDebet"><strong><?= ($flag != 0) ? format_ribuan($total_debit) :  format_ribuan(0); ?></strong></td>
+                                <td id="jumlahKredit"><strong><?= ($flag != 0) ? format_ribuan($total_kredit) : format_ribuan(0); ?></strong></td>
                             </tr>
                         </tfoot>
                     </table>
