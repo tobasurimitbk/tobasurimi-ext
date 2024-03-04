@@ -478,7 +478,6 @@
                         confirmButtonColor: '#4e73df',
                     })
                 } else {
-                    var is_add = false;
                     var bc_id = $('.bc_id option:selected').val();
                     var no_aju = $('.no_aju').val();
                     var id_detail = $('.id_detail').val();
@@ -490,11 +489,16 @@
                         // CREATE
                         var isAdd = false;
                         for (var i = 0; i < listStock.length; i++) {
+
+                            if (listStock[i].bc_id == '0' && listStock[i].no_aju == '-' && bc_id == '0') {
+                                isAdd = true;
+                                console.log("SINIIII", bc_id, no_aju);
+                                break;
+                            }
+
                             if (listStock[i].bc_id == bc_id && listStock[i].no_aju == no_aju) {
                                 isAdd = true;
-                                break;
-                            } else if (listStock[i].bc_id == '0') {
-                                isAdd = true;
+                                console.log("SINI", bc_id, no_aju);
                                 break;
                             }
                         }
@@ -613,7 +617,7 @@
             `
             ));
             table.find('tbody').append(newRow);
-            qtyTotal += parseInt(v.qty);
+            qtyTotal += parseFloat(v.qty);
         });
         table.find('tfoot').empty();
         var newRow = $('<tr>');
@@ -621,7 +625,7 @@
         newRow.append($('<td><b></b></td>'));
         newRow.append($('<td><b></b></td>'));
         newRow.append($('<td><b>TOTAL</b></td>'));
-        newRow.append($('<td><b>' + qtyTotal + '</b></td>'));
+        newRow.append($('<td><b>' + qtyTotal.toFixed(2) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
     }

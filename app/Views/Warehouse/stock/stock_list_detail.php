@@ -70,25 +70,25 @@
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Awal</label>
+                        <label for="floatingInput">Qty Awal</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokMasuk']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Masuk</label>
+                        <label for="floatingInput">Qty Masuk</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokKeluar']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Keluar</label>
+                        <label for="floatingInput">Qty Keluar</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokSekarang']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Stok Akhir</label>
+                        <label for="floatingInput">Qty Akhir</label>
                     </div>
                 </div>
             </div>

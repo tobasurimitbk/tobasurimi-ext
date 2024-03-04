@@ -672,7 +672,7 @@ class StokList extends BaseController
                 array_push($dataResult, [
                     "no" => $no++,
                     "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
-                    "po" => $data->no_dokumen2,
+                    "po" => '-',
                     "dokumen" => $data->no_dokumen1 . " - " . $bcName,
                     "supplier" => $supplier == null ? "-" : $supplier['name'],
                     "barang" => strtoupper($barang['name']),
