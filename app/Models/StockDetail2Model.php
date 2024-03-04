@@ -75,9 +75,9 @@ class StockDetail2Model extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['bc_id'] || $addCondition['no_aju'] || $addCondition['bc_id'] == 0) {
+        if ($addCondition['bc_id'] != "" || $addCondition['no_aju'] != "") {
             $dataQry->groupStart();
-            if ($addCondition['bc_id'] || $addCondition['bc_id'] == 0) {
+            if ($addCondition['bc_id'] || $addCondition['bc_id'] == 0 && $addCondition['bc_id'] != "") {
                 $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
             }
 
@@ -155,11 +155,11 @@ class StockDetail2Model extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['bc_id']) {
+        if ($addCondition['search'] || $addCondition['bc_id'] != "") {
             $dataQry->groupStart();
         }
 
-        if ($addCondition['bc_id']) {
+        if ($addCondition['bc_id'] || $addCondition['bc_id'] != "") {
             $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
         }
 
@@ -169,7 +169,7 @@ class StockDetail2Model extends Model
                 ->orLike('stock_details2.no_aju', $addCondition['search']);
         }
 
-        if ($addCondition['search'] || $addCondition['bc_id']) {
+        if ($addCondition['search'] || $addCondition['bc_id'] != "") {
             $dataQry->groupEnd();
         }
 
