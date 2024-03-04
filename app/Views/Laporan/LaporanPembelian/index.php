@@ -105,7 +105,7 @@
 
 <script>
     let sort = "createdAt";
-    let sortType = "asc";
+    let sortType = "desc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -114,7 +114,7 @@
             serverSide: true,
             ordering: true,
             order: [
-                [1, 'asc']
+                [1, 'desc']
             ],
             fixedHeader: true,
             lengthMenu: [

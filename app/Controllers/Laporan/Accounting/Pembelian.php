@@ -91,9 +91,6 @@ class Pembelian extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-
-        // var_dump($res);
-        // exit;
         foreach ($res['data'] as $data) {
             $tglTransaksi = $data->tanggal_penerimaan;
             $dokumenTransaksi = $data->BC23_AJU ? "BC 2.3/" . $data->BC23_AJU : ($data->BC40_AJU ? "BC 4.0/" . $data->BC40_AJU : "-");
@@ -138,12 +135,10 @@ class Pembelian extends BaseController
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
-            } else if ($data->tipe_bahan == "PENOLONG") {
+            } else {
                 $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
                 foreach ($bp as $value) {
-                    // var_dump($valasTransaksi);
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-                    // var_dump($kursData);
                     if ($kursData) {
                         foreach ($metaValuta as $valueValuta) {
                             if ($value['currency'] == $valueValuta['id']) {
@@ -152,18 +147,13 @@ class Pembelian extends BaseController
                             }
                         }
                     } else {
-                        $valasTransaksi = $value['currencyValue'];
+                        $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
                     }
-                    // var_dump($valasTransaksi);
-                    // var_dump($exchangeTransaksi);
                     $nominalTransaksi += $value['total_po'];
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             }
-            // var_dump($lokalbb);
-            // var_dump($importbb);
-            // var_dump($bp);
 
             array_push($rdata, [
                 "no"                    => $no++,
@@ -182,6 +172,8 @@ class Pembelian extends BaseController
                 "nominal_idr"           => number_format(floatval($nominalIdrTransaksi), 2, ',', '.'),
                 "paid_idr"              => $paidIdrTransaksi,
             ]);
+
+            // var_dump($rdata);
         }
 
         $data = [
