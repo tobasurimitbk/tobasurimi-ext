@@ -703,6 +703,11 @@ $routes->get('/stock-list/id/(:segment)', 'Inventori\StokList::detail/$1', ['fil
 $routes->get('/stock-list/stock-dokumen-bc', 'Inventori\StokList::allStokPerDokumen', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-filtered', 'Inventori\StokList::allStokFiltered', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-pemasukkan-barang-lpb', 'Inventori\StokList::allStokLogPemasukkanBarang', ['filter' => 'Auth']);
+// STOK ADJUSMENT
+$routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/create', 'Inventori\StokAdjusment::create', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);

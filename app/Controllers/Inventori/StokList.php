@@ -15,6 +15,7 @@ use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\SupplierModel;
+use App\Models\WarehousesModel;
 
 class StokList extends BaseController
 {
@@ -52,6 +53,7 @@ class StokList extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->supplierModel = new SupplierModel();
+        $this->warehouseModel = new WarehousesModel();
     }
 
     public function index()
@@ -420,7 +422,8 @@ class StokList extends BaseController
                 'totalPerInit' => $totalStokInit,
                 'totalPerPemasukkan' => $totalStokPemasukkanBarang
             ],
-            'divisi' => $this->divisiModel->find($stok['divisi_id'])
+            'divisi' => $this->divisiModel->find($stok['divisi_id']),
+            'warehouse' => $this->warehouseModel->find($stok['warehouse_id'])
         ];
 
         return view('Warehouse/stock/stock_list_detail', $data);
