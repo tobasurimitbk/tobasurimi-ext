@@ -201,6 +201,10 @@ class StockDetail2Model extends Model
             ->groupBy('stock_details.stock_id')
             ->findAll();
 
-        return number_format($dataQry[0]['stok_total']);
+        if (count($dataQry) == 0) {
+            return 0;
+        } else {
+            return number_format($dataQry[0]['stok_total']);
+        }
     }
 }
