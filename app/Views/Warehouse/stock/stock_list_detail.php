@@ -229,15 +229,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="">Purchase Order</th>
-                                <th onclick="">Nomor LPB</th>
                                 <th onclick="">Dokumen</th>
-                                <th>Supplier</th>
-                                <th>Barang - Spesifikasi</th>
-                                <th>Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
-                                <th>Harga</th>
+                                <th onclick="">Dokumen Pabean</th>
+                                <th onclick="">Barang - Spesifikasi</th>
+                                <th onclick="">Qty Satuan 1</th>
+                                <th onclick="">Qty Satuan 2</th>
+                                <th onclick="">Qty Satuan 3</th>
+                                <th onclick="">Stok</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">

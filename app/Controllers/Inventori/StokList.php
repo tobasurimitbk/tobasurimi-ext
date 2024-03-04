@@ -7,10 +7,12 @@ use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
+use App\Models\PenerimaanBarangModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\SupplierModel;
 
 class StokList extends BaseController
 {
@@ -26,6 +28,8 @@ class StokList extends BaseController
     protected $stockDetailModel;
     protected $stockDetail2Model;
     protected $satuanModel;
+    protected $penerimaanBarangModel;
+    protected $supplierModel;
 
     public function __construct()
     {
@@ -40,6 +44,8 @@ class StokList extends BaseController
         $this->stockDetail2Model = new StockDetail2Model();
         $this->satuanModel = new SatuansModel();
         $this->kemasanModel = new KemasanModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->supplierModel = new SupplierModel();
     }
 
     public function index()
@@ -540,4 +546,71 @@ class StokList extends BaseController
 
         return response()->setJSON($data);
     }
+
+    // public function allStokLog()
+    // {
+    //     $payload = [
+    //         "pageSize"      => $this->request->getVar("length"),
+    //         "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+    //         "sort" => $this->request->getVar("sort"),
+    //         "sorttype" => $this->request->getVar("sortType"),
+    //     ];
+
+    //     $addCondition = [
+    //         "sort"   => $this->request->getVar("sort"),
+    //         "sortType"  => $this->request->getVar("sortType"),
+    //         "no_dokumen" => $this->request->getVar("no_dokumen"),
+    //     ];
+
+    //     $limit = $this->request->getVar("length");
+    //     $offset = $this->request->getVar("start");
+
+    //     $stok_id = decrypt($this->request->getVar('stok_id'));
+    //     $stok = $this->stockModel->find($stok_id);
+
+    //     $condition = [
+    //         "stock_details2.stock_id" => $stok_id,
+    //         "stock_details.status" => trim(($this->request->getVar('status'))),
+    //         "stock_details2.deletedAt" => null,
+    //         "stock.deletedAt" => null,
+    //         "stock_details.deletedAt" => null,
+    //     ];
+
+    //     $dataQry = $this->stockDetail2Model->getListStokLog($condition, $addCondition, $limit, $offset);
+    //     $dataResult = [];
+    //     $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+    //     if ($stok['kemasan_id'] == 0) {
+    //         // BARANG
+    //         $barang = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
+    //     } else {
+    //         // KEMASAN
+    //         $barang = $this->kemasanModel->find($stok['kemasan_id']);
+    //     }
+
+    //     foreach ($dataQry['data'] as $data) {
+
+    //         $lpb = $this->penerimaanBarangModel->where('no_penerimaan_barang', $data->no_penerimaan_barang)->first();
+    //         $supplier = $this->supplierModel->find($lpb['supplier_id']);
+
+    //         if ($stok['kemasan_id'] == 0) {
+    //             // BARANG
+    //             $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+    //             $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
+    //             $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
+
+
+    //             array_push($dataResult, [
+    //                 "no" => $no++,
+    //                 "dokumen" => $data->no_dokumen1 . "/" . $data->no_dokumen2 . "/" . $supplier['name'],
+    //                 "dokumen_pabean" => '',
+    //                 "bc_type" => $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'],
+    //                 "no_aju" => $data->no_aju,
+    //                 "stok_1" => $data->stok_total . " " . $satuan_1['kode_satuan'],
+    //                 "stok_2" => $satuan_2 == null ? "-" : ($data->stok_total * $barang['konversi_satuan_2']) . " " . $satuan_2['kode_satuan'],
+    //                 "stok_3" => $satuan_3 == null ? "-" : ($data->stok_total * $barang['konversi_satuan_3']) . " " . $satuan_3['kode_satuan'],
+    //             ]);
+    //         }
+    //     }
+    // }
 }
