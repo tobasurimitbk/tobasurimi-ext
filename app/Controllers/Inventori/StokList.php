@@ -504,7 +504,6 @@ class StokList extends BaseController
             "recordsFiltered"   => $dataQry['totalFilteredData'],
             "data"              => $dataResult,
             "payload"           => $payload,
-            "total"             => $this->stockDetail2Model->getTotalStockLog($condition) . " " . $satuan_1['kode_satuan']
         ];
 
         return response()->setJSON($data);
@@ -591,7 +590,6 @@ class StokList extends BaseController
             "recordsFiltered"   => $dataQry['totalFilteredData'],
             "data"              => $dataResult,
             "payload"           => $payload,
-            "total"             => $this->stockDetail2Model->getTotalStockLog($condition) . " " . $satuan_1['kode_satuan']
         ];
 
         return response()->setJSON($data);
@@ -692,7 +690,6 @@ class StokList extends BaseController
             "recordsFiltered"   => $dataQry['totalFilteredData'],
             "data"              => $dataResult,
             "payload"           => $payload,
-            "total"             => $this->stockDetail2Model->getTotalStockLog($condition) . " " . $satuan_1['kode_satuan']
         ];
 
         return response()->setJSON($data);
