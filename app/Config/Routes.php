@@ -708,6 +708,15 @@ $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 
 $routes->get('/stock-adjusment/create', 'Inventori\StokAdjusment::create', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/get-adjusment-no', 'Inventori\StokAdjusment::getAdjusmentNo', ['filter' => 'Auth']);
+$routes->post('/stock-adjusment/save', 'Inventori\StokAdjusment::createAction', ['filter' => 'Auth']);
+$routes->post('/stock-adjusment/update', 'Inventori\StokAdjusment::updateAction', ['filter' => 'Auth']);
+$routes->post('/stock-adjusment/posting', 'Inventori\StokAdjusment::posting', ['filter' => 'Auth']);
+$routes->post('/stock-adjusment/delete', 'Inventori\StokAdjusment::delete', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/id/(:segment)', 'Inventori\StokAdjusment::detail/$1', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/all', 'Inventori\StokAdjusment::all', ['filter' => 'Auth']);
+
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);

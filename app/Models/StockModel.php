@@ -586,6 +586,7 @@ class StockModel extends Model
         if ($type_barang == "kemasan") {
             // LIST KEMASAN
             $selectQry = "
+                stock.id AS stock_id,
                 kemasan.id AS spesifikasi_id,
                 kemasan.name AS barang,
                 kemasan.kode AS kode_barang,
@@ -605,6 +606,7 @@ class StockModel extends Model
         } else {
             // LIST BARANG
             $selectQry = "
+                stock.id AS stock_id,
                 stock.barang2_id AS spesifikasi_id,
                 CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang,
                 barang_master.kode_barang,

@@ -207,4 +207,29 @@ class StockDetail2Model extends Model
             return $dataQry[0]['stok_total'];
         }
     }
+
+    public function getStockListWithBCDoc($stockID)
+    {
+        $selectQry = '
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,        
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->where('stock_details2.stock_id', $stockID)
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.no_aju')
+            ->findAll();
+
+        return $dataQry;
+    }
 }
