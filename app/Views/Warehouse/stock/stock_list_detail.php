@@ -280,13 +280,70 @@
                 </div>
             </div>
 
-            <!-- <div class="row">
+            <div class="row mt-3">
                 <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Dari Adjusment</label>
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PEMASUKAN ATAU PENGELUARAN DARI ADJUSMENT</label>
+                    </div>
                 </div>
             </div>
 
             <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_adjusment" name="bc_id_stok_adjusment" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($jenisDokAju as $j) : ?>
+                                <option value="<?= $j->id ?>">
+                                    <?= $j->value ?>
+                                </option>
+                            <?php endforeach; ?>
+                            <option value="0">NON PABEAN</option>
+
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search_no_aju_stok_adjusment" id="search_no_aju_stok_adjusment" name="search_no_aju_stok_pemasukkan_barang" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Adjusment </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-adjusment" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="changeSortStokAdjusment('stock_details2.no_aju')">Dokumen</th>
+                                <th onclick="changeSortStokAdjusment('stock_details.tanggal')">Tanggal</th>
+                                <th>Barang - Spesifikasi</th>
+                                <th onclick="changeSortStokAdjusment('stock_details.no_dokumen')">No Adjusment</th>
+                                <th onclick="changeSortStokAdjusment('stock_details2.qty')">Qty Satuan 1</th>
+                                <th>Qty Satuan 2</th>
+                                <th>Qty Satuan 3</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4"></td>
+                                <td style="float: right;"><b>TOTAL</b></td>
+                                <td><b><?= number_format($total['totalPerAdjusment']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- <div class="row">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Data Pemasukkan Barang Dari Produksi</label>
                 </div>
@@ -318,6 +375,10 @@
 
     let sortStokPemasukkanBarang = "createdAt";
     let sortTypePemasukkanBarang = "DESC";
+
+    let sortStokAdjusment = "createdAt";
+    let sortTypeAdjusment = "DESC";
+
 
     const stokTableDokumenBC = $('.stok-dokumen-bc-table').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -645,6 +706,117 @@
         }
     });
 
+    const stokTableAdjusment = $('.stok-adjusment').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [4, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/stock-log-adjusment"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.bc_id = $("#bc_id_stok_adjusment option:selected").val();
+                data.search = $("#search_no_aju_stok_adjusment").val();
+                data.stok_id = "<?= encrypt($stok['id']) ?>";
+                data.sumber = "ADJUSMENT";
+
+                data.sort = sortStokAdjusment;
+                data.sortType = sortTypeAdjusment;
+            },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "dokumen",
+                className: "text-center"
+            },
+            {
+                data: "tanggal",
+                className: "text-center"
+            },
+            {
+                data: "barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "no_adjusment",
+                className: "text-center",
+            },
+            {
+                data: "stok_1",
+                className: "text-center"
+            },
+            {
+                data: "stok_2",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "stok_3",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
     $('#bc_id_stok_per_dokumen').select2({
         placeholder: "Pilih Dokumen Pabean",
         theme: "bootstrap-5",
@@ -669,6 +841,14 @@
         stokTablePemasukkanBarang.ajax.reload();
     });
 
+    $('#bc_id_stok_adjusment').select2({
+        placeholder: "Pilih Dokumen Pabean",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        stokTableAdjusment.ajax.reload();
+    });
+
     $('#search_no_aju_stok_per_dokumen').change(function() {
         stokTableDokumenBC.ajax.reload();
     });
@@ -681,13 +861,27 @@
         stokTablePemasukkanBarang.ajax.reload();
     });
 
-    $("#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang")
+    $('#search_no_aju_stok_adjusment').change(function() {
+        stokTableAdjusment.ajax.reload();
+    });
+
+    $("#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang, #bc_id_stok_adjusment")
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
+
+    const changeSortStokAdjusment = function(val) {
+        if (sortTypeAdjusment !== val) {
+            sortTypeAdjusment = "asc";
+            sortStokAdjusment = val;
+        } else {
+            sortTypeAdjusment = sortTypeAdjusment === "asc" ? "desc" : "asc";
+        }
+        stokTableAdjusment.ajax.reload();
+    }
 
     const changeSortStokPerDokumen = function(val) {
         if (sortTypeStokPerDokumen !== val) {

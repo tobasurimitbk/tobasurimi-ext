@@ -124,7 +124,10 @@ class StockDetail2Model extends Model
             'stock_details.no_dokumen' => 'stock_details.no_dokumen',
             'stock_details2.bc_id' => 'stock_details2.bc_id',
             'stock.barang1_id' => 'stock.barang1_id',
-            'stock_details2.qty' => 'stock_details2.qty'
+            'stock_details2.qty' => 'stock_details2.qty',
+            'stock_details2.no_aju' => 'stock_details2.no_aju',
+            'stock_details.tanggal' => 'stock_details.stock_date'
+
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -140,6 +143,7 @@ class StockDetail2Model extends Model
             stock_details.no_dokumen AS no_dokumen1,
             stock.barang1_id,
             stock.barang2_id,
+            stock_details.status,
             stock_details2.qty AS stok_total,
             stock_details2.bc_id,
             stock_details2.no_aju,
