@@ -684,13 +684,13 @@ $routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode'
 // $routes->post('/stock/save', 'Warehouse\Stock::addNewStock', ['filter' => 'Auth']);
 // INVENTORI
 // STOCK SAFETY
-$routes->get('/stock-safety', 'Inventori\Inventori::stockSafetyView', ['filter' => 'Auth']);
-$routes->get('/stock-safety/id/(:num)', 'Inventori\Inventori::stockSafetyGet/$1', ['filter' => 'Auth']);
-$routes->post('/stock-safety/update', 'Inventori\Inventori::stockSafetyUpdate', ['filter' => 'Auth']);
-$routes->get('/stock-safety/all', 'Inventori\Inventori::stockSafetyAll', ['filter' => 'Auth']);
+// $routes->get('/stock-safety', 'Inventori\Inventori::stockSafetyView', ['filter' => 'Auth']);
+// $routes->get('/stock-safety/id/(:num)', 'Inventori\Inventori::stockSafetyGet/$1', ['filter' => 'Auth']);
+// $routes->post('/stock-safety/update', 'Inventori\Inventori::stockSafetyUpdate', ['filter' => 'Auth']);
+// $routes->get('/stock-safety/all', 'Inventori\Inventori::stockSafetyAll', ['filter' => 'Auth']);
 // STOCK HISTORI
-$routes->get('/stock-histori', 'Inventori\Inventori::stockHistoriView', ['filter' => 'Auth']);
-$routes->get('/stock-histori/all', 'Inventori\Inventori::stockHistoriAll', ['filter' => 'Auth']);
+$routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
+$routes->get('/stock-histori/all', 'Inventori\StokHistori::all', ['filter' => 'Auth']);
 // STOK LIST
 $routes->get('/stock-list', 'Inventori\StokList::index', ['filter' => 'Auth']);
 $routes->get('/stock-list/create', 'Inventori\StokList::create', ['filter' => 'Auth']);
