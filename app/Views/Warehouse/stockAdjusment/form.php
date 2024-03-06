@@ -164,10 +164,11 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="form-floating" style="height: 50px;">
                                 <input placeholder="Qty" class="form-control qty" id="qty" name="qty" aria-label="Floating label select example" />
                                 <label for="floatingInput" style="z-index: 1;">Qty</label>
                             </div>
+                            <small class=" mb-3"><i id="text-qty-warehouse"> </i></small>
                         </div>
                     </div>
                 </form>
@@ -228,6 +229,8 @@
     var qtyTotal = 0;
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
+
+    $('#text-qty-warehouse').hide();
 
     <?php if (!empty($adjusment)) : ?>
         <?php if ($adjusment['status_posting']) : ?>
@@ -322,7 +325,10 @@
         allowClear: true
     }).change(function() {
         var selected = $('#bc_id option:selected');
-        $('#qty').val(selected.data('stock'));
+        var satuan_name = $('#satuan_name').val();
+        // $('#qty').val(selected.data('stock'));
+        $('#text-qty-warehouse').show();
+        $('#text-qty-warehouse').text('Stok di Warehouse : ' + selected.data('stock') + ' ' + satuan_name);
     });
 
     $('#operasi').select2({
@@ -814,7 +820,7 @@
 
         $('#satuan_name').val(item.satuan_name);
         $('#operasi').val(item.operasi).change();
-        $('#qty').val(item.qty);
+        // $('#qty').val(item.qty);
     }
 
     function drawTable() {
@@ -941,6 +947,7 @@
         $('#no_aju').val(null).change();
         $('#operasi').val(null).change();
         $('#qty').val(null);
+        $('#text-qty-warehouse').hide();
     }
 
     function changeStatus() {
