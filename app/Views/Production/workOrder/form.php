@@ -612,47 +612,9 @@
         let keterangan = $(".keterangan").val() ? $(".keterangan").val() : '-'
 
         let header_barang_name = $('.header_barang_name').val();
-        // let spp_type = $('.spp_type').val().trim();
 
         let validate_same = false;
         let validate_bahan_baku = false;
-
-        // if (barang_detail_id === '') {
-        //     list_items.map(item => {
-        //         if (item.barang_id === barang_id && item.barang_spesifikasi_id === barang_spesifikasi_id) {
-        //             validate_same = true
-        //         }
-        //     });
-        // }
-
-        // if (list_items.length >= 1 && spp_type === "Lokal BB") {
-        //     list_items.map(item => {
-        //         if (item.barang_id !== barang_id) {
-        //             validate_bahan_baku = true;
-        //         }
-        //     });
-        // }
-
-        // validator_detail.resetForm();
-        // validator_detail.reset();
-
-        // if (validate_bahan_baku) {
-        //     Swal.fire({
-        //         icon: 'error',
-        //         title: 'Barang harus sejenis',
-        //         // title: "Header Barang Wajib " + header_barang_name.toUpperCase() + " (Karena ini merupakan PO Lokal Bahan Baku)",
-        //         confirmButtonColor: '#4e73df',
-        //     })
-        // } else
-
-        // if (validate_same) {
-        //     Swal.fire({
-        //         icon: 'error',
-        //         title: "Barang Sudah Ada",
-        //         confirmButtonColor: '#4e73df',
-        //     })
-        // } else {
-
         if (barang_detail_id) {
             if ($(".detail-form").valid()) {
                 // UPDATE DETAIL
@@ -693,8 +655,6 @@
                 $(".detail-modal").modal("hide");
             }
         }
-
-        // }
     }
 
     const changeStatus = function() {
