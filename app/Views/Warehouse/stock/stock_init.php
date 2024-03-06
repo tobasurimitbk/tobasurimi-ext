@@ -492,13 +492,11 @@
 
                             if (listStock[i].bc_id == '0' && listStock[i].no_aju == '-' && bc_id == '0') {
                                 isAdd = true;
-                                console.log("SINIIII", bc_id, no_aju);
                                 break;
                             }
 
                             if (listStock[i].bc_id == bc_id && listStock[i].no_aju == no_aju) {
                                 isAdd = true;
-                                console.log("SINI", bc_id, no_aju);
                                 break;
                             }
                         }

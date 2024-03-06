@@ -580,4 +580,53 @@ class StockModel extends Model
             'stokInisiasi' => $stokInisiasi[0]
         ];
     }
+
+    public function getBarangAndStock($type_barang, $divisi_id, $warehouse_id)
+    {
+        if ($type_barang == "kemasan") {
+            // LIST KEMASAN
+            $selectQry = "
+                stock.id AS stock_id,
+                kemasan.id AS spesifikasi_id,
+                kemasan.name AS barang,
+                kemasan.kode AS kode_barang,
+                satuans.kode_satuan
+            ";
+
+            $dataResult = $this->asArray()->select($selectQry)
+                ->join('kemasan', 'kemasan.id = stock.kemasan_id')
+                ->join('satuans', 'satuans.id = kemasan.satuan_id', 'left')
+                ->where('stock.tipe_barang', $type_barang)
+                ->where('stock.divisi_id', $divisi_id)
+                ->where('stock.warehouse_id', $warehouse_id)
+                ->where('stock.deletedAt', null)
+                ->where('kemasan.deletedAt', null)
+                ->orderBy('kemasan.kode', "ASC")
+                ->findAll();
+        } else {
+            // LIST BARANG
+            $selectQry = "
+                stock.id AS stock_id,
+                stock.barang2_id AS spesifikasi_id,
+                CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang,
+                barang_master.kode_barang,
+                satuans.kode_satuan
+            ";
+
+            $dataResult = $this->asArray()->select($selectQry)
+                ->join('barang_master', 'barang_master.id = stock.barang1_id')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->where('stock.tipe_barang', $type_barang)
+                ->where('stock.divisi_id', $divisi_id)
+                ->where('stock.warehouse_id', $warehouse_id)
+                ->where('stock.deletedAt', null)
+                ->where('barang_master_spesifikasi.deletedAt', null)
+                ->where('barang_master.deletedAt', null)
+                ->orderBy('barang_master.kode_barang', "ASC")
+                ->findAll();
+        }
+
+        return $dataResult;
+    }
 }

@@ -844,8 +844,8 @@
             newRow.append($('<td>').text(v.jml_diterima_lpb));
             newRow.append($('<td>').text(v.jml_diterima_total));
             newRow.append($('<td>').text(v.sisa_total));
-            newRow.append($('<td>').text(formatRupiah(parseInt(v.harga) || 0)));
-            newRow.append($('<td>').text(formatRupiah(parseInt(v.sub_total) || 0)));
+            newRow.append($('<td>').text(formatRupiah(parseFloat(v.harga) || 0)));
+            newRow.append($('<td>').text(formatRupiah(parseFloat(v.sub_total) || 0)));
             newRow.append($('<td>').text(v.keterangan));
             newRow.append($('<td>').html(
                 <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
