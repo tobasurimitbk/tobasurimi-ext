@@ -171,6 +171,14 @@ $routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
 $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
+// KAWASAN
+$routes->get('/kawasan-warehouse', 'Master\Kawasan::index', ['filter' => 'Auth']);
+$routes->get('/kawasan-warehouse/all', 'Master\Kawasan::all', ['filter' => 'Auth']);
+$routes->post('/kawasan-warehouse/save', 'Master\Kawasan::create', ['filter' => 'Auth']);
+$routes->post('/kawasan-warehouse/update', 'Master\Kawasan::update', ['filter' => 'Auth']);
+$routes->post('/kawasan-warehouse/delete', 'Master\Kawasan::delete', ['filter' => 'Auth']);
+$routes->get('/kawasan-warehouse/get', 'Master\Kawasan::get', ['filter' => 'Auth']);
+
 // SUPPLIER HARGA
 // $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/all', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
@@ -720,6 +728,9 @@ $routes->post('/stock-adjusment/delete', 'Inventori\StokAdjusment::delete', ['fi
 $routes->get('/stock-adjusment/id/(:segment)', 'Inventori\StokAdjusment::detail/$1', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/all', 'Inventori\StokAdjusment::all', ['filter' => 'Auth']);
 
+// MUTASI
+
+// PENERIMAAN MUTASI
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);
