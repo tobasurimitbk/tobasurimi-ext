@@ -143,11 +143,16 @@ class StockDetail2Model extends Model
             stock_details.no_dokumen AS no_dokumen1,
             stock.barang1_id,
             stock.barang2_id,
+            stock.kemasan_id,
+            stock.divisi_id,
+            stock.warehouse_id,
             stock_details.status,
+            stock_details.sumber,
             stock_details2.qty AS stok_total,
             stock_details2.bc_id,
             stock_details2.no_aju,
             stock_details.stock_date,
+            stock_details2.createdAt
         ';
 
         $dataQry = $this->asObject()
@@ -159,7 +164,7 @@ class StockDetail2Model extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['bc_id'] != "") {
+        if ($addCondition['search'] || $addCondition['bc_id'] != "" || $addCondition['divisi_id'] || $addCondition['warehouse_id']) {
             $dataQry->groupStart();
         }
 
@@ -167,13 +172,22 @@ class StockDetail2Model extends Model
             $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
         }
 
+        if ($addCondition['divisi_id']) {
+            $dataQry->where('stock.divisi_id', $addCondition['divisi_id']);
+        }
+
+        if ($addCondition['warehouse_id']) {
+            $dataQry->where('stock.warehouse_id', $addCondition['warehouse_id']);
+        }
+
         if ($addCondition['search']) {
             $dataQry->like('stock_details2.no_dokumen', $addCondition['search'])
                 ->orLike('stock_details.no_dokumen', $addCondition['search'])
-                ->orLike('stock_details2.no_aju', $addCondition['search']);
+                ->orLike('stock_details2.no_aju', $addCondition['search'])
+                ->orLike('stock_details.sumber', $addCondition['search']);
         }
 
-        if ($addCondition['search'] || $addCondition['bc_id'] != "") {
+        if ($addCondition['search'] || $addCondition['bc_id'] != "" || $addCondition['divisi_id'] || $addCondition['warehouse_id']) {
             $dataQry->groupEnd();
         }
 

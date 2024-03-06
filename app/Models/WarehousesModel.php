@@ -14,6 +14,7 @@ class WarehousesModel extends Model
         'id',
         'company_id',
         'divisi_id',
+        'kawasan_id',
         'code_warehouse',
         'warehouse_name',
         'address',
@@ -58,11 +59,12 @@ class WarehousesModel extends Model
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
-        $requete = "SELECT warehouses.*,provinces.province_name,cities.city_name,employees.name as pic_name, divisis.divisi AS divisi_name FROM warehouses ";
+        $requete = "SELECT warehouses.*,kawasan.name AS kawasan_name,provinces.province_name,cities.city_name,employees.name as pic_name, divisis.divisi AS divisi_name FROM warehouses ";
         $requete .= "LEFT JOIN provinces ON (warehouses.province_id=provinces.id) ";
         $requete .= "LEFT JOIN cities ON (warehouses.city_id=cities.id) ";
         $requete .= "LEFT JOIN employees ON (warehouses.pic_id=employees.id) ";
         $requete .= "LEFT JOIN divisis ON (warehouses.divisi_id=divisis.id) ";
+        $requete .= "LEFT JOIN kawasan ON (warehouses.kawasan_id=kawasan.id) ";
         $requete .= "WHERE warehouses.deletedAt is null ";
         if (isset($values["company_id"]))
             $requete .= ($values["company_id"] == "") ? "" : ("AND warehouses.company_id ='" . $values["company_id"] . "' ");

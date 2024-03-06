@@ -171,6 +171,14 @@ $routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
 $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
+// KAWASAN
+$routes->get('/kawasan-warehouse', 'Master\Kawasan::index', ['filter' => 'Auth']);
+$routes->get('/kawasan-warehouse/all', 'Master\Kawasan::all', ['filter' => 'Auth']);
+$routes->post('/kawasan-warehouse/save', 'Master\Kawasan::create', ['filter' => 'Auth']);
+$routes->post('/kawasan-warehouse/update', 'Master\Kawasan::update', ['filter' => 'Auth']);
+$routes->post('/kawasan-warehouse/delete', 'Master\Kawasan::delete', ['filter' => 'Auth']);
+$routes->get('/kawasan-warehouse/get', 'Master\Kawasan::get', ['filter' => 'Auth']);
+
 // SUPPLIER HARGA
 // $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/all', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
@@ -684,13 +692,13 @@ $routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode'
 // $routes->post('/stock/save', 'Warehouse\Stock::addNewStock', ['filter' => 'Auth']);
 // INVENTORI
 // STOCK SAFETY
-$routes->get('/stock-safety', 'Inventori\Inventori::stockSafetyView', ['filter' => 'Auth']);
-$routes->get('/stock-safety/id/(:num)', 'Inventori\Inventori::stockSafetyGet/$1', ['filter' => 'Auth']);
-$routes->post('/stock-safety/update', 'Inventori\Inventori::stockSafetyUpdate', ['filter' => 'Auth']);
-$routes->get('/stock-safety/all', 'Inventori\Inventori::stockSafetyAll', ['filter' => 'Auth']);
+// $routes->get('/stock-safety', 'Inventori\Inventori::stockSafetyView', ['filter' => 'Auth']);
+// $routes->get('/stock-safety/id/(:num)', 'Inventori\Inventori::stockSafetyGet/$1', ['filter' => 'Auth']);
+// $routes->post('/stock-safety/update', 'Inventori\Inventori::stockSafetyUpdate', ['filter' => 'Auth']);
+// $routes->get('/stock-safety/all', 'Inventori\Inventori::stockSafetyAll', ['filter' => 'Auth']);
 // STOCK HISTORI
-$routes->get('/stock-histori', 'Inventori\Inventori::stockHistoriView', ['filter' => 'Auth']);
-$routes->get('/stock-histori/all', 'Inventori\Inventori::stockHistoriAll', ['filter' => 'Auth']);
+$routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
+$routes->get('/stock-histori/all', 'Inventori\StokHistori::all', ['filter' => 'Auth']);
 // STOK LIST
 $routes->get('/stock-list', 'Inventori\StokList::index', ['filter' => 'Auth']);
 $routes->get('/stock-list/create', 'Inventori\StokList::create', ['filter' => 'Auth']);
@@ -720,6 +728,9 @@ $routes->post('/stock-adjusment/delete', 'Inventori\StokAdjusment::delete', ['fi
 $routes->get('/stock-adjusment/id/(:segment)', 'Inventori\StokAdjusment::detail/$1', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/all', 'Inventori\StokAdjusment::all', ['filter' => 'Auth']);
 
+// MUTASI
+
+// PENERIMAAN MUTASI
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);
