@@ -17,10 +17,14 @@ class WorkOrdersModel extends Model
     protected $allowedFields = [
         'id',
         'wo_no',
-        'barang_id',
-        'production_amt',
-        'satuan_id',
-        'target',
+        'company_id',
+        'divisi_id',
+        'request_date',
+        'standart_production',
+        'note',
+        'is_posted',
+        'request_status',
+        'createdBy',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -54,28 +58,25 @@ class WorkOrdersModel extends Model
     {
         $availableSort = [
             'wo_no'             => 'work_orders.wo_no',
-            'kode_barang'       => 'barangs.kode_barang',
+            'department'       => 'divisis.divisi',
             'nama_barang'       => 'barangs.nama_barang',
-            'nama_satuan'       => 'satuans.nama_satuan',
-            'target'            => 'work_orders.target',
-            'production_amt'    => 'work_orders.production_amt'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'work_orders.updatedAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'work_orders.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "work_orders.*,
-            barangs.nama_barang,
-            barangs.kode_barang,
-            satuans.nama_satuan
+            GROUP_CONCAT(work_order_details.nama_barang SEPARATOR ', ') AS nama_barang,
+            divisis.divisi
         ";
 
         $workOrdersDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('barangs', 'barangs.id = work_orders.barang_id')
-            ->join('satuans', 'satuans.id = work_orders.satuan_id')
+            ->join('divisis', 'divisis.id = work_orders.divisi_id')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id')
+            ->groupBy('work_orders.id')
             ->orderBy($sort, $sortType);
 
         $totalData = $workOrdersDataQry->countAllResults(false);
@@ -125,8 +126,8 @@ class WorkOrdersModel extends Model
         $builder = $this->db->table('work_orders');
         $builder->select('wo_no');
         $builder->orderBy('wo_no', 'desc')
-        ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
-        ->where('createdAt <=', $last_day . " 23:59:59");
+            ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+            ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('wo_no', $lastStr);
         $query = $builder->get();
 

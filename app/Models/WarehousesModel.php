@@ -48,6 +48,13 @@ class WarehousesModel extends Model
         return $query->getResultArray();
     }
 
+    public function get_by_divisi_id($company_id, $divisi_id)
+    {
+        $requete = "SELECT * FROM warehouses WHERE warehouses.deletedAt is null and divisi_id='" . $divisi_id . "' and company_id='" . $company_id . "'";
+        //echo $requete;
+        $query = $this->db->query($requete);
+        return $query->getResultArray();
+    }
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {

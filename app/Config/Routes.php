@@ -597,6 +597,7 @@ $routes->get('/user/dropdown', 'Setting\User::dropdownUser', ['filter' => 'Auth'
 
 // WAREHOUSE
 $routes->get('/warehouse/dropdown', 'Master\Warehouse::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/warehouse/dropdown/divisi/(:segment)', 'Master\Warehouse::dropdownWarehouseByDivisiId/$1', ['filter' => 'Auth']);
 
 // DIVISI
 $routes->get('/divisi/dropdown', 'Master\Divisi::dropdownDivisi', ['filter' => 'Auth']);

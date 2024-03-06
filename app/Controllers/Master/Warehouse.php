@@ -356,4 +356,16 @@ class Warehouse extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function dropdownWarehouseByDivisiId($divisiID)
+    {
+        $dataWarehouse = $this->WarehousesModel->get_by_divisi_id($this->this_company_id, $divisiID);
+
+        $data = [
+            "data" => $dataWarehouse
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

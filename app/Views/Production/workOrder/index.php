@@ -24,12 +24,10 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('nama_satuan')" class="sort">Nama Satuan</th>
-                                <th onclick="changeSort('target')" class="sort">Target</th>
-                                <th onclick="changeSort('production_amt')" class="sort">Hasil</th>
-                                <th>Permintaan Material</th>
+                                <th onclick="changeSort('department')" class="sort">Department</th>
+                                <th>Jumlah Produksi</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -97,23 +95,15 @@
                 className: "text-center"
             },
             {
-                data: "kode_barang",
-                className: "text-center"
-            },
-            {
                 data: "nama_barang",
                 className: "text-center"
             },
             {
-                data: "nama_satuan",
+                data: "nama_divisi",
                 className: "text-center"
             },
             {
-                data: "target",
-                className: "text-center"
-            },
-            {
-                data: "production_amt",
+                data: "standart_production",
                 className: "text-center"
             },
             {
@@ -124,8 +114,11 @@
                 render: function(data, type, row) {
                     return `
                         <div class="mt-0">
-                            <button class="btn btn-success posting-spp" onclick="spp()">
-                                Permintaan Material
+                            <button class="btn btn-primary">
+                                <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-danger">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         </div>
                     `
