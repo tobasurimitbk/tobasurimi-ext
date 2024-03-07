@@ -192,16 +192,16 @@
                         <div class="row">
                             <div class="table-responsive">
                                 <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
-                                    <!-- <thead class="thead-dark"> -->
-                                    <tr>
-                                        <th scope="col">No</th>
-                                        <th scope="col">Spesifikasi</th>
-                                        <th scope="col">Satuan 1</th>
-                                        <th scope="col">Satuan 2</th>
-                                        <th scope="col">Satuan 3</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                    <!-- </thead> -->
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th scope="col">No</th>
+                                            <th scope="col">Spesifikasi</th>
+                                            <th scope="col">Satuan 1</th>
+                                            <th scope="col">Satuan 2</th>
+                                            <th scope="col">Satuan 3</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
                                     <tbody class="body-detail-table" id="body-detail-table" id="tbody2" style="cursor: pointer;">
                                     </tbody>
                                 </table>
