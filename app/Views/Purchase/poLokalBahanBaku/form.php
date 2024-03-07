@@ -239,7 +239,7 @@
                             </select>
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
                         </div>
-                        <small class="mb-3"><i>Kosongkan jika PO tidak memerlukan dokumen pabean</i></small>
+                        <small class="mb-3 form-lpb"><i>Kosongkan jika PO tidak memerlukan dokumen pabean</i></small>
                     </div>
                 </div>
                 <div class="row">
@@ -604,8 +604,10 @@
         }).change(function() {
             var supplier_id = $('.supplier_id').val();
             var spp_id = $('.spp_id').val();
+            // reset list
+            list_items = [];
+            drawTable();
 
-            console.log(spp_id);
             if (supplier_id !== '') {
                 getDetailSPP();
             } else {
