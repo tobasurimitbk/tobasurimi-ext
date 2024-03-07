@@ -230,9 +230,9 @@
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
             serverSide: true,
-            ordering: true,
+            // ordering: true,
             order: [
-                [1, 'asc']
+                // [1, 'asc']
             ],
             fixedHeader: true,
             lengthMenu: [
@@ -261,7 +261,6 @@
             columns: [{
                     data: "no",
                     className: "text-center",
-                    sortable: false,
                     width: "5%"
                 }, {
                     data: "kelompok_barang",
@@ -278,22 +277,18 @@
                 {
                     data: "satuan",
                     className: "text-center",
-                    sortable: false,
                 },
                 {
                     data: "satuan2",
                     className: "text-center",
-                    sortable: false,
                 },
                 {
                     data: "satuan3",
                     className: "text-center",
-                    sortable: false,
                 },
                 {
                     data: "akun_coa", // Assuming "akun_coa" is the field name in your data source
                     className: "text-center",
-                    sortable: false,
                     render: function(data, type, row) {
                         // If "akun_coa" exists and is not empty, display a checkbox
                         if (data && data !== "") {
@@ -305,9 +300,10 @@
                 }
             ],
             columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
+                targets: [0, 4, 5, 6, 7],
+                sortable: false,
+                orderable: false,
+            }, ],
             language: {
                 emptyTable: "Master Data Bahan Baku Masih Kosong",
                 lengthMenu: "Show _MENU_ entries",
