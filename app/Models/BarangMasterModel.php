@@ -80,7 +80,7 @@ class BarangMasterModel extends Model
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['filter_coa']) {
             $barangDataQry->groupStart();
         }
 
@@ -90,6 +90,10 @@ class BarangMasterModel extends Model
 
         if ($addCondition['search']) {
             $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $barangDataQry->orLike('parent_barang.parent_name', $addCondition['search']);
         }
 
 
@@ -105,7 +109,7 @@ class BarangMasterModel extends Model
             $barangDataQry->where('account_barang.ap_id !=', NULL);
         }
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['filter_coa']) {
             $barangDataQry->groupEnd();
         }
 
