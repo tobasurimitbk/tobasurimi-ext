@@ -22,7 +22,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : $today; ?>" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Pembuatan Dokumen">
+                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : date("d/m/Y"); ?>" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Pembuatan Dokumen">
                             <label for="floatingInput">Tanggal Pembuatan Dokumen</label>
                         </div>
                     </div>
