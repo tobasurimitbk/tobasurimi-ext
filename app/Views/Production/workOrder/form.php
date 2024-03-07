@@ -52,7 +52,7 @@
                             <select class="form-select department_id" name="department_id" id="department_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                    <option value="<?= $dataDivisi->id ?>"><?= $dataDivisi->divisi ?></option>
+                                    <option value="<?= $dataDivisi->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->divisi_id == $dataDivisi->id ? "selected" : "" : ""; ?>><?= $dataDivisi->divisi ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Department</label>
@@ -62,13 +62,18 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select warehouse_id" name="warehouse_id" id="warehouse_id" disabled>
                                 <option value=""></option>
+                                <?php if (!empty($dataWorkOrders)) : ?>
+                                    <?php foreach ($dataWarehouse ?? [] as $dataWarehouse) : ?>
+                                        <option value="<?= $dataWarehouse->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->warehouse_id == $dataWarehouse->id ? "selected" : "" : ""; ?>><?= $dataWarehouse->warehouse_name ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');">
+                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->standart_production : ""; ?>" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');">
                             <label for="floatingInput">Jumlah Standart Produksi</label>
                         </div>
                     </div>

@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\SatuansModel;
+use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
 
@@ -17,6 +18,7 @@ class WorkOrder extends BaseController
     protected $satuanModel;
     protected $workOrdersModel;
     protected $workOrderDetailsModel;
+    protected $warehousesModel;
     protected $divisiModel;
 
     public function __construct()
@@ -27,6 +29,7 @@ class WorkOrder extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->workOrdersModel = new WorkOrdersModel();
         $this->workOrderDetailsModel = new WorkOrderDetailsModel();
+        $this->warehousesModel = new WarehousesModel();
         $this->divisiModel = new DivisisModel();
     }
 
@@ -43,12 +46,14 @@ class WorkOrder extends BaseController
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
 
+        $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
         $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
 
         $data = [
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
+            "dataWarehouse" => $dataWarehouse,
         ];
 
         return view('Production/workOrder/form', $data);
@@ -56,18 +61,21 @@ class WorkOrder extends BaseController
 
     public function getById($id = null)
     {
+        $id = decrypt($id);
         //Get Barang
         $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
 
+        $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
         $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
 
         $data = [
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
+            "dataWarehouse" => $dataWarehouse,
         ];
 
         if (!empty($id)) {
@@ -114,7 +122,7 @@ class WorkOrder extends BaseController
         foreach ($workOrdersData['data'] as $data) {
             array_push($dataWorkOrders, [
                 "no"                    => $no++,
-                "id"                    => $data->id,
+                "id"                    => encrypt($data->id),
                 "wo_no"                 => $data->wo_no,
                 "nama_barang"           => $data->nama_barang,
                 "nama_divisi"           => $data->divisi,
