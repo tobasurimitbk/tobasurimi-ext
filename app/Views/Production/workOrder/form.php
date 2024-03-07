@@ -22,7 +22,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Pembuatan Dokumen">
+                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : $today; ?>" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Pembuatan Dokumen">
                             <label for="floatingInput">Tanggal Pembuatan Dokumen</label>
                         </div>
                     </div>
@@ -30,10 +30,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : ""; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi">
+                                    <input <?= !empty($dataWorkOrders) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : ""; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi">
                                     <label for="floatingInput">Kode Produksi</label>
                                 </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($dataWorkOrders) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -710,8 +710,8 @@
                 row += '<td>' + item.nama_satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
                 row += '<td>' + item.keterangan + '</td>';
-                <?php if (!empty($dataSPP)) : ?>
-                    <?php if ($dataSPP->is_posted == '0') : ?>
+                <?php if (!empty($dataWorkOrders)) : ?>
+                    <?php if ($dataWorkOrders->is_posted == '0') : ?>
                         row += '<td>' + `
                     <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -743,6 +743,24 @@
         }
         drawTable();
     }
+
+    // Update
+    <?php if (!empty($dataWorkOrders)) : ?>
+        <?php foreach ($dataWorkOrderDetails as $i => $d) : ?>
+            list_items.push({
+                'barang_detail_id': getID(),
+                'barang_id': "<?= encrypt($d->barang1_id) ?>",
+                'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
+                'kode_barang': "<?= $d->kode_barang ?>",
+                'nama_barang': "<?= $d->nama_barang ?>",
+                'nama_satuan': "<?= $d->nama_satuan ?>",
+                'satuan_id': "<?= $d->unit ?>",
+                'qty': "<?= $d->qty ?>",
+                'keterangan': "<?= $d->note ?>"
+            });
+        <?php endforeach; ?>
+        drawTable();
+    <?php endif; ?>
 </script>
 
 <?= $this->endSection(); ?>

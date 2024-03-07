@@ -62,14 +62,24 @@ class WorkOrder extends BaseController
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
 
+        $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
+
         $data = [
             "dataBarang" => $dataBarang,
-            "dataSatuan" => $dataSatuan
+            "dataSatuan" => $dataSatuan,
+            "dataDivisi" => $dataDivisi,
         ];
 
         if (!empty($id)) {
             $dataWorkOrders = $this->workOrdersModel->asObject()->find($id);
+            $dataWorkOrderDetails = $this->workOrderDetailsModel->asObject()->select('work_order_details.*, barang_master.kode_barang, satuans.nama_satuan')
+                ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = work_order_details.barang2_id', 'left')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->where('work_order_id', $id)
+                ->get()->getResult();
             $data["dataWorkOrders"] = $dataWorkOrders;
+            $data["dataWorkOrderDetails"] = $dataWorkOrderDetails;
         }
 
         return view('Production/workOrder/form', $data);
