@@ -190,4 +190,14 @@ class DivisisModel extends Model
             ->orderBy('divisi', "ASC")
             ->findAll();
     }
+
+    public function getDivisiExcept($divisi_id)
+    {
+        return $this->asArray()->where('deletedAt', null)
+            ->whereNotIn('id', [$divisi_id])
+            ->whereIn('id', session()->get('login')->this_access_divisi_id)
+            ->where('company_id', session()->get('login')->this_company_id)
+            ->orderBy('divisi', "ASC")
+            ->findAll();
+    }
 }

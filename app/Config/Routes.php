@@ -738,7 +738,19 @@ $routes->get('/stock-adjusment/id/(:segment)', 'Inventori\StokAdjusment::detail/
 $routes->get('/stock-adjusment/all', 'Inventori\StokAdjusment::all', ['filter' => 'Auth']);
 
 // MUTASI
-
+$routes->get('/mutasi', 'Inventori\Mutasi::index', ['filter' => 'Auth']);
+$routes->get('/mutasi/create', 'Inventori\Mutasi::create', ['filter' => 'Auth']);
+$routes->get('/mutasi/list-divisi-except', 'Inventori\Mutasi::listDivisiExcept', ['filter' => 'Auth']);
+$routes->get('/mutasi/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/mutasi/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/mutasi/get-mutasi-no', 'Inventori\Mutasi::getMutasiNo', ['filter' => 'Auth']);
+$routes->get('/mutasi/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->post('/mutasi/save', 'Inventori\Mutasi::createAction', ['filter' => 'Auth']);
+$routes->post('/mutasi/update', 'Inventori\Mutasi::updateAction', ['filter' => 'Auth']);
+$routes->post('/mutasi/delete', 'Inventori\Mutasi::delete', ['filter' => 'Auth']);
+$routes->post('/mutasi/posting', 'Inventori\Mutasi::posting', ['filter' => 'Auth']);
+$routes->get('/mutasi/id/(:segment)', 'Inventori\Mutasi::detail/$1', ['filter' => 'Auth']);
+$routes->get('/mutasi/all', 'Inventori\Mutasi::all', ['filter' => 'Auth']);
 // PENERIMAAN MUTASI
 
 // PENERIMAAN BARANG LOKAL BP

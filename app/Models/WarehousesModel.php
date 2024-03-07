@@ -96,4 +96,23 @@ class WarehousesModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getDokumenMutasiBarang($warehouse_asal_id, $warehouse_tujuan_id)
+    {
+        $metaDataModel = new MetadataModel();
+
+        $warehouseAsal = $this->asArray()->where('deletedAt', null)
+            ->where('id', $warehouse_asal_id)
+            ->first();
+
+        $warehouseTujuan = $this->asArray()->where('deletedAt', null)
+            ->where('id', $warehouse_tujuan_id)
+            ->first();
+
+        if ($warehouseAsal['kawasan_id'] == $warehouseTujuan['kawasan_id']) {
+            return $metaDataModel->where('value', 'PPP-KB')->where('name', 'jenis_dok_aju')->first()['id'];
+        } else {
+            return $metaDataModel->where('value', 'BC 2.7')->where('name', 'jenis_dok_aju')->first()['id'];
+        }
+    }
 }

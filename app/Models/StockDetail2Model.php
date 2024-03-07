@@ -233,6 +233,7 @@ class StockDetail2Model extends Model
             stock_details2.bc_id,
             stock_details2.stock_detail_id,
             stock_details2.no_aju,
+            stock_details2.stock_id,
             (SUM(CASE WHEN stock_details.status = "In" 
             THEN stock_details2.qty ELSE 0 END) - 
             SUM(CASE WHEN stock_details.status = "Out" 
@@ -247,6 +248,35 @@ class StockDetail2Model extends Model
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')
             ->findAll();
+
+        return $dataQry;
+    }
+
+    public function getStockListDetail($stockID, $bcID, $noAju)
+    {
+
+        $selectQry = '
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            stock_details2.stock_id,
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,        
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->where('stock_details2.stock_id', $stockID)
+            ->where('stock_details2.bc_id', $bcID)
+            ->where('stock_details2.no_aju', $noAju)
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.no_aju')
+            ->first();
 
         return $dataQry;
     }

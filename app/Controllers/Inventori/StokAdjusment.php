@@ -5,8 +5,13 @@ namespace App\Controllers\Inventori;
 use App\Controllers\BaseController;
 use App\Models\AdjusmentDetailModel;
 use App\Models\AdjusmentModel;
+use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSalesSpesifikasiModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
+use App\Models\KemasanModel;
 use App\Models\MetadataModel;
+use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
@@ -26,6 +31,10 @@ class StokAdjusment extends BaseController
     protected $adjusmentDetailModel;
     protected $warehouseModel;
     protected $userModel;
+    protected $barangMaster;
+    protected $barangMasterSpesifikasiModel;
+    protected $kemasanModel;
+    protected $satuanModel;
 
     public function __construct()
     {
@@ -40,6 +49,10 @@ class StokAdjusment extends BaseController
         $this->adjusmentDetailModel = new AdjusmentDetailModel();
         $this->warehouseModel = new WarehousesModel();
         $this->userModel = new UserModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $this->satuanModel = new SatuansModel();
+        $this->kemasanModel = new KemasanModel();
+        $this->barangMaster = new BarangMasterModel();
     }
 
     public function index()
@@ -354,19 +367,38 @@ class StokAdjusment extends BaseController
 
     public function getListStockByStockID()
     {
-        $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
-            $this->request->getVar('stock_id')
-        );
-        for ($i = 0; $i < count($dataResult); $i++) {
-            $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-            $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "" : $dataResult[$i]['no_aju'];
-            $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+        if (!empty($this->request->getVar('stock_id'))) {
+            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
+                $this->request->getVar('stock_id')
+            );
+            $stock = $this->stockModel->find($this->request->getVar('stock_id'));
+            if ($stock['kemasan_id'] == 0) {
+                $barangMaster = $this->barangMaster->find($stock['barang1_id']);
+                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+            } else {
+                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+                $barangName = $kemasan['name'];
+            }
+            for ($i = 0; $i < count($dataResult); $i++) {
+                $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
+                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+                $dataResult[$i]['barang'] = strtoupper($barangName);
+                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+                $dataResult[$i]['stok_total'] = number_format($dataResult[$i]['stok_total']);
+            }
+            return response()->setJSON([
+                'data' => $dataResult,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
         }
-        return response()->setJSON([
-            'data' => $dataResult,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
     }
 
     public function getAdjusmentNo()
