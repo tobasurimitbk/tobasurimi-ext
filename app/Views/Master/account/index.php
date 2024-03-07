@@ -1032,6 +1032,7 @@
 
         $(".btn-show-form-sub").click(function() {
             $(".id_sub").val("");
+            $(".header_id_sub").val("").change();
 
             $(".title-name-sub").text("Tambah");
 
@@ -1054,7 +1055,7 @@
             //         })
             //     }
             // })
-            $('.header_id_sub').select2(select2header_id_sub);
+            // $('.header_id_sub').select2(select2header_id_sub);
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
