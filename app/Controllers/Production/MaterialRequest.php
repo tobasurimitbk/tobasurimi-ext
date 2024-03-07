@@ -10,7 +10,7 @@ use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
 
-class WorkOrder extends BaseController
+class MaterialRequest extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -35,7 +35,7 @@ class WorkOrder extends BaseController
 
     public function index()
     {
-        return view('Production/workOrder/index');
+        return view('Production/materialRequest/index');
     }
 
     public function createView()
@@ -56,7 +56,7 @@ class WorkOrder extends BaseController
             "dataWarehouse" => $dataWarehouse,
         ];
 
-        return view('Production/workOrder/form', $data);
+        return view('Production/materialRequest/form', $data);
     }
 
     public function getById($id = null)
@@ -90,7 +90,7 @@ class WorkOrder extends BaseController
             $data["dataWorkOrderDetails"] = $dataWorkOrderDetails;
         }
 
-        return view('Production/workOrder/form', $data);
+        return view('Production/materialRequest/form', $data);
     }
 
     public function all()
@@ -152,7 +152,6 @@ class WorkOrder extends BaseController
                 "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
-                'warehouse_id' => $this->request->getVar("warehouse_id"),
                 "request_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
                 'standart_production' => $this->request->getVar('standart_production'),
                 'note' => $this->request->getVar('note'),
@@ -268,18 +267,5 @@ class WorkOrder extends BaseController
             echo json_encode($data);
         }
         return;
-    }
-
-    public function deleteWO()
-    {
-        $id = decrypt($this->request->getVar('id'));
-        $this->workOrdersModel->delete($id);
-        $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
-
-        return response()->setJSON([
-            'message' => "Work Order Berhasil Dihapus",
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
     }
 }

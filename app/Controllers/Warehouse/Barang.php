@@ -187,7 +187,7 @@ class Barang extends BaseController
                     //     $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key]));
                     // } else {
                     $harga_pokok = 0.0;
-                    // }
+                    // } 
                     // if (isset($_POST['harga_jual'][$key])) {
                     //     $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key]));
                     // } else {
@@ -215,7 +215,7 @@ class Barang extends BaseController
                     // } else {
                     $harga_jual = 0.0;
                     // }
-                    $result[] = array(
+                    $result = [
                         'barang_master_id' => $id,
                         'spesifikasi' => $value->spesifikasi,
                         'satuan_1' => $value->satuan_1,
@@ -225,10 +225,10 @@ class Barang extends BaseController
                         'konversi_satuan_3' => $value->konversi_satuan_3,
                         'harga_pokok' => $harga_pokok,
                         'harga_jual' => $harga_jual,
-                    );
+                    ];
+                    $barangSpesifikasiModel->insert($result);
                 }
             }
-            $barangSpesifikasiModel->insertBatch($result);
         }
 
         return response()->setJSON([

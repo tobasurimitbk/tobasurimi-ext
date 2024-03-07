@@ -61,8 +61,6 @@ class BarangMasterModel extends Model
             'kelompok_barang'   => 'parent_barang.parent_name',
             'kode_barang'       => 'barang_master.kode_barang',
             'barang_name'       => 'barang_master.barang_name',
-            'satuan'            => 'satuans.nama_satuan',
-            'stok'              => 'barang_master.stok',
             'createdAt'         => 'barang_master.createdAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];

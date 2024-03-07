@@ -37,10 +37,10 @@
                                 <th onclick="changeSort('kelompok_barang')" class="sort">Kategori</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
-                                <th class="sort">Satuan 1</th>
-                                <th class="sort">Satuan 2</th>
-                                <th class="sort">Satuan 3</th>
-                                <th class="sort">Akun COA</th>
+                                <th data-sortable="false">Satuan 1</th>
+                                <th data-sortable="false">Satuan 2</th>
+                                <th data-sortable="false">Satuan 3</th>
+                                <th data-sortable="false">Akun COA</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -192,16 +192,16 @@
                         <div class="row">
                             <div class="table-responsive">
                                 <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th scope="col">No</th>
-                                            <th scope="col">Spesifikasi</th>
-                                            <th scope="col">Satuan 1</th>
-                                            <th scope="col">Satuan 2</th>
-                                            <th scope="col">Satuan 3</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
+                                    <!-- <thead class="thead-dark"> -->
+                                    <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col">Spesifikasi</th>
+                                        <th scope="col">Satuan 1</th>
+                                        <th scope="col">Satuan 2</th>
+                                        <th scope="col">Satuan 3</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                    <!-- </thead> -->
                                     <tbody class="body-detail-table" id="body-detail-table" id="tbody2" style="cursor: pointer;">
                                     </tbody>
                                 </table>
@@ -222,10 +222,10 @@
 <script>
     let sort = "nomor";
     let sortType = "desc";
+    const csrfToken = '<?= csrf_token() ?>';
 
     let list_items = [];
     $(document).ready(function() {
-        const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
@@ -330,6 +330,8 @@
             $('.title-name').text("Tambah Bahan Baku");
             $(".create-form :input:not([name='type'])").val('');
             $('select[name="parent_type_id"]').val(null).change();
+            list_items.splice(0, list_items.length);
+            drawTable();
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
@@ -886,13 +888,13 @@
         let satuan3_text = $("#satuan3_id option:selected").text(); // Mendapatkan teks dari opsi yang dipilih
         let konversi_satuan_3 = $("#konversi_satuan_3").val();
         let spek_id = $("#spek_id").val();
+        let spesifikasi_id = $("#spesifikasi_id").val();
 
         if ($(".create-form").valid()) {
             if ($(".spek-form").valid()) {
                 if (spek_id) {
                     $.each(list_items, function(i, v) {
                         if (v.spek_id === spek_id) {
-                            list_items[i].spesifikasi_id = "";
                             list_items[i].spesifikasi = spek;
                             list_items[i].satuan_1 = satuan1_id;
                             list_items[i].satuan_1_text = satuan1_text;
@@ -939,6 +941,7 @@
         $.each(list_items, function(i, v) {
             if (v.spek_id === spek_id) {
                 $("#spek_id").val(v.spek_id);
+                $("#spesifikasi_id").val(v.id);
                 $("#spek").val(v.spesifikasi);
                 $("#satuan1_id").val(v.satuan_1).change();
                 $("#satuan2_id").val(v.satuan_2).change();
@@ -973,7 +976,7 @@
                 row += '<td>' + `
                     <button class="btn btn-warning edit-table-detail" data-spek_id="${item.spek_id}">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.spek_id}')">
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.spek_id}', '${item.spesifikasi_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>` +
                     '</td>';
@@ -1004,10 +1007,62 @@
         $("#satuan3_id").val('').val(null).change()
         $("#konversi_satuan_3").val('');
     }
-    const deleteRowDetail = function(id) {
-        const indexToRemove = list_items.findIndex(item => item.spek_id === id);
-        if (indexToRemove !== -1) {
-            list_items.splice(indexToRemove, 1);
+    const deleteRowDetail = function(id, spesifikasi_id) {
+        if (spesifikasi_id) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data Spesifikasi?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("barang-master/delete-spek"); ?>",
+                        data: {
+                            id: spesifikasi_id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $('.dataTable').DataTable().ajax.reload();
+                                        $(".add-modal").modal("hide")
+                                    });
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    });
+                }
+            })
+        } else {
+            const indexToRemove = list_items.findIndex(item => item.spek_id === id);
+            if (indexToRemove !== -1) {
+                list_items.splice(indexToRemove, 1);
+            }
         }
         drawTable();
     }

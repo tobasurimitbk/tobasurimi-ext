@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Rencana Produksi</h1>
+        <h1>Material Request</h1>
 
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -112,13 +112,12 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
                     return `
                         <div class="mt-0">
                             <button class="btn btn-primary">
                                 <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button class="btn btn-danger" onclick="remove('${id}')" >
+                            <button class="btn btn-danger">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -165,51 +164,6 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
-    }
-
-    const remove = function(id, tipe) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Yakin akan di hapus?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("work-order/delete"); ?>",
-                    data: {
-                        id: id,
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        }
-                    },
-                });
-            }
-        })
     }
 </script>
 <?= $this->endSection(); ?>

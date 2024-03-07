@@ -19,6 +19,7 @@ class WorkOrdersModel extends Model
         'wo_no',
         'company_id',
         'divisi_id',
+        'warehouse_id',
         'request_date',
         'standart_production',
         'note',
