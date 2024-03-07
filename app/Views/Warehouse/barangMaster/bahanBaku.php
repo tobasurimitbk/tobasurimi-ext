@@ -177,7 +177,7 @@
                     </div>
                 </form>
                 <div class="row">
-                    <div class="col-md-12" style="font-size: 12px;">
+                    <div class="col-md-12 mt-1" style="font-size: 12px;">
                         Note : <br>
                         <ul>
                             <li style="height: 15px;">PCS, Lusin 12 PCS, Dus 24 PCS</li>
@@ -332,6 +332,7 @@
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
             $('#generate_new_code').prop('checked', true).change().show();
+            resetFormDetail();
             $('.add-modal').modal('show');
         });
 
