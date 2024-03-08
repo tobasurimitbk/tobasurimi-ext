@@ -60,6 +60,7 @@ class SppModel extends Model
             'divisi'            => 'divisis.divisi',
             'company'            => 'companies.company',
             'requestDate'      => 'purchase_requests.request_date',
+            'is_posted' => 'purchase_requests.is_posted'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

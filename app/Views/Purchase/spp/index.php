@@ -63,7 +63,7 @@
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th>Jumlah Order</th>
                                 <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
-                                <th>Status</th>
+                                <th onclick="changeSort('is_posted')">Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -151,14 +151,10 @@
             {
                 data: "request_date",
                 className: "text-center",
-                sortable: true,
-                orderable: true,
             },
             {
                 data: "status",
                 className: "text-center",
-                sortable: false,
-                orderable: false,
             },
             {
                 data: "id",
