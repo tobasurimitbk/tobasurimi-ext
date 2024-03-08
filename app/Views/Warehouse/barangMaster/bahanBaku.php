@@ -177,7 +177,7 @@
                     </div>
                 </form>
                 <div class="row">
-                    <div class="col-md-12" style="font-size: 12px;">
+                    <div class="col-md-12 mt-1" style="font-size: 12px;">
                         Note : <br>
                         <ul>
                             <li style="height: 15px;">PCS, Lusin 12 PCS, Dus 24 PCS</li>
@@ -192,16 +192,16 @@
                         <div class="row">
                             <div class="table-responsive">
                                 <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
-                                    <!-- <thead class="thead-dark"> -->
-                                    <tr>
-                                        <th scope="col">No</th>
-                                        <th scope="col">Spesifikasi</th>
-                                        <th scope="col">Satuan 1</th>
-                                        <th scope="col">Satuan 2</th>
-                                        <th scope="col">Satuan 3</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                    <!-- </thead> -->
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th scope="col">No</th>
+                                            <th scope="col">Spesifikasi</th>
+                                            <th scope="col">Satuan 1</th>
+                                            <th scope="col">Satuan 2</th>
+                                            <th scope="col">Satuan 3</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
                                     <tbody class="body-detail-table" id="body-detail-table" id="tbody2" style="cursor: pointer;">
                                     </tbody>
                                 </table>
@@ -332,6 +332,7 @@
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
             $('#generate_new_code').prop('checked', true).change().show();
+            resetFormDetail();
             $('.add-modal').modal('show');
         });
 
