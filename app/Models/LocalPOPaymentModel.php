@@ -282,7 +282,7 @@ class LocalPOPaymentModel extends Model
         $poAll = [];
 
         foreach ($lpb as $l) {
-            $poarr = \json_decode(json_decode($l['multiple_po_id']));
+            $poarr = \json_decode(($l['multiple_po_id']));
             foreach ($poarr as $p) {
                 $poAll[] = $p;
             }
