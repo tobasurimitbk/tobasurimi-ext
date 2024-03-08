@@ -155,7 +155,7 @@
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                                <option value=""></option>
+                                <option value="">Pilih Dokumen Pabean</option>
                                 <?php foreach ($dataAJU as $aju) : ?>
                                     <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
                                 <?php endforeach; ?>
@@ -295,7 +295,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control jml_diterima_lpb" id="jml_diterima_lpb" name="jml_diterima_lpb" placeholder="Qty Diterima LPB ini">
+                                <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control jml_diterima_lpb" id="jml_diterima_lpb" name="jml_diterima_lpb" placeholder="Qty Diterima LPB ini">
                                 <label for="floatingInput">Qty Diterima Saat ini</label>
                             </div>
                         </div>
@@ -364,7 +364,7 @@
     $('.multiple_po_id').select2({
         placeholder: "Pilih Nomor PO",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {
         let arr = $('.multiple_po_id').val();
         $.ajax({
@@ -505,11 +505,11 @@
         $('.detail-modal').modal('hide');
     })
 
-    $('.aju_document_type').select2({
-        placeholder: "Pilih Dokumen Bea Cukai",
-        theme: "bootstrap-5",
-        allowClear: true
-    });
+    // $('.aju_document_type').select2({
+    //     placeholder: "Pilih Dokumen Bea Cukai",
+    //     theme: "bootstrap-5",
+    //     allowClear: true
+    // });
 
     $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id')
         .parent('div')
@@ -823,63 +823,91 @@
         }
     });
 
+    function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        var parsedValue = parseFloat(numericValue);
+        if (!isNaN(parsedValue) && parsedValue >= 0) {
+            inputElement.value = numericValue;
+        } else {
+            inputElement.value = '';
+        }
+    }
 
     function drawTable(listData) {
         const table = $('#dataTable');
         table.find('tbody').empty();
-        var no = 1;
-        var jmlDiterimaLPBTotal = 0;
-        var jmlDiterimaTotal = 0;
-        var sisaTotal = 0;
-        var subTotal = 0;
-        $.each(listData.result, function(i, v) {
+
+        if (listData.result.length == 0) {
+            table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td>').text(no++));
-            newRow.append($('<td>').text(v.kode_barang));
-            newRow.append($('<td>').text(v.nama_barang));
-            newRow.append($('<td>').text(v.po_no));
-            newRow.append($('<td>').text(v.satuan));
-            newRow.append($('<td>').text(v.jml_order));
-            newRow.append($('<td>').text(v.jml_diterima_lpb));
-            newRow.append($('<td>').text(v.jml_diterima_total));
-            newRow.append($('<td>').text(v.sisa_total));
-            newRow.append($('<td>').text(formatRupiah(parseInt(v.harga) || 0)));
-            newRow.append($('<td>').text(formatRupiah(parseInt(v.sub_total) || 0)));
-            newRow.append($('<td>').text(v.keterangan));
-            newRow.append($('<td>').html(
-                <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
-                    <?php else : ?> `
+            newRow.append($('<td></td>'));
+            newRow.append($('<td></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>0.0</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>0.0</b></td>'));
+            newRow.append($('<td></td>'));
+            newRow.append($('<td></td>'));
+            table.find('tfoot').append(newRow);
+        } else {
+            var no = 1;
+            var jmlDiterimaLPBTotal = 0;
+            var jmlDiterimaTotal = 0;
+            var sisaTotal = 0;
+            var subTotal = 0;
+            $.each(listData.result, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td>').text(no++));
+                newRow.append($('<td>').text(v.kode_barang));
+                newRow.append($('<td>').text(v.nama_barang));
+                newRow.append($('<td>').text(v.po_no));
+                newRow.append($('<td>').text(v.satuan));
+                newRow.append($('<td>').text(v.jml_order));
+                newRow.append($('<td>').text(v.jml_diterima_lpb));
+                newRow.append($('<td>').text(v.jml_diterima_total));
+                newRow.append($('<td>').text(v.sisa_total));
+                newRow.append($('<td>').text(formatRupiah(parseInt(v.harga) || 0)));
+                newRow.append($('<td>').text(formatRupiah(parseInt(v.sub_total) || 0)));
+                newRow.append($('<td>').text(v.keterangan));
+                newRow.append($('<td>').html(
+                    <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
+                        <?php else : ?> `
                 <button class="btn btn-warning posting-spp mr-1" onclick="editModal('${v.am_purchase_order_id}', '${v.am_purchase_order_details_id}')">
                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                 </button>
                 `
-                    <?php endif; ?> <?php else : ?> `
+                        <?php endif; ?> <?php else : ?> `
                 <button class="btn btn-warning posting-spp mr-1" onclick="editModal('${v.am_purchase_order_id}', '${v.am_purchase_order_details_id}')">
                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                 </button>
                 `
-                <?php endif; ?>
-            ));
-            table.find('tbody').append(newRow);
-            jmlDiterimaLPBTotal += Number(v.jml_diterima_lpb) || 0;
-            jmlDiterimaTotal += Number(v.jml_diterima_total) || 0;
-            sisaTotal += Number(v.sisa_total) || 0;
-            subTotal += Number(v.sub_total) || 0;
-        });
-        table.find('tfoot').empty();
-        var newRow = $('<tr>');
-        newRow.append($('<td></td>'));
-        newRow.append($('<td></td>'));
-        newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + listData.jml_order_total + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + sisaTotal + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(listData.harga_per_barang_total) || 0) + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal) || 0) + '</b></td>'));
-        newRow.append($('<td></td>'));
-        newRow.append($('<td></td>'));
-        table.find('tfoot').append(newRow);
+                    <?php endif; ?>
+                ));
+                table.find('tbody').append(newRow);
+                jmlDiterimaLPBTotal += Number(v.jml_diterima_lpb) || 0;
+                jmlDiterimaTotal += Number(v.jml_diterima_total) || 0;
+                sisaTotal += Number(v.sisa_total) || 0;
+                subTotal += Number(v.sub_total) || 0;
+            });
+            table.find('tfoot').empty();
+            var newRow = $('<tr>');
+            newRow.append($('<td></td>'));
+            newRow.append($('<td></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + listData.jml_order_total + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + sisaTotal + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(listData.harga_per_barang_total) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal) || 0) + '</b></td>'));
+            newRow.append($('<td></td>'));
+            newRow.append($('<td></td>'));
+            table.find('tfoot').append(newRow);
+        }
     }
 
     function editModal(am_purchase_order_id, am_purchase_order_details_id) {

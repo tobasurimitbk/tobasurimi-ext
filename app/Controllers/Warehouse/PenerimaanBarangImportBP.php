@@ -254,7 +254,7 @@ class PenerimaanBarangImportBP extends BaseController
             return redirect()->to('penerimaan-barang-import-bp');
         }
 
-        $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
+        $dataAJU = $this->metadataModel->getBCUsed("po_import_bp");
         $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataSatuan = $this->satuanModel->asObject()->find();
@@ -278,6 +278,14 @@ class PenerimaanBarangImportBP extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $barangs = $this->request->getVar('barangs');
+
+        if (count(json_decode($barangs)) == 0) {
+            return response()->setJSON([
+                'message' => "Gagal Update: List barang tidak ditemukan",
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
 
         $this->penerimaanBarangModel->update($id, [
             'company_id' => $this->this_company_id,
@@ -608,6 +616,12 @@ class PenerimaanBarangImportBP extends BaseController
     {
         $penerimaanBarangID = empty($this->request->getVar('penerimaan_barang_id')) ? null : decrypt($this->request->getVar('penerimaan_barang_id'));
         $amPurchaseOrderID = json_decode($this->request->getVar('am_purchase_order_id'));
+
+        if (count($amPurchaseOrderID) == 0) {
+            return response()->setJSON([
+                'result' => []
+            ]);
+        }
 
         return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, $penerimaanBarangID));
     }
