@@ -143,7 +143,7 @@ class POLokalBahanBaku extends BaseController
 
             $data["dataSpesifikasi"] = $this->SupplierHargaModel->getSupplierHarga($dataBBLokal->supplier_id, $dataBBLokal->barang_id);
             $data["dataSPP"] = $this->sppModel->find($dataBBLokal->purchase_request_id);
-            $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $dataBBLokal->divisi_id)->where('deletedAt', null)->findAll();
+            $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $dataBBLokal->divisi_id)->where('spp_type', "Lokal BB")->where('deletedAt', null)->findAll();
             $data["dataBarang"] = $dataBarang;
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;

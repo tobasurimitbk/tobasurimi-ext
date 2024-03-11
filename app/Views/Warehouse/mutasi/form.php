@@ -648,7 +648,7 @@
 
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
-        var numericValue = inputValue.replace(/[^0-9]/g, '');
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
         if (parseFloat(numericValue) <= 0) {
             inputElement.value = 0;
         } else {

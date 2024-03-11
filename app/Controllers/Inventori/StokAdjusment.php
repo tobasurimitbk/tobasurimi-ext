@@ -401,6 +401,42 @@ class StokAdjusment extends BaseController
         }
     }
 
+    public function handleStockMinusAdjusment()
+    {
+        $stockID = $this->request->getVar('stock_id');
+        $qty = $this->request->getVar('qty');
+        $bcID = $this->request->getVar('bc_id');
+        $noAju = empty($this->request->getVar('no_aju')) ? "-" : $this->request->getVar('no_aju');
+        $operasi = $this->request->getVar('operasi');
+
+        if ($operasi == "PLUS") {
+            return response()->setJSON([
+                'message' => "Stok valid",
+                'status' => true
+            ]);
+        }
+
+        $stockListDetail = $this->stockDetail2Model->getStockListDetail(
+            $stockID,
+            $bcID,
+            $noAju
+        );
+
+        $result = $stockListDetail['stok_total'] - $qty;
+
+        if ($result < 0) {
+            return response()->setJSON([
+                'message' => "Stok tidak valid: adjusment ini akan menghasilkan nilai stok minus, silahkan coba dengan qty adjusment lain",
+                'status' => false
+            ]);
+        } else {
+            return response()->setJSON([
+                'message' => "Stok valid",
+                'status' => true
+            ]);
+        }
+    }
+
     public function getAdjusmentNo()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));

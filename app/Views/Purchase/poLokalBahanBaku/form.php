@@ -232,14 +232,14 @@
                     <div class="col-md-4">
                         <div class="form-floating form-lpb" style="height: 50px;">
                             <select class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
-                                <option value=""></option>
+                                <option value="">Pilih Dokumen Pabean</option>
                                 <?php foreach ($dataBCType as $aju) : ?>
                                     <option value="<?= $aju["id"]; ?>" <?= (!empty($dataPOLokal) ? ($aju["id"] === $dataPOLokal->bc_type ? "selected" : "") : ""); ?>><?= $aju["value"]; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
                         </div>
-                        <small class="mb-3"><i>Kosongkan jika PO tidak memerlukan dokumen pabean</i></small>
+                        <small class="mb-3 form-lpb"><i>Kosongkan jika PO tidak memerlukan dokumen pabean</i></small>
                     </div>
                 </div>
                 <div class="row">
@@ -586,10 +586,10 @@
         });
 
         // BC Type
-        $('.bc_type').select2({
-            placeholder: "Pilih Dokumen Pabean",
-            theme: "bootstrap-5"
-        })
+        // $('.bc_type').select2({
+        //     placeholder: "Pilih Dokumen Pabean",
+        //     theme: "bootstrap-5"
+        // })
 
         // JENIS KEMASAN
         $('.kemasan_id').select2({
@@ -604,8 +604,10 @@
         }).change(function() {
             var supplier_id = $('.supplier_id').val();
             var spp_id = $('.spp_id').val();
+            // reset list
+            list_items = [];
+            drawTable();
 
-            console.log(spp_id);
             if (supplier_id !== '') {
                 getDetailSPP();
             } else {
@@ -978,7 +980,7 @@
                                                     })
                                                     .then(() => {
                                                         window.open('<?= base_url("po-lokal-bahan-baku/print") ?>/' + response.id, "_blank")
-                                                        window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
+                                                        window.location.href = "<?= base_url("po-lokal-bahan-baku/id"); ?>/" + response.id;
                                                     })
                                             } else {
                                                 Swal.fire({

@@ -164,11 +164,16 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input disabled placeholder="Stok Warehouse" class="form-control stok_warehouse" id="stok_warehouse" name="stok_warehouse" aria-label="Floating label select example" />
+                                <label for="floatingInput" style="z-index: 1;">Stok Warehouse</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-floating" style="height: 50px;">
                                 <input placeholder="Qty" class="form-control qty" id="qty" name="qty" aria-label="Floating label select example" />
-                                <label for="floatingInput" style="z-index: 1;">Qty</label>
+                                <label for="floatingInput" style="z-index: 1;">Qty Adjusment</label>
                             </div>
-                            <small class=" mb-3"><i id="text-qty-warehouse"> </i></small>
                         </div>
                     </div>
                 </form>
@@ -229,8 +234,6 @@
     var qtyTotal = 0;
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-
-    $('#text-qty-warehouse').hide();
 
     <?php if (!empty($adjusment)) : ?>
         <?php if ($adjusment['status_posting']) : ?>
@@ -326,9 +329,9 @@
     }).change(function() {
         var selected = $('#bc_id option:selected');
         var satuan_name = $('#satuan_name').val();
+        var stock = selected.data('stock') == undefined ? "" : selected.data('stock');
         // $('#qty').val(selected.data('stock'));
-        $('#text-qty-warehouse').show();
-        $('#text-qty-warehouse').text('Stok di Warehouse : ' + selected.data('stock') + ' ' + satuan_name);
+        $('.stok_warehouse').val(stock + ' ' + satuan_name);
     });
 
     $('#operasi').select2({
@@ -567,38 +570,8 @@
     // SUBMIT DETAIL
     $('.btn-submit-detail').click(function() {
         if ($('.detail-form').valid()) {
+            handleMinusAdjusment();
 
-            var id_detail = $('#id_detail').val();
-            var id = $('#bc_id option:selected').val();
-
-            if (id_detail) {
-                // UPDATE
-                updateList(id_detail);
-            } else {
-                // INSERT
-                var is_add = false;
-                for (var i = 0; i < listStock.length; i++) {
-                    if (listStock[i].id == id) {
-                        item = listStock[i];
-                        is_add = true;
-                        break;
-                    }
-                }
-
-                if (is_add) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Barang sudah ada',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true,
-                        confirmButtonText: 'Oke',
-                    })
-                } else {
-                    insertList();
-                    resetFormDetail()
-                }
-            }
         }
     });
 
@@ -904,6 +877,7 @@
                 $(".bc_id").empty()
                 $(".bc_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
+                    item.no_aju = (item.no_aju == "-") ? "" : item.no_aju;
                     $(".bc_id").append(`<option data-stock="${item.stok_total}" data-bc_id="${item.bc_id}" data-no_aju="${item.no_aju}" data-dokumen="${'('+item.bc_type+') '+item.no_aju}"  value="${item.id}">(${item.bc_type}) ${item.no_aju}</option>`)
                 })
             }
@@ -938,6 +912,69 @@
         });
     }
 
+    function handleMinusAdjusment() {
+        $.ajax({
+            url: `<?= base_url('stock-adjusment/handle-minus-adjusment'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
+                qty: $(".qty").val(),
+                bc_id: $(".bc_id option:selected").data('bc_id'),
+                no_aju: $(".bc_id option:selected").data('no_aju'),
+                operasi: $('#operasi').val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    var id_detail = $('#id_detail').val();
+                    var id = $('#bc_id option:selected').val();
+
+                    if (id_detail) {
+                        // UPDATE
+                        updateList(id_detail);
+                    } else {
+                        // INSERT
+                        var is_add = false;
+                        for (var i = 0; i < listStock.length; i++) {
+                            if (listStock[i].id == id) {
+                                item = listStock[i];
+                                is_add = true;
+                                break;
+                            }
+                        }
+
+                        if (is_add) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Barang sudah ada',
+                                confirmButtonColor: '#4e73df',
+                                cancelButtonColor: '#d33',
+                                reverseButtons: true,
+                                confirmButtonText: 'Oke',
+                            })
+                        } else {
+                            insertList();
+                            resetFormDetail()
+                        }
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                    $('#qty').val(null).change()
+                }
+            }
+        });
+    }
+
     function resetFormDetail() {
         $('#id_detail').val(null);
         $('#type_barang').val(null).change();
@@ -947,7 +984,8 @@
         $('#no_aju').val(null).change();
         $('#operasi').val(null).change();
         $('#qty').val(null);
-        $('#text-qty-warehouse').hide();
+        $('#stok_warehouse').val(null);
+        validatorDetail.resetForm();
     }
 
     function changeStatus() {
