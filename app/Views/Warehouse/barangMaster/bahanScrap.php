@@ -4,7 +4,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Bahan Scrap</h1>
-        <button class="btn btn-show-form btn-add float-right">
+        <button class="btn btn-show-form btn-add btn-add-barang float-right">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
     </div>
@@ -33,12 +33,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('barang_master.kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('barang_master.barang_name')" class="sort">Nama Barang</th>
-                                <th class="sort">Satuan 1</th>
-                                <th class="sort">Satuan 2</th>
-                                <th class="sort">Satuan 3</th>
-                                <th class="sort">Akun COA</th>
+                                <th onclick="changeSort('kelompok_barang')" class="sort">Kategori</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
+                                <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
+                                <th data-sortable="false">Satuan 1</th>
+                                <th data-sortable="false">Satuan 2</th>
+                                <th data-sortable="false">Satuan 3</th>
+                                <th data-sortable="false">Akun COA</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -50,7 +51,7 @@
     </div>
 </section>
 
-<div class="modal add-modal" id="add_modal" tabindex="-1">
+<div class="modal add-modal m-t-bahan-baku" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
@@ -95,112 +96,118 @@
                             </div>
                         </div>
                     </div>
+                </form>
+                <form class="spek-form" role="form">
+                    <div class="col-subtitle-modal">
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold modal-sub-title">Tambah Spesifikasi</label>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-add float-right" onclick="resetFormDetail()" style="background: orange;">
+                                    <i class="fa fa-refresh fa-sm mr-2" aria-hidden="true"></i>Reset
+                                </button>
+                                <button type="button" class="btn btn-add float-right mr-1 title-detail-name" onclick="submitSpekForm()">
+                                    <i class="title-detail-icon fa fa-plus fa-sm mr-2" aria-hidden="true"></i><span class="btn-text">Tambah</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input autocomplete="one-time-code" type="hidden" class="spek_id" name="spek_id" id="spek_id" />
                     <div class="row">
-                        <div class="col-md-12" style="font-size: 12px;">
-                            Note : <br>
-                            <ul>
-                                <li style="height: 15px;">PCS, Lusin 12 PCS, Dus 24 PCS</li>
-                                <li style="height: 15px;">Satuan 1 adalah satuan terkecil</li>
-                                <li style="height: 15px;">Satuan 2 harus lebih besar daripada satuan 1</li>
-                                <li style="height: 15px;">Saturan 3 harus lebih besar dari satuan 2</li>
-                            </ul>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control" name="spek" id="spek">
+                                <label for="floatingInput">Spesifikasi</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <select class="form-select" name="satuan1_id" id="satuan1_id" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText()">
+                                    <option value=""></option>
+                                    <?php foreach ($satuanBarang as $sb) : ?>
+                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Satuan 1</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="row">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th scope="col" style="width: 1%;">No</th>
-                                                <th scope="col" colspan="3" style="width: 89%;">Spesifikasi</th>
-                                                <th scope="col" style="width: 10%;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="body-table" id="tbody2" style="cursor: pointer;">
-                                            <tr>
-                                                <td rowspan="2" style="padding:0px!important;text-align:center;">
-                                                    <span id="nomber">1</span>
-                                                </td>
-                                                <td colspan="3" style="padding:0px!important;">
-                                                    <input type="text" name="spek[]" id="spek" class="form-control">
-                                                </td>
-                                                <td rowspan="2" style="padding:0px!important;text-align:center;">
-                                                    <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
-                                                    <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 15%;">
-                                                    <div class="row">
-                                                        <div class="col-sm-12" style="padding:0px!important;">
-                                                            <div class="form-floating">
-                                                                <select class="form-select" name="satuan1_id[]" id="satuan1_id" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText()">
-                                                                    <option value=""></option>
-                                                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                                                    <?php endforeach; ?>
-                                                                </select>
-                                                                <label for="floatingInput">Satuan 1</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td style="width: 30%;">
-                                                    <div class="row">
-                                                        <div class="col-sm-6" style="padding:0px!important;">
-                                                            <div class="form-floating">
-                                                                <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2()">
-                                                                    <option value=""></option>
-                                                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                                                    <?php endforeach; ?>
-                                                                </select>
-                                                                <label for="floatingInput">Satuan 2</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6" style="padding:0px!important;">
-                                                            <div class="input-group ">
-                                                                <input type="text" name="konversi_satuan_2[]" onchange="checkValueKonversi()" id="konversi_satuan_2" class="form-control" onkeypress="return isNumberKey(event)">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text satuan1">-</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td style="width: 30%;">
-                                                    <div class="row">
-                                                        <div class="col-sm-6" style="padding:0px!important;">
-                                                            <div class="form-floating">
-                                                                <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3()">
-                                                                    <option value=""></option>
-                                                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                                                    <?php endforeach; ?>
-                                                                </select>
-                                                                <label for="floatingInput">Satuan 3</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6" style="padding:0px!important;">
-                                                            <div class="input-group ">
-                                                                <input type="text" name="konversi_satuan_3[]" onchange="checkValueKonversi()" id="konversi_satuan_3" class="form-control" onkeypress="return isNumberKey(event)">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text satuan1">-</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <div class="col-sm-3">
+                            <div class="form-floating">
+                                <select class="form-select" name="satuan2_id" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2()">
+                                    <option value=""></option>
+                                    <?php foreach ($satuanBarang as $sb) : ?>
+                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Satuan 2</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group ">
+                                <input type="text" name="konversi_satuan_2" onchange="checkValueKonversi()" id="konversi_satuan_2" class="form-control" onkeypress="return isNumberKey(event)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text satuan1">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-floating">
+                                <select class="form-select" name="satuan3_id" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3()">
+                                    <option value=""></option>
+                                    <?php foreach ($satuanBarang as $sb) : ?>
+                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Satuan 3</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group ">
+                                <input type="text" name="konversi_satuan_3" onchange="checkValueKonversi()" id="konversi_satuan_3" class="form-control" onkeypress="return isNumberKey(event)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text satuan1">-</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
+                <div class="row">
+                    <div class="col-md-12 mt-1" style="font-size: 12px;">
+                        Note : <br>
+                        <ul>
+                            <li style="height: 15px;">PCS, Lusin 12 PCS, Dus 24 PCS</li>
+                            <li style="height: 15px;">Satuan 1 adalah satuan terkecil</li>
+                            <li style="height: 15px;">Satuan 2 harus lebih besar daripada satuan 1</li>
+                            <li style="height: 15px;">Saturan 3 harus lebih besar dari satuan 2</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th scope="col">No</th>
+                                            <th scope="col">Spesifikasi</th>
+                                            <th scope="col">Satuan 1</th>
+                                            <th scope="col">Satuan 2</th>
+                                            <th scope="col">Satuan 3</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body-detail-table" id="body-detail-table" id="tbody2" style="cursor: pointer;">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
@@ -214,15 +221,17 @@
 <script>
     let sort = "nomor";
     let sortType = "desc";
+    const csrfToken = '<?= csrf_token() ?>';
+
+    let list_items = [];
     $(document).ready(function() {
-        const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
             serverSide: true,
-            ordering: true,
+            // ordering: true,
             order: [
-                [1, 'asc']
+                // [1, 'asc']
             ],
             fixedHeader: true,
             lengthMenu: [
@@ -251,8 +260,10 @@
             columns: [{
                     data: "no",
                     className: "text-center",
-                    sortable: false,
                     width: "5%"
+                }, {
+                    data: "kelompok_barang",
+                    className: "text-center",
                 },
                 {
                     data: "kode_barang",
@@ -265,17 +276,14 @@
                 {
                     data: "satuan",
                     className: "text-center",
-                    sortable: false,
                 },
                 {
                     data: "satuan2",
                     className: "text-center",
-                    sortable: false,
                 },
                 {
                     data: "satuan3",
                     className: "text-center",
-                    sortable: false,
                 },
                 {
                     data: "akun_coa", // Assuming "akun_coa" is the field name in your data source
@@ -289,12 +297,12 @@
                         }
                     }
                 }
-
             ],
             columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
+                targets: [0, 4, 5, 6, 7],
+                sortable: false,
+                orderable: false,
+            }, ],
             language: {
                 emptyTable: "Master Data Bahan Scrap Masih Kosong",
                 lengthMenu: "Show _MENU_ entries",
@@ -313,167 +321,22 @@
             table.ajax.reload();
         });
 
-        $('.btn-add').click(function() {
+        $('.btn-add-barang').click(function() {
             $('.title-name').text("Tambah Bahan Scrap");
             $(".create-form :input:not([name='type'])").val('');
             $('select[name="parent_type_id"]').val(null).change();
+            list_items.splice(0, list_items.length);
+            drawTable();
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
             $('#generate_new_code').prop('checked', true).change().show();
+            resetFormDetail();
             $('.add-modal').modal('show');
-            $('#tbody2').empty();
-            var table = document.getElementById('tbody2');
-            var row = table.insertRow();
-            var row2 = table.insertRow();
-
-            // Create cells with appropriate colspan
-            row.innerHTML = `
-                <td rowspan="2" style="padding:0px!important;text-align:center;">
-                    <span id="nomber">1</span>
-                </td>
-                <td colspan="3">
-                    <div class="row">
-                        <div class="col-sm-12" style="padding:0px!important;">
-                            <div class="form-floating">
-                                <input type="text" name="spek[]" id="spek" class="form-control">
-                                <label for="floatingInput">Spesifikasi</label>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td rowspan="2" style="padding:0px!important;text-align:center;">
-                    <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
-                    <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-                </td>`;
-            row2.innerHTML = `
-                <td style="width: 15%;">
-                    <div class="row">
-                        <div class="col-sm-12" style="padding:0px!important;">
-                            <div class="form-floating">
-                                <select class="form-select" name="satuan1_id[]" id="satuan1_id" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText()">
-                                    <option value=""></option>
-                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Satuan 1</label>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td style="width: 30%;">
-                    <div class="row">
-                        <div class="col-sm-6" style="padding:0px!important;">
-                            <div class="form-floating">
-                                <select class="form-select" name="satuan2_id[]" id="satuan2_id" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2()">
-                                    <option value=""></option>
-                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Satuan 2</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6" style="padding:0px!important;">
-                            <div class="input-group ">
-                                <input type="text" name="konversi_satuan_2[]" onchange="checkValueKonversi()" id="konversi_satuan_2" class="form-control" onkeypress="return isNumberKey(event)">
-                                <div class="input-group-append">
-                                    <span class="input-group-text satuan1">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td style="width: 30%;">
-                    <div class="row">
-                        <div class="col-sm-6" style="padding:0px!important;">
-                            <div class="form-floating">
-                                <select class="form-select" name="satuan3_id[]" id="satuan3_id" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3()">
-                                    <option value=""></option>
-                                    <?php foreach ($satuanBarang as $sb) : ?>
-                                        <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Satuan 3</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6" style="padding:0px!important;">
-                            <div class="input-group ">
-                                <input type="text" name="konversi_satuan_3[]" onchange="checkValueKonversi()" id="konversi_satuan_3" class="form-control" onkeypress="return isNumberKey(event)">
-                                <div class="input-group-append">
-                                    <span class="input-group-text satuan1">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </td>`;
-            changeSpanText();
-            $("#satuan1_id, #satuan2_id, #satuan3_id")
-                .parent('div')
-                .find('label')
-                .css('z-index', '1');
-            $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
-                theme: "bootstrap-5",
-                allowClear: true,
-                placeholder: 'Pilih Satuan',
-                dropdownParent: $(".add-modal .modal-content")
-            });
         });
 
         $('.btn-discard').click(function() {
             $('.add-modal').modal('hide');
-        });
-
-        var validator = $(".create-form").validate({
-            rules: {
-                parent_type_id: {
-                    required: true
-                },
-                barang_name: {
-                    required: true
-                },
-                kode_barang: {
-                    required: true
-                },
-                'satuan1_id[]': {
-                    required: true
-                }
-            },
-            messages: {
-                parent_type_id: {
-                    required: "Kategori Barang Wajib Diisi"
-                },
-                barang_name: {
-                    required: "Nama Barang Wajib Diisi"
-                },
-                kode_barang: {
-                    required: "Kode Barang Wajib Diisi"
-                },
-                'satuan1_id[]': {
-                    required: "Satuan 1 Wajib Diisi"
-                }
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
         });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
@@ -494,9 +357,9 @@
                 success: function(res) {
                     $('.delete-btn').show();
                     $('.title-name').text("Update Bahan Scrap");
-                    <?php if (!can('Master Barang', 'Barang Scrap', 'u')) : ?>
-                        $('.btn-submit-form').hide();
-                    <?php endif; ?>
+                    // <?php if (!can('Master Barang', 'Bahan Scrap', 'u')) : ?>
+                    //     $('.btn-submit-form').hide();
+                    // <?php endif; ?>
                     $('input[name="kode_barang"]').attr('readonly', true);
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
@@ -504,184 +367,146 @@
                     $('input[name="barang_name"]').val(res.data.barang_name);
                     $('input[name="id"]').val(res.data.id);
 
+
                     // Iterate through dataSpekDetail and append rows to the table
                     if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
-                        // Clear existing rows from the table
-                        $('#tbody2').empty();
-                        var counter = 1;
+                        list_items.splice(0, list_items.length);
                         res.dataSpekDetail.forEach(function(item) {
-                            // Get the ID of satuan1 for the current item
-                            var satuan1Id = item.satuan_1;
-                            var satuan2Id = item.satuan_2;
-                            var satuan3Id = item.satuan_3;
-                            var newRow = '<tr>' +
-                                '<td rowspan="2" style="padding:0px!important;text-align:center;"><span id="nomber">' + counter + '</span></td>' +
-                                '<td colspan="3"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><input type="text" name="spek_old[]" id="spek" class="form-control"  value="' + item.spesifikasi + '"><input type="hidden" name="id_spek[]" id="id_spek_' + counter + '" value="' + item.id + '"><label for="floatingInput">Spesifikasi</label></div></div></div></td>' +
-                                '<td rowspan="2" style="padding:0px!important;text-align:center;"><button type="button" class="btn btn-primary" onclick="addRow(\'tbody2\')"><i class="fas fa-plus"></i></button>' +
-                                '<button type="button" class="btn btn-danger" onclick="deleteRow(\'tbody2\',' + counter + ')"><i class="far fa-trash-alt"></i></button></td>' +
-                                '</tr>' +
-                                '<tr>' +
-                                '<td style="width: 15%;"><div class="row"><div class="col-sm-12" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan1_id_old[]" id="satuan1_id_' + counter + '" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText(' + counter + ')"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 1</label></div></div></div></td>' +
-                                '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan2_id_old[]" id="satuan2_id_' + counter + '" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2(' + counter + ')"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 2</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_2_old[]" id="konversi_satuan_2_' + counter + '" onchange="checkValueKonversi(' + counter + ')" onkeypress="return isNumberKey(event)" class="form-control" value="' + item.konversi_satuan_2 + '"><div class="input-group-append"><span class="input-group-text satuan_' + counter + '">-</span></div></div></div></div></td>' +
-                                '<td style="width: 30%;"><div class="row"><div class="col-sm-6" style="padding:0px!important;"><div class="form-floating"><select class="form-select" name="satuan3_id_old[]" id="satuan3_id_' + counter + '" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3(' + counter + ')"><option value=""></option><?php foreach ($satuanBarang as $sb) : ?><option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option><?php endforeach; ?></select><label for="floatingInput">Satuan 3</label></div></div><div class="col-sm-6" style="padding:0px!important;"><div class="input-group "><input type="text" name="konversi_satuan_3_old[]" id="konversi_satuan_3_' + counter + '" onchange="checkValueKonversi(' + counter + ')" onkeypress="return isNumberKey(event)" class="form-control" value="' + item.konversi_satuan_3 + '"><div class="input-group-append"><span class="input-group-text satuan_' + counter + '">-</span></div></div></div></div></td>' +
-                                '</tr>';
-                            $('#tbody2').append(newRow);
-                            $(`#satuan1_id_${counter} option`).each(function() {
-                                if ($(this).val() == satuan1Id) {
-                                    $(this).prop('selected', true);
-                                    changeSpanText(counter);
-                                }
+                            list_items.push({
+                                'spek_id': getID(),
+                                'spesifikasi_id': item.id,
+                                'spesifikasi': item.spesifikasi,
+                                'satuan_1': item.satuan_1,
+                                'satuan_1_text': item.satuan1_text,
+                                'satuan_2': item.satuan_2,
+                                'satuan_2_text': item.satuan2_text,
+                                'konversi_satuan_2': item.konversi_satuan_2,
+                                'satuan_3': item.satuan_3,
+                                'satuan_3_text': item.satuan3_text,
+                                'konversi_satuan_3': item.konversi_satuan_3
                             });
-                            $(`#satuan2_id_${counter} option`).each(function() {
-                                if ($(this).val() == satuan2Id) {
-                                    $(this).prop('selected', true);
-                                }
-                            });
-                            $(`#satuan3_id_${counter} option`).each(function() {
-                                if ($(this).val() == satuan3Id) {
-                                    $(this).prop('selected', true);
-                                }
-                            });
-                            $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-                                .parent('div')
-                                .children('span')
-                                .children('span')
-                                .children('span')
-                                .css('height', ' calc(3.5rem + 2px)');
-
-                            $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-                                .parent('div')
-                                .children('span')
-                                .children('span')
-                                .children('span')
-                                .children('span')
-                                .css('margin-top', '22px').css('margin-left', '-7px');
-
-                            $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-                                .parent('div')
-                                .find('label')
-                                .css('z-index', '1');
-
-                            $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
-                                theme: "bootstrap-5",
-                                allowClear: true,
-                                placeholder: 'Pilih Satuan',
-                                dropdownParent: $(".add-modal .modal-content")
-                            });
-                            counter++;
+                            resetFormDetail();
+                            drawTable();
                         });
                     }
-
                     $('.add-modal').modal('show');
                 }
             })
         })
         $('.btn-submit-form').click(function(e) {
             e.preventDefault();
-            if ($(".create-form").valid()) {
+            if (list_items.length === 0) {
                 Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
+                    icon: 'error',
+                    title: 'Masukkan Spesifikasi Barang Dahulu',
                     confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let id = $('input[name="id"]').val();
-                        let csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.querySelector(".create-form"));
+                });
+            } else {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let id = $('input[name="id"]').val();
+                            let csrf = $(`[name="${csrfToken}"]`);
+                            let data = new FormData(document.querySelector(".create-form"));
+                            data.append("items", JSON.stringify(list_items));
 
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("barang-master/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
+                            if (id) {
+                                $.ajax({
+                                    url: "<?= base_url("barang-master/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    table.ajax.reload();
+                                                    $(".add-modal").modal("hide");
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload();
-                                                $(".add-modal").modal("hide");
-                                            })
-                                    } else {
+                                            }).then(() => {
+
+                                            });
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
-                                        }).then(() => {
-
-                                        });
+                                        })
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        } else {
-                            $.ajax({
-                                url: "<?= base_url("barang-master/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
+                                });
+                            } else {
+                                $.ajax({
+                                    url: "<?= base_url("barang-master/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    table.ajax.reload();
+                                                    $(".add-modal").modal("hide");
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload();
-                                                $(".add-modal").modal("hide");
-                                            })
-                                    } else {
+                                            }).then(() => {
+
+                                            });
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
-                                        }).then(() => {
-
-                                        });
+                                        })
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
+                                });
+                            }
                         }
-                    }
-                })
-
+                    })
+                }
             }
         });
         $(".delete-btn").click(function() {
@@ -737,6 +562,91 @@
             })
         });
     });
+
+    var validator_spek = $(".spek-form").validate({
+        rules: {
+            spek: {
+                required: true
+            },
+            satuan1_id: {
+                required: true
+            }
+        },
+        messages: {
+            spek: {
+                required: "Spesifikasi wajib diisi"
+            },
+            satuan1_id: {
+                required: "Satuan 1 wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    var validator = $(".create-form").validate({
+        rules: {
+            parent_type_id: {
+                required: true
+            },
+            barang_name: {
+                required: true
+            },
+            kode_barang: {
+                required: true
+            }
+        },
+        messages: {
+            parent_type_id: {
+                required: "Kategori Barang Wajib Diisi"
+            },
+            barang_name: {
+                required: "Nama Barang Wajib Diisi"
+            },
+            kode_barang: {
+                required: "Kode Barang Wajib Diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
 
     function changeSpanText(counter = null) {
         var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
@@ -936,227 +846,6 @@
         }
     }
 
-    var counter = 2; // Counter variable for rowspan
-
-    function addRow(tableID) {
-        var table = document.getElementById(tableID);
-        var row = table.insertRow();
-        var row2 = table.insertRow();
-
-        // Create cells with appropriate colspan
-        row.innerHTML = `
-    <td rowspan="2" style="padding:0px!important;text-align:center;">
-        <span id="nomber">${counter}</span>
-    </td>
-    <td colspan="3">
-        <div class="row">
-            <div class="col-sm-12" style="padding:0px!important;">
-                <div class="form-floating">
-                    <input type="text" name="spek[]" id="spek" class="form-control">
-                    <label for="floatingInput">Spesifikasi</label>
-                </div>
-            </div>
-        </div>
-    </td>
-    <td rowspan="2" style="padding:0px!important;text-align:center;">
-        <button type="button" class="btn btn-primary" onclick="addRow('tbody2')"><i class="fas fa-plus"></i></button>
-        <button type="button" class="btn btn-danger" onclick="deleteRow('tbody2')"><i class="far fa-trash-alt"></i></button>
-    </td>`;
-        row2.innerHTML = `
-    <td style="width: 15%;">
-        <div class="row">
-            <div class="col-sm-12" style="padding:0px!important;">
-                <div class="form-floating">
-                    <select class="form-select" name="satuan1_id[]" id="satuan1_id_${counter}" title="Satuan terkecil dari produk. Cth: PCS" onchange="changeSpanText(${counter})">
-                        <option value=""></option>
-                        <?php foreach ($satuanBarang as $sb) : ?>
-                            <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="floatingInput">Satuan 1</label>
-                </div>
-            </div>
-        </div>
-    </td>
-    <td style="width: 30%;">
-        <div class="row">
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="form-floating">
-                    <select class="form-select" name="satuan2_id[]" id="satuan2_id_${counter}" title="Satuan yang lebih besar dari Satuan 1. Cth: LUSIN (12 Pcs)" onchange="checkSatuan2(${counter})">
-                        <option value=""></option>
-                        <?php foreach ($satuanBarang as $sb) : ?>
-                            <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="floatingInput">Satuan 2</label>
-                </div>
-            </div>
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="input-group ">
-                    <input type="text" name="konversi_satuan_2[]" id="konversi_satuan_2_${counter}" onchange="checkValueKonversi(${counter})" class="form-control" onkeypress="return isNumberKey(event)">
-                    <div class="input-group-append">
-                        <span class="input-group-text satuan_${counter}">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </td>
-    <td style="width: 30%;">
-        <div class="row">
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="form-floating">
-                    <select class="form-select" name="satuan3_id[]" id="satuan3_id_${counter}" title="Satuan terbesar dari produk. Cth: DUS (konversi 48 PCS)" onchange="checkSatuan3(${counter})">
-                        <option value=""></option>
-                        <?php foreach ($satuanBarang as $sb) : ?>
-                            <option value="<?= ($sb['id']); ?>"><?= $sb['kode_satuan'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="floatingInput">Satuan 3</label>
-                </div>
-            </div>
-            <div class="col-sm-6" style="padding:0px!important;">
-                <div class="input-group ">
-                    <input type="text" name="konversi_satuan_3[]" id="konversi_satuan_3_${counter}" onchange="checkValueKonversi(${counter})" class="form-control" onkeypress="return isNumberKey(event)">
-                    <div class="input-group-append">
-                        <span class="input-group-text satuan_${counter}">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </td>`;
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`)
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        $(`#satuan_id_${counter}, #satuan1_id_${counter}, #satuan2_id_${counter}, #satuan3_id_${counter}`).select2({
-            theme: "bootstrap-5",
-            allowClear: true,
-            placeholder: 'Pilih Satuan',
-            dropdownParent: $(".add-modal .modal-content")
-        });
-
-        counter++;
-        // rows++;
-    }
-
-    function deleteRow(tableID, counters = null) {
-        try {
-            var table = document.getElementById(tableID);
-            var rowCount = table.rows.length;
-            let csrfToken = '<?= csrf_token() ?>';
-
-            // Variable to track whether any checkbox is checked
-            var isChecked = false;
-
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                var chkbox = row.cells[0].childNodes[0];
-
-                if (null != chkbox && true == chkbox.checked) {
-                    isChecked = true;
-                    table.deleteRow(i);
-                    table.deleteRow(i - 1); // Remove the previous row as well
-                    rowCount -= 2; // Reduce rowCount by 2
-                    i--;
-                }
-            }
-
-            // If no checkbox is checked, remove the last two rows
-            if (!isChecked && rowCount > 2) {
-                if (counters) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Hapus Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Hapus',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            let idSpek = document.getElementById('id_spek_' + counters).value;
-                            setLoading()
-                            $.ajax({
-                                url: "<?= base_url("barang-master/delete-spek"); ?>",
-                                data: {
-                                    id: idSpek
-                                },
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                $('.dataTable').DataTable().ajax.reload()
-                                                $("#add_modal").modal("hide")
-                                            });
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        }
-                    })
-
-                } else {
-                    table.deleteRow(rowCount - 1);
-                    table.deleteRow(rowCount - 2);
-                    rowCount -= 2;
-                }
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Baris terakhir tidak boleh dihapus!!!',
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-            // Reset counter based on the remaining rows
-            // counter = rowCount > 1 ? currentCount : 2;
-            // Get the last row in the table
-            var lastRow = table.rows[rowCount - 2];
-
-            // Update the value of the span with the updated counter value
-            var currentCount = parseInt(lastRow.querySelector('#nomber').innerText);
-            counter = currentCount + 1;
-
-        } catch (e) {
-            alert(e);
-        }
-    }
-
     function generateNewCode() {
         let csrfToken = '<?= csrf_token() ?>';
         let value = document.getElementById('generate_new_code').checked ? true : false;
@@ -1182,6 +871,196 @@
             $("input[name='kode_barang']").attr("readonly", false);
             $("input[name='kode_barang']").val("");
         }
+    }
+
+    const submitSpekForm = function() {
+        let spek = $("#spek").val();
+        let satuan1_id = $("#satuan1_id").val();
+        let satuan1_text = $("#satuan1_id option:selected").text(); // Mendapatkan teks dari opsi yang dipilih
+        let satuan2_id = $("#satuan2_id").val();
+        let satuan2_text = $("#satuan2_id option:selected").text(); // Mendapatkan teks dari opsi yang dipilih
+        let konversi_satuan_2 = $("#konversi_satuan_2").val();
+        let satuan3_id = $("#satuan3_id").val();
+        let satuan3_text = $("#satuan3_id option:selected").text(); // Mendapatkan teks dari opsi yang dipilih
+        let konversi_satuan_3 = $("#konversi_satuan_3").val();
+        let spek_id = $("#spek_id").val();
+        let spesifikasi_id = $("#spesifikasi_id").val();
+
+        if ($(".create-form").valid()) {
+            if ($(".spek-form").valid()) {
+                if (spek_id) {
+                    $.each(list_items, function(i, v) {
+                        if (v.spek_id === spek_id) {
+                            list_items[i].spesifikasi = spek;
+                            list_items[i].satuan_1 = satuan1_id;
+                            list_items[i].satuan_1_text = satuan1_text;
+                            list_items[i].satuan_2 = satuan2_id;
+                            list_items[i].satuan_2_text = satuan2_text;
+                            list_items[i].konversi_satuan_2 = konversi_satuan_2;
+                            list_items[i].satuan_3 = satuan3_id;
+                            list_items[i].satuan_3_text = satuan3_text;
+                            list_items[i].konversi_satuan_3 = konversi_satuan_3;
+                        }
+                    });
+                    resetFormDetail();
+                    drawTable();
+                } else {
+                    list_items.push({
+                        'spek_id': getID(),
+                        'spesifikasi_id': "",
+                        'spesifikasi': spek,
+                        'satuan_1': satuan1_id,
+                        'satuan_1_text': satuan1_text,
+                        'satuan_2': satuan2_id,
+                        'satuan_2_text': satuan2_text,
+                        'konversi_satuan_2': konversi_satuan_2,
+                        'satuan_3': satuan3_id,
+                        'satuan_3_text': satuan3_text,
+                        'konversi_satuan_3': konversi_satuan_3
+                    });
+                    resetFormDetail();
+                    drawTable();
+                }
+            }
+        }
+    }
+
+    $(document).on('click', '.edit-table-detail', function(evt) {
+        resetFormDetail();
+        $(".title-detail-name .btn-text").text("Update");
+        $(".title-detail-icon").removeClass("fa-plus").addClass("fa-exchange");
+
+        validator_spek.resetForm();
+        validator_spek.reset();
+        let spek_id = $(this).data('spek_id');
+
+        $.each(list_items, function(i, v) {
+            if (v.spek_id === spek_id) {
+                $("#spek_id").val(v.spek_id);
+                $("#spesifikasi_id").val(v.id);
+                $("#spek").val(v.spesifikasi);
+                $("#satuan1_id").val(v.satuan_1).change();
+                $("#satuan2_id").val(v.satuan_2).change();
+                $("#konversi_satuan_2").val(v.konversi_satuan_2);
+                $("#satuan3_id").val(v.satuan_3).change();
+                $("#konversi_satuan_3").val(v.konversi_satuan_3);
+            }
+        });
+    });
+
+    const drawTable = function() {
+        $('.body-detail-table').empty();
+        $('.tfoot').empty();
+        var row = '';
+        var no = 1;
+        if (list_items.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                    </tr>
+                `;
+            $('.tfoot').append(row);
+        } else {
+            list_items.map(item => {
+                row += '<tr style="color:whitesmoke;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.spesifikasi + '</td>';
+                row += '<td>' + item.satuan_1_text + '</td>';
+                row += '<td>' + item.satuan_2_text + '(' + item.konversi_satuan_2 + ' ' + item.satuan_1_text + ')</td>';
+                row += '<td>' + item.satuan_3_text + '(' + item.konversi_satuan_3 + ' ' + item.satuan_1_text + ')</td>';
+
+                row += '<td>' + `
+                    <button class="btn btn-warning edit-table-detail" data-spek_id="${item.spek_id}">
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.spek_id}', '${item.spesifikasi_id}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>` +
+                    '</td>';
+
+                no++;
+            });
+            $('.body-detail-table').append(row);
+        }
+    }
+    const getID = function() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    }
+    const resetFormDetail = function() {
+        $(".title-detail-name .btn-text").text("Tambah");
+        $(".title-detail-icon").removeClass("fa-update").addClass("fa-plus");
+        $("#spek_id").val('');
+        $("#spek").val('');
+        $("#satuan1_id").val('').val(null).change()
+        $("#satuan2_id").val('').val(null).change()
+        $("#konversi_satuan_2").val('');
+        $("#satuan3_id").val('').val(null).change()
+        $("#konversi_satuan_3").val('');
+    }
+    const deleteRowDetail = function(id, spesifikasi_id) {
+        if (spesifikasi_id) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data Spesifikasi?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("barang-master/delete-spek"); ?>",
+                        data: {
+                            id: spesifikasi_id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $('.dataTable').DataTable().ajax.reload();
+                                        $(".add-modal").modal("hide")
+                                    });
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    });
+                }
+            })
+        } else {
+            const indexToRemove = list_items.findIndex(item => item.spek_id === id);
+            if (indexToRemove !== -1) {
+                list_items.splice(indexToRemove, 1);
+            }
+        }
+        drawTable();
     }
 </script>
 <script>
@@ -1248,6 +1127,15 @@
         placeholder: 'Pilih Satuan',
         dropdownParent: $(".add-modal .modal-content")
     });
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

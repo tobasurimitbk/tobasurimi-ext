@@ -666,7 +666,7 @@
             spanText = $('.satuan1');
         }
 
-        if (selectedSatuan1Val === selectedSatuan2Val && selectedSatuan1Val !== "") {
+        if (selectedSatuan1Val === selectedSatuan2Val && selectedSatuan1Val !== "" && selectedSatuan2Val !== "") {
             Swal.fire({
                 icon: 'error',
                 title: 'Satuan 2 tidak boleh sama dengan satuan 1',
@@ -680,7 +680,8 @@
                     $('#satuan3_id').val('').change();
                 }
             });
-        } else if (selectedSatuan1Val === selectedSatuan3Val && selectedSatuan1Val !== "") {
+        }
+        if (selectedSatuan1Val === selectedSatuan3Val && selectedSatuan1Val !== "" && selectedSatuan3Val !== "") {
             Swal.fire({
                 icon: 'error',
                 title: 'Satuan 3 tidak boleh sama dengan satuan 1',
@@ -692,7 +693,8 @@
                     $('#satuan3_id').val('').change();
                 }
             });
-        } else if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
+        }
+        if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "" && selectedSatuan3Val !== "") {
             Swal.fire({
                 icon: 'error',
                 title: 'Satuan 3 tidak boleh sama dengan satuan 2',
