@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Mutasi</h1>
+        <h1>Penerimaan Mutasi</h1>
         <?php if (can("Inventori", "Mutasi", "c")) : ?>
-            <a href="<?= base_url('mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+            <a href="<?= base_url('penerimaan-mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -32,13 +32,13 @@
                             <option value="1">POSTED</option>
                             <option value="0">WAITING</option>
                         </select>
-                        <label style="z-index: 1;">Status Mutasi</label>
+                        <label style="z-index: 1;">Status Penerimaan Mutasi</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Mutasi </label>
+                        <input placeholder="" class="form-control search penerimaan_mutasi_no" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Penerimaan Mutasi </label>
                     </div>
                 </div>
             </div>
@@ -47,11 +47,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('no_mutasi')">No Mutasi</th>
-                            <th onclick="changeSort('tanggal')">Tanggal</th>
-                            <th onclick="changeSort('divisis.divisi')">Warehouse Asal</th>
-                            <th onclick="changeSort('divisis.divisi')">Warehouse Tujuan</th>
-                            <th onclick="changeSort('bc_id')">Dokumen Mutasi</th>
+                            <th onclick="changeSort('penerimaan_mutasi_no')">No Penerimaan Mutasi</th>
+                            <th>Nomor Mutasi</th>
+                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal</th>
+                            <th onclick="changeSort('penerimaan_mutasi.warehouse_id')">Warehouse Tujuan</th>
+                            <th onclick="changeSort('penerimaan_mutasi.jenis_mutasi')">Dokumen Mutasi</th>
+                            <th onclick="changeSort('penerimaan_mutasi.bc_no')">Nomor Dokumen Pabean</th>
                             <th>Total Item</th>
                             <th>State</th>
                             <th>Action</th>
@@ -88,12 +89,12 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("mutasi/all"); ?>",
+            url: "<?= base_url("penerimaan-mutasi/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
                 data.status = $(".status").val();
-                data.no_mutasi = $(".no_mutasi").val();
+                data.penerimaan_mutasi_no = $(".penerimaan_mutasi_no").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -111,23 +112,30 @@
                 orderable: false
             },
             {
-                data: "no_mutasi",
-                className: "text-center"
+                data: "penerimaan_mutasi_no",
+                className: "text-center",
+
+            },
+            {
+                data: "multiple_no_mutasi",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
             },
             {
                 data: "tanggal",
                 className: "text-center"
             },
             {
-                data: "warehouse_asal",
+                data: "warehouse_tujuan",
                 className: "text-center",
             },
             {
-                data: "warehouse_tujuan",
+                data: "jenis_mutasi",
                 className: "text-center"
             },
             {
-                data: "dokumen_mutasi",
+                data: "bc_no",
                 className: "text-center"
             },
             {
@@ -142,14 +150,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let state = row?.state;
-                    if (state == '0') {
-                        return '<i class="fa-solid fa-square text-danger"></i>';
-
-                    } else {
-                        return '<i class="fa-solid fa-square text-success"></i>';
-
-                    }
+                    return '<i class="fa-solid fa-square text-danger"></i>';
 
                 }
             }, {
@@ -164,12 +165,17 @@
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Inventori', 'Mutasi', 'a')) : ?>
+                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Inventori', 'Mutasi', 'd')) : ?>
+                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
@@ -178,7 +184,12 @@
                     `
                     } else {
                         return `
-                        -
+                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        
                     `
                     }
 
@@ -229,20 +240,20 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $(".no_mutasi").keyup(function() {
+    $(".penerimaan_mutasi_no").keyup(function() {
         table.ajax.reload();
     })
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("mutasi/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("penerimaan-mutasi/id"); ?>/${data.id}`);
     });
 
 
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Mutasi ?',
+            title: 'Posting Penerimaan Mutasi ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -253,7 +264,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("mutasi/posting"); ?>",
+                    url: "<?= base_url("penerimaan-mutasi/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -292,7 +303,7 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Mutasi ?',
+            title: 'Hapus Penerimaan Mutasi ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -303,7 +314,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("mutasi/delete"); ?>",
+                    url: "<?= base_url("penerimaan-mutasi/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -332,7 +343,9 @@
         })
     }
 
-
+    const print = function(url) {
+        window.open(url, "_blank");
+    }
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

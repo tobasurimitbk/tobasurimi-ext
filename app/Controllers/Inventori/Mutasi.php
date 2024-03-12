@@ -7,6 +7,7 @@ use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\MutasiDetailModel;
 use App\Models\MutasiModel;
+use App\Models\PenerimaanMutasiDetailModel;
 use App\Models\WarehousesModel;
 
 class Mutasi extends BaseController
@@ -18,6 +19,7 @@ class Mutasi extends BaseController
     protected $mutasiModel;
     protected $mutasiDetailModel;
     protected $warehouseModel;
+    protected $penerimaanMutasiDetailModel;
 
     public function __construct()
     {
@@ -28,6 +30,7 @@ class Mutasi extends BaseController
         $this->mutasiModel = new MutasiModel();
         $this->mutasiDetailModel = new MutasiDetailModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
     }
 
 
@@ -89,6 +92,23 @@ class Mutasi extends BaseController
             $warehouseTujuanName = $warehouseTujuan == null ? '-' : $warehouseTujuan['warehouse_name'];
             $warehouseAsalName = $warehouseAsal == null ? '-' : $warehouseAsal['warehouse_name'];
 
+            $penerimaanTotalDetail =   $this->penerimaanMutasiDetailModel
+                ->select('SUM(qty) AS qty_diterima')
+                ->where('mutasi_id', $data->id)
+                ->where('deletedAt', null)
+                ->groupBy('mutasi_id')
+                ->findAll();
+
+            $totalQtyMutasi = $this->mutasiDetailModel
+                ->select('SUM(qty) AS qty_mutasi')
+                ->where('mutasi_id', $data->id)
+                ->where('deletedAt', null)
+                ->groupBy('mutasi_id')
+                ->findAll();
+
+            $totalDiterima = count($penerimaanTotalDetail) == 0 ? 0 : $penerimaanTotalDetail[0]['qty_diterima'];
+            $totalMutasi = count($totalQtyMutasi) == 0 ? 0 : $totalQtyMutasi[0]['qty_mutasi'];
+
             array_push($dataResult, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -97,8 +117,8 @@ class Mutasi extends BaseController
                 "warehouse_asal"        =>  $data->divisi . ' - ' . $warehouseAsalName,
                 "warehouse_tujuan"      => $divisiTujuanName . ' - ' . $warehouseTujuanName,
                 "dokumen_mutasi"        => $dokumenMutasi['value'],
-                "total_item"            => $totalItem . " Barang",
-                "state"                 => '0',
+                "total_item"            => $totalItem,
+                "state"                 => $totalDiterima == $totalMutasi ? '1' : '0',
                 "status_posting"        => $data->status_posting
             ]);
         }
