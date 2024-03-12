@@ -648,7 +648,6 @@
         },
     });
 
-
     function changeSpanText(counter = null) {
         var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
 
@@ -666,45 +665,53 @@
             spanText = $('.satuan1');
         }
 
-        if (selectedSatuan1Val === selectedSatuan2Val && selectedSatuan1Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 2 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan2_id_${counter}`).val('').change();
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan2_id').val('').change();
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan1Val === selectedSatuan3Val && selectedSatuan1Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 2',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
+        if (selectedSatuan1Val && selectedSatuan2Val) {
+            if (selectedSatuan1Val === selectedSatuan2Val) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Satuan 2 tidak boleh sama dengan satuan 1',
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {
+                    if (counter) {
+                        $(`#satuan2_id_${counter}`).val('').change();
+                        $(`#satuan3_id_${counter}`).val('').change();
+                    } else {
+                        $('#satuan2_id').val('').change();
+                        $('#satuan3_id').val('').change();
+                    }
+                });
+            }
+        }
+        if (selectedSatuan1Val && selectedSatuan3Val) {
+            if (selectedSatuan1Val === selectedSatuan3Val) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Satuan 3 tidak boleh sama dengan satuan 1',
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {
+                    if (counter) {
+                        $(`#satuan3_id_${counter}`).val('').change();
+                    } else {
+                        $('#satuan3_id').val('').change();
+                    }
+                });
+            }
+        }
+        if (selectedSatuan2Val && selectedSatuan3Val) {
+            if (selectedSatuan2Val === selectedSatuan3Val) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Satuan 3 tidak boleh sama dengan satuan 2 1',
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {
+                    if (counter) {
 
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
+                        $(`#satuan3_id_${counter}`).val('').change();
+                    } else {
+                        $('#satuan3_id').val('').change();
+                    }
+                });
+            }
         } else {
             if (selectedSatuan1Val == "") {
                 if (counter) {
@@ -740,30 +747,34 @@
             spanText = $('.satuan1');
         }
 
-        if (selectedSatuan2Val === selectedSatuan1Val && selectedSatuan2Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 2 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan2_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan2_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan2Val === selectedSatuan3Val && selectedSatuan2Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 2 tidak boleh sama dengan satuan 3',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan2_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan2_id').val('').change();
-                }
-            });
+        if (selectedSatuan2Val && selectedSatuan1Val) {
+            if (selectedSatuan2Val === selectedSatuan1Val) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Satuan 2 tidak boleh sama dengan satuan 1',
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {
+                    if (counter) {
+                        $(`#satuan2_id_${counter}`).val('').change();
+                    } else {
+                        $('#satuan2_id').val('').change();
+                    }
+                });
+            }
+        } else if (selectedSatuan2Val && selectedSatuan3Val) {
+            if (selectedSatuan2Val === selectedSatuan3Val) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Satuan 2 tidak boleh sama dengan satuan 3',
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {
+                    if (counter) {
+                        $(`#satuan2_id_${counter}`).val('').change();
+                    } else {
+                        $('#satuan2_id').val('').change();
+                    }
+                });
+            }
         } else {
             if (selectedSatuan2Val == "") {
                 if (counter) {
@@ -794,30 +805,34 @@
             spanText = $('.satuan1');
         }
 
-        if (selectedSatuan3Val === selectedSatuan1Val && selectedSatuan3Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 1',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
-        } else if (selectedSatuan3Val === selectedSatuan2Val && selectedSatuan3Val !== "") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Satuan 3 tidak boleh sama dengan satuan 2',
-                confirmButtonColor: '#4e73df',
-            }).then(() => {
-                if (counter) {
-                    $(`#satuan3_id_${counter}`).val('').change();
-                } else {
-                    $('#satuan3_id').val('').change();
-                }
-            });
+        if (selectedSatuan3Val && selectedSatuan1Val) {
+            if (selectedSatuan3Val === selectedSatuan1Val) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Satuan 3 tidak boleh sama dengan satuan 1',
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {
+                    if (counter) {
+                        $(`#satuan3_id_${counter}`).val('').change();
+                    } else {
+                        $('#satuan3_id').val('').change();
+                    }
+                });
+            }
+        } else if (selectedSatuan3Val && selectedSatuan2Val) {
+            if (selectedSatuan3Val === selectedSatuan2Val) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Satuan 3 tidak boleh sama dengan satuan 2 2',
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {
+                    if (counter) {
+                        $(`#satuan3_id_${counter}`).val('').change();
+                    } else {
+                        $('#satuan3_id').val('').change();
+                    }
+                });
+            }
         }
     }
 
@@ -832,7 +847,7 @@
             selectedSatuan3Val = $('#konversi_satuan_3').val();
         }
 
-        if (Number(selectedSatuan3Val) <= Number(selectedSatuan2Val) && selectedSatuan3Val !== "") {
+        if (Number(selectedSatuan3Val) <= Number(selectedSatuan2Val) && selectedSatuan3Val) {
             Swal.fire({
                 icon: 'error',
                 title: 'Satuan 3 harus lebih besar dari satuan 2',
