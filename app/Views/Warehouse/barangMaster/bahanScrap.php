@@ -357,9 +357,9 @@
                 success: function(res) {
                     $('.delete-btn').show();
                     $('.title-name').text("Update Bahan Scrap");
-                    // <?php if (!can('Master Barang', 'Bahan Scrap', 'u')) : ?>
-                    //     $('.btn-submit-form').hide();
-                    // <?php endif; ?>
+                    <?php if (!can('Master Barang', 'Barang Scrap', 'u')) : ?>
+                        $('.btn-submit-form').hide();
+                    <?php endif; ?>
                     $('input[name="kode_barang"]').attr('readonly', true);
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);

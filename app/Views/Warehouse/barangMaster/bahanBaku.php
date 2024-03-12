@@ -648,7 +648,6 @@
         },
     });
 
-
     function changeSpanText(counter = null) {
         var selectedText, selectedSatuan1Val, selectedSatuan2Val, selectedSatuan3Val, spanText;
 
@@ -926,6 +925,7 @@
                 }
             }
         }
+        console.log(list_items);
     }
 
     $(document).on('click', '.edit-table-detail', function(evt) {
