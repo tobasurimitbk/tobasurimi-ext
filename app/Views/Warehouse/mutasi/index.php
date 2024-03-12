@@ -142,7 +142,14 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return '<i class="fa-solid fa-square text-danger"></i>';
+                    let state = row?.state;
+                    if (state == '0') {
+                        return '<i class="fa-solid fa-square text-danger"></i>';
+
+                    } else {
+                        return '<i class="fa-solid fa-square text-success"></i>';
+
+                    }
 
                 }
             }, {
