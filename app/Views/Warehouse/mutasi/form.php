@@ -888,12 +888,12 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                    <input class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                    <input <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                    <button type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
             ));
             table.find('tbody').append(newRow);
