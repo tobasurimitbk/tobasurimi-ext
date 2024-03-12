@@ -114,9 +114,9 @@ class StockModel extends Model
         }
 
         if ($addCondition['search']) {
-            $dataQry->where('barang_master.barang_name', $addCondition['barang_name']);
-            $dataQry->orWhere('barang_master.kode_barang', $addCondition['kode_barang']);
-            $dataQry->orWhere('barang_master_spesifikasi.spesifikasi', $addCondition['spesifikasi']);
+            $dataQry->where('barang_master.barang_name', $addCondition['search']);
+            $dataQry->orWhere('barang_master.kode_barang', $addCondition['search']);
+            $dataQry->orWhere('barang_master_spesifikasi.spesifikasi', $addCondition['search']);
         }
 
         if (
@@ -458,6 +458,11 @@ class StockModel extends Model
                 $this->update($stok['id'], [
                     'qty' => $stok['qty'] + $qtyTotal
                 ]);
+                // REPAIR STOK
+                $detailStok = $this->detailStock($stok['id']);
+                $this->update($stok['id'], [
+                    'qty' => $detailStok['stok']['stokSekarang']
+                ]);
             } else {
                 // KEMASAN
                 $stok =  $this->asArray()
@@ -472,6 +477,11 @@ class StockModel extends Model
                 // UPDATE QTY
                 $this->update($stok['id'], [
                     'qty' => $stok['qty'] + $qtyTotal
+                ]);
+                // REPAIR STOK
+                $detailStok = $this->detailStock($stok['id']);
+                $this->update($stok['id'], [
+                    'qty' => $detailStok['stok']['stokSekarang']
                 ]);
             }
 
