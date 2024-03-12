@@ -79,6 +79,7 @@ class KemasanModel extends Model
         if ($addCondition['search']) {
             $DataQry->like('satuans.kode_satuan', $addCondition['search'])
                 ->orLike('kemasan.name', $addCondition['search'])
+                ->orLike('kemasan.kode', $addCondition['search'])
                 ->orLike('parent_name', $addCondition['search']);
         }
 
