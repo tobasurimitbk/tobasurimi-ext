@@ -165,29 +165,29 @@ class RMPurchaseOrderDetailModel extends Model
 
         foreach ($barangs as $b) {
 
-            $allLPB = $penerimaanBarangDetailModel
-                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
-                ->where('purchase_order_id', $b['rm_purchase_order_id'])
-                ->where('purchase_order_details_id', $b['id'])
-                ->where('deletedAt', null)
-                ->groupBy('purchase_order_id', 'purchase_order_details_id')
-                ->findAll();
-
-            $jmlMasukAll = 0;
-            foreach ($allLPB as $a) {
-                $jmlMasukAll = $a['jmlMasuk'];
-            }
-
-            $firstLPB =  $penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangID)
-                ->where('purchase_order_id', $b['rm_purchase_order_id'])
-                ->where('purchase_order_details_id', $b['id'])
-                ->where('deletedAt', null)
-                ->first();
-
-            $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
-            $sisaDiterima = $b['qty'] - $jmlMasukAll;
-
             if ($penerimaanBarangID == null) {
+                $allLPB = $penerimaanBarangDetailModel
+                    ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                    ->where('purchase_order_id', $b['rm_purchase_order_id'])
+                    ->where('purchase_order_details_id', $b['id'])
+                    ->where('')
+                    ->where('deletedAt', null)
+                    ->groupBy('purchase_order_id', 'purchase_order_details_id')
+                    ->findAll();
+
+                $jmlMasukAll = 0;
+                foreach ($allLPB as $a) {
+                    $jmlMasukAll = $a['jmlMasuk'];
+                }
+
+                $firstLPB =  $penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangID)
+                    ->where('purchase_order_id', $b['rm_purchase_order_id'])
+                    ->where('purchase_order_details_id', $b['id'])
+                    ->where('deletedAt', null)
+                    ->first();
+
+                $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
+                $sisaDiterima = $b['qty'] - $jmlMasukAll;
                 // CREATE
                 if ($sisaDiterima != 0) {
                     $res[] = [
@@ -222,6 +222,28 @@ class RMPurchaseOrderDetailModel extends Model
                     $subTotal += ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price']));
                 }
             } else {
+                $allLPB = $penerimaanBarangDetailModel
+                    ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                    ->where('purchase_order_id', $b['rm_purchase_order_id'])
+                    ->where('purchase_order_details_id', $b['id'])
+                    ->where('penerimaan_barang_id', $penerimaanBarangID)
+                    ->where('deletedAt', null)
+                    ->groupBy('purchase_order_id', 'purchase_order_details_id', 'penerimaan_barang_id')
+                    ->findAll();
+
+                $jmlMasukAll = 0;
+                foreach ($allLPB as $a) {
+                    $jmlMasukAll = $a['jmlMasuk'];
+                }
+
+                $firstLPB =  $penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangID)
+                    ->where('purchase_order_id', $b['rm_purchase_order_id'])
+                    ->where('purchase_order_details_id', $b['id'])
+                    ->where('deletedAt', null)
+                    ->first();
+
+                $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
+                $sisaDiterima = $b['qty'] - $jmlMasukAll;
                 // UPDATE
                 if ($inLPB != 0) {
                     $res[] = [
