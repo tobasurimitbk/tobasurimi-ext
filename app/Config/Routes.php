@@ -753,6 +753,19 @@ $routes->post('/mutasi/posting', 'Inventori\Mutasi::posting', ['filter' => 'Auth
 $routes->get('/mutasi/id/(:segment)', 'Inventori\Mutasi::detail/$1', ['filter' => 'Auth']);
 $routes->get('/mutasi/all', 'Inventori\Mutasi::all', ['filter' => 'Auth']);
 // PENERIMAAN MUTASI
+$routes->get('/penerimaan-mutasi', 'Inventori\PenerimaanMutasi::index', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/create', 'Inventori\PenerimaanMutasi::create', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-warehouse', 'Inventori\PenerimaanMutasi::dropdownListDivisi', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-mutasi', 'Inventori\PenerimaanMutasi::dropdownListNomorMutasi', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-barang', 'Inventori\PenerimaanMutasi::dropdownListBarang', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/save', 'Inventori\PenerimaanMutasi::createAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/update', 'Inventori\PenerimaanMutasi::updateAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/posting', 'Inventori\PenerimaanMutasi::posting', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/delete', 'Inventori\PenerimaanMutasi::delete', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/id/(:segment)', 'Inventori\PenerimaanMutasi::detail/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-no', 'Inventori\PenerimaanMutasi::getPenerimaanMutasiNo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/all', 'Inventori\PenerimaanMutasi::all', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/print/(:segment)', 'Inventori\PenerimaanMutasi::print/$1', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);

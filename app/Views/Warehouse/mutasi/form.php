@@ -469,7 +469,7 @@
             warehouse_tujuan_id: {
                 required: true,
             },
-            keterangan_id: {
+            keterangan: {
                 required: true,
             },
         },
@@ -489,7 +489,7 @@
             warehouse_tujuan_id: {
                 required: "Warehouse tujuan wajib diisi",
             },
-            keterangan_id: {
+            keterangan: {
                 required: "Keterangan wajib diisi",
             },
         },
