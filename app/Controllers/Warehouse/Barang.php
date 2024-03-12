@@ -146,9 +146,9 @@ class Barang extends BaseController
                 'spesifikasi' => $value->spesifikasi,
                 'satuan_1' => $value->satuan_1,
                 'satuan_2' => $value->satuan_2 != "" ? $value->satuan_2 : null,
-                'konversi_satuan_2' => $value->konversi_satuan_2,
+                'konversi_satuan_2' => $value->konversi_satuan_2 ? $value->konversi_satuan_2 : 1,
                 'satuan_3' => $value->satuan_3 != "" ? $value->satuan_3 : null,
-                'konversi_satuan_3' => $value->konversi_satuan_3,
+                'konversi_satuan_3' => $value->konversi_satuan_3 ? $value->konversi_satuan_3 : 1,
                 'harga_pokok' => $harga_pokok,
                 'harga_jual' => $harga_jual,
             );
@@ -182,24 +182,23 @@ class Barang extends BaseController
         if ($spek) {
             foreach ($spek as $key => $value) {
                 if ($value->spesifikasi_id) {
-                    // var_dump($_POST['primer'][$key]);
-                    // if (isset($_POST['harga_pokok'][$key])) {
-                    //     $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key]));
-                    // } else {
-                    $harga_pokok = 0.0;
-                    // } 
-                    // if (isset($_POST['harga_jual'][$key])) {
-                    //     $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key]));
-                    // } else {
-                    $harga_jual = 0.0;
-                    // }
+                    if ($value->harga_pokok) {
+                        $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
+                    } else {
+                        $harga_pokok = 0.0;
+                    }
+                    if ($value->harga_jual) {
+                        $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
+                    } else {
+                        $harga_jual = 0.0;
+                    }
                     $barangSpesifikasiModel->update($value->spesifikasi_id, [
                         'spesifikasi' => $value->spesifikasi,
                         'satuan_1' => $value->satuan_1,
                         'satuan_2' => $value->satuan_2 != "" ? $value->satuan_2 : null,
-                        'konversi_satuan_2' => $value->konversi_satuan_2,
+                        'konversi_satuan_2' => $value->konversi_satuan_2 ? $value->konversi_satuan_2 : 1,
                         'satuan_3' => $value->satuan_3 != "" ? $value->satuan_3 : null,
-                        'konversi_satuan_3' => $value->konversi_satuan_3,
+                        'konversi_satuan_3' => $value->konversi_satuan_3 ? $value->konversi_satuan_3 : 1,
                         'harga_pokok' => $harga_pokok,
                         'harga_jual' => $harga_jual,
                     ]);
