@@ -527,6 +527,27 @@ class Barang extends BaseController
         return;
     }
 
+    public function dropdownBarangTypeWithoutSpec()
+    {
+        $barangModel = new BarangMasterModel();
+
+        $type = $this->request->getGet("type");
+        $dataBarang = $barangModel->getBarangByType($type);
+
+        for ($i = 0; $i < count($dataBarang); $i++) {
+            $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
+            $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
+            $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
+        }
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function getBySupplier($id)
     {
         $barangModel = new BarangMasterModel();

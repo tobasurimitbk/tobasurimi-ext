@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1>Material Request</h1>
 
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
@@ -64,7 +64,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("work-order/all"); ?>",
+            url: "<?= base_url("material-request/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -149,7 +149,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("work-order/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("material-request/id"); ?>/${data.id}`);
         })
     })
 

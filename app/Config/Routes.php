@@ -627,6 +627,7 @@ $routes->get('/barang/dropdown', 'Warehouse\Barang::dropdownBarang', ['filter' =
 $routes->get('/barang/dropdown/parent', 'Warehouse\Barang::dropdownParentBarang', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKategori', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type', 'Warehouse\Barang::dropdownBarangType', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/type-nospec', 'Warehouse\Barang::dropdownBarangTypeWithoutSpec', ['filter' => 'Auth']);
 
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
