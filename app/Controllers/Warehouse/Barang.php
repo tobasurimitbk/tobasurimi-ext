@@ -133,10 +133,11 @@ class Barang extends BaseController
             // var_dump($_POST['primer'][$key]);
             $harga_jual = 0.0;
             $harga_pokok = 0.0;
-            if ($value->harga_pokok) {
+            if (isset($value->harga_pokok) && $value->harga_pokok) {
                 $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
             }
-            if ($value->harga_jual) {
+
+            if (isset($value->harga_jual) && $value->harga_jual) {
                 $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
             }
             $result[] = array(
@@ -182,10 +183,11 @@ class Barang extends BaseController
                 if ($value->spesifikasi_id) {
                     $harga_jual = 0.0;
                     $harga_pokok = 0.0;
-                    if ($value->harga_pokok) {
+                    if (isset($value->harga_pokok) && $value->harga_pokok) {
                         $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
                     }
-                    if ($value->harga_jual) {
+
+                    if (isset($value->harga_jual) && $value->harga_jual) {
                         $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
                     }
                     $barangSpesifikasiModel->update($value->spesifikasi_id, [
