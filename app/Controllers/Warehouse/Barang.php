@@ -201,17 +201,15 @@ class Barang extends BaseController
                         'harga_jual' => $harga_jual,
                     ]);
                 } else {
-                    // var_dump($_POST['primer'][$key]);
-                    // if (isset($_POST['harga_pokok'][$key])) {
-                    //     $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_pokok'][$key]));
-                    // } else {
-                    $harga_pokok = 0.0;
-                    // }
-                    // if (isset($_POST['harga_jual'][$key])) {
-                    //     $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['harga_jual'][$key]));
-                    // } else {
                     $harga_jual = 0.0;
-                    // }
+                    $harga_pokok = 0.0;
+                    if (isset($value->harga_pokok) && $value->harga_pokok) {
+                        $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
+                    }
+
+                    if (isset($value->harga_jual) && $value->harga_jual) {
+                        $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
+                    }
                     $result = [
                         'barang_master_id' => $id,
                         'spesifikasi' => $value->spesifikasi,
