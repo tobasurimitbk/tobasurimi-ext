@@ -115,7 +115,7 @@ class StokAdjusment extends BaseController
                 "divisi"                => $data->divisi,
                 "keterangan"            => $data->keterangan,
                 "divisi"                => $data->divisi,
-                "total_item"            => $totalItem . " Barang",
+                "total_item"            => $totalItem,
                 "status_posting"        => $data->status_posting,
                 "created_by"            => $userName == null ? "-" : $userName['name']
             ]);

@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Penerimaan Mutasi</h1>
-        <?php if (can("Inventori", "Mutasi", "c")) : ?>
-            <a href="<?= base_url('penerimaan-mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <h1>Jasa Vendor Barang Keluar</h1>
+        <?php if (can("Jasa Vendor", "Barang Keluar", "c")) : ?>
+            <a href="<?= base_url('jasa-vendor-out/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -27,18 +27,52 @@
                 </div>
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating">
+                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                        </select>
+                        <label style="z-index: 1;">Warehouse</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
                         <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
                             <option value="">SEMUA</option>
                             <option value="1">POSTED</option>
                             <option value="0">WAITING</option>
                         </select>
-                        <label style="z-index: 1;">Status Penerimaan Mutasi</label>
+                        <label style="z-index: 1;">Status Posting</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Dibuat" />
+                                <label for="floatingInput">Tanggal Mulai</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Selesai" />
+                                <label for="floatingInput">Tanggal Selesai</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search penerimaan_mutasi_no" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Penerimaan Mutasi </label>
+                        <input placeholder="" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Surat Jalan </label>
                     </div>
                 </div>
             </div>
@@ -47,14 +81,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('penerimaan_mutasi_no')">No Penerimaan Mutasi</th>
-                            <th>Nomor Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal</th>
-                            <th onclick="changeSort('penerimaan_mutasi.warehouse_id')">Warehouse Tujuan</th>
-                            <th onclick="changeSort('penerimaan_mutasi.jenis_mutasi')">Dokumen Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.bc_no')">Nomor Dokumen Pabean</th>
+                            <th onclick="changeSort('no_surat_jalan')">No Surat Jalan</th>
+                            <th onclick="changeSort('jasa_vendor_out.createdAt')">Tanggal</th>
+                            <th onclick="changeSort('divisi_id')">Departemen</th>
+                            <th onclick="changeSort('warehouse_id')">Warehouse</th>
                             <th>Total Item</th>
-                            <th>State</th>
+                            <th onclick="changeSort('vendor_id')">Vendor</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -66,8 +98,6 @@
         </div>
     </div>
 </section>
-
-
 
 <script>
     let sort = "createdAt";
@@ -89,12 +119,15 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("penerimaan-mutasi/all"); ?>",
+            url: "<?= base_url("jasa-vendor-out/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
+                data.warehouse_id = $(".warehouse_id").val();
                 data.status = $(".status").val();
-                data.penerimaan_mutasi_no = $(".penerimaan_mutasi_no").val();
+                data.start_date = $(".start_date").val();
+                data.end_date = $(".end_date").val();
+                data.no_surat_jalan = $(".no_surat_jalan").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -112,30 +145,20 @@
                 orderable: false
             },
             {
-                data: "penerimaan_mutasi_no",
+                data: "no_surat_jalan",
                 className: "text-center",
 
-            },
-            {
-                data: "multiple_no_mutasi",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
             },
             {
                 data: "tanggal",
                 className: "text-center"
             },
             {
-                data: "warehouse_tujuan",
+                data: "divisi",
                 className: "text-center",
             },
             {
-                data: "jenis_mutasi",
-                className: "text-center"
-            },
-            {
-                data: "bc_no",
+                data: "warehouse_name",
                 className: "text-center"
             },
             {
@@ -145,14 +168,8 @@
                 sortable: false
             },
             {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    return '<i class="fa-solid fa-square text-danger"></i>';
-
-                }
+                data: "vendor_name",
+                className: "text-center"
             }, {
                 data: "id",
                 className: "text-center actions",
@@ -165,17 +182,17 @@
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'a')) : ?>
+                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-out/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'd')) : ?>
+                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
@@ -184,7 +201,7 @@
                     `
                     } else {
                         return `
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
+                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
@@ -216,8 +233,53 @@
         }
     });
 
+    $(".start_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".end_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // GET WAREHOUSES
+        $.ajax({
+            url: `<?= base_url('jasa-vendor-out/warehouse'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $(".divisi_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".warehouse_id").empty()
+                $(".warehouse_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
+                $(".warehouse_id").val();
+            }
+        });
+        table.ajax.reload();
+    });
+
+    $('#warehouse_id').select2({
+        placeholder: "Pilih Warehouse",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -232,7 +294,7 @@
         table.ajax.reload();
     });
 
-    $("#divisi_id,#status")
+    $("#divisi_id,#warehouse_id,#status")
         .parent('div')
         .children('span')
         .children('span')
@@ -240,20 +302,25 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $(".penerimaan_mutasi_no").keyup(function() {
+
+    $(".no_surat_jalan").keyup(function() {
         table.ajax.reload();
     })
 
+    $('.start_date,.end_date').change(function() {
+        table.ajax.reload();
+    });
+
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("penerimaan-mutasi/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("jasa-vendor-out/id"); ?>/${data.id}`);
     });
 
 
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Penerimaan Mutasi ?',
+            title: 'Posting Jasa Vendor Barang Keluar ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -264,7 +331,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-mutasi/posting"); ?>",
+                    url: "<?= base_url("jasa-vendor-out/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -303,7 +370,7 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Penerimaan Mutasi ?',
+            title: 'Hapus Jasa Vendori Barang Keluar ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -314,7 +381,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-mutasi/delete"); ?>",
+                    url: "<?= base_url("jasa-vendor-out/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -346,6 +413,7 @@
     const print = function(url) {
         window.open(url, "_blank");
     }
+
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

@@ -19,7 +19,7 @@
                         <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['divisi_id'] === $divisi["id"] ? "selected" : "") : ""; ?>><?= strtoupper($divisi["divisi"]); ?></option>
+                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
                             <?php endforeach; ?>
                         </select>
                         <label style="z-index: 1;">Departemen</label>
