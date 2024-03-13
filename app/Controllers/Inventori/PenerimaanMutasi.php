@@ -5,8 +5,13 @@ namespace App\Controllers\Inventori;
 use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
+use App\Models\MutasiDetailModel;
+use App\Models\MutasiModel;
 use App\Models\PenerimaanMutasiDetailModel;
 use App\Models\PenerimaanMutasiModel;
+use App\Models\StockDetail2Model;
+use App\Models\StockDetailModel;
+use App\Models\StockModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
 
@@ -17,6 +22,11 @@ class PenerimaanMutasi extends BaseController
     protected $penerimaanMutasiModel;
     protected $penerimaanMutasiDetailModel;
     protected $warehouseModel;
+    protected $stockModel;
+    protected $stockDetailModel;
+    protected $stockDetail2Model;
+    protected $mutasiModel;
+    protected $mutasiDetailModel;
     protected $dompdf;
     protected $this_user_id;
     protected $this_company_id;
@@ -30,6 +40,11 @@ class PenerimaanMutasi extends BaseController
         $this->penerimaanMutasiModel = new PenerimaanMutasiModel();
         $this->penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->mutasiModel = new MutasiModel();
+        $this->mutasiDetailModel = new MutasiDetailModel();
+        $this->stockModel = new StockModel();
+        $this->stockDetailModel = new StockDetailModel();
+        $this->stockDetail2Model = new StockDetail2Model();
         $this->dompdf = new Dompdf();
     }
 
@@ -335,6 +350,54 @@ class PenerimaanMutasi extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+        // Insert To Inventori (-)
+        $penerimaanMutasi = $this->penerimaanMutasiModel->find($id);
+        $penerimaanMutasiList = $this->penerimaanMutasiDetailModel->where('penerimaan_mutasi_id', $penerimaanMutasi['id'])->where('deletedAt', null)->findAll();
+        // Inventori Stok Minus
+        foreach ($penerimaanMutasiList as $p) {
+            $mutasi = $this->mutasiModel->find($p['mutasi_id']);
+            $stock = $this->stockModel->find($p['stock_id']);
+            $qty = $p['qty'];
+
+            if ($stock['tipe_barang'] == "kemasan") {
+                $barang2_id = $stock['kemasan_id'];
+            } else {
+                $barang2_id = $stock['barang2_id'];
+            }
+
+            $stok = $this->stockModel->insertStok(
+                $mutasi['company_id'],
+                $mutasi['warehouse_asal_id'],
+                $mutasi['divisi_asal_id'],
+                $stock['tipe_barang'],
+                $stock['barang1_id'],
+                $barang2_id,
+                $qty,
+            );
+
+            // DETAIL
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $qty,
+                "Out",
+                date('Y-m-d'),
+                $this->this_user_id,
+                "MUTASI",
+                $penerimaanMutasi['penerimaan_mutasi_no'],
+                $penerimaanMutasi['keterangan'],
+            );
+
+            // SUB DETAIL
+            $this->stockDetail2Model->insertStokDetail2(
+                $p['bc_id'],
+                $stok,
+                $stokDetail,
+                $qty,
+                $p['no_aju'],
+                $mutasi['no_mutasi']
+            );
+        }
+
         $this->penerimaanMutasiModel->update($id, ['status_posting' => '1']);
         return response()->setJSON([
             'message' => "Penerimaan Mutasi berhasil diposting",

@@ -528,7 +528,7 @@
                 newRow.append($('<td>').text(v.qty_diterima_all));
                 newRow.append($('<td>').html(
                     `
-                        <input class="form-control stok-mutasi" style="height: 40px; padding-bottom: 10px;" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.mutasi_detail_id}" data-qty_sisa="${v.qty_sisa}" class="form-control" type="text" value="${v.qty_diterima_current}">
+                        <input <?= !empty($penerimaanMutasi) ? (($penerimaanMutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" style="height: 40px; padding-bottom: 10px;" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.mutasi_detail_id}" data-qty_sisa="${v.qty_sisa}" class="form-control" type="text" value="${v.qty_diterima_current}">
                     `
                 ));
                 newRow.append($('<td>').text(v.qty_sisa));

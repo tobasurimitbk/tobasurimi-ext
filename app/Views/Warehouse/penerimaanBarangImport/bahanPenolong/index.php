@@ -49,7 +49,7 @@
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                                 <th>No. PO</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
-                                <th>Tanggal</th>
+                                <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                                 <th>Jumlah Item</th>
                                 <th>Actions</th>
