@@ -131,15 +131,13 @@ class Barang extends BaseController
 
         foreach ($spek as $value) {
             // var_dump($_POST['primer'][$key]);
+            $harga_jual = 0.0;
+            $harga_pokok = 0.0;
             if ($value->harga_pokok) {
                 $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
-            } else {
-                $harga_pokok = 0.0;
             }
             if ($value->harga_jual) {
                 $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
-            } else {
-                $harga_jual = 0.0;
             }
             $result[] = array(
                 'barang_master_id' => $barangMasterID,
