@@ -30,6 +30,12 @@
                             Simpan
                         </button>
                     <?php endif; ?>
+                <?php else : ?>
+                    <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("jasa-vendor-out/print/"); ?><?= encrypt($jasaVendorOut['id']); ?>')">
+                            Print
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -77,7 +83,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select vendor_id" id="vendor_id" name="vendor_id" aria-label="Floating label select example">
+                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select vendor_id" id="vendor_id" name="vendor_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($vendor as $v) : ?>
                                     <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['vendor_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>">
@@ -109,7 +115,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($warehouse)) : ?>
                                     <?php foreach ($warehouse as $w) : ?>
@@ -132,87 +138,90 @@
 
             </form>
 
-            <div class="row">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Barang</label>
-                </div>
-            </div>
-            <form class="detail-form">
-                <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
+            <div class="detail-form-layout">
                 <div class="row">
-
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select type_barang" disabled id="type_barang" name="type_barang" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($tipeBarang as $t) : ?>
-                                    <?php if ($t['description'] == "bahan_baku") : ?>
-                                        <option selected value="<?= $t['description'] ?>">
-                                            <?= strtoupper($t['value']); ?>
-                                        </option>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
-                        </div>
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Barang</label>
                     </div>
-
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id" aria-label="Floating label select example">
-                                <option value=""></option>
-
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi (Kirim Ke Vendor)</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select spesifikasi_in_id" id="spesifikasi_in_id" name="spesifikasi_in_id" aria-label="Floating label select example">
-                                <option value=""></option>
-
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi (Output Dari Vendor)</label>
-                        </div>
-                    </div>
-
                 </div>
-            </form>
+                <form class="detail-form">
+                    <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select type_barang" disabled id="type_barang" name="type_barang" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($tipeBarang as $t) : ?>
+                                        <?php if ($t['description'] == "bahan_baku") : ?>
+                                            <option selected value="<?= $t['description'] ?>">
+                                                <?= strtoupper($t['value']); ?>
+                                            </option>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi (Kirim Ke Vendor)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select spesifikasi_in_id" id="spesifikasi_in_id" name="spesifikasi_in_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi (Output Dari Vendor)</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
 
 
-            <div class="row mt-3">
-                <div class="col mb-0">
-                    <label class="form-label font-weight-bold lable-title">List Inventori Barang</label>
-                </div>
-                <div class="col-md-12 col-table-button-tts">
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table">
-                            </tbody>
-                        </table>
-                        <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
+                <div class="row mt-3">
+                    <div class="col mb-0">
+                        <label class="form-label font-weight-bold lable-title">List Inventori Barang</label>
+                    </div>
+                    <div class="col-md-12 col-table-button-tts">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">Dokumen Pabean</th>
+                                        <th style="text-align: center;">No Aju</th>
+                                        <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Satuan</th>
+                                        <th style="text-align: center;">Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table">
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
+                        </div>
                     </div>
                 </div>
             </div>
+
 
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Daftar Barang Yang Akan Dikeluarkan</label>
                 </div>
-                <div class="col-md-12 mb-4">
-                    <div class="table-responsive">
+                <div class="col-md-12">
+                    <div class="table-responsive" style="margin-top: -10px;">
                         <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
@@ -338,6 +347,9 @@
             });
         <?php endforeach; ?>
         drawTableSelectedItem(listStockSelected);
+        <?php if ($jasaVendorOut['status_posting']) : ?>
+            $('.detail-form-layout').hide()
+        <?php endif; ?>
     <?php endif; ?>
 
     $('#vendor_id').select2({
