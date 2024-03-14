@@ -4,9 +4,9 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Rencana Produksi</h1>
+        <h1 class="title-name">Tambah Material Request</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("work-order"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
                 Batal
             </a>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
@@ -19,11 +19,56 @@
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->id : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : $today; ?>" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Pembuatan Dokumen">
-                            <label for="floatingInput">Tanggal Pembuatan Dokumen</label>
+                            <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
+                                    <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Kode Produksi</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control barang_jadi" name="barang_jadi" id="barang_jadi" placeholder="Barang Jadi" readonly>
+                            <label for="floatingInput">Barang Jadi</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" readonly>
+                            <label for="floatingInput">Jumlah Standart Produksi</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">Header Request</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : $today; ?>" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                            <label for="floatingInput">Tanggal Request</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : $today; ?>" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <label for="floatingInput">Tanggal Produksi</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -37,12 +82,6 @@
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control user_production" name="user_production" id="user_production" placeholder="Pembuat Dokumen" value="<?= session()->get("login")->name; ?>" readonly>
-                            <label for="floatingInput">Pembuat Dokumen</label>
                         </div>
                     </div>
                 </div>
@@ -71,46 +110,54 @@
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->standart_production : ""; ?>" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');">
-                            <label for="floatingInput">Jumlah Standart Produksi</label>
-                        </div>
-                    </div>
                 </div>
             </form>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">List Hasil Barang</label>
+                        <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
                     </div>
-                    <div class="col-md-6">
-                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan">
+                            <option value=""></option>
+                            <option value="bahan_baku">Bahan Baku</option>
+                            <option value="bahan_penolong">Bahan Penolong</option>
+                            <option value="bahan_scrap">Bahan Scrap</option>
+                            <option value="bahan_modal">Bahan Modal</option>
+                            <option value="kemasan">Kemasan</option>
+                        </select>
+                        <label for="floatingInput">Tipe Bahan</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang">
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Nama Barang</label>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTableBarang" id="dataTableBarang" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="width: 10px;">No</th>
+                                <th>No</th>
+                                <th>Referensi Barang</th>
+                                <th>Tanggal Penerimaan</th>
+                                <th>Warehouse</th>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
-                                <th>Jumlah Barang</th>
-                                <th>Keterangan</th>
-                                <th style="width:80px;">Action</th>
+                                <th>Qty</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-table" id="body-detail-table">
-                        <tfoot class="tfoot">
-                            <tr>
-                                <td colspan="7" class="text-center">Tidak Ada Data</td>
-                            </tr>
-                        </tfoot>
+                        <tbody>
                         </tbody>
                     </table>
                 </div>
@@ -119,83 +166,136 @@
     </div>
 </section>
 
-<div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
-                <!-- <button class="btn btn-show-form btn-add-barang float-right">
-                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
-                </button> -->
-            </div>
-            <div class="modal-body">
-                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="barang_spesifikasi_id" class="barang_spesifikasi_id" id="barang_spesifikasi_id">
-                    <input autocomplete="one-time-code" type="hidden" class="barang_detail_id" name="barang_detail_id" id="barang_detail_id" />
-                    <input autocomplete="one-time-code" type="hidden" class="barang_id" name="barang_id" id="barang_id" />
-                    <input autocomplete="one-time-code" type="hidden" class="header_barang_name" name="header_barang_name" id="header_barang_name" />
-
-                    <input autocomplete="one-time-code" type="hidden" class="spp_type_bypass" name="spp_type_bypass" id="spp_type_bypass" />
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
-                                <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
-                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
-                                </select>
-                                <label for="floatingInput">Kode Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
-                                <label for="floatingInput">Nama Barang</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="hidden" class="satuan_id" name="satuan_id">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" readonly="true" type="text" class="form-control satuan" id="satuan" name="satuan" placeholder="Satuan">
-                                    <label for="floatingInput">Satuan</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
-                                <label for="floatingInput">Qty</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3">
-                                <textarea autocomplete="one-time-code" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan (Opsional)"></textarea>
-                                <label for="floatingInput">Keterangan (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-detail" onclick="submitDetailForm()">Simpan</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
     let list_items = [];
 
+    let sortDataBarang = "createdAt";
+    let sortTypeDataBarang = "DESC";
+
     $(document).ready(function() {
+        const dataTableBarang = $('.dataTableBarang').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [4, 'desc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("material-request/data-barang"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.bc_id = "";
+                    data.no_aju = "";
+                    data.id = $("#select_nama_barang option:selected").val() ? $("#select_nama_barang option:selected").val() : "";
+                    data.spek_id = $("#select_nama_barang option:selected").data("spesifikasi_id") ? $("#select_nama_barang option:selected").data("spesifikasi_id") : "";
+
+                    data.sort = sortDataBarang;
+                    data.sortType = sortTypeDataBarang;
+                },
+                beforeSend: function() {
+                    $.LoadingOverlay("show", {
+                        image: "",
+                        fontawesomeColor: "#222FCC",
+                        fontawesome: "fa fa-cog fa-spin"
+                    });
+                },
+                complete: function() {
+                    $.LoadingOverlay("hide", {
+                        image: "",
+                        fontawesomeColor: "#222FCC",
+                        fontawesome: "fa fa-cog fa-spin"
+                    });
+                },
+            },
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            columns: [{
+                    data: "no",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false,
+                    render: function(data, type, full, meta) {
+                        // Return a checkbox input
+                        return '<input type="checkbox" class="checkbox_no" value="' + data + '">';
+                    }
+                },
+                {
+                    data: "dokumen",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false
+                },
+                {
+                    data: "stock",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false
+                },
+                {
+                    data: "warehouse",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false
+                },
+                {
+                    data: "kode",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false
+                },
+                {
+                    data: "barang",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false
+                },
+                {
+                    data: "satuan",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false
+                },
+                {
+                    data: "qty",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false
+                },
+            ],
+            "drawCallback": function(settings) {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+                var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl)
+                });
+            },
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
         // Departemen
         $('.department_id').select2({
             placeholder: "Pilih Departemen",
@@ -219,6 +319,90 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.department_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // select tipe bahan
+        $('.select_tipe_bahan').select2({
+            placeholder: "Pilih Tipe Bahan",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.select_tipe_bahan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.select_tipe_bahan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.select_tipe_bahan')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // select nama barang
+        $('.select_nama_barang').select2({
+            placeholder: "Pilih Barang",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.select_nama_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.select_nama_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.select_nama_barang')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // Kode Produksi
+        $('.kode_produksi').select2({
+            placeholder: "Pilih kode Produksi",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.kode_produksi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.kode_produksi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.kode_produksi')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -278,40 +462,23 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
-        // Mengatur default value ke hari ini
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-
-        today = dd + '/' + mm + '/' + yyyy;
-        $('#date_production').val(today);
 
         // Mengaktifkan datepicker
-        $('#date_production').datepicker();
+        $('#date_production').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'dd/mm/yyyy'
+        });
+        $('#date_request').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'dd/mm/yyyy'
+        });
 
-        // Membuat input readonly
-        $('#date_production').prop('readonly', true);
-
-        $(".btn-show-detail").click(function() {
-
-            $(".title-detail-name").text("Tambah");
-            $(".barang_detail_id").val('');
-
-            $(".kode").val('')
-            $(".nama_barang").val('')
-            $(".qty").val('')
-            $(".satuan").val('')
-            $(".satuan_id").val('')
-            $(".harga").val('')
-            $(".total").val('')
-            $(".keterangan").val('')
-
-            validator_detail.resetForm();
-            validator_detail.reset();
-            var type = "bahan_jadi";
-            $(".spp_type_bypass").val(type)
+        $(".select_tipe_bahan").change(function() {
+            var type = $(".select_tipe_bahan").val();
             if (type) {
+                setLoading();
                 $.ajax({
                     url: `<?= base_url("barang/dropdown/type"); ?>`,
                     method: "GET",
@@ -320,53 +487,26 @@
                         type: type
                     },
                     success: function(res) {
-                        $(".kode_barang").empty();
-                        $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+                        $(".select_nama_barang").empty();
+                        $(".select_nama_barang").append(`<option value=""></option>`);
                         res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                            $(".select_nama_barang").append(`<option value="${item.id}" data-spesifikasi_id="${item.barang_master_spesifikasi_id}">${item.kode_barang} - ${item.barang_name}</option>`);
                         })
-                        $(".kode_barang").val("").change();
-                        $(".detail-modal").modal("show");
+                        $(".select_nama_barang").val("").change();
+                        stopLoading();
                     }
                 })
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: "Pilih Tipe SPP Dahulu",
+                    title: "Pilih Tipe Bahan Dahulu",
                     confirmButtonColor: '#4e73df',
                 })
             }
+        })
 
-            $(".kode_barang").change(function() {
-                if ($(".kode_barang option:selected").val()) {
-                    let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
-                    let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
-                    let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
-                    let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-                    let barang_spesifikasi_id = $(".kode_barang option:selected").data("barang_spesifikasi_id") ? $(".kode_barang option:selected").data("barang_spesifikasi_id") : "";
-                    let barang_name_master = $(".kode_barang option:selected").data("barang_name_master");
-                    // let spp_type = $('.spp_type').val().trim();
-
-
-                    // if (list_items.length === 0 && spp_type === "Lokal BB") {
-                    //     $('.header_barang_name').val(barang_name_master);
-                    // }
-
-                    $(".kode").val($(".kode_barang option:selected").val());
-                    $(".nama_barang").val(nama);
-                    $(".barang_id").val(barang_id);
-                    $(".barang_spesifikasi_id").val(barang_spesifikasi_id);
-                    $(".satuan").val(satuan);
-                    $(".satuan_id").val(satuan_id);
-                } else {
-                    $(".kode").val("");
-                    $(".nama_barang").val("");
-                    $(".barang_id").val("");
-                    $(".barang_spesifikasi_id").val("");
-                    $(".satuan").val("");
-                    $(".satuan_id").val("");
-                }
-            })
+        $(".select_nama_barang").change(function() {
+            dataTableBarang.ajax.reload();
         })
 
         var validator_detail = $(".detail-form").validate({
@@ -509,7 +649,7 @@
                                 // UPDATE
                                 <?php if (can('Produksi', 'Dokumen Produksi', 'u')) : ?>
                                     $.ajax({
-                                        url: "<?= base_url("work-order/update"); ?>",
+                                        url: "<?= base_url("material-request/update"); ?>",
                                         data: formData,
                                         method: "POST",
                                         dataType: "json",
@@ -547,7 +687,7 @@
                             } else {
                                 // CREATE
                                 $.ajax({
-                                    url: "<?= base_url("work-order/save"); ?>",
+                                    url: "<?= base_url("material-request/save"); ?>",
                                     data: formData,
                                     method: "POST",
                                     dataType: "json",
@@ -569,7 +709,7 @@
                                                 reverseButtons: true,
                                                 confirmButtonText: 'Oke',
                                             }).then((result) => {
-                                                window.location.replace("<?= base_url('work-order/id/') ?>" + response.id);
+                                                window.location.replace("<?= base_url('material-request/id/') ?>" + response.id);
                                             })
                                         }
                                     }
@@ -598,6 +738,19 @@
                 }
             })
         });
+
+        $(".kode_produksi").change(function() {
+            if ($(".kode_produksi option:selected").val()) {
+                let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
+                let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
+
+                $(".barang_jadi").val(nama_barang);
+                $(".standart_production").val(standart_production);
+            } else {
+                $(".barang_jadi").val("");
+                $(".standart_production").val("");
+            }
+        })
     });
 
     $('.btn-hide-detail').click(function() {
