@@ -97,7 +97,11 @@ class StokHistori extends BaseController
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
             if ($data->sumber == "LPB" || $data->sumber == "JASA VENDOR") {
-                $no_dokumen = $data->no_dokumen1 . " / " . $data->no_dokumen2;
+                if ($data->no_dokumen1 != "-" && $data->no_dokumen1 != $data->no_dokumen2) {
+                    $no_dokumen = $data->no_dokumen1 . " <-> " . $data->no_dokumen2;
+                } else {
+                    $no_dokumen = $data->no_dokumen2;
+                }
             } else {
                 $no_dokumen = $data->no_dokumen1;
             }
