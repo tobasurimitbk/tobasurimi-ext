@@ -535,16 +535,18 @@ $routes->get('/work-order/create', 'Production\WorkOrder::createView', ['filter'
 $routes->get('/work-order/all', 'Production\WorkOrder::all', ['filter' => 'Auth']);
 $routes->post('/work-order/save', 'Production\WorkOrder::create', ['filter' => 'Auth']);
 $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' => 'Auth']);
-$routes->post('/work-order/delete', 'Purchase\WorkOrder::deleteWO', ['filter' => 'Auth']);
+$routes->post('/work-order/delete', 'Production\WorkOrder::deleteWO', ['filter' => 'Auth']);
 
 // Material Request
 $routes->get('/material-request', 'Production\materialRequest::index', ['filter' => 'Auth']);
 $routes->get('/material-request/id/(:segment)', 'Production\materialRequest::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-request/create', 'Production\materialRequest::createView', ['filter' => 'Auth']);
 $routes->get('/material-request/all', 'Production\materialRequest::all', ['filter' => 'Auth']);
+$routes->get('/material-request/data-detail-material', 'Production\materialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request/data-barang', 'Production\materialRequest::allDataBarang', ['filter' => 'Auth']);
 $routes->post('/material-request/save', 'Production\materialRequest::create', ['filter' => 'Auth']);
 $routes->post('/material-request/update', 'Production\materialRequest::update', ['filter' => 'Auth']);
+$routes->post('/material-request/update-status', 'Production\materialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 
 // DROPDOWN
 

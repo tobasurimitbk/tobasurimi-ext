@@ -9,6 +9,7 @@
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
+        <?= csrf_field() ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -42,6 +43,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
     let sort = "wo_no";
     let sortType = "desc";
 
@@ -179,7 +181,6 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("work-order/delete"); ?>",
                     data: {

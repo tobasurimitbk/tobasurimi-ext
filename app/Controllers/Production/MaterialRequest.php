@@ -8,6 +8,8 @@ use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
+use App\Models\MaterialRequestDetailsModel;
+use App\Models\MaterialRequestsModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
@@ -19,6 +21,7 @@ use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
+use Exception;
 
 class MaterialRequest extends BaseController
 {
@@ -41,6 +44,8 @@ class MaterialRequest extends BaseController
     protected $barangMasterModel;
     protected $penerimaanBarangDetailModel;
     protected $supplierModel;
+    protected $materialRequestModel;
+    protected $materialRequestDetailsModel;
 
     public function __construct()
     {
@@ -65,6 +70,8 @@ class MaterialRequest extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->supplierModel = new SupplierModel();
+        $this->materialRequestModel = new MaterialRequestsModel();
+        $this->materialRequestDetailsModel = new MaterialRequestDetailsModel();
     }
 
     public function index()
@@ -82,20 +89,12 @@ class MaterialRequest extends BaseController
 
         $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
         $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
-        $dataWorkOrder = $this->woModel
-            ->asObject()
-            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang) AS nama_barang')
-            ->join('work_order_details', 'work_orders.id = work_order_details.work_order_id', 'left')
-            ->where('company_id', $this->this_company_id)
-            ->groupBy('work_order_details.work_order_id')
-            ->find();
 
         $data = [
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
-            "dataWarehouse" => $dataWarehouse,
-            "dataWorkOrder" => $dataWorkOrder,
+            "dataWarehouse" => $dataWarehouse
         ];
 
         return view('Production/materialRequest/form', $data);
@@ -121,18 +120,21 @@ class MaterialRequest extends BaseController
         ];
 
         if (!empty($id)) {
-            $dataWorkOrders = $this->workOrdersModel->asObject()->find($id);
-            $dataWorkOrderDetails = $this->workOrderDetailsModel->asObject()->select('work_order_details.*, barang_master.kode_barang, satuans.nama_satuan')
-                ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = work_order_details.barang2_id', 'left')
+            $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
+            $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
+            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.nama_satuan')
+                ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                ->where('work_order_id', $id)
+                ->where('material_request_id', $id)
                 ->get()->getResult();
-            $data["dataWorkOrders"] = $dataWorkOrders;
-            $data["dataWorkOrderDetails"] = $dataWorkOrderDetails;
+            $data["dataMaterialRequests"] = $dataMaterialRequests;
+            $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
+            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
+            $data["ids"] = $id;
         }
 
-        return view('Production/materialRequest/form', $data);
+        return view('Production/materialRequest/form-detail', $data);
     }
 
     public function all()
@@ -155,28 +157,28 @@ class MaterialRequest extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $workOrdersData = $this->workOrdersModel->getWorkOrderList($condition, $addCondition, $limit, $offset);
+        $materialRequestData = $this->materialRequestModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
 
-        $dataWorkOrders = [];
+        $dataMaterialRequest = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($workOrdersData['data'] as $data) {
-            array_push($dataWorkOrders, [
+        foreach ($materialRequestData['data'] as $data) {
+            array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "wo_no"                 => $data->wo_no,
+                "req_no"                 => $data->req_no,
                 "nama_barang"           => $data->nama_barang,
                 "nama_divisi"           => $data->divisi,
-                "standart_production"   => $data->standart_production,
+                "is_posted"           => $data->is_posted,
             ]);
         }
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $workOrdersData['totalData'],
-            "recordsFiltered"   => $workOrdersData['totalFilteredData'],
-            "data"              => $dataWorkOrders,
+            "recordsTotal"      => $materialRequestData['totalData'],
+            "recordsFiltered"   => $materialRequestData['totalFilteredData'],
+            "data"              => $dataMaterialRequest,
             // "response" => $response,
             "payload"           => $payload
         ];
@@ -229,52 +231,55 @@ class MaterialRequest extends BaseController
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
-        $stok = $this->stockModel->where('barang1_id', $id)->where('barang2_id', $spek_id)->first();
-
-        $condition = [
-            "stock_details2.stock_id" => $stok['id'],
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $dataQry = $this->stockDetail2Model->getListStokPerDokumen($condition, $addCondition, $limit, $offset);
+        $stok = $this->stockModel->where('barang1_id', $id)
+            ->where('barang2_id', $spek_id)
+            ->findAll(); // Menggunakan findAll() untuk mendapatkan semua hasil yang sesuai
 
         $dataResult = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        if ($stok['kemasan_id'] == 0) {
-            // BARANG
-            $barang = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
-        } else {
-            // KEMASAN
-            $barang = $this->kemasanModel->find($stok['kemasan_id']);
-        }
+        foreach ($stok as $singleStok) {
+            $condition = [
+                "stock_details2.stock_id" => $singleStok['id'],
+                "stock_details2.deletedAt" => null,
+                "stock_details.deletedAt" => null,
+            ];
 
-        foreach ($dataQry['data'] as $data) {
-            $dokumenBC = $this->metaDataModel->find($data->bc_id);
-            $stockDetail = $this->stockDetailModel->find($data->stock_detail_id);
-            $dataWarehouse = $this->warehousesModel->find($stok['warehouse_id']);
+            $dataQry = $this->stockDetail2Model->getListStokPerDokumen($condition, $addCondition, $limit, $offset);
 
-            $dokumen = substr(strrchr($data->no_aju, '-'), -6);
-            $tgldokumen = str_replace("-", "", $stockDetail['stock_date']);
-            if ($stok['kemasan_id'] == 0) {
-                // BARANG
-                $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
-                $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
-                $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
-                $barangMaster = $this->barangMasterModel->find($stok['barang1_id']);
-                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
+            foreach ($dataQry['data'] as $data) {
+                $dokumenBC = $this->metaDataModel->find($data->bc_id);
+                $stockDetail = $this->stockDetailModel->find($data->stock_detail_id);
+                $dataWarehouse = $this->warehousesModel->find($singleStok['warehouse_id']);
 
-                array_push($dataResult, [
-                    "no" => $no++,
-                    "dokumen" => $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'] . "/" . $dokumen . "/" . $tgldokumen,
-                    "stock"   => $stockDetail['stock_date'],
-                    "warehouse"   => $dataWarehouse['warehouse_name'],
-                    "kode"  => strtoupper($barangMaster['kode_barang']),
-                    "barang"  => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
-                    "satuan" => $satuan_1['kode_satuan'],
-                    "qty" => $data->stok_total,
-                ]);
+                $dokumen = substr(strrchr($data->no_aju, '-'), -6);
+                $tgldokumen = str_replace("-", "", $stockDetail['stock_date']);
+
+                if ($singleStok['kemasan_id'] == 0) {
+                    // BARANG
+                    $barang = $this->barangMasterSpesifikasiModel->find($singleStok['barang2_id']);
+                    $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+                    $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
+                    $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
+                    $barangMaster = $this->barangMasterModel->find($singleStok['barang1_id']);
+                    $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($singleStok['barang2_id']);
+
+                    array_push($dataResult, [
+                        "no" => $no++,
+                        "dokumen" => $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'] . "/" . $dokumen . "/" . $tgldokumen,
+                        "stock"   => $stockDetail['stock_date'],
+                        "warehouse"   => $dataWarehouse['warehouse_name'],
+                        "kode"  => strtoupper($barangMaster['kode_barang']),
+                        "barang"  => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
+                        "satuan" => $satuan_1['kode_satuan'],
+                        "qty" => $data->stok_total,
+                        "stock_id" => encrypt($singleStok['id']),
+                        "bc_id" => encrypt($data->bc_id),
+                        "barang1_id" => encrypt($id),
+                        "barang2_id" => encrypt($spek_id),
+                        "no_aju" => $data->no_aju,
+                    ]);
+                }
             }
         }
 
@@ -289,34 +294,93 @@ class MaterialRequest extends BaseController
         return response()->setJSON($data);
     }
 
+    public function allDetailMaterialRequest()
+    {
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+        ];
+
+        $condition = [
+            "material_requests.id"        => decrypt($this->request->getGet("id"))
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType")
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $materialRequestData = $this->materialRequestModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
+
+        $dataMaterialRequest = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($materialRequestData['data'] as $data) {
+            array_push($dataMaterialRequest, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "req_no"                 => $data->req_no,
+                "tgl_req"                 => $data->request_date,
+                "nama_divisi"           => $data->divisi,
+                "nama_warehouse"           => $data->warehouse_name,
+                "nama_barang"           => $data->nama_barang,
+                "satuan"           => $data->satuan,
+                "total"           => $data->total,
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $materialRequestData['totalData'],
+            "recordsFiltered"   => $materialRequestData['totalFilteredData'],
+            "data"              => $dataMaterialRequest,
+            // "response" => $response,
+            "payload"           => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function create()
     {
         try {
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-            $id = $this->workOrdersModel->insert([
-                "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
+            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+            $id = $this->materialRequestModel->insert([
+                "work_order_id" => $this->request->getPost("kode_produksi"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
-                "request_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
-                'standart_production' => $this->request->getVar('standart_production'),
-                'note' => $this->request->getVar('note'),
+                'warehouse_id' => $this->request->getVar("warehouse_id"),
+                "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
+                "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
+                "req_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("req_no"),
                 'is_posted' => 0,
-                'request_status' => "waiting",
                 'createdBy' =>  session()->get("login")->user_id,
             ]);
 
-            $wo_detail = json_decode($this->request->getVar("items"));
+            $mr_detail = json_decode($this->request->getVar("items"));
 
-            foreach ($wo_detail as $s) {
-                $this->workOrderDetailsModel->insert([
-                    'work_order_id' => $id,
-                    'barang1_id' => decrypt($s->barang_id),
-                    'barang2_id' => decrypt($s->barang_spesifikasi_id),
-                    'nama_barang' => $s->nama_barang,
-                    'qty' => $s->qty,
-                    'unit' => $s->satuan_id,
-                    'note' => $s->keterangan,
+            foreach ($mr_detail as $s) {
+                $this->materialRequestDetailsModel->insert([
+                    'material_request_id' => $id,
+                    'barang1_id' => decrypt($s->barang1_id),
+                    'barang2_id' => decrypt($s->barang2_id),
+                    'nama_barang' => $s->barang,
+                    'satuan' => $s->satuan,
+                    'stock_id' => decrypt($s->stock_id),
+                    'bc_id' => decrypt($s->bc_id),
+                    'no_aju' => $s->no_aju,
+                    'qty' => $s->jumlahBarang,
+                    'note' => $s->ketBarang,
                 ]);
             }
 
@@ -405,6 +469,49 @@ class MaterialRequest extends BaseController
                 }
             }
         } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+
+    public function updateStatusPostedMaterialRequest()
+    {
+        try {
+
+            $id = $this->request->getVar('id');
+            $id = decrypt($id);
+
+            // po posting
+            $payload = [
+                "is_posted" => $this->request->getVar('status_posting')
+            ];
+
+            if (!empty($id)) {
+                $this->materialRequestModel->update($id, $payload);
+                $data = [
+                    "status"    => true,
+                    "message"   => "Status Posting Berhasil Diperbaharui",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Data Gagal Disimpan",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

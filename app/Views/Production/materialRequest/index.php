@@ -9,6 +9,7 @@
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
+        <?= csrf_field() ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -26,7 +27,6 @@
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('department')" class="sort">Department</th>
-                                <th>Jumlah Produksi</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -42,7 +42,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "wo_no";
+    const csrf = $(`[name="${csrfToken}"]`);
+    let sort = "req_no";
     let sortType = "desc";
 
     let search = $('.search').val();
@@ -91,7 +92,7 @@
                 orderable: false
             },
             {
-                data: "wo_no",
+                data: "req_no",
                 className: "text-center"
             },
             {
@@ -103,22 +104,23 @@
                 className: "text-center"
             },
             {
-                data: "standart_production",
-                className: "text-center"
-            },
-            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
+                    let id = row?.id;
+                    let status = row?.is_posted
                     return `
                         <div class="mt-0">
-                            <button class="btn btn-primary">
-                                <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
+                            <button class="btn btn-primary detail-material-request">
+                                <i class="fa fa-info fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button class="btn btn-danger">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            <button class="btn btn-warning">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="posting('${id}', 1)">
+                                <i class="fa fa-paper-plane" aria-hidden="true"></i>
                             </button>
                         </div>
                     `
@@ -147,14 +149,193 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("material-request/id"); ?>/${data.id}`);
-        })
+        $('#dataTable tbody').on('click', '.detail-material-request', function() {
+            // Get the data associated with the clicked row
+            const data = table.row($(this).closest('tr')).data();
+
+            // Redirect to the detail page using the data ID
+            if (data) {
+                location.replace(`<?= base_url("material-request/id"); ?>/${data.id}`);
+            }
+        });
     })
 
-    const spp = function() {
-        location.replace(`<?= base_url("spp/create"); ?>`);
+    const posting = function(id, status_posting) {
+        console.log(id);
+        Swal.fire({
+            icon: 'question',
+            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url("material-request/update-status"); ?>",
+                    data: {
+                        id: id,
+                        status_posting: status_posting
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
+    const closePO = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan Close PO?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Close',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("po-lokal-bahan-baku/close-po"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
+    const remove = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di hapus?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("po-lokal-bahan-baku/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 
     const changeSort = function(val) {

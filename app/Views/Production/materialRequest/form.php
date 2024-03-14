@@ -61,13 +61,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : $today; ?>" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                            <input autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
                             <label for="floatingInput">Tanggal Request</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? ($dataWorkOrders->request_date ? date("d/m/Y", strtotime($dataWorkOrders->request_date)) : "") : $today; ?>" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <input autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
                             <label for="floatingInput">Tanggal Produksi</label>
                         </div>
                     </div>
@@ -75,10 +75,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataWorkOrders) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : ""; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi">
-                                    <label for="floatingInput">Kode Produksi</label>
+                                    <input autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
+                                    <label for="floatingInput">Kode Request</label>
                                 </div>
-                                <div style="<?= !empty($dataWorkOrders) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                             <select class="form-select department_id" name="department_id" id="department_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                    <option value="<?= $dataDivisi->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->divisi_id == $dataDivisi->id ? "selected" : "" : ""; ?>><?= $dataDivisi->divisi ?></option>
+                                    <option value="<?= $dataDivisi->id ?>"><?= $dataDivisi->divisi ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Department</label>
@@ -103,7 +103,7 @@
                                 <option value=""></option>
                                 <?php if (!empty($dataWorkOrders)) : ?>
                                     <?php foreach ($dataWarehouse ?? [] as $dataWarehouse) : ?>
-                                        <option value="<?= $dataWarehouse->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->warehouse_id == $dataWarehouse->id ? "selected" : "" : ""; ?>><?= $dataWarehouse->warehouse_name ?></option>
+                                        <option value="<?= $dataWarehouse->id ?>"><?= $dataWarehouse->warehouse_name ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
@@ -155,10 +155,45 @@
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
                                 <th>Qty</th>
+                                <th>Jumlah</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal">
+                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTableBarangAdd" id="dataTableBarangAdd" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th>Referensi Barang</th>
+                                <th>Warehouse</th>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Qty</th>
+                                <th>Jumlah</th>
+                                <th>Keterangan</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+                        <tfoot class="tfoot">
+                            <tr>
+                                <td colspan="10" class="text-center">Tidak Ada Data</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -231,7 +266,7 @@
                     sortable: false,
                     render: function(data, type, full, meta) {
                         // Return a checkbox input
-                        return '<input type="checkbox" class="checkbox_no" value="' + data + '">';
+                        return '<input type="checkbox" class="checkbox_no" value="' + data.no + '" data-stock_id="' + data.stock_id + '">';
                     }
                 },
                 {
@@ -275,6 +310,22 @@
                     className: "text-center",
                     searchable: false,
                     sortable: false
+                }, {
+                    data: "no",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false,
+                    render: function(data, type, full, meta) {
+                        return '<input type="text" class="form-control jumlahBarang" id="jumlahBarang" name="jumlahBarang" value="">';
+                    }
+                }, {
+                    data: "no",
+                    className: "text-center",
+                    searchable: false,
+                    sortable: false,
+                    render: function(data, type, full, meta) {
+                        return '<input type="text" class="form-control ketBarang" id="ketBarang" name="ketBarang" value="">';
+                    }
                 },
             ],
             "drawCallback": function(settings) {
@@ -751,79 +802,118 @@
                 $(".standart_production").val("");
             }
         })
+
+        $('.btn-submit-barang').on('click', function() {
+            list_items = [];
+            // Cari baris yang memiliki kotak centang yang dicentang
+            $('.dataTableBarang tbody input[type="checkbox"]:checked').each(function() {
+                var rowData = dataTableBarang.row($(this).closest('tr')).data();
+                // Pastikan data baris tidak null sebelum disimpan
+                if (rowData) {
+                    var jmlhBarang = $(this).closest('tr').find('.jumlahBarang').val();
+                    if (jmlhBarang) {
+                        var item = {
+                            barang_detail_id: getID(),
+                            no: rowData.no,
+                            dokumen: rowData.dokumen,
+                            stock: rowData.stock,
+                            warehouse: rowData.warehouse,
+                            kode: rowData.kode,
+                            barang: rowData.barang,
+                            satuan: rowData.satuan,
+                            qty: rowData.qty,
+                            stock_id: rowData.stock_id,
+                            bc_id: rowData.bc_id,
+                            barang1_id: rowData.barang1_id,
+                            barang2_id: rowData.barang2_id,
+                            no_aju: rowData.no_aju,
+                            jumlahBarang: jmlhBarang, // Mengambil nilai dari input teks dengan class 'jumlahBarang'
+                            ketBarang: $(this).closest('tr').find('.ketBarang').val(), // Mengambil nilai dari input teks dengan class 'ketBarang'
+                        };
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Harap isi jumlah barang dahulu",
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                    list_items.push(item);
+                }
+            });
+
+            console.log(list_items);
+            drawTable();
+        });
     });
 
     $('.btn-hide-detail').click(function() {
         $('.detail-modal').modal('hide');
-        resetFormDetail();
     });
 
-    const submitDetailForm = function() {
-        let barang_detail_id = $(".barang_detail_id").val();
-        let barang_id = $(".barang_id").val()
-        let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
-        let kode_barang = $(".kode_barang").val()
-        let nama_barang = $(".nama_barang").val()
-        let nama_satuan = $(".satuan").val()
-        let satuan_id = $(".satuan_id").val()
-        let qty = $(".qty").val()
-        let keterangan = $(".keterangan").val() ? $(".keterangan").val() : '-'
+    // const submitDetailForm = function() {
+    //     let barang_detail_id = $(".barang_detail_id").val();
+    //     let barang_id = $(".barang_id").val()
+    //     let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
+    //     let kode_barang = $(".kode_barang").val()
+    //     let nama_barang = $(".nama_barang").val()
+    //     let nama_satuan = $(".satuan").val()
+    //     let satuan_id = $(".satuan_id").val()
+    //     let qty = $(".qty").val()
+    //     let keterangan = $(".keterangan").val() ? $(".keterangan").val() : '-'
 
-        let header_barang_name = $('.header_barang_name').val();
+    //     let header_barang_name = $('.header_barang_name').val();
 
-        let validate_same = false;
-        let validate_bahan_baku = false;
-        if (barang_detail_id) {
-            if ($(".detail-form").valid()) {
-                // UPDATE DETAIL
-                $.each(list_items, function(i, v) {
-                    if (v.barang_detail_id === barang_detail_id) {
-                        list_items[i].barang_id = barang_id;
-                        list_items[i].barang_spesifikasi_id = barang_spesifikasi_id;
-                        list_items[i].kode_barang = kode_barang;
-                        list_items[i].nama_barang = nama_barang;
-                        list_items[i].nama_satuan = nama_satuan;
-                        list_items[i].satuan_id = satuan_id;
-                        list_items[i].qty = qty;
-                        list_items[i].keterangan = keterangan;
-                    }
-                });
-                drawTable();
-                $(".detail-modal").modal("hide");
-            }
-        } else {
-            if ($(".detail-form").valid()) {
-                // CREATE DETAIL
-                if (barang_id !== "") {
-                    list_items.push({
-                        'barang_detail_id': getID(),
-                        'barang_id': barang_id,
-                        'barang_spesifikasi_id': barang_spesifikasi_id,
-                        'kode_barang': kode_barang,
-                        'nama_barang': nama_barang,
-                        'nama_satuan': nama_satuan,
-                        'satuan_id': satuan_id,
-                        'qty': qty,
-                        'keterangan': keterangan
-                    });
-                }
+    //     let validate_same = false;
+    //     let validate_bahan_baku = false;
+    //     if (barang_detail_id) {
+    //         if ($(".detail-form").valid()) {
+    //             // UPDATE DETAIL
+    //             $.each(list_items, function(i, v) {
+    //                 if (v.barang_detail_id === barang_detail_id) {
+    //                     list_items[i].barang_id = barang_id;
+    //                     list_items[i].barang_spesifikasi_id = barang_spesifikasi_id;
+    //                     list_items[i].kode_barang = kode_barang;
+    //                     list_items[i].nama_barang = nama_barang;
+    //                     list_items[i].nama_satuan = nama_satuan;
+    //                     list_items[i].satuan_id = satuan_id;
+    //                     list_items[i].qty = qty;
+    //                     list_items[i].keterangan = keterangan;
+    //                 }
+    //             });
+    //             drawTable();
+    //             $(".detail-modal").modal("hide");
+    //         }
+    //     } else {
+    //         if ($(".detail-form").valid()) {
+    //             // CREATE DETAIL
+    //             if (barang_id !== "") {
+    //                 list_items.push({
+    //                     'barang_detail_id': getID(),
+    //                     'barang_id': barang_id,
+    //                     'barang_spesifikasi_id': barang_spesifikasi_id,
+    //                     'kode_barang': kode_barang,
+    //                     'nama_barang': nama_barang,
+    //                     'nama_satuan': nama_satuan,
+    //                     'satuan_id': satuan_id,
+    //                     'qty': qty,
+    //                     'keterangan': keterangan
+    //                 });
+    //             }
 
-                resetFormDetail();
-                drawTable();
-                $(".detail-modal").modal("hide");
-            }
-        }
-    }
+    //             drawTable();
+    //         }
+    //     }
+    // }
 
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
 
         if (value) {
-            $(".wo_no").attr("readonly", true);
-            $(".wo_no").val("AUTO GENERATE");
+            $(".req_no").attr("readonly", true);
+            $(".req_no").val("AUTO GENERATE");
         } else {
-            $(".wo_no").attr("readonly", false);
-            $(".wo_no").val("");
+            $(".req_no").attr("readonly", false);
+            $(".req_no").val("");
         }
     }
     const getID = function() {
@@ -836,17 +926,6 @@
 
         return randomString;
     }
-    const resetFormDetail = function() {
-        $(".barang_detail_id").val('');
-        $(".barang_id").val('').val(null).change()
-        $(".barang_spesifikasi_id").val('');
-        $(".kode").val(null).change()
-        $(".nama_barang").val('')
-        $(".satuan").val('')
-        $(".satuan_id").val('')
-        $(".qty").val('')
-        $(".keterangan").val('')
-    }
     const drawTable = function() {
         $('.body-detail-table').empty();
         $('.tfoot').empty();
@@ -855,7 +934,7 @@
         if (list_items.length === 0) {
             row += `
                     <tr>
-                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                        <td colspan="10" class="text-center">Data Barang Tidak Ada</td>
                     </tr>
                 `;
             $('.tfoot').append(row);
@@ -863,31 +942,19 @@
             list_items.map(item => {
                 row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
-                row += '<td>' + item.kode_barang + '</td>';
-                row += '<td>' + item.nama_barang + '</td>';
-                row += '<td>' + item.nama_satuan + '</td>';
+                row += '<td>' + item.dokumen + '</td>';
+                row += '<td>' + item.warehouse + '</td>';
+                row += '<td>' + item.kode + '</td>';
+                row += '<td>' + item.barang + '</td>';
+                row += '<td>' + item.satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
-                row += '<td>' + item.keterangan + '</td>';
-                <?php if (!empty($dataWorkOrders)) : ?>
-                    <?php if ($dataWorkOrders->is_posted == '0') : ?>
-                        row += '<td>' + `
-                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
-                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}')">
+                row += '<td>' + item.jumlahBarang + '</td>';
+                row += '<td>' + item.ketBarang + '</td>';
+                row += '<td>' + `
+                    <button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>` +
-                            '</td>';
-                    <?php endif; ?>
-                <?php else : ?>
-                    row += '<td>' + `
-                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
-                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}')">
-                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                    </button>` +
-                        '</td>';
-                <?php endif; ?>
-
+                    '</td>';
                 no++;
             });
             $('.body-detail-table').append(row);
