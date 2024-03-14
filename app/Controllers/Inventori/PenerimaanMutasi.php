@@ -372,7 +372,7 @@ class PenerimaanMutasi extends BaseController
                 $stock['tipe_barang'],
                 $stock['barang1_id'],
                 $barang2_id,
-                $qty,
+                ($qty * -1),
             );
 
             // DETAIL

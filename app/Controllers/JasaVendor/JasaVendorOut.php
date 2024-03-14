@@ -7,6 +7,8 @@ use App\Models\DivisisModel;
 use App\Models\JasaVendorOutDetailModel;
 use App\Models\JasaVendorOutModel;
 use App\Models\MetadataModel;
+use App\Models\StockDetail2Model;
+use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
@@ -20,6 +22,8 @@ class JasaVendorOut extends BaseController
     protected $metaDataModel;
     protected $divisiModel;
     protected $stockModel;
+    protected $stockDetailModel;
+    protected $stockDetail2Model;
     protected $jasaVendorOutModel;
     protected $jasaVendorOutDetailModel;
     protected $warehouseModel;
@@ -33,6 +37,8 @@ class JasaVendorOut extends BaseController
         $this->metaDataModel = new MetadataModel();
         $this->divisiModel = new DivisisModel();
         $this->stockModel = new StockModel();
+        $this->stockDetailModel = new StockDetailModel();
+        $this->stockDetail2Model = new StockDetail2Model();
         $this->jasaVendorOutModel = new JasaVendorOutModel();
         $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $this->warehouseModel = new WarehousesModel();
@@ -265,6 +271,55 @@ class JasaVendorOut extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        // BARANG OUT KE VENDOR
+        // Insert To Inventori (-)
+        $jasaVendorOut = $this->jasaVendorOutModel->find($id);
+        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->where('deletedAt', null)->findAll();
+
+        foreach ($jasaVendorOutDetail as $j) {
+            $stock = $this->stockModel->find($j['stock_out_id']);
+            $qty = $j['qty'];
+
+            if ($stock['tipe_barang'] == "kemasan") {
+                $barang2_id = $stock['kemasan_id'];
+            } else {
+                $barang2_id = $stock['barang2_id'];
+            }
+
+            $stok = $this->stockModel->insertStok(
+                $jasaVendorOut['company_id'],
+                $jasaVendorOut['warehouse_id'],
+                $jasaVendorOut['divisi_id'],
+                $stock['tipe_barang'],
+                $stock['barang1_id'],
+                $barang2_id,
+                ($qty * -1)
+            );
+
+            // DETAIL
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $qty,
+                "Out",
+                date('Y-m-d'),
+                $this->this_user_id,
+                "JASA VENDOR",
+                "-",
+                $jasaVendorOut['keterangan']
+            );
+
+            // SUB DETAIL
+            $this->stockDetail2Model->insertStokDetail2(
+                $j['bc_out_id'],
+                $j['stock_out_id'],
+                $stokDetail,
+                $qty,
+                $j['no_aju_out'],
+                $jasaVendorOut['no_surat_jalan']
+            );
+        }
+
         $this->jasaVendorOutModel->update($id, ['status_posting' => '1']);
 
         return response()->setJSON([

@@ -709,6 +709,7 @@ $routes->get('/stock-list/stock-filtered', 'Inventori\StokList::allStokFiltered'
 $routes->get('/stock-list/stock-log-pemasukkan-barang-lpb', 'Inventori\StokList::allStokLogPemasukkanBarang', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-adjusment', 'Inventori\StokList::allStokAdjusment', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-mutasi', 'Inventori\StokList::allStokMutasi', ['filter' => 'Auth']);
+$routes->get('/stock-list/stock-log-jasa-vendor', 'Inventori\StokList::allStokJasaVendor', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);

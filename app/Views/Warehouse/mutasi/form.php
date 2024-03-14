@@ -142,66 +142,68 @@
                 </div>
 
             </form>
-
-            <div class="row">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Barang</label>
-                </div>
-            </div>
-            <form class="detail-form">
-                <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
+            <div class="detail-form-layout">
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select type_barang" id="type_barang" name="type_barang" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($tipeBarang as $t) : ?>
-                                    <option value="<?= $t['description'] ?>">
-                                        <?= strtoupper($t['value']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Barang</label>
+                    </div>
+                </div>
+                <form class="detail-form">
+                    <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select type_barang" id="type_barang" name="type_barang" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($tipeBarang as $t) : ?>
+                                        <option value="<?= $t['description'] ?>">
+                                            <?= strtoupper($t['value']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+                <div class="row mt-3">
+                    <div class="col mb-0">
+                        <label class="form-label font-weight-bold lable-title">List Inventori Asal Barang</label>
+                    </div>
+                    <div class="col-md-12 col-table-button-tts">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">Dokumen Pabean</th>
+                                        <th style="text-align: center;">No Aju</th>
+                                        <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Satuan</th>
+                                        <th style="text-align: center;">Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table">
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
                         </div>
                     </div>
-
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id" aria-label="Floating label select example">
-                                <option value=""></option>
-
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi</label>
-                        </div>
-                    </div>
-
                 </div>
-            </form>
 
-            <div class="row mt-3">
-                <div class="col mb-0">
-                    <label class="form-label font-weight-bold lable-title">List Inventori Asal Barang</label>
-                </div>
-                <div class="col-md-12 col-table-button-tts">
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table">
-                            </tbody>
-                        </table>
-                        <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
-                    </div>
-                </div>
             </div>
 
             <div class="row">
@@ -209,7 +211,7 @@
                     <label class="form-label font-weight-bold lable-title">Daftar Barang Yang Akan Dipindahkan</label>
                 </div>
                 <div class="col-md-12 mb-5">
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="margin-top: -10px;">
                         <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
@@ -260,6 +262,9 @@
                 qty: "<?= $m['qty'] ?>"
             });
         <?php endforeach; ?>
+        <?php if ($mutasi['status_posting']) : ?>
+            $('.detail-form-layout').hide()
+        <?php endif; ?>
     <?php endif; ?>
 
     var qtyTotal = 0;

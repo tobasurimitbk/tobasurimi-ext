@@ -30,6 +30,13 @@
                             Simpan
                         </button>
                     <?php endif; ?>
+
+                <?php else : ?>
+                    <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?><?= encrypt($penerimaanMutasi['id']); ?>')">
+                            Print
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
