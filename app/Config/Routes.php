@@ -671,42 +671,24 @@ $routes->post('/kemasan/get', 'Warehouse\Kemasan::get', ['filter' => 'Auth']);
 $routes->get('/kemasan/all', 'Warehouse\Kemasan::all', ['filter' => 'Auth']);
 $routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode', ['filter' => 'Auth']);
 
-// $routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
-//     $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');
-// });
+// JASA VENDOR
+// JASA VENDOR OUT
+$routes->get('/jasa-vendor-out',  'JasaVendor\JasaVendorOut::index', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/create',  'JasaVendor\JasaVendorOut::create', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/list-barang-output', 'JasaVendor\JasaVendorOut::dropdownListOutputVendor', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/all', 'JasaVendor\JasaVendorOut::all', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/save',  'JasaVendor\JasaVendorOut::createAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/delete',  'JasaVendor\JasaVendorOut::delete', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/posting',  'JasaVendor\JasaVendorOut::posting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/id/(:segment)',  'JasaVendor\JasaVendorOut::detail/$1', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/get-jasa-vendor-out-no',  'JasaVendor\JasaVendorOut::getJasaVendorOutNo', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out/print/(:segment)', 'JasaVendor\JasaVendorOut::print/$1', ['filter' => 'Auth']);
 
-// $routes->group('barang-bahan-baku', ['filter' => 'Auth'], function ($routes) {
-//     $routes->get('/', 'Warehouse\Barang::barang/Bahan Baku');
-// });
-
-// $routes->group('barang-bahan-jadi', ['filter' => 'Auth'], function ($routes) {
-//     $routes->get('/', 'Warehouse\Barang::barang/Jadi');
-// });
-
-// $routes->group('barang-scrap', ['filter' => 'Auth'], function ($routes) {
-//     $routes->get('/', 'Warehouse\Barang::barang/Scrap');
-// });
-
-// $routes->group('barang', ['filter' => 'Auth'], function ($routes) {
-//     $routes->get('all', 'Warehouse\Barang::allBarang');
-//     $routes->get('id/(:segment)', 'Warehouse\Barang::getByIdBarang/$1');
-//     $routes->post('save', 'Warehouse\Barang::saveBarang');
-//     $routes->post('update', 'Warehouse\Barang::updateBarang');
-//     $routes->post('delete', 'Warehouse\Barang::deleteBarang');
-// });
-
-// WAREHOUSE
-// MASTER STOCK
-// $routes->get('/stock', 'Warehouse\Stock::index', ['filter' => 'Auth']);
-// $routes->get('/stock/all', 'Warehouse\Stock::allStock', ['filter' => 'Auth']);
-// $routes->get('/stock/(:num)/(:num)', 'Warehouse\Stock::getStockInfo/$1/$2', ['filter' => 'Auth']);
-// $routes->post('/stock/save', 'Warehouse\Stock::addNewStock', ['filter' => 'Auth']);
-// INVENTORI
-// STOCK SAFETY
-// $routes->get('/stock-safety', 'Inventori\Inventori::stockSafetyView', ['filter' => 'Auth']);
-// $routes->get('/stock-safety/id/(:num)', 'Inventori\Inventori::stockSafetyGet/$1', ['filter' => 'Auth']);
-// $routes->post('/stock-safety/update', 'Inventori\Inventori::stockSafetyUpdate', ['filter' => 'Auth']);
-// $routes->get('/stock-safety/all', 'Inventori\Inventori::stockSafetyAll', ['filter' => 'Auth']);
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
 $routes->get('/stock-histori/all', 'Inventori\StokHistori::all', ['filter' => 'Auth']);
