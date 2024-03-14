@@ -96,6 +96,12 @@ class StokHistori extends BaseController
             $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
+            if ($data->sumber == "LPB" || $data->sumber == "JASA VENDOR") {
+                $no_dokumen = $data->no_dokumen1 . " / " . $data->no_dokumen2;
+            } else {
+                $no_dokumen = $data->no_dokumen1;
+            }
+
             if ($data->kemasan_id == 0) {
                 // BARANG
                 $barang = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
@@ -117,7 +123,7 @@ class StokHistori extends BaseController
                     "dokumen_pabean" => $bcName . " / " . $data->no_aju,
                     "sumber" => $data->sumber,
                     "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
-                    "dokumen" => $data->no_dokumen1,
+                    "dokumen" => $no_dokumen,
                     "stok" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                 ]);
             } else {
@@ -138,7 +144,7 @@ class StokHistori extends BaseController
                     "dokumen_pabean" => $bcName . " / " . $data->no_aju,
                     "sumber" => $data->sumber,
                     "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
-                    "dokumen" => $data->no_dokumen1,
+                    "dokumen" => $no_dokumen,
                     "stok" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                 ]);
             }

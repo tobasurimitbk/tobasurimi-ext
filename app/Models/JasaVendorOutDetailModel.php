@@ -76,10 +76,10 @@ class JasaVendorOutDetailModel extends Model
             if ($stockOutput['kemasan_id'] == 0) {
                 $barangMaster = $barangMasterModel->find($stockOutput['barang1_id']);
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stockOutput['barang2_id']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+                $barangNameOutput = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
             } else {
                 $kemasan = $kemasanModel->find($stockOutput['kemasan_id']);
-                $barangName = $kemasan['name'];
+                $barangNameOutput = $kemasan['name'];
             }
 
             $stockList['qty'] = $m['qty'];
@@ -93,7 +93,7 @@ class JasaVendorOutDetailModel extends Model
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = number_format($stockList['stok_total']);
             $stockList['output'] = [
-                'barang' => $barangName,
+                'barang' => $barangNameOutput,
                 'stock_id' => $stockOutput['id']
             ];
 
