@@ -98,7 +98,6 @@ class MaterialRequest extends BaseController
             ->where('work_orders.is_posted', 0)
             ->find();
 
-
         $data = [
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
