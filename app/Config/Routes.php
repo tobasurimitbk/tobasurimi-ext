@@ -548,6 +548,14 @@ $routes->post('/material-request/save', 'Production\materialRequest::create', ['
 $routes->post('/material-request/update', 'Production\materialRequest::update', ['filter' => 'Auth']);
 $routes->post('/material-request/update-status', 'Production\materialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 
+
+// Rencana Produksi
+$routes->get('/material-warehouse', 'Production\materialWarehouse::index', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/id/(:segment)', 'Production\materialWarehouse::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/create', 'Production\materialWarehouse::createView', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/all', 'Production\materialWarehouse::all', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/data-detail-material', 'Production\materialWarehouse::allDetailMaterialRequest', ['filter' => 'Auth']);
+
 // DROPDOWN
 
 // TERIMA FAKTUR

@@ -24,6 +24,8 @@ class MaterialRequestDetailsModel extends Model
         'stock_id',
         'bc_id',
         'no_aju',
+        'ref_no',
+        'stock_date',
         'qty',
         'note',
         'createdAt',

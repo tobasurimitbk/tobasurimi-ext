@@ -23,7 +23,7 @@ use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
 use Exception;
 
-class MaterialRequest extends BaseController
+class MaterialWarehouse extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -76,7 +76,7 @@ class MaterialRequest extends BaseController
 
     public function index()
     {
-        return view('Production/materialRequest/index');
+        return view('Production/materialWarehouse/index');
     }
 
     public function createView()
@@ -89,25 +89,15 @@ class MaterialRequest extends BaseController
 
         $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
         $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
-        $dataWorkOrder = $this->workOrdersModel->asObject()
-            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
-            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
-            ->where('company_id', $this->this_company_id)
-            ->where('work_orders.deletedAt', null)
-            ->where('work_order_details.deletedAt', null)
-            ->where('work_orders.is_posted', 0)
-            ->find();
-
 
         $data = [
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
-            "dataWarehouse" => $dataWarehouse,
-            "dataWorkOrder" => $dataWorkOrder,
+            "dataWarehouse" => $dataWarehouse
         ];
 
-        return view('Production/materialRequest/form', $data);
+        return view('Production/materialWarehouse/form', $data);
     }
 
     public function getById($id = null)
@@ -144,7 +134,7 @@ class MaterialRequest extends BaseController
             $data["ids"] = $id;
         }
 
-        return view('Production/materialRequest/form-detail', $data);
+        return view('Production/materialWarehouse/form-detail', $data);
     }
 
     public function all()
@@ -157,7 +147,9 @@ class MaterialRequest extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [];
+        $condition = [
+            "material_requests.is_posted"        => 1,
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -167,7 +159,13 @@ class MaterialRequest extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $materialRequestData = $this->materialRequestModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
+
+        // var_dump($limit);
+        // var_dump($offset);
+        // var_dump($payload);
+        // var_dump($condition);
+        $materialRequestData = $this->materialRequestModel->getMaterialRequestListForMaterialWarehouse($condition, $addCondition, $limit, $offset);
+        // var_dump($materialRequestData);
 
         $dataMaterialRequest = [];
 
@@ -177,10 +175,14 @@ class MaterialRequest extends BaseController
             array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
+                "request_date"                 => date('d/m/Y', strtotime($data->request_date)),
                 "req_no"                 => $data->req_no,
+                "wo_no"                 => $data->wo_no,
                 "nama_barang"           => $data->nama_barang,
                 "nama_divisi"           => $data->divisi,
-                "is_posted"           => $data->is_posted,
+                "warehouse"           => $data->warehouse_name,
+                "user"           => $data->name,
+                "satuan"           => $data->satuan,
             ]);
         }
 
@@ -197,113 +199,6 @@ class MaterialRequest extends BaseController
         return;
     }
 
-    public function allDataBarang()
-    {
-        // Mendapatkan nilai $id dan $spek_id dari request
-        $id = $this->request->getVar('id');
-        $spek_id = $this->request->getVar('spek_id');
-
-        // Dekripsi nilai $id dan $spek_id jika perlu
-        if ($id !== null || $id !== "") {
-            $id = decrypt($id);
-        }
-        if ($spek_id !== null || $spek_id !== "") {
-            $spek_id = decrypt($spek_id);
-        }
-
-        // Jika $id atau $spek_id kosong, kembalikan respons kosong
-        if ($id === null || $spek_id === null || $id === "" || $spek_id === "" || $id === 0 || $spek_id === 0) {
-            return response()->setJSON([
-                "draw"              => intval($this->request->getVar("draw")),
-                "recordsTotal"      => 0,
-                "recordsFiltered"   => 0,
-                "data"              => [],
-                "payload"           => [],
-            ]);
-        }
-
-
-        $payload = [
-            "pageSize"      => $this->request->getVar("length"),
-            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
-            "sort" => $this->request->getVar("sort"),
-            "sorttype" => $this->request->getVar("sortType"),
-        ];
-
-        $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "bc_id" => $this->request->getVar("bc_id"),
-            "no_aju" => $this->request->getVar("no_aju"),
-            "divisi_id" => $this->request->getVar("divisi_id"),
-            "warehouse_id" => $this->request->getVar('warehouse_id'),
-        ];
-
-        $limit = $this->request->getVar("length");
-        $offset = $this->request->getVar("start");
-        $stok = $this->stockModel->where('barang1_id', $id)
-            ->where('barang2_id', $spek_id)
-            ->findAll(); // Menggunakan findAll() untuk mendapatkan semua hasil yang sesuai
-
-        $dataResult = [];
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-        foreach ($stok as $singleStok) {
-            $condition = [
-                "stock_details2.stock_id" => $singleStok['id'],
-                "stock_details2.deletedAt" => null,
-                "stock_details.deletedAt" => null,
-            ];
-
-            $dataQry = $this->stockDetail2Model->getListStokPerDokumen($condition, $addCondition, $limit, $offset);
-
-            foreach ($dataQry['data'] as $data) {
-                $dokumenBC = $this->metaDataModel->find($data->bc_id);
-                $stockDetail = $this->stockDetailModel->find($data->stock_detail_id);
-                $dataWarehouse = $this->warehousesModel->find($singleStok['warehouse_id']);
-
-                $dokumen = substr(strrchr($data->no_aju, '-'), -6);
-                $tgldokumen = str_replace("-", "", $stockDetail['stock_date']);
-
-                if ($singleStok['kemasan_id'] == 0) {
-                    // BARANG
-                    $barang = $this->barangMasterSpesifikasiModel->find($singleStok['barang2_id']);
-                    $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
-                    $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
-                    $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
-                    $barangMaster = $this->barangMasterModel->find($singleStok['barang1_id']);
-                    $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($singleStok['barang2_id']);
-
-                    array_push($dataResult, [
-                        "no" => $no++,
-                        "dokumen" => $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'] . "/" . $dokumen . "/" . $tgldokumen,
-                        "stock"   => $stockDetail['stock_date'],
-                        "warehouse"   => $dataWarehouse['warehouse_name'],
-                        "kode"  => strtoupper($barangMaster['kode_barang']),
-                        "barang"  => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
-                        "satuan" => $satuan_1['kode_satuan'],
-                        "qty" => $data->stok_total,
-                        "stock_id" => encrypt($singleStok['id']),
-                        "bc_id" => encrypt($data->bc_id),
-                        "barang1_id" => encrypt($id),
-                        "barang2_id" => encrypt($spek_id),
-                        "no_aju" => $data->no_aju,
-                    ]);
-                }
-            }
-        }
-
-        $data = [
-            "draw"              => intval($this->request->getVar("draw")),
-            "recordsTotal"      => $dataQry['totalData'],
-            "recordsFiltered"   => $dataQry['totalFilteredData'],
-            "data"              => $dataResult,
-            "payload"           => $payload,
-        ];
-
-        return response()->setJSON($data);
-    }
-
     public function allDetailMaterialRequest()
     {
         $payload = [
@@ -315,7 +210,8 @@ class MaterialRequest extends BaseController
         ];
 
         $condition = [
-            "material_requests.id"        => decrypt($this->request->getGet("id"))
+            "material_requests.is_posted"        => 1,
+            "material_request_details.id"        => decrypt($this->request->getGet("id")),
         ];
 
         $addCondition = [
@@ -327,7 +223,12 @@ class MaterialRequest extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $materialRequestData = $this->materialRequestModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
+        // var_dump($limit);
+        // var_dump($offset);
+        // var_dump($payload);
+        // var_dump($condition);
+        $materialRequestData = $this->materialRequestModel->getMaterialRequestListForMaterialWarehouse($condition, $addCondition, $limit, $offset);
+
 
         $dataMaterialRequest = [];
 
@@ -337,13 +238,11 @@ class MaterialRequest extends BaseController
             array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "req_no"                 => $data->req_no,
-                "tgl_req"                 => $data->request_date,
-                "nama_divisi"           => $data->divisi,
-                "nama_warehouse"           => $data->warehouse_name,
+                "ref_no"                 => $data->ref_no,
                 "nama_barang"           => $data->nama_barang,
                 "satuan"           => $data->satuan,
                 "total"           => $data->total,
+                "note"           => $data->note,
             ]);
         }
 
@@ -389,8 +288,6 @@ class MaterialRequest extends BaseController
                     'stock_id' => decrypt($s->stock_id),
                     'bc_id' => decrypt($s->bc_id),
                     'no_aju' => $s->no_aju,
-                    'ref_no' => $s->dokumen,
-                    'stock_date' => $s->stock,
                     'qty' => $s->jumlahBarang,
                     'note' => $s->ketBarang,
                 ]);

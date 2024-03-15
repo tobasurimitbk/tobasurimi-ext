@@ -108,6 +108,68 @@ class MaterialRequestsModel extends Model
         ];
     }
 
+    public function getMaterialRequestListForMaterialWarehouse($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'req_no'             => 'material_requests.req_no',
+            'department'       => 'divisis.divisi',
+            'nama_barang'       => 'material_request_details.nama_barang',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'material_requests.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "material_requests.id, material_requests.request_date, 
+            material_requests.req_no, 
+            work_orders.wo_no, 
+            material_request_details.nama_barang,
+            material_request_details.satuan,
+            material_request_details.ref_no,
+            material_request_details.stock_date,
+            material_request_details.note,
+            SUM(material_request_details.qty) as total,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            users.name,
+        ";
+
+        $materialRequestsDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('divisis', 'divisis.id = material_requests.divisi_id')
+            ->join('warehouses', 'warehouses.id = material_requests.warehouse_id')
+            ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id')
+            ->join('work_orders', 'work_orders.id = material_requests.work_order_id')
+            ->join('users', 'users.id = work_orders.createdBy')
+            ->groupBy('material_requests.id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $materialRequestsDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $materialRequestsDataQry->groupStart();
+        }
+        if ($addCondition['search']) {
+            $materialRequestsDataQry
+                ->like('material_requests.req_no', $addCondition['search'])
+                ->orLike('work_orders.wo_no', $addCondition['search'])
+                ->orLike('material_request_details.nama_barang', $addCondition['search']);
+        }
+        if ($addCondition['search']) {
+            $materialRequestsDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $materialRequestsDataQry->countAllResults(false);
+        $data = $materialRequestsDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     public function get_no($tgl, $bln, $thn, $last_day)
     {
         $romanNumb = [
