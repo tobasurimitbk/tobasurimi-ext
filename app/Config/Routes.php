@@ -538,23 +538,23 @@ $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' =>
 $routes->post('/work-order/delete', 'Production\WorkOrder::deleteWO', ['filter' => 'Auth']);
 
 // Material Request
-$routes->get('/material-request', 'Production\materialRequest::index', ['filter' => 'Auth']);
-$routes->get('/material-request/id/(:segment)', 'Production\materialRequest::getById/$1', ['filter' => 'Auth']);
-$routes->get('/material-request/create', 'Production\materialRequest::createView', ['filter' => 'Auth']);
-$routes->get('/material-request/all', 'Production\materialRequest::all', ['filter' => 'Auth']);
-$routes->get('/material-request/data-detail-material', 'Production\materialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
-$routes->get('/material-request/data-barang', 'Production\materialRequest::allDataBarang', ['filter' => 'Auth']);
-$routes->post('/material-request/save', 'Production\materialRequest::create', ['filter' => 'Auth']);
-$routes->post('/material-request/update', 'Production\materialRequest::update', ['filter' => 'Auth']);
-$routes->post('/material-request/update-status', 'Production\materialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
+$routes->get('/material-request/id/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
+$routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
+$routes->get('/material-request/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/material-request/data-barang', 'Production\MaterialRequest::allDataBarang', ['filter' => 'Auth']);
+$routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
+$routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
+$routes->post('/material-request/update-status', 'Production\MaterialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 
 
 // Rencana Produksi
-$routes->get('/material-warehouse', 'Production\materialWarehouse::index', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/id/(:segment)', 'Production\materialWarehouse::getById/$1', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/create', 'Production\materialWarehouse::createView', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/all', 'Production\materialWarehouse::all', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/data-detail-material', 'Production\materialWarehouse::allDetailMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/material-warehouse', 'Production\MaterialWarehouse::index', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/id/(:segment)', 'Production\MaterialWarehouse::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/create', 'Production\MaterialWarehouse::createView', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/all', 'Production\MaterialWarehouse::all', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/data-detail-material', 'Production\MaterialWarehouse::allDetailMaterialRequest', ['filter' => 'Auth']);
 
 // DROPDOWN
 
