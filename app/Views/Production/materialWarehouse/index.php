@@ -5,10 +5,6 @@
 <section class="section">
     <div class="section-header">
         <h1>Material Warehouse</h1>
-
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
         <?= csrf_field() ?>
     </div>
     <div class="card">
@@ -125,16 +121,27 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
-                    return `
-                    <div class="mt-0">
-                        <button type="button" class="btn btn-primary detail-material-warehouse">
-                            <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="posting('${id}', 1)">
-                        <i class="fa fa-check" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                    `
+                    let is_approve = row?.is_approve;
+                    if (is_approve != 1) {
+                        return `
+                        <div class="mt-0">
+                            <button type="button" class="btn btn-primary detail-material-warehouse">
+                                <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="posting('${id}', 1)">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        `
+                    } else {
+                        return `
+                        <div class="mt-0">
+                            <button type="button" class="btn btn-primary detail-material-warehouse">
+                                <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        `
+                    }
                 }
             }
         ],
@@ -175,7 +182,7 @@
         console.log(id);
         Swal.fire({
             icon: 'question',
-            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+            title: status_posting == "1" ? "Yakin Akan disetujui ?" : "Yakin Akan batal disetujui ?",
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -185,7 +192,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "<?= base_url("material-request/update-status"); ?>",
+                    url: "<?= base_url("material-warehouse/update-status"); ?>",
                     data: {
                         id: id,
                         status_posting: status_posting

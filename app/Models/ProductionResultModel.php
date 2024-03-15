@@ -48,7 +48,7 @@ class ProductionResultModel extends Model
     public function getProductResultList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'productionCode'=> 'production_results.pr_no',
+            'productionCode' => 'production_results.pr_no',
             'workOrderCode' => 'suppliers.kode',
             'barangCode'    => 'barangs.kode_barang',
             'barangName'    => 'barangs.nama_barang',
@@ -64,15 +64,16 @@ class ProductionResultModel extends Model
                       DATE_FORMAT(production_results.receive_date, '%d/%m/%Y') AS receive_date,
                       warehouses.warehouse_name AS warehouseName, 
                       work_orders.wo_no AS wo_no,
-                      barangs.kode_barang AS barangCode,
-                      barangs.nama_barang AS barangName
+                      barang_master.kode_barang AS barangCode,
+                      barang_master.barang_name AS barangName
                       ";
         $productionResDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('warehouses', 'warehouses.id = production_results.warehouse_id')
             ->join('work_orders', 'work_orders.id = production_results.work_order_id')
-            ->join('barangs', 'barangs.id = work_orders.barang_id')
+            ->join('work_order_details', 'work_order_details.work_order_id = production_results.work_order_id')
+            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $productionResDataQry->countAllResults(false);
@@ -82,9 +83,9 @@ class ProductionResultModel extends Model
                 ->like('production_results.pr_no', $addCondition['search'], 'after')
                 ->orLike('work_orders.wo_no', $addCondition['search'], 'after')
                 ->orLike('barangs.nama_barang', $addCondition['search'], 'after')
-            ->groupEnd();
+                ->groupEnd();
         }
-        
+
         $totalFilteredData = $productionResDataQry->countAllResults(false);
         $data = $productionResDataQry->findAll($limit, $offset);
 

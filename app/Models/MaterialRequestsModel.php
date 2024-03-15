@@ -25,6 +25,8 @@ class MaterialRequestsModel extends Model
         'req_no',
         'is_posted',
         'createdBy',
+        'is_approve',
+        'approveBy',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -122,6 +124,8 @@ class MaterialRequestsModel extends Model
 
         $selectQry = "material_requests.id, material_requests.request_date, 
             material_requests.req_no, 
+            material_requests.is_posted, 
+            material_requests.is_approve, 
             work_orders.wo_no, 
             material_request_details.nama_barang,
             material_request_details.satuan,

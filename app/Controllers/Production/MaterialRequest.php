@@ -490,7 +490,6 @@ class MaterialRequest extends BaseController
         return;
     }
 
-
     public function updateStatusPostedMaterialRequest()
     {
         try {

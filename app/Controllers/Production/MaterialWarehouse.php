@@ -183,6 +183,8 @@ class MaterialWarehouse extends BaseController
                 "warehouse"           => $data->warehouse_name,
                 "user"           => $data->name,
                 "satuan"           => $data->satuan,
+                "is_posted"           => $data->is_posted,
+                "is_approve"           => $data->is_approve,
             ]);
         }
 
@@ -259,137 +261,7 @@ class MaterialWarehouse extends BaseController
         return;
     }
 
-    public function create()
-    {
-        try {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-            $id = $this->materialRequestModel->insert([
-                "work_order_id" => $this->request->getPost("kode_produksi"),
-                'company_id' => $this->this_company_id,
-                'divisi_id' => $this->request->getVar("department_id"),
-                'warehouse_id' => $this->request->getVar("warehouse_id"),
-                "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
-                "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
-                "req_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("req_no"),
-                'is_posted' => 0,
-                'createdBy' =>  session()->get("login")->user_id,
-            ]);
-
-            $mr_detail = json_decode($this->request->getVar("items"));
-
-            foreach ($mr_detail as $s) {
-                $this->materialRequestDetailsModel->insert([
-                    'material_request_id' => $id,
-                    'barang1_id' => decrypt($s->barang1_id),
-                    'barang2_id' => decrypt($s->barang2_id),
-                    'nama_barang' => $s->barang,
-                    'satuan' => $s->satuan,
-                    'stock_id' => decrypt($s->stock_id),
-                    'bc_id' => decrypt($s->bc_id),
-                    'no_aju' => $s->no_aju,
-                    'qty' => $s->jumlahBarang,
-                    'note' => $s->ketBarang,
-                ]);
-            }
-
-            return response()->setJSON([
-                "id"      => encrypt($id),
-                "status"  => true,
-                "message" => "Data Berhasil disimpan",
-                'token'   => csrf_hash(),
-            ]);
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function update()
-    {
-        try {
-            $rules = [
-                "barang_id" => [
-                    "rules" => "required"
-                ],
-                "production_amt" => [
-                    "rules" => "required"
-                ],
-                "satuan_id" => [
-                    "rules" => "required"
-                ],
-                "target" => [
-                    "rules" => "required"
-                ]
-            ];
-
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-                // $no = $this->workOrdersModel->get_no();
-                $payload = [
-                    "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
-                    "barang_id" => formatter($this->request->getPost("barang_id"), "STR_TO_INT"),
-                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "target" => $this->request->getPost("target"),
-                    "production_amt" => $this->request->getPost("production_amt")
-                ];
-
-                $condition = [
-                    'id' => $id
-                ];
-
-                $response = $this->workOrdersModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-
-    public function updateStatusPostedMaterialRequest()
+    public function updateStatusApproveMaterialRequest()
     {
         try {
 
@@ -398,14 +270,49 @@ class MaterialWarehouse extends BaseController
 
             // po posting
             $payload = [
-                "is_posted" => $this->request->getVar('status_posting')
+                "is_approve" => $this->request->getVar('status_posting'),
+                "approveBy" => session()->get("login")->user_id,
             ];
+
 
             if (!empty($id)) {
                 $this->materialRequestModel->update($id, $payload);
+                $materialRequestData = $this->materialRequestModel->find($id);
+
+                // $stok = $this->stockModel->insertStok(
+                //     $this->this_company_id,
+                //     $materialRequestData['warehouse_id'],
+                //     $materialRequestData['divisi_id'],
+                //     $stock['tipe_barang'],
+                //     $stock['barang1_id'],
+                //     $barang2_id,
+                //     ($qty * -1),
+                // );
+
+                // // DETAIL
+                // $stokDetail = $this->stockDetailModel->insertStokDetail(
+                //     $stok,
+                //     $qty,
+                //     "Out",
+                //     date('Y-m-d'),
+                //     $this->this_user_id,
+                //     "MUTASI",
+                //     $penerimaanMutasi['penerimaan_mutasi_no'],
+                //     $penerimaanMutasi['keterangan'],
+                // );
+
+                // // SUB DETAIL
+                // $this->stockDetail2Model->insertStokDetail2(
+                //     $p['bc_id'],
+                //     $stok,
+                //     $stokDetail,
+                //     $qty,
+                //     $p['no_aju'],
+                //     $mutasi['no_mutasi']
+                // );
                 $data = [
                     "status"    => true,
-                    "message"   => "Status Posting Berhasil Diperbaharui",
+                    "message"   => "Material Request Berhasil Diapprove",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];
@@ -414,7 +321,7 @@ class MaterialWarehouse extends BaseController
             } else {
                 $data = [
                     "status"    => false,
-                    "message"   => "Data Gagal Disimpan",
+                    "message"   => "Data Gagal Diapprove",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];

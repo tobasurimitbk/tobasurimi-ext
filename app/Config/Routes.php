@@ -555,6 +555,7 @@ $routes->get('/material-warehouse/id/(:segment)', 'Production\MaterialWarehouse:
 $routes->get('/material-warehouse/create', 'Production\MaterialWarehouse::createView', ['filter' => 'Auth']);
 $routes->get('/material-warehouse/all', 'Production\MaterialWarehouse::all', ['filter' => 'Auth']);
 $routes->get('/material-warehouse/data-detail-material', 'Production\MaterialWarehouse::allDetailMaterialRequest', ['filter' => 'Auth']);
+$routes->post('/material-warehouse/update-status', 'Production\MaterialWarehouse::updateStatusApproveMaterialRequest', ['filter' => 'Auth']);
 
 // DROPDOWN
 

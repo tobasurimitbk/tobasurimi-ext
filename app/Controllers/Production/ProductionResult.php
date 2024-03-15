@@ -33,7 +33,7 @@ class ProductionResult extends BaseController
         $this->warehousesModel = new WarehousesModel();
         $this->workOrdersModel = new WorkOrdersModel();
     }
-    
+
     public function index()
     {
         return view('Production/productionResult/index');
@@ -171,14 +171,15 @@ class ProductionResult extends BaseController
             ->findAll();
 
         $workOrderData = $this->workOrdersModel->asObject()
-            ->select("work_orders.id AS id, CONCAT(wo_no, ' - ', barangs.nama_barang) AS wo_no")
-            ->join('barangs', 'barangs.id = work_orders.barang_id')
+            ->select("work_orders.id AS id, CONCAT(wo_no, ' - ', barang_master.barang_name) AS wo_no")
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id')
+            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id')
             ->findAll();
 
         $data = [
-            'barangData'=> $barangData,
-            'workOrders'=> $workOrderData,
-            'warehouses'=> $warehouseData
+            'barangData' => $barangData,
+            'workOrders' => $workOrderData,
+            'warehouses' => $warehouseData
         ];
         return view('Production/productionResult/form', $data);
     }
@@ -351,7 +352,7 @@ class ProductionResult extends BaseController
         $year = date('y');
         $romanMonth = romanMonthNumber($month);
         $numberTemplate = "/PR/$romanMonth/$year";
-        
+
         $lastData = $this->productionResultModel->asObject()
             ->like('pr_no', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
