@@ -170,8 +170,7 @@ class RMPurchaseOrderDetailModel extends Model
                     ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
                     ->where('purchase_order_id', $b['rm_purchase_order_id'])
                     ->where('purchase_order_details_id', $b['id'])
-                    ->where('')
-                    ->where('deletedAt', null)
+                    ->where('penerimaan_barang_detail.deletedAt', null)
                     ->groupBy('purchase_order_id', 'purchase_order_details_id')
                     ->findAll();
 
@@ -250,7 +249,7 @@ class RMPurchaseOrderDetailModel extends Model
                         'rm_purchase_order_details_id' => $b['id'],
                         'rm_purchase_order_id' => $b['rm_purchase_order_id'],
                         'kode_barang' => $b['kode_barang'],
-                        'nama_barang' => $b['nama_barang'] . ' (' . $b['spesifikasi'] . ')',
+                        'nama_barang' => strtoupper($b['nama_barang'] . ' - ' . $b['spesifikasi'] . ''),
                         'spesifikasi_name' => $b['spesifikasi'],
                         'nama_barang_master' => $b['nama_barang'],
                         'po_no' => $b['po_no'],
