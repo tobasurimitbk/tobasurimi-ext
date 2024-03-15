@@ -211,7 +211,7 @@ class MaterialWarehouse extends BaseController
 
         $condition = [
             "material_requests.is_posted"        => 1,
-            "material_request_details.id"        => decrypt($this->request->getGet("id")),
+            "material_request_details.material_request_id"        => decrypt($this->request->getGet("id")),
         ];
 
         $addCondition = [
@@ -227,7 +227,7 @@ class MaterialWarehouse extends BaseController
         // var_dump($offset);
         // var_dump($payload);
         // var_dump($condition);
-        $materialRequestData = $this->materialRequestModel->getMaterialRequestListForMaterialWarehouse($condition, $addCondition, $limit, $offset);
+        $materialRequestData = $this->materialRequestModel->getMaterialRequestListForMaterialWarehouseDetail($condition, $addCondition, $limit, $offset);
 
 
         $dataMaterialRequest = [];
