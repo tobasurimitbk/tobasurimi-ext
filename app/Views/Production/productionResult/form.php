@@ -1026,7 +1026,7 @@
                     dataType: "json",
                     success: function(res) {
                         console.log(res);
-                        if (res && res.data && Array.isArray(res.data)) {
+                        if (res.status) {
                             // Clear existing options
                             $('#kode_request').empty();
                             // Append a default option
@@ -1047,9 +1047,13 @@
                                 }));
                             });
                         } else {
-                            console.error('Invalid or empty response data:', res);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Material Request Tidak Ada',
+                                confirmButtonColor: '#4e73df',
+                            })
                         }
-                    }
+                    },
                 });
                 $.ajax({
                     url: `<?= base_url('production-result/list-work-order'); ?>`,

@@ -465,11 +465,18 @@ class ProductionResult extends BaseController
                 ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
                 ->groupBy('material_request_details.material_request_id')
                 ->find();
-            return response()->setJSON([
-                'data' => $dataMaterialRequest,
-                'token' => csrf_hash(),
-                'status' => true
-            ]);
+            if ($dataMaterialRequest) {
+                return response()->setJSON([
+                    'data' => $dataMaterialRequest,
+                    'token' => csrf_hash(),
+                    'status' => true
+                ]);
+            } else {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
         }
     }
 }
