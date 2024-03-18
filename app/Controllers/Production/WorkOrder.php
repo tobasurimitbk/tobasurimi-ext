@@ -195,69 +195,80 @@ class WorkOrder extends BaseController
     public function update()
     {
         try {
-            $rules = [
-                "barang_id" => [
-                    "rules" => "required"
-                ],
-                "production_amt" => [
-                    "rules" => "required"
-                ],
-                "satuan_id" => [
-                    "rules" => "required"
-                ],
-                "target" => [
-                    "rules" => "required"
-                ]
+            $id = ($this->request->getPost("id"));
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+            // $no = $this->workOrdersModel->get_no();
+            $payload = [
+                "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $this->request->getVar("department_id"),
+                'warehouse_id' => $this->request->getVar("warehouse_id"),
+                "request_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
+                'standart_production' => $this->request->getVar('standart_production'),
+                'note' => $this->request->getVar('note'),
+                'is_posted' => 0,
+                'request_status' => "waiting",
+                'createdBy' =>  session()->get("login")->user_id,
             ];
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
+            // $condition = [
+            //     'id' => $id
+            // ];
+
+            $response = $this->workOrdersModel->update($id, [
+                "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $this->request->getVar("department_id"),
+                'warehouse_id' => $this->request->getVar("warehouse_id"),
+                "request_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
+                'standart_production' => $this->request->getVar('standart_production'),
+                'note' => $this->request->getVar('note'),
+                'is_posted' => 0,
+                'request_status' => "waiting",
+                'createdBy' =>  session()->get("login")->user_id,
+            ]);
+
+            $wo_detail = json_decode($this->request->getVar("items"));
+
+            foreach ($wo_detail as $s) {
+                if (decrypt($s->work_order_detail_id) != "") {
+                    $this->workOrderDetailsModel->update(decrypt($s->work_order_detail_id), [
+                        'barang1_id' => decrypt($s->barang_id),
+                        'barang2_id' => decrypt($s->barang_spesifikasi_id),
+                        'nama_barang' => $s->nama_barang,
+                        'qty' => $s->qty,
+                        'unit' => $s->satuan_id,
+                        'note' => $s->keterangan,
+                    ]);
+                } else {
+                    $this->workOrderDetailsModel->insert([
+                        'work_order_id' => $id,
+                        'barang1_id' => decrypt($s->barang_id),
+                        'barang2_id' => decrypt($s->barang_spesifikasi_id),
+                        'nama_barang' => $s->nama_barang,
+                        'qty' => $s->qty,
+                        'unit' => $s->satuan_id,
+                        'note' => $s->keterangan,
+                    ]);
+                }
             }
 
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-                // $no = $this->workOrdersModel->get_no();
-                $payload = [
-                    "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
-                    "barang_id" => formatter($this->request->getPost("barang_id"), "STR_TO_INT"),
-                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "target" => $this->request->getPost("target"),
-                    "production_amt" => $this->request->getPost("production_amt")
+            if ($response) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    'token' => csrf_hash()
                 ];
-
-                $condition = [
-                    'id' => $id
+                echo json_encode($data);
+            } else {
+                $message =  'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
                 ];
-
-                $response = $this->workOrdersModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
+                echo json_encode($data);
             }
         } catch (\Exception $e) {
             $data = [

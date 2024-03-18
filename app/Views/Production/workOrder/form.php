@@ -136,6 +136,7 @@
                     <input autocomplete="one-time-code" type="hidden" class="header_barang_name" name="header_barang_name" id="header_barang_name" />
 
                     <input autocomplete="one-time-code" type="hidden" class="spp_type_bypass" name="spp_type_bypass" id="spp_type_bypass" />
+                    <input autocomplete="one-time-code" type="hidden" class="work_order_detail_id" name="work_order_detail_id" id="work_order_detail_id" />
 
                     <div class="row">
                         <div class="col-md-6">
@@ -598,6 +599,59 @@
                 }
             })
         });
+
+        $(document).on('click', '.edit-table-detail', function(evt) {
+            $(".title-detail-name").text("Update")
+
+            validator_detail.resetForm();
+            validator_detail.reset();
+            let barang_id = "";
+            let barang_spesifikasi_id = "";
+            let barang_detail_id = $(this).data('barang_detail_id');
+
+            $.each(list_items, function(i, v) {
+                if (v.barang_detail_id === barang_detail_id) {
+                    $(".barang_detail_id").val(v.barang_detail_id);
+                    $(".barang_id").val(v.barang_id);
+                    $(".barang_spesifikasi_id").val(v.barang_spesifikasi_id);
+                    $(".kode_barang").val(v.kode_barang);
+                    $(".nama_barang").val(v.nama_barang);
+                    $(".nama_satuan").val(v.nama_satuan);
+                    $(".work_order_detail_id").val(v.work_order_detail_id);
+                    $(".satuan_id").val(v.satuan_id);
+                    $(".qty").val(v.qty);
+                    $(".keterangan").val(v.keterangan);
+
+                    barang_id = v.barang_id;
+                    barang_spesifikasi_id = v.barang_spesifikasi_id;
+                }
+            });
+            type = "bahan_jadi";
+
+            $.ajax({
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    type: type
+                },
+                success: function(res) {
+                    $(".kode_barang").empty();
+                    $(".kode_barang").append(`<option data-barang_name_master=""  data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+                    res.data.forEach(function(item) {
+                        if (barang_id === item.id && barang_spesifikasi_id === item.barang_master_spesifikasi_id) {
+                            $(".satuan_id").val(item.satuan_1);
+                            $(".satuan").val(item.nama_satuan);
+                            $(".kode_barang").append(`<option selected data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        } else {
+                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        }
+                    })
+
+                    $(".detail-modal").modal("show");
+                }
+            })
+        });
     });
 
     $('.btn-hide-detail').click(function() {
@@ -608,6 +662,7 @@
     const submitDetailForm = function() {
         let barang_detail_id = $(".barang_detail_id").val();
         let barang_id = $(".barang_id").val()
+        let work_order_detail_id = $(".work_order_detail_id").val()
         let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
         let kode_barang = $(".kode_barang").val()
         let nama_barang = $(".nama_barang").val()
@@ -626,6 +681,7 @@
                 $.each(list_items, function(i, v) {
                     if (v.barang_detail_id === barang_detail_id) {
                         list_items[i].barang_id = barang_id;
+                        list_items[i].work_order_detail_id = work_order_detail_id;
                         list_items[i].barang_spesifikasi_id = barang_spesifikasi_id;
                         list_items[i].kode_barang = kode_barang;
                         list_items[i].nama_barang = nama_barang;
@@ -644,6 +700,7 @@
                 if (barang_id !== "") {
                     list_items.push({
                         'barang_detail_id': getID(),
+                        'work_order_detail_id': "",
                         'barang_id': barang_id,
                         'barang_spesifikasi_id': barang_spesifikasi_id,
                         'kode_barang': kode_barang,
@@ -754,6 +811,7 @@
         <?php foreach ($dataWorkOrderDetails as $i => $d) : ?>
             list_items.push({
                 'barang_detail_id': getID(),
+                'work_order_detail_id': "<?= encrypt($d->id) ?>",
                 'barang_id': "<?= encrypt($d->barang1_id) ?>",
                 'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
                 'kode_barang': "<?= $d->kode_barang ?>",
@@ -764,6 +822,7 @@
                 'keterangan': "<?= $d->note ?>"
             });
         <?php endforeach; ?>
+        console.log(list_items);
         drawTable();
     <?php endif; ?>
 </script>
