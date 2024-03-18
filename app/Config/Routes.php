@@ -543,7 +543,6 @@ $routes->get('/material-request/id/(:segment)', 'Production\MaterialRequest::get
 $routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
 $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
 $routes->get('/material-request/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
-$routes->get('/material-request/data-barang', 'Production\MaterialRequest::allDataBarang', ['filter' => 'Auth']);
 $routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
 $routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
 $routes->post('/material-request/update-status', 'Production\MaterialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);

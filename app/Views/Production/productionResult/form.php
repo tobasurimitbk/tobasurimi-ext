@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Hasil Produksi</h1>
+        <h1 class="title-name">Tambah Penerimaan Hasil Produksi</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("production-result"); ?>">
                 Batal
@@ -19,49 +19,146 @@
             <form class="create-form form-add-spp form-hp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">Bukti Penerimaan</label>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= $data->pr_no ?? ""; ?>" class="form-control" id="pr_no" name="pr_no" placeholder="Kode Produksi" disabled>
-                                    <label for="floatingInput">Kode Produksi</label>
+                                    <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan">
+                                    <label for="floatingInput">Kode Penerimaan</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control date_picker" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <label for="floatingInput">Tanggal Penerimaan</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select barang_id" name="work_order" id="work_order" aria-label="Floating label select example">
+                            <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php foreach ($workOrders ?? [] as $workOrder) : ?>
-                                    <option value="<?= $workOrder->id ?>" <?= !empty($data) && $data->work_order_id == $workOrder->id ? 'selected' : '' ?>><?= $workOrder->wo_no ?></option>
+                                <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
+                                    <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Work Order</label>
+                            <label for="floatingInput">Kode Produksi</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select barang_id" name="warehouse" id="warehouse" aria-label="Floating label select example">
+                            <input autocomplete="one-time-code" type="text" class="form-control barang_jadi" name="barang_jadi" id="barang_jadi" placeholder="Barang Jadi" readonly>
+                            <label for="floatingInput">Barang Jadi</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" readonly>
+                            <label for="floatingInput">Jumlah Standart Produksi</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select department_id_order" name="department_id" id="department_id_order" disabled>
                                 <option value=""></option>
-                                <?php foreach ($warehouses ?? [] as $warehouse) : ?>
-                                    <option value="<?= $warehouse->id ?>" <?= !empty($data) && $data->warehouse_id == $warehouse->id ? 'selected' : '' ?>><?= $warehouse->warehouse_name ?></option>
+                                <?php foreach ($dataDivisi as $divisi) : ?>
+                                    <option value="<?= $divisi['id'] ?>"><?= $divisi['divisi'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Department</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select warehouse_id_order" name="warehouse_id" id="warehouse_id_order" disabled>
+                                <option value=""></option>
+                                <?php foreach ($dataWarehouse ?? [] as $Warehouse) : ?>
+                                    <option value="<?= $Warehouse['id'] ?>"><?= $Warehouse['warehouse_name'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= $data->receive_date ?? '' ?>" class="form-control target input-picker" name="receive_date" id="receive_date" placeholder="Target">
-                            <label for="floatingInput">Receive Date</label>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">Data Request</label>
                         </div>
                     </div>
                 </div>
-
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select kode_request" name="kode_request" id="kode_request" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataMaterialRequest ?? [] as $dataMR) : ?>
+                                    <option value="<?= $dataMR->id ?>" data-tanggal-request="<?= date('d/m/Y', strtotime($dataMR->request_date)) ?>" data-user-request="<?= $dataMR->user_name ?>" data-warehouse-request="<?= $dataWO->warehouse_id ?>" data-divisi-request="<?= $dataWO->divisi_id ?>"><?= $dataMR->req_no ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Kode Request</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control date_picker" name="date_request" id="date_request" placeholder="Tanggal Request" readonly>
+                            <label for="floatingInput">Tanggal Request</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control user_request" name="user_request" id="user_request" placeholder="User Request" readonly>
+                            <label for="floatingInput">User Request</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select department_id_request" name="department_id_request" id="department_id_request" disabled>
+                                <option value=""></option>
+                                <?php foreach ($dataDivisi as $divisi) : ?>
+                                    <option value="<?= $divisi['id'] ?>"><?= $divisi['divisi'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Department</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select warehouse_id_request" name="warehouse_id_request" id="warehouse_id_request" disabled>
+                                <option value=""></option>
+                                <?php foreach ($dataWarehouse ?? [] as $Warehouse) : ?>
+                                    <option value="<?= $Warehouse['id'] ?>"><?= $Warehouse['warehouse_name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Warehouse</label>
+                        </div>
+                    </div>
+                </div>
                 <!-- details -->
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -301,6 +398,13 @@
             autoclose: true
         });
 
+        // Mengaktifkan datepicker
+        $('.date_picker').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'dd/mm/yyyy'
+        });
+
         //CSS SELECT2 FLOATING LABEL
         $('.barang_id')
             .parent('div')
@@ -322,20 +426,20 @@
             .find('label')
             .css('z-index', '1');
 
-        $('.satuan_id').select2({
+        $('.satuan_id, #kode_produksi, #kode_request').select2({
             placeholder: "",
             theme: "bootstrap-5",
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.satuan_id')
+        $('.satuan_id, #kode_produksi, #kode_request')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.satuan_id')
+        $('.satuan_id, #kode_produksi, #kode_request')
             .parent('div')
             .children('span')
             .children('span')
@@ -343,7 +447,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.satuan_id')
+        $('.satuan_id, #kode_produksi, #kode_request')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -873,17 +977,55 @@
             const materialReturnData = <?= json_encode($materialReturn ?? []); ?>;
             materialReturnDataTable.rows.add(materialReturnData).draw(false);
         }
+
+        $(".kode_produksi").change(function() {
+            if ($(".kode_produksi option:selected").val()) {
+                let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
+                let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
+                let warehouse_id = $(".kode_produksi option:selected").data("warehouse") ? $(".kode_produksi option:selected").data("warehouse") : "";
+                let divisi_id = $(".kode_produksi option:selected").data("divisi") ? $(".kode_produksi option:selected").data("divisi") : "";
+
+                $(".barang_jadi").val(nama_barang);
+                $(".standart_production").val(standart_production);
+                $(".warehouse_id_order").val(warehouse_id).change();
+                $(".department_id_order").val(divisi_id).change();
+            } else {
+                $(".barang_jadi").val("");
+                $(".standart_production").val("");
+                $(".warehouse_id_produksi").val("").change();
+                $(".divisi_id_produksi").val("").change();
+            }
+        })
+
+        $(".kode_request").change(function() {
+            if ($(".kode_request option:selected").val()) {
+                let date_request = $(".kode_request option:selected").data("tanggal-request") ? $(".kode_request option:selected").data("tanggal-request") : "";
+                let user_request = $(".kode_request option:selected").data("user-request") ? $(".kode_request option:selected").data("user-request") : "";
+                let warehouse_id = $(".kode_request option:selected").data("warehouse-request") ? $(".kode_request option:selected").data("warehouse-request") : "";
+                let divisi_id = $(".kode_request option:selected").data("divisi-request") ? $(".kode_request option:selected").data("divisi-request") : "";
+
+                $("#date_request").val(date_request);
+                $(".user_request").val(user_request);
+                $(".warehouse_id_request").val(warehouse_id).change();
+                $(".department_id_request").val(divisi_id).change();
+            } else {
+                $("#date_request").val("");
+                $(".user_request").val("");
+                $(".warehouse_id_request").val("").change();
+                $(".divisi_id_request").val("").change();
+            }
+        })
     });
 
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
 
         if (value) {
-            $(".wo_no").attr("readonly", true);
-            $(".wo_no").val("AUTO GENERATE");
+            $(".res_no").attr("readonly", true);
+            $(".res_no").val("AUTO GENERATE");
         } else {
-            $(".wo_no").attr("readonly", false);
-            $(".wo_no").val("");
+            $(".res_no").attr("readonly", false);
+            $(".res_no").val("");
         }
     }
 </script>

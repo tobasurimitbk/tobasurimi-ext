@@ -3,8 +3,10 @@
 namespace App\Controllers\Production;
 
 use App\Controllers\BaseController;
-
+use App\Controllers\Master\Divisi;
 use App\Models\BarangModel;
+use App\Models\DivisisModel;
+use App\Models\MaterialRequestsModel;
 use App\Models\ProductionResultModel;
 use App\Models\ProductionResultDetailModel;
 use App\Models\StockDetailModel;
@@ -21,6 +23,8 @@ class ProductionResult extends BaseController
     private $stockDetailModel;
     private $warehousesModel;
     private $workOrdersModel;
+    private $divisiModel;
+    private $materialRequestModel;
 
     public function __construct()
     {
@@ -32,6 +36,8 @@ class ProductionResult extends BaseController
         $this->stockDetailModel = new StockDetailModel();
         $this->warehousesModel = new WarehousesModel();
         $this->workOrdersModel = new WorkOrdersModel();
+        $this->divisiModel = new DivisisModel();
+        $this->materialRequestModel = new MaterialRequestsModel();
     }
 
     public function index()
@@ -166,20 +172,35 @@ class ProductionResult extends BaseController
             ->join('satuans', 'satuans.id = barangs.satuan_id')
             ->findAll();
 
-        $warehouseData = $this->warehousesModel->asObject()
-            ->where('company_id', $this->this_company_id)
-            ->findAll();
 
-        $workOrderData = $this->workOrdersModel->asObject()
-            ->select("work_orders.id AS id, CONCAT(wo_no, ' - ', barang_master.barang_name) AS wo_no")
-            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id')
-            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id')
-            ->findAll();
+        $dataWarehouse = $this->warehousesModel->asArray()->where('company_id', $this->this_company_id)->findAll();
+        $dataDivisi = $this->divisiModel->asArray()->where('company_id', $this->this_company_id)->findAll();
+
+        $dataWorkOrder = $this->workOrdersModel->asObject()
+            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('work_orders.deletedAt', null)
+            ->where('work_order_details.deletedAt', null)
+            ->groupBy('work_order_details.work_order_id')
+            ->find();
+
+        $dataMaterialRequest = $this->materialRequestModel->asObject()
+            ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
+            ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
+            ->join('users', 'users.id = material_requests.createdBy', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('material_requests.deletedAt', null)
+            ->where('material_request_details.deletedAt', null)
+            ->groupBy('material_request_details.material_request_id')
+            ->find();
 
         $data = [
             'barangData' => $barangData,
-            'workOrders' => $workOrderData,
-            'warehouses' => $warehouseData
+            'dataWorkOrder' => $dataWorkOrder,
+            'dataWarehouse' => $dataWarehouse,
+            'dataDivisi' => $dataDivisi,
+            'dataMaterialRequest' => $dataMaterialRequest,
         ];
         return view('Production/productionResult/form', $data);
     }
