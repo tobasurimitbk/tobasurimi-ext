@@ -502,6 +502,7 @@
                         cancelButtonText: 'Batal',
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            $('#warehouse_id').prop('disabled', false);
                             let id = $(".id").val();
                             let formData = new FormData(document.querySelector('.create-form'));
                             formData.append("items", JSON.stringify(list_items));
