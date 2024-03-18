@@ -56,4 +56,22 @@ class MaterialRequestDetailsModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getMaterialRequestDetailByMaterialRequestID($mrID)
+    {
+        $selectQry = '
+            material_request_details.*,        
+            barang_master.kode_barang,        
+            barang_master.barang_name,        
+            barang_master.type_barang      
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
+            ->where('material_request_details.material_request_id', $mrID)
+            ->findAll();
+
+        return $dataQry;
+    }
 }

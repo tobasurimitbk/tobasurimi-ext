@@ -527,6 +527,8 @@ $routes->get('/production-result/(:num)', 'Production\ProductionResult::getById/
 $routes->get('/production-result/all', 'Production\ProductionResult::getAll', ['filter' => 'Auth']);
 $routes->get('/production-result/create', 'Production\ProductionResult::createProductionResult', ['filter' => 'Auth']);
 $routes->post('/production-result/create', 'Production\ProductionResult::saveProductionResult', ['filter' => 'Auth']);
+$routes->get('/production-result/list-work-order', 'Production\ProductionResult::getListWorkOrderByID', ['filter' => 'Auth']);
+$routes->get('/production-result/list-material-request', 'Production\ProductionResult::getListMaterialRequestByID', ['filter' => 'Auth']);
 
 // Rencana Produksi
 $routes->get('/work-order', 'Production\WorkOrder::index', ['filter' => 'Auth']);

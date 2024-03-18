@@ -172,32 +172,57 @@
                         </nav>
                         <div class="tab-content mt-3" id="nav-tabContent">
                             <div class="tab-pane fade show active" id="nav-barang-jadi" role="tabpanel" aria-labelledby="nav-home-tab">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_barang ?? '' ?>" disabled>
-                                            <label for="floatingInput">Nama Barang</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="barang_jadi_code" value="<?= $barangJadi->kode_barang ?? '' ?>" disabled>
-                                            <label for="floatingInput">Kode Barang</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_satuan ?? '' ?>" disabled>
-                                            <label for="floatingInput">Satuan</label>
+                                <div class="col-subtitle-modal">
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label font-weight-bold modal-sub-title">Daftar Barang Jadi</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" value="<?= $barangJadi->qty ?? '' ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="barang_jadi_qty" id="barangJadiQty">
-                                            <label for="floatingInput">Qty</label>
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangJadi" id="tableBarangJadi" width="100%" cellspacing="0">
+                                            <thead class="thead-dark text-center">
+                                                <tr>
+                                                    <th style="width: 10px;">No</th>
+                                                    <th>Kode Barang</th>
+                                                    <th>Jenis Barang</th>
+                                                    <th>Nama Barang</th>
+                                                    <th>Satuan</th>
+                                                    <th>Qty Target</th>
+                                                    <th>Qty Hasil</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-subtitle-modal">
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label font-weight-bold modal-sub-title">Daftar Bahan Digunakan</label>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangDigunakan" id="tableBarangDigunakan" width="100%" cellspacing="0">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th style="width: 10px;">No</th>
+                                                    <th>Referensi</th>
+                                                    <th>Kode Barang</th>
+                                                    <th>Jenis Barang</th>
+                                                    <th>Nama Barang</th>
+                                                    <th>Satuan</th>
+                                                    <th>Jumlah Request</th>
+                                                    <th>Jumlah Digunakan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -384,6 +409,9 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+
+    let list_items_barang_jadi = [];
+    let list_items_barang_digunakan = [];
 
     $(document).ready(function() {
         $('#work_order, #warehouse, #barang_setengah_jadi, #scrap').select2({
@@ -989,6 +1017,36 @@
                 $(".standart_production").val(standart_production);
                 $(".warehouse_id_order").val(warehouse_id).change();
                 $(".department_id_order").val(divisi_id).change();
+                $.ajax({
+                    url: `<?= base_url('production-result/list-work-order'); ?>`,
+                    method: "GET",
+                    data: {
+                        kode_produksi: $(this).val(),
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        console.log(res);
+                        list_items_barang_jadi = [];
+                        res.data.forEach(function(item) {
+                            // Push each item into the list_items_barang_jadi array
+                            list_items_barang_jadi.push({
+                                'barang_detail_id': getID(),
+                                'barang1_id': item.barang1_id,
+                                'barang2_id': item.barang2_id,
+                                'barang_name': item.barang_name,
+                                'kode_barang': item.kode_barang,
+                                'kode_satuan': item.kode_satuan,
+                                'nama_barang': item.nama_barang,
+                                'note': item.note,
+                                'qty': item.qty,
+                                'type_barang': item.type_barang,
+                                'type_barang_text': item.type_barang_text,
+                                'unit': item.unit,
+                            });
+                        });
+                        drawTableBarangJadi();
+                    }
+                });
             } else {
                 $(".barang_jadi").val("");
                 $(".standart_production").val("");
@@ -1008,6 +1066,37 @@
                 $(".user_request").val(user_request);
                 $(".warehouse_id_request").val(warehouse_id).change();
                 $(".department_id_request").val(divisi_id).change();
+                $.ajax({
+                    url: `<?= base_url('production-result/list-material-request'); ?>`,
+                    method: "GET",
+                    data: {
+                        kode_request: $(this).val(),
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        console.log(res);
+                        list_items_barang_digunakan = [];
+                        res.data.forEach(function(item) {
+                            // Push each item into the list_items_barang_jadi array
+                            list_items_barang_digunakan.push({
+                                'barang_detail_id': getID(),
+                                'barang1_id': item.barang1_id,
+                                'barang2_id': item.barang2_id,
+                                'barang_name': item.barang_name,
+                                'kode_barang': item.kode_barang,
+                                'satuan': item.satuan,
+                                'nama_barang': item.nama_barang,
+                                'note': item.note,
+                                'qty': item.qty,
+                                'ref_no': item.ref_no,
+                                'type_barang': item.type_barang,
+                                'type_barang_text': item.type_barang_text,
+                                'unit': item.unit,
+                            });
+                        });
+                        drawTableBarangDigunakan();
+                    }
+                });
             } else {
                 $("#date_request").val("");
                 $(".user_request").val("");
@@ -1026,6 +1115,99 @@
         } else {
             $(".res_no").attr("readonly", false);
             $(".res_no").val("");
+        }
+    }
+    const getID = function() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    }
+    const resetFormDetail = function() {
+        $(".barang_detail_id").val('');
+        $(".barang_id").val('').val(null).change()
+        $(".barang_spesifikasi_id").val('');
+        $(".kode").val(null).change()
+        $(".nama_barang").val('')
+        $(".satuan").val('')
+        $(".satuan_id").val('')
+        $(".qty").val('')
+        $(".keterangan").val('')
+    }
+
+    const drawTableBarangDigunakan = function() {
+        $('.body-table-barang-digunakan').empty();
+        $('.tfoot').empty();
+        var row = '';
+        var no = 1;
+        if (list_items_barang_digunakan.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                    </tr>
+                `;
+            $('.tfoot').append(row);
+        } else {
+            list_items_barang_digunakan.map(item => {
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.ref_no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.type_barang_text + '</td>';
+                row += '<td>' + item.barang_name + '</td>';
+                row += '<td>' + item.satuan + '</td>';
+                row += '<td>' + item.qty + '</td>';
+                row += '<td>' + `
+                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text">` +
+                    '</td>';
+
+                no++;
+            });
+            $('.body-table-barang-digunakan').append(row);
+        }
+    }
+    const drawTableBarangJadi = function() {
+        $('.body-table-barang-jadi').empty();
+        $('.tfoot').empty();
+        var row = '';
+        var no = 1;
+        if (list_items_barang_jadi.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                    </tr>
+                `;
+            $('.tfoot').append(row);
+        } else {
+            list_items_barang_jadi.map(item => {
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.type_barang_text + '</td>';
+                row += '<td>' + item.barang_name + '</td>';
+                row += '<td>' + item.kode_satuan + '</td>';
+                row += '<td>' + item.qty + '</td>';
+                row += '<td>' + `
+                <input class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text">` +
+                    '</td>';
+
+                no++;
+            });
+            $('.body-table-barang-jadi').append(row);
+        }
+    }
+
+    function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        if (parseFloat(numericValue) <= 0) {
+            inputElement.value = 0;
+        } else {
+            inputElement.value = numericValue;
         }
     }
 </script>

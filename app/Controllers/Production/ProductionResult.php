@@ -6,11 +6,13 @@ use App\Controllers\BaseController;
 use App\Controllers\Master\Divisi;
 use App\Models\BarangModel;
 use App\Models\DivisisModel;
+use App\Models\MaterialRequestDetailsModel;
 use App\Models\MaterialRequestsModel;
 use App\Models\ProductionResultModel;
 use App\Models\ProductionResultDetailModel;
 use App\Models\StockDetailModel;
 use App\Models\WarehousesModel;
+use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
 
 class ProductionResult extends BaseController
@@ -23,8 +25,10 @@ class ProductionResult extends BaseController
     private $stockDetailModel;
     private $warehousesModel;
     private $workOrdersModel;
+    private $workOrderDetailsModel;
     private $divisiModel;
     private $materialRequestModel;
+    private $materialRequestDetailModel;
 
     public function __construct()
     {
@@ -35,9 +39,11 @@ class ProductionResult extends BaseController
         $this->productionResultDetailModel = new ProductionResultDetailModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->warehousesModel = new WarehousesModel();
+        $this->workOrderDetailsModel = new WorkOrderDetailsModel();
         $this->workOrdersModel = new WorkOrdersModel();
         $this->divisiModel = new DivisisModel();
         $this->materialRequestModel = new MaterialRequestsModel();
+        $this->materialRequestDetailModel = new MaterialRequestDetailsModel();
     }
 
     public function index()
@@ -390,5 +396,59 @@ class ProductionResult extends BaseController
         }
 
         return $invNumber;
+    }
+
+    public function getListWorkOrderByID()
+    {
+        if (!empty($this->request->getVar('kode_produksi'))) {
+            $dataResult = $this->workOrderDetailsModel->getWorkOrderDetailByWorkOrderID(
+                $this->request->getVar('kode_produksi')
+            );
+            foreach ($dataResult as $key => &$value) {
+                if ($value['type_barang'] == "bahan_baku") {
+                    $value['type_barang_text'] = "Bahan Baku";
+                } elseif ($value['type_barang'] == "bahan_penolong") {
+                    $value['type_barang_text'] = "Bahan Penolong";
+                } elseif ($value['type_barang'] == "bahan_jadi") {
+                    $value['type_barang_text'] = "Bahan Jadi";
+                } elseif ($value['type_barang'] == "bahan_scrap") {
+                    $value['type_barang_text'] = "Bahan Scrap";
+                } elseif ($value['type_barang'] == "bahan_modal") {
+                    $value['type_barang_text'] = "Bahan Modal";
+                }
+            }
+            return response()->setJSON([
+                'data' => $dataResult,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+    }
+
+    public function getListMaterialRequestByID()
+    {
+        if (!empty($this->request->getVar('kode_request'))) {
+            $dataResult = $this->materialRequestDetailModel->getMaterialRequestDetailByMaterialRequestID(
+                $this->request->getVar('kode_request')
+            );
+            foreach ($dataResult as $key => &$value) {
+                if ($value['type_barang'] == "bahan_baku") {
+                    $value['type_barang_text'] = "Bahan Baku";
+                } elseif ($value['type_barang'] == "bahan_penolong") {
+                    $value['type_barang_text'] = "Bahan Penolong";
+                } elseif ($value['type_barang'] == "bahan_jadi") {
+                    $value['type_barang_text'] = "Bahan Jadi";
+                } elseif ($value['type_barang'] == "bahan_scrap") {
+                    $value['type_barang_text'] = "Bahan Scrap";
+                } elseif ($value['type_barang'] == "bahan_modal") {
+                    $value['type_barang_text'] = "Bahan Modal";
+                }
+            }
+            return response()->setJSON([
+                'data' => $dataResult,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
     }
 }

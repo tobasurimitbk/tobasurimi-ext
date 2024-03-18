@@ -51,4 +51,24 @@ class WorkOrderDetailsModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getWorkOrderDetailByWorkOrderID($woID)
+    {
+        $selectQry = '
+            work_order_details.*,        
+            barang_master.kode_barang,        
+            barang_master.barang_name,        
+            barang_master.type_barang,        
+            satuans.kode_satuan,        
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id')
+            ->join('satuans', 'satuans.id = work_order_details.unit')
+            ->where('work_order_details.work_order_id', $woID)
+            ->findAll();
+
+        return $dataQry;
+    }
 }
