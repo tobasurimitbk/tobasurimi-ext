@@ -107,7 +107,8 @@ class JasaVendorOut extends BaseController
                 "warehouse_name"        => $data->warehouse_name,
                 "total_item"            => count($jasaVendorOutDetail),
                 "vendor_name"           => $data->vendor_name,
-                "status_posting"        => $data->status_posting
+                "status_posting"        => $data->status_posting,
+                "status_closed"         => $data->status_closed == "1" ? "CLOSED" : "OPEN",
             ]);
         }
 
@@ -167,7 +168,7 @@ class JasaVendorOut extends BaseController
             'tanggal' => date('Y-m-d'),
             'tipe_barang' => "bahan_baku",
             'no_kontainer' => $this->request->getVar('no_kontainer'),
-            'keterangan' => $this->request->getVar('keterangan')
+            'keterangan' => $this->request->getVar('keterangan'),
         ]);
 
         $barang = json_decode($this->request->getVar('listBarang'));
@@ -325,6 +326,18 @@ class JasaVendorOut extends BaseController
         return response()->setJSON([
             'status' => true,
             'message' => "Jasa vendor pengeluaran barang berhasil diposting",
+            'token' => csrf_hash(),
+        ]);
+    }
+
+    public function close()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->jasaVendorOutModel->update($id, ['status_closed' => '1']);
+
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Jasa vendor pengeluaran barang berhasil diclose",
             'token' => csrf_hash(),
         ]);
     }

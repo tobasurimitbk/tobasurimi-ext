@@ -47,7 +47,8 @@ class JasaVendorOutModel extends Model
             'jasa_vendor_out.createdAt' => 'jasa_vendor_out.createdAt',
             'jasa_vendor_out.divisi_id' => 'jasa_vendor_out.divisi_id',
             'jasa_vendor_out.warehouse_id' => 'jasa_vendor_out.warehouse_id',
-            'vendor_id' => 'vendor_id'
+            'vendor_id' => 'vendor_id',
+            'status_closed' => 'status_closed'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

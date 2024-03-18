@@ -4,8 +4,8 @@
 <section class="section">
     <div class="section-header">
         <h1>Jasa Vendor Barang Keluar</h1>
-        <?php if (can("Jasa Vendor", "Barang Keluar", "c")) : ?>
-            <a href="<?= base_url('jasa-vendor-out/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <?php if (can("Jasa Vendor", "Barang Masuk", "c")) : ?>
+            <a href="<?= base_url('jasa-vendor-in/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -71,8 +71,8 @@
                 </div>
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Surat Jalan </label>
+                        <input placeholder="" class="form-control no_penerimaan_surat_jalan" id="no_penerimaan_surat_jalan" name="no_penerimaan_surat_jalan" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Penerimaan Surat Jalan </label>
                     </div>
                 </div>
             </div>
@@ -81,12 +81,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('no_surat_jalan')">No Surat Jalan</th>
-                            <th onclick="changeSort('jasa_vendor_out.createdAt')">Tanggal</th>
+                            <th onclick="changeSort('no_penerimaan_surat_jalan')">No Penerimaan Surat Jalan</th>
+                            <th onclick="changeSort('jasa_vendor_in.createdAt')">Tanggal</th>
                             <th onclick="changeSort('divisi_id')">Departemen</th>
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
+                            <th onclick="changeSort('warehouse_id')">No Surat Jalan</th>
                             <th>Total Item</th>
-                            <th onclick="changeSort('status_closed')">Status</th>
                             <th onclick="changeSort('vendor_id')">Vendor</th>
                             <th>Action</th>
                         </tr>
@@ -120,7 +120,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("jasa-vendor-out/all"); ?>",
+            url: "<?= base_url("jasa-vendor-in/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
@@ -128,7 +128,7 @@
                 data.status = $(".status").val();
                 data.start_date = $(".start_date").val();
                 data.end_date = $(".end_date").val();
-                data.no_surat_jalan = $(".no_surat_jalan").val();
+                data.no_penerimaan_surat_jalan = $(".no_penerimaan_surat_jalan").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -146,7 +146,7 @@
                 orderable: false
             },
             {
-                data: "no_surat_jalan",
+                data: "no_penerimaan_surat_jalan",
                 className: "text-center",
 
             },
@@ -163,6 +163,12 @@
                 className: "text-center"
             },
             {
+                data: "no_surat_jalan",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
                 data: "total_item",
                 className: "text-center",
                 searchable: false,
@@ -172,9 +178,6 @@
                 data: "vendor_name",
                 className: "text-center"
             }, {
-                data: "status_closed",
-                className: "text-center"
-            }, {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
@@ -182,51 +185,41 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let status = row?.status_posting
-                    let status_closed = row?.status_closed;
 
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'a')) : ?>
+                        <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-out/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'd')) : ?>
+                        <?php if (can('Jasa Vendor', 'Barang Masuk', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
+                   
                         </div>
                     `
                     } else {
-                        var res = '';
 
-                        if (status_closed != "CLOSED") {
-                            res += `
-                                <button data-toggle="tooltip" title="Close" onclick="closed('${id}')" class="btn btn-danger posting-spp">
-                                    <i class="fa-solid fa-ban"></i>    
-                                </button>
-                            `;
-                        }
-
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
-                            res += `
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-out/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            `;
-
-                        <?php endif; ?>
-
-
-                        return res;
-
+                        return `
+                            <div class="mt-0">
+                                <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
+                                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    
+                                <?php endif; ?>
+                            </div>
+                        
+                        `
                     }
 
                 }
@@ -251,6 +244,7 @@
             }
         }
     });
+
 
     $(".start_date").datepicker({
         todayHighlight: true,
@@ -332,14 +326,14 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("jasa-vendor-out/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("jasa-vendor-in/id"); ?>/${data.id}`);
     });
 
 
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Jasa Vendor Barang Keluar ?',
+            title: 'Posting Jasa Vendor Barang Masuk ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -350,7 +344,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/posting"); ?>",
+                    url: "<?= base_url("jasa-vendor-in/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -389,7 +383,7 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Jasa Vendori Barang Keluar ?',
+            title: 'Hapus Jasa Vendor Barang Masuk ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -400,51 +394,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        setLoading();
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                table.ajax.reload()
-                            });
-                        }
-                    },
-                });
-            }
-        })
-    }
-
-
-    const closed = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Close Jasa Vendori Barang Keluar ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/close"); ?>",
+                    url: "<?= base_url("jasa-vendor-in/delete"); ?>",
                     data: {
                         id: id
                     },
