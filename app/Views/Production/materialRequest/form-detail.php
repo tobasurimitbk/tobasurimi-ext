@@ -27,6 +27,23 @@
                 <h6>Kode Produksi : <?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->wo_no : ""; ?></h6>
                 <span><?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->nama_barang . " : " . $dataMaterialRequestswithwo[0]->standart_production : ""; ?></span>
                 <span>Tanggal Produksi : <?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->production_date)) : ""; ?></span>
+                <?php
+                if (!empty($dataMaterialRequestswithwo)) {
+                    if ($dataMaterialRequestswithwo[0]->is_posted && $dataMaterialRequestswithwo[0]->is_approve) {
+                ?>
+                        <span>Status : Approved</span>
+                    <?php
+                    } else if ($dataMaterialRequestswithwo[0]->is_posted && !($dataMaterialRequestswithwo[0]->is_approve)) {
+                    ?>
+                        <span>Status : Posted (Waiting to Approve)</span>
+                    <?php
+                    } else if (!($dataMaterialRequestswithwo[0]->is_posted) && !($dataMaterialRequestswithwo[0]->is_approve)) {
+                    ?>
+                        <span>Status : Waiting to Posted</span>
+                <?php
+                    }
+                }
+                ?>
                 <span>Keterangan : - </span>
             </div>
             <div class="col-subtitle-modal">
