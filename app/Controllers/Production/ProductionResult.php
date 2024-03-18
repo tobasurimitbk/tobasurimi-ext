@@ -451,4 +451,25 @@ class ProductionResult extends BaseController
             ]);
         }
     }
+
+    public function getListMaterialRequestByWOID()
+    {
+        if (!empty($this->request->getVar('kode_produksi'))) {
+            $dataMaterialRequest = $this->materialRequestModel->asObject()
+                ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
+                ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
+                ->join('users', 'users.id = material_requests.createdBy', 'left')
+                ->where('company_id', $this->this_company_id)
+                ->where('material_requests.deletedAt', null)
+                ->where('material_request_details.deletedAt', null)
+                ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
+                ->groupBy('material_request_details.material_request_id')
+                ->find();
+            return response()->setJSON([
+                'data' => $dataMaterialRequest,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+    }
 }

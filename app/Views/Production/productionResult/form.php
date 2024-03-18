@@ -115,9 +115,9 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select kode_request" name="kode_request" id="kode_request" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php foreach ($dataMaterialRequest ?? [] as $dataMR) : ?>
+                                <!-- <?php foreach ($dataMaterialRequest ?? [] as $dataMR) : ?>
                                     <option value="<?= $dataMR->id ?>" data-tanggal-request="<?= date('d/m/Y', strtotime($dataMR->request_date)) ?>" data-user-request="<?= $dataMR->user_name ?>" data-warehouse-request="<?= $dataWO->warehouse_id ?>" data-divisi-request="<?= $dataWO->divisi_id ?>"><?= $dataMR->req_no ?></option>
-                                <?php endforeach; ?>
+                                <?php endforeach; ?> -->
                             </select>
                             <label for="floatingInput">Kode Request</label>
                         </div>
@@ -1018,7 +1018,7 @@
                 $(".warehouse_id_order").val(warehouse_id).change();
                 $(".department_id_order").val(divisi_id).change();
                 $.ajax({
-                    url: `<?= base_url('production-result/list-work-order'); ?>`,
+                    url: `<?= base_url('production-result/material-request'); ?>`,
                     method: "GET",
                     data: {
                         kode_produksi: $(this).val(),
@@ -1026,6 +1026,40 @@
                     dataType: "json",
                     success: function(res) {
                         console.log(res);
+                        if (res && res.data && Array.isArray(res.data)) {
+                            // Clear existing options
+                            $('#kode_request').empty();
+                            // Append a default option
+                            $('#kode_request').append($('<option>', {
+                                value: '',
+                                text: ''
+                            }));
+                            // Iterate over each item in the response data
+                            res.data.forEach(function(item) {
+                                // Append an option for each item
+                                $('#kode_request').append($('<option>', {
+                                    value: item.id,
+                                    text: item.req_no,
+                                    'data-tanggal-request': item.request_date,
+                                    'data-user-request': item.user_name,
+                                    'data-warehouse-request': item.warehouse_id,
+                                    'data-divisi-request': item.divisi_id
+                                }));
+                            });
+                        } else {
+                            console.error('Invalid or empty response data:', res);
+                        }
+                    }
+                });
+                $.ajax({
+                    url: `<?= base_url('production-result/list-work-order'); ?>`,
+                    method: "GET",
+                    data: {
+                        kode_produksi: $(this).val(),
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        // console.log(res);
                         list_items_barang_jadi = [];
                         res.data.forEach(function(item) {
                             // Push each item into the list_items_barang_jadi array
@@ -1074,7 +1108,7 @@
                     },
                     dataType: "json",
                     success: function(res) {
-                        console.log(res);
+                        // console.log(res);
                         list_items_barang_digunakan = [];
                         res.data.forEach(function(item) {
                             // Push each item into the list_items_barang_jadi array
