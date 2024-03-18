@@ -88,17 +88,18 @@ class MaterialRequest extends BaseController
         $dataSatuan = $this->satuanModel->asObject()->find();
 
         $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
-        $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataWorkOrder = $this->workOrdersModel->asObject()
             ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
             ->where('work_order_details.deletedAt', null)
-            ->where('work_orders.is_posted', 0)
+            ->groupBy('work_order_details.work_order_id')
             ->find();
 
         $data = [
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
@@ -364,7 +365,8 @@ class MaterialRequest extends BaseController
         try {
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-            $id = $this->materialRequestModel->insert([
+
+            $dataMaterial = [
                 "work_order_id" => $this->request->getPost("kode_produksi"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
@@ -374,25 +376,29 @@ class MaterialRequest extends BaseController
                 "req_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("req_no"),
                 'is_posted' => 0,
                 'createdBy' =>  session()->get("login")->user_id,
-            ]);
+            ];
+            $id = $this->materialRequestModel->insert($dataMaterial);
 
-            $mr_detail = json_decode($this->request->getVar("items"));
+            $mr_detail = json_decode($this->request->getVar("listMaterial"));
+
 
             foreach ($mr_detail as $s) {
-                $this->materialRequestDetailsModel->insert([
+                $stockBarang =  $this->stockModel->asObject()->find($s->stock_id);
+                $stockDetailBarang =  $this->stockDetailModel->asObject()->find($s->stock_detail_id);
+                $dataMaterialDetail = [
                     'material_request_id' => $id,
-                    'barang1_id' => decrypt($s->barang1_id),
-                    'barang2_id' => decrypt($s->barang2_id),
+                    'barang1_id' => $stockBarang->barang1_id,
+                    'barang2_id' => $stockBarang->barang2_id,
                     'nama_barang' => $s->barang,
                     'satuan' => $s->satuan,
-                    'stock_id' => decrypt($s->stock_id),
-                    'bc_id' => decrypt($s->bc_id),
+                    'stock_id' => $s->stock_id,
+                    'bc_id' => $s->bc_id,
                     'no_aju' => $s->no_aju,
-                    'ref_no' => $s->dokumen,
-                    'stock_date' => $s->stock,
-                    'qty' => $s->jumlahBarang,
-                    'note' => $s->ketBarang,
-                ]);
+                    'ref_no' => $s->bc_type,
+                    'stock_date' => $stockDetailBarang->stock_date,
+                    'qty' => $s->qty,
+                ];
+                $this->materialRequestDetailsModel->insert($dataMaterialDetail);
             }
 
             return response()->setJSON([

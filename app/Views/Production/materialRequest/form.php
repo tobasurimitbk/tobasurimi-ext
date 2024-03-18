@@ -16,7 +16,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->id : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="col-subtitle-modal">
@@ -91,7 +91,7 @@
                             <select class="form-select department_id" name="department_id" id="department_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                    <option value="<?= $dataDivisi->id ?>"><?= $dataDivisi->divisi ?></option>
+                                    <option value="<?= $dataDivisi['id'] ?>"><?= $dataDivisi['divisi'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Department</label>
@@ -101,11 +101,6 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select warehouse_id" name="warehouse_id" id="warehouse_id" disabled>
                                 <option value=""></option>
-                                <?php if (!empty($dataWorkOrders)) : ?>
-                                    <?php foreach ($dataWarehouse ?? [] as $dataWarehouse) : ?>
-                                        <option value="<?= $dataWarehouse->id ?>"><?= $dataWarehouse->warehouse_name ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Warehouse</label>
                         </div>
@@ -122,20 +117,20 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan">
+                        <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan" disabled>
                             <option value=""></option>
-                            <option value="bahan_baku">Bahan Baku</option>
-                            <option value="bahan_penolong">Bahan Penolong</option>
-                            <option value="bahan_scrap">Bahan Scrap</option>
-                            <option value="bahan_modal">Bahan Modal</option>
-                            <option value="kemasan">Kemasan</option>
+                            <?php foreach ($tipeBarang as $t) : ?>
+                                <option value="<?= $t['description'] ?>">
+                                    <?= strtoupper($t['value']); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                         <label for="floatingInput">Tipe Bahan</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang">
+                        <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang" disabled>
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">Nama Barang</label>
@@ -144,56 +139,48 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTableBarang" id="dataTableBarang" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No</th>
-                                <th>Referensi Barang</th>
-                                <th>Tanggal Penerimaan</th>
-                                <th>Warehouse</th>
-                                <th>Kode Barang</th>
-                                <th>Nama Barang</th>
-                                <th>Satuan</th>
-                                <th>Qty</th>
-                                <th>Jumlah</th>
-                                <th>Keterangan</th>
+                                <th style="text-align: center;">#</th>
+                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">Dokumen Pabean</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Qty</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="body-table">
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-2">
-                    <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal">
+                    <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn">
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
                     </button>
                 </div>
             </div>
             <div class="row mt-3">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTableBarangAdd" id="dataTableBarangAdd" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No</th>
-                                <th>Referensi Barang</th>
-                                <th>Warehouse</th>
-                                <th>Kode Barang</th>
-                                <th>Nama Barang</th>
-                                <th>Satuan</th>
-                                <th>Qty</th>
-                                <th>Jumlah</th>
-                                <th>Keterangan</th>
-                                <th>Action</th>
+                                <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">Dokumen Pabean</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Qty Awal</th>
+                                <th style="text-align: center;">Qty Digunakan</th>
+                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-table" id="body-detail-table">
-                        <tfoot class="tfoot">
-                            <tr>
-                                <td colspan="10" class="text-center">Tidak Ada Data</td>
-                            </tr>
-                        </tfoot>
+                        <tbody class="body-table">
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -206,6 +193,7 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     let list_items = [];
+    var listStockSelected = [];
 
     let sortDataBarang = "createdAt";
     let sortTypeDataBarang = "DESC";
@@ -351,6 +339,9 @@
         $('.department_id').select2({
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5"
+        }).change(function() {
+            getListWarehouseAsal();
+            $('.select_tipe_bahan').val(null).change();
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -379,6 +370,8 @@
             placeholder: "Pilih Tipe Bahan",
             theme: "bootstrap-5",
             allowClear: true
+        }).change(function() {
+            getListBarang();
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -407,6 +400,8 @@
             placeholder: "Pilih Barang",
             theme: "bootstrap-5",
             allowClear: true
+        }).change(function() {
+            getListDokumenPabean();
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -462,6 +457,9 @@
         $('.warehouse_id').select2({
             placeholder: "Pilih Warehouse",
             theme: "bootstrap-5"
+        }).change(function() {
+            $("#select_tipe_bahan").prop('disabled', false);
+            $("#select_nama_barang").prop('disabled', false);
         });
 
         $('.warehouse_id')
@@ -525,36 +523,6 @@
             todayHighlight: true,
             format: 'dd/mm/yyyy'
         });
-
-        $(".select_tipe_bahan").change(function() {
-            var type = $(".select_tipe_bahan").val();
-            if (type) {
-                setLoading();
-                $.ajax({
-                    url: `<?= base_url("barang/dropdown/type"); ?>`,
-                    method: "GET",
-                    dataType: "json",
-                    data: {
-                        type: type
-                    },
-                    success: function(res) {
-                        $(".select_nama_barang").empty();
-                        $(".select_nama_barang").append(`<option value=""></option>`);
-                        res.data.forEach(function(item) {
-                            $(".select_nama_barang").append(`<option value="${item.id}" data-spesifikasi_id="${item.barang_master_spesifikasi_id}">${item.kode_barang} - ${item.barang_name}</option>`);
-                        })
-                        $(".select_nama_barang").val("").change();
-                        stopLoading();
-                    }
-                })
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Pilih Tipe Bahan Dahulu",
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-        })
 
         $(".select_nama_barang").change(function() {
             dataTableBarang.ajax.reload();
@@ -672,105 +640,121 @@
             },
         });
 
-        $(".btn-save").click(function() {
-            if (list_items.length === 0) {
+        $('.btn-save').click(function() {
+            console.log(listStockSelected);
+            if (listStockSelected.length == 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: "Barang masih kosong",
+                    title: 'Barang yang akan direquest tidak boleh kosong !',
                     confirmButtonColor: '#4e73df',
-                })
+                    confirmButtonText: 'Ok'
+                });
             } else {
-                if ($(".create-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let id = $(".id").val();
-                            let formData = new FormData(document.querySelector('.create-form'));
-                            formData.append("items", JSON.stringify(list_items));
+                if ($('.create-form').valid()) {
+                    var isValid = true;
+                    var dataError = null;
 
-                            if (id) {
-                                // UPDATE
-                                <?php if (can('Produksi', 'Dokumen Produksi', 'u')) : ?>
+                    $.each(listStockSelected, function(i, v) {
+                        var element = $('input[data-id="' + v.id + '"].stok-mutasi');
+                        var input_user = parseFloat(element.val());
+                        var stok_max = parseFloat(element.data('stok_total'));
+
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                            dataError = listStockSelected[i];
+                            isValid = false;
+                        } else {
+                            listStockSelected[i].qty = input_user;
+                        }
+                    });
+
+                    if (!isValid) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Stok barang ' + dataError.barang + ' dengan dokumen ' + dataError.bc_type + ' / ' + dataError.no_aju + ' tidak valid!',
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data ?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                let id = $('#id').val();
+                                let data = new FormData(document.querySelector(".create-form"));
+                                data.append('listMaterial', JSON.stringify(listStockSelected));
+                                if (id) {
+                                    // UPDATE
                                     $.ajax({
                                         url: "<?= base_url("material-request/update"); ?>",
-                                        data: formData,
-                                        method: "POST",
-                                        dataType: "json",
+                                        data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                                             setLoading();
                                         },
                                         complete: function() {
-                                            stopLoading();
+                                            stopLoading()
                                         },
+                                        method: "POST",
+                                        dataType: "json",
                                         processData: false,
                                         contentType: false,
                                         success: function(response) {
-                                            if (response.status) {
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                    reverseButtons: true,
-                                                    confirmButtonText: 'Oke',
-                                                }).then((result) => {
-                                                    location.reload();
-                                                })
-                                            }
-
-                                        }
-                                    });
-                                <?php else : ?>
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: "Anda tidak memiliki akses update",
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                <?php endif; ?>
-                            } else {
-                                // CREATE
-                                $.ajax({
-                                    url: "<?= base_url("material-request/save"); ?>",
-                                    data: formData,
-                                    method: "POST",
-                                    dataType: "json",
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading();
-                                    },
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        if (response.status) {
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                                reverseButtons: true,
-                                                confirmButtonText: 'Oke',
+                                                confirmButtonText: 'Ok'
                                             }).then((result) => {
-                                                window.location.replace("<?= base_url('material-request/id/') ?>" + response.id);
-                                            })
-                                        }
-                                    }
-                                });
+                                                if (result.isConfirmed) {
+                                                    location.reload();
+                                                }
+                                            });
+                                        },
+                                    });
+                                } else {
+                                    // INSERT
+                                    $.ajax({
+                                        url: "<?= base_url("material-request/save"); ?>",
+                                        data: data,
+                                        beforeSend: function(xhr) {
+                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            setLoading();
+                                        },
+                                        complete: function() {
+                                            stopLoading()
+                                        },
+                                        method: "POST",
+                                        dataType: "json",
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = "<?= base_url('material-request/id/') ?>" + response.id
+                                                }
+                                            });
+                                        },
+                                    });
+                                }
                             }
-                        }
-                    })
+                        });
+                    }
+
                 }
             }
-        })
+        });
 
         $('#department_id').on('change', function() {
             var departmentId = $(this).val();
@@ -785,7 +769,7 @@
                         $("#warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`);
                     })
                     $("#warehouse_id").prop('disabled', false);
-                    $("#warehouse_id").val("").change();
+                    // $("#warehouse_id").val().change();
                 }
             })
         });
@@ -802,108 +786,11 @@
                 $(".standart_production").val("");
             }
         })
-
-        $('.btn-submit-barang').on('click', function() {
-            list_items = [];
-            // Cari baris yang memiliki kotak centang yang dicentang
-            $('.dataTableBarang tbody input[type="checkbox"]:checked').each(function() {
-                var rowData = dataTableBarang.row($(this).closest('tr')).data();
-                // Pastikan data baris tidak null sebelum disimpan
-                if (rowData) {
-                    var jmlhBarang = $(this).closest('tr').find('.jumlahBarang').val();
-                    if (jmlhBarang) {
-                        var item = {
-                            barang_detail_id: getID(),
-                            no: rowData.no,
-                            dokumen: rowData.dokumen,
-                            stock: rowData.stock,
-                            warehouse: rowData.warehouse,
-                            kode: rowData.kode,
-                            barang: rowData.barang,
-                            satuan: rowData.satuan,
-                            qty: rowData.qty,
-                            stock_id: rowData.stock_id,
-                            bc_id: rowData.bc_id,
-                            barang1_id: rowData.barang1_id,
-                            barang2_id: rowData.barang2_id,
-                            no_aju: rowData.no_aju,
-                            jumlahBarang: jmlhBarang, // Mengambil nilai dari input teks dengan class 'jumlahBarang'
-                            ketBarang: $(this).closest('tr').find('.ketBarang').val(), // Mengambil nilai dari input teks dengan class 'ketBarang'
-                        };
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: "Harap isi jumlah barang dahulu",
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                    list_items.push(item);
-                }
-            });
-
-            console.log(list_items);
-            drawTable();
-        });
     });
 
     $('.btn-hide-detail').click(function() {
         $('.detail-modal').modal('hide');
     });
-
-    // const submitDetailForm = function() {
-    //     let barang_detail_id = $(".barang_detail_id").val();
-    //     let barang_id = $(".barang_id").val()
-    //     let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
-    //     let kode_barang = $(".kode_barang").val()
-    //     let nama_barang = $(".nama_barang").val()
-    //     let nama_satuan = $(".satuan").val()
-    //     let satuan_id = $(".satuan_id").val()
-    //     let qty = $(".qty").val()
-    //     let keterangan = $(".keterangan").val() ? $(".keterangan").val() : '-'
-
-    //     let header_barang_name = $('.header_barang_name').val();
-
-    //     let validate_same = false;
-    //     let validate_bahan_baku = false;
-    //     if (barang_detail_id) {
-    //         if ($(".detail-form").valid()) {
-    //             // UPDATE DETAIL
-    //             $.each(list_items, function(i, v) {
-    //                 if (v.barang_detail_id === barang_detail_id) {
-    //                     list_items[i].barang_id = barang_id;
-    //                     list_items[i].barang_spesifikasi_id = barang_spesifikasi_id;
-    //                     list_items[i].kode_barang = kode_barang;
-    //                     list_items[i].nama_barang = nama_barang;
-    //                     list_items[i].nama_satuan = nama_satuan;
-    //                     list_items[i].satuan_id = satuan_id;
-    //                     list_items[i].qty = qty;
-    //                     list_items[i].keterangan = keterangan;
-    //                 }
-    //             });
-    //             drawTable();
-    //             $(".detail-modal").modal("hide");
-    //         }
-    //     } else {
-    //         if ($(".detail-form").valid()) {
-    //             // CREATE DETAIL
-    //             if (barang_id !== "") {
-    //                 list_items.push({
-    //                     'barang_detail_id': getID(),
-    //                     'barang_id': barang_id,
-    //                     'barang_spesifikasi_id': barang_spesifikasi_id,
-    //                     'kode_barang': kode_barang,
-    //                     'nama_barang': nama_barang,
-    //                     'nama_satuan': nama_satuan,
-    //                     'satuan_id': satuan_id,
-    //                     'qty': qty,
-    //                     'keterangan': keterangan
-    //                 });
-    //             }
-
-    //             drawTable();
-    //         }
-    //     }
-    // }
 
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
@@ -916,50 +803,6 @@
             $(".req_no").val("");
         }
     }
-    const getID = function() {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let randomString = '';
-
-        for (let i = 0; i < 10; i++) {
-            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-
-        return randomString;
-    }
-    const drawTable = function() {
-        $('.body-detail-table').empty();
-        $('.tfoot').empty();
-        var row = '';
-        var no = 1;
-        if (list_items.length === 0) {
-            row += `
-                    <tr>
-                        <td colspan="10" class="text-center">Data Barang Tidak Ada</td>
-                    </tr>
-                `;
-            $('.tfoot').append(row);
-        } else {
-            list_items.map(item => {
-                row += '<tr style="color:whitesmoke;">';
-                row += '<td>' + no + '</td>';
-                row += '<td>' + item.dokumen + '</td>';
-                row += '<td>' + item.warehouse + '</td>';
-                row += '<td>' + item.kode + '</td>';
-                row += '<td>' + item.barang + '</td>';
-                row += '<td>' + item.satuan + '</td>';
-                row += '<td>' + item.qty + '</td>';
-                row += '<td>' + item.jumlahBarang + '</td>';
-                row += '<td>' + item.ketBarang + '</td>';
-                row += '<td>' + `
-                    <button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}')">
-                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                    </button>` +
-                    '</td>';
-                no++;
-            });
-            $('.body-detail-table').append(row);
-        }
-    }
 
     const deleteRowDetail = function(id) {
         const indexToRemove = list_items.findIndex(item => item.barang_detail_id === id);
@@ -969,23 +812,253 @@
         drawTable();
     }
 
-    // Update
-    <?php if (!empty($dataWorkOrders)) : ?>
-        <?php foreach ($dataWorkOrderDetails as $i => $d) : ?>
-            list_items.push({
-                'barang_detail_id': getID(),
-                'barang_id': "<?= encrypt($d->barang1_id) ?>",
-                'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
-                'kode_barang': "<?= $d->kode_barang ?>",
-                'nama_barang': "<?= $d->nama_barang ?>",
-                'nama_satuan': "<?= $d->nama_satuan ?>",
-                'satuan_id': "<?= $d->unit ?>",
-                'qty': "<?= $d->qty ?>",
-                'keterangan': "<?= $d->note ?>"
-            });
-        <?php endforeach; ?>
-        drawTable();
-    <?php endif; ?>
+    function getListWarehouseAsal() {
+        // GET LIST WAREHOUSE ASAL
+        $.ajax({
+            url: `<?= base_url('mutasi/warehouse'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $(".department_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".warehouse_id").empty()
+                $(".warehouse_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
+            }
+        });
+    }
+
+    function getListBarang() {
+        // GET LIST BARANG
+        $.ajax({
+            url: `<?= base_url('mutasi/list-barang-stock-init'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                type_barang: $(".select_tipe_bahan option:selected").val(),
+                divisi_id: $(".department_id option:selected").val(),
+                warehouse_id: $(".warehouse_id option:selected").val()
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".select_nama_barang").empty()
+                $(".select_nama_barang").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    console.log(item);
+                    $(".select_nama_barang").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
+                })
+                $(".select_nama_barang").val();
+            }
+        });
+    }
+
+    function getListDokumenPabean() {
+        // GET LIST STOCK PER DOKUMEN PABEAN
+        $.ajax({
+            url: `<?= base_url('mutasi/list-stock-dokumen-bc'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                stock_id: $(".select_nama_barang option:selected").data('stock_id'),
+            },
+            dataType: "json",
+            success: function(res) {
+                // LIST STOK PER BC
+                listStockAsal = [];
+                listStockAsal = res.data;
+                drawTableAsalBarang(res.data);
+            }
+        });
+    }
+
+    function drawTableAsalBarang(data) {
+        if ($.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable().clear().draw();
+            dataTable.destroy();
+        }
+        const table = $('#dataTable');
+        $.each(data, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                    <div class="form-check">
+                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                    </div>
+                `
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align: center;">').text(v.satuan));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            table.find('tbody').append(newRow);
+        });
+
+        dataTable = $('#dataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: false,
+            serverSide: false,
+            ordering: true,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: true,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        dataTable.draw();
+    }
+
+
+    $('#select-item-btn').click(function() {
+        var checkedCheckboxes = $(".child:checked");
+        var dataIds = checkedCheckboxes.map(function() {
+            return $(this).data("id");
+        }).get();
+        var id_selected = getIDListDataSelected();
+
+        $.each(listStockAsal, function(i, v) {
+            var currentID = Number(v.id);
+
+            if ($.inArray(currentID, dataIds) !== -1) {
+                var isIDSelected = $.grep(listStockSelected, function(item) {
+                    return item.id == Number(currentID);
+                }).length > 0;
+
+                if (!isIDSelected) {
+                    listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                    listStockAsal[i].qty = 0;
+                    listStockSelected.push(listStockAsal[i]);
+                }
+            }
+        });
+
+        drawTableSelectedItem(listStockSelected);
+    });
+
+    function drawTableSelectedItem(data) {
+        if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
+            $('#selectedItemTable').DataTable().clear().draw();
+            selectedItemTable.destroy();
+        }
+        const table = $('#selectedItemTable');
+        var no = 1;
+        $.each(data, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+               ${no++} 
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align: center;">').text(v.satuan));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <input <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <button <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+            `
+            ));
+            table.find('tbody').append(newRow);
+        });
+
+        selectedItemTable = $('#selectedItemTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: false,
+            serverSide: false,
+            ordering: true,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: true,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        selectedItemTable.draw();
+    }
+
+    function getIDListDataSelected() {
+        var id_selected = [];
+        $.each(listStockSelected, function(i, v) {
+            id_selected.push(v.id);
+        })
+        return id_selected;
+    }
+
+    function deleteDetail(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listStockSelected.length; i++) {
+            if (listStockSelected[i].id == id) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listStockSelected.splice(indexToRemove, 1);
+            drawTableSelectedItem(listStockSelected);
+        }
+    }
+
+    function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        if (parseFloat(numericValue) <= 0) {
+            inputElement.value = 0;
+        } else {
+            inputElement.value = numericValue;
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

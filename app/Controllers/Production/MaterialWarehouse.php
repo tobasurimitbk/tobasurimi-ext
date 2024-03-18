@@ -46,11 +46,13 @@ class MaterialWarehouse extends BaseController
     protected $supplierModel;
     protected $materialRequestModel;
     protected $materialRequestDetailsModel;
+    protected $this_user_id;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
         $this->barangModel = new BarangModel();
         $this->satuanModel = new SatuansModel();
         $this->workOrdersModel = new WorkOrdersModel();
@@ -276,40 +278,58 @@ class MaterialWarehouse extends BaseController
 
 
             if (!empty($id)) {
-                $this->materialRequestModel->update($id, $payload);
                 $materialRequestData = $this->materialRequestModel->find($id);
+                $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->groupBy('material_request_details.barang1_id')->findAll();
+                $workOrderData = $this->workOrdersModel->find($materialRequestData['work_order_id']);
+                // var_dump($materialRequestData);
+                foreach ($materialRequestDetailData as $key => $value) {
+                    $barangMasterData = $this->barangMasterModel->find($value['barang1_id']);
 
-                // $stok = $this->stockModel->insertStok(
-                //     $this->this_company_id,
-                //     $materialRequestData['warehouse_id'],
-                //     $materialRequestData['divisi_id'],
-                //     $stock['tipe_barang'],
-                //     $stock['barang1_id'],
-                //     $barang2_id,
-                //     ($qty * -1),
-                // );
+                    // $data = [
+                    //     'this_company_id' => $this->this_company_id,
+                    //     'warehouse_id' => $materialRequestData['warehouse_id'],
+                    //     'divisi_id' => $materialRequestData['divisi_id'],
+                    //     'type_barang' => $barangMasterData['type_barang'],
+                    //     'barang1_id' => $value['barang1_id'],
+                    //     'barang2_id' => $value['barang2_id'],
+                    //     'qty' => ($value['qty'] * -1),
+                    // ];
+                    // var_dump($data);
+                    // exit;
+                    $stok = $this->stockModel->insertStok(
+                        $this->this_company_id,
+                        "3",
+                        "28",
+                        $barangMasterData['type_barang'],
+                        $value['barang1_id'],
+                        $value['barang2_id'],
+                        ($value['qty'] * -1),
+                    );
 
-                // // DETAIL
-                // $stokDetail = $this->stockDetailModel->insertStokDetail(
-                //     $stok,
-                //     $qty,
-                //     "Out",
-                //     date('Y-m-d'),
-                //     $this->this_user_id,
-                //     "MUTASI",
-                //     $penerimaanMutasi['penerimaan_mutasi_no'],
-                //     $penerimaanMutasi['keterangan'],
-                // );
+                    // DETAIL
+                    $stokDetail = $this->stockDetailModel->insertStokDetail(
+                        $stok,
+                        $value['qty'],
+                        "Out",
+                        date('Y-m-d'),
+                        $this->this_user_id,
+                        "PRODUKSI",
+                        $workOrderData['wo_no'],
+                        $workOrderData['note'] ? $workOrderData['note'] : "-",
+                    );
 
-                // // SUB DETAIL
-                // $this->stockDetail2Model->insertStokDetail2(
-                //     $p['bc_id'],
-                //     $stok,
-                //     $stokDetail,
-                //     $qty,
-                //     $p['no_aju'],
-                //     $mutasi['no_mutasi']
-                // );
+                    // SUB DETAIL
+                    $stokDetail2 = $this->stockDetail2Model->insertStokDetail2(
+                        $value['bc_id'],
+                        $stok,
+                        $stokDetail,
+                        $value['qty'],
+                        $value['no_aju'],
+                        $materialRequestData['req_no']
+                    );
+                }
+                $this->materialRequestModel->update($id, $payload);
+
                 $data = [
                     "status"    => true,
                     "message"   => "Material Request Berhasil Diapprove",

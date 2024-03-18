@@ -930,30 +930,30 @@
 
         if ($(".create-form").valid()) {
             if ($(".spek-form").valid()) {
-                let isDuplicate = list_items.some(function(item) {
-                    return item.spesifikasi === spek;
-                });
+                if (spek_id) {
+                    $.each(list_items, function(i, v) {
+                        if (v.spek_id === spek_id) {
+                            list_items[i].spesifikasi = spek;
+                            list_items[i].satuan_1 = satuan1_id;
+                            list_items[i].satuan_1_text = satuan1_text;
+                            list_items[i].satuan_2 = satuan2_id;
+                            list_items[i].satuan_2_text = satuan2_text;
+                            list_items[i].konversi_satuan_2 = konversi_satuan_2;
+                            list_items[i].satuan_3 = satuan3_id;
+                            list_items[i].satuan_3_text = satuan3_text;
+                            list_items[i].konversi_satuan_3 = konversi_satuan_3;
+                            list_items[i].harga_pokok = harga_pokok;
+                            list_items[i].harga_jual = harga_jual;
+                        }
+                    });
+                    resetFormDetail();
+                    drawTable();
+                } else {
+                    let isDuplicate = list_items.some(function(item) {
+                        return item.spesifikasi === spek;
+                    });
 
-                if (!isDuplicate) {
-                    if (spek_id) {
-                        $.each(list_items, function(i, v) {
-                            if (v.spek_id === spek_id) {
-                                list_items[i].spesifikasi = spek;
-                                list_items[i].satuan_1 = satuan1_id;
-                                list_items[i].satuan_1_text = satuan1_text;
-                                list_items[i].satuan_2 = satuan2_id;
-                                list_items[i].satuan_2_text = satuan2_text;
-                                list_items[i].konversi_satuan_2 = konversi_satuan_2;
-                                list_items[i].satuan_3 = satuan3_id;
-                                list_items[i].satuan_3_text = satuan3_text;
-                                list_items[i].konversi_satuan_3 = konversi_satuan_3;
-                                list_items[i].harga_pokok = harga_pokok;
-                                list_items[i].harga_jual = harga_jual;
-                            }
-                        });
-                        resetFormDetail();
-                        drawTable();
-                    } else {
+                    if (!isDuplicate) {
                         list_items.push({
                             'spek_id': getID(),
                             'spesifikasi_id': "",
@@ -971,13 +971,13 @@
                         });
                         resetFormDetail();
                         drawTable();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Spesifikasi sudah ada!',
+                            confirmButtonColor: 'red',
+                        })
                     }
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Spesifikasi sudah ada!',
-                        confirmButtonColor: 'red',
-                    })
                 }
             }
         }
