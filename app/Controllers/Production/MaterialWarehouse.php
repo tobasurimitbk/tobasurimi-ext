@@ -298,8 +298,8 @@ class MaterialWarehouse extends BaseController
                     // exit;
                     $stok = $this->stockModel->insertStok(
                         $this->this_company_id,
-                        "3",
-                        "28",
+                        $materialRequestData['warehouse_id'],
+                        $materialRequestData['divisi_id'],
                         $barangMasterData['type_barang'],
                         $value['barang1_id'],
                         $value['barang2_id'],
