@@ -77,11 +77,11 @@ class JasaVendorInModel extends Model
         }
 
         if ($addCondition['divisi_id']) {
-            $dataQry->where('jasa_vendor_out.divisi_id', $addCondition['divisi_id']);
+            $dataQry->where('jasa_vendor_in.divisi_id', $addCondition['divisi_id']);
         }
 
         if ($addCondition['warehouse_id']) {
-            $dataQry->like('jasa_vendor_out.warehouse_id', $addCondition['warehouse_id']);
+            $dataQry->like('jasa_vendor_in.warehouse_id', $addCondition['warehouse_id']);
         }
 
         if ($addCondition['status'] || $addCondition['status'] == '0') {
