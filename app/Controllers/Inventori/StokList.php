@@ -118,9 +118,9 @@ class StokList extends BaseController
                         "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
                         "divisi"                => strtoupper($data->divisi),
                         "warehouse"             => strtoupper($data->warehouse),
-                        "stok_1"                => $satuan1 == null ? '-' : number_format($data->qty) . " " . $satuan1['kode_satuan'],
-                        "stok_2"                => $satuan2 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
-                        "stok_3"                => $satuan3 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
+                        "stok_1"                => $satuan1 == null ? '-' : ($data->qty) . " " . $satuan1['kode_satuan'],
+                        "stok_2"                => $satuan2 == null ? '-' : (sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
+                        "stok_3"                => $satuan3 == null ? '-' : (sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
                     ]);
                 } else {
                     if ($addCondition['status_stok'] == 1) {
@@ -134,9 +134,9 @@ class StokList extends BaseController
                                 "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
                                 "divisi"                => strtoupper($data->divisi),
                                 "warehouse"             => strtoupper($data->warehouse),
-                                "stok_1"                => $satuan1 == null ? '-' : number_format($data->qty) . " " . $satuan1['kode_satuan'],
-                                "stok_2"                => $satuan2 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
-                                "stok_3"                => $satuan3 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
+                                "stok_1"                => $satuan1 == null ? '-' : ($data->qty) . " " . $satuan1['kode_satuan'],
+                                "stok_2"                => $satuan2 == null ? '-' : (sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
+                                "stok_3"                => $satuan3 == null ? '-' : (sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
                             ]);
                         }
                     } else {
@@ -150,9 +150,9 @@ class StokList extends BaseController
                                 "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
                                 "divisi"                => strtoupper($data->divisi),
                                 "warehouse"             => strtoupper($data->warehouse),
-                                "stok_1"                => $satuan1 == null ? '-' : number_format($data->qty) . " " . $satuan1['kode_satuan'],
-                                "stok_2"                => $satuan2 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
-                                "stok_3"                => $satuan3 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
+                                "stok_1"                => $satuan1 == null ? '-' : ($data->qty) . " " . $satuan1['kode_satuan'],
+                                "stok_2"                => $satuan2 == null ? '-' : (sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
+                                "stok_3"                => $satuan3 == null ? '-' : (sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
                             ]);
                         }
                     }
@@ -184,7 +184,7 @@ class StokList extends BaseController
                         "barang"                => strtoupper($data->name),
                         "divisi"                => strtoupper($data->divisi),
                         "warehouse"             => strtoupper($data->warehouse),
-                        "stok_1"                => number_format($data->qty) . " " . $satuan1['kode_satuan'],
+                        "stok_1"                => ($data->qty) . " " . $satuan1['kode_satuan'],
                     ]);
                 } else {
                     if ($addCondition['status_stok'] == 1) {
@@ -198,7 +198,7 @@ class StokList extends BaseController
                                 "barang"                => strtoupper($data->name),
                                 "divisi"                => strtoupper($data->divisi),
                                 "warehouse"             => strtoupper($data->warehouse),
-                                "stok_1"                => number_format($data->qty) . " " .  $satuan1['kode_satuan'],
+                                "stok_1"                => ($data->qty) . " " .  $satuan1['kode_satuan'],
                             ]);
                         }
                     } else {
@@ -211,7 +211,7 @@ class StokList extends BaseController
                             "barang"                => strtoupper($data->name),
                             "divisi"                => strtoupper($data->divisi),
                             "warehouse"             => strtoupper($data->warehouse),
-                            "stok_1"                => number_format($data->qty) . " " .  $satuan1['kode_satuan'],
+                            "stok_1"                => ($data->qty) . " " .  $satuan1['kode_satuan'],
                         ]);
                     }
                 }

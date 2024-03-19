@@ -69,25 +69,25 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stokInisiasi'] == 0 ? 0 : $detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stokInisiasi'] == 0 ? 0 : $detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Qty Awal</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokMasuk']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stok']['stokMasuk']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Qty Masuk</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokKeluar']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stok']['stokKeluar']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Qty Keluar</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stok']['stokSekarang']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stok']['stokSekarang']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Qty Akhir</label>
                     </div>
                 </div>
@@ -144,7 +144,7 @@
                             <tr>
                                 <td colspan="3"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalPerDokumen']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalPerDokumen']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -206,7 +206,7 @@
                             <tr>
                                 <td colspan="3"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalPerInit']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalPerInit']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -270,7 +270,7 @@
                             <tr>
                                 <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalPerPemasukkan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalPerPemasukkan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
@@ -334,7 +334,7 @@
                             <tr>
                                 <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalPerAdjusment']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalPerAdjusment']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -399,7 +399,7 @@
                             <tr>
                                 <td colspan="5"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalMutasi']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalMutasi']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -463,7 +463,7 @@
                             <tr>
                                 <td colspan="5"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalJasaVendor']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalJasaVendor']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -526,7 +526,7 @@
                             <tr>
                                 <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalProduksiOut']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalProduksiOut']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
@@ -589,7 +589,7 @@
                             <tr>
                                 <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= number_format($total['totalProduksiIn']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b><?= ($total['totalProduksiIn']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
                                 <td><b></b></td>
                             </tr>
