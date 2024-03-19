@@ -16,9 +16,13 @@ class ProductionResultDetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'production_result_id',
-        'barang_id',
+        'barang1_id',
+        'barang2_id',
+        'bc_id',
+        'stock_id',
+        'no_aju',
+        'barang_type',
         'qty',
-        'barang_type'
     ];
 
     // Dates

@@ -454,6 +454,8 @@ class StockModel extends Model
                     ->where('deletedAt', null)
                     ->first();
 
+                // var_dump($stok);
+
                 // UPDATE QTY
                 $this->update($stok['id'], [
                     'qty' => $stok['qty'] + $qtyTotal

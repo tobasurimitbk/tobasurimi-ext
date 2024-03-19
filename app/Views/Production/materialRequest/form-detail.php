@@ -9,6 +9,16 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
                 Batal
             </a>
+            <?= csrf_field() ?>
+            <?php
+            if (!($dataMaterialRequestswithwo[0]->is_posted)) {
+            ?>
+                <button type="button" class="btn btn-success" onclick="posting('<?= encrypt($ids) ?>', 1)">
+                    Posting
+                </button>
+            <?php
+            }
+            ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Print
             </button>
@@ -29,7 +39,7 @@
                 <span>Tanggal Produksi : <?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->production_date)) : ""; ?></span>
                 <?php
                 if (!empty($dataMaterialRequestswithwo)) {
-                    if ($dataMaterialRequestswithwo[0]->is_posted && $dataMaterialRequestswithwo[0]->is_approve) {
+                    if ($dataMaterialRequestswithwo[0]->is_posted && $dataMaterialRequestswithwo[0]->is_approve == "1") {
                 ?>
                         <span>Status : Approved</span>
                     <?php
@@ -40,11 +50,28 @@
                     } else if (!($dataMaterialRequestswithwo[0]->is_posted) && !($dataMaterialRequestswithwo[0]->is_approve)) {
                     ?>
                         <span>Status : Waiting to Posted</span>
+                    <?php
+                    } else if ($dataMaterialRequestswithwo[0]->is_posted && $dataMaterialRequestswithwo[0]->is_approve == "2") {
+                    ?>
+                        <span>Status : Rejected</span>
                 <?php
                     }
                 }
                 ?>
-                <span>Keterangan : - </span>
+                <?php
+                if (!empty($dataMaterialRequestswithwo)) {
+                    if ($dataMaterialRequestswithwo[0]->note_approve) {
+                ?>
+                        <span>Status : Approved</span>
+                        <span>Keterangan : <?= $dataMaterialRequestswithwo[0]->note_approve ?></span>
+                    <?php
+                    } else {
+                    ?>
+                        <span>Keterangan : - </span>
+                <?php
+                    }
+                }
+                ?>
             </div>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
@@ -107,6 +134,8 @@
 <script>
     let sortDataBarang = "createdAt";
     let sortTypeDataBarang = "DESC";
+    const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
     $(document).ready(function() {
         const dataTableMaterialRequest = $('.dataTableMaterialRequest').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -223,6 +252,72 @@
             }
         });
     });
+
+    const posting = function(id, status_posting) {
+        console.log(id);
+        Swal.fire({
+            icon: 'question',
+            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url("material-request/update-status"); ?>",
+                    data: {
+                        id: id,
+                        status_posting: status_posting
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        // Menghindari XSS dengan menghindari menyisipkan variabel PHP langsung ke dalam string JavaScript
+                        const baseUrl = '<?= base_url("material-request/id"); ?>';
+
+                        // Mengambil token CSRF dari respons dan memperbarui nilainya pada input CSRF
+                        csrf.val(response.token);
+
+                        // Menampilkan pesan berdasarkan respons dari server
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                // Mengarahkan ke URL yang diperoleh dari PHP
+                                location.replace(`${baseUrl}/${response.id}`);
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
 </script>
 
 <?= $this->endSection(); ?>

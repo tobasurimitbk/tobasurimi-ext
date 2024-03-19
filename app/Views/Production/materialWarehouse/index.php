@@ -39,6 +39,47 @@
     </div>
 </section>
 
+<div class="modal approve-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Update Status</h5>
+                <!-- <button class="btn btn-show-form btn-add-barang float-right">
+                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
+                </button> -->
+            </div>
+            <div class="modal-body">
+                <form class="approve-form" role="form" method="POST" enctype="multipart/form-data">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                                <select class="form-select status_approve" name="status_approve" id="status_approve" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="1">Approve</option>
+                                    <option value="2">Reject</option>
+                                </select>
+                                <label for="floatingInput">Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan_approve" id="keterangan_approve" name="keterangan_approve" placeholder="Keterangan">
+                                <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail" onclick="postingUpdateStatus()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
@@ -122,14 +163,11 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let is_approve = row?.is_approve;
-                    if (is_approve != 1) {
+                    if (is_approve == 0) {
                         return `
                         <div class="mt-0">
                             <button type="button" class="btn btn-primary detail-material-warehouse">
                                 <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger" onclick="posting('${id}', 1)">
-                            <i class="fa fa-check" aria-hidden="true"></i>
                             </button>
                         </div>
                         `
@@ -138,6 +176,9 @@
                         <div class="mt-0">
                             <button type="button" class="btn btn-primary detail-material-warehouse">
                                 <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger show-modal-approve">
+                            <i class="fa fa-check" aria-hidden="true"></i>
                             </button>
                         </div>
                         `
@@ -176,10 +217,26 @@
                 location.replace(`<?= base_url("material-warehouse/id"); ?>/${data.id}`);
             }
         });
+
+        $('#dataTable tbody').on('click', '.show-modal-approve', function() {
+            // Get the data associated with the clicked row
+            const data = table.row($(this).closest('tr')).data();
+
+            // Redirect to the detail page using the data ID
+            if (data) {
+                $(".id").val(data.id);
+                $(".approve-modal").modal("show");
+            }
+        });
+        $('.btn-hide-detail').on('click', function() {
+            $(".approve-modal").modal("hide");
+        });
     })
 
-    const posting = function(id, status_posting) {
-        console.log(id);
+    const postingUpdateStatus = function() {
+        let id = $(".id").val();
+        let status_posting = $(".status_approve").val();
+        let keterangan_posting = $(".keterangan_approve").val();
         Swal.fire({
             icon: 'question',
             title: status_posting == "1" ? "Yakin Akan disetujui ?" : "Yakin Akan batal disetujui ?",
@@ -195,7 +252,8 @@
                     url: "<?= base_url("material-warehouse/update-status"); ?>",
                     data: {
                         id: id,
-                        status_posting: status_posting
+                        status_posting: status_posting,
+                        keterangan_posting: keterangan_posting,
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -216,6 +274,7 @@
                                 })
                                 .then(() => {
                                     table.ajax.reload()
+                                    $(".approve-modal").modal("hide");
                                 })
                         } else {
                             Swal.fire({

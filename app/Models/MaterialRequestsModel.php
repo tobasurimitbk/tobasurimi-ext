@@ -27,6 +27,7 @@ class MaterialRequestsModel extends Model
         'createdBy',
         'is_approve',
         'approveBy',
+        'note_approve',
         'createdAt',
         'updatedAt',
         'deletedAt'

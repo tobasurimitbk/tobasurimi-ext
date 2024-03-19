@@ -274,65 +274,23 @@ class MaterialWarehouse extends BaseController
             $payload = [
                 "is_approve" => $this->request->getVar('status_posting'),
                 "approveBy" => session()->get("login")->user_id,
+                "note_approve" => $this->request->getVar('keterangan_posting')
             ];
 
 
             if (!empty($id)) {
-                $materialRequestData = $this->materialRequestModel->find($id);
-                $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->groupBy('material_request_details.barang1_id')->findAll();
-                $workOrderData = $this->workOrdersModel->find($materialRequestData['work_order_id']);
-                // var_dump($materialRequestData);
-                foreach ($materialRequestDetailData as $key => $value) {
-                    $barangMasterData = $this->barangMasterModel->find($value['barang1_id']);
-
-                    // $data = [
-                    //     'this_company_id' => $this->this_company_id,
-                    //     'warehouse_id' => $materialRequestData['warehouse_id'],
-                    //     'divisi_id' => $materialRequestData['divisi_id'],
-                    //     'type_barang' => $barangMasterData['type_barang'],
-                    //     'barang1_id' => $value['barang1_id'],
-                    //     'barang2_id' => $value['barang2_id'],
-                    //     'qty' => ($value['qty'] * -1),
-                    // ];
-                    // var_dump($data);
-                    // exit;
-                    $stok = $this->stockModel->insertStok(
-                        $this->this_company_id,
-                        $materialRequestData['warehouse_id'],
-                        $materialRequestData['divisi_id'],
-                        $barangMasterData['type_barang'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        ($value['qty'] * -1),
-                    );
-
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $value['qty'],
-                        "Out",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "PRODUKSI",
-                        $workOrderData['wo_no'],
-                        $workOrderData['note'] ? $workOrderData['note'] : "-",
-                    );
-
-                    // SUB DETAIL
-                    $stokDetail2 = $this->stockDetail2Model->insertStokDetail2(
-                        $value['bc_id'],
-                        $stok,
-                        $stokDetail,
-                        $value['qty'],
-                        $value['no_aju'],
-                        $materialRequestData['req_no']
-                    );
-                }
                 $this->materialRequestModel->update($id, $payload);
+
+                if ($this->request->getVar('status_posting') == "1") {
+                    $status = "approve";
+                } else {
+                    $status = "reject";
+                }
+
 
                 $data = [
                     "status"    => true,
-                    "message"   => "Material Request Berhasil Diapprove",
+                    "message"   => "Material Request Berhasil Di" . $status,
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];

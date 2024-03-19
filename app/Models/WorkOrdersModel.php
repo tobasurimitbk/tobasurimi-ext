@@ -127,8 +127,7 @@ class WorkOrdersModel extends Model
         $builder = $this->db->table('work_orders');
         $builder->select('wo_no');
         $builder->orderBy('wo_no', 'desc')
-            ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
+            ->where('deletedAt', null);
         $builder->like('wo_no', $lastStr);
         $query = $builder->get();
 

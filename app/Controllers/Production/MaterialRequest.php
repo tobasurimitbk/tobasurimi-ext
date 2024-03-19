@@ -398,13 +398,15 @@ class MaterialRequest extends BaseController
 
             // po posting
             $payload = [
-                "is_posted" => $this->request->getVar('status_posting')
+                "is_posted" => $this->request->getVar('status_posting'),
+                "note_approve" => $this->request->getVar('keterangan_posting')
             ];
 
             if (!empty($id)) {
                 $this->materialRequestModel->update($id, $payload);
                 $data = [
                     "status"    => true,
+                    "id"    => $this->request->getVar('id'),
                     "message"   => "Status Posting Berhasil Diperbaharui",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
@@ -414,6 +416,7 @@ class MaterialRequest extends BaseController
             } else {
                 $data = [
                     "status"    => false,
+                    "id"    => $this->request->getVar('id'),
                     "message"   => "Data Gagal Disimpan",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
