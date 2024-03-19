@@ -584,10 +584,11 @@ class StockModel extends Model
             ->groupBy('stock_details.stock_id')
             ->findAll();
 
+        $stokInisiasi = count($stokInisiasi) == 0 ? 0 : $stokInisiasi[0];
         return [
             'barang' => $detailBarang,
             'stok' => $detailStock[0],
-            'stokInisiasi' => $stokInisiasi[0]
+            'stokInisiasi' => $stokInisiasi
         ];
     }
 

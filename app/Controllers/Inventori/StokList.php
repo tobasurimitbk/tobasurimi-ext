@@ -107,17 +107,17 @@ class StokList extends BaseController
                 $satuan1 = $this->satuanModel->find($data->satuan_1);
                 $satuan2 = $this->satuanModel->find($data->satuan_2);
                 $satuan3 = $this->satuanModel->find($data->satuan_3);
-
+                $data->qty = $this->stockModel->detailStock($data->id)['stok']['stokSekarang'];
                 if ($addCondition['status_stok'] == "ALL") {
                     array_push($dataResult, [
                         "no"                    => $no++,
                         "id"                    => encrypt($data->id),
-                        "parent_type"           => str_replace("_", " ", strtoupper($data->parent_type)),
-                        "parent_name"           => $data->parent_name,
-                        "kode_barang"           => $data->kode_barang,
-                        "barang"                => $data->barang_name . " " . $data->spesifikasi,
-                        "divisi"                => $data->divisi,
-                        "warehouse"             => $data->warehouse,
+                        "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
+                        "parent_name"           => strtoupper($data->parent_name),
+                        "kode_barang"           => strtoupper($data->kode_barang),
+                        "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
+                        "divisi"                => strtoupper($data->divisi),
+                        "warehouse"             => strtoupper($data->warehouse),
                         "stok_1"                => $satuan1 == null ? '-' : number_format($data->qty) . " " . $satuan1['kode_satuan'],
                         "stok_2"                => $satuan2 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
                         "stok_3"                => $satuan3 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
@@ -128,12 +128,12 @@ class StokList extends BaseController
                             array_push($dataResult, [
                                 "no"                    => $no++,
                                 "id"                    => encrypt($data->id),
-                                "parent_type"           => str_replace("_", " ", strtoupper($data->parent_type)),
-                                "parent_name"           => $data->parent_name,
-                                "kode_barang"           => $data->kode_barang,
-                                "barang"                => $data->barang_name . " " . $data->spesifikasi,
-                                "divisi"                => $data->divisi,
-                                "warehouse"             => $data->warehouse,
+                                "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
+                                "parent_name"           => strtoupper($data->parent_name),
+                                "kode_barang"           => strtoupper($data->kode_barang),
+                                "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
+                                "divisi"                => strtoupper($data->divisi),
+                                "warehouse"             => strtoupper($data->warehouse),
                                 "stok_1"                => $satuan1 == null ? '-' : number_format($data->qty) . " " . $satuan1['kode_satuan'],
                                 "stok_2"                => $satuan2 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
                                 "stok_3"                => $satuan3 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
@@ -144,12 +144,12 @@ class StokList extends BaseController
                             array_push($dataResult, [
                                 "no"                    => $no++,
                                 "id"                    => encrypt($data->id),
-                                "parent_type"           => str_replace("_", " ", strtoupper($data->parent_type)),
-                                "parent_name"           => $data->parent_name,
-                                "kode_barang"           => $data->kode_barang,
-                                "barang"                => $data->barang_name . " " . $data->spesifikasi,
-                                "divisi"                => $data->divisi,
-                                "warehouse"             => $data->warehouse,
+                                "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
+                                "parent_name"           => strtoupper($data->parent_name),
+                                "kode_barang"           => strtoupper($data->kode_barang),
+                                "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
+                                "divisi"                => strtoupper($data->divisi),
+                                "warehouse"             => strtoupper($data->warehouse),
                                 "stok_1"                => $satuan1 == null ? '-' : number_format($data->qty) . " " . $satuan1['kode_satuan'],
                                 "stok_2"                => $satuan2 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
                                 "stok_3"                => $satuan3 == null ? '-' : number_format(sprintf("%.2f", $data->qty / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
@@ -172,17 +172,18 @@ class StokList extends BaseController
 
             foreach ($dataQry['data'] as $data) {
                 $satuan1 = $this->satuanModel->find($data->satuan_id);
+                $data->qty = $this->stockModel->detailStock($data->id)['stok']['stokSekarang'];
 
                 if ($addCondition['status_stok'] == "ALL") {
                     array_push($dataResult, [
                         "no"                    => $no++,
                         "id"                    => encrypt($data->id),
-                        "parent_type"           => str_replace("_", " ", strtoupper($data->parent_type)),
-                        "parent_name"           => $data->parent_name,
-                        "kode_barang"           => $data->kode,
-                        "barang"                => $data->name,
-                        "divisi"                => $data->divisi,
-                        "warehouse"             => $data->warehouse,
+                        "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
+                        "parent_name"           => strtoupper($data->parent_name),
+                        "kode_barang"           => strtoupper($data->kode),
+                        "barang"                => strtoupper($data->name),
+                        "divisi"                => strtoupper($data->divisi),
+                        "warehouse"             => strtoupper($data->warehouse),
                         "stok_1"                => number_format($data->qty) . " " . $satuan1['kode_satuan'],
                     ]);
                 } else {
@@ -191,12 +192,12 @@ class StokList extends BaseController
                             array_push($dataResult, [
                                 "no"                    => $no++,
                                 "id"                    => encrypt($data->id),
-                                "parent_type"           => str_replace("_", " ", strtoupper($data->parent_type)),
-                                "parent_name"           => $data->parent_name,
-                                "kode_barang"           => $data->kode,
-                                "barang"                => $data->name,
-                                "divisi"                => $data->divisi,
-                                "warehouse"             => $data->warehouse,
+                                "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
+                                "parent_name"           => strtoupper($data->parent_name),
+                                "kode_barang"           => strtoupper($data->kode),
+                                "barang"                => strtoupper($data->name),
+                                "divisi"                => strtoupper($data->divisi),
+                                "warehouse"             => strtoupper($data->warehouse),
                                 "stok_1"                => number_format($data->qty) . " " .  $satuan1['kode_satuan'],
                             ]);
                         }
@@ -204,12 +205,12 @@ class StokList extends BaseController
                         array_push($dataResult, [
                             "no"                    => $no++,
                             "id"                    => encrypt($data->id),
-                            "parent_type"           => str_replace("_", " ", strtoupper($data->parent_type)),
-                            "parent_name"           => $data->parent_name,
-                            "kode_barang"           => $data->kode,
-                            "barang"                => $data->name,
-                            "divisi"                => $data->divisi,
-                            "warehouse"             => $data->warehouse,
+                            "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
+                            "parent_name"           => strtoupper($data->parent_name),
+                            "kode_barang"           => strtoupper($data->kode),
+                            "barang"                => strtoupper($data->name),
+                            "divisi"                => strtoupper($data->divisi),
+                            "warehouse"             => strtoupper($data->warehouse),
                             "stok_1"                => number_format($data->qty) . " " .  $satuan1['kode_satuan'],
                         ]);
                     }

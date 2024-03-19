@@ -158,7 +158,7 @@
                                 if (!empty($dataBarang)) {
                                     foreach ($dataBarang as $b) {
                                 ?>
-                                        <option value="<?= $b["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->barang_id === $b["id"] ? "selected" : "") : ""; ?>><?= $b["barang_name"]; ?></option>
+                                        <option value="<?= $b["id"]; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->barang_id === $b["id"] ? "selected" : "") : ""; ?>><?= strtoupper($b["barang_name"]); ?></option>
                                 <?php
                                     }
                                 }
@@ -720,6 +720,9 @@
                 barang_id: {
                     required: true
                 },
+                divisi_id: {
+                    required: true
+                },
                 po_no: {
                     required: true
                 },
@@ -745,6 +748,9 @@
                 },
                 company_id: {
                     required: "Company wajib diisi"
+                },
+                divisi_id: {
+                    required: "Departemen wajib diisi"
                 },
                 pph: {
                     required: "PPH wajib diisi"

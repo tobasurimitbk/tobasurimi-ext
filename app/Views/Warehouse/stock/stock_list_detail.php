@@ -29,31 +29,31 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= $detail['barang']['parent_name'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= strtoupper($detail['barang']['parent_name']) ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Kategori Barang</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= $divisi['divisi'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= strtoupper($divisi['divisi']) ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Departemen</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= $warehouse['warehouse_name'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= strtoupper($warehouse['warehouse_name']) ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Warehouse</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= "(" . $detail['barang']['kode'] . ")" . "  " . ($detail['barang']['parent_type'] != "kemasan" ? $detail['barang']['barang_name'] : $detail['barang']['barang']) .  ($detail['barang']['parent_type'] != "kemasan" ? " - " . $detail['barang']['spesifikasi'] : "") ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= "(" . strtoupper($detail['barang']['kode']) . ")" . "  " . ($detail['barang']['parent_type'] != "kemasan" ? strtoupper($detail['barang']['barang_name']) : strtoupper($detail['barang']['barang'])) .  ($detail['barang']['parent_type'] != "kemasan" ? " - " . $detail['barang']['spesifikasi'] : "") ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">(Kode) Nama Barang <?= $detail['barang']['parent_type'] == "kemasan" ? "" : "- Spesifikasi" ?></label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= strtoupper($detail['barang']['kode_satuan']) ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Satuan</label>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= number_format($detail['stokInisiasi'] == 0 ? 0 : $detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">Qty Awal</label>
                     </div>
                 </div>
