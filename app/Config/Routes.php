@@ -736,6 +736,7 @@ $routes->get('/stock-list/stock-log-pemasukkan-barang-lpb', 'Inventori\StokList:
 $routes->get('/stock-list/stock-log-adjusment', 'Inventori\StokList::allStokAdjusment', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-mutasi', 'Inventori\StokList::allStokMutasi', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-jasa-vendor', 'Inventori\StokList::allStokJasaVendor', ['filter' => 'Auth']);
+$routes->get('/stock-list/stock-log-produksi', 'Inventori\StokList::allStokProduksi', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);

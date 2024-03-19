@@ -47,7 +47,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= "(" . strtoupper($detail['barang']['kode']) . ")" . "  " . ($detail['barang']['parent_type'] != "kemasan" ? strtoupper($detail['barang']['barang_name']) : strtoupper($detail['barang']['barang'])) .  ($detail['barang']['parent_type'] != "kemasan" ? " - " . $detail['barang']['spesifikasi'] : "") ?>" type="text" class="form-control " id="" name="" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= "(" . strtoupper($detail['barang']['kode']) . ")" . "  " . ($detail['barang']['parent_type'] != "kemasan" ? strtoupper($detail['barang']['barang_name']) : strtoupper($detail['barang']['barang'])) .  ($detail['barang']['parent_type'] != "kemasan" ? " - " . strtoupper($detail['barang']['spesifikasi']) : "") ?>" type="text" class="form-control " id="" name="" placeholder="">
                         <label for="floatingInput">(Kode) Nama Barang <?= $detail['barang']['parent_type'] == "kemasan" ? "" : "- Spesifikasi" ?></label>
                     </div>
                 </div>
@@ -472,20 +472,131 @@
                 </div>
             </div>
 
-
-            <!-- <div class="row">
+            <div class="row mt-3">
                 <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Pengeluaran Barang Ke Produksi</label>
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG KE PRODUKSI</label>
+                    </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Pengeluaran Barang</label>
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select bc_id_stok_produksi_out" id="bc_id_stok_produksi_out" name="bc_id_stok_produksi_out" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($jenisDokAju as $j) : ?>
+                                <option value="<?= $j->id ?>">
+                                    <?= $j->value ?>
+                                </option>
+                            <?php endforeach; ?>
+                            <option value="0">NON PABEAN</option>
+
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
+                    </div>
                 </div>
-            </div> -->
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search_no_aju_stok_produksi_out" id="search_no_aju_stok_produksi_out" name="search_no_aju_stok_produksi_out" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Kode Produksi </label>
+                    </div>
+                </div>
+            </div>
 
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-out-produksi" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="changeSortProduksiOut('stock_details2.no_aju')">Dokumen</th>
+                                <th onclick="changeSortProduksiOut('stock_details.tanggal')">Tanggal</th>
+                                <th>Barang - Spesifikasi</th>
+                                <th onclick="changeSortProduksiOut('stock_details.no_dokumen')">Kode Produksi</th>
+                                <th onclick="changeSortProduksiOut('stock_details2.qty')">Qty Satuan 1</th>
+                                <th>Qty Satuan 2</th>
+                                <th>Qty Satuan 3</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
 
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4"></td>
+                                <td style="float: right;"><b>TOTAL</b></td>
+                                <td><b><?= number_format($total['totalProduksiOut']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PENERIMAAN BARANG KE PRODUKSI</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select bc_id_stok_produksi_in" id="bc_id_stok_produksi_in" name="bc_id_stok_produksi_in" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($jenisDokAju as $j) : ?>
+                                <option value="<?= $j->id ?>">
+                                    <?= $j->value ?>
+                                </option>
+                            <?php endforeach; ?>
+                            <option value="0">NON PABEAN</option>
+
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search_no_aju_stok_produksi_in" id="search_no_aju_stok_produksi_in" name="search_no_aju_stok_produksi_in" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Kode Penerimaan Produksi </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-in-produksi" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="changeSortProduksiIn('stock_details2.no_aju')">Dokumen</th>
+                                <th onclick="changeSortProduksiIn('stock_details.tanggal')">Tanggal</th>
+                                <th>Barang - Spesifikasi</th>
+                                <th onclick="changeSortProduksiIn('stock_details.no_dokumen')">Kode Produksi</th>
+                                <th onclick="changeSortProduksiIn('stock_details2.qty')">Qty Satuan 1</th>
+                                <th>Qty Satuan 2</th>
+                                <th>Qty Satuan 3</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4"></td>
+                                <td style="float: right;"><b>TOTAL</b></td>
+                                <td><b><?= number_format($total['totalProduksiIn']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                                <td><b></b></td>
+                                <td><b></b></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -508,6 +619,12 @@
 
     let sortStokJasaVendor = "createdAt";
     let sortTypeJasaVendor = "DESC";
+
+    let sortStokProduksiOut = "createdAt";
+    let sortTypeProduksiOut = "DESC";
+
+    let sortStokProduksiIn = "createdAt";
+    let sortTypeProduksiIn = "DESC";
 
     const stokTableDokumenBC = $('.stok-dokumen-bc-table').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -1176,6 +1293,230 @@
         }
     });
 
+    const stokTableProduksiOut = $('.stok-out-produksi').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [4, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/stock-log-produksi"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.bc_id = $("#bc_id_stok_produksi_out option:selected").val();
+                data.search = $("#search_no_aju_stok_produksi_out").val();
+                data.stok_id = "<?= encrypt($stok['id']) ?>";
+                data.sumber = "PRODUKSI";
+                data.status = "Out"
+
+                data.sort = sortStokProduksiOut
+                data.sortType = sortTypeProduksiOut;
+            },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "dokumen",
+                className: "text-center"
+            },
+            {
+                data: "tanggal",
+                className: "text-center"
+            },
+            {
+                data: "barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "no_dokumen1",
+                className: "text-center",
+            },
+            {
+                data: "stok_1",
+                className: "text-center"
+            },
+            {
+                data: "stok_2",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "stok_3",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    const stokTableProduksiIn = $('.stok-in-produksi').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [4, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/stock-log-produksi"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.bc_id = $("#bc_id_stok_produksi_out option:selected").val();
+                data.search = $("#search_no_aju_stok_produksi_out").val();
+                data.stok_id = "<?= encrypt($stok['id']) ?>";
+                data.sumber = "PRODUKSI";
+                data.status = "In"
+
+                data.sort = sortStokProduksiIn
+                data.sortType = sortTypeProduksiIn;
+            },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "dokumen",
+                className: "text-center"
+            },
+            {
+                data: "tanggal",
+                className: "text-center"
+            },
+            {
+                data: "barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "no_dokumen1",
+                className: "text-center",
+            },
+            {
+                data: "stok_1",
+                className: "text-center"
+            },
+            {
+                data: "stok_2",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "stok_3",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
     $('#bc_id_stok_per_dokumen').select2({
         placeholder: "Pilih Dokumen Pabean",
         theme: "bootstrap-5",
@@ -1224,6 +1565,21 @@
         stokTableJasaVendor.ajax.reload();
     });
 
+    $('#bc_id_stok_produksi_out').select2({
+        placeholder: "Pilih Dokumen Pabean",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        stokTableProduksiOut.ajax.reload();
+    });
+
+    $('#bc_id_stok_produksi_in').select2({
+        placeholder: "Pilih Dokumen Pabean",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        stokTableProduksiIn.ajax.reload();
+    });
 
     $('#search_no_aju_stok_per_dokumen').change(function() {
         stokTableDokumenBC.ajax.reload();
@@ -1249,7 +1605,15 @@
         stokTableJasaVendor.ajax.reload();
     });
 
-    $("#bc_id_stok_mutasi,#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang, #bc_id_stok_adjusment,#bc_id_stok_jasa_vendor")
+    $('#search_no_aju_stok_produksi_in').change(function() {
+        stokTableProduksiIn.ajax.reload();
+    });
+
+    $('#search_no_aju_stok_produksi_out').change(function() {
+        stokTableProduksiOut.ajax.reload();
+    });
+
+    $("#bc_id_stok_mutasi,#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang, #bc_id_stok_adjusment,#bc_id_stok_jasa_vendor,#bc_id_stok_produksi_in,#bc_id_stok_produksi_out")
         .parent('div')
         .children('span')
         .children('span')
@@ -1315,6 +1679,26 @@
             sortTypeJasaVendor = sortTypeJasaVendor === "asc" ? "desc" : "asc";
         }
         sortTypeJasaVendor.ajax.reload();
+    }
+
+    const changeSortProduksiOut = function(val) {
+        if (sortStokProduksiOut !== val) {
+            sortTypeProduksiOut = "asc";
+            sortStokProduksiOut = val;
+        } else {
+            sortTypeProduksiOut = sortTypeProduksiOut === "asc" ? "desc" : "asc";
+        }
+        sortTypeProduksiOut.ajax.reload();
+    }
+
+    const changeSortProduksiIn = function(val) {
+        if (sortStokProduksiIn !== val) {
+            sortTypeProduksiIn = "asc";
+            sortStokProduksiIn = val;
+        } else {
+            sortTypeProduksiIn = sortTypeProduksiIn === "asc" ? "desc" : "asc";
+        }
+        sortTypeProduksiIn.ajax.reload();
     }
 </script>
 

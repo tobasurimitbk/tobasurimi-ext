@@ -54,7 +54,7 @@
                             <th onclick="changeSort('penerimaan_mutasi.jenis_mutasi')">Dokumen Mutasi</th>
                             <th onclick="changeSort('penerimaan_mutasi.bc_no')">Nomor Dokumen Pabean</th>
                             <th>Total Item</th>
-                            <th>State</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>

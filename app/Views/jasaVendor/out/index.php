@@ -86,8 +86,8 @@
                             <th onclick="changeSort('divisi_id')">Departemen</th>
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
                             <th>Total Item</th>
-                            <th onclick="changeSort('status_closed')">Status</th>
                             <th onclick="changeSort('vendor_id')">Vendor</th>
+                            <th onclick="changeSort('status_closed')">Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>

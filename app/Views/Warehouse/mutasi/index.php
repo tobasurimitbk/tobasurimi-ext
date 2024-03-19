@@ -53,7 +53,7 @@
                             <th onclick="changeSort('divisis.divisi')">Warehouse Tujuan</th>
                             <th onclick="changeSort('bc_id')">Dokumen Mutasi</th>
                             <th>Total Item</th>
-                            <th>State</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
