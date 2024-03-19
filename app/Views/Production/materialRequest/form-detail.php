@@ -62,7 +62,6 @@
                 if (!empty($dataMaterialRequestswithwo)) {
                     if ($dataMaterialRequestswithwo[0]->note_approve) {
                 ?>
-                        <span>Status : Approved</span>
                         <span>Keterangan : <?= $dataMaterialRequestswithwo[0]->note_approve ?></span>
                     <?php
                     } else {
