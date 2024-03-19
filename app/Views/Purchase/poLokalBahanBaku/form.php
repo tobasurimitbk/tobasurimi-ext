@@ -1551,9 +1551,10 @@
     const formatRupiah = function(number) {
         return number ? Number(number).toLocaleString(undefined, {
             minimumFractionDigits: 2,
-            maximumSignificantDigits: 2
-        }) : 0
+            maximumFractionDigits: 2
+        }) : "0.00";
     }
+
     const reformatRupiah = function(number) {
         return number ? Number(number.replaceAll(",", "")) : 0;
     }
