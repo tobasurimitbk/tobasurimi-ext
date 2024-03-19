@@ -44,7 +44,7 @@
                                 <option value=""></option>
                                 <?php foreach ($tipeBarang as $t) : ?>
                                     <option value="<?= $t['description'] ?>">
-                                        <?= $t['value']; ?>
+                                        <?= strtoupper($t['value']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -85,20 +85,21 @@
                             <label for="floatingInput" style="z-index: 1;">Nama Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input placeholder="" class="form-control spesifikasi_name" disabled id="spesifikasi_name" name="spesifikasi_name" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Spesifikasi</label>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
+                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input placeholder="" class="form-control kode_barang" disabled id="kode_barang" name="kode_barang" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Kode Barang</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input placeholder="" class="form-control nama_satuan" disabled id="nama_satuan" name="nama_satuan" aria-label="Floating label select example" />
@@ -120,12 +121,12 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select bc_id" id="bc_id" name="bc_id" aria-label="Floating label select example">
                                 <option value=""></option>
+                                <option value="0">NON PABEAN</option>
                                 <?php foreach ($jenisDokAju as $j) : ?>
                                     <option value="<?= $j->id ?>">
                                         <?= $j->value ?>
                                     </option>
                                 <?php endforeach; ?>
-                                <option value="0">NON PABEAN</option>
 
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>

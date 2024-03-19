@@ -105,12 +105,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_per_dokumen" id="bc_id_stok_per_dokumen" name="bc_id_stok_per_dokumen" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
@@ -166,12 +166,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_inisasi" id="bc_id_stok_inisasi" name="bc_id_stok_inisasi" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
@@ -228,12 +228,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_pemasukkan_barang" name="bc_id_stok_inisasi" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
@@ -293,12 +293,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_adjusment" name="bc_id_stok_adjusment" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
@@ -356,12 +356,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_mutasi" id="bc_id_stok_mutasi" name="bc_id_stok_mutasi" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
@@ -421,12 +421,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_jasa_vendor" id="bc_id_stok_jasa_vendor" name="bc_id_stok_jasa_vendor" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
@@ -485,12 +485,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_produksi_out" id="bc_id_stok_produksi_out" name="bc_id_stok_produksi_out" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
@@ -548,12 +548,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_produksi_in" id="bc_id_stok_produksi_in" name="bc_id_stok_produksi_in" aria-label="Floating label select example">
                             <option value=""></option>
+                            <option value="0">NON PABEAN</option>
                             <?php foreach ($jenisDokAju as $j) : ?>
                                 <option value="<?= $j->id ?>">
                                     <?= $j->value ?>
                                 </option>
                             <?php endforeach; ?>
-                            <option value="0">NON PABEAN</option>
 
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
