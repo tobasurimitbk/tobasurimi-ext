@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Jasa Vendor Barang Keluar</h1>
+        <h1>Jasa Vendor Barang Masuk</h1>
         <?php if (can("Jasa Vendor", "Barang Masuk", "c")) : ?>
             <a href="<?= base_url('jasa-vendor-in/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah

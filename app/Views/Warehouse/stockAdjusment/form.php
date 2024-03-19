@@ -171,7 +171,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating" style="height: 50px;">
-                                <input placeholder="Qty" class="form-control qty" id="qty" name="qty" aria-label="Floating label select example" />
+                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty" id="qty" name="qty" aria-label="Floating label select example" />
                                 <label for="floatingInput" style="z-index: 1;">Qty Adjusment</label>
                             </div>
                         </div>
@@ -856,6 +856,16 @@
             });
         }
 
+    }
+
+    function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        if (parseFloat(numericValue) <= 0) {
+            inputElement.value = 0;
+        } else {
+            inputElement.value = numericValue;
+        }
     }
 
     function getListDokumenPabean() {

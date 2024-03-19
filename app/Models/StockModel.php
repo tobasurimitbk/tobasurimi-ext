@@ -289,7 +289,7 @@ class StockModel extends Model
                     'barang_id'  => $b['id'],
                     'spesifikasi_id' => $b['spesifikasi_id'], // spesifikasi_id = kemasan_id (jika kemasan)
                     'type_barang' => $type_barang,
-                    'barang' => strtoupper($b['barang_name'] . " " . $b['spesifikasi']),
+                    'barang' => strtoupper($b['barang_name'] . "-" . $b['spesifikasi']),
                     'spesifikasi_name' => strtoupper($b['spesifikasi']),
                     'kode_barang' => $b['kode_barang'],
                     'nama_satuan' => $b['nama_satuan'],
@@ -586,10 +586,11 @@ class StockModel extends Model
             ->groupBy('stock_details.stock_id')
             ->findAll();
 
+        $stokInisiasi = count($stokInisiasi) == 0 ? 0 : $stokInisiasi[0];
         return [
             'barang' => $detailBarang,
             'stok' => $detailStock[0],
-            'stokInisiasi' => $stokInisiasi[0]
+            'stokInisiasi' => $stokInisiasi
         ];
     }
 
@@ -600,7 +601,7 @@ class StockModel extends Model
             $selectQry = "
                 stock.id AS stock_id,
                 kemasan.id AS spesifikasi_id,
-                kemasan.name AS barang,
+                UPPER(kemasan.name) AS barang,
                 kemasan.kode AS kode_barang,
                 satuans.kode_satuan
             ";
@@ -620,7 +621,7 @@ class StockModel extends Model
             $selectQry = "
                 stock.id AS stock_id,
                 stock.barang2_id AS spesifikasi_id,
-                CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang,
+                CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
                 barang_master.kode_barang,
                 satuans.kode_satuan
             ";
