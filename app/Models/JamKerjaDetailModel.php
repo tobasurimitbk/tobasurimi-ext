@@ -12,8 +12,8 @@ class JamKerjaDetailModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
+    protected $useSoftDeletes   = true;
+    protected $protectFields    = false;
     protected $allowedFields    = [
         'jam_kerja_id',
         'hari',
@@ -26,9 +26,9 @@ class JamKerjaDetailModel extends Model
     // Dates
     protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
 
     // Validation
     protected $validationRules      = [];
