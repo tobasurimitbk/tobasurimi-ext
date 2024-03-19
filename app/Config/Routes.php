@@ -693,14 +693,29 @@ $routes->get('/jasa-vendor-out/list-barang-stock-init', 'Inventori\StokAdjusment
 $routes->get('/jasa-vendor-out/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/list-barang-output', 'JasaVendor\JasaVendorOut::dropdownListOutputVendor', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/all', 'JasaVendor\JasaVendorOut::all', ['filter' => 'Auth']);
-$routes->get('/jasa-vendor-out/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/save',  'JasaVendor\JasaVendorOut::createAction', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateAction', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/delete',  'JasaVendor\JasaVendorOut::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/posting',  'JasaVendor\JasaVendorOut::posting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/close',  'JasaVendor\JasaVendorOut::close', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/id/(:segment)',  'JasaVendor\JasaVendorOut::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/get-jasa-vendor-out-no',  'JasaVendor\JasaVendorOut::getJasaVendorOutNo', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/print/(:segment)', 'JasaVendor\JasaVendorOut::print/$1', ['filter' => 'Auth']);
+// JASA VENDOR IN
+$routes->get('/jasa-vendor-in', 'JasaVendor\JasaVendorIn::index', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/create', 'JasaVendor\JasaVendorIn::create', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/divisi', 'JasaVendor\JasaVendorIn::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/warehouse', 'JasaVendor\JasaVendorIn::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/list-jasa-vendor-out', 'JasaVendor\JasaVendorIn::dropdownNoJasaVendorOut', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/list-barang', 'JasaVendor\JasaVendorIn::dropdownListBarang', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/get-jasa-vendor-in-no',  'JasaVendor\JasaVendorIn::getJasaVendorInNo', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/delete',  'JasaVendor\JasaVendorIn::delete', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/posting',  'JasaVendor\JasaVendorIn::posting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/$1', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
