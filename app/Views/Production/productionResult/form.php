@@ -17,7 +17,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp form-hp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
+                <input autocomplete="one-time-code" type="text" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
@@ -31,18 +31,21 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan">
+                                    <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan" value="<?= isset($data) ? $data->pr_no : ""; ?>" <?= isset($data) ? "readonly" : ""; ?>>
                                     <label for="floatingInput">Kode Penerimaan</label>
                                 </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div>
+                                <?php if (!isset($data)) : ?>
+                                    <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                        <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    </div>
+                                <?php endif; ?>
+
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control date_picker" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <input autocomplete="one-time-code" type="text" class="form-control date_picker" name="date_production" id="date_production" placeholder="Tanggal Produksi" value="<?= $data->receive_date ?? ""; ?>" <?= isset($data) ? "readonly" : ""; ?>>
                             <label for="floatingInput">Tanggal Penerimaan</label>
                         </div>
                     </div>
@@ -57,14 +60,19 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php if (isset($dataWorkOrder)) : ?>
-                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
+                            <?php if (!isset($data)) : ?>
+                                <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php if (isset($dataWorkOrder)) : ?>
+                                        <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
+                                            <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            <?php endif; ?>
+                            <?php if (isset($data)) : ?>
+                                <input autocomplete="one-time-code" type="text" class="form-control wo_no" name="wo_no" id="wo_no" placeholder="Kode Produksi" readonly>
+                            <?php endif; ?>
                             <label for="floatingInput">Kode Produksi</label>
                         </div>
                     </div>
@@ -115,9 +123,14 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select kode_request" name="kode_request" id="kode_request" aria-label="Floating label select example">
-                                <option value=""></option>
-                            </select>
+                            <?php if (!isset($data)) : ?>
+                                <select class="form-select kode_request" name="kode_request" id="kode_request" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                            <?php endif; ?>
+                            <?php if (isset($data)) : ?>
+                                <input autocomplete="one-time-code" type="text" class="form-control req_no" name="req_no" id="req_no" placeholder="Kode Produksi" readonly>
+                            <?php endif; ?>
                             <label for="floatingInput">Kode Request</label>
                         </div>
                     </div>
@@ -225,60 +238,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="tab-pane fade" id="nav-barang-setengah-jadi" role="tabpanel" aria-labelledby="nav-profile-tab">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <select class="form-select" name="" id="barang_setengah_jadi">
-                                                <option value="" selected disabled></option>
-                                            </select>
-                                            <label for="floatingInput">Nama Barang</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="setengah_jadi_barang_code" disabled>
-                                            <label for="floatingInput">Kode Barang</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="setengah_jadi_barang_unit" disabled>
-                                            <label for="floatingInput">Satuan</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" id="barangSetengahJadiQty">
-                                            <label for="floatingInput">Qty</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <button type="button" class="btn btn-primary btn-pilih" id="addBarangSetengahJadi">Pilih</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table nowrap table-hover-tobasurimi" id="barangSetengahJadiDataTable" width="100%" cellspacing="0">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th>No.</th>
-                                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                                <th onclick="changeSort('nama_satuan')" class="sort">Nama Satuan</th>
-                                                <th onclick="changeSort('target')" class="sort">Jumlah</th>
-                                                <th onclick="changeSort('target')" class="sort">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div> -->
                             <div class="tab-pane fade" id="nav-scrap" role="tabpanel" aria-labelledby="nav-contact-tab">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -381,6 +340,65 @@
     let list_items_barang_scrap = [];
 
     $(document).ready(function() {
+        <?php if (isset($data)) : ?>
+            $(".kode_produksi").val('<?= $data->work_order_id ?>').change();
+            $(".wo_no").val('<?= $dataWorkOrder[0]->wo_no ?>').change();
+            $(".barang_jadi").val('<?= $dataWorkOrder[0]->nama_barang ?>');
+            $(".standart_production").val('<?= $dataWorkOrder[0]->standart_production ?>');
+            $(".department_id_order").val('<?= $dataWorkOrder[0]->divisi_id ?>');
+            $(".warehouse_id_order").val('<?= $dataWorkOrder[0]->warehouse_id ?>');
+            $(".req_no").val('<?= $dataMaterialRequest[0]->req_no ?>');
+            $("#date_request").val('<?= $dataMaterialRequest[0]->request_date ?>');
+            $(".user_request").val('<?= $dataMaterialRequest[0]->user_name ?>');
+            $(".department_id_request").val('<?= $dataMaterialRequest[0]->divisi_id ?>');
+            $(".warehouse_id_request").val('<?= $dataMaterialRequest[0]->warehouse_id ?>');
+            <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
+                list_items_barang_jadi.push({
+                    'barang_detail_id': getID(),
+                    'barang1_id': '<?= $bj->barang1_id; ?>',
+                    'barang2_id': '<?= $bj->barang2_id; ?>',
+                    'barang_name': '<?= $bj->barang_name; ?>',
+                    'kode_barang': '<?= $bj->kode_barang; ?>',
+                    'kode_satuan': '<?= $bj->kode_satuan; ?>',
+                    'nama_barang': '<?= $bj->nama_barang; ?>',
+                    'qty': '<?= $bj->qty; ?>',
+                    'type_barang': '<?= $bj->barang_type; ?>',
+                    'type_barang_text': '<?= $bj->type_barang_text; ?>',
+                });
+                drawTableBarangJadi();
+            <?php endforeach; ?>
+            <?php foreach ($dataResultBarangScrap as $key => $bs) : ?>
+                list_items_barang_scrap.push({
+                    'barang_detail_id': getID(),
+                    'barang1_id': '<?= $bs->barang1_id; ?>',
+                    'barang2_id': '<?= $bs->barang2_id; ?>',
+                    'barang_name': '<?= $bs->barang_name; ?>',
+                    'kode_barang': '<?= $bs->kode_barang; ?>',
+                    'kode_satuan': '<?= $bs->kode_satuan; ?>',
+                    'nama_barang': '<?= $bs->nama_barang; ?>',
+                    'qty': '<?= $bs->qty; ?>',
+                    'type_barang': '<?= $bs->barang_type; ?>',
+                    'type_barang_text': '<?= $bs->type_barang_text; ?>',
+                });
+                drawTableBarangScrap();
+            <?php endforeach; ?>
+            <?php foreach ($dataResultBarangDigunakan as $key => $bd) : ?>
+                list_items_barang_digunakan.push({
+                    'barang_detail_id': getID(),
+                    'barang1_id': '<?= $bd->barang1_id; ?>',
+                    'barang2_id': '<?= $bd->barang2_id; ?>',
+                    'barang_name': '<?= $bd->barang_name; ?>',
+                    'kode_barang': '<?= $bd->kode_barang; ?>',
+                    'satuan': '<?= $bd->kode_satuan; ?>',
+                    'nama_barang': '<?= $bd->nama_barang; ?>',
+                    'qty': '<?= $bd->qty; ?>',
+                    'ref_no': '<?= $bd->no_aju; ?>',
+                    'type_barang': '<?= $bd->barang_type; ?>',
+                    'type_barang_text': '<?= $bd->type_barang_text; ?>',
+                });
+                drawTableBarangDigunakan();
+            <?php endforeach; ?>
+        <?php endif; ?>
         // Departemen
         $('.department_id_scrap').select2({
             placeholder: "Pilih Departemen",
@@ -701,8 +719,10 @@
             }
         });
 
-        $(".kode_produksi").change(function() {
-            if ($(".kode_produksi option:selected").val()) {
+        $(".kode_produksi").on('change', function() {
+            console.log('masuk');
+            if ($(this).val()) {
+                console.log('masuk 2');
                 let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
                 let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
                 let warehouse_id = $(".kode_produksi option:selected").data("warehouse") ? $(".kode_produksi option:selected").data("warehouse") : "";
@@ -973,7 +993,7 @@
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
                 row += '<td>' + `
-        <input class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty}">` +
+        <input class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) ? "readonly" : ""; ?>>` +
                     '</td>';
 
                 no++;

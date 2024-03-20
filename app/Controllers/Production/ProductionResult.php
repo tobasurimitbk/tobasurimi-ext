@@ -118,13 +118,74 @@ class ProductionResult extends BaseController
             ->select("*, DATE_FORMAT(receive_date, '%d/%m/%Y') AS receive_date")
             ->find($id);
 
-        $productionResDetSelect = "production_result_details.*";
-        $productionResDetData = $this->productionResultDetailModel->asObject()
+        $productionResDetSelect = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
+        $productionResDetDataBJ = $this->productionResultDetailModel->asObject()
             ->select($productionResDetSelect)
-            // ->join('barangs', 'barangs.id = production_result_details.barang_id')
-            // ->join('satuans', 'satuans.id = barangs.satuan_id')
-            ->where('production_result_id', $id)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.barang_type', 'bahan_jadi')
+            ->where('production_result_details.production_result_id', $id)
             ->findAll();
+        foreach ($productionResDetDataBJ as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            }
+        }
+
+        $productionResDetDataBS = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelect)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.barang_type', 'bahan_scrap')
+            ->where('production_result_details.production_result_id', $id)
+            ->findAll();
+        foreach ($productionResDetDataBS as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            }
+        }
+
+        $productionResDetDataBD = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelect)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.barang_type', 'bahan_baku')
+            ->where('production_result_details.production_result_id', $id)
+            ->findAll();
+        foreach ($productionResDetDataBD as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            }
+        }
+
+        var_dump($productionResDetDataBD);
 
         $barangData = $this->barangMasterModel->asObject()
             ->select('barang_master.*')
@@ -142,23 +203,31 @@ class ProductionResult extends BaseController
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
+            ->where('work_orders.id', $productionResData->work_order_id)
             ->where('work_orders.is_posted', "1")
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
+
+        // var_dump($productionResData);
 
         $dataMaterialRequest = $this->materialRequestModel->asObject()
             ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
             ->join('users', 'users.id = material_requests.createdBy', 'left')
             ->where('company_id', $this->this_company_id)
+            ->where('material_requests.id', $productionResData->material_request_id)
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
             ->groupBy('material_request_details.material_request_id')
             ->find();
+        // var_dump($dataMaterialRequest);
 
         $data = [
             'data'                  => $productionResData,
+            'dataResultBarangJadi'                  => $productionResDetDataBJ,
+            'dataResultBarangScrap'                  => $productionResDetDataBS,
+            'dataResultBarangDigunakan'                  => $productionResDetDataBD,
             'dataWorkOrder' => $dataWorkOrder,
             'dataWarehouse' => $dataWarehouse,
             'dataDivisi' => $dataDivisi,
@@ -506,7 +575,7 @@ class ProductionResult extends BaseController
                         "bc_id" => $br->bc_id,
                         "stock_id" => $br->stock_id,
                         "no_aju" => $br->no_aju == "-" ? "-" : $br->no_aju,
-                        "barang_type" => $br->type_barang,
+                        "barang_type" => "barang_return",
                         "qty" => isset($br->qty_dikembalikan) ? (float) $br->qty_dikembalikan : 0,
                     ];
                     $this->productionResultDetailModel->insert($datasbr);
