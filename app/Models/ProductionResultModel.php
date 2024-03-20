@@ -62,19 +62,18 @@ class ProductionResultModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "production_results.*, 
-                      DATE_FORMAT(production_results.receive_date, '%d/%m/%Y') AS receive_date,
-                      warehouses.warehouse_name AS warehouseName, 
+                      DATE_FORMAT(production_results.receive_date, '%d/%m/%Y') AS receives_date,
                       work_orders.wo_no AS wo_no,
                       barang_master.kode_barang AS barangCode,
-                      barang_master.barang_name AS barangName
+                      GROUP_CONCAT(work_order_details.nama_barang SEPARATOR ', ') AS barangName
                       ";
         $productionResDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('warehouses', 'warehouses.id = production_results.warehouse_id')
-            ->join('work_orders', 'work_orders.id = production_results.work_order_id')
-            ->join('work_order_details', 'work_order_details.work_order_id = production_results.work_order_id')
-            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id')
+            ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
+            ->join('work_order_details', 'work_order_details.work_order_id = production_results.work_order_id', 'left')
+            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
+            ->groupBy('production_results.work_order_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $productionResDataQry->countAllResults(false);
@@ -89,7 +88,6 @@ class ProductionResultModel extends Model
 
         $totalFilteredData = $productionResDataQry->countAllResults(false);
         $data = $productionResDataQry->findAll($limit, $offset);
-
         return [
             'data'              => $data,
             'totalData'         => $totalData,

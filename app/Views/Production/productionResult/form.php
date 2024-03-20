@@ -82,7 +82,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select department_id_order" name="department_id" id="department_id_order" disabled>
+                            <select class="form-select department_id_order" name="department_id_order" id="department_id_order" disabled>
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $divisi) : ?>
                                     <option value="<?= $divisi['id'] ?>"><?= $divisi['divisi'] ?></option>
@@ -93,7 +93,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select warehouse_id_order" name="warehouse_id" id="warehouse_id_order" disabled>
+                            <select class="form-select warehouse_id_order" name="warehouse_id_order" id="warehouse_id_order" disabled>
                                 <option value=""></option>
                                 <?php foreach ($dataWarehouse ?? [] as $Warehouse) : ?>
                                     <option value="<?= $Warehouse['id'] ?>"><?= $Warehouse['warehouse_name'] ?></option>
@@ -307,7 +307,7 @@
                                             <select class="form-select department_id_scrap" name="department_id_scrap" id="department_id_scrap" aria-label="Floating label select example">
                                                 <option value=""></option>
                                                 <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                                    <option value="<?= $dataDivisi['id'] ?>"><?= $dataDivisi['divisi'] ?></option>
+                                                    <option value="<?= $dataDivisi['id'] ?>" data-department-name="<?= $dataDivisi['divisi'] ?>"><?= $dataDivisi['divisi'] ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                             <label for="floatingInput">Department</label>
@@ -334,6 +334,8 @@
                                                 <th>No.</th>
                                                 <th>Kode Barang</th>
                                                 <th>Nama Barang</th>
+                                                <th>Department</th>
+                                                <th>Warehouse</th>
                                                 <th>Jumlah</th>
                                                 <th>Action</th>
                                             </tr>
@@ -356,7 +358,7 @@
                                                 <th>Nama Barang</th>
                                                 <th>Satuan</th>
                                                 <th>Jumlah Request</th>
-                                                <th>Jumlah Digunakan</th>
+                                                <th>Jumlah Direturn</th>
                                             </tr>
                                         </thead>
                                         <tbody class="body-table-barang-return" id="body-table-barang-digunakan">
@@ -601,6 +603,10 @@
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
+                        $("#department_id_order").prop('disabled', false);
+                        $("#department_id_request").prop('disabled', false);
+                        $("#warehouse_id_order").prop('disabled', false);
+                        $("#warehouse_id_request").prop('disabled', false);
                         const data = new FormData(document.querySelector(".create-form"));
                         const id = $(".id").val();
                         data.append("jadi", JSON.stringify(list_items_barang_jadi));
@@ -717,7 +723,7 @@
                     },
                     dataType: "json",
                     success: function(res) {
-                        console.log(res);
+                        // console.log(res);
                         if (res.status) {
                             // Clear existing options
                             $('#kode_request').empty();
@@ -808,33 +814,50 @@
                         list_items_barang_digunakan = [];
                         list_items_barang_return = [];
                         res.data.forEach(function(item) {
-                            // Push each item into the list_items_barang_jadi array
+                            console.log(item);
+                            if (item.ref_no == "NON PABEAN") {
+                                var new_ref_no = item.ref_no;
+                            } else {
+                                var ref_no = item.ref_no + "/" + item.no_aju + "/" + item.stock_date;
+
+                                // Pisahkan string berdasarkan tanda slash '/'
+                                var parts = ref_no.split('/');
+                                var partsAju = parts[1].split('-');
+                                var partsDate = parts[2].replace(/-/g, '');
+
+                                // // Dapatkan bagian yang Anda inginkan (bagian ke-1 dan ke-4)
+                                var new_ref_no = parts[0] + '/' + partsAju[3] + '/' + partsDate;
+                            }
                             list_items_barang_digunakan.push({
                                 'barang_detail_id': getID(),
+                                'bc_id': item.bc_id,
+                                'stock_id': item.stock_id,
                                 'barang1_id': item.barang1_id,
                                 'barang2_id': item.barang2_id,
-                                'barang_name': item.barang_name,
                                 'kode_barang': item.kode_barang,
                                 'satuan': item.satuan,
                                 'nama_barang': item.nama_barang,
                                 'note': item.note,
                                 'qty': item.qty,
-                                'ref_no': item.ref_no,
+                                'ref_no': new_ref_no,
+                                'no_aju': item.no_aju,
                                 'type_barang': item.type_barang,
                                 'type_barang_text': item.type_barang_text,
                                 'unit': item.unit,
                             });
                             list_items_barang_return.push({
                                 'barang_detail_id': getID(),
+                                'bc_id': item.bc_id,
+                                'stock_id': item.stock_id,
                                 'barang1_id': item.barang1_id,
                                 'barang2_id': item.barang2_id,
-                                'barang_name': item.barang_name,
                                 'kode_barang': item.kode_barang,
                                 'satuan': item.satuan,
                                 'nama_barang': item.nama_barang,
                                 'note': item.note,
                                 'qty': item.qty,
-                                'ref_no': item.ref_no,
+                                'ref_no': new_ref_no,
+                                'no_aju': item.no_aju,
                                 'type_barang': item.type_barang,
                                 'type_barang_text': item.type_barang_text,
                                 'unit': item.unit,
@@ -863,7 +886,7 @@
                     $("#warehouse_id_scrap").empty();
                     $("#warehouse_id_scrap").append(`<option value=""></option>`);
                     res.data.forEach(function(item) {
-                        $("#warehouse_id_scrap").append(`<option value="${item.id}">${item.warehouse_name}</option>`);
+                        $("#warehouse_id_scrap").append(`<option value="${item.id}" data-warehouse-name="${item.warehouse_name}">${item.warehouse_name}</option>`);
                     })
                     $("#warehouse_id_scrap").prop('disabled', false);
                     // $("#warehouse_id").val().change();
@@ -876,7 +899,9 @@
                 let barang = $(".kode_barang_scrap option:selected").val() ? $(".kode_barang_scrap option:selected").val() : "";
                 let qtyBarang = $(".qty_scrap").val() ? $(".qty_scrap").val() : "";
                 let department = $(".department_id_scrap option:selected").val() ? $(".department_id_scrap option:selected").val() : "";
+                let departmentName = $(".department_id_scrap option:selected").data("department-name") ? $(".department_id_scrap option:selected").data("department-name") : "";
                 let warehouse = $(".warehouse_id_scrap option:selected").val() ? $(".warehouse_id_scrap option:selected").val() : "";
+                let warehouseName = $(".warehouse_id_scrap option:selected").data("warehouse-name") ? $(".warehouse_id_scrap option:selected").data("warehouse-name") : "";
 
                 let nama = $(".kode_barang_scrap option:selected").data("nama") ? $(".kode_barang_scrap option:selected").data("nama") : "";
                 let satuan = $(".kode_barang_scrap option:selected").data("satuan") ? $(".kode_barang_scrap option:selected").data("satuan") : "";
@@ -894,8 +919,10 @@
                     'nama_barang': nama,
                     'nama_satuan': satuan,
                     'satuan_id': satuan_id,
+                    'divisi_name': departmentName,
                     'divisi_id': department,
                     'warehouse_id': warehouse,
+                    'warehouse_name': warehouseName,
                     'qty': qtyBarang
                 });
                 console.log(list_items_barang_scrap);
@@ -984,7 +1011,7 @@
                 row += '<td>' + item.ref_no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.type_barang_text + '</td>';
-                row += '<td>' + item.barang_name + '</td>';
+                row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
                 // row += '<td>' + `
@@ -995,13 +1022,6 @@
             });
             $('.body-table-barang-digunakan').append(row);
         }
-
-        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
-        $('.qty-barang-digunakan').on('input change', function() {
-            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
-            var newValue = $(this).val(); // Dapatkan nilai yang dimasukkan pengguna
-            list_items_barang_digunakan[index].qty_digunakan = newValue; // Simpan nilai ke dalam list_items_barang_jadi
-        });
     }
 
     const drawTableBarangScrap = function() {
@@ -1022,6 +1042,8 @@
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.nama_barang + '</td>';
+                row += '<td>' + item.divisi_name + '</td>';
+                row += '<td>' + item.warehouse_name + '</td>';
                 row += '<td>' + item.qty + '</td>';
                 row += '<td>' + `
             <button type="button" class="btn btn-danger" onclick="deleteRowDetailScrap('${item.barang_detail_id}')">
@@ -1048,23 +1070,33 @@
                 `;
             $('.tfoot').append(row);
         } else {
-            list_items_barang_return.map(item => {
+            list_items_barang_return.map((item, index) => {
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.ref_no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.type_barang_text + '</td>';
-                row += '<td>' + item.barang_name + '</td>';
+                row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
                 row += '<td>' + `
-                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text">` +
+                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" >` +
                     '</td>';
 
                 no++;
             });
             $('.body-table-barang-return').append(row);
         }
+
+        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        $('.qty-barang-digunakan').on('input change', function() {
+            var index = $(this).data('index');
+            var newValue = $(this).val();
+            // console.log(newValue);
+            list_items_barang_return[index].qty_dikembalikan = newValue;
+        });
+
+        // console.log(list_items_barang_return);
     }
 
     const deleteRowDetailScrap = function(id) {
@@ -1075,10 +1107,10 @@
         drawTableBarangScrap();
     }
     const resetFormDetailScrap = function() {
-        $(".kode_barang_scrap").val('').val(null).change()
+        $(".kode_barang_scrap").val('').change()
         $(".qty_scrap").val('')
-        $(".department_id_scrap").val('').val(null).change()
-        $(".warehouse_id_scrap").val('').val(null).change()
+        $(".department_id_scrap").val('').change()
+        $(".warehouse_id_scrap").val('').change()
     }
 
     function preventNegativeInput(inputElement) {

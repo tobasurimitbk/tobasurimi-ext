@@ -27,7 +27,7 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Work Order</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Nama Gudang</th>
+                                <th onclick="changeSort('nama_barang')" class="sort">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -107,8 +107,19 @@
                 className: "text-center"
             },
             {
-                data: "warehouseName",
-                className: "text-center"
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    return `
+                        <div class="mt-0">
+                            <button type="button" class="btn btn-primary detail-material-warehouse">
+                                <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        `
+                }
             }
         ],
         columnDefs: [{
