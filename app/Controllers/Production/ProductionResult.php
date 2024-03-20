@@ -118,61 +118,51 @@ class ProductionResult extends BaseController
             ->select("*, DATE_FORMAT(receive_date, '%d/%m/%Y') AS receive_date")
             ->find($id);
 
-        $productionResDetSelect = "production_result_details.*, 
-                                   barangs.nama_barang AS nama_barang, 
-                                   barangs.kode_barang AS kode_barang, 
-                                   satuans.kode_satuan AS nama_satuan, 
-                                   qty AS jumlah";
+        $productionResDetSelect = "production_result_details.*";
         $productionResDetData = $this->productionResultDetailModel->asObject()
             ->select($productionResDetSelect)
-            ->join('barangs', 'barangs.id = production_result_details.barang_id')
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            // ->join('barangs', 'barangs.id = production_result_details.barang_id')
+            // ->join('satuans', 'satuans.id = barangs.satuan_id')
             ->where('production_result_id', $id)
             ->findAll();
 
-        $barangData = $this->barangModel->asObject()
-            ->select('barangs.*, satuans.kode_satuan AS unit')
+        $barangData = $this->barangMasterModel->asObject()
+            ->select('barang_master.*')
+            // ->join('satuans', 'satuans.id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
-            ->where('parent_id !=', 0)
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->where('type_barang', 'bahan_scrap')
             ->findAll();
 
-        $warehouseData = $this->warehousesModel->asObject()
+
+        $dataWarehouse = $this->warehousesModel->asArray()->where('company_id', $this->this_company_id)->findAll();
+        $dataDivisi = $this->divisiModel->asArray()->where('company_id', $this->this_company_id)->findAll();
+
+        $dataWorkOrder = $this->workOrdersModel->asObject()
+            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
-            ->findAll();
+            ->where('work_orders.deletedAt', null)
+            ->where('work_orders.is_posted', "1")
+            ->where('work_order_details.deletedAt', null)
+            ->groupBy('work_order_details.work_order_id')
+            ->find();
 
-        $workOrderData = $this->workOrdersModel->asObject()
-            ->select("work_orders.id AS id, CONCAT(wo_no, ' - ', barangs.nama_barang) AS wo_no")
-            ->join('barangs', 'barangs.id = work_orders.barang_id')
-            ->findAll();
-
-        $barangJadi = (object)[];
-        $barangSetengahJadiList = [];
-        $scrapList = [];
-        $materialReturnList = [];
-
-        foreach ($productionResDetData as $detData) {
-
-            if ($detData->barang_type === 'Barang Jadi') {
-                $barangJadi = $detData;
-            } elseif ($detData->barang_type === 'Barang Setengah Jadi') {
-                $barangSetengahJadiList[] = $detData;
-            } elseif ($detData->barang_type === 'Scrap') {
-                $scrapList[] = $detData;
-            } elseif ($detData->barang_type === 'Material Return') {
-                $materialReturnList[] = $detData;
-            }
-        }
+        $dataMaterialRequest = $this->materialRequestModel->asObject()
+            ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
+            ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
+            ->join('users', 'users.id = material_requests.createdBy', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('material_requests.deletedAt', null)
+            ->where('material_request_details.deletedAt', null)
+            ->groupBy('material_request_details.material_request_id')
+            ->find();
 
         $data = [
             'data'                  => $productionResData,
-            'barangJadi'            => $barangJadi,
-            'barangSetengahJadi'    => $barangSetengahJadiList,
-            'scrap'                 => $scrapList,
-            'materialReturn'        => $materialReturnList,
-            'barangData'            => $barangData,
-            'workOrders'            => $workOrderData,
-            'warehouses'            => $warehouseData
+            'dataWorkOrder' => $dataWorkOrder,
+            'dataWarehouse' => $dataWarehouse,
+            'dataDivisi' => $dataDivisi,
+            'dataMaterialRequest' => $dataMaterialRequest,
         ];
         return view('Production/productionResult/form', $data);
     }
@@ -195,6 +185,7 @@ class ProductionResult extends BaseController
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
+            ->where('work_orders.is_posted', "1")
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
@@ -275,7 +266,7 @@ class ProductionResult extends BaseController
                             "bahan_jadi",
                             $value['barang1_id'],
                             $value['barang2_id'],
-                            isset($bj->qty_jadi) ? $bj->qty_jadi : $bj->qty
+                            isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty
                         );
                         $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
                             $value['company_id'],
@@ -314,7 +305,7 @@ class ProductionResult extends BaseController
                         // // DETAIL
                         $stokDetail = $this->stockDetailModel->insertStokDetail(
                             $stok,
-                            isset($bj->qty_jadi) ? $bj->qty_jadi : $bj->qty,
+                            isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty,
                             "In",
                             date('Y-m-d'),
                             $this->this_user_id,
@@ -328,7 +319,7 @@ class ProductionResult extends BaseController
                             0,
                             $stok,
                             $stokDetail,
-                            isset($bj->qty_jadi) ? $bj->qty_jadi : $bj->qty,
+                            isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty,
                             '-',
                             $productionResData['pr_no']
                         );
@@ -340,9 +331,9 @@ class ProductionResult extends BaseController
                             "stock_id" => 0,
                             "no_aju" => "-",
                             "barang_type" => $bj->type_barang,
-                            "qty" => isset($bj->qty_jadi) ? $bj->qty_jadi : $bj->qty,
+                            "qty" => isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty,
                         ];
-                        // $this->productionResultDetailModel->insert($datasbj);
+                        $this->productionResultDetailModel->insert($datasbj);
                     }
                 }
             }
@@ -358,7 +349,7 @@ class ProductionResult extends BaseController
                     "stock_id" => $bd->stock_id,
                     "no_aju" => "-",
                     "barang_type" => $bd->type_barang,
-                    "qty" => isset($bd->qty_digunakan) ? $bd->qty_digunakan : $bd->qty,
+                    "qty" => isset($bd->qty_digunakan) ? (float) $bd->qty_digunakan : $bd->qty,
                 ];
                 // var_dump($datasbd);
                 $this->productionResultDetailModel->insert($datasbd);
@@ -374,7 +365,7 @@ class ProductionResult extends BaseController
                     "bahan_scrap",
                     decrypt($bs->barang_id),
                     decrypt($bs->barang_spesifikasi_id),
-                    $bs->qty
+                    (float) $bs->qty
                 );
                 $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
                     $this->this_company_id,
@@ -412,7 +403,7 @@ class ProductionResult extends BaseController
                 // // DETAIL
                 $stokDetail = $this->stockDetailModel->insertStokDetail(
                     $stok,
-                    $bs->qty,
+                    (float) $bs->qty,
                     "In",
                     date('Y-m-d'),
                     $this->this_user_id,
@@ -426,7 +417,7 @@ class ProductionResult extends BaseController
                     0,
                     $stok,
                     $stokDetail,
-                    $bs->qty,
+                    (float) $bs->qty,
                     '-',
                     $productionResData['pr_no']
                 );
@@ -438,7 +429,7 @@ class ProductionResult extends BaseController
                     "stock_id" => 0,
                     "no_aju" => "-",
                     "barang_type" => "bahan_scrap",
-                    "qty" => $bs->qty,
+                    "qty" => (float) $bs->qty,
                 ];
                 $this->productionResultDetailModel->insert($datasbs);
             }
@@ -452,7 +443,7 @@ class ProductionResult extends BaseController
                         $br->type_barang,
                         $br->barang1_id,
                         $br->barang2_id,
-                        isset($br->qty_dikembalikan) ? $br->qty_dikembalikan : 0
+                        isset($br->qty_dikembalikan) ? (float) $br->qty_dikembalikan : 0
                     );
                     $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
                         $this->this_company_id,
@@ -490,7 +481,7 @@ class ProductionResult extends BaseController
                     // // DETAIL
                     $stokDetail = $this->stockDetailModel->insertStokDetail(
                         $stok,
-                        isset($br->qty_dikembalikan) ? $br->qty_dikembalikan : 0,
+                        isset($br->qty_dikembalikan) ? (float) $br->qty_dikembalikan : 0,
                         "In",
                         date('Y-m-d'),
                         $this->this_user_id,
@@ -504,22 +495,22 @@ class ProductionResult extends BaseController
                         0,
                         $stok,
                         $stokDetail,
-                        isset($br->qty_dikembalikan) ? $br->qty_dikembalikan : 0,
+                        isset($br->qty_dikembalikan) ? (float) $br->qty_dikembalikan : 0,
                         '-',
                         $productionResData['pr_no']
                     );
+                    $datasbr = [
+                        "production_result_id" => $productionResID,
+                        "barang1_id" => $br->barang1_id,
+                        "barang2_id" => $br->barang2_id,
+                        "bc_id" => $br->bc_id,
+                        "stock_id" => $br->stock_id,
+                        "no_aju" => $br->no_aju == "-" ? "-" : $br->no_aju,
+                        "barang_type" => $br->type_barang,
+                        "qty" => isset($br->qty_dikembalikan) ? (float) $br->qty_dikembalikan : 0,
+                    ];
+                    $this->productionResultDetailModel->insert($datasbr);
                 }
-                $datasbr = [
-                    "production_result_id" => $productionResID,
-                    "barang1_id" => $br->barang1_id,
-                    "barang2_id" => $br->barang2_id,
-                    "bc_id" => $br->bc_id,
-                    "stock_id" => $br->stock_id,
-                    "no_aju" => $br->no_aju == "-" ? "-" : $br->no_aju,
-                    "barang_type" => $br->type_barang,
-                    "qty" => isset($br->qty_dikembalikan) ? $br->qty_dikembalikan : 0,
-                ];
-                $this->productionResultDetailModel->insert($datasbr);
             }
 
             $data = [

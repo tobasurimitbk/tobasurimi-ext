@@ -93,6 +93,7 @@ class MaterialRequest extends BaseController
             ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
+            ->where('work_orders.is_posted', "0")
             ->where('work_orders.deletedAt', null)
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
@@ -404,6 +405,11 @@ class MaterialRequest extends BaseController
 
             if (!empty($id)) {
                 $this->materialRequestModel->update($id, $payload);
+                $materialRequestData = $this->materialRequestModel->find($id);
+
+                $this->workOrdersModel->update($materialRequestData['work_order_id'], [
+                    'is_posted' => 1
+                ]);
                 $data = [
                     "status"    => true,
                     "id"    => $this->request->getVar('id'),

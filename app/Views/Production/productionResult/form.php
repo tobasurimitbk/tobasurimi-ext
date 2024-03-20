@@ -59,9 +59,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                    <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?></option>
-                                <?php endforeach; ?>
+                                <?php if (isset($dataWorkOrder)) : ?>
+                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
+                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Kode Produksi</label>
                         </div>
@@ -115,9 +117,6 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select kode_request" name="kode_request" id="kode_request" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <!-- <?php foreach ($dataMaterialRequest ?? [] as $dataMR) : ?>
-                                    <option value="<?= $dataMR->id ?>" data-tanggal-request="<?= date('d/m/Y', strtotime($dataMR->request_date)) ?>" data-user-request="<?= $dataMR->user_name ?>" data-warehouse-request="<?= $dataWO->warehouse_id ?>" data-divisi-request="<?= $dataWO->divisi_id ?>"><?= $dataMR->req_no ?></option>
-                                <?php endforeach; ?> -->
                             </select>
                             <label for="floatingInput">Kode Request</label>
                         </div>
@@ -232,9 +231,6 @@
                                         <div class="form-floating mb-3" style="height: 50px;">
                                             <select class="form-select" name="" id="barang_setengah_jadi">
                                                 <option value="" selected disabled></option>
-                                                <?php foreach ($barangData as $barang) : ?>
-                                                    <option data-code="<?= $barang->kode_barang ?>" data-unit="" value="<?= $barang->id ?>"><?= $barang->barang_name ?></option>
-                                                <?php endforeach; ?>
                                             </select>
                                             <label for="floatingInput">Nama Barang</label>
                                         </div>
@@ -671,6 +667,7 @@
                                     console.log(response)
                                     csrf.val(response.token);
                                     if (response.status) {
+                                        stopLoading()
                                         Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -680,12 +677,12 @@
                                                 window.location.href = "<?= base_url("production-result/"); ?>" + response.id;
                                             })
                                     } else {
+                                        stopLoading()
                                         Swal.fire({
                                             icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        stopLoading()
                                     }
                                 },
                                 onError: function(response) {
