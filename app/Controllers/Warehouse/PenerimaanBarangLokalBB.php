@@ -250,11 +250,12 @@ class PenerimaanBarangLokalBB extends BaseController
             return redirect()->to('penerimaan-barang-lokal-bb');
         }
 
+        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
         $dataAJU = $this->metadataModel->getBCUsed('po_lokal_bb');
         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
         $dataSatuan = $this->satuanModel->asObject()->find();
-        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataDivisi = $this->divisiModel->where('id', $dataPenerimaanBarang['divisi_id'])->findAll();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
 
         $data = [
@@ -263,7 +264,7 @@ class PenerimaanBarangLokalBB extends BaseController
             "dataSupplier" => $dataSupplier,
             "dataAJU" => $dataAJU,
             "dataDivisi" => $dataDivisi,
-            "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first(),
+            "dataPenerimaanBarang" => $dataPenerimaanBarang,
             "dataKemasan"   => $dataKemasan
         ];
 
@@ -287,6 +288,7 @@ class PenerimaanBarangLokalBB extends BaseController
             'company_id' => $this->this_company_id,
             'bc_type' => $this->request->getVar('aju_document_type'),
             'supplier_id' => $this->request->getVar('supplier_id'),
+            'kemasan_id' => $this->request->getVar('kemasan_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
             'acceptance_type' => $this->request->getVar('acceptance_type'),
@@ -308,7 +310,7 @@ class PenerimaanBarangLokalBB extends BaseController
             $supplierHarga = null;
             if ($poDetail != null) {
                 $supplierHarga = $this->supplierHargaModel
-                    ->select('supplier_harga.spesifikasi, barang_master.barang_name, barang_master.id')
+                    ->select('supplier_harga.*, supplier_harga.spesifikasi, barang_master.barang_name, barang_master.id')
                     ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
                     ->where('supplier_harga.id', $poDetail['supplier_harga_id'])
                     ->first();
