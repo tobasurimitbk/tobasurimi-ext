@@ -9,15 +9,17 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("production-result"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button>
+            <?php if (!isset($data)) : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp form-hp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="text" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
+                <input autocomplete="one-time-code" type="hidden" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
@@ -398,6 +400,22 @@
                 });
                 drawTableBarangDigunakan();
             <?php endforeach; ?>
+            <?php foreach ($dataResultBarangReturn as $key => $bd) : ?>
+                list_items_barang_return.push({
+                    'barang_detail_id': getID(),
+                    'barang1_id': '<?= $bd->barang1_id; ?>',
+                    'barang2_id': '<?= $bd->barang2_id; ?>',
+                    'barang_name': '<?= $bd->barang_name; ?>',
+                    'kode_barang': '<?= $bd->kode_barang; ?>',
+                    'satuan': '<?= $bd->kode_satuan; ?>',
+                    'nama_barang': '<?= $bd->nama_barang; ?>',
+                    'qty': '<?= $bd->qty; ?>',
+                    'ref_no': '<?= $bd->no_aju; ?>',
+                    'type_barang': '<?= $bd->barang_type; ?>',
+                    'type_barang_text': '<?= $bd->type_barang_text; ?>',
+                });
+                drawTableBarangReturn();
+            <?php endforeach; ?>
         <?php endif; ?>
         // Departemen
         $('.department_id_scrap').select2({
@@ -649,7 +667,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("production-result/"); ?>" + id;
+                                                window.location.href = "<?= base_url("production-result/"); ?>" + response.id;
                                             })
                                     } else {
                                         Swal.fire({
@@ -1096,10 +1114,12 @@
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
-                row += '<td>' + `
-                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" >` +
-                    '</td>';
 
+                <?php if (!isset($data)) : ?>
+                    row += '<td>' + `
+                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" >` +
+                        '</td>';
+                <?php endif; ?>
                 no++;
             });
             $('.body-table-barang-return').append(row);

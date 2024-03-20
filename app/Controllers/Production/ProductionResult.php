@@ -185,7 +185,29 @@ class ProductionResult extends BaseController
             }
         }
 
-        var_dump($productionResDetDataBD);
+        $productionResDetDataBR = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelect)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.barang_type', 'bahan_return')
+            ->where('production_result_details.production_result_id', $id)
+            ->findAll();
+        foreach ($productionResDetDataBR as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            }
+        }
+
+        // var_dump($productionResDetDataBD);
 
         $barangData = $this->barangMasterModel->asObject()
             ->select('barang_master.*')
@@ -228,6 +250,7 @@ class ProductionResult extends BaseController
             'dataResultBarangJadi'                  => $productionResDetDataBJ,
             'dataResultBarangScrap'                  => $productionResDetDataBS,
             'dataResultBarangDigunakan'                  => $productionResDetDataBD,
+            'dataResultBarangReturn'                  => $productionResDetDataBD,
             'dataWorkOrder' => $dataWorkOrder,
             'dataWarehouse' => $dataWarehouse,
             'dataDivisi' => $dataDivisi,
@@ -584,7 +607,7 @@ class ProductionResult extends BaseController
 
             $data = [
                 "status"    => true,
-                "id"    => $productionResID,
+                "id"    => ($productionResID),
                 "message"   => 'Success',
                 'token'     => csrf_hash()
             ];

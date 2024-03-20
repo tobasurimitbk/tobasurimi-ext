@@ -114,7 +114,7 @@
                 render: function(data, type, row) {
                     return `
                         <div class="mt-0">
-                            <button type="button" class="btn btn-primary detail-material-warehouse">
+                            <button type="button" class="btn btn-primary detail-result">
                                 <i class="fa fa-info fa-sm" aria-hidden="true"></i>
                             </button>
                         </div>
