@@ -355,6 +355,7 @@
             $(".department_id_request").val('<?= $dataMaterialRequest[0]->divisi_id ?>');
             $(".warehouse_id_request").val('<?= $dataMaterialRequest[0]->warehouse_id ?>');
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
+                list_items_barang_jadi = [];
                 list_items_barang_jadi.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bj->barang1_id; ?>',
@@ -370,6 +371,7 @@
                 drawTableBarangJadi();
             <?php endforeach; ?>
             <?php foreach ($dataResultBarangScrap as $key => $bs) : ?>
+                list_items_barang_scrap = [];
                 list_items_barang_scrap.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bs->barang1_id; ?>',
@@ -385,6 +387,7 @@
                 drawTableBarangScrap();
             <?php endforeach; ?>
             <?php foreach ($dataResultBarangDigunakan as $key => $bd) : ?>
+                list_items_barang_digunakan = [];
                 list_items_barang_digunakan.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bd->barang1_id; ?>',
@@ -401,6 +404,7 @@
                 drawTableBarangDigunakan();
             <?php endforeach; ?>
             <?php foreach ($dataResultBarangReturn as $key => $bd) : ?>
+                list_items_barang_return = [];
                 list_items_barang_return.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bd->barang1_id; ?>',

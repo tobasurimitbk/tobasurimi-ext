@@ -598,7 +598,7 @@ class ProductionResult extends BaseController
                         "bc_id" => $br->bc_id,
                         "stock_id" => $br->stock_id,
                         "no_aju" => $br->no_aju == "-" ? "-" : $br->no_aju,
-                        "barang_type" => "barang_return",
+                        "barang_type" => "bahan_return",
                         "qty" => isset($br->qty_dikembalikan) ? (float) $br->qty_dikembalikan : 0,
                     ];
                     $this->productionResultDetailModel->insert($datasbr);
