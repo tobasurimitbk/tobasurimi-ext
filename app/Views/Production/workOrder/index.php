@@ -117,7 +117,7 @@
                     let id = row?.id;
                     return `
                         <div class="mt-0">
-                            <button class="btn btn-primary">
+                            <button class="btn btn-primary to-material-request" onclick="toMaterialRequest()" >
                                 <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
                             </button>
                             <button class="btn btn-danger" onclick="remove('${id}')" >
@@ -211,6 +211,9 @@
                 });
             }
         })
+    }
+    const toMaterialRequest = function() {
+        window.location.href = "<?= base_url("material-request"); ?>";
     }
 </script>
 <?= $this->endSection(); ?>

@@ -72,7 +72,7 @@
                 }
                 ?>
             </div>
-            <div class="col-subtitle-modal">
+            <!-- <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label class="form-label font-weight-bold modal-sub-title">Bill of Material</label>
@@ -98,7 +98,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div> -->
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">

@@ -183,7 +183,7 @@ class MaterialWarehouse extends BaseController
                 "nama_barang"           => $data->nama_barang,
                 "nama_divisi"           => $data->divisi,
                 "warehouse"           => $data->warehouse_name,
-                "user"           => $data->name,
+                "user"           => $data->namaUser,
                 "satuan"           => $data->satuan,
                 "is_posted"           => $data->is_posted,
                 "is_approve"           => $data->is_approve,

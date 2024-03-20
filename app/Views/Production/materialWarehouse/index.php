@@ -152,7 +152,7 @@
                 className: "text-center"
             },
             {
-                data: "name",
+                data: "user",
                 className: "text-center"
             },
             {
@@ -169,6 +169,9 @@
                             <button type="button" class="btn btn-primary detail-material-warehouse">
                                 <i class="fa fa-info fa-sm" aria-hidden="true"></i>
                             </button>
+                            <button type="button" class="btn btn-danger show-modal-approve">
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                            </button>
                         </div>
                         `
                     } else {
@@ -176,9 +179,6 @@
                         <div class="mt-0">
                             <button type="button" class="btn btn-primary detail-material-warehouse">
                                 <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger show-modal-approve">
-                            <i class="fa fa-check" aria-hidden="true"></i>
                             </button>
                         </div>
                         `

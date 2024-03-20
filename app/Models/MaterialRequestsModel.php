@@ -136,7 +136,7 @@ class MaterialRequestsModel extends Model
             SUM(material_request_details.qty) as total,
             divisis.divisi,
             warehouses.warehouse_name,
-            users.name,
+            users.name as namaUser,
         ";
 
         $materialRequestsDataQry = $this->asObject()
