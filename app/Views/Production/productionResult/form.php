@@ -314,7 +314,9 @@
                                                 <th>Jenis Barang</th>
                                                 <th>Nama Barang</th>
                                                 <th>Satuan</th>
-                                                <th>Jumlah Request</th>
+                                                <?php if (!isset($data)) : ?>
+                                                    <th>Jumlah Request</th>
+                                                <?php endif; ?>
                                                 <th>Jumlah Direturn</th>
                                             </tr>
                                         </thead>
@@ -403,21 +405,22 @@
                 });
                 drawTableBarangDigunakan();
             <?php endforeach; ?>
-            <?php foreach ($dataResultBarangReturn as $key => $bd) : ?>
+            <?php foreach ($dataResultBarangReturn as $key => $br) : ?>
                 list_items_barang_return = [];
                 list_items_barang_return.push({
                     'barang_detail_id': getID(),
-                    'barang1_id': '<?= $bd->barang1_id; ?>',
-                    'barang2_id': '<?= $bd->barang2_id; ?>',
-                    'barang_name': '<?= $bd->barang_name; ?>',
-                    'kode_barang': '<?= $bd->kode_barang; ?>',
-                    'satuan': '<?= $bd->kode_satuan; ?>',
-                    'nama_barang': '<?= $bd->nama_barang; ?>',
-                    'qty': '<?= $bd->qty; ?>',
-                    'ref_no': '<?= $bd->no_aju; ?>',
-                    'type_barang': '<?= $bd->barang_type; ?>',
-                    'type_barang_text': '<?= $bd->type_barang_text; ?>',
+                    'barang1_id': '<?= $br->barang1_id; ?>',
+                    'barang2_id': '<?= $br->barang2_id; ?>',
+                    'barang_name': '<?= $br->barang_name; ?>',
+                    'kode_barang': '<?= $br->kode_barang; ?>',
+                    'satuan': '<?= $br->kode_satuan; ?>',
+                    'nama_barang': '<?= $br->nama_barang; ?>',
+                    'qty': '<?= $br->qty; ?>',
+                    'ref_no': '<?= $br->no_aju; ?>',
+                    'type_barang': '<?= $br->barang_type; ?>',
+                    'type_barang_text': '<?= $br->type_barang_text; ?>',
                 });
+                console.log(list_items_barang_return);
                 drawTableBarangReturn();
             <?php endforeach; ?>
         <?php endif; ?>

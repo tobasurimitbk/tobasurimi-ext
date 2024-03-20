@@ -118,9 +118,9 @@ class ProductionResult extends BaseController
             ->select("*, DATE_FORMAT(receive_date, '%d/%m/%Y') AS receive_date")
             ->find($id);
 
-        $productionResDetSelect = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
+        $productionResDetSelectBJ = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
         $productionResDetDataBJ = $this->productionResultDetailModel->asObject()
-            ->select($productionResDetSelect)
+            ->select($productionResDetSelectBJ)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -140,9 +140,9 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "Bahan Modal";
             }
         }
-
+        $productionResDetSelectBS = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
         $productionResDetDataBS = $this->productionResultDetailModel->asObject()
-            ->select($productionResDetSelect)
+            ->select($productionResDetSelectBS)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -162,9 +162,9 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "Bahan Modal";
             }
         }
-
+        $productionResDetSelectBD = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
         $productionResDetDataBD = $this->productionResultDetailModel->asObject()
-            ->select($productionResDetSelect)
+            ->select($productionResDetSelectBD)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -185,8 +185,9 @@ class ProductionResult extends BaseController
             }
         }
 
+        $productionResDetSelectBR = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
         $productionResDetDataBR = $this->productionResultDetailModel->asObject()
-            ->select($productionResDetSelect)
+            ->select($productionResDetSelectBR)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -204,10 +205,12 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "Bahan Scrap";
             } elseif ($value->barang_type == "bahan_modal") {
                 $value->type_barang_text = "Bahan Modal";
+            } else {
+                $value->type_barang_text = "Bahan Return";
             }
         }
 
-        // var_dump($productionResDetDataBD);
+        var_dump($productionResDetDataBR);
 
         $barangData = $this->barangMasterModel->asObject()
             ->select('barang_master.*')
@@ -250,7 +253,7 @@ class ProductionResult extends BaseController
             'dataResultBarangJadi'                  => $productionResDetDataBJ,
             'dataResultBarangScrap'                  => $productionResDetDataBS,
             'dataResultBarangDigunakan'                  => $productionResDetDataBD,
-            'dataResultBarangReturn'                  => $productionResDetDataBD,
+            'dataResultBarangReturn'                  => $productionResDetDataBR,
             'dataWorkOrder' => $dataWorkOrder,
             'dataWarehouse' => $dataWarehouse,
             'dataDivisi' => $dataDivisi,
