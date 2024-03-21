@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Rencana Produksi</h1>
+        <h1 class="title-name">Tambah Dokumen Produksi</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("work-order"); ?>">
                 Batal
@@ -71,12 +71,12 @@
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($dataWorkOrders) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->standart_production : ""; ?>" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');">
                             <label for="floatingInput">Jumlah Standart Produksi</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -294,8 +294,10 @@
             enableOnReadonly: false
         });
 
-        // Membuat input readonly
-        $('#date_production').prop('readonly', true);
+        <?php if (!empty($dataWorkOrders)) : ?>
+            // Membuat input readonly
+            $('#date_production').prop('readonly', true);
+        <?php endif; ?>
 
         $(".btn-show-detail").click(function() {
 

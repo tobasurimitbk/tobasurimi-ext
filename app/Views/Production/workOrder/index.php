@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Rencana Produksi</h1>
+        <h1>Dokumen Produksi</h1>
 
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
