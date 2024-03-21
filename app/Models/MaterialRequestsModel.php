@@ -94,7 +94,6 @@ class MaterialRequestsModel extends Model
         if ($addCondition['search']) {
             $materialRequestsDataQry
                 ->like('material_requests.req_no', $addCondition['search'])
-                ->orLike('material_request_details.kode_barang', $addCondition['search'])
                 ->orLike('material_request_details.nama_barang', $addCondition['search']);
         }
         if ($addCondition['search']) {

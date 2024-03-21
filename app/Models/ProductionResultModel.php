@@ -82,7 +82,7 @@ class ProductionResultModel extends Model
             $productionResDataQry->groupStart()
                 ->like('production_results.pr_no', $addCondition['search'], 'after')
                 ->orLike('work_orders.wo_no', $addCondition['search'], 'after')
-                ->orLike('barangs.nama_barang', $addCondition['search'], 'after')
+                ->orLike('barang_master.nama_barang', $addCondition['search'], 'after')
                 ->groupEnd();
         }
 

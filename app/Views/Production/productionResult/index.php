@@ -14,7 +14,7 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-5 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Produksi / Kode Barang / Nama Barang" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Produksi / Kode Penerimaan / Nama Barang" value="" />
                 </div>
             </div>
             <div class="row">
@@ -23,8 +23,8 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Work Order</th>
+                                <th onclick="changeSort('wo_no')" class="sort">Kode Penerimaan</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Produksi</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Action</th>

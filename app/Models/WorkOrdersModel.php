@@ -60,7 +60,7 @@ class WorkOrdersModel extends Model
         $availableSort = [
             'wo_no'             => 'work_orders.wo_no',
             'department'       => 'divisis.divisi',
-            'nama_barang'       => 'barangs.nama_barang',
+            'nama_barang'       => 'work_order_details.nama_barang',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -88,8 +88,7 @@ class WorkOrdersModel extends Model
         if ($addCondition['search']) {
             $workOrdersDataQry
                 ->like('work_orders.wo_no', $addCondition['search'])
-                ->orLike('barangs.kode_barang', $addCondition['search'])
-                ->orLike('barangs.nama_barang', $addCondition['search']);
+                ->orLike('work_order_details.nama_barang', $addCondition['search']);
         }
         if ($addCondition['search']) {
             $workOrdersDataQry->groupEnd();
