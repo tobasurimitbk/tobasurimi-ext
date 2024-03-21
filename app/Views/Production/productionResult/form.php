@@ -60,7 +60,7 @@
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
+                            <label class="form-label font-weight-bold modal-sub-title">Data Work Order</label>
                         </div>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Data Request</label>
+                            <label class="form-label font-weight-bold modal-sub-title">Data Material Request</label>
                         </div>
                     </div>
                 </div>
@@ -825,10 +825,14 @@
                     success: function(res) {
                         // console.log(res);
                         list_items_barang_jadi = [];
+                        list_items_barang_scrap = [];
+                        list_items_barang_digunakan = [];
+                        list_items_barang_return = [];
                         res.data.forEach(function(item) {
                             // Push each item into the list_items_barang_jadi array
                             list_items_barang_jadi.push({
                                 'barang_detail_id': getID(),
+                                'detail_work_order': item.id,
                                 'barang1_id': item.barang1_id,
                                 'barang2_id': item.barang2_id,
                                 'barang_name': item.barang_name,
@@ -842,6 +846,7 @@
                                 'unit': item.unit,
                             });
                         });
+                        console.log(list_items_barang_jadi);
                         drawTableBarangJadi();
                         stopLoading();
                     }
@@ -865,6 +870,7 @@
                 $(".user_request").val(user_request);
                 $(".warehouse_id_request").val(warehouse_id).change();
                 $(".department_id_request").val(divisi_id).change();
+                setLoading();
                 $.ajax({
                     url: `<?= base_url('production-result/list-material-request'); ?>`,
                     method: "GET",
@@ -928,6 +934,7 @@
                         });
                         drawTableBarangDigunakan();
                         drawTableBarangReturn();
+                        stopLoading()
                     }
                 });
             } else {
@@ -956,44 +963,6 @@
                 }
             })
         })
-
-        // Inisialisasi validasi formulir
-        var validatorScrap = $(".formBarangScrap").validate({
-            rules: {
-                qty_scrap: {
-                    required: true
-                }
-            },
-            messages: {
-                qty_scrap: {
-                    required: "Kode Barang wajib diisi"
-                }
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                // console.log(elem);
-                if (elem.hasClass("multiple_po_id")) {
-                    element = $(".select2-selection--multiple").parent();
-                    error.insertAfter(element);
-                } else if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.col-md-6').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.col-md-6').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
 
         // Event click untuk tombol "Tambah Barang Scrap"
         $(".button-add-scrap").click(function() {

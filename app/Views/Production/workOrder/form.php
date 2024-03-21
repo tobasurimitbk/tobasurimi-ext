@@ -30,12 +30,12 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataWorkOrders) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : ""; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi">
+                                    <input <?= !empty($dataWorkOrders) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : "AUTO GENERATE"; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi" readonly>
                                     <label for="floatingInput">Kode Produksi</label>
                                 </div>
-                                <div style="<?= !empty($dataWorkOrders) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <!-- <div style="<?= !empty($dataWorkOrders) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -100,7 +100,8 @@
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
-                                <th>Jumlah Barang</th>
+                                <th>Qty Target</th>
+                                <th>Qty Hasil</th>
                                 <th>Keterangan</th>
                                 <th style="width:80px;">Action</th>
                             </tr>
@@ -108,7 +109,7 @@
                         <tbody class="body-detail-table" id="body-detail-table">
                         <tfoot class="tfoot">
                             <tr>
-                                <td colspan="7" class="text-center">Tidak Ada Data</td>
+                                <td colspan="8" class="text-center">Tidak Ada Data</td>
                             </tr>
                         </tfoot>
                         </tbody>
@@ -168,7 +169,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
-                                <label for="floatingInput">Qty</label>
+                                <label for="floatingInput">Qty Target</label>
                             </div>
                         </div>
                     </div>
@@ -280,18 +281,11 @@
             .find('label')
             .css('z-index', '1');
         // Mengatur default value ke hari ini
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
 
-        today = dd + '/' + mm + '/' + yyyy;
-        <?php if (empty($dataWorkOrders)) : ?>
-            $('#date_production').val(today);
-        <?php endif; ?>
         // Mengaktifkan datepicker
         $('#date_production').datepicker({
-            enableOnReadonly: false
+            enableOnReadonly: false,
+            format: 'dd/mm/yyyy'
         });
 
         <?php if (!empty($dataWorkOrders)) : ?>
@@ -714,6 +708,7 @@
                         'nama_satuan': nama_satuan,
                         'satuan_id': satuan_id,
                         'qty': qty,
+                        'qty_hasil': 0,
                         'keterangan': keterangan
                     });
                 }
@@ -725,17 +720,17 @@
         }
     }
 
-    const changeStatus = function() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
+    // const changeStatus = function() {
+    //     let value = document.getElementById('auto_generate').checked ? true : false;
 
-        if (value) {
-            $(".wo_no").attr("readonly", true);
-            $(".wo_no").val("AUTO GENERATE");
-        } else {
-            $(".wo_no").attr("readonly", false);
-            $(".wo_no").val("");
-        }
-    }
+    //     if (value) {
+    //         $(".wo_no").attr("readonly", true);
+    //         $(".wo_no").val("AUTO GENERATE");
+    //     } else {
+    //         $(".wo_no").attr("readonly", false);
+    //         $(".wo_no").val("");
+    //     }
+    // }
     const getID = function() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let randomString = '';
@@ -765,7 +760,7 @@
         if (list_items.length === 0) {
             row += `
                     <tr>
-                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                        <td colspan="8" class="text-center">Data Barang Tidak Ada</td>
                     </tr>
                 `;
             $('.tfoot').append(row);
@@ -777,6 +772,7 @@
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.nama_satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
+                row += '<td>' + item.qty_hasil + '</td>';
                 row += '<td>' + item.keterangan + '</td>';
                 <?php if (!empty($dataWorkOrders)) : ?>
                     <?php if ($dataWorkOrders->is_posted == '0') : ?>

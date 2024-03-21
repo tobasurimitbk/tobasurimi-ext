@@ -21,6 +21,7 @@ class WorkOrderDetailsModel extends Model
         'barang2_id',
         'nama_barang',
         'qty',
+        'qty_hasil',
         'unit',
         'note',
         'createdAt',
