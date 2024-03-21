@@ -4,7 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Penerimaan Hasil Produksi</h1>
+        <?php if (!isset($data)) : ?>
+            <h1 class="title-name">Tambah Penerimaan Hasil Produksi</h1>
+        <?php endif; ?>
+        <?php if (isset($data)) : ?>
+            <h1 class="title-name">Detail Penerimaan Hasil Produksi</h1>
+        <?php endif; ?>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("production-result"); ?>">
                 Batal
@@ -230,8 +235,12 @@
                                                     <th>Jenis Barang</th>
                                                     <th>Nama Barang</th>
                                                     <th>Satuan</th>
-                                                    <th>Jumlah Request</th>
-                                                    <!-- <th>Jumlah Digunakan</th> -->
+                                                    <?php if (!isset($data)) : ?>
+                                                        <th>Jumlah Request</th>
+                                                    <?php endif; ?>
+                                                    <?php if (isset($data)) : ?>
+                                                        <th>Jumlah Digunakan</th>
+                                                    <?php endif; ?>
                                                 </tr>
                                             </thead>
                                             <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
@@ -241,49 +250,53 @@
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="nav-scrap" role="tabpanel" aria-labelledby="nav-contact-tab">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
-                                            <select class="form-select kode_barang_scrap" name="kode_barang_scrap" id="kode_barang_scrap" aria-label="Floating label select example">
-                                                <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
-                                            </select>
-                                            <label for="floatingInput">Kode Barang</label>
+                                <?php if (!isset($data)) : ?>
+                                    <form class="formBarangScrap" id="formBarangScrap">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3" style="height: 50px;">
+                                                    <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
+                                                    <select class="form-select kode_barang_scrap" name="kode_barang_scrap" id="kode_barang_scrap" aria-label="Floating label select example">
+                                                        <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                                    </select>
+                                                    <label for="floatingInput">Kode Barang</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3" style="height: 50px;">
+                                                    <input autocomplete="one-time-code" type="number" class="form-control qty_scrap" name="qty_scrap" id="qty_scrap" placeholder="Qty">
+                                                    <label for="floatingInput">Qty</label>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="number" class="form-control qty_scrap" name="qty_scrap" id="qty_scrap" placeholder="Qty">
-                                            <label for="floatingInput">Qty</label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3" style="height: 50px;">
+                                                    <select class="form-select department_id_scrap" name="department_id_scrap" id="department_id_scrap" aria-label="Floating label select example">
+                                                        <option value=""></option>
+                                                        <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
+                                                            <option value="<?= $dataDivisi['id'] ?>" data-department-name="<?= $dataDivisi['divisi'] ?>"><?= $dataDivisi['divisi'] ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                    <label for="floatingInput">Department</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3" style="height: 50px;">
+                                                    <select class="form-select warehouse_id_scrap" name="warehouse_id_scrap" id="warehouse_id_scrap" disabled>
+                                                        <option value=""></option>
+                                                    </select>
+                                                    <label for="floatingInput">Warehouse</label>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <select class="form-select department_id_scrap" name="department_id_scrap" id="department_id_scrap" aria-label="Floating label select example">
-                                                <option value=""></option>
-                                                <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                                    <option value="<?= $dataDivisi['id'] ?>" data-department-name="<?= $dataDivisi['divisi'] ?>"><?= $dataDivisi['divisi'] ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <label for="floatingInput">Department</label>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <button type="button" class="btn btn-primary button-add-scrap">Tambah Barang Scrap</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3" style="height: 50px;">
-                                            <select class="form-select warehouse_id_scrap" name="warehouse_id_scrap" id="warehouse_id_scrap" disabled>
-                                                <option value=""></option>
-                                            </select>
-                                            <label for="floatingInput">Warehouse</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <button type="button" class="btn btn-primary button-add-scrap">Tambah Barang Scrap</button>
-                                    </div>
-                                </div>
+                                    </form>
+                                <?php endif; ?>
                                 <div class="table-responsive">
                                     <table class="table nowrap table-hover-tobasurimi tableBarangScrap" id="tableBarangScrap" width="100%" cellspacing="0">
                                         <thead class="thead-dark text-center">
@@ -294,7 +307,9 @@
                                                 <th>Department</th>
                                                 <th>Warehouse</th>
                                                 <th>Jumlah</th>
-                                                <th>Action</th>
+                                                <?php if (!isset($data)) : ?>
+                                                    <th>Action</th>
+                                                <?php endif; ?>
                                             </tr>
                                         </thead>
                                         <tbody class="body-table-barang-scrap" id="body-table-barang-scrap" style="cursor: pointer;">
@@ -356,8 +371,11 @@
             $(".user_request").val('<?= $dataMaterialRequest[0]->user_name ?>');
             $(".department_id_request").val('<?= $dataMaterialRequest[0]->divisi_id ?>');
             $(".warehouse_id_request").val('<?= $dataMaterialRequest[0]->warehouse_id ?>');
+            list_items_barang_jadi = [];
+            list_items_barang_digunakan = [];
+            list_items_barang_scrap = [];
+            list_items_barang_return = [];
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
-                list_items_barang_jadi = [];
                 list_items_barang_jadi.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bj->barang1_id; ?>',
@@ -370,10 +388,9 @@
                     'type_barang': '<?= $bj->barang_type; ?>',
                     'type_barang_text': '<?= $bj->type_barang_text; ?>',
                 });
-                drawTableBarangJadi();
             <?php endforeach; ?>
+            drawTableBarangJadi();
             <?php foreach ($dataResultBarangScrap as $key => $bs) : ?>
-                list_items_barang_scrap = [];
                 list_items_barang_scrap.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bs->barang1_id; ?>',
@@ -382,14 +399,15 @@
                     'kode_barang': '<?= $bs->kode_barang; ?>',
                     'kode_satuan': '<?= $bs->kode_satuan; ?>',
                     'nama_barang': '<?= $bs->nama_barang; ?>',
+                    'divisi_name': '<?= $bs->divisi; ?>',
+                    'warehouse_name': '<?= $bs->warehouse; ?>',
                     'qty': '<?= $bs->qty; ?>',
                     'type_barang': '<?= $bs->barang_type; ?>',
                     'type_barang_text': '<?= $bs->type_barang_text; ?>',
                 });
-                drawTableBarangScrap();
             <?php endforeach; ?>
+            drawTableBarangScrap();
             <?php foreach ($dataResultBarangDigunakan as $key => $bd) : ?>
-                list_items_barang_digunakan = [];
                 list_items_barang_digunakan.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bd->barang1_id; ?>',
@@ -403,10 +421,10 @@
                     'type_barang': '<?= $bd->barang_type; ?>',
                     'type_barang_text': '<?= $bd->type_barang_text; ?>',
                 });
-                drawTableBarangDigunakan();
+                // console.log(list_items_barang_digunakan);
             <?php endforeach; ?>
+            drawTableBarangDigunakan();
             <?php foreach ($dataResultBarangReturn as $key => $br) : ?>
-                list_items_barang_return = [];
                 list_items_barang_return.push({
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $br->barang1_id; ?>',
@@ -420,9 +438,8 @@
                     'type_barang': '<?= $br->barang_type; ?>',
                     'type_barang_text': '<?= $br->type_barang_text; ?>',
                 });
-                console.log(list_items_barang_return);
-                drawTableBarangReturn();
             <?php endforeach; ?>
+            drawTableBarangReturn();
         <?php endif; ?>
         // Departemen
         $('.department_id_scrap').select2({
@@ -584,7 +601,7 @@
             errorClass: 'text-danger',
             errorPlacement: function(error, element) {
                 var elem = $(element);
-                console.log(elem);
+                // console.log(elem);
                 if (elem.hasClass("multiple_po_id")) {
                     element = $(".select2-selection--multiple").parent();
                     error.insertAfter(element);
@@ -674,7 +691,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("production-result/"); ?>" + response.id;
+                                                window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
                                             })
                                     } else {
                                         Swal.fire({
@@ -707,7 +724,7 @@
                                 processData: false,
                                 contentType: false,
                                 success: function(response) {
-                                    console.log(response)
+                                    // console.log(response)
                                     csrf.val(response.token);
                                     if (response.status) {
                                         stopLoading()
@@ -717,7 +734,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("production-result/"); ?>" + response.id;
+                                                window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
                                             })
                                     } else {
                                         stopLoading()
@@ -745,9 +762,9 @@
         });
 
         $(".kode_produksi").on('change', function() {
-            console.log('masuk');
+            // console.log('masuk');
             if ($(this).val()) {
-                console.log('masuk 2');
+                // console.log('masuk 2');
                 let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
                 let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
                 let warehouse_id = $(".kode_produksi option:selected").data("warehouse") ? $(".kode_produksi option:selected").data("warehouse") : "";
@@ -757,6 +774,7 @@
                 $(".standart_production").val(standart_production);
                 $(".warehouse_id_order").val(warehouse_id).change();
                 $(".department_id_order").val(divisi_id).change();
+                setLoading();
                 $.ajax({
                     url: `<?= base_url('production-result/material-request'); ?>`,
                     method: "GET",
@@ -766,6 +784,7 @@
                     dataType: "json",
                     success: function(res) {
                         // console.log(res);
+                        stopLoading()
                         if (res.status) {
                             // Clear existing options
                             $('#kode_request').empty();
@@ -787,6 +806,7 @@
                                 }));
                             });
                         } else {
+                            stopLoading()
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Data Material Request Tidak Ada',
@@ -823,6 +843,7 @@
                             });
                         });
                         drawTableBarangJadi();
+                        stopLoading();
                     }
                 });
             } else {
@@ -856,7 +877,7 @@
                         list_items_barang_digunakan = [];
                         list_items_barang_return = [];
                         res.data.forEach(function(item) {
-                            console.log(item);
+                            // console.log(item);
                             if (item.ref_no == "NON PABEAN") {
                                 var new_ref_no = item.ref_no;
                             } else {
@@ -919,7 +940,7 @@
 
         $('#department_id_scrap').on('change', function() {
             var departmentId = $(this).val();
-            console.log('masuk');
+            // console.log('masuk');
             $.ajax({
                 url: `<?= base_url("warehouse/dropdown/divisi/"); ?>/${departmentId}`,
                 method: "GET",
@@ -936,20 +957,67 @@
             })
         })
 
-        $(".button-add-scrap").click(function() {
-            if ($(".kode_barang_scrap option:selected").val()) {
-                let barang = $(".kode_barang_scrap option:selected").val() ? $(".kode_barang_scrap option:selected").val() : "";
-                let qtyBarang = $(".qty_scrap").val() ? $(".qty_scrap").val() : "";
-                let department = $(".department_id_scrap option:selected").val() ? $(".department_id_scrap option:selected").val() : "";
-                let departmentName = $(".department_id_scrap option:selected").data("department-name") ? $(".department_id_scrap option:selected").data("department-name") : "";
-                let warehouse = $(".warehouse_id_scrap option:selected").val() ? $(".warehouse_id_scrap option:selected").val() : "";
-                let warehouseName = $(".warehouse_id_scrap option:selected").data("warehouse-name") ? $(".warehouse_id_scrap option:selected").data("warehouse-name") : "";
+        // Inisialisasi validasi formulir
+        var validatorScrap = $(".formBarangScrap").validate({
+            rules: {
+                qty_scrap: {
+                    required: true
+                }
+            },
+            messages: {
+                qty_scrap: {
+                    required: "Kode Barang wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                // console.log(elem);
+                if (elem.hasClass("multiple_po_id")) {
+                    element = $(".select2-selection--multiple").parent();
+                    error.insertAfter(element);
+                } else if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.col-md-6').addClass('has-error');
+                $(element).addClass('select-class');
 
-                let nama = $(".kode_barang_scrap option:selected").data("nama") ? $(".kode_barang_scrap option:selected").data("nama") : "";
-                let satuan = $(".kode_barang_scrap option:selected").data("satuan") ? $(".kode_barang_scrap option:selected").data("satuan") : "";
-                let satuan_id = $(".kode_barang_scrap option:selected").data("satuan_id") ? $(".kode_barang_scrap option:selected").data("satuan_id") : "";
-                let barang_id = $(".kode_barang_scrap option:selected").data("barang_id") ? $(".kode_barang_scrap option:selected").data("barang_id") : "";
-                let barang_spesifikasi_id = $(".kode_barang_scrap option:selected").data("barang_spesifikasi_id") ? $(".kode_barang_scrap option:selected").data("barang_spesifikasi_id") : "";
+            },
+            unhighlight: function(element) {
+                $(element).closest('.col-md-6').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        // Event click untuk tombol "Tambah Barang Scrap"
+        $(".button-add-scrap").click(function() {
+            // Menghapus pesan kesalahan sebelumnya
+            $('.error-message').remove();
+
+            // Mengambil nilai dari setiap input
+            let kodeBarang = $(".kode_barang_scrap option:selected").val();
+            let qtyBarang = $(".qty_scrap").val();
+            let department = $(".department_id_scrap option:selected").val();
+            let warehouse = $(".warehouse_id_scrap option:selected").val();
+
+            // Memeriksa apakah semua input terisi
+            if (kodeBarang && qtyBarang && department && warehouse) {
+                // Jika semua input terisi, tambahkan barang scrap
+                let barang = $(".kode_barang_scrap option:selected").val();
+                let departmentName = $(".department_id_scrap option:selected").data("department-name");
+                let warehouseName = $(".warehouse_id_scrap option:selected").data("warehouse-name");
+
+                let nama = $(".kode_barang_scrap option:selected").data("nama");
+                let satuan = $(".kode_barang_scrap option:selected").data("satuan");
+                let satuan_id = $(".kode_barang_scrap option:selected").data("satuan_id");
+                let barang_id = $(".kode_barang_scrap option:selected").data("barang_id");
+                let barang_spesifikasi_id = $(".kode_barang_scrap option:selected").data("barang_spesifikasi_id");
                 let barang_name_master = $(".kode_barang_scrap option:selected").data("barang_name_master");
 
                 list_items_barang_scrap.push({
@@ -967,11 +1035,17 @@
                     'warehouse_name': warehouseName,
                     'qty': qtyBarang
                 });
-                console.log(list_items_barang_scrap);
-                drawTableBarangScrap();
-                resetFormDetailScrap();
+
+                drawTableBarangScrap(); // Menggambar tabel
+                resetFormDetailScrap(); // Mengatur ulang form
+            } else {
+                // Menampilkan pesan kesalahan di bawah input yang kosong
+                if (!kodeBarang) $(".kode_barang_scrap").closest('.form-floating').append('<span class="error-message text-danger">Harap pilih kode barang.</span>');
+                if (!qtyBarang) $(".qty_scrap").closest('.form-floating').append('<span class="error-message text-danger">Harap masukkan jumlah barang.</span>');
+                if (!department) $(".department_id_scrap").closest('.form-floating').append('<span class="error-message text-danger">Harap pilih departemen.</span>');
+                if (!warehouse) $(".warehouse_id_scrap").closest('.form-floating').append('<span class="error-message text-danger">Harap pilih gudang.</span>');
             }
-        })
+        });
     });
 
     const changeStatus = function() {
@@ -1087,11 +1161,13 @@
                 row += '<td>' + item.divisi_name + '</td>';
                 row += '<td>' + item.warehouse_name + '</td>';
                 row += '<td>' + item.qty + '</td>';
-                row += '<td>' + `
+                <?php if (!isset($data)) : ?>
+                    row += '<td>' + `
             <button type="button" class="btn btn-danger" onclick="deleteRowDetailScrap('${item.barang_detail_id}')">
                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                 </button>` +
-                    '</td>';
+                        '</td>';
+                <?php endif; ?>
 
                 no++;
             });

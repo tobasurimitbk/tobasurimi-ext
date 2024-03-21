@@ -144,10 +144,12 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("production-result/"); ?>${data.id}`);
-        })
+        $('.dataTable tbody').on('click', '.detail-result', function() {
+            const data = table.row($(this).closest('tr')).data();
+            if (data) {
+                location.replace(`<?= base_url("production-result/details/"); ?>${data.id}`);
+            }
+        });
     })
 
     const spp = function() {
