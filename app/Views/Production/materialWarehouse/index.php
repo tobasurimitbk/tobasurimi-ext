@@ -163,13 +163,14 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let is_approve = row?.is_approve;
-                    if (is_approve == 0) {
+                    if (is_approve == 0 || is_approve == null) {
+
                         return `
                         <div class="mt-0">
                             <button type="button" class="btn btn-primary detail-material-warehouse">
                                 <i class="fa fa-info fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button type="button" class="btn btn-danger show-modal-approve">
+                            <button type="button" class="btn btn-success show-modal-approve">
                                 <i class="fa fa-check" aria-hidden="true"></i>
                             </button>
                         </div>

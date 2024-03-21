@@ -121,7 +121,7 @@
                                     <button class="btn btn-warning">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger" onclick="posting('${id}', 1)">
+                                    <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
                                         <i class="fa fa-paper-plane" aria-hidden="true"></i>
                                     </button>
                                 </div>
