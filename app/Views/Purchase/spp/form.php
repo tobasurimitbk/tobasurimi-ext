@@ -106,7 +106,7 @@
                             <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '')  : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataSppType as $d) : ?>
-                                    <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == trim($d['value']) ? 'selected' : '') : '') ?> value="<?= trim($d['value']) ?>"><?= $d['value'] ?></option>
+                                    <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == trim($d['value']) ? 'selected' : '') : '') ?> value="<?= trim($d['value']) ?>"><?= strtoupper($d['value']) ?></option>
                                 <?php endforeach; ?>
                             </select>
 

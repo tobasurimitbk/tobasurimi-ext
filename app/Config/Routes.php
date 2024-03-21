@@ -456,17 +456,14 @@ $routes->post('/retur/save', 'SalesLokal\Retur::save', ['filter' => 'Auth']);
 $routes->post('/retur/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
 $routes->post('/retur/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
 
-// Master Barang Lokal
+// MASTER BARANG LOKAL
 $routes->get('master-barang-lokal', 'SalesLokal\Barang::bahanJadiView', ['filter' => 'Auth']);
-$routes->group('master-barang-lokal', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('all', 'SalesLokal\Barang::all');
-    $routes->post('get', 'SalesLokal\Barang::get');
-    $routes->post('save', 'SalesLokal\Barang::create');
-    $routes->post('update', 'SalesLokal\Barang::update');
-    $routes->post('delete', 'SalesLokal\Barang::delete');
-    $routes->post('delete-spek', 'SalesLokal\Barang::deleteSpek');
-    $routes->post('generate-new-code', 'SalesLokal\Barang::generateNewCode');
-});
+$routes->get('master-barang-lokal/all', 'SalesLokal\Barang::all', ['filter' => 'Auth']);
+$routes->post('master-barang-lokal/generate-new-code', 'SalesLokal\Barang::generateNewCode', ['filter' => 'Auth']);
+$routes->post('master-barang-lokal/save', 'SalesLokal\Barang::create', ['filter' => 'Auth']);
+$routes->post('master-barang-lokal/update', 'SalesLokal\Barang::update', ['filter' => 'Auth']);
+$routes->post('master-barang-lokal/delete', 'SalesLokal\Barang::delete', ['filter' => 'Auth']);
+$routes->post('master-barang-lokal/get', 'SalesLokal\Barang::get', ['filter' => 'Auth']);
 
 // SALES INTERNASIONAL
 // Sales Kontrak

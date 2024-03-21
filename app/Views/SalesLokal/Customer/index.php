@@ -51,7 +51,7 @@
                                             if (!empty($dataProvinces)) {
                                                 foreach ($dataProvinces as $province) {
                                             ?>
-                                                    <option value="<?= $province["id"]; ?>"><?= $province["province_name"]; ?></option>
+                                                    <option value="<?= $province["id"]; ?>"><?= strtoupper($province["province_name"]); ?></option>
                                             <?php
                                                 }
                                             }
@@ -173,9 +173,9 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama Customer</th>
-                                <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('phone')" class="sort">Kontak</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -238,14 +238,14 @@
             data: "name",
             className: "text-center"
         }, {
-            data: "namaSales",
-            className: "text-center"
-        }, {
             data: "phone",
             className: "text-center"
         }, {
             data: "address",
             className: "text-center",
+        }, {
+            data: "namaSales",
+            className: "text-center"
         }, ],
         columnDefs: [{
             defaultContent: "-",
@@ -565,7 +565,7 @@
                     $(".termin").empty()
                     $(".termin").append(`<option value=""></option>`)
                     result.data.forEach(function(item) {
-                        $(".termin").append(`<option value="${item.id}">${item.value}</option>`)
+                        $(".termin").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
                     })
 
                     $(".termin").val("").change();
@@ -589,7 +589,7 @@
                     $(".currency").empty()
                     $(".currency").append(`<option value=""></option>`)
                     result.data.forEach(function(item) {
-                        $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
+                        $(".currency").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
                     })
 
                     $(".currency").attr("disabled", true).val("30").change();
@@ -613,7 +613,7 @@
                     $(".tipe_pelanggan").empty()
                     $(".tipe_pelanggan").append(`<option value=""></option>`)
                     result.data.forEach(function(item) {
-                        $(".tipe_pelanggan").append(`<option value="${item.id}">${item.value}</option>`)
+                        $(".tipe_pelanggan").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
                     })
 
                     $(".tipe_pelanggan").val("").change();
@@ -727,7 +727,7 @@
                                 $(".city_parent_id").val("").change()
                                 $(".city_parent_id").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name.toUpperCase()}</option>`)
                                 })
 
                                 $(".city_parent_id").val(res?.data?.city_id).change();
@@ -751,7 +751,7 @@
                                 $(".tipe_pelanggan").empty()
                                 $(".tipe_pelanggan").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".tipe_pelanggan").append(`<option value="${item.id}">${item.value}</option>`)
+                                    $(".tipe_pelanggan").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
                                 })
 
                                 $(".tipe_pelanggan").val(res?.data?.tipe_pelanggan).change();
