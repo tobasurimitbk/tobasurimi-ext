@@ -164,7 +164,6 @@
                     let id = row?.id;
                     let is_approve = row?.is_approve;
                     if (is_approve == 0 || is_approve == null) {
-
                         return `
                         <div class="mt-0">
                             <button type="button" class="btn btn-primary detail-material-warehouse">

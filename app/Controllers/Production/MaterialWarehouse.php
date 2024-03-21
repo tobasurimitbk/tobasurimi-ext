@@ -287,7 +287,6 @@ class MaterialWarehouse extends BaseController
                     $status = "reject";
                 }
 
-
                 $data = [
                     "status"    => true,
                     "message"   => "Material Request Berhasil Di" . $status,
