@@ -82,7 +82,7 @@
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">List Hasil Barang</label>
+                        <label class="form-label font-weight-bold modal-sub-title">List Hasil Barang Jadi</label>
                     </div>
                     <div class="col-md-6">
                         <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
