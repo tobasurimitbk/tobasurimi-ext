@@ -57,6 +57,7 @@ class StockDetail2Model extends Model
             stock_details2.bc_id,
             stock_details2.stock_detail_id,
             stock_details2.no_aju,
+            stock_details.stock_date,
             (SUM(CASE WHEN stock_details.status = "In" 
             THEN stock_details2.qty ELSE 0 END) - 
             SUM(CASE WHEN stock_details.status = "Out" 
