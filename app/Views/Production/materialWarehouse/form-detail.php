@@ -28,7 +28,7 @@
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
-                                <th>Keterangan</th>
+                                <!-- <th>Keterangan</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -116,12 +116,6 @@
                 },
                 {
                     data: "total",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "note",
                     className: "text-center",
                     searchable: false,
                     sortable: false
