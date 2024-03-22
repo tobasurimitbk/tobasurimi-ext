@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Material Warehouse</h1>
+        <h1>Material Request Gudang</h1>
         <?= csrf_field() ?>
     </div>
     <div class="card">
