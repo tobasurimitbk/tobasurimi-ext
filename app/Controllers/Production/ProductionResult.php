@@ -282,10 +282,12 @@ class ProductionResult extends BaseController
         $dataWorkOrder = $this->workOrdersModel->asObject()
             ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
-            ->where('company_id', $this->this_company_id)
+            ->join('material_requests', 'material_requests.work_order_id = work_orders.id')
+            ->where('work_orders.company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
             ->where('work_orders.is_posted', "1")
             ->where('work_orders.request_status', "waiting")
+            ->where('material_requests.is_approve', '1')
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
