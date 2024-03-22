@@ -193,6 +193,7 @@
                                 <th>No</th>
                                 <th onclick="changeSortStokInisasi('bc_id')">Dokumen Pabean</th>
                                 <th onclick="changeSortStokInisasi('no_aju')">No Aju</th>
+                                <th onclick="changeSortStokInisasi('tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortStokInisasi('stok_total')">Qty Satuan 1</th>
                                 <th>Qty Satuan 2</th>
@@ -204,7 +205,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="3"></td>
+                                <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPerInit']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
@@ -254,6 +255,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSortPemasukkanBarang('stock_details2.no_dokumen')">Purchase Order</th>
+                                <th onclick="changeSortPemasukkanBarang('stock_details.tanggal')">Tanggal</th>
                                 <th onclick="changeSortPemasukkanBarang('stock_details.no_dokumen')">Dokumen</th>
                                 <th>Supplier</th>
                                 <th onclick="changeSortPemasukkanBarang('stock.barang1_id')">Barang - Spesifikasi</th>
@@ -268,7 +270,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4"></td>
+                                <td colspan="5"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPerPemasukkan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
@@ -792,6 +794,10 @@
                 className: "text-center"
             },
             {
+                data: "tanggal",
+                className: "text-center"
+            },
+            {
                 data: "barang",
                 className: "text-center",
                 searchable: false,
@@ -892,6 +898,10 @@
             },
             {
                 data: "po",
+                className: "text-center"
+            },
+            {
+                data: "tanggal",
                 className: "text-center"
             },
             {
