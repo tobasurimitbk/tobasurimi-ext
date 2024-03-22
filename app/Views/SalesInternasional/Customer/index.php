@@ -34,7 +34,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Pilih Negara</label>
+                                <label for="floatingInput">Negara</label>
                             </div>
                         </div>
                     </div>
@@ -79,8 +79,10 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="d-flex float-right mb-3">
-                <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-internasional" placeholder="Cari Customer" value="" />
+            <div class="row  justify-content-end ">
+                <div class="col-sm-3 mb-3" style="float: right;">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-internasional" placeholder="Cari Kode / Nama Customer" value="" />
+                </div>
             </div>
             <div class="table-responsive">
                 <div class="table-responsive">
@@ -193,6 +195,7 @@
             .css('z-index', '1');
 
         $('.country_id').select2({
+            placeholder: "Pilih Negara",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal-internasional .modal-content")
         })

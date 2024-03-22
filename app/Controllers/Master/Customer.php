@@ -157,8 +157,8 @@ class Customer extends BaseController
                     "company_id" => $this->this_company_id,
                     "kode" => $kode,
                     "nik" => $this->request->getPost("nik"),
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
+                    "name" => strtoupper($this->request->getVar("name")),
+                    "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => $this->request->getPost("no_npwp"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
@@ -245,9 +245,9 @@ class Customer extends BaseController
 
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "name" => $this->request->getPost("name"),
+                    "name" => strtoupper($this->request->getVar("name")),
+                    "address" => strtoupper($this->request->getVar("address")),
                     "nik" => $this->request->getPost("nik"),
-                    "address" => $this->request->getPost("address"),
                     "no_npwp" => $this->request->getPost("no_npwp"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),

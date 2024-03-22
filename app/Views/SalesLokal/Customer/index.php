@@ -162,8 +162,10 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="d-flex float-right mb-3">
-                <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-lokal" placeholder="Cari Customer / Sales" value="" />
+            <div class="row  justify-content-end ">
+                <div class="col-sm-3 mb-3" style="float: right;">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-lokal" placeholder="Cari Kode / Customer / Sales" value="" />
+                </div>
             </div>
             <div class="table-responsive">
                 <div class="table-responsive">

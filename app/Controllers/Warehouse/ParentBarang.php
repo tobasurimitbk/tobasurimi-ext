@@ -63,7 +63,7 @@ class ParentBarang extends BaseController
         $id = decrypt($this->request->getVar('id'));
 
         $parentBarangModel->update($id, [
-            'parent_name' => $parentName,
+            'parent_name' => strtoupper($parentName),
         ]);
 
         return response()->setJSON([
@@ -139,7 +139,7 @@ class ParentBarang extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
-                "parent_name"           => $data['parent_name'],
+                "parent_name"           => strtoupper($data['parent_name']),
             ]);
         }
 

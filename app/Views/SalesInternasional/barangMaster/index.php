@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Master Barang Sales Lokal</h1>
+        <h1>Master Barang Sales Ekspor</h1>
         <button class="btn btn-show-form btn-add float-right">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -12,16 +12,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
-                <!-- <div class="col-md-3 col mb-3">
-                    <select name="" class="form-select search-type-barang" id="search-type-barang">
-                        <option value="">SEMUA</option>
-                        <?php foreach ($typeBarang as $t) : ?>
-                            <option value="<?= $t['value'] ?>">
-                                <?= strtoupper(str_replace('_', ' ', str_replace('bahan', 'barang', $t['value']))) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div> -->
+
                 <div class="col-md-3 col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
                 </div>
@@ -81,19 +72,6 @@
                         </div>
                     </div>
                     <div class="row">
-                        <!-- <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_barang" name="type_barang" id="type_barang">
-                                    <option value=""></option>
-                                    <?php foreach ($typeBarang as $t) : ?>
-                                        <option value="<?= $t['value'] ?>">
-                                            <?= strtoupper(str_replace('_', ' ', str_replace('bahan', 'barang', $t['value']))) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
-                            </div>
-                        </div> -->
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
@@ -157,7 +135,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("master-barang-lokal/all"); ?>",
+            url: "<?= base_url("master-barang-internasional/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -298,7 +276,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: "<?= base_url("master-barang-lokal/update"); ?>",
+                                url: "<?= base_url("master-barang-internasional/update"); ?>",
                                 data: data,
                                 method: "POST",
                                 dataType: "json",
@@ -352,7 +330,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "<?= base_url("master-barang-lokal/save"); ?>",
+                            url: "<?= base_url("master-barang-internasional/save"); ?>",
                             data: data,
                             method: "POST",
                             dataType: "json",
@@ -405,7 +383,7 @@
         formData.append("id", id);
 
         $.ajax({
-            url: "<?= base_url("master-barang-lokal/get"); ?>",
+            url: "<?= base_url("master-barang-internasional/get"); ?>",
             data: formData,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -452,7 +430,7 @@
                 let csrf = $(`[name="${csrfToken}"]`);
                 let id = $('input[name="id"]').val();
                 $.ajax({
-                    url: "<?= base_url("master-barang-lokal/delete"); ?>",
+                    url: "<?= base_url("master-barang-internasional/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -538,7 +516,7 @@
         if (value) {
             $("input[name='kode_barang']").attr("readonly", true);
             $.ajax({
-                url: `<?= base_url("master-barang-lokal/generate-new-code"); ?>`,
+                url: `<?= base_url("master-barang-internasional/generate-new-code"); ?>`,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                     setLoading();
