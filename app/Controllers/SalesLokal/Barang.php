@@ -49,7 +49,7 @@ class Barang extends BaseController
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => strtoupper($this->request->getVar('barang_name')),
             'type_barang_sales' => "LOKAL",
-            'type_barang' => $this->request->getVar('type_barang'),
+            'type_barang' => "bahan_jadi",
             'satuan_id' => $this->request->getVar('satuan_id'),
             'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
             'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
@@ -71,7 +71,6 @@ class Barang extends BaseController
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => strtoupper($this->request->getVar('barang_name')),
             'type_barang_sales' => "LOKAL",
-            'type_barang' => $this->request->getVar('type_barang'),
             'satuan_id' => $this->request->getVar('satuan_id'),
             'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
             'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
@@ -86,7 +85,7 @@ class Barang extends BaseController
 
     public function delete()
     {
-        $id = ($this->request->getVar('id'));
+        $id = decrypt($this->request->getVar('id'));
         $this->barangMasterSalesModel->delete($id);
         return response()->setJSON([
             'status' => true,
@@ -120,6 +119,7 @@ class Barang extends BaseController
         $condition = [
             "barang_master_sales.company_id"  => $this->this_company_id,
             "barang_master_sales.type_barang_sales" => "LOKAL",
+            "barang_master_sales.type_barang" => "bahan_jadi",
             "barang_master_sales.deletedAt" => NULL,
         ];
 

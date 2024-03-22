@@ -490,15 +490,12 @@ $routes->post('/order-form-internasional/update-status', 'SalesInternasional\Ord
 
 // Master Barang Internasional
 $routes->get('master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);
-$routes->group('master-barang-internasional', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('all', 'SalesInternasional\Barang::all');
-    $routes->post('get', 'SalesInternasional\Barang::get');
-    $routes->post('save', 'SalesInternasional\Barang::create');
-    $routes->post('update', 'SalesInternasional\Barang::update');
-    $routes->post('delete', 'SalesInternasional\Barang::delete');
-    $routes->post('delete-spek', 'SalesInternasional\Barang::deleteSpek');
-    $routes->post('generate-new-code', 'SalesInternasional\Barang::generateNewCode');
-});
+$routes->get('master-barang-internasional/all', 'SalesInternasional\Barang::all', ['filter' => 'Auth']);
+$routes->post('master-barang-internasional/save', 'SalesInternasional\Barang::create', ['filter' => 'Auth']);
+$routes->post('master-barang-internasional/update', 'SalesInternasional\Barang::update', ['filter' => 'Auth']);
+$routes->post('master-barang-internasional/delete', 'SalesInternasional\Barang::delete', ['filter' => 'Auth']);
+$routes->post('master-barang-internasional/get', 'SalesInternasional\Barang::get', ['filter' => 'Auth']);
+$routes->post('master-barang-internasional/generate-new-code', 'SalesInternasional\Barang::generateNewCode', ['filter' => 'Auth']);
 
 // Customer Lokal
 $routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);
