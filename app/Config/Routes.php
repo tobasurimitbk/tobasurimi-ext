@@ -530,7 +530,7 @@ $routes->get('/production-result/material-request', 'Production\ProductionResult
 
 // Rencana Produksi
 $routes->get('/work-order', 'Production\WorkOrder::index', ['filter' => 'Auth']);
-$routes->get('/work-order/id/(:segment)', 'Production\WorkOrder::getById/$1', ['filter' => 'Auth']);
+$routes->get('/work-order/details/(:segment)', 'Production\WorkOrder::getById/$1', ['filter' => 'Auth']);
 $routes->get('/work-order/create', 'Production\WorkOrder::createView', ['filter' => 'Auth']);
 $routes->get('/work-order/all', 'Production\WorkOrder::all', ['filter' => 'Auth']);
 $routes->post('/work-order/save', 'Production\WorkOrder::create', ['filter' => 'Auth']);
@@ -539,7 +539,7 @@ $routes->post('/work-order/delete', 'Production\WorkOrder::deleteWO', ['filter' 
 
 // Material Request
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
-$routes->get('/material-request/id/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request/details/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
 $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
 $routes->get('/material-request/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
@@ -550,7 +550,7 @@ $routes->post('/material-request/update-status', 'Production\MaterialRequest::up
 
 // Rencana Produksi
 $routes->get('/material-warehouse', 'Production\MaterialWarehouse::index', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/id/(:segment)', 'Production\MaterialWarehouse::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-warehouse/details/(:segment)', 'Production\MaterialWarehouse::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-warehouse/create', 'Production\MaterialWarehouse::createView', ['filter' => 'Auth']);
 $routes->get('/material-warehouse/all', 'Production\MaterialWarehouse::all', ['filter' => 'Auth']);
 $routes->get('/material-warehouse/data-detail-material', 'Production\MaterialWarehouse::allDetailMaterialRequest', ['filter' => 'Auth']);

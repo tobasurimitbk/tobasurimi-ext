@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Dokumen Produksi</h1>
+        <h1 class="title-name"><?= !empty($dataWorkOrders) ? "Detail Work Order" : "Tambah Work Order"; ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("work-order"); ?>">
                 Batal
@@ -570,7 +570,7 @@
                                                 reverseButtons: true,
                                                 confirmButtonText: 'Oke',
                                             }).then((result) => {
-                                                window.location.replace("<?= base_url('work-order/id/') ?>" + response.id);
+                                                window.location.replace("<?= base_url('work-order/details/') ?>" + response.id);
                                             })
                                         }
                                     }

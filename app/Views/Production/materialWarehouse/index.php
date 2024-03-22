@@ -214,7 +214,7 @@
 
             // Redirect to the detail page using the data ID
             if (data) {
-                location.replace(`<?= base_url("material-warehouse/id"); ?>/${data.id}`);
+                location.replace(`<?= base_url("material-warehouse/details"); ?>/${data.id}`);
             }
         });
 

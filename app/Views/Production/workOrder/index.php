@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Dokumen Produksi</h1>
+        <h1>Work Order</h1>
 
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -152,7 +152,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("work-order/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("work-order/details"); ?>/${data.id}`);
         })
     })
 

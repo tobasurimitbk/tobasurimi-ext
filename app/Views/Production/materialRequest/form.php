@@ -754,7 +754,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url('material-request/id/') ?>" + response.id
+                                                    window.location.href = "<?= base_url('material-request/details/') ?>" + response.id
                                                 }
                                             });
                                         },
