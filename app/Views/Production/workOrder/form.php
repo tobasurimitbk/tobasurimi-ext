@@ -508,7 +508,7 @@
 
                             if (id) {
                                 // UPDATE
-                                <?php if (can('Produksi', 'Dokumen Produksi', 'u')) : ?>
+                                <?php if (can('Produksi', 'Work Order', 'u')) : ?>
                                     $.ajax({
                                         url: "<?= base_url("work-order/update"); ?>",
                                         data: formData,
