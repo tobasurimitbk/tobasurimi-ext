@@ -260,8 +260,7 @@ class MaterialRequestsModel extends Model
         $builder = $this->db->table('material_requests');
         $builder->select('req_no');
         $builder->orderBy('req_no', 'desc')
-            ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
+            ->where('deletedAt', null);
         $builder->like('req_no', $lastStr);
         $query = $builder->get();
 

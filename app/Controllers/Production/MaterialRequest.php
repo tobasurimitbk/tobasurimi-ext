@@ -267,7 +267,7 @@ class MaterialRequest extends BaseController
                 'warehouse_id' => $this->request->getVar("warehouse_id"),
                 "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
                 "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
-                "req_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("req_no"),
+                "req_no" => $no,
                 'is_posted' => 0,
                 'createdBy' =>  session()->get("login")->user_id,
             ];
