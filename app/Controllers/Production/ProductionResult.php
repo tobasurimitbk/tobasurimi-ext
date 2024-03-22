@@ -438,6 +438,9 @@ class ProductionResult extends BaseController
                             "qty" => isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty,
                         ];
                         $this->productionResultDetailModel->insert($datasbj);
+                        $this->workOrderDetailsModel->update($bj->detail_work_order, [
+                            'qty_hasil' => isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty
+                        ]);
                     }
                 }
             }

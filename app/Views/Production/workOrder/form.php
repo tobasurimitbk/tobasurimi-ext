@@ -821,6 +821,7 @@
                 'nama_satuan': "<?= $d->nama_satuan ?>",
                 'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",
+                'qty_hasil': "<?= $d->qty_hasil ?>",
                 'keterangan': "<?= $d->note ?>"
             });
         <?php endforeach; ?>
