@@ -282,7 +282,7 @@
                     dataType: "json",
                     success: function(response) {
                         // Menghindari XSS dengan menghindari menyisipkan variabel PHP langsung ke dalam string JavaScript
-                        const baseUrl = '<?= base_url("material-request/id"); ?>';
+                        const baseUrl = '<?= base_url("material-request/details"); ?>';
 
                         // Mengambil token CSRF dari respons dan memperbarui nilainya pada input CSRF
                         csrf.val(response.token);
