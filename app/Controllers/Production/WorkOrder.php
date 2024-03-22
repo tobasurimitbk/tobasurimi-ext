@@ -149,7 +149,7 @@ class WorkOrder extends BaseController
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
             $id = $this->workOrdersModel->insert([
-                "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
+                "wo_no" => $no,
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),

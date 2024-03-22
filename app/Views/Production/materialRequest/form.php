@@ -44,12 +44,12 @@
                             <label for="floatingInput">Barang Jadi</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" readonly>
                             <label for="floatingInput">Jumlah Standart Produksi</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
