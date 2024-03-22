@@ -270,7 +270,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4"></td>
+                                <td colspan="5"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPerPemasukkan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                                 <td><b></b></td>
