@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Material Warehouse</h1>
+        <h1 class="title-name">Material Request Gudang</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-warehouse"); ?>">
                 Batal
@@ -28,7 +28,7 @@
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
-                                <th>Keterangan</th>
+                                <!-- <th>Keterangan</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -116,12 +116,6 @@
                 },
                 {
                     data: "total",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "note",
                     className: "text-center",
                     searchable: false,
                     sortable: false
