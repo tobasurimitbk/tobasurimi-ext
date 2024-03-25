@@ -106,6 +106,11 @@ class Sub_AkunsModel extends Model
 
     public function searchSubAkun($query)
     {
-        return $this->like('nama_sub', $query)->orLike('no_sub', $query)->where('deletedAt', null)->findAll();
+        return $this->like('nama_sub', $query)->orLike('no_sub', $query)->orLike('LOWER(REPLACE(CONCAT(no_sub, nama_sub), " ", ""))', $query)->where('deletedAt', null)->findAll();
+    }
+
+    public function searchSubAkunExact($query)
+    {
+        return $this->where('LOWER(REPLACE(no_sub, " ", ""))', $query)->orWhere('LOWER(REPLACE(CONCAT(no_sub, nama_sub), " ", ""))', $query)->where('deletedAt', null)->findAll();
     }
 }

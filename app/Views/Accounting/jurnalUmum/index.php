@@ -10,9 +10,9 @@
         <?= csrf_field() ?>
         <div class="section-header">
             <h1>Jurnal</h1>
-            <button class="btn btn-show-form btn-add float-right">
+            <!-- <button class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Simpan Jurnal
-            </button>
+            </button> -->
         </div>
         <!-- Check and display success message -->
         <?php if (session()->has('success_message')) : ?>
@@ -172,37 +172,64 @@
         });
 
         //search coa
-        $('#gsearchsimple').on('keyup input', function() {
+        $('#gsearchsimple').on('keypress', function(e) {
             let csrfToken = '<?= csrf_token() ?>';
             var query = $('#gsearchsimple').val();
             let csrf = $(`[name="${csrfToken}"]`);
             var inputWidth = $(this).outerWidth();
-            $('#searchResults').css('width', inputWidth);
-            $('#searchResults').css('display', 'block');
-            if (query.length >= 2) {
-                $.ajax({
-                    url: "<?= base_url("jurnal/getSubAkuns"); ?>",
-                    method: "POST",
-                    data: {
-                        query: query
-                    },
-                    dataType: "json",
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    success: function(data) {
-                        $('#searchResults').html('');
-                        data.forEach(function(item) {
-                            var subAkunId = item.hexid;
-                            var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
-                            var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
-                            $('#searchResults').append(listItem); // Tambahkan item ke daftar hasil pencarian
-                        });
-                    }
-                })
-            }
-            if (query.length == 0) {
-                $('#searchResults').css('display', 'none');
+            if (e.which == 13) {
+                console.log($(this).val());
+                e.preventDefault();
+                if (query.length >= 2) {
+                    $.ajax({
+                        url: "<?= base_url("jurnal/getSubAkunsExact"); ?>",
+                        method: "POST",
+                        data: {
+                            query: query
+                        },
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        success: function(data) {
+                            console.log(data);
+                            // $('#searchResults').html('');
+                            data.forEach(function(item) {
+                                $('#id_coa').val(item.hexid);
+                                $('#gsearchsimple').val(item.no_sub + " " + item.nama_sub).change();
+                                $('#searchResults').css('display', 'none');
+                            });
+                        }
+                    })
+                }
+            } else {
+                $('#searchResults').css('width', inputWidth);
+                $('#searchResults').css('display', 'block');
+                if (query.length >= 2) {
+                    $.ajax({
+                        url: "<?= base_url("jurnal/getSubAkuns"); ?>",
+                        method: "POST",
+                        data: {
+                            query: query
+                        },
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        success: function(data) {
+                            $('#searchResults').html('');
+                            data.forEach(function(item) {
+                                var subAkunId = item.hexid;
+                                var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
+                                var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
+                                $('#searchResults').append(listItem); // Tambahkan item ke daftar hasil pencarian
+                            });
+                        }
+                    })
+                }
+                if (query.length == 0) {
+                    $('#searchResults').css('display', 'none');
+                }
             }
         });
 
@@ -295,39 +322,66 @@
         var counters = 0;
 
         //search coa
-        $(`#gsearchsimple_${counter}`).on('keyup input', function() {
+        $(`#gsearchsimple_${counter}`).on('keypress', function(e) {
             let csrfToken = '<?= csrf_token() ?>';
             var query = $(this).val();
             counters = $(this).data('counters');
             let csrf = $(`[name="${csrfToken}"]`);
             var inputWidth = $(this).outerWidth();
             var searchResultsId = `#searchResults_${counters}`;
-            $(searchResultsId).css('width', inputWidth);
-            $(searchResultsId).css('display', 'block');
-            if (query.length >= 2) {
-                $.ajax({
-                    url: "<?= base_url("jurnal/getSubAkuns"); ?>",
-                    method: "POST",
-                    data: {
-                        query: query
-                    },
-                    dataType: "json",
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    success: function(data) {
-                        $(searchResultsId).html('');
-                        data.forEach(function(item) {
-                            var subAkunId = item.hexid;
-                            var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
-                            var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
-                            $(searchResultsId).append(listItem); // Tambahkan item ke daftar hasil pencarian
-                        });
-                    }
-                })
-            }
-            if (query.length == 0) {
-                $(searchResultsId).css('display', 'none');
+            if (e.which == 13) {
+                console.log($(this).val());
+                e.preventDefault();
+                if (query.length >= 2) {
+                    $.ajax({
+                        url: "<?= base_url("jurnal/getSubAkunsExact"); ?>",
+                        method: "POST",
+                        data: {
+                            query: query
+                        },
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        success: function(data) {
+                            console.log(data);
+                            // $('#searchResults').html('');
+                            data.forEach(function(item) {
+                                $(`#id_coa_${counters}`).val(item.hexid);
+                                $(`#gsearchsimple_${counters}`).val(item.no_sub + " " + item.nama_sub).change();
+                                $(searchResultsId).css('display', 'none');
+                            });
+                        }
+                    })
+                }
+            } else {
+                $(searchResultsId).css('width', inputWidth);
+                $(searchResultsId).css('display', 'block');
+                if (query.length >= 2) {
+                    $.ajax({
+                        url: "<?= base_url("jurnal/getSubAkuns"); ?>",
+                        method: "POST",
+                        data: {
+                            query: query
+                        },
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        success: function(data) {
+                            $(searchResultsId).html('');
+                            data.forEach(function(item) {
+                                var subAkunId = item.hexid;
+                                var noSubNamaSub = item.no_sub + ' ' + item.nama_sub;
+                                var listItem = '<a href="javascript:void(0)" class="gsearch" data-sub_akun_id="' + subAkunId + '" style="color:#333;text-decoration:none;"><li class="list-group-item contsearch">' + noSubNamaSub + '</li></a>';
+                                $(searchResultsId).append(listItem); // Tambahkan item ke daftar hasil pencarian
+                            });
+                        }
+                    })
+                }
+                if (query.length == 0) {
+                    $(searchResultsId).css('display', 'none');
+                }
             }
         });
 

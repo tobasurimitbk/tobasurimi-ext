@@ -190,10 +190,28 @@ class JurnalUmum extends BaseController
 
     public function searchSubAkun()
     {
-        $query = $this->request->getPost('query');
+        $query = strtolower(str_replace(' ', '', $this->request->getPost('query')));
 
         $subAkunModel = new Sub_AkunsModel();
         $subAkuns = $subAkunModel->searchSubAkun($query);
+
+        $output = array(); // Menggunakan array untuk menyimpan data
+        foreach ($subAkuns as $sub_akun) {
+            $sub_akun['hexid'] = bin2hex($this->encrypter->encrypt($sub_akun['id'])); // Menyimpan nilai yang dienkripsi dengan kunci 'hexid'
+            $output[] = $sub_akun; // Menambahkan $sub_akun ke dalam array $output
+        }
+
+        // Mengembalikan output dalam format JSON
+        echo json_encode($output);
+        return;
+    }
+
+    public function searchSubAkunExact()
+    {
+        $query = strtolower(str_replace(' ', '', $this->request->getPost('query')));
+
+        $subAkunModel = new Sub_AkunsModel();
+        $subAkuns = $subAkunModel->searchSubAkunExact($query);
 
         $output = array(); // Menggunakan array untuk menyimpan data
         foreach ($subAkuns as $sub_akun) {

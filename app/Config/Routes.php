@@ -1193,6 +1193,7 @@ $routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 
 $routes->post('/jurnal/generate-no-bukti', 'Accounting\JurnalUmum\JurnalUmum::generateNoBukti', ['filter' => 'Auth']);
 $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
+$routes->post('/jurnal/getSubAkunsExact', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkunExact', ['filter' => 'Auth']);
 // set no bukti
 $routes->get('/no-bukti', 'Accounting\NoBukti\NoBukti::index', ['filter' => 'Auth']);
 $routes->get('/no-bukti/all', 'Accounting\NoBukti\NoBukti::allNoBukti', ['filter' => 'Auth']);
