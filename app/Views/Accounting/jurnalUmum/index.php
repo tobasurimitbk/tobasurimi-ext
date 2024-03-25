@@ -69,12 +69,14 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col" style="width: 20%;">Tanggal</th>
-                                <th scope="col" style="width: 20%;">Nama Akun</th>
-                                <th scope="col" style="width: 17%;">Keterangan</th>
-                                <th scope="col" style="width: 20%;">Debit</th>
-                                <th scope="col" style="width: 20%;">Kredit</th>
-                                <th scope="col" style="width: 3%;"></th>
+                                <th scope="col" style="width: 15%;">Tanggal</th>
+                                <th scope="col" style="width: 15%;">Nama Akun</th>
+                                <th scope="col" style="width: 15%;">Keterangan</th>
+                                <th scope="col" style="width: 10%;">Valas</th>
+                                <th scope="col" style="width: 10%;">Kurs</th>
+                                <th scope="col" style="width: 15%;">Debit</th>
+                                <th scope="col" style="width: 15%;">Kredit</th>
+                                <th scope="col" style="width: 5%;"></th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="tbody2" style="cursor: pointer;">
@@ -95,6 +97,17 @@
                                     <input type="text" name="ket[]" id="ket" class="form-control">
                                 </td>
                                 <td>
+                                    <select class="form-select valas" id="valas" name="valas[]" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php foreach ($dataValuta as $valuta) : ?>
+                                            <option value="<?= $valuta["id"]; ?>" <?= $valuta["id"] == "30" ? "selected" : ""; ?>><?= $valuta["value"]; ?></option>
+                                        <?php endforeach ?>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" name="kurs[]" id="kurs" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" class="form-control" value="1,00">
+                                </td>
+                                <td>
                                     <input type="text" name="debit[]" id="debit" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');checkValueDebitKredit();" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
                                 </td>
                                 <td>
@@ -111,6 +124,8 @@
                                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Simpan Jurnal
                                 </button>
                             </td>
+                            <td scope="col"></td>
+                            <td scope="col"></td>
                             <td scope="col"></td>
                             <td scope="col"></td>
                             <td scope="col"><input type="text" name="jumlahDebet" id="jumlahDebet" class="form-control" readonly></td>
@@ -148,6 +163,11 @@
 
         $("#akun_coa_1").select2({
             placeholder: "Pilih Akun",
+            theme: "bootstrap-5"
+        });
+
+        $(".valas").select2({
+            placeholder: "Pilih Valas",
             theme: "bootstrap-5"
         });
 
@@ -299,6 +319,17 @@
             <input type="text" name="ket[]" id="ket_${counter}" class="form-control">
         </td>
         <td>
+            <select class="form-select valas" id="valas" name="valas[]" aria-label="Floating label select example">
+                <option value=""></option>
+                <?php foreach ($dataValuta as $valuta) : ?>
+                    <option value="<?= $valuta["id"]; ?>" <?= $valuta["id"] == "30" ? "selected" : ""; ?>><?= $valuta["value"]; ?></option>
+                <?php endforeach ?>
+            </select>
+        </td>
+        <td>
+            <input type="text" name="kurs[]" id="kurs" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" class="form-control" value="1,00">
+        </td>
+        <td>
             <input type="text" name="debit[]" id="debit_${counter}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');checkValueDebitKredit('${counter}');" onchange="this.value = formatRupiah(this.value);getItems();" class="form-control yy">
         </td>
         <td>
@@ -312,6 +343,10 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
+        });
+        $(".valas").select2({
+            placeholder: "Pilih Valas",
+            theme: "bootstrap-5"
         });
         $(`#ket_${counter}, #debit_${counter}, #kredit_${counter}`).keypress(function(e) {
             if (e.which == 13) {
@@ -431,6 +466,11 @@
             // Recalculate the totals after deletion
             getItems();
             getItems2();
+
+            $(".valas").select2({
+                placeholder: "Pilih Valas",
+                theme: "bootstrap-5"
+            });
         } catch (e) {
             alert(e);
         }

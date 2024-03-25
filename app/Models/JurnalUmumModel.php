@@ -21,6 +21,8 @@ class JurnalUmumModel extends Model
         'tanggal_jurnal',
         'debit',
         'kredit',
+        'valas',
+        'kurs',
         'keterangan',
         'id_inputer',
     ];

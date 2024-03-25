@@ -105,6 +105,7 @@ class JurnalUmum extends BaseController
         $data = [
             "dataAccountModule" => $accountModuleData,
             "dataMetadataTipeTransaksi" => $dataMetadataTipeTransaksi,
+            "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
             "subAkuns" => $subAkunsModel
         ];
 
@@ -133,6 +134,12 @@ class JurnalUmum extends BaseController
                     $kreditValue = 0;
                 }
 
+                if (isset($_POST['kurs'][$key])) {
+                    $kursValue = ($_POST['kurs'][$key] != "") ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $_POST['kurs'][$key])) : 0;
+                } else {
+                    $kursValue = 0;
+                }
+
                 if ($debitValue == 0) {
                     $result[] = array(
                         'id_transaksi' => $id_transaksi_jurnal,
@@ -140,6 +147,8 @@ class JurnalUmum extends BaseController
                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
                         'debit' => $debitValue,
                         'kredit' => $kreditValue,
+                        'valas' => $_POST['valas'][$key],
+                        'kurs' => $kursValue,
                         'keterangan' => $_POST['ket'][$key],
                         'id_inputer' => session()->get("login")->user_id
                     );
@@ -151,6 +160,8 @@ class JurnalUmum extends BaseController
                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $_POST['tgl_transaksi'][$key]))),
                         'debit' => $debitValue,
                         'kredit' => $kreditValue,
+                        'valas' => $_POST['valas'][$key],
+                        'kurs' => $kursValue,
                         'keterangan' => $_POST['ket'][$key],
                         'id_inputer' => session()->get("login")->user_id
                     );
@@ -339,6 +350,8 @@ class JurnalUmum extends BaseController
                                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
                                     'debit' => (repairDouble($totalPOqty)),
                                     'kredit' => 0,
+                                    'valas' => 'IDR',
+                                    'kurs' => 1,
                                     'keterangan' => $dataBB->po_no,
                                     'id_inputer' => session()->get("login")->user_id
                                 );
@@ -369,6 +382,8 @@ class JurnalUmum extends BaseController
                             'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
                             'debit' => 0,
                             'kredit' => repairDouble($totalPO),
+                            'valas' => 'IDR',
+                            'kurs' => 1,
                             'keterangan' => $dataBB->po_no,
                             'id_inputer' => session()->get("login")->user_id
                         );
@@ -499,6 +514,8 @@ class JurnalUmum extends BaseController
                                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
                                     'debit' => repairDouble($dataBBDetail->total) * $exchangeTransaksi,
                                     'kredit' => 0,
+                                    'valas' => $valasTransaksi,
+                                    'kurs' => $exchangeTransaksi,
                                     'keterangan' => $dataBB->po_no,
                                     'id_inputer' => session()->get("login")->user_id
                                 );
@@ -527,6 +544,8 @@ class JurnalUmum extends BaseController
                             'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
                             'debit' => 0,
                             'kredit' => $totalPO * $exchangeTransaksi,
+                            'valas' => $valasTransaksi,
+                            'kurs' => $exchangeTransaksi,
                             'keterangan' => $dataBB->po_no,
                             'id_inputer' => session()->get("login")->user_id
                         );
@@ -645,6 +664,8 @@ class JurnalUmum extends BaseController
                                 'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
                                 'debit' => repairDouble($dataBPDetail->total) * $exchangeTransaksi,
                                 'kredit' => 0,
+                                'valas' => $valasTransaksi,
+                                'kurs' => $exchangeTransaksi,
                                 'keterangan' => $dataBP->po_no,
                                 'id_inputer' => session()->get("login")->user_id
                             );
@@ -675,6 +696,8 @@ class JurnalUmum extends BaseController
                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
                         'debit' => 0,
                         'kredit' => $totalPO * $exchangeTransaksi,
+                        'valas' => $valasTransaksi,
+                        'kurs' => $exchangeTransaksi,
                         'keterangan' => $dataBP->po_no,
                         'id_inputer' => session()->get("login")->user_id
                     );
@@ -764,6 +787,8 @@ class JurnalUmum extends BaseController
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                     'debit' => 0,
                     'kredit' => repairDouble($POlocal->amount),
+                    'valas' => 'IDR',
+                    'kurs' => 1,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -773,6 +798,8 @@ class JurnalUmum extends BaseController
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                     'debit' => repairDouble($POlocal->amount),
                     'kredit' => 0,
+                    'valas' => 'IDR',
+                    'kurs' => 1,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -844,6 +871,8 @@ class JurnalUmum extends BaseController
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
                     'debit' => 0,
                     'kredit' => repairDouble($POimport->payment_amt) * repairDouble($POimport->current_exchange_rate),
+                    'valas' => $POimport->currency,
+                    'kurs' => $POimport->current_exchange_rate,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -853,6 +882,8 @@ class JurnalUmum extends BaseController
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
                     'debit' => repairDouble($POimport->payment_amt) * repairDouble($POimport->current_exchange_rate),
                     'kredit' => 0,
+                    'valas' => $POimport->currency,
+                    'kurs' => $POimport->current_exchange_rate,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
