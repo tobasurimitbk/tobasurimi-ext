@@ -110,6 +110,7 @@ class JasaVendorIn extends BaseController
                 "id"                    => encrypt($data->id),
                 "no_penerimaan_surat_jalan"        => $data->no_penerimaan_surat_jalan,
                 "no_surat_jalan"        => str_replace(['"', ']', '['], "",  $data->multiple_jasa_vendor_out_no),
+                "no_surat_jalan_vendor" => $data->no_surat_jalan_vendor,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
                 "warehouse_name"        => $data->warehouse_name,
@@ -228,6 +229,7 @@ class JasaVendorIn extends BaseController
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'vendor_id' => $this->request->getVar('vendor_id'),
             'tanggal' => date('Y-m-d'),
+            "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
             'no_penerimaan_surat_jalan' => $this->request->getVar('no_penerimaan_surat_jalan'),
             'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
             'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
@@ -292,6 +294,7 @@ class JasaVendorIn extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
+            "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
             'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
             'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
             'keterangan' => $this->request->getVar('keterangan')

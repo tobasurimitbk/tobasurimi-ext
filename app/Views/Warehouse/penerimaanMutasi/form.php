@@ -152,6 +152,7 @@
                                     <th style="text-align: center;">Tipe Barang</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
                                     <th style="text-align: center;">No Aju</th>
+                                    <th style="text-align: center;">Tgl Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
                                     <th style="text-align: center;">Qty Mutasi</th>
@@ -529,6 +530,7 @@
                 newRow.append($('<td>').text(v.tipe_barang));
                 newRow.append($('<td>').text(v.bc_name));
                 newRow.append($('<td>').text(v.no_aju));
+                newRow.append($('<td>').text(v.stock_date));
                 newRow.append($('<td>').text(v.barang));
                 newRow.append($('<td>').text(v.satuan));
                 newRow.append($('<td>').text(v.qty));

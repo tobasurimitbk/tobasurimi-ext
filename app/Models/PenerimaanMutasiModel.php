@@ -187,6 +187,7 @@ class PenerimaanMutasiModel extends Model
         $barangMasterModel = new BarangMasterModel();
         $mutasiDetailModel = new MutasiDetailModel();
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
+        $stockDetail2Model = new StockDetail2Model();
 
         $selectQry = "
             mutasi.no_mutasi, 
@@ -226,6 +227,12 @@ class PenerimaanMutasiModel extends Model
 
             $stock = $stockModel->find($m['stock_id']);
 
+            $stockListDetail = $stockDetail2Model->getStockListDetail(
+                $m['stock_id'],
+                $m['bc_id'],
+                $m['no_aju']
+            );
+
             if ($m['tipe_barang'] == 'kemasan') {
                 // Kemasan
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
@@ -255,6 +262,7 @@ class PenerimaanMutasiModel extends Model
                         'qty_diterima_all' => count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima'],
                         'qty_diterima_current' => count($penerimaanTotalCurrent) == 0 ? 0 : $penerimaanTotalCurrent[0]['qty_diterima'],
                         'qty_sisa' => $m['qty'] - $qtyDiterima,
+                        'stock_date' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
                         // --
                         'no_mutasi' => $m['no_mutasi'],
                         'tipe_barang' => strtoupper(str_replace('_', ' ', $m['tipe_barang'])),
@@ -276,6 +284,7 @@ class PenerimaanMutasiModel extends Model
                         'qty_diterima_all' => count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima'],
                         'qty_diterima_current' => count($penerimaanTotalCurrent) == 0 ? 0 : $penerimaanTotalCurrent[0]['qty_diterima'],
                         'qty_sisa' => $m['qty'] - $qtyDiterima,
+                        'stock_date' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
                         // --
                         'no_mutasi' => $m['no_mutasi'],
                         'tipe_barang' => strtoupper(str_replace('_', ' ', $m['tipe_barang'])),

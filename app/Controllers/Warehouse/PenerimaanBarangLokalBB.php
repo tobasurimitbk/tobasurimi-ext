@@ -429,11 +429,8 @@ class PenerimaanBarangLokalBB extends BaseController
             // MASUKKAN STOK BARANG DAN KEMASAN JIKA NON PABEAN 
             // (JIKA ADA BC MASUK KE INVENTORI DI MODUL BEA CUKAI)
             if ($penerimaanBarang['bc_type'] == 0) {
-
                 // CHECK STOK APAKAH SUDAH DIINISASI
                 foreach ($penerimaanBarangList as $p) {
-                    $barang = $this->barangMasterModel->find($p['barang_id']);
-                    $spesifikasi = $this->barangMasterSpesifikasiModel->find($p['spesifikasi_id']);
 
                     // CHECK STOK BARANG HEADER
                     $stok = $this->stockModel->getStokMaster(
@@ -446,12 +443,15 @@ class PenerimaanBarangLokalBB extends BaseController
                     );
 
                     if ($stok == null) {
-                        return response()->setJSON([
-                            'message' => "Gagal Posting LPB dikarenakan Barang " . $barang['barang_name'] . " (" . $spesifikasi['spesifikasi'] . ") belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                            'token' => csrf_hash(),
-                            'status' => false
-                        ]);
-                        break;
+                        $stok = $this->stockModel->insertStok(
+                            $this->this_company_id,
+                            $penerimaanBarang['warehouse_id'],
+                            $penerimaanBarang['divisi_id'],
+                            "bahan_baku",
+                            $p['barang_id'],
+                            $p['spesifikasi_id'],
+                            0
+                        );
                     }
 
                     // CHECK STOK DETAIL
@@ -465,14 +465,28 @@ class PenerimaanBarangLokalBB extends BaseController
                             $p['spesifikasi_id'],
                             $penerimaanBarang['bc_type'],
                             "-",
-                            $stok['id']
+                            is_array($stok) ? $stok['id'] : $stok,
                         ) == null
                     ) {
-                        return response()->setJSON([
-                            'message' => "Gagal Posting LPB dikarenakan Barang " . $barang['barang_name'] . " (" . $spesifikasi['spesifikasi'] . ") belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                            'token' => csrf_hash(),
-                            'status' => false
-                        ]);
+                        // INSERT STOK INISIASI
+                        $stokDetail = $this->stockDetailModel->insertStokDetail(
+                            is_array($stok) ? $stok['id'] : $stok,
+                            0,
+                            "In",
+                            date('Y-m-d'),
+                            $this->this_user_id,
+                            "INISIASI",
+                            "-",
+                            "-"
+                        );
+                        $this->stockDetail2Model->insertStokDetail2(
+                            $penerimaanBarang['bc_type'],
+                            is_array($stok) ? $stok['id'] : $stok,
+                            $stokDetail,
+                            0,
+                            "-",
+                            "-"
+                        );
                     }
                 }
 
@@ -486,14 +500,16 @@ class PenerimaanBarangLokalBB extends BaseController
                     $penerimaanBarang['kemasan_id'],
                 );
 
-                $kemasan = $this->kemasanModel->find($penerimaanBarang['kemasan_id']);
-
                 if ($stok == null) {
-                    return response()->setJSON([
-                        'message' => "Gagal Posting LPB dikarenakan Kemasan " . $kemasan['name'] . " belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                        'token' => csrf_hash(),
-                        'status' => false
-                    ]);
+                    $stok = $this->stockModel->insertStok(
+                        $this->this_company_id,
+                        $penerimaanBarang['warehouse_id'],
+                        $penerimaanBarang['divisi_id'],
+                        "kemasan",
+                        0,
+                        $penerimaanBarang['kemasan_id'],
+                        0
+                    );
                 }
 
                 // CHECK STOK KEMASAN DETAIL
@@ -507,14 +523,29 @@ class PenerimaanBarangLokalBB extends BaseController
                         $penerimaanBarang['kemasan_id'],
                         $penerimaanBarang['bc_type'],
                         "-",
-                        $stok['id']
+                        is_array($stok) ? $stok['id'] : $stok,
                     ) == null
                 ) {
-                    return response()->setJSON([
-                        'message' => "Gagal Posting LPB dikarenakan Kemasan " . $kemasan['name'] . " belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                        'token' => csrf_hash(),
-                        'status' => false
-                    ]);
+
+                    // INSERT STOK INISIASI
+                    $stokDetail = $this->stockDetailModel->insertStokDetail(
+                        is_array($stok) ? $stok['id'] : $stok,
+                        0,
+                        "In",
+                        date('Y-m-d'),
+                        $this->this_user_id,
+                        "INISIASI",
+                        "-",
+                        "-"
+                    );
+                    $this->stockDetail2Model->insertStokDetail2(
+                        $penerimaanBarang['bc_type'],
+                        is_array($stok) ? $stok['id'] : $stok,
+                        $stokDetail,
+                        0,
+                        "-",
+                        "-"
+                    );
                 }
 
                 // STOK BARANG DIINPUT
