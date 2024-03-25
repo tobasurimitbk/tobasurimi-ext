@@ -85,6 +85,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($adjusment) ? ($adjusment['status_posting'] ? 'disabled' : '') : '' ?> class="form-select tipe_adjusment" id="tipe_adjusment" name="tipe_adjusment" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($tipeAdjusment as $t) : ?>
+                                    <option <?= !empty($adjusment) ? ($adjusment['tipe_adjusment'] == $t['value'] ? 'selected' : '') : '' ?> value="<?= $t['value'] ?>">
+                                        <?= $t['value']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tipe Adjusment</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($adjusment) ? ($adjusment['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($adjusment) ? $adjusment['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Keterangan</label>
                         </div>
@@ -157,8 +170,8 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select operasi" id="operasi" name="operasi" aria-label="Floating label select example">
                                     <option value=""></option>
-                                    <option value="PLUS">PLUS</option>
-                                    <option value="MINUS">MINUS</option>
+                                    <option value="PLUS">PENAMBAHAN STOK</option>
+                                    <option value="MINUS">PENGURANGAN STOK</option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Operasi</label>
                             </div>
@@ -303,6 +316,11 @@
         getListBarang();
     });
 
+    $('#tipe_adjusment').select2({
+        placeholder: "Pilih Tipe Adjusment",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {});
 
     $('#warehouse_id').select2({
         placeholder: "Pilih Warehouse",
@@ -450,7 +468,7 @@
     });
 
 
-    $("#type_barang,#divisi_id,#warehouse_id,#spesifikasi_id,#bc_id,#no_aju,#operasi")
+    $("#type_barang,#divisi_id,#warehouse_id,#spesifikasi_id,#bc_id,#no_aju,#operasi,#tipe_adjusment")
         .parent('div')
         .children('span')
         .children('span')
@@ -683,7 +701,7 @@
             satuan_name: $('#satuan_name').val(),
             warehouse: $('#warehouse_id option:selected').text(),
             warehouse_id: $('#warehouse_id option:selected').val(),
-            operasi: $('#operasi option:selected').text(),
+            operasi: $('#operasi option:selected').val(),
             qty: $('#qty').val()
         });
 
@@ -706,7 +724,7 @@
                 listStock[i].satuan_name = $('#satuan_name').val();
                 listStock[i].warehouse = $('#warehouse_id option:selected').text();
                 listStock[i].warehouse_id = $('#warehouse_id option:selected').val();
-                listStock[i].operasi = $('#operasi option:selected').text();
+                listStock[i].operasi = $('#operasi option:selected').val();
                 listStock[i].qty = $('#qty').val();
             }
         }

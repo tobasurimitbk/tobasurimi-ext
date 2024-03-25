@@ -132,9 +132,7 @@
                                 <th onclick="changeSortStokPerDokumen('bc_id')">Dokumen Pabean</th>
                                 <th onclick="changeSortStokPerDokumen('no_aju')">No Aju</th>
                                 <th>Barang - Spesifikasi</th>
-                                <th onclick="changeSortStokPerDokumen('stok_total')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
+                                <th onclick="changeSortStokPerDokumen('stok_total')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -145,8 +143,6 @@
                                 <td colspan="3"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPerDokumen']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -195,9 +191,7 @@
                                 <th onclick="changeSortStokInisasi('no_aju')">No Aju</th>
                                 <th onclick="changeSortStokInisasi('tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
-                                <th onclick="changeSortStokInisasi('stok_total')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
+                                <th onclick="changeSortStokInisasi('stok_total')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -208,8 +202,6 @@
                                 <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPerInit']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -259,10 +251,8 @@
                                 <th onclick="changeSortPemasukkanBarang('stock_details.no_dokumen')">Dokumen</th>
                                 <th>Supplier</th>
                                 <th onclick="changeSortPemasukkanBarang('stock.barang1_id')">Barang - Spesifikasi</th>
-                                <th onclick="changeSortPemasukkanBarang('stock_details2.qty')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
                                 <th>Harga</th>
+                                <th onclick="changeSortPemasukkanBarang('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -270,12 +260,9 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5"></td>
+                                <td colspan="6"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPerPemasukkan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -307,6 +294,20 @@
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select tipe_adjusment" id="tipe_adjusment" name="tipe_adjusment" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($tipeAdjusment as $t) : ?>
+                                <option value="<?= $t['value'] ?>">
+                                    <?= $t['value'] ?>
+                                </option>
+                            <?php endforeach; ?>
+
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Tipe Adjusment</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_adjusment" id="search_no_aju_stok_adjusment" name="search_no_aju_stok_pemasukkan_barang" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Adjusment </label>
@@ -324,9 +325,9 @@
                                 <th onclick="changeSortStokAdjusment('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortStokAdjusment('stock_details.no_dokumen')">No Adjusment</th>
-                                <th onclick="changeSortStokAdjusment('stock_details2.qty')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
+                                <th>Tipe Adjusment</th>
+                                <th onclick="changeSortStokAdjusment('stock_details.keterangan')">Keterangan</th>
+                                <th onclick="changeSortStokAdjusment('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -334,11 +335,9 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4"></td>
+                                <td colspan="6"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPerAdjusment']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -389,9 +388,7 @@
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortMutasi('stock_details.no_dokumen')">No Penerimaan Mutasi</th>
                                 <th onclick="changeSortMutasi('stock_details2.no_dokumen')">No Mutasi</th>
-                                <th onclick="changeSortMutasi('stock_details2.qty')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
+                                <th onclick="changeSortMutasi('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -402,8 +399,6 @@
                                 <td colspan="5"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalMutasi']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -453,9 +448,7 @@
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortJasaVendor('stock_details.no_dokumen')">No Penerimaan Surat Jalan</th>
                                 <th onclick="changeSortJasaVendor('stock_details2.no_dokumen')">No Surat Jalan</th>
-                                <th onclick="changeSortJasaVendor('stock_details2.qty')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
+                                <th onclick="changeSortJasaVendor('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -466,8 +459,6 @@
                                 <td colspan="5"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalJasaVendor']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -516,9 +507,7 @@
                                 <th onclick="changeSortProduksiOut('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortProduksiOut('stock_details.no_dokumen')">Kode Produksi</th>
-                                <th onclick="changeSortProduksiOut('stock_details2.qty')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
+                                <th onclick="changeSortProduksiOut('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -529,8 +518,6 @@
                                 <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalProduksiOut']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -579,9 +566,7 @@
                                 <th onclick="changeSortProduksiIn('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortProduksiIn('stock_details.no_dokumen')">Kode Produksi</th>
-                                <th onclick="changeSortProduksiIn('stock_details2.qty')">Qty Satuan 1</th>
-                                <th>Qty Satuan 2</th>
-                                <th>Qty Satuan 3</th>
+                                <th onclick="changeSortProduksiIn('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -592,8 +577,6 @@
                                 <td colspan="4"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalProduksiIn']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                                <td><b></b></td>
-                                <td><b></b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -698,18 +681,6 @@
                 data: "stok_1",
                 className: "text-center"
             },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
 
         ],
         "drawCallback": function(settings) {
@@ -807,19 +778,6 @@
                 data: "stok_1",
                 className: "text-center"
             },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-
         ],
         "drawCallback": function(settings) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
@@ -919,28 +877,15 @@
                 className: "text-center",
             },
             {
-                data: "stok_1",
-                className: "text-center"
-            },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
                 data: "harga",
                 className: "text-center",
                 searchable: false,
                 sortable: false
             },
-
+            {
+                data: "stok_1",
+                className: "text-center"
+            }
         ],
         "drawCallback": function(settings) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
@@ -982,6 +927,7 @@
             data: function(data) {
                 data.bc_id = $("#bc_id_stok_adjusment option:selected").val();
                 data.search = $("#search_no_aju_stok_adjusment").val();
+                data.tipe_adjusment = $('#tipe_adjusment option:selected').val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "ADJUSMENT";
 
@@ -1036,20 +982,18 @@
                 className: "text-center",
             },
             {
+                data: "tipe_adjusment",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "keterangan",
+                className: "text-center",
+            },
+            {
                 data: "stok_1",
                 className: "text-center"
-            },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
             },
 
         ],
@@ -1154,18 +1098,6 @@
                 data: "stok_1",
                 className: "text-center"
             },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
 
         ],
         "drawCallback": function(settings) {
@@ -1269,18 +1201,6 @@
                 data: "stok_1",
                 className: "text-center"
             },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
 
         ],
         "drawCallback": function(settings) {
@@ -1381,19 +1301,6 @@
                 data: "stok_1",
                 className: "text-center"
             },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-
         ],
         "drawCallback": function(settings) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
@@ -1492,20 +1399,7 @@
             {
                 data: "stok_1",
                 className: "text-center"
-            },
-            {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-
+            }
         ],
         "drawCallback": function(settings) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
@@ -1591,6 +1485,15 @@
         stokTableProduksiIn.ajax.reload();
     });
 
+    $('#tipe_adjusment').select2({
+        placeholder: "Pilih Tipe Adjusment",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        stokTableAdjusment.ajax.reload();
+    });
+
+
     $('#search_no_aju_stok_per_dokumen').change(function() {
         stokTableDokumenBC.ajax.reload();
     });
@@ -1623,7 +1526,7 @@
         stokTableProduksiOut.ajax.reload();
     });
 
-    $("#bc_id_stok_mutasi,#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang, #bc_id_stok_adjusment,#bc_id_stok_jasa_vendor,#bc_id_stok_produksi_in,#bc_id_stok_produksi_out")
+    $("#bc_id_stok_mutasi,#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang, #bc_id_stok_adjusment,#bc_id_stok_jasa_vendor,#bc_id_stok_produksi_in,#bc_id_stok_produksi_out,#tipe_adjusment")
         .parent('div')
         .children('span')
         .children('span')

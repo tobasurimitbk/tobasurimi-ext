@@ -3,6 +3,7 @@
 namespace App\Controllers\Inventori;
 
 use App\Controllers\BaseController;
+use App\Models\AdjusmentModel;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
@@ -34,6 +35,7 @@ class StokList extends BaseController
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
     protected $supplierModel;
+    protected $adjusmentModel;
 
     public function __construct()
     {
@@ -54,6 +56,7 @@ class StokList extends BaseController
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->supplierModel = new SupplierModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->adjusmentModel = new AdjusmentModel();
     }
 
     public function index()
@@ -460,6 +463,7 @@ class StokList extends BaseController
 
         $data = [
             'jenisDokAju' => $this->metaDataModel->getByName("jenis_dok_aju"),
+            'tipeAdjusment' => $this->metaDataModel->where('deletedAt', null)->where('name', "Tipe Adjusment")->findAll(),
             'stok' => $stok,
             'detail' => $this->stockModel->detailStock($id),
             'total' => [
@@ -778,6 +782,7 @@ class StokList extends BaseController
         $offset = $this->request->getVar("start");
 
         $stok_id = decrypt($this->request->getVar('stok_id'));
+        $tipe_adjusment = $this->request->getVar('tipe_adjusment');
         $stok = $this->stockModel->find($stok_id);
 
         $condition = [
@@ -815,29 +820,74 @@ class StokList extends BaseController
                 $barangMaster = $this->barangMasterModel->find($data->barang1_id);
                 $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
                 $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+                $adjusment = $this->adjusmentModel->where('no_adjusment', $data->no_dokumen1)->first();
 
-                array_push($dataResult, [
-                    "no" => $no++,
-                    "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
-                    "dokumen" => $bcName . " / " . $data->no_aju,
-                    "no_adjusment" => $data->no_dokumen1,
-                    "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
-                    "stok_1" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
-                    "stok_2" => $satuan_2 == null ? "-" : $in_out . (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
-                    "stok_3" => $satuan_3 == null ? "-" : $in_out .  (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_3'])) . " " . $satuan_3['kode_satuan'],
-                ]);
+                if (empty($tipe_adjusment)) {
+                    array_push($dataResult, [
+                        "no" => $no++,
+                        "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                        "dokumen" => $bcName . " / " . $data->no_aju,
+                        "no_adjusment" => $data->no_dokumen1,
+                        "tipe_adjusment" => $adjusment != null ? $adjusment['tipe_adjusment'] : "-",
+                        "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
+                        "keterangan" => strtoupper($data->keterangan),
+                        "stok_1" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
+                        "stok_2" => $satuan_2 == null ? "-" : $in_out . (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
+                        "stok_3" => $satuan_3 == null ? "-" : $in_out .  (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_3'])) . " " . $satuan_3['kode_satuan'],
+                    ]);
+                } else {
+                    if ($adjusment != null) {
+                        if ($tipe_adjusment == $adjusment['tipe_adjusment']) {
+                            array_push($dataResult, [
+                                "no" => $no++,
+                                "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                                "dokumen" => $bcName . " / " . $data->no_aju,
+                                "no_adjusment" => $data->no_dokumen1,
+                                "tipe_adjusment" => $adjusment != null ? $adjusment['tipe_adjusment'] : "-",
+                                "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
+                                "keterangan" => strtoupper($data->keterangan),
+                                "stok_1" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
+                                "stok_2" => $satuan_2 == null ? "-" : $in_out . (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
+                                "stok_3" => $satuan_3 == null ? "-" : $in_out .  (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_3'])) . " " . $satuan_3['kode_satuan'],
+                            ]);
+                        }
+                    }
+                }
             } else {
                 $satuan_1 = $this->satuanModel->find($barang['satuan_id']);
-                array_push($dataResult, [
-                    "no" => $no++,
-                    "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
-                    "dokumen" => $bcName . " / " . $data->no_aju,
-                    "no_adjusment" => $data->no_dokumen1,
-                    "barang" => strtoupper($barang['name']),
-                    "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
-                    "stok_2" => "-",
-                    "stok_3" => "-",
-                ]);
+                $adjusment = $this->adjusmentModel->where('no_adjusment', $data->no_dokumen1)->first();
+
+                if (empty($tipe_adjusment)) {
+                    array_push($dataResult, [
+                        "no" => $no++,
+                        "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                        "dokumen" => $bcName . " / " . $data->no_aju,
+                        "no_adjusment" => $data->no_dokumen1,
+                        "tipe_adjusment" => $adjusment != null ? $adjusment['tipe_adjusment'] : "-",
+                        "barang" => strtoupper($barang['name']),
+                        "keterangan" => strtoupper($data->keterangan),
+                        "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
+                        "stok_2" => "-",
+                        "stok_3" => "-",
+                    ]);
+                } else {
+                    if ($adjusment != null) {
+                        if ($tipe_adjusment == $adjusment['tipe_adjusment']) {
+                            array_push($dataResult, [
+                                "no" => $no++,
+                                "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                                "dokumen" => $bcName . " / " . $data->no_aju,
+                                "no_adjusment" => $data->no_dokumen1,
+                                "tipe_adjusment" => $adjusment != null ? $adjusment['tipe_adjusment'] : "-",
+                                "barang" => strtoupper($barang['name']),
+                                "keterangan" => strtoupper($data->keterangan),
+                                "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
+                                "stok_2" => "-",
+                                "stok_3" => "-",
+                            ]);
+                        }
+                    }
+                }
             }
         }
 

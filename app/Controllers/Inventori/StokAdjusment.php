@@ -15,6 +15,7 @@ use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\SupplierModel;
 use App\Models\UserModel;
 use App\Models\WarehousesModel;
 
@@ -35,6 +36,7 @@ class StokAdjusment extends BaseController
     protected $barangMasterSpesifikasiModel;
     protected $kemasanModel;
     protected $satuanModel;
+    protected $supplierModel;
 
     public function __construct()
     {
@@ -53,6 +55,7 @@ class StokAdjusment extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->kemasanModel = new KemasanModel();
         $this->barangMaster = new BarangMasterModel();
+        $this->supplierModel = new SupplierModel();
     }
 
     public function index()
@@ -137,6 +140,7 @@ class StokAdjusment extends BaseController
         $data = [
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
+            'tipeAdjusment' => $this->metaDataModel->where('deletedAt', null)->where('name', "Tipe Adjusment")->findAll(),
             'tanggal' => date('Y-m-d'),
         ];
 
@@ -150,6 +154,7 @@ class StokAdjusment extends BaseController
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'adjusment' => $this->adjusmentModel->find($id),
+            'tipeAdjusment' => $this->metaDataModel->where('deletedAt', null)->where('name', "Tipe Adjusment")->findAll(),
             'listBarang' => $this->adjusmentDetailModel->getDetail($id)
         ];
 
@@ -170,6 +175,7 @@ class StokAdjusment extends BaseController
             'no_adjusment' => $this->request->getVar('no_adjusment'),
             'tanggal' => date('Y-m-d'),
             'keterangan' => $this->request->getVar('keterangan'),
+            'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
             'status_posting' => '0',
             'createdBy' => $this->this_user_id
         ]);
@@ -206,6 +212,7 @@ class StokAdjusment extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'keterangan' => $this->request->getVar('keterangan'),
+            'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
             'status_posting' => '0',
             'createdBy' => $this->this_user_id
         ]);
@@ -384,13 +391,20 @@ class StokAdjusment extends BaseController
             }
             for ($i = 0; $i < count($dataResult); $i++) {
                 $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
+                $supplier = $this->supplierModel->select('suppliers.*')
+                    ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
+                    ->where('penerimaan_barang.no_penerimaan_barang', $dataResult[$i]['no_dokumen_1'])
+                    ->first();
+
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                 $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
                 $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
                 $dataResult[$i]['barang'] = strtoupper($barangName);
+                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
                 $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+                $dataResult[$i]['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
                 $dataResult[$i]['stok_total'] = number_format($dataResult[$i]['stok_total']);
             }
             return response()->setJSON([
