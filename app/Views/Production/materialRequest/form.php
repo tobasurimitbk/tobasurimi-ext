@@ -630,7 +630,7 @@
             errorClass: 'text-danger',
             errorPlacement: function(error, element) {
                 var elem = $(element);
-                console.log(elem);
+                // console.log(elem);
                 if (elem.hasClass("multiple_po_id")) {
                     element = $(".select2-selection--multiple").parent();
                     error.insertAfter(element);
@@ -653,7 +653,7 @@
         });
 
         $('.btn-save').click(function() {
-            console.log(listStockSelected);
+            // console.log(listStockSelected);
             if (listStockSelected.length == 0) {
                 Swal.fire({
                     icon: 'error',
@@ -870,7 +870,7 @@
                 $(".select_nama_barang").empty()
                 $(".select_nama_barang").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    console.log(item);
+                    // console.log(item);
                     $(".select_nama_barang").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
                 })
                 $(".select_nama_barang").val();
@@ -972,6 +972,7 @@
                 if (!isIDSelected) {
                     listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                     listStockAsal[i].qty = 0;
+                    console.log(listStockAsal[i]);
                     listStockSelected.push(listStockAsal[i]);
                 }
             }
