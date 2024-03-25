@@ -61,18 +61,6 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
-                            <label for="floatingInput">Tanggal Request</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
-                            <label for="floatingInput">Tanggal Produksi</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input value="AUTO GENERATE" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
@@ -82,6 +70,18 @@
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div> -->
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                            <label for="floatingInput">Tanggal Request</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <label for="floatingInput">Tanggal Produksi</label>
                         </div>
                     </div>
                 </div>
@@ -146,6 +146,7 @@
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
                                 <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty</th>
@@ -163,19 +164,86 @@
                     </button>
                 </div>
             </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">Data Bahan Baku Request</label>
+                    </div>
+                </div>
+            </div>
             <div class="row mt-3">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahanBaku" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
                                 <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Awal</th>
-                                <th style="text-align: center;">Qty Digunakan</th>
+                                <th style="text-align: center;">Qty Sortir</th>
+                                <th style="text-align: center;">Qty Direquest</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Scrap dan Penolong Request</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahan" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">Dokumen Pabean</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Tanggal Penerimaan</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Qty Awal</th>
+                                <th style="text-align: center;">Qty Direquest</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Jadi Request</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahanJadi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">Dokumen Pabean</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Tanggal Penerimaan</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Qty Awal</th>
+                                <th style="text-align: center;">Qty Direquest</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -193,148 +261,14 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     let list_items = [];
-    var listStockSelected = [];
+    var listStockSelectedBahanBaku = [];
+    var listStockSelectedBahan = [];
+    var listStockSelectedBahanJadi = [];
 
     let sortDataBarang = "createdAt";
     let sortTypeDataBarang = "DESC";
 
     $(document).ready(function() {
-        const dataTableBarang = $('.dataTableBarang').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: true,
-            order: [
-                [4, 'desc']
-            ],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("material-request/data-barang"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.bc_id = "";
-                    data.no_aju = "";
-                    data.id = $("#select_nama_barang option:selected").val() ? $("#select_nama_barang option:selected").val() : "";
-                    data.spek_id = $("#select_nama_barang option:selected").data("spesifikasi_id") ? $("#select_nama_barang option:selected").data("spesifikasi_id") : "";
-
-                    data.sort = sortDataBarang;
-                    data.sortType = sortTypeDataBarang;
-                },
-                beforeSend: function() {
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesomeColor: "#222FCC",
-                        fontawesome: "fa fa-cog fa-spin"
-                    });
-                },
-                complete: function() {
-                    $.LoadingOverlay("hide", {
-                        image: "",
-                        fontawesomeColor: "#222FCC",
-                        fontawesome: "fa fa-cog fa-spin"
-                    });
-                },
-            },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false,
-                    render: function(data, type, full, meta) {
-                        // Return a checkbox input
-                        return '<input type="checkbox" class="checkbox_no" value="' + data.no + '" data-stock_id="' + data.stock_id + '">';
-                    }
-                },
-                {
-                    data: "dokumen",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "stock",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "warehouse",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "kode",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "barang",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "satuan",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                },
-                {
-                    data: "qty",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false
-                }, {
-                    data: "no",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false,
-                    render: function(data, type, full, meta) {
-                        return '<input type="text" class="form-control jumlahBarang" id="jumlahBarang" name="jumlahBarang" value="">';
-                    }
-                }, {
-                    data: "no",
-                    className: "text-center",
-                    searchable: false,
-                    sortable: false,
-                    render: function(data, type, full, meta) {
-                        return '<input type="text" class="form-control ketBarang" id="ketBarang" name="ketBarang" value="">';
-                    }
-                },
-            ],
-            "drawCallback": function(settings) {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-                var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl)
-                });
-            },
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
         // Departemen
         $('.department_id').select2({
             placeholder: "Pilih Departemen",
@@ -524,9 +458,9 @@
             format: 'dd/mm/yyyy'
         });
 
-        $(".select_nama_barang").change(function() {
-            dataTableBarang.ajax.reload();
-        })
+        // $(".select_nama_barang").change(function() {
+        //     dataTableBarang.ajax.reload();
+        // })
 
         var validator_detail = $(".detail-form").validate({
             rules: {
@@ -653,8 +587,8 @@
         });
 
         $('.btn-save').click(function() {
-            // console.log(listStockSelected);
-            if (listStockSelected.length == 0) {
+            // console.log(listStockSelectedBahanBaku);
+            if (listStockSelectedBahanBaku.length == 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Barang yang akan direquest tidak boleh kosong !',
@@ -666,16 +600,16 @@
                     var isValid = true;
                     var dataError = null;
 
-                    $.each(listStockSelected, function(i, v) {
+                    $.each(listStockSelectedBahanBaku, function(i, v) {
                         var element = $('input[data-id="' + v.id + '"].stok-mutasi');
                         var input_user = parseFloat(element.val());
                         var stok_max = parseFloat(element.data('stok_total'));
 
                         if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                            dataError = listStockSelected[i];
+                            dataError = listStockSelectedBahanBaku[i];
                             isValid = false;
                         } else {
-                            listStockSelected[i].qty = input_user;
+                            listStockSelectedBahanBaku[i].qty = input_user;
                         }
                     });
 
@@ -700,7 +634,7 @@
                             if (result.isConfirmed) {
                                 let id = $('#id').val();
                                 let data = new FormData(document.querySelector(".create-form"));
-                                data.append('listMaterial', JSON.stringify(listStockSelected));
+                                data.append('listMaterial', JSON.stringify(listStockSelectedBahanBaku));
                                 if (id) {
                                     // UPDATE
                                     $.ajax({
@@ -920,6 +854,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
@@ -939,7 +874,7 @@
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
             },
             display: "stripe",
-            searching: true,
+            searching: false,
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -964,29 +899,56 @@
         $.each(listStockAsal, function(i, v) {
             var currentID = Number(v.id);
 
-            if ($.inArray(currentID, dataIds) !== -1) {
-                var isIDSelected = $.grep(listStockSelected, function(item) {
-                    return item.id == Number(currentID);
-                }).length > 0;
+            if (listStockAsal[i].type_barang == "bahan_baku") {
+                if ($.inArray(currentID, dataIds) !== -1) {
+                    var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
+                        return item.id == Number(currentID);
+                    }).length > 0;
 
-                if (!isIDSelected) {
-                    listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                    listStockAsal[i].qty = 0;
-                    console.log(listStockAsal[i]);
-                    listStockSelected.push(listStockAsal[i]);
+                    if (!isIDSelected) {
+                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                        listStockAsal[i].qty = 0;
+                        listStockSelectedBahanBaku.push(listStockAsal[i]);
+                    }
+                }
+            } else if (listStockAsal[i].type_barang == "bahan_jadi") {
+                if ($.inArray(currentID, dataIds) !== -1) {
+                    var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
+                        return item.id == Number(currentID);
+                    }).length > 0;
+
+                    if (!isIDSelected) {
+                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                        listStockAsal[i].qty = 0;
+                        listStockSelectedBahanJadi.push(listStockAsal[i]);
+                    }
+                }
+            } else {
+                if ($.inArray(currentID, dataIds) !== -1) {
+                    var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
+                        return item.id == Number(currentID);
+                    }).length > 0;
+
+                    if (!isIDSelected) {
+                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                        listStockAsal[i].qty = 0;
+                        listStockSelectedBahan.push(listStockAsal[i]);
+                    }
                 }
             }
         });
 
-        drawTableSelectedItem(listStockSelected);
+        drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
+        drawTableSelectedItemBahan(listStockSelectedBahan);
+        drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
     });
 
-    function drawTableSelectedItem(data) {
-        if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
-            $('#selectedItemTable').DataTable().clear().draw();
-            selectedItemTable.destroy();
+    function drawTableSelectedItemBahanBaku(data) {
+        if ($.fn.DataTable.isDataTable('#selectedItemTableBahanBaku')) {
+            $('#selectedItemTableBahanBaku').DataTable().clear().draw();
+            selectedItemTableBahanBaku.destroy();
         }
-        const table = $('#selectedItemTable');
+        const table = $('#selectedItemTableBahanBaku');
         var no = 1;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
@@ -998,23 +960,29 @@
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                <input class="form-control stok-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <button <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                <input class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
             ));
             table.find('tbody').append(newRow);
         });
 
-        selectedItemTable = $('#selectedItemTable').DataTable({
+        selectedItemTableBahanBaku = $('#selectedItemTableBahanBaku').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: false,
             serverSide: false,
@@ -1027,7 +995,7 @@
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
             },
             display: "stripe",
-            searching: true,
+            searching: false,
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1038,28 +1006,178 @@
             }
         });
 
-        selectedItemTable.draw();
+        selectedItemTableBahanBaku.draw();
+    }
+
+    function drawTableSelectedItemBahan(data) {
+        if ($.fn.DataTable.isDataTable('#selectedItemTableBahan')) {
+            $('#selectedItemTableBahan').DataTable().clear().draw();
+            selectedItemTableBahan.destroy();
+        }
+        const table = $('#selectedItemTableBahan');
+        var no = 1;
+        $.each(data, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+               ${no++} 
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align: center;">').text(v.satuan));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <input class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+            `
+            ));
+            table.find('tbody').append(newRow);
+        });
+
+        selectedItemTableBahan = $('#selectedItemTableBahan').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: false,
+            serverSide: false,
+            ordering: true,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        selectedItemTableBahan.draw();
+    }
+
+    function drawTableSelectedItemBahanJadi(data) {
+        if ($.fn.DataTable.isDataTable('#selectedItemTableBahanJadi')) {
+            $('#selectedItemTableBahanJadi').DataTable().clear().draw();
+            selectedItemTableBahanJadi.destroy();
+        }
+        const table = $('#selectedItemTableBahanJadi');
+        var no = 1;
+        $.each(data, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+               ${no++} 
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align: center;">').text(v.satuan));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <input class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanJadi(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+            `
+            ));
+            table.find('tbody').append(newRow);
+        });
+
+        selectedItemTableBahanJadi = $('#selectedItemTableBahanJadi').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: false,
+            serverSide: false,
+            ordering: true,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        selectedItemTableBahanJadi.draw();
     }
 
     function getIDListDataSelected() {
         var id_selected = [];
-        $.each(listStockSelected, function(i, v) {
+        $.each(listStockSelectedBahanBaku, function(i, v) {
             id_selected.push(v.id);
         })
         return id_selected;
     }
 
-    function deleteDetail(id) {
+    function deleteDetailBahanBaku(id) {
         var indexToRemove = -1;
-        for (var i = 0; i < listStockSelected.length; i++) {
-            if (listStockSelected[i].id == id) {
+        for (var i = 0; i < listStockSelectedBahanBaku.length; i++) {
+            if (listStockSelectedBahanBaku[i].id == id) {
                 indexToRemove = i;
                 break;
             }
         }
         if (indexToRemove !== -1) {
-            listStockSelected.splice(indexToRemove, 1);
-            drawTableSelectedItem(listStockSelected);
+            listStockSelectedBahanBaku.splice(indexToRemove, 1);
+            drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
+        }
+    }
+
+    function deleteDetailBahan(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listStockSelectedBahan.length; i++) {
+            if (listStockSelectedBahan[i].id == id) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listStockSelectedBahan.splice(indexToRemove, 1);
+            drawTableSelectedItemBahan(listStockSelectedBahan);
+        }
+    }
+
+    function deleteDetailBahanJadi(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listStockSelectedBahanJadi.length; i++) {
+            if (listStockSelectedBahanJadi[i].id == id) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listStockSelectedBahanJadi.splice(indexToRemove, 1);
+            drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
         }
     }
 
