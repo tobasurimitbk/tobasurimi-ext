@@ -92,6 +92,7 @@ class JasaVendorOutDetailModel extends Model
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = number_format($stockList['stok_total']);
+            $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
             $stockList['output'] = [
                 'barang' => $barangNameOutput,
                 'stock_id' => $stockOutput['id']

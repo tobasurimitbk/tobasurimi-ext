@@ -76,6 +76,7 @@ class MutasiDetailModel extends Model
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
             $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+            $stockList['stock_date'] = $stockList != null ? date('d/m/Y', strtotime($stockList['stock_date'])) : "-";
             $stockList['satuan'] = $satuan['kode_satuan'];
             $stockList['barang'] = strtoupper($barangName);
             $stockList['stock_id'] = $stockList['stock_id'];

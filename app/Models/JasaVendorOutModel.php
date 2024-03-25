@@ -114,14 +114,14 @@ class JasaVendorOutModel extends Model
         ];
     }
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $divisi_id)
+    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouse_id)
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('jasa_vendor_out');
         $builder->select('no_surat_jalan');
         $builder->orderBy('no_surat_jalan', 'desc');
-        $builder->where('jasa_vendor_out.divisi_id', $divisi_id);
+        $builder->where('jasa_vendor_out.warehouse_id', $warehouse_id);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_surat_jalan', $lastStr);

@@ -85,7 +85,8 @@
                             <th onclick="changeSort('jasa_vendor_in.createdAt')">Tanggal</th>
                             <th onclick="changeSort('divisi_id')">Departemen</th>
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
-                            <th onclick="changeSort('warehouse_id')">No Surat Jalan</th>
+                            <th>No Surat Jalan</th>
+                            <th onclick="changeSort('no_surat_jalan_vendor')">No Surat Jalan Vendor</th>
                             <th>Total Item</th>
                             <th onclick="changeSort('vendor_id')">Vendor</th>
                             <th>Action</th>
@@ -167,6 +168,10 @@
                 className: "text-center",
                 searchable: false,
                 sortable: false
+            },
+            {
+                data: "no_surat_jalan_vendor",
+                className: "text-center",
             },
             {
                 data: "total_item",

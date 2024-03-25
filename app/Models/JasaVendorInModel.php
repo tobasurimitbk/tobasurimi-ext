@@ -48,7 +48,8 @@ class JasaVendorInModel extends Model
             'jasa_vendor_in.createdAt' => 'jasa_vendor_in.createdAt',
             'jasa_vendor_in.divisi_id' => 'jasa_vendor_in.divisi_id',
             'jasa_vendor_in.warehouse_id' => 'jasa_vendor_in.warehouse_id',
-            'vendor_id' => 'vendor_id'
+            'vendor_id' => 'vendor_id',
+            'no_surat_jalan_vendor' => 'no_surat_jalan_vendor',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -121,6 +122,7 @@ class JasaVendorInModel extends Model
         $jasaVendorInDetailModel = new JasaVendorInDetailModel();
         $stockModel = new StockModel();
         $metaDataModel = new MetadataModel();
+        $stockDetail2Model = new StockDetail2Model();
 
         $jasaVendorOutData = $jasaVendorOutDetailModel->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)->where('deletedAt', null)->findAll();
         $result = array();
@@ -128,6 +130,11 @@ class JasaVendorInModel extends Model
         foreach ($jasaVendorOutData as $j) {
             $stockBarangOut = $stockModel->find($j['stock_out_id']);
             $stockBarangIn = $stockModel->find($j['stock_in_id']);
+            $stockListOutDetail = $stockDetail2Model->getStockListDetail(
+                $j['stock_out_id'],
+                $j['bc_out_id'],
+                $j['no_aju_out']
+            );
 
             $barangOut = self::getDetailBarang($stockBarangOut);
             $barangIn = self::getDetailBarang($stockBarangIn);
@@ -145,6 +152,7 @@ class JasaVendorInModel extends Model
                     'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                     'stock_out_id' => $j['stock_out_id'],
                     'stock_in_id' => $j['stock_in_id'],
+                    'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                     'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
                     'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                     'bc_id' => $j['bc_out_id'],
@@ -164,6 +172,7 @@ class JasaVendorInModel extends Model
                         'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                         'stock_out_id' => $j['stock_out_id'],
                         'stock_in_id' => $j['stock_in_id'],
+                        'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                         'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
                         'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                         'bc_id' => $j['bc_out_id'],
@@ -211,14 +220,14 @@ class JasaVendorInModel extends Model
         return $result;
     }
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $divisi_id)
+    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouse_id)
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('jasa_vendor_in');
         $builder->select('no_penerimaan_surat_jalan');
         $builder->orderBy('no_penerimaan_surat_jalan', 'desc');
-        $builder->where('jasa_vendor_in.divisi_id', $divisi_id);
+        $builder->where('jasa_vendor_in.warehouse_id', $warehouse_id);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_penerimaan_surat_jalan', $lastStr);

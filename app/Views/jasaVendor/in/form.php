@@ -139,6 +139,12 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorIn) ? $jasaVendorIn['no_surat_jalan_vendor'] : '' ?>" class="form-control no_surat_jalan_vendor" id="no_surat_jalan_vendor" name="no_surat_jalan_vendor" aria-label="Floating label select example" />
+                            <label for="floatingInput" style="z-index: 1;">No Surat Jalan Vendor</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorIn) ? $jasaVendorIn['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Keterangan</label>
                         </div>
@@ -152,7 +158,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="4">Detail Dokumen Pabean</th>
+                                    <th style="text-align: center;" colspan="5">Detail Dokumen Pabean</th>
                                     <th style="text-align: center;" colspan="3">Daftar Barang Keluar</th>
                                     <th style="text-align: center;" colspan="4">Daftar Barang Masuk</th>
                                 </tr>
@@ -161,10 +167,12 @@
                                     <th style="text-align: center;">Tipe Barang</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
                                     <th style="text-align: center;">No Aju</th>
+                                    <th style="text-align: center;">Tgl Penerimaan</th>
+
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan Output</th>
-                                    <th style="text-align: center;">Qty Output</th>
+                                    <th style="text-align: center;">Qty Keluar</th>
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan Masuk</th>
@@ -292,6 +300,9 @@
             warehouse_id: {
                 required: true
             },
+            no_surat_jalan_vendor: {
+                required: true
+            },
             keterangan: {
                 required: true
             },
@@ -308,6 +319,9 @@
             },
             warehouse_id: {
                 required: "Warehouse wajib diisi"
+            },
+            no_surat_jalan_vendor: {
+                required: "No surat jalan vendor wajib diisi"
             },
             keterangan: {
                 required: "Keterangan wajib diisi"
@@ -522,6 +536,7 @@
                 newRow.append($('<td>').text(v.tipe_barang));
                 newRow.append($('<td>').text(v.bc_name));
                 newRow.append($('<td>').text(v.no_aju));
+                newRow.append($('<td>').text(v.stock_date));
                 newRow.append($('<td>').text(v.barang_out));
                 newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.qty_out));
