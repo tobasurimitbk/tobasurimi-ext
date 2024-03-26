@@ -145,19 +145,34 @@ class MaterialRequest extends BaseController
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
             $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
-            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.nama_satuan')
+            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
                 ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
+                ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
                 ->where('material_request_id', $id)
                 ->get()->getResult();
+            foreach ($dataMaterialRequestDetails as $key => &$value) {
+                if ($value->barang_type == "bahan_baku") {
+                    $value->barang_type_text = "Bahan Baku";
+                } elseif ($value->barang_type == "bahan_penolong") {
+                    $value->barang_type_text = "Bahan Penolong";
+                } elseif ($value->barang_type == "bahan_jadi") {
+                    $value->barang_type_text = "Bahan Jadi";
+                } elseif ($value->barang_type == "bahan_scrap") {
+                    $value->barang_type_text = "Bahan Scrap";
+                } elseif ($value->barang_type == "bahan_modal") {
+                    $value->barang_type_text = "Bahan Modal";
+                }
+            }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
             $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
             $data["ids"] = $ids;
         }
 
-        var_dump($data);
+        // var_dump($data);
         // exit;
 
         return view('Production/materialRequest/form', $data);
@@ -395,70 +410,77 @@ class MaterialRequest extends BaseController
     public function update()
     {
         try {
-            $rules = [
-                "barang_id" => [
-                    "rules" => "required"
-                ],
-                "production_amt" => [
-                    "rules" => "required"
-                ],
-                "satuan_id" => [
-                    "rules" => "required"
-                ],
-                "target" => [
-                    "rules" => "required"
-                ]
-            ];
+            $id = decrypt($this->request->getPost("id"));
+            $mr_detail = json_decode($this->request->getVar("listMaterial"));
+            // var_dump($mr_detail);
+            // exit;
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-                // $no = $this->workOrdersModel->get_no();
-                $payload = [
-                    "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
-                    "barang_id" => formatter($this->request->getPost("barang_id"), "STR_TO_INT"),
-                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "target" => $this->request->getPost("target"),
-                    "production_amt" => $this->request->getPost("production_amt")
-                ];
-
-                $condition = [
-                    'id' => $id
-                ];
-
-                $response = $this->workOrdersModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+            foreach ($mr_detail as $s) {
+                if (!empty($s->id_material_request_detail)) {
+                    if ($s->type_barang == "bahan_jadi") {
+                        $dataMaterialDetail = [
+                            'qty' => $s->qty_request,
+                            'qty2' => $s->qty_request_kaleng,
+                            'qty_isi' => $s->qty_isi,
+                        ];
+                    } else {
+                        $dataMaterialDetail = [
+                            'qty' => $s->qty,
+                            'qty2' => $s->qty2,
+                        ];
+                    }
+                    $this->materialRequestDetailsModel->update($s->id_material_request_detail, $dataMaterialDetail);
                 } else {
-                    $message =  'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                    $stockBarang =  $this->stockModel->asObject()->find($s->stock_id);
+                    $stockDetailBarang =  $this->stockDetailModel->asObject()->find($s->stock_detail_id);
+                    if ($s->type_barang == "bahan_jadi") {
+                        $dataMaterialDetail = [
+                            'material_request_id' => $id,
+                            'divisi_id' => $s->departmentID,
+                            'warehouse_id' => $s->warehouseID,
+                            'barang1_id' => $stockBarang->barang1_id,
+                            'barang2_id' => $stockBarang->barang2_id,
+                            'nama_barang' => $s->barang,
+                            'satuan' => $s->satuan,
+                            'stock_id' => $s->stock_id,
+                            'bc_id' => $s->bc_id,
+                            'no_aju' => $s->no_aju,
+                            'ref_no' => $s->bc_type,
+                            'stock_date' => $stockDetailBarang->stock_date,
+                            'barang_type' => $s->type_barang,
+                            'qty' => $s->qty_request,
+                            'qty2' => $s->qty_request_kaleng,
+                            'qty_isi' => $s->qty_isi,
+                        ];
+                    } else {
+                        $dataMaterialDetail = [
+                            'material_request_id' => $id,
+                            'divisi_id' => $s->departmentID,
+                            'warehouse_id' => $s->warehouseID,
+                            'barang1_id' => $stockBarang->barang1_id,
+                            'barang2_id' => $stockBarang->barang2_id,
+                            'nama_barang' => $s->barang,
+                            'satuan' => $s->satuan,
+                            'stock_id' => $s->stock_id,
+                            'bc_id' => $s->bc_id,
+                            'no_aju' => $s->no_aju,
+                            'ref_no' => $s->bc_type,
+                            'stock_date' => $stockDetailBarang->stock_date,
+                            'barang_type' => $s->type_barang,
+                            'qty' => $s->qty,
+                            'qty2' => $s->qty2,
+                        ];
+                    }
+                    $this->materialRequestDetailsModel->insert($dataMaterialDetail);
                 }
             }
+
+            return response()->setJSON([
+                "id"      => encrypt($id),
+                "status"  => true,
+                "message" => "Data Berhasil disimpan",
+                'token'   => csrf_hash(),
+            ]);
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
