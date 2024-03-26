@@ -63,7 +63,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($prosesRebus) ? $prosesRebus['tanggal'] : $tanggal)); ?>">
+                                    <input <?= !empty($prosesRebus) ? ($prosesRebus['status_posting'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($prosesRebus) ? $prosesRebus['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Rebus</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
