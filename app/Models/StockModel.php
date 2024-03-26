@@ -642,4 +642,33 @@ class StockModel extends Model
 
         return $dataResult;
     }
+
+    public function getBarangRebusAndStock($type_barang, $divisi_id, $warehouse_id)
+    {
+        // LIST BARANG
+        $selectQry = "
+        stock.id AS stock_id,
+        stock.barang2_id AS spesifikasi_id,
+        CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
+        barang_master.kode_barang,
+        satuans.kode_satuan
+    ";
+
+        $dataResult = $this->asArray()->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('stock.tipe_barang', $type_barang)
+            ->where('stock.divisi_id', $divisi_id)
+            ->where('stock.warehouse_id', $warehouse_id)
+            ->where('stock.deletedAt', null)
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            ->like('barang_master.barang_name', '%' . "UDANG" . '%')
+            ->orLike('barang_master.barang_name', '%' . "KEPITING" . '%')
+            ->orderBy('barang_master.kode_barang', "ASC")
+            ->findAll();
+
+        return $dataResult;
+    }
 }
