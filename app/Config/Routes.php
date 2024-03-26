@@ -679,6 +679,21 @@ $routes->get('/kemasan/all', 'Warehouse\Kemasan::all', ['filter' => 'Auth']);
 $routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode', ['filter' => 'Auth']);
 
 // JASA VENDOR
+// REBUSAN
+$routes->get('/proses-rebus', 'JasaVendor\ProsesRebus::index', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/create', 'JasaVendor\ProsesRebus::create', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/list-barang-stock-init', 'JasaVendor\ProsesRebus::dropdownListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/list-barang-rebus', 'JasaVendor\ProsesRebus::dropdownListHasilRebus', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/all',  'JasaVendor\ProsesRebus::all', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/id/(:segment)',  'JasaVendor\ProsesRebus::detail/$1', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/save',  'JasaVendor\ProsesRebus::createAction', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateAction', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/delete',  'JasaVendor\ProsesRebus::delete', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/posting',  'JasaVendor\ProsesRebus::posting', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/get-no',  'JasaVendor\ProsesRebus::getProsesRebusNo', ['filter' => 'Auth']);
+
 // JASA VENDOR OUT
 $routes->get('/jasa-vendor-out',  'JasaVendor\JasaVendorOut::index', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/create',  'JasaVendor\JasaVendorOut::create', ['filter' => 'Auth']);
@@ -731,6 +746,7 @@ $routes->get('/stock-list/stock-log-adjusment', 'Inventori\StokList::allStokAdju
 $routes->get('/stock-list/stock-log-mutasi', 'Inventori\StokList::allStokMutasi', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-jasa-vendor', 'Inventori\StokList::allStokJasaVendor', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-produksi', 'Inventori\StokList::allStokProduksi', ['filter' => 'Auth']);
+$routes->get('/stock-list/stock-log-rebus', 'Inventori\StokList::allStokRebus', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);
