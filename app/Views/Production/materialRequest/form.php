@@ -4,7 +4,11 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Material Request</h1>
+        <?php if (isset($ids)) { ?>
+            <h1 class="title-name">Edit Material Request</h1>
+        <?php } else { ?>
+            <h1 class="title-name">Tambah Material Request</h1>
+        <?php } ?>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
                 Batal
@@ -17,7 +21,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="text" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
+                <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
@@ -279,38 +283,86 @@
     let sortDataBarang = "createdAt";
     let sortTypeDataBarang = "DESC";
 
+    <?php if (!empty($dataMaterialRequestDetails)) : ?>
+        <?php foreach ($dataMaterialRequestDetails as $materialRequestDetails) : ?>
+            <?php if ($materialRequestDetails->barang_type == "bahan_baku") { ?>
+                listStockSelectedBahanBaku.push({
+                    id_material_request_detail: "<?= $materialRequestDetails->id ?>",
+                    barang: "<?= $materialRequestDetails->nama_barang ?>",
+                    bc_id: "<?= $materialRequestDetails->bc_id ?>",
+                    bc_type: "<?= $materialRequestDetails->ref_no ?>",
+                    departmentID: "<?= $materialRequestDetails->divisi_id ?>",
+                    departmentText: "<?= $materialRequestDetails->divisi_text ?>",
+                    no_aju: "<?= $materialRequestDetails->no_aju ?>",
+                    no_dokumen_1: "-",
+                    no_dokumen_2: "-",
+                    qty: "<?= $materialRequestDetails->qty ?>",
+                    qty2: "<?= $materialRequestDetails->qty2 ?>",
+                    satuan: "<?= $materialRequestDetails->kode_satuan ?>",
+                    stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
+                    stock_id: "<?= $materialRequestDetails->stock_id ?>",
+                    stok_total: "<?= $materialRequestDetails->qty ?>",
+                    supplier_name: "-",
+                    type_barang: "<?= $materialRequestDetails->barang_type ?>",
+                    type_barang_text: "<?= $materialRequestDetails->barang_type_text ?>",
+                    warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
+                    warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
+                });
+            <?php } else if ($materialRequestDetails->barang_type == "bahan_jadi") { ?>
+                listStockSelectedBahanJadi.push({
+                    id_material_request_detail: "<?= $materialRequestDetails->id ?>",
+                    barang: "<?= $materialRequestDetails->nama_barang ?>",
+                    bc_id: "<?= $materialRequestDetails->bc_id ?>",
+                    bc_type: "<?= $materialRequestDetails->ref_no ?>",
+                    departmentID: "<?= $materialRequestDetails->divisi_id ?>",
+                    departmentText: "<?= $materialRequestDetails->divisi_text ?>",
+                    no_aju: "<?= $materialRequestDetails->no_aju ?>",
+                    no_dokumen_1: "-",
+                    no_dokumen_2: "-",
+                    qty: "<?= $materialRequestDetails->qty2 ?>",
+                    qty2: "<?= $materialRequestDetails->qty_isi ?>",
+                    satuan: "<?= $materialRequestDetails->kode_satuan ?>",
+                    stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
+                    stock_id: "<?= $materialRequestDetails->stock_id ?>",
+                    stok_total: "<?= $materialRequestDetails->qty ?>",
+                    supplier_name: "-",
+                    type_barang: "<?= $materialRequestDetails->barang_type ?>",
+                    type_barang_text: "<?= $materialRequestDetails->barang_type_text ?>",
+                    warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
+                    warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
+                });
+            <?php } else { ?>
+                listStockSelectedBahan.push({
+                    id_material_request_detail: "<?= $materialRequestDetails->id ?>",
+                    barang: "<?= $materialRequestDetails->nama_barang ?>",
+                    bc_id: "<?= $materialRequestDetails->bc_id ?>",
+                    bc_type: "<?= $materialRequestDetails->ref_no ?>",
+                    departmentID: "<?= $materialRequestDetails->divisi_id ?>",
+                    departmentText: "<?= $materialRequestDetails->divisi_text ?>",
+                    no_aju: "<?= $materialRequestDetails->no_aju ?>",
+                    no_dokumen_1: "-",
+                    no_dokumen_2: "-",
+                    qty: "<?= $materialRequestDetails->qty ?>",
+                    qty2: "<?= $materialRequestDetails->qty2 ?>",
+                    satuan: "<?= $materialRequestDetails->kode_satuan ?>",
+                    stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
+                    stock_id: "<?= $materialRequestDetails->stock_id ?>",
+                    stok_total: "<?= $materialRequestDetails->qty ?>",
+                    supplier_name: "-",
+                    type_barang: "<?= $materialRequestDetails->barang_type ?>",
+                    type_barang_text: "<?= $materialRequestDetails->barang_type_text ?>",
+                    warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
+                    warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
+                });
+            <?php } ?>
+        <?php endforeach; ?>
+        // console.log(listStockSelectedBahan);
+        // console.log(listStockSelectedBahanJadi);
+        drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
+        drawTableSelectedItemBahan(listStockSelectedBahan);
+        drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
+    <?php endif; ?>
     $(document).ready(function() {
-        <?php if (!empty($materialRequestDetails)) : ?>
-            <?php foreach ($dataMaterialRequestDetails as $materialRequestDetails) : ?>
-                <?php if ($materialRequestDetails->barang_type == "bahan_baku") { ?>
-                    listStockSelectedBahanBaku.push({
-                        barang: <?= $materialRequestDetails->nama_barang ?>,
-                        bc_id: "48",
-                        bc_type: "BC 2.3",
-                        departmentID: "28",
-                        departmentText: "CANNING",
-                        id: "258",
-                        no_aju: "000023-017189-20240212-000010",
-                        no_dokumen_1: "-",
-                        no_dokumen_2: "-",
-                        qty: 0,
-                        qty2: 0,
-                        satuan: "KG",
-                        stock_date: "18/03/2024",
-                        stock_detail_id: "792",
-                        stock_id: "35",
-                        stok_total: 21,
-                        supplier_name: "-",
-                        type_barang: "bahan_baku",
-                        type_barang_text: "BAHAN BAKU",
-                        warehouseID: "3",
-                        warehouseText: "WH1 CAN KIM 1"
-                    });
-                <?php } else if ($materialRequestDetails->barang_type == "bahan_jadi") { ?>
-                <?php } else { ?>
-                <?php } ?>
-            <?php endforeach; ?>
-        <?php endif; ?>
         // Departemen
         $('.department_id').select2({
             placeholder: "Pilih Departemen",
@@ -632,7 +684,7 @@
 
         $('.btn-save').click(function() {
             // console.log(listStockSelectedBahanBaku);
-            if (listStockSelectedBahanBaku.length == 0) {
+            if (listStockSelectedBahanBaku.length == 0 || listStockSelectedBahan.length == 0 || listStockSelectedBahanJadi.length == 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Barang yang akan direquest tidak boleh kosong !',
