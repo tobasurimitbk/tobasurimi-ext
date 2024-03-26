@@ -61,7 +61,7 @@ class MaterialRequestsModel extends Model
     {
         $availableSort = [
             'req_no'             => 'material_requests.req_no',
-            'department'       => 'divisis.divisi',
+            'wo_no'       => 'work_orders.wo_no',
             'nama_barang'       => 'material_request_details.nama_barang',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -70,20 +70,18 @@ class MaterialRequestsModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "material_requests.*,
-            material_request_details.nama_barang,
+            GROUP_CONCAT(material_request_details.nama_barang SEPARATOR ',') AS nama_barang,
             material_request_details.satuan,
             SUM(material_request_details.qty) as total,
-            divisis.divisi,
-            warehouses.warehouse_name,
+            work_orders.wo_no,
         ";
 
         $materialRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('divisis', 'divisis.id = material_requests.divisi_id')
-            ->join('warehouses', 'warehouses.id = material_requests.warehouse_id')
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id')
-            ->groupBy('material_requests.id')
+            ->join('work_orders', 'work_orders.id = material_requests.work_order_id')
+            ->groupBy('material_request_details.material_request_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $materialRequestsDataQry->countAllResults(false);

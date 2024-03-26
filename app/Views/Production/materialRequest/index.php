@@ -24,9 +24,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('wo_no')" class="sort">Kode Request</th>
+                                <th onclick="changeSort('wo_no')" class="sort">Kode Work Order</th>
+                                <th onclick="changeSort('req_no')" class="sort">Kode Request</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('department')" class="sort">Department</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -92,15 +92,15 @@
                 orderable: false
             },
             {
+                data: "wo_no",
+                className: "text-center"
+            },
+            {
                 data: "req_no",
                 className: "text-center"
             },
             {
                 data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: "nama_divisi",
                 className: "text-center"
             },
             {
@@ -111,7 +111,7 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let status = row?.is_posted
-                    console.log(status);
+                    // console.log(status);
                     if (status != 1) {
                         return `
                                 <div class="mt-0">
