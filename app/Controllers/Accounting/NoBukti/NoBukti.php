@@ -28,7 +28,7 @@ class NoBukti extends BaseController
     {
 
 
-        return view('Accounting/noBukti/index');
+        return view('Accounting/NoBukti/index');
     }
 
     public function allNoBukti()

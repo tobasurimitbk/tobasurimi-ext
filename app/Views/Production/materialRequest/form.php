@@ -17,7 +17,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->id : ""; ?>" class="id" name="id" id="id" />
+                <input autocomplete="one-time-code" type="text" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
@@ -29,18 +29,22 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                    <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <?php if (isset($dataMaterialRequestswithwo)) { ?>
+                                <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->wo_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control kode_produksi_detail" name="kode_produksi_detail" id="kode_produksi_detail" placeholder="Kode Produksi" readonly>
+                            <?php } else { ?>
+                                <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
+                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php } ?>
                             <label for="floatingInput">Kode Produksi</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control barang_jadi" name="barang_jadi" id="barang_jadi" placeholder="Barang Jadi" readonly>
+                            <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->nama_barang : "" ?>" autocomplete="one-time-code" type="text" class="form-control barang_jadi" name="barang_jadi" id="barang_jadi" placeholder="Barang Jadi" readonly>
                             <label for="floatingInput">Barang Jadi</label>
                         </div>
                     </div>
@@ -63,7 +67,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="AUTO GENERATE" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
+                                    <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
                                     <label for="floatingInput">Kode Request</label>
                                 </div>
                                 <!-- <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -74,35 +78,14 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                            <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->request_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
                             <label for="floatingInput">Tanggal Request</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->production_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
                             <label for="floatingInput">Tanggal Produksi</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select department_id" name="department_id" id="department_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                    <option value="<?= $dataDivisi['id'] ?>"><?= $dataDivisi['divisi'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Department</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select warehouse_id" name="warehouse_id" id="warehouse_id" disabled>
-                                <option value=""></option>
-                            </select>
-                            <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
                 </div>
@@ -111,6 +94,27 @@
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select department_id" name="department_id" id="department_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
+                                <option value="<?= $dataDivisi['id'] ?>"><?= $dataDivisi['divisi'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Department</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select warehouse_id" name="warehouse_id" id="warehouse_id" disabled>
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Warehouse</label>
                     </div>
                 </div>
             </div>
@@ -177,6 +181,8 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Department</th>
+                                <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
                                 <th style="text-align: center;">No Aju</th>
@@ -184,8 +190,8 @@
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Awal</th>
-                                <th style="text-align: center;">Qty Sortir</th>
                                 <th style="text-align: center;">Qty Direquest</th>
+                                <th style="text-align: center;">Qty Sortir</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -207,6 +213,8 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Department</th>
+                                <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
                                 <th style="text-align: center;">No Aju</th>
@@ -236,13 +244,16 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Department</th>
+                                <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
                                 <th style="text-align: center;">No Aju</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Qty Awal</th>
+                                <th style="text-align: center;">Qty Kaleng</th>
+                                <th style="text-align: center;">Qty Isi</th>
                                 <th style="text-align: center;">Qty Direquest</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
@@ -269,6 +280,37 @@
     let sortTypeDataBarang = "DESC";
 
     $(document).ready(function() {
+        <?php if (!empty($materialRequestDetails)) : ?>
+            <?php foreach ($dataMaterialRequestDetails as $materialRequestDetails) : ?>
+                <?php if ($materialRequestDetails->barang_type == "bahan_baku") { ?>
+                    listStockSelectedBahanBaku.push({
+                        barang: <?= $materialRequestDetails->nama_barang ?>,
+                        bc_id: "48",
+                        bc_type: "BC 2.3",
+                        departmentID: "28",
+                        departmentText: "CANNING",
+                        id: "258",
+                        no_aju: "000023-017189-20240212-000010",
+                        no_dokumen_1: "-",
+                        no_dokumen_2: "-",
+                        qty: 0,
+                        qty2: 0,
+                        satuan: "KG",
+                        stock_date: "18/03/2024",
+                        stock_detail_id: "792",
+                        stock_id: "35",
+                        stok_total: 21,
+                        supplier_name: "-",
+                        type_barang: "bahan_baku",
+                        type_barang_text: "BAHAN BAKU",
+                        warehouseID: "3",
+                        warehouseText: "WH1 CAN KIM 1"
+                    });
+                <?php } else if ($materialRequestDetails->barang_type == "bahan_jadi") { ?>
+                <?php } else { ?>
+                <?php } ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
         // Departemen
         $('.department_id').select2({
             placeholder: "Pilih Departemen",
@@ -450,12 +492,14 @@
         $('#date_production').datepicker({
             autoclose: true,
             todayHighlight: true,
-            format: 'dd/mm/yyyy'
+            format: 'dd/mm/yyyy',
+            enableOnReadonly: false
         });
         $('#date_request').datepicker({
             autoclose: true,
             todayHighlight: true,
-            format: 'dd/mm/yyyy'
+            format: 'dd/mm/yyyy',
+            enableOnReadonly: false
         });
 
         // $(".select_nama_barang").change(function() {
@@ -601,15 +645,51 @@
                     var dataError = null;
 
                     $.each(listStockSelectedBahanBaku, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].stok-mutasi');
+                        var element = $('input[data-id="' + v.id + '"].qty-baku-request');
+                        var elementSortir = $('input[data-id="' + v.id + '"].qty-baku-sortir');
                         var input_user = parseFloat(element.val());
+                        var input_user_sortir = parseFloat(elementSortir.val());
                         var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
                             dataError = listStockSelectedBahanBaku[i];
                             isValid = false;
                         } else {
                             listStockSelectedBahanBaku[i].qty = input_user;
+                            listStockSelectedBahanBaku[i].qty2 = input_user_sortir;
+                        }
+                    });
+
+                    $.each(listStockSelectedBahan, function(i, v) {
+                        var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
+                        var input_user = parseFloat(element.val());
+                        var stok_max = parseFloat(element.data('stok_total'));
+
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                            dataError = listStockSelectedBahan[i];
+                            isValid = false;
+                        } else {
+                            listStockSelectedBahan[i].qty = input_user;
+                        }
+                    });
+
+                    $.each(listStockSelectedBahanJadi, function(i, v) {
+                        var element = $('input[data-id="' + v.id + '"].qty-jadi-isi');
+                        var elementRequest = $('input[data-id="' + v.id + '"].qty-jadi-request');
+                        var input_user = parseFloat(element.val());
+                        var input_user_request = parseFloat(elementRequest.val());
+                        var stok_max = parseFloat(element.data('stok_total')) * parseFloat(input_user);
+                        var stok_request = parseFloat(input_user_request) / parseFloat(input_user);
+
+                        if (input_user_request > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || isNaN(input_user_request) || input_user_request == undefined || input_user_request == 0) {
+                            dataError = listStockSelectedBahanJadi[i];
+                            isValid = false;
+                        } else {
+                            listStockSelectedBahanJadi[i].qty = input_user_request;
+                            listStockSelectedBahanJadi[i].qty2 = input_user;
+                            listStockSelectedBahanJadi[i].qty_request = stok_request;
+                            listStockSelectedBahanJadi[i].qty_isi = input_user;
+                            listStockSelectedBahanJadi[i].qty_request_kaleng = input_user_request;
                         }
                     });
 
@@ -634,7 +714,8 @@
                             if (result.isConfirmed) {
                                 let id = $('#id').val();
                                 let data = new FormData(document.querySelector(".create-form"));
-                                data.append('listMaterial', JSON.stringify(listStockSelectedBahanBaku));
+                                var listMaterial = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanJadi);
+                                data.append('listMaterial', JSON.stringify(listMaterial));
                                 if (id) {
                                     // UPDATE
                                     $.ajax({
@@ -891,6 +972,11 @@
 
     $('#select-item-btn').click(function() {
         var checkedCheckboxes = $(".child:checked");
+        var departmentID = $("#department_id").val();
+        var departmentText = $("#department_id option:selected").text();
+        var warehouseID = $("#warehouse_id").val();
+        var warehouseText = $("#warehouse_id option:selected").text();
+        var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
         }).get();
@@ -908,6 +994,11 @@
                     if (!isIDSelected) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
+                        listStockAsal[i].qty2 = 0;
+                        listStockAsal[i].departmentID = departmentID;
+                        listStockAsal[i].departmentText = departmentText;
+                        listStockAsal[i].warehouseID = warehouseID;
+                        listStockAsal[i].warehouseText = warehouseText;
                         listStockSelectedBahanBaku.push(listStockAsal[i]);
                     }
                 }
@@ -920,6 +1011,11 @@
                     if (!isIDSelected) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
+                        listStockAsal[i].qty2 = 0;
+                        listStockAsal[i].departmentID = departmentID;
+                        listStockAsal[i].departmentText = departmentText;
+                        listStockAsal[i].warehouseID = warehouseID;
+                        listStockAsal[i].warehouseText = warehouseText;
                         listStockSelectedBahanJadi.push(listStockAsal[i]);
                     }
                 }
@@ -932,12 +1028,19 @@
                     if (!isIDSelected) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
+                        listStockAsal[i].qty2 = 0;
+                        listStockAsal[i].departmentID = departmentID;
+                        listStockAsal[i].departmentText = departmentText;
+                        listStockAsal[i].warehouseID = warehouseID;
+                        listStockAsal[i].warehouseText = warehouseText;
                         listStockSelectedBahan.push(listStockAsal[i]);
                     }
                 }
             }
         });
-
+        console.log(listStockSelectedBahanBaku);
+        console.log(listStockSelectedBahan);
+        console.log(listStockSelectedBahanJadi);
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
         drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
@@ -957,6 +1060,8 @@
                ${no++} 
             `
             ));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
@@ -966,12 +1071,12 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input class="form-control stok-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty}">
+                <input class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                <input class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1023,6 +1128,8 @@
                ${no++} 
             `
             ));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
@@ -1032,7 +1139,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                <input class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1084,6 +1191,8 @@
                ${no++} 
             `
             ));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
@@ -1093,7 +1202,12 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                <input class="form-control qty-jadi-isi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <input class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(

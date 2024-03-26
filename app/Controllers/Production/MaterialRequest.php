@@ -113,6 +113,58 @@ class MaterialRequest extends BaseController
 
     public function getById($id = null)
     {
+        $ids = $id;
+        $id = decrypt($id);
+        //Get Barang
+        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
+
+        //Get Satuan
+        $dataSatuan = $this->satuanModel->asObject()->find();
+
+        $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataWorkOrder = $this->workOrdersModel->asObject()
+            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('work_orders.is_posted', "0")
+            ->where('work_orders.deletedAt', null)
+            ->where('work_order_details.deletedAt', null)
+            ->groupBy('work_order_details.work_order_id')
+            ->find();
+
+        $data = [
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
+            "dataBarang" => $dataBarang,
+            "dataSatuan" => $dataSatuan,
+            "dataDivisi" => $dataDivisi,
+            "dataWarehouse" => $dataWarehouse,
+            "dataWorkOrder" => $dataWorkOrder,
+        ];
+
+        if (!empty($id)) {
+            $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
+            $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
+            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.nama_satuan')
+                ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->where('material_request_id', $id)
+                ->get()->getResult();
+            $data["dataMaterialRequests"] = $dataMaterialRequests;
+            $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
+            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
+            $data["ids"] = $ids;
+        }
+
+        var_dump($data);
+        // exit;
+
+        return view('Production/materialRequest/form', $data);
+    }
+
+    public function getByIdDetail($id = null)
+    {
         $id = decrypt($id);
         //Get Barang
         $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
@@ -137,6 +189,8 @@ class MaterialRequest extends BaseController
                 ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
+                ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
                 ->where('material_request_id', $id)
                 ->get()->getResult();
             $data["dataMaterialRequests"] = $dataMaterialRequests;
@@ -274,24 +328,50 @@ class MaterialRequest extends BaseController
             $id = $this->materialRequestModel->insert($dataMaterial);
 
             $mr_detail = json_decode($this->request->getVar("listMaterial"));
-
+            // var_dump($mr_detail);
+            // exit;
 
             foreach ($mr_detail as $s) {
                 $stockBarang =  $this->stockModel->asObject()->find($s->stock_id);
                 $stockDetailBarang =  $this->stockDetailModel->asObject()->find($s->stock_detail_id);
-                $dataMaterialDetail = [
-                    'material_request_id' => $id,
-                    'barang1_id' => $stockBarang->barang1_id,
-                    'barang2_id' => $stockBarang->barang2_id,
-                    'nama_barang' => $s->barang,
-                    'satuan' => $s->satuan,
-                    'stock_id' => $s->stock_id,
-                    'bc_id' => $s->bc_id,
-                    'no_aju' => $s->no_aju,
-                    'ref_no' => $s->bc_type,
-                    'stock_date' => $stockDetailBarang->stock_date,
-                    'qty' => $s->qty,
-                ];
+                if ($s->type_barang == "bahan_jadi") {
+                    $dataMaterialDetail = [
+                        'material_request_id' => $id,
+                        'divisi_id' => $s->departmentID,
+                        'warehouse_id' => $s->warehouseID,
+                        'barang1_id' => $stockBarang->barang1_id,
+                        'barang2_id' => $stockBarang->barang2_id,
+                        'nama_barang' => $s->barang,
+                        'satuan' => $s->satuan,
+                        'stock_id' => $s->stock_id,
+                        'bc_id' => $s->bc_id,
+                        'no_aju' => $s->no_aju,
+                        'ref_no' => $s->bc_type,
+                        'stock_date' => $stockDetailBarang->stock_date,
+                        'barang_type' => $s->type_barang,
+                        'qty' => $s->qty_request,
+                        'qty2' => $s->qty_request_kaleng,
+                        'qty_isi' => $s->qty_isi,
+                    ];
+                } else {
+                    $dataMaterialDetail = [
+                        'material_request_id' => $id,
+                        'divisi_id' => $s->departmentID,
+                        'warehouse_id' => $s->warehouseID,
+                        'barang1_id' => $stockBarang->barang1_id,
+                        'barang2_id' => $stockBarang->barang2_id,
+                        'nama_barang' => $s->barang,
+                        'satuan' => $s->satuan,
+                        'stock_id' => $s->stock_id,
+                        'bc_id' => $s->bc_id,
+                        'no_aju' => $s->no_aju,
+                        'ref_no' => $s->bc_type,
+                        'stock_date' => $stockDetailBarang->stock_date,
+                        'barang_type' => $s->type_barang,
+                        'qty' => $s->qty,
+                        'qty2' => $s->qty2,
+                    ];
+                }
                 $this->materialRequestDetailsModel->insert($dataMaterialDetail);
             }
 
