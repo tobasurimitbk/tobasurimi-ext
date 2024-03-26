@@ -658,14 +658,14 @@ class StockModel extends Model
             ->join('barang_master', 'barang_master.id = stock.barang1_id')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->where('stock.tipe_barang', $type_barang)
-            ->where('stock.divisi_id', $divisi_id)
-            ->where('stock.warehouse_id', $warehouse_id)
             ->where('stock.deletedAt', null)
             ->where('barang_master_spesifikasi.deletedAt', null)
             ->where('barang_master.deletedAt', null)
             ->like('barang_master.barang_name', '%' . "UDANG" . '%')
             ->orLike('barang_master.barang_name', '%' . "KEPITING" . '%')
+            ->where('stock.tipe_barang', $type_barang)
+            ->where('stock.divisi_id', $divisi_id)
+            ->where('stock.warehouse_id', $warehouse_id)
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
 
