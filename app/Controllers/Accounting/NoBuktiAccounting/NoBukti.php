@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Accounting\NoBukti;
+namespace App\Controllers\Accounting\NoBuktiAccounting;
 
 use App\Controllers\BaseController;
 use App\Models\MetadataModel;

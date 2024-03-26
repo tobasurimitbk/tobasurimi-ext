@@ -1195,12 +1195,12 @@ $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['f
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkunsExact', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkunExact', ['filter' => 'Auth']);
 // set no bukti
-$routes->get('/no-bukti', 'Accounting\NoBukti\NoBukti::index', ['filter' => 'Auth']);
-$routes->get('/no-bukti/all', 'Accounting\NoBukti\NoBukti::allNoBukti', ['filter' => 'Auth']);
-$routes->post('/no-bukti/save', 'Accounting\NoBukti\NoBukti::saveNoBukti', ['filter' => 'Auth']);
-$routes->get('/no-bukti/id/(:segment)', 'Accounting\NoBukti\NoBukti::getByIdNoBukti/$1', ['filter' => 'Auth']);
-$routes->post('/no-bukti/update', 'Accounting\NoBukti\NoBukti::updateNoBukti', ['filter' => 'Auth']);
-$routes->post('/no-bukti/delete', 'Accounting\NoBukti\NoBukti::deleteNoBukti', ['filter' => 'Auth']);
+$routes->get('/no-bukti', 'Accounting\NoBuktiAccounting\NoBukti::index', ['filter' => 'Auth']);
+$routes->get('/no-bukti/all', 'Accounting\NoBuktiAccounting\NoBukti::allNoBukti', ['filter' => 'Auth']);
+$routes->post('/no-bukti/save', 'Accounting\NoBuktiAccounting\NoBukti::saveNoBukti', ['filter' => 'Auth']);
+$routes->get('/no-bukti/id/(:segment)', 'Accounting\NoBuktiAccounting\NoBukti::getByIdNoBukti/$1', ['filter' => 'Auth']);
+$routes->post('/no-bukti/update', 'Accounting\NoBuktiAccounting\NoBukti::updateNoBukti', ['filter' => 'Auth']);
+$routes->post('/no-bukti/delete', 'Accounting\NoBuktiAccounting\NoBukti::deleteNoBukti', ['filter' => 'Auth']);
 //Jurnal Penyesuaian
 // $routes->get('/jurnal-penyesuaian', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::index', ['filter' => 'Auth']);
 // $routes->post('/jurnal-penyesuaian/addJurnal', 'Accounting\JurnalPenyesuaian\JurnalPenyesuaian::save', ['filter' => 'Auth']);
