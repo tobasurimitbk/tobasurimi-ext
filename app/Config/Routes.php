@@ -712,7 +712,7 @@ $routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::prin
 $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);
 
 // REBUSAN
-$routes->get('/proses-rebus', 'JasaVendor\ProsesRebus::index', ['filter' => 'Auth']);
+$routes->get('/proses-rebus', 'JasaVendor\JasaVendorIn::index', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/create', 'JasaVendor\ProsesRebus::create', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-barang-stock-init', 'JasaVendor\ProsesRebus::dropdownListBarangIsInit', ['filter' => 'Auth']);
