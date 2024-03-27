@@ -151,7 +151,9 @@ class MaterialRequest extends BaseController
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
                 ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
                 ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
+                ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
                 ->where('material_request_id', $id)
+                ->where('parent_barang.parent_name !=', "KIMIA")
                 ->get()->getResult();
             foreach ($dataMaterialRequestDetails as $key => &$value) {
                 if ($value->barang_type == "bahan_baku") {
@@ -227,7 +229,9 @@ class MaterialRequest extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [];
+        $condition = [
+            'parent_barang.parent_name !=' => "KIMIA"
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

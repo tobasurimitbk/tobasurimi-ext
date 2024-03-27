@@ -4,14 +4,18 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Material Request Gudang</h1>
+        <h1>Material Request Kimia</h1>
+
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request-kimia/create"); ?>">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </a>
         <?= csrf_field() ?>
     </div>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Produksi / Kode Request / Nama Barang" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Request / Nama Barang" value="" />
                 </div>
             </div>
             <div class="row">
@@ -20,12 +24,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('tanggal')" class="sort">Tanggal</th>
-                                <th onclick="changeSort('req_no')" class="sort">No Request</th>
-                                <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
+                                <th onclick="changeSort('wo_no')" class="sort">Kode Work Order</th>
+                                <th onclick="changeSort('req_no')" class="sort">Kode Request</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('department')" class="sort">Department</th>
-                                <th onclick="changeSort('user')" class="sort">User</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -38,47 +39,6 @@
         </div>
     </div>
 </section>
-
-<div class="modal approve-modal" tabindex="1">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-secondary">Update Status</h5>
-                <!-- <button class="btn btn-show-form btn-add-barang float-right">
-                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
-                </button> -->
-            </div>
-            <div class="modal-body">
-                <form class="approve-form" role="form" method="POST" enctype="multipart/form-data">
-                    <?= csrf_field() ?>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
-                                <select class="form-select status_approve" name="status_approve" id="status_approve" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <option value="1">Approve</option>
-                                    <option value="2">Reject</option>
-                                </select>
-                                <label for="floatingInput">Status</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control keterangan_approve" id="keterangan_approve" name="keterangan_approve" placeholder="Keterangan">
-                                <label for="floatingInput">Keterangan</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-detail" onclick="postingUpdateStatus()">Simpan</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -105,7 +65,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("material-warehouse/all"); ?>",
+            url: "<?= base_url("material-request-kimia/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -132,7 +92,7 @@
                 orderable: false
             },
             {
-                data: "request_date",
+                data: "wo_no",
                 className: "text-center"
             },
             {
@@ -140,19 +100,7 @@
                 className: "text-center"
             },
             {
-                data: "wo_no",
-                className: "text-center"
-            },
-            {
                 data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: "nama_divisi",
-                className: "text-center"
-            },
-            {
-                data: "user",
                 className: "text-center"
             },
             {
@@ -162,26 +110,33 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
-                    let is_approve = row?.is_approve;
-                    if (is_approve == 0 || is_approve == null) {
+                    let status = row?.is_posted
+                    // console.log(status);
+                    if (status != 1) {
                         return `
-                        <div class="mt-0">
-                            <button type="button" class="btn btn-primary detail-material-warehouse">
-                                <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="btn btn-success show-modal-approve">
-                                <i class="fa fa-check" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        `
+                                <div class="mt-0">
+                                    <button class="btn btn-primary detail-material-request">
+                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-warning">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
+                                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            `
                     } else {
                         return `
-                        <div class="mt-0">
-                            <button type="button" class="btn btn-primary detail-material-warehouse">
-                                <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        `
+                                <div class="mt-0">
+                                    <button class="btn btn-primary detail-material-request">
+                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-warning">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            `
                     }
                 }
             }
@@ -208,38 +163,22 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', '.detail-material-warehouse', function() {
+        $('#dataTable tbody').on('click', '.detail-material-request', function() {
             // Get the data associated with the clicked row
             const data = table.row($(this).closest('tr')).data();
 
             // Redirect to the detail page using the data ID
             if (data) {
-                location.replace(`<?= base_url("material-warehouse/details"); ?>/${data.id}`);
+                location.replace(`<?= base_url("material-request-kimia/details"); ?>/${data.id}`);
             }
-        });
-
-        $('#dataTable tbody').on('click', '.show-modal-approve', function() {
-            // Get the data associated with the clicked row
-            const data = table.row($(this).closest('tr')).data();
-
-            // Redirect to the detail page using the data ID
-            if (data) {
-                $(".id").val(data.id);
-                $(".approve-modal").modal("show");
-            }
-        });
-        $('.btn-hide-detail').on('click', function() {
-            $(".approve-modal").modal("hide");
         });
     })
 
-    const postingUpdateStatus = function() {
-        let id = $(".id").val();
-        let status_posting = $(".status_approve").val();
-        let keterangan_posting = $(".keterangan_approve").val();
+    const posting = function(id, status_posting) {
+        console.log(id);
         Swal.fire({
             icon: 'question',
-            title: status_posting == "1" ? "Yakin Akan disetujui ?" : "Yakin Akan batal disetujui ?",
+            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -249,11 +188,10 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "<?= base_url("material-warehouse/update-status"); ?>",
+                    url: "<?= base_url("material-request-kimia/update-status"); ?>",
                     data: {
                         id: id,
-                        status_posting: status_posting,
-                        keterangan_posting: keterangan_posting,
+                        status_posting: status_posting
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -274,7 +212,6 @@
                                 })
                                 .then(() => {
                                     table.ajax.reload()
-                                    $(".approve-modal").modal("hide");
                                 })
                         } else {
                             Swal.fire({

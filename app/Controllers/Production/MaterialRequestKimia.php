@@ -23,7 +23,7 @@ use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
 use Exception;
 
-class MaterialWarehouse extends BaseController
+class MaterialRequestKimia extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -46,13 +46,11 @@ class MaterialWarehouse extends BaseController
     protected $supplierModel;
     protected $materialRequestModel;
     protected $materialRequestDetailsModel;
-    protected $this_user_id;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->this_user_id = session()->get("login")->user_id;
         $this->barangModel = new BarangModel();
         $this->satuanModel = new SatuansModel();
         $this->workOrdersModel = new WorkOrdersModel();
@@ -78,7 +76,7 @@ class MaterialWarehouse extends BaseController
 
     public function index()
     {
-        return view('Production/materialWarehouse/index');
+        return view('Production/materialRequestKimia/index');
     }
 
     public function createView()
@@ -90,20 +88,32 @@ class MaterialWarehouse extends BaseController
         $dataSatuan = $this->satuanModel->asObject()->find();
 
         $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
-        $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataWorkOrder = $this->workOrdersModel->asObject()
+            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('work_orders.is_posted', "0")
+            ->where('work_orders.deletedAt', null)
+            ->where('work_order_details.deletedAt', null)
+            ->groupBy('work_order_details.work_order_id')
+            ->find();
 
         $data = [
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
-            "dataWarehouse" => $dataWarehouse
+            "dataWarehouse" => $dataWarehouse,
+            "dataWorkOrder" => $dataWorkOrder,
         ];
 
-        return view('Production/materialWarehouse/form', $data);
+        return view('Production/materialRequestKimia/form', $data);
     }
 
     public function getById($id = null)
     {
+        $ids = $id;
         $id = decrypt($id);
         //Get Barang
         $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
@@ -112,31 +122,57 @@ class MaterialWarehouse extends BaseController
         $dataSatuan = $this->satuanModel->asObject()->find();
 
         $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
-        $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataWorkOrder = $this->workOrdersModel->asObject()
+            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('work_orders.is_posted', "0")
+            ->where('work_orders.deletedAt', null)
+            ->where('work_order_details.deletedAt', null)
+            ->groupBy('work_order_details.work_order_id')
+            ->find();
 
         $data = [
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
+            "dataWorkOrder" => $dataWorkOrder,
         ];
 
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
             $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
-            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.nama_satuan')
+            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
                 ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
+                ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
                 ->where('material_request_id', $id)
                 ->get()->getResult();
+            foreach ($dataMaterialRequestDetails as $key => &$value) {
+                if ($value->barang_type == "bahan_baku") {
+                    $value->barang_type_text = "Bahan Baku";
+                } elseif ($value->barang_type == "bahan_penolong") {
+                    $value->barang_type_text = "Bahan Penolong";
+                } elseif ($value->barang_type == "bahan_jadi") {
+                    $value->barang_type_text = "Bahan Jadi";
+                } elseif ($value->barang_type == "bahan_scrap") {
+                    $value->barang_type_text = "Bahan Scrap";
+                } elseif ($value->barang_type == "bahan_modal") {
+                    $value->barang_type_text = "Bahan Modal";
+                }
+            }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
             $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
-            $data["ids"] = $id;
+            $data["ids"] = $ids;
         }
 
-        return view('Production/materialWarehouse/form-detail', $data);
+        return view('Production/materialRequestKimia/form', $data);
     }
 
     public function all()
@@ -149,9 +185,7 @@ class MaterialWarehouse extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            "material_requests.is_posted"        => 1,
-        ];
+        $condition = [];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -161,13 +195,7 @@ class MaterialWarehouse extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-
-        // var_dump($limit);
-        // var_dump($offset);
-        // var_dump($payload);
-        // var_dump($condition);
-        $materialRequestData = $this->materialRequestModel->getMaterialRequestListForMaterialWarehouse($condition, $addCondition, $limit, $offset);
-        // var_dump($materialRequestData);
+        $materialRequestData = $this->materialRequestModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
 
         $dataMaterialRequest = [];
 
@@ -177,16 +205,10 @@ class MaterialWarehouse extends BaseController
             array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "request_date"                 => date('d/m/Y', strtotime($data->request_date)),
                 "req_no"                 => $data->req_no,
-                "wo_no"                 => $data->wo_no,
                 "nama_barang"           => $data->nama_barang,
-                "nama_divisi"           => $data->divisi,
-                "warehouse"           => $data->warehouse_name,
-                "user"           => $data->namaUser,
-                "satuan"           => $data->satuan,
+                "wo_no"           => $data->wo_no,
                 "is_posted"           => $data->is_posted,
-                "is_approve"           => $data->is_approve,
             ]);
         }
 
@@ -313,5 +335,26 @@ class MaterialWarehouse extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function getListBarangIsInit()
+    {
+        $addCondition = [];
+        if ($this->request->getVar('type_barang') == "bahan_penolong" && $this->request->getVar('kondisi') == "nonkimia") {
+            $addCondition = [
+                "parent_name !=" => "KIMIA"
+            ];
+        }
+        $data = $this->stockModel->getBarangAndStockCondition(
+            $this->request->getVar('type_barang'),
+            $this->request->getVar('divisi_id'),
+            $this->request->getVar('warehouse_id'),
+            $addCondition
+        );
+        return response()->setJSON([
+            'data' => $data,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 }

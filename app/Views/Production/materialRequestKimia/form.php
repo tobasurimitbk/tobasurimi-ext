@@ -931,7 +931,7 @@
                 type_barang: $(".select_tipe_bahan option:selected").val(),
                 divisi_id: $(".department_id option:selected").val(),
                 warehouse_id: $(".warehouse_id option:selected").val(),
-                kondisi: "nonkimia",
+                kondisi: "kimia",
             },
             dataType: "json",
             success: function(res) {

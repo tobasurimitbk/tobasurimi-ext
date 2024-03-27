@@ -546,13 +546,13 @@ $routes->post('/material-request/update-status', 'Production\MaterialRequest::up
 
 
 // Rencana Produksi
-$routes->get('/material-warehouse', 'Production\MaterialWarehouse::index', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/details/(:segment)', 'Production\MaterialWarehouse::getById/$1', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/create', 'Production\MaterialWarehouse::createView', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/all', 'Production\MaterialWarehouse::all', ['filter' => 'Auth']);
-$routes->get('/material-warehouse/data-detail-material', 'Production\MaterialWarehouse::allDetailMaterialRequest', ['filter' => 'Auth']);
-$routes->post('/material-warehouse/update-status', 'Production\MaterialWarehouse::updateStatusApproveMaterialRequest', ['filter' => 'Auth']);
-
+$routes->get('/material-request-kimia', 'Production\MaterialRequestKimia::index', ['filter' => 'Auth']);
+$routes->get('/material-request-kimia/details/(:segment)', 'Production\MaterialRequestKimia::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request-kimia/create', 'Production\MaterialRequestKimia::createView', ['filter' => 'Auth']);
+$routes->get('/material-request-kimia/all', 'Production\MaterialRequestKimia::all', ['filter' => 'Auth']);
+$routes->get('/material-request-kimia/data-detail-material', 'Production\MaterialRequestKimia::allDetailMaterialRequest', ['filter' => 'Auth']);
+$routes->post('/material-request-kimia/update-status', 'Production\MaterialRequestKimia::updateStatusApproveMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/material-request-kimia/list-barang-stock-init', 'Production\MaterialRequestKimia::getListBarangIsInit', ['filter' => 'Auth']);
 // DROPDOWN
 
 // TERIMA FAKTUR
