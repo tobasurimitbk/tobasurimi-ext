@@ -38,14 +38,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan" value="<?= isset($data) ? $data->pr_no : ""; ?>" <?= isset($data) ? "readonly" : ""; ?>>
+                                    <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan" value="<?= isset($data) ? $data->pr_no : "AUTO GENERATE"; ?>" <?= isset($data) ? "readonly" : "readonly"; ?>>
                                     <label for="floatingInput">Kode Penerimaan</label>
                                 </div>
-                                <?php if (!isset($data)) : ?>
-                                    <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                        <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                    </div>
-                                <?php endif; ?>
+
 
                             </div>
                         </div>
