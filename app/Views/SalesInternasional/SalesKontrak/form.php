@@ -42,6 +42,11 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Header</label>
+                </div>
+            </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSO) ? $dataSO->sales_contract_id : ""; ?>" />
                 <?= csrf_field() ?>
@@ -50,8 +55,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : 'readonly=true'; ?> value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : "AUTO GENERATE"; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
-                                    <label for="floatingInput">No. SC</label>
+                                    <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : 'readonly=true'; ?> value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <label for="floatingInput">No Sales Kontrak</label>
                                 </div>
                                 <div style="<?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input <?= empty($dataSO) ? 'checked' : ''; ?> autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
@@ -60,26 +65,36 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataCustomer)) {
-                                    foreach ($dataCustomer as $customer) {
-                                ?>
-                                        <option <?= !empty($dataSO) ? ($dataSO->customer_id === $customer["id"] ? "selected" : "") : ""; ?> value="<?= $customer["id"]; ?>"><?= $customer["name"]; ?></option>
-                                <?php
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataCustomer)) {
+                                        foreach ($dataCustomer as $customer) {
+                                    ?>
+                                            <option <?= !empty($dataSO) ? ($dataSO->customer_id === $customer["id"] ? "selected" : "") : ""; ?> value="<?= $customer["id"]; ?>"><?= strtoupper("(" . $customer['kode'] . ") " . $customer["name"]); ?></option>
+                                    <?php
+                                        }
                                     }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Customer</label>
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Customer</label>
+                            </div>
+                            <?php if (can('Penjualan Ekspor', 'Master Barang', 'c')) : ?>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
                         </div>
+
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->customer_po_no : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
-                            <label for="floatingInput">No. PO</label>
+                            <label for="floatingInput">No. PO (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -138,6 +153,77 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataValuta as $valuta) : ?>
+                                    <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= strtoupper($valuta["description"]); ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput">Currency</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataValuta as $valuta) : ?>
+                                    <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= strtoupper($valuta["description"]); ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput">Currency</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
+                            <label for="floatingInput">Potongan Harga (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
+                            <label for="floatingInput">Keterangan (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Broker</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control broker" id="broker" name="broker" placeholder="Agency / Broker (Opsional)">
+                            <label for="floatingInput">Agency / Broker (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control komisi" id="komisi" name="komisi" placeholder="Komisi Broker (Opsional)">
+                            <label for="floatingInput">Komisi Broker (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> class="form-select print_out_broker" id="print_out_broker" name="print_out_broker" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <option value="1">TAMPILKAN BROKER DI PRINT OUT</option>
+                                <option value="0">JANGAN TAMPILKAN BROKER DI PRINT OUT</option>
+                            </select>
+                            <label for="floatingInput">Print Out Sales Kontak</label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Dokumen & Special Instructions</label>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating">
                             <textarea autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSO) ? $dataSO->documents_required : ""; ?></textarea>
@@ -151,14 +237,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-md-4">
-                        <div class="form-floating">
-                            <input autocomplete="one-time-code" readonly value="<?= !empty($dataSO) ? ($dataSO->total_amount ? number_format($dataSO->total_amount) : 0) : ""; ?>" type="text" value="0" class="form-control total_amount" id="total_amount" name="total_amount" placeholder="Grand Total" />
-                            <label for="floatingInput">Grand Total</label>
-                        </div>
-                    </div>
-                </div>
+
             </form>
             <div class="col-subtitle-modal mt-5">
                 <div class="row mt-3">
@@ -349,6 +428,67 @@
     </div>
 </div>
 
+<div class="modal addCustomerModal" id="addCustomerModal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Customer</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form-customer" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="tipe_customer" class="tipe_customer" id="tipe_customer" value="INTERNASIONAL">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <label for="floatingInput">Nama Customer</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select country_id" name="country_id" id="country_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataCountry)) {
+                                        foreach ($dataCountry as $dc) {
+                                    ?>
+                                            <option value="<?= $dc["id"]; ?>">(<?= $dc["code"]; ?>) <?= $dc['country_name'] ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Negara</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <textarea autocomplete="one-time-code" class="form-control address" id="address" name="address"></textarea>
+                                <label for="floatingInput">Alamat (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
+                                <label for="floatingInput">Nama Sales</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard mr-2 btn-discard-customer" id="btn-discard-customer">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-customer">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let list_items = [];
@@ -469,7 +609,7 @@
 
         // CUSTOMER
         $('.customer_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Customer",
             theme: "bootstrap-5"
         })
 
@@ -586,6 +726,210 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        // COUNTRY
+        $('.country_id').select2({
+            placeholder: "Pilih Negara",
+            theme: "bootstrap-5",
+            dropdownParent: $("#addCustomerModal")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.country_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.country_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.country_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+
+        // CURRENCY
+        $('.currency').select2({
+            placeholder: "Pilih Mata Uang",
+            theme: "bootstrap-5",
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.currency')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.currency')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.currency')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+
+        // BROKER
+        $('.print_out_broker').select2({
+            placeholder: "Pilih Print Out Broker",
+            theme: "bootstrap-5",
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.print_out_broker')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.print_out_broker')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.print_out_broker')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+
+        // CUSTOMER 
+        $('.btn-customer-add').click(function() {
+            $('.name').val(null);
+            $('.country_id').val(null).change();
+            $('.address').val(null);
+            $('#addCustomerModal').modal('show');
+        });
+
+        $('.btn-discard-customer').click(function() {
+            $('#addCustomerModal').modal('hide');
+        });
+
+        // VALIDATOR CUSTOMER INTERNASIONAL
+        var validatorCustomer = $(".create-form-customer").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                country_id: {
+                    required: true
+                },
+            },
+            messages: {
+                name: {
+                    required: "Nama customer wajib diisi"
+                },
+                country_id: {
+                    required: "Pilih negara"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('.btn-submit-customer').click(function() {
+            if ($('.create-form-customer').valid()) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                const data = new FormData(document.querySelector(".create-form-customer"));
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Customer?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("customer-ekspor/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                $("#addCustomerModal").modal("hide");
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $('#addCustomerModal').modal('hide');
+
+                                        })
+                                    getListCustomer();
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+                        });
+                    }
+                })
+
+            }
+        })
+
 
         var validator = $(".create-form").validate({
             rules: {
@@ -1768,20 +2112,64 @@
         })
     })
 
-    const print = function(url) {
+    function print(url) {
         window.open(url, "_blank");
     }
 
-    const changeStatus = function() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
+    changeStatus();
 
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
             $(".sales_contract_no").attr("readonly", true);
-            $(".sales_contract_no").val("AUTO GENERATE");
+            $.ajax({
+                url: `<?= base_url("sales-kontrak/get-sales-kontrak-no"); ?>`,
+                method: "GET",
+                data: {},
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".sales_contract_no").val(res?.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $(".sales_contract_no").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $(".sales_contract_no").val("");
+                    }
+                }
+            })
         } else {
             $(".sales_contract_no").attr("readonly", false);
             $(".sales_contract_no").val("");
         }
+
+    }
+
+    function getListCustomer() {
+        $.ajax({
+            url: `<?= base_url('sales-kontrak/customer'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {},
+            dataType: "json",
+            success: function(res) {
+                $(".customer_id").empty()
+                $(".customer_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".customer_id").append(`<option value="${item.id}">(${item.kode}) ${item.name}</option>`)
+                })
+                $(".customer_id").val();
+            }
+        });
     }
 </script>
 <?= $this->endSection(); ?>

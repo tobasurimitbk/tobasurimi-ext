@@ -479,6 +479,8 @@ $routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete'
 $routes->get('/sales-kontrak/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/warehouseAll/(:segment)', 'SalesLokal\OrderForm::getAllWarehouse/$1', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/stok/(:segment)/(:segment)', 'SalesLokal\OrderForm::getStockDetail/$1/$2', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/get-sales-kontrak-no', 'SalesInternasional\SalesKontrak::getNo', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/customer', 'SalesInternasional\SalesKontrak::dropdownCustomer', ['filter' => 'Auth']);
 
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);

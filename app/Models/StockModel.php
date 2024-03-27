@@ -645,7 +645,6 @@ class StockModel extends Model
 
     public function getBarangRebusAndStock($type_barang, $divisi_id, $warehouse_id)
     {
-        // LIST BARANG
         $selectQry = "
         stock.id AS stock_id,
         stock.barang2_id AS spesifikasi_id,
@@ -654,20 +653,35 @@ class StockModel extends Model
         satuans.kode_satuan
     ";
 
-        $dataResult = $this->asArray()->select($selectQry)
+        $dataResult1 = $this->asArray()->select($selectQry)
             ->join('barang_master', 'barang_master.id = stock.barang1_id')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('stock.deletedAt', null)
             ->where('barang_master_spesifikasi.deletedAt', null)
             ->where('barang_master.deletedAt', null)
-            ->like('barang_master.barang_name', '%' . "UDANG" . '%')
-            ->orLike('barang_master.barang_name', '%' . "KEPITING" . '%')
             ->where('stock.tipe_barang', $type_barang)
             ->where('stock.divisi_id', $divisi_id)
             ->where('stock.warehouse_id', $warehouse_id)
+            ->like('barang_master.barang_name', '%' . "UDANG" . '%')
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
+
+        $dataResult2 = $this->asArray()->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('stock.deletedAt', null)
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            ->where('stock.tipe_barang', $type_barang)
+            ->where('stock.divisi_id', $divisi_id)
+            ->where('stock.warehouse_id', $warehouse_id)
+            ->like('barang_master.barang_name', '%' . "KEPITING" . '%')
+            ->orderBy('barang_master.kode_barang', "ASC")
+            ->findAll();
+
+        $dataResult = array_merge($dataResult1, $dataResult2);
 
         return $dataResult;
     }
