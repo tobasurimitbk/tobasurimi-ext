@@ -154,6 +154,7 @@ class MaterialRequest extends BaseController
                 ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
                 ->where('material_request_id', $id)
                 ->where('parent_barang.parent_name !=', "KIMIA")
+                ->where('material_request_details.deletedAt', null)
                 ->get()->getResult();
             foreach ($dataMaterialRequestDetails as $key => &$value) {
                 if ($value->barang_type == "bahan_baku") {
@@ -209,6 +210,7 @@ class MaterialRequest extends BaseController
                 ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
                 ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
                 ->where('material_request_id', $id)
+                ->where('material_request_details.deletedAt', null)
                 ->get()->getResult();
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
@@ -548,12 +550,12 @@ class MaterialRequest extends BaseController
 
     public function deleteMR()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->workOrdersModel->delete($id);
-        $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
+        $id = ($this->request->getVar('id'));
+        $this->materialRequestDetailsModel->delete($id);
+        // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 
         return response()->setJSON([
-            'message' => "Work Order Berhasil Dihapus",
+            'message' => "Bahan Berhasil Dihapus",
             'token' => csrf_hash(),
             'status' => true
         ]);

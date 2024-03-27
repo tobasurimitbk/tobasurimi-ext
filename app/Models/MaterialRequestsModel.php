@@ -84,6 +84,8 @@ class MaterialRequestsModel extends Model
             ->join('work_orders', 'work_orders.id = material_requests.work_order_id')
             ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+            ->where('material_requests.deletedAt', null)
+            ->where('material_request_details.deletedAt', null)
             ->groupBy('material_request_details.material_request_id')
             ->orderBy($sort, $sortType);
 
