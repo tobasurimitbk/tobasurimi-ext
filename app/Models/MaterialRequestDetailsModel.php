@@ -32,6 +32,7 @@ class MaterialRequestDetailsModel extends Model
         'qty',
         'qty2',
         'qty_isi',
+        'kimia',
         'note',
         'createdAt',
         'updatedAt',

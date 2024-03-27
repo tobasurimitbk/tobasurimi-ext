@@ -202,6 +202,11 @@ class MaterialRequestKimia extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($materialRequestData['data'] as $data) {
+            $checkKimia = $this->materialRequestDetailsModel->where('material_request_id', $data->id)->where('kimia', 1)->find();
+            $kimia = "0";
+            if ($checkKimia) {
+                $kimia = "1";
+            }
             array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -209,6 +214,7 @@ class MaterialRequestKimia extends BaseController
                 "nama_barang"           => $data->nama_barang,
                 "wo_no"           => $data->wo_no,
                 "is_posted"           => $data->is_posted,
+                "kimia"           => $kimia,
             ]);
         }
 
@@ -285,6 +291,76 @@ class MaterialRequestKimia extends BaseController
         return;
     }
 
+    public function update()
+    {
+        try {
+            $id = decrypt($this->request->getPost("id"));
+            $mr_detail = json_decode($this->request->getVar("listMaterial"));
+            // var_dump($mr_detail);
+            // exit;
+
+            foreach ($mr_detail as $s) {
+                $stockBarang =  $this->stockModel->asObject()->find($s->stock_id);
+                $stockDetailBarang =  $this->stockDetailModel->asObject()->find($s->stock_detail_id);
+                if ($s->type_barang == "bahan_jadi") {
+                    $dataMaterialDetail = [
+                        'material_request_id' => $id,
+                        'divisi_id' => $s->departmentID,
+                        'warehouse_id' => $s->warehouseID,
+                        'barang1_id' => $stockBarang->barang1_id,
+                        'barang2_id' => $stockBarang->barang2_id,
+                        'nama_barang' => $s->barang,
+                        'satuan' => $s->satuan,
+                        'stock_id' => $s->stock_id,
+                        'bc_id' => $s->bc_id,
+                        'no_aju' => $s->no_aju,
+                        'ref_no' => $s->bc_type,
+                        'stock_date' => $stockDetailBarang->stock_date,
+                        'barang_type' => $s->type_barang,
+                        'qty' => $s->qty_request,
+                        'qty2' => $s->qty_request_kaleng,
+                        'qty_isi' => $s->qty_isi,
+                    ];
+                } else {
+                    $dataMaterialDetail = [
+                        'material_request_id' => $id,
+                        'divisi_id' => $s->departmentID,
+                        'warehouse_id' => $s->warehouseID,
+                        'barang1_id' => $stockBarang->barang1_id,
+                        'barang2_id' => $stockBarang->barang2_id,
+                        'nama_barang' => $s->barang,
+                        'satuan' => $s->satuan,
+                        'stock_id' => $s->stock_id,
+                        'bc_id' => $s->bc_id,
+                        'no_aju' => $s->no_aju,
+                        'ref_no' => $s->bc_type,
+                        'stock_date' => $stockDetailBarang->stock_date,
+                        'barang_type' => $s->type_barang,
+                        'qty' => $s->qty,
+                        'qty2' => $s->qty2,
+                        'kimia' => 1,
+                    ];
+                }
+                $this->materialRequestDetailsModel->insert($dataMaterialDetail);
+            }
+
+            return response()->setJSON([
+                "id"      => encrypt($id),
+                "status"  => true,
+                "message" => "Data Berhasil disimpan",
+                'token'   => csrf_hash(),
+            ]);
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
     public function updateStatusApproveMaterialRequest()
     {
         try {
@@ -343,6 +419,10 @@ class MaterialRequestKimia extends BaseController
         if ($this->request->getVar('type_barang') == "bahan_penolong" && $this->request->getVar('kondisi') == "nonkimia") {
             $addCondition = [
                 "parent_name !=" => "KIMIA"
+            ];
+        } else if ($this->request->getVar('type_barang') == "bahan_penolong" && $this->request->getVar('kondisi') == "kimia") {
+            $addCondition = [
+                "parent_name" => "KIMIA"
             ];
         }
         $data = $this->stockModel->getBarangAndStockCondition(

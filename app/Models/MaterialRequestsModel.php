@@ -72,6 +72,7 @@ class MaterialRequestsModel extends Model
         $selectQry = "material_requests.*,
             GROUP_CONCAT(material_request_details.nama_barang SEPARATOR ',') AS nama_barang,
             material_request_details.satuan,
+            material_request_details.kimia,
             SUM(material_request_details.qty) as total,
             work_orders.wo_no,
         ";

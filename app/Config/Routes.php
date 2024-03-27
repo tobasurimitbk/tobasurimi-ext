@@ -550,6 +550,7 @@ $routes->get('/material-request-kimia', 'Production\MaterialRequestKimia::index'
 $routes->get('/material-request-kimia/details/(:segment)', 'Production\MaterialRequestKimia::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/create', 'Production\MaterialRequestKimia::createView', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/all', 'Production\MaterialRequestKimia::all', ['filter' => 'Auth']);
+$routes->post('/material-request-kimia/update', 'Production\MaterialRequestKimia::update', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/data-detail-material', 'Production\MaterialRequestKimia::allDetailMaterialRequest', ['filter' => 'Auth']);
 $routes->post('/material-request-kimia/update-status', 'Production\MaterialRequestKimia::updateStatusApproveMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/list-barang-stock-init', 'Production\MaterialRequestKimia::getListBarangIsInit', ['filter' => 'Auth']);
