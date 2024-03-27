@@ -284,6 +284,8 @@
 
         // Mengaktifkan datepicker
         $('#date_production').datepicker({
+            autoclose: true,
+            todayHighlight: true,
             enableOnReadonly: false,
             format: 'dd/mm/yyyy'
         });
@@ -716,6 +718,7 @@
                 resetFormDetail();
                 drawTable();
                 $(".detail-modal").modal("hide");
+                $(".btn-show-detail").css("display", "none");
             }
         }
     }
@@ -806,6 +809,7 @@
             list_items.splice(indexToRemove, 1);
         }
         drawTable();
+        $(".btn-show-detail").css("display", "");
     }
 
     // Update
@@ -827,6 +831,7 @@
         <?php endforeach; ?>
         console.log(list_items);
         drawTable();
+        $(".btn-show-detail").css("display", "none");
     <?php endif; ?>
 </script>
 
