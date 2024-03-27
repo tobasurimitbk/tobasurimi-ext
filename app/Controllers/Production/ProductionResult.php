@@ -173,6 +173,7 @@ class ProductionResult extends BaseController
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('production_result_details.barang_type', 'bahan_baku')
+            ->orWhere('production_result_details.barang_type', 'bahan_penolong')
             ->where('production_result_details.production_result_id', $id)
             ->findAll();
         foreach ($productionResDetDataBD as $key => &$value) {

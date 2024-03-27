@@ -545,4 +545,17 @@ class MaterialRequest extends BaseController
         }
         return;
     }
+
+    public function deleteMR()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->workOrdersModel->delete($id);
+        $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Work Order Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
 }

@@ -1206,7 +1206,7 @@
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
             ));
             table.find('tbody').append(newRow);
@@ -1378,17 +1378,63 @@
         return id_selected;
     }
 
-    function deleteDetailBahanBaku(id) {
-        var indexToRemove = -1;
-        for (var i = 0; i < listStockSelectedBahanBaku.length; i++) {
-            if (listStockSelectedBahanBaku[i].id == id) {
-                indexToRemove = i;
-                break;
+    function deleteDetailBahanBaku(id, iddetail) {
+        if (id) {
+            var indexToRemove = -1;
+            for (var i = 0; i < listStockSelectedBahanBaku.length; i++) {
+                if (listStockSelectedBahanBaku[i].id == id) {
+                    indexToRemove = i;
+                    break;
+                }
+            }
+            if (indexToRemove !== -1) {
+                listStockSelectedBahanBaku.splice(indexToRemove, 1);
+                drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
             }
         }
-        if (indexToRemove !== -1) {
-            listStockSelectedBahanBaku.splice(indexToRemove, 1);
-            drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
+        if (iddetail) {
+            console.log(iddetail);
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url("work-order/delete"); ?>",
+                        data: {
+                            id: id,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
         }
     }
 
