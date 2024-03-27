@@ -5,6 +5,10 @@ namespace App\Controllers\Production;
 use App\Controllers\BaseController;
 use App\Models\BarangModel;
 use App\Models\DivisisModel;
+use App\Models\MaterialRequestDetailsModel;
+use App\Models\MaterialRequestsModel;
+use App\Models\ProductionResultDetailModel;
+use App\Models\ProductionResultModel;
 use App\Models\SatuansModel;
 use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
@@ -20,6 +24,10 @@ class WorkOrder extends BaseController
     protected $workOrderDetailsModel;
     protected $warehousesModel;
     protected $divisiModel;
+    protected $materialRequestModel;
+    protected $materialRequestDetailsModel;
+    protected $productionResultModel;
+    protected $productionResultDetailsModel;
 
     public function __construct()
     {
@@ -31,6 +39,10 @@ class WorkOrder extends BaseController
         $this->workOrderDetailsModel = new WorkOrderDetailsModel();
         $this->warehousesModel = new WarehousesModel();
         $this->divisiModel = new DivisisModel();
+        $this->materialRequestModel = new MaterialRequestsModel();
+        $this->materialRequestDetailsModel = new MaterialRequestDetailsModel();
+        $this->productionResultModel = new ProductionResultModel();
+        $this->productionResultDetailsModel = new ProductionResultDetailModel();
     }
 
     public function index()
@@ -120,9 +132,15 @@ class WorkOrder extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($workOrdersData['data'] as $data) {
+            $materialRequestData = $this->materialRequestModel->asObject()->where('work_order_id', $data->id)->where('deletedAt', null)->where('is_posted', 1)->find();
+            $materialRequestId = isset($materialRequestData[0]->id) ? $materialRequestData[0]->id : null;
+            $productionData = $this->productionResultModel->asObject()->where('work_order_id', $data->id)->where('material_request_id', $materialRequestId)->where('deletedAt', null)->find();
+            $productionResultId = isset($productionData[0]->id) ? $productionData[0]->id : null;
             array_push($dataWorkOrders, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
+                "id_material_request"   => $materialRequestId ? encrypt($materialRequestId) : 0,
+                "id_production_result"  => $productionResultId ? encrypt($productionResultId) : 0,
                 "wo_no"                 => $data->wo_no,
                 "nama_barang"           => $data->nama_barang,
                 "nama_divisi"           => $data->divisi,

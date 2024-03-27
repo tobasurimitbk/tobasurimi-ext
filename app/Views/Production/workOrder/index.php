@@ -110,16 +110,34 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
-                    return `
+                    let id_material_request = row?.id_material_request;
+                    let id_production_result = row?.id_production_result;
+
+                    let buttonsHTML = `
                         <div class="mt-0">
-                            <button class="btn btn-primary to-material-request" onclick="toMaterialRequest()" >
-                                <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
+                    `;
+                    buttonsHTML += `
+                        <button class="btn btn-primary to-material-request" onclick="toMaterialRequest('${id_material_request}')" >
+                            <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
+                        </button>
+                    `;
+                    if (id_production_result) {
+                        buttonsHTML += `
+                            <button class="btn btn-warning to-production-result" onclick="toProductionResult('${id_production_result}')" >
+                                <i class="fa fa-folder fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button class="btn btn-danger" onclick="remove('${id}')" >
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
+                        `;
+                    }
+                    // Tombol hapus selalu ditampilkan
+                    buttonsHTML += `
+                        <button class="btn btn-danger" onclick="remove('${id}')" >
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    `;
+                    buttonsHTML += `
                         </div>
-                    `
+                    `;
+                    return buttonsHTML;
                 }
             }
         ],
@@ -207,8 +225,21 @@
             }
         })
     }
-    const toMaterialRequest = function() {
-        window.location.href = "<?= base_url("material-request"); ?>";
+    const toMaterialRequest = function(id) {
+        console.log(id);
+        if (id != 0) {
+            window.location.href = "<?= base_url('material-request/details'); ?>/" + id;
+        } else {
+            window.location.href = "<?= base_url('material-request'); ?>";
+        }
+    }
+    const toProductionResult = function(id) {
+        console.log(id);
+        if (id != 0) {
+            window.location.href = "<?= base_url('production-result/details'); ?>/" + id;
+        } else {
+            window.location.href = "<?= base_url('production-result'); ?>";
+        }
     }
 </script>
 <?= $this->endSection(); ?>
