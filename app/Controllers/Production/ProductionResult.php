@@ -287,7 +287,7 @@ class ProductionResult extends BaseController
             ->where('work_orders.deletedAt', null)
             ->where('work_orders.is_posted', "1")
             ->where('work_orders.request_status', "waiting")
-            ->where('material_requests.is_approve', '1')
+            // ->where('material_requests.is_approve', '1')
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
@@ -735,7 +735,7 @@ class ProductionResult extends BaseController
                 ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
                 ->join('users', 'users.id = material_requests.createdBy', 'left')
                 ->where('company_id', $this->this_company_id)
-                ->where('material_requests.is_approve', 1)
+                ->where('material_requests.is_posted', 1)
                 ->where('material_requests.deletedAt', null)
                 ->where('material_request_details.deletedAt', null)
                 ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))

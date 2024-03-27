@@ -154,7 +154,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select department_id_request" name="department_id_request" id="department_id_request" disabled>
@@ -177,7 +177,7 @@
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <!-- details -->
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -510,7 +510,8 @@
         $('.date_picker').datepicker({
             autoclose: true,
             todayHighlight: true,
-            format: 'dd/mm/yyyy'
+            format: 'dd/mm/yyyy',
+            enableOnReadonly: false
         });
 
         // KODE BARANG
@@ -862,9 +863,14 @@
         $(".kode_request").change(function() {
             if ($(".kode_request option:selected").val()) {
                 let date_request = $(".kode_request option:selected").data("tanggal-request") ? $(".kode_request option:selected").data("tanggal-request") : "";
-                let user_request = $(".kode_request option:selected").data("user-request") ? $(".kode_request option:selected").data("user-request") : "";
+                let user_request = $(".kode_request option:select ed").data("user-request") ? $(".kode_request option:selected").data("user-request") : "";
                 let warehouse_id = $(".kode_request option:selected").data("warehouse-request") ? $(".kode_request option:selected").data("warehouse-request") : "";
                 let divisi_id = $(".kode_request option:selected").data("divisi-request") ? $(".kode_request option:selected").data("divisi-request") : "";
+
+                if (date_request) {
+                    let parts = date_request.split('-');
+                    date_request = parts[2] + '/' + parts[1] + '/' + parts[0];
+                }
 
                 $("#date_request").val(date_request);
                 $(".user_request").val(user_request);
