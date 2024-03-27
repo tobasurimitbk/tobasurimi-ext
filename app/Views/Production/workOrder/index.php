@@ -27,7 +27,6 @@
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('department')" class="sort">Department</th>
-                                <th>Jumlah Produksi</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -102,10 +101,6 @@
             },
             {
                 data: "nama_divisi",
-                className: "text-center"
-            },
-            {
-                data: "standart_production",
                 className: "text-center"
             },
             {

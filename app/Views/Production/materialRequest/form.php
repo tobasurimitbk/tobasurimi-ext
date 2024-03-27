@@ -13,6 +13,16 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
                 Batal
             </a>
+            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted != 1) { ?>
+                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
+                    Posting
+                </button>
+            <?php } ?>
+            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) { ?>
+                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
+                    Un Posting
+                </button>
+            <?php } ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
@@ -684,7 +694,9 @@
 
         $('.btn-save').click(function() {
             // console.log(listStockSelectedBahanBaku);
-            if (listStockSelectedBahanBaku.length == 0 || listStockSelectedBahan.length == 0 || listStockSelectedBahanJadi.length == 0) {
+            var listMaterialCheck = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanJadi);
+
+            if (listMaterialCheck.length == 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Barang yang akan direquest tidak boleh kosong !',
@@ -968,6 +980,66 @@
                 drawTableAsalBarang(res.data);
             }
         });
+    }
+
+    const posting = function(id, status_posting) {
+        console.log(id);
+        Swal.fire({
+            icon: 'question',
+            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url("material-request/update-status"); ?>",
+                    data: {
+                        id: id,
+                        status_posting: status_posting
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = "<?= base_url('material-request/details/') ?>" + response.id
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
     }
 
     function drawTableAsalBarang(data) {

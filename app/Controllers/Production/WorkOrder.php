@@ -126,7 +126,6 @@ class WorkOrder extends BaseController
                 "wo_no"                 => $data->wo_no,
                 "nama_barang"           => $data->nama_barang,
                 "nama_divisi"           => $data->divisi,
-                "standart_production"   => $data->standart_production,
             ]);
         }
 
