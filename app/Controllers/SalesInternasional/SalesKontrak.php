@@ -7,6 +7,8 @@ use Config\Services;
 
 use App\Models\CustomerModel;
 use App\Models\BarangMasterModel;
+use App\Models\CountryModel;
+use App\Models\MetadataModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesOrderExportModel;
@@ -18,6 +20,7 @@ class SalesKontrak extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_user_id;
     protected $encrypter;
     protected $customerModel;
     protected $salesKontrakModel;
@@ -26,12 +29,15 @@ class SalesKontrak extends BaseController
     protected $salesOrderExportDetailModel;
     protected $barangMasterModel;
     protected $stokDetailModel;
+    protected $countryModel;
+    protected $metaDataModel;
     protected $dompdf;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
         $this->encrypter = Services::encrypter();
         $this->customerModel = new CustomerModel();
         $this->barangMasterModel = new BarangMasterModel();
@@ -40,6 +46,8 @@ class SalesKontrak extends BaseController
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->stokDetailModel = new StockDetailModel();
+        $this->countryModel = new CountryModel();
+        $this->metaDataModel = new MetadataModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -50,12 +58,14 @@ class SalesKontrak extends BaseController
 
     public function createView()
     {
-        //Get Buyer From Customer
-        $dataCustomer = $this->customerModel->getCustomer();
-        $dataBarangMaster = $this->barangMasterModel->asObject()->findAll();
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        $dataCountry = $this->countryModel->findAll();
+        $dataValuta = $this->metaDataModel->get_by_name('Valuta');
 
         $data = [
-            "dataCustomer" => $dataCustomer
+            "dataCustomer" => $dataCustomer,
+            "dataCountry" => $dataCountry,
+            "dataValuta" => $dataValuta
         ];
 
         return view('SalesInternasional/SalesKontrak/form', $data);
@@ -765,5 +775,26 @@ class SalesKontrak extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function dropdownCustomer()
+    {
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        return response()->setJSON([
+            'data' => $dataCustomer,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function getNo()
+    {
+        $no = $this->salesKontrakModel->get_no(date('Y'), date('y'));
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $no
+        ]);
     }
 }
