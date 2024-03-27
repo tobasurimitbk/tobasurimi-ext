@@ -267,8 +267,8 @@
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Kaleng</th>
-                                <th style="text-align: center;">Qty Isi</th>
-                                <th style="text-align: center;">Qty Direquest</th>
+                                <th style="text-align: center;">Berat Isi Kaleng</th>
+                                <th style="text-align: center;">Berat Isi Direquest</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
