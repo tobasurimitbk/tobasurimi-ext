@@ -19,7 +19,7 @@
                 </button>
             <?php } ?>
             <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) { ?>
-                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
+                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 0)">
                     Un Posting
                 </button>
             <?php } ?>
