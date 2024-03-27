@@ -505,7 +505,7 @@ class MaterialRequest extends BaseController
 
             // po posting
             $payload = [
-                "is_posted" => $this->request->getVar('status_posting'),
+                "is_posted" => $this->request->getVar('status_posting') == '1' ? $this->request->getVar('status_posting') : null,
                 "note_approve" => $this->request->getVar('keterangan_posting')
             ];
 
