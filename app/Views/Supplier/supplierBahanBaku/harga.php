@@ -19,7 +19,7 @@
                     <tr style="color: black;">
                         <td width="150px">Nama Supplier</td>
                         <td width="5px">:</td>
-                        <td><?= empty($dataSupplier) ? "" : $dataSupplier->name; ?></td>
+                        <td><?= empty($dataSupplier) ? "" : strtoupper($dataSupplier->name); ?></td>
                     </tr>
                     <tr style="color: black; height: 20px;">
                         <td colspan="3"></td>

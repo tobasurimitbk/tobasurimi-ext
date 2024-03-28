@@ -405,7 +405,7 @@ class StokAdjusment extends BaseController
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                 $dataResult[$i]['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
-                $dataResult[$i]['stok_total'] = number_format($dataResult[$i]['stok_total']);
+                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
             }
             return response()->setJSON([
                 'data' => $dataResult,

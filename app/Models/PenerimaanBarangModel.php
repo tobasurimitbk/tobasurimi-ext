@@ -433,12 +433,15 @@ class PenerimaanBarangModel extends Model
                 );
 
                 if ($stok == null) {
-                    return response()->setJSON([
-                        'message' => "Gagal Posting LPB dikarenakan Barang " . $barang['barang_name'] . " (" . $spesifikasi['spesifikasi'] . ") belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                        'token' => csrf_hash(),
-                        'status' => false
-                    ]);
-                    break;
+                    $stok = $stockModel->insertStok(
+                        $rmDetail['company_id'],
+                        $rmDetail['warehouse_id'],
+                        $rmDetail['divisi_id'],
+                        "bahan_baku",
+                        $r['barang1_id'],
+                        $r['barang2_id'],
+                        0
+                    );
                 }
 
                 // CHECK STOK DETAIL
@@ -452,14 +455,28 @@ class PenerimaanBarangModel extends Model
                         $r['barang2_id'],
                         $rmDetail['bc_type'],
                         "-",
-                        $stok['id']
+                        is_array($stok) ? $stok['id'] : $stok,
                     ) == null
                 ) {
-                    return response()->setJSON([
-                        'message' => "Gagal Posting LPB dikarenakan Barang " . $barang['barang_name'] . " (" . $spesifikasi['spesifikasi'] . ") belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                        'token' => csrf_hash(),
-                        'status' => false
-                    ]);
+                    // INSERT STOK INISIASI
+                    $stokDetail = $stockDetailModel->insertStokDetail(
+                        is_array($stok) ? $stok['id'] : $stok,
+                        0,
+                        "In",
+                        date('Y-m-d'),
+                        $rmDetail['createdBy'],
+                        "INISIASI",
+                        "-",
+                        "-"
+                    );
+                    $stockDetail2Model->insertStokDetail2(
+                        $rmDetail['bc_type'],
+                        is_array($stok) ? $stok['id'] : $stok,
+                        $stokDetail,
+                        0,
+                        "-",
+                        "-"
+                    );
                 }
             }
 
@@ -473,14 +490,16 @@ class PenerimaanBarangModel extends Model
                 $rmDetail['kemasan_id'],
             );
 
-            $kemasan = $kemasanModel->find($rmDetail['kemasan_id']);
-
             if ($stok == null) {
-                return response()->setJSON([
-                    'message' => "Gagal Posting LPB dikarenakan Kemasan " . $kemasan['name'] . " belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                    'token' => csrf_hash(),
-                    'status' => false
-                ]);
+                $stok = $stockModel->insertStok(
+                    $rmDetail['company_id'],
+                    $rmDetail['warehouse_id'],
+                    $rmDetail['divisi_id'],
+                    "kemasan",
+                    0,
+                    $rmDetail['kemasan_id'],
+                    0
+                );
             }
 
             // CHECK STOK KEMASAN DETAIL
@@ -494,14 +513,28 @@ class PenerimaanBarangModel extends Model
                     $rmDetail['kemasan_id'],
                     $rmDetail['bc_type'],
                     "-",
-                    $stok['id']
+                    is_array($stok) ? $stok['id'] : $stok,
                 ) == null
             ) {
-                return response()->setJSON([
-                    'message' => "Gagal Posting LPB dikarenakan Kemasan " . $kemasan['name'] . " belum diinisasi stok nya (Silahkan inisiasi terlebih dahulu)",
-                    'token' => csrf_hash(),
-                    'status' => false
-                ]);
+                // INSERT STOK INISIASI
+                $stokDetail = $stockDetailModel->insertStokDetail(
+                    is_array($stok) ? $stok['id'] : $stok,
+                    0,
+                    "In",
+                    date('Y-m-d'),
+                    $rmDetail['createdBy'],
+                    "INISIASI",
+                    "-",
+                    "-"
+                );
+                $stockDetail2Model->insertStokDetail2(
+                    $rmDetail['bc_type'],
+                    is_array($stok) ? $stok['id'] : $stok,
+                    $stokDetail,
+                    0,
+                    "-",
+                    "-"
+                );
             }
         }
 
