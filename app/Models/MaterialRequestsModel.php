@@ -285,7 +285,7 @@ class MaterialRequestsModel extends Model
 
     public function getMaterialWithWorkOrder($id)
     {
-        $selectQry = "material_requests.*, work_orders.wo_no, work_orders.standart_production, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR ', ') AS nama_barang";
+        $selectQry = "material_requests.*, work_orders.wo_no, work_orders.standart_production, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR ', ') AS nama_barang, work_orders.is_posted AS posted_wo, work_orders.request_status AS status_wo";
 
         $data = $this->asObject()
             ->select($selectQry)

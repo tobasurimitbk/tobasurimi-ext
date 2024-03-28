@@ -181,45 +181,45 @@ class MaterialRequest extends BaseController
         return view('Production/materialRequest/form', $data);
     }
 
-    public function getByIdDetail($id = null)
-    {
-        $id = decrypt($id);
-        //Get Barang
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
+    // public function getByIdDetail($id = null)
+    // {
+    //     $id = decrypt($id);
+    //     //Get Barang
+    //     $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
-        //Get Satuan
-        $dataSatuan = $this->satuanModel->asObject()->find();
+    //     //Get Satuan
+    //     $dataSatuan = $this->satuanModel->asObject()->find();
 
-        $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
-        $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
+    //     $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
+    //     $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
 
-        $data = [
-            "dataBarang" => $dataBarang,
-            "dataSatuan" => $dataSatuan,
-            "dataDivisi" => $dataDivisi,
-            "dataWarehouse" => $dataWarehouse,
-        ];
+    //     $data = [
+    //         "dataBarang" => $dataBarang,
+    //         "dataSatuan" => $dataSatuan,
+    //         "dataDivisi" => $dataDivisi,
+    //         "dataWarehouse" => $dataWarehouse,
+    //     ];
 
-        if (!empty($id)) {
-            $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
-            $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
-            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.nama_satuan')
-                ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
-                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
-                ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
-                ->where('material_request_id', $id)
-                ->where('material_request_details.deletedAt', null)
-                ->get()->getResult();
-            $data["dataMaterialRequests"] = $dataMaterialRequests;
-            $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
-            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
-            $data["ids"] = $id;
-        }
+    //     if (!empty($id)) {
+    //         $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
+    //         $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
+    //         $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.nama_satuan')
+    //             ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
+    //             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
+    //             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+    //             ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
+    //             ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
+    //             ->where('material_request_id', $id)
+    //             ->where('material_request_details.deletedAt', null)
+    //             ->get()->getResult();
+    //         $data["dataMaterialRequests"] = $dataMaterialRequests;
+    //         $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
+    //         $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
+    //         $data["ids"] = $id;
+    //     }
 
-        return view('Production/materialRequest/form-detail', $data);
-    }
+    //     return view('Production/materialRequest/form-detail', $data);
+    // }
 
     public function all()
     {

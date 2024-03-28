@@ -18,7 +18,7 @@
                     Posting
                 </button>
             <?php } ?>
-            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) { ?>
+            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1 && $dataMaterialRequestswithwo[0]->posted_wo == 1 && $dataMaterialRequestswithwo[0]->status_wo == "waiting") { ?>
                 <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 0)">
                     Un Posting
                 </button>
