@@ -114,9 +114,10 @@ class StockModel extends Model
         }
 
         if ($addCondition['search']) {
-            $dataQry->where('barang_master.barang_name', $addCondition['search']);
-            $dataQry->orWhere('barang_master.kode_barang', $addCondition['search']);
-            $dataQry->orWhere('barang_master_spesifikasi.spesifikasi', $addCondition['search']);
+            $dataQry->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->groupEnd()
+                ->orWhere('barang_master.kode_barang', $addCondition['search']);
         }
 
         if (

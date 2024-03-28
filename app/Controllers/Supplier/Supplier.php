@@ -126,8 +126,8 @@ class Supplier extends BaseController
                 "no"            => $no++,
                 "kode"          => $data->kode,
                 "id"            => encrypt($data->id),
-                "name"          => $data->name,
-                "address"       => $data->address,
+                "name"          => strtoupper($data->name),
+                "address"       => strtoupper($data->address),
                 "no_npwp"       => $data->no_npwp
             ]);
         }
@@ -202,8 +202,8 @@ class Supplier extends BaseController
 
             $insertData = [
                 "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
+                "name" => strtoupper($this->request->getVar("name")),
+                "address" => strtoupper($this->request->getVar("address")),
                 "no_npwp" => $this->request->getPost("no_npwp"),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
@@ -306,8 +306,8 @@ class Supplier extends BaseController
                 $id = decrypt($this->request->getPost("id"));
 
                 $payload = [
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
+                    "name" => strtoupper($this->request->getVar("name")),
+                    "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => $this->request->getPost("no_npwp"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
@@ -389,8 +389,8 @@ class Supplier extends BaseController
                 "no"            => $no++,
                 "kode"          => $data->kode,
                 "id"            => $data->id,
-                "name"          => $data->name,
-                "address"       => $data->address,
+                "name"          => strtoupper($data->name),
+                "address"       => strtoupper($data->address),
                 "no_npwp"       => $data->no_npwp,
                 "phone"         => $data->phone
             ]);
@@ -460,8 +460,8 @@ class Supplier extends BaseController
 
             $insertData = [
                 "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
+                "name" => strtoupper($this->request->getVar("name")),
+                "address" => strtoupper($this->request->getVar("address")),
                 "no_npwp" => $this->request->getPost("no_npwp"),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
@@ -556,8 +556,8 @@ class Supplier extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
+                    "name" => strtoupper($this->request->getVar("name")),
+                    "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => $this->request->getPost("no_npwp"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
@@ -629,8 +629,8 @@ class Supplier extends BaseController
                 "no"                => $no++,
                 "kode"              => $data->kode,
                 "id"                => $data->id,
-                "name"              => $data->name,
-                "address"           => $data->address,
+                "name"              => strtoupper($data->name),
+                "address"           => strtoupper($data->address),
                 "phone"             => $data->phone,
                 "contact_person"    => $data->contact_person,
                 "fax"               => $data->fax
@@ -686,8 +686,8 @@ class Supplier extends BaseController
 
             $insertData = [
                 "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
+                "name" => strtoupper($this->request->getVar("name")),
+                "address" => strtoupper($this->request->getVar("address")),
                 "fax" => $this->request->getPost("fax"),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
@@ -762,8 +762,8 @@ class Supplier extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
+                    "name" => strtoupper($this->request->getVar("name")),
+                    "address" => strtoupper($this->request->getVar("address")),
                     "fax" => $this->request->getPost("fax"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),

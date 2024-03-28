@@ -197,7 +197,7 @@
                             <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Tipe Barang</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju</th>
