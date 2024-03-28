@@ -404,11 +404,8 @@ class PenerimaanBarangModel extends Model
         $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $supplierHargaModel = new SupplierHargaModel();
         $stockDetailModel = new StockDetailModel();
-        $barangMasterModel = new BarangMasterModel();
-        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $stockModel = new StockModel();
         $stockDetail2Model = new StockDetail2Model();
-        $kemasanModel = new KemasanModel();
 
         $rmDetail =  $rmPurchaseOrder->where('id', $poID)->first();
         $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
@@ -419,8 +416,6 @@ class PenerimaanBarangModel extends Model
 
             foreach ($rmBarangDetail as $r) {
                 // HANDLE STOK BARANG
-                $barang = $barangMasterModel->find($r['barang1_id']);
-                $spesifikasi = $barangMasterSpesifikasiModel->find($r['barang2_id']);
 
                 // CHECK STOK BARANG HEADER
                 $stok = $stockModel->getStokMaster(
@@ -679,8 +674,6 @@ class PenerimaanBarangModel extends Model
         }
 
         $this->autoClosePO($lpbID);
-
-        return '';
     }
 
     public function autoClosePO($penerimaanBarangID)
