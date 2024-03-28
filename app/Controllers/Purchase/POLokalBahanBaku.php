@@ -466,15 +466,10 @@ class POLokalBahanBaku extends BaseController
                         $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
                         // cek if warehouse_id != null
                         if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
-                            $data =  $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
+                            $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
                         }
                     }
                     $this->RMPurchaseOrderModel->update($id, $payload);
-                    return response()->setJSON([
-                        "status"    => true,
-                        "message"   => "Status Posting PO Berhasil Diperbaruhi",
-                        'token'     => csrf_hash()
-                    ]);
                 }
                 echo json_encode($data);
             } else {
