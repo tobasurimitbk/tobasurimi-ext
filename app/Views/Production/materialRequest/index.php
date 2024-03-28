@@ -111,6 +111,7 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let status = row?.is_posted
+                    let request_status = row?.request_status
                     // console.log(status);
                     if (status != 1) {
                         return `
@@ -127,19 +128,32 @@
                                 </div>
                             `
                     } else {
-                        return `
-                                <div class="mt-0">
-                                    <button class="btn btn-primary detail-material-request">
-                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <button class="btn btn-warning">
-                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger" onclick="posting('${id}', 0)">
-                                        <i class="fa fa-ban" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            `
+                        if (request_status == "waiting") {
+                            return `
+                                    <div class="mt-0">
+                                        <button class="btn btn-primary detail-material-request">
+                                            <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-warning">
+                                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger" onclick="posting('${id}', 0)">
+                                            <i class="fa fa-ban" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                `
+                        } else {
+                            return `
+                                    <div class="mt-0">
+                                        <button class="btn btn-primary detail-material-request">
+                                            <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-warning">
+                                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                `
+                        }
                     }
                 }
             }

@@ -257,6 +257,7 @@ class MaterialRequest extends BaseController
                 "nama_barang"           => $data->nama_barang,
                 "wo_no"           => $data->wo_no,
                 "is_posted"           => $data->is_posted,
+                "request_status"           => $data->request_status,
             ]);
         }
 

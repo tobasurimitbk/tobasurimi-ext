@@ -75,6 +75,7 @@ class MaterialRequestsModel extends Model
             material_request_details.kimia,
             SUM(material_request_details.qty) as total,
             work_orders.wo_no,
+            work_orders.request_status,
         ";
 
         $materialRequestsDataQry = $this->asObject()
