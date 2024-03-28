@@ -172,9 +172,10 @@ class ProductionResult extends BaseController
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->where('production_result_details.barang_type', 'bahan_baku')
-            ->orWhere('production_result_details.barang_type', 'bahan_penolong')
             ->where('production_result_details.production_result_id', $id)
+            ->where('production_result_details.barang_type !=', 'bahan_scrap')
+            ->where('production_result_details.barang_type !=', 'bahan_return')
+            ->where('production_result_details.barang_type !=', 'bahan_jadi')
             ->findAll();
         foreach ($productionResDetDataBD as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
