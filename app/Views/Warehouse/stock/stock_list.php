@@ -206,9 +206,9 @@
                     let id = row?.id;
                     return `
                         <div class="mt-0 actions">
-                            <button onclick="stokDetail('${id}')" data-toggle="tooltip" title="Detail Stok" class="btn btn-success posting-spp actions">
+                            <a href="<?= base_url('stock-list/id/') ?>${id}'" data-toggle="tooltip" title="Detail Stok" class="btn btn-success posting-spp actions">
                                 <i class="fas fa-eye"></i>
-                            </button>
+                            </a>
                         </div>
                     `
                 }

@@ -446,17 +446,6 @@ class POLokalBahanBaku extends BaseController
                 "is_posted" => $this->request->getVar('status_posting')
             ];
 
-            if ($payload['is_posted']) {
-                $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
-                // cek if warehouse_id != null
-                if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
-                    $data =  $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
-                    if ($data != '') {
-                        return $data;
-                    }
-                }
-            }
-
             if (!empty($id)) {
                 $data = [
                     "status"    => true,
@@ -473,6 +462,16 @@ class POLokalBahanBaku extends BaseController
                         $data["token"] = csrf_hash();
                     }
                 } else {
+                    if ($payload['is_posted']) {
+                        $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
+                        // cek if warehouse_id != null
+                        if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
+                            $data =  $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
+                            if ($data != '') {
+                                return $data;
+                            }
+                        }
+                    }
                     $this->RMPurchaseOrderModel->update($id, $payload);
                 }
                 echo json_encode($data);
