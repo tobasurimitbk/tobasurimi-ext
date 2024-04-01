@@ -44,13 +44,13 @@ class ProsesRebusModel extends Model
     {
         $availableSort = [
             'no_rebus' => 'no_rebus',
-            'proses_rebus.createdAt' => 'proses_rebus.createdAt',
+            'proses_rebus.createdAt' => 'proses_rebus.tanggal',
             'proses_rebus.divisi_id' => 'proses_rebus.divisi_id',
             'proses_rebus.warehouse_id' => 'proses_rebus.warehouse_id',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'proses_rebus.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "proses_rebus.*,
