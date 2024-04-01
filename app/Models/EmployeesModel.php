@@ -382,4 +382,24 @@ class EmployeesModel extends Model
 
         return $res;
     }
+
+    public function getEmployeesComplete($company_id, $condition = null)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id,
+            'employees.status' => "Aktif"
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.*, divisis.divisi, bagian.nama_bagian AS namaBagian")
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('jabatans', 'jabatans.id = employees.jabatan_id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left');
+        $builder->where($arrCondition);
+        $builder->where($condition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }

@@ -22,7 +22,9 @@ class SalesOrderModel extends Model
         'id_user',
         'id_po',
         'id_customer',
+        'jenis_penjualan',
         'sales_id',
+        'nama_ecommerce',
         'no_sales_order',
         'no_po',
         'surat_jalan_so_id',
@@ -141,40 +143,39 @@ class SalesOrderModel extends Model
     {
         $selectQry = "sales_order.*,
                       users.name as seller_name,
-                      CONCAT(employees.nip , ' - ', employees.name) AS salesName,
                       customers.name as customer_name ,
                       customers.address,customers.phone,
                       customers.tipe_pelanggan as tipe_pelanggan,
+                      CONCAT(employees.nip , ' - ', employees.name) AS salesName,
                       termin.value AS termin,
                       tipe_pelanggan.value AS tipe_pelanggan_value";
 
         $dataSalesOrder = $this->asObject()
-            ->join('users', 'users.id = sales_order.id_user')
-            ->join('customers', 'customers.id = sales_order.id_customer ')
-            ->join('metadata as termin', 'termin.id = customers.termin', 'left')
+            ->join('users', 'users.id = sales_order.id_user', 'left')
+            ->join('customers', 'customers.id = sales_order.id_customer ', 'left')
+            ->join('metadata as termin', 'termin.id = sales_order.payment_terms', 'left')
             ->join('metadata as tipe_pelanggan', 'tipe_pelanggan.id = customers.tipe_pelanggan', 'left')
-            ->join('employees', 'employees.id = sales_order.sales_id ')
+            ->join('employees', 'employees.id = sales_order.sales_id ', 'left')
             ->select($selectQry)
             ->find($id);
 
         $selectQueryDetail = "sales_order_detail.*,
                               sales_order_detail.discount_percentage AS disc, 
                               warehouses.warehouse_name, 
-                              barang_master.kode_barang AS kode_barang,
-                              barang_master.barang_name AS nama_barang,
+                              barang_master_sales.kode_barang AS kode_barang,
+                              barang_master_sales.barang_name AS nama_barang,
                               sales_order_detail.harga_barang AS harga_barang,
-                              barang_master.satuan_id,
+                              barang_master_sales.satuan_id,
                               satuans.kode_satuan AS satuan";
         $detail = $this->SalesOrderDetailModel
             ->where('id_sales_order', $id)
-            ->join('barang_master', 'barang_master.id = sales_order_detail.id_barang')
-            ->join('satuans', 'satuans.id = barang_master.satuan_id')
-            ->join('warehouses', 'warehouses.id = sales_order_detail.id_warehouse')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->join('warehouses', 'warehouses.id = sales_order_detail.id_warehouse', 'left')
             ->select($selectQueryDetail)
             ->findAll();
 
-        if($dataSalesOrder)
-        {
+        if ($dataSalesOrder) {
             $dataSalesOrder->detail = $detail;
         }
 

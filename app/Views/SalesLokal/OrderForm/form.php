@@ -32,7 +32,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="tipe_sales_order" name="tipe_sales_order" id="tipe_sales_order" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -45,10 +45,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="order_date" type="text" value="<?= !empty($data) ? $data->order_date : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" class="form-control order_date" id="order_date">
+                                <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" name="order_date" type="text" value="<?= !empty($data) ? $data->order_date : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" class="form-control order_date" id="order_date">
                                 <label>Tanggal Pemesanan</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -56,18 +56,48 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $data->salesName ?? '' ?>">
                             <input autocomplete="one-time-code" type="hidden" class="form-control sales_name" id="id_user" name="id_user" value="<?= $id_user ?>">
                             <label for="floatingInput">Nama Sales</label>
+                        </div>
+                    </div> -->
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <option value=""></option>
+                                <option value="1" <?= !empty($data) ? ($data->jenis_penjualan == 1 ? "selected" : "") : ""; ?>>By Sales</option>
+                                <option value="2" <?= !empty($data) ? ($data->jenis_penjualan == 2 ? "selected" : "") : ""; ?>>By Office</option>
+                                <option value="3" <?= !empty($data) ? ($data->jenis_penjualan == 3 ? "selected" : "") : ""; ?>>By Ecommerce</option>
+                            </select>
+                            <label for="floatingInput">Jenis Penjualan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 nama_sales_div">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select id_sales" name="id_sales" id="id_sales" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <option value=""></option>
+                                <?php foreach ($dataSales ?? [] as $sales) : ?>
+                                    <option value="<?= $sales['id']; ?>" <?= !empty($data) ? ($data->sales_id == $sales['id'] ? "selected" : "") : ""; ?>><?= $sales['name']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Nama Sales</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 nama_ecommerce_div">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control nama_ecommerce" id="nama_ecommerce" name="nama_ecommerce" value="<?= !empty($data) ? $data->nama_ecommerce : ""; ?>">
+                            <label for="floatingInput">Nama Ecommerce</label>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer) : ?>
                                     <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
@@ -84,7 +114,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>">
+                            <select class="form-select termin" name="termin" id="termin" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <option value=""></option>
+                                <?php foreach ($dataTermin ?? [] as $termin) : ?>
+                                    <option value="<?= $termin['id']; ?>" <?= !empty($data) ? ($data->payment_terms == $termin['id'] ? "selected" : "") : ""; ?>><?= $termin['value']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <!-- <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>"> -->
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
@@ -101,7 +137,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="shipping_date" type="text" <?= !empty($paymentData) ? 'readonly' : '' ?> value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
+                                <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
                                 <label>Tanggal Pengiriman</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -109,67 +145,20 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select disabled class="form-select company" name="company" id="company">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($companies)) {
-                                    foreach ($companies as $c) {
-                                ?>
-                                        <option <?= session()->get('login')->this_company_id == $c->id ? 'selected' : '' ?> value="<?= $c->id; ?>" <?= !empty($data) ? ($data->id_company === $c->id ? "selected" : "") : ""; ?>><?= $c->company; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Company</label>
-                        </div>
-                    </div> -->
-                    <!-- <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?php // !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; 
-                                                                                                                                                        ?> placeholder="Terms" value="<?php // !empty($data) ? $data->payment_terms : ""; 
-                                                                                                                                                                                        ?>">
-                            <label for="floatingInput">Terms</label>
-                        </div>
-                    </div> -->
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="End of time">
+                            <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="Biaya Kirim">
                             <label for="floatingInput">Biaya Kirim</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 80px;">
-                            <textarea autocomplete="one-time-code" <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" <?= !empty($data) ? 'disabled=true' : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-1">
-                        <div class="mb-3" style="height: 50px;">
-                            <label for="floatingInput">Pajak</label>
-                            <div class="switch-form-pinjaman-karyawan">
-                                <label class="switch">
-                                    <input autocomplete="one-time-code" class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status == 'true' ? 'checked' : '') : ''; ?>>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div> 
-                    <div class="col-md-2">
-                        <div class="mb-3" style="height: 50px;">
-                            <label for="floatingInput">Include Pajak</label>
-                            <div class="switch-form-pinjaman-karyawan">
-                                <label class="switch">
-                                    <input autocomplete="one-time-code" class="include_tax" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : ''; ?> name="include_tax" id="include_tax" type="checkbox" <?= !empty($data) ? ($data->include_pa == 'true' ? 'checked' : '') : ''; ?>>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
 
             </form>
@@ -260,24 +249,6 @@
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Nama Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select warehouse" name="warehouse" id="warehouse" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">warehouse</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="number" readonly="true" class="form-control stok" name="stok" id="stok" placeholder="Stok">
-                                    <label for="floatingInput">Stok</label>
-                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -395,9 +366,9 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     return `
-                <div class="mt-2">
-                    <button data-no="${row?.no}">X</button>
-                </div>
+                    <div class="">
+                        <button data-no="${row?.no}" data-id="${row?.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                    </div>
                 `
                 }
             }
@@ -432,82 +403,103 @@
                     keterangan: "<?= $payload['keterangan'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
-                    dept: <?= $payload['dept'] ?? 0 ?>,
-                    warehouse_id: <?= $payload['id_warehouse'] ?>,
-                    warehouse_name: "<?= $payload['warehouse_name'] ?>",
-                    isDeleted: false
+                    isDeleted: false,
+                    kode_barang: '<?= $payload['kode_barang'] ?>',
+                    satuan: '<?= $payload['satuan'] ?>',
+                    harga_barang: Number('<?= $payload['harga_barang'] ?>').toLocaleString(),
+                    barangTotal: "<?= $payload['barangTotal'] ?>",
+                    disc: "<?= $payload['discount_percentage'] ?? 0 ?>",
+                    taxAmt: null,
+                    discAmt: <?= $payload['barangTotal'] ?> * (<?= $payload['discount_percentage'] ?? 0 ?> / 100),
                 });
 
                 table.row.add({
                     no: no,
                     id: <?= $payload['id'] ?>,
                     id_barang: <?= $payload['id_barang'] ?>,
+                    nama_barang: "<?= $payload['nama_barang'] ?>",
+                    harga: "<?= $payload['harga_barang'] ?>",
+                    qty: "<?= $payload['qty'] ?>",
+                    amount: "<?= $payload['amount'] ?>",
+                    keterangan: "<?= $payload['keterangan'] ?>",
+                    tax: null,
+                    discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
+                    isDeleted: false,
                     kode_barang: '<?= $payload['kode_barang'] ?>',
-                    nama_barang: '<?= $payload['nama_barang'] ?>',
-                    qty: '<?= $payload['qty'] ?>',
                     satuan: '<?= $payload['satuan'] ?>',
                     harga_barang: Number('<?= $payload['harga_barang'] ?>').toLocaleString(),
                     barangTotal: "<?= $payload['barangTotal'] ?>",
                     disc: "<?= $payload['discount_percentage'] ?? 0 ?>",
-                    tax: null,
                     taxAmt: null,
-                    keterangan: "<?= $payload['keterangan'] ?>",
                     discAmt: <?= $payload['barangTotal'] ?> * (<?= $payload['discount_percentage'] ?? 0 ?> / 100),
-                    amount: Number("<?= $payload['amount'] ?>").toLocaleString(),
-                    dept: <?= $payload['dept'] ?? 0 ?>,
-                    warehouse_id: <?= $payload['id_warehouse'] ?>,
-                    warehouse_name: "<?= $payload['warehouse_name'] ?>",
-                    isDeleted: false
                 }).draw(false);
             <?php
             }
             ?>
         <?php
         } ?>
+        console.log(list_items);
 
-        $('.dataTable tbody').on('click', 'button', function() { // delete datatable row
-            console.log($(this).data('no'))
-            table.clear().draw();
-            // table.row($(this).parents('tr')).remove().draw();
-            let new_list = [];
-            no = 0;
-            row = 0;
-            list_items.map((obj) => {
-                if (obj.no !== $(this).data('no')) {
-                    no = no + 1;
-                    new_list.push(obj);
+        $('.dataTable tbody').on('click', 'button', function() {
+            let rowData = table.row($(this).parents('tr')).data();
+            let dataNo = $(this).data('no');
+            let dataId = $(this).data('id');
+            const csrf = $(`[name="${csrfToken}"]`);
 
-                    table.row.add({
-                        id: obj.id,
-                        no: no,
-                        tipe_pelanggan: obj.tipe_pelanggan,
-                        id_barang: obj.id_barang,
-                        kode_barang: obj.kode_barang,
-                        nama_barang: obj.nama_barang,
-                        qty: obj.qty,
-                        satuan: obj.satuan,
-                        harga_barang: obj.harga,
-                        barangTotal: obj.amount,
-                        disc: obj.disc,
-                        tax: obj.tax,
-                        taxAmt: obj.taxAmt,
-                        keterangan: obj.keterangan,
-                        discAmt: obj.discAmt,
-                        amount: Number(obj.amount).toLocaleString(),
-                        dept: obj.dept,
-                        warehouse_id: obj.warehouse_id,
-                        warehouse_name: obj.warehouse_name,
-                        isDeleted: false
-                    }).draw(false);
-                } else {
-                    if (obj.id) {
-                        list_delete.push(obj);
+            if (dataId) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Yakin akan di hapus?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("order-form-lokal/delete-detail"); ?>",
+                            data: {
+                                id: dataId,
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            location.reload();
+                                        })
+                                }
+                            },
+                        });
                     }
+                })
+            } else {
+                // Hapus item dari array JavaScript dan gambar ulang tabel
+                let indexToRemove = list_items.findIndex(item => item.no === dataNo);
+                if (indexToRemove !== -1) {
+                    list_items.splice(indexToRemove, 1);
+                    table.clear().rows.add(list_items).draw();
                 }
-            })
-            list_items = new_list;
+            }
+
             reCountTotal();
         });
+
 
         $(".order_date").datepicker({
             todayHighlight: true,
@@ -520,7 +512,7 @@
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
-            autoclose: true
+            autoclose: true,
         })
 
         // Customer
@@ -535,7 +527,7 @@
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan');
 
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
-            $('#termin').val(decodeURIComponent(termin));
+            $('#termin').val(decodeURIComponent(termin)).change();
             $('#sales_name').val(decodeURIComponent(salesName));
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
         });
@@ -545,15 +537,11 @@
 
 
             let tipePelanggan = $("#hidden_tipe_pelanggan").val();
-            console.log(tipePelanggan);
-            // console.log(idCustomer);
             $.ajax({
                 url: "<?= base_url('/order-form-lokal/getmetaData'); ?>" + "/" + tipePelanggan,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-
-                    // console.log(res.dataWarehouse)
                     res.dataMetaData.forEach(function(item) {
                         $(".tipe_pelanggan").val(item.value);
                     })
@@ -579,6 +567,62 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.id_customer')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // Sales
+        $('.termin').select2({
+            placeholder: "Pilih Termin",
+            allowClear: true,
+            theme: "bootstrap-5"
+        }).change(function() {});
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.termin')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.termin')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.termin')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // Sales
+        $('.id_sales').select2({
+            placeholder: "Pilih Nama Sales",
+            allowClear: true,
+            theme: "bootstrap-5"
+        }).change(function() {});
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.id_sales')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.id_sales')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.id_sales')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -614,6 +658,51 @@
             .css('z-index', '1');
 
         // BARANG
+        $('.jenis_penjualan').select2({
+            placeholder: "Pilih Jenis Penjualan",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            let isi = $(this).val();
+            if (isi == 1) {
+                $('.id_sales').prop('disabled', false);
+                $('.nama_ecommerce').prop('readonly', true);
+            } else if (isi == 2) {
+                $('.id_sales').prop('disabled', true);
+                $('.nama_ecommerce').prop('readonly', true);
+            } else if (isi == 3) {
+                $('.id_sales').prop('disabled', true);
+                $('.nama_ecommerce').prop('readonly', false);
+            } else {
+                $('.id_sales').prop('disabled', true);
+                $('.nama_ecommerce').prop('readonly', true);
+            }
+            $('.id_sales').val('').change();
+            $('.nama_ecommerce').val('');
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.jenis_penjualan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.jenis_penjualan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.jenis_penjualan')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // BARANG
         $('.id_barang').select2({
             placeholder: "Pilih Barang",
             theme: "bootstrap-5",
@@ -644,6 +733,9 @@
 
         var validator = $(".create-form").validate({
             rules: {
+                no_sales_order: {
+                    required: true
+                },
                 id_customer: {
                     required: true
                 },
@@ -652,9 +744,18 @@
                 },
                 shipping_date: {
                     required: true
+                },
+                termin: {
+                    required: true
+                },
+                jenis_penjualan: {
+                    required: true
                 }
             },
             messages: {
+                no_sales_order: {
+                    required: "No sales order wajib diisi"
+                },
                 id_customer: {
                     required: "Nama Customer wajib diisi"
                 },
@@ -663,6 +764,12 @@
                 },
                 shipping_date: {
                     required: "Tanggal pengiriman wajib diisi"
+                },
+                termin: {
+                    required: "Termin wajib diisi"
+                },
+                jenis_penjualan: {
+                    required: "Jenis penjualan wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -690,9 +797,6 @@
         // MODAL
         var validator_detail = $(".detail-form").validate({
             rules: {
-                no_sales_order: {
-                    required: true
-                },
                 id_barang: {
                     required: true
                 },
@@ -701,15 +805,9 @@
                 },
                 qty: {
                     required: true
-                },
-                warehouse: {
-                    required: true
                 }
             },
             messages: {
-                no_sales_order: {
-                    required: "No sales order wajib diisi"
-                },
                 id_barang: {
                     required: "Nama barang wajib diisi"
                 },
@@ -718,10 +816,7 @@
                 },
                 qty: {
                     required: "Qty wajib diisi"
-                },
-                warehouse: {
-                    required: "Warehouse wajib diisi"
-                },
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -765,8 +860,6 @@
                         $(".warehouse").empty();
                         //bug di penjualan lokal
                         // $(".warehouse").append(`<option value=""></option>`);
-
-                        // console.log(res.dataWarehouse)
                         res.dataWarehouse.forEach(function(item) {
                             $(".warehouse").append(`<option  value="${item.warehouse_id}" ${warehouseId==item.id?"selected":""}>${item.warehouse_name}</option>`).change();
                             // $(".stok").val(item.qty);
@@ -786,8 +879,6 @@
                         success: function(res) {
                             //bug di penjualan lokal
                             // $(".warehouse").append(`<option value=""></option>`);
-
-                            // console.log(res.dataWarehouse)
                             if (res.dataDetailStock.length > 0) {
                                 // You can set the value of .stok based on the selected warehouse here
                                 let selectedWarehouse = res.dataDetailStock; // Assuming you want the first item in the response
@@ -836,9 +927,6 @@
             validator_detail.resetForm();
             validator_detail.reset();
 
-            console.log(nama_barang);
-            console.log(tipe_pelanggan);
-
             $(".id_detail").val(id)
             // $(".harga").val(parseInt(harga))
             $(".qty").val(qty)
@@ -850,8 +938,6 @@
             $(".dept").val(dept)
             $("#warehouse").val(idWarehouse)
             $("#warehouse").text(warehouseName)
-
-            console.log(id)
 
             $.ajax({
                 url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
@@ -872,16 +958,12 @@
 
                     $(".id_barang").val(valData).change();
                     $(".detail-modal").modal("show");
-
-
-
                 }
             })
 
         });
 
         $(".btn-submit").click(function() {
-            // console.log('test')
             $(".detail-modal").modal("hide")
 
             // CHECK IF NO BARANG
@@ -911,7 +993,6 @@
 
                         if (list_delete.length !== 0) {
                             list_delete.map(obj => {
-                                console.log(obj)
                                 update_list_items.push({
                                     id: obj.id ? Number(obj.id) : 0,
                                     id_barang: obj.id_barang ? Number(obj.id_barang) : 0,
@@ -933,7 +1014,6 @@
                         const taxStatus = $('#tax_status').is(':checked');
                         const includeTaxStatus = $('#include_tax').is(':checked');
                         tableData.map(obj => {
-                            console.log(obj)
                             // total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
                             total += Number(obj.amount.replaceAll(",", "")) || 0;
 
@@ -941,7 +1021,6 @@
                                 taxAmt += obj.taxAmt ?? 0;
                                 total += obj.taxAmt ?? 0;
                             }
-                            console.log(obj.harga_barang);
                         })
 
                         data.append("total", total)
@@ -984,7 +1063,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("order-form-lokal"); ?>";
+                                                window.location.href = "<?= base_url("order-form-lokal/id/"); ?>" + response.id;
                                             })
                                     } else {
                                         Swal.fire({
@@ -1041,7 +1120,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("order-form-lokal"); ?>";
+                                                window.location.href = "<?= base_url("order-form-lokal/id/"); ?>" + response.id;
                                             })
                                     } else {
                                         Swal.fire({
@@ -1147,7 +1226,6 @@
             const discountedAmt = amount - discAmt;
 
             const currentItemList = table.rows().data().toArray();
-            console.log('hehoo')
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
             if (validate_same >= 0) {
@@ -1259,6 +1337,7 @@
                     }
                 }
             }
+            console.log(list_items);
         });
 
         $('#estimated_freight').keyup(function() {
