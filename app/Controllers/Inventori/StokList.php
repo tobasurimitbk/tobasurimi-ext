@@ -86,7 +86,9 @@ class StokList extends BaseController
             "parent_name" => $this->request->getVar("parent_name"),
             "divisi_id" => $this->request->getVar("divisi_id"),
             "warehouse_id" => $this->request->getVar("warehouse_id"),
-            "status_stok" => $this->request->getVar("status_stok")
+            "status_stok" => $this->request->getVar("status_stok"),
+            "kode" =>  $this->request->getVar("search"),
+            "kode_barang" =>  $this->request->getVar("search"),
         ];
 
         $limit = $this->request->getVar("length");
@@ -713,8 +715,13 @@ class StokList extends BaseController
         }
 
         foreach ($dataQry['data'] as $data) {
-
-            $lpb = $this->penerimaanBarangModel->like('multiple_po_no', $data->no_dokumen2)->first();
+            if ($stok['kemasan_id'] == 0) {
+                // BARANG
+                $lpb = $this->penerimaanBarangModel->like('multiple_po_no', $data->no_dokumen2)->first();
+            } else {
+                // KEMASAN
+                $lpb = $this->penerimaanBarangModel->where('no_penerimaan_barang', $data->no_dokumen2)->first();
+            }
             $supplier = $this->supplierModel->find($lpb['supplier_id']);
             $dokumenBC = $this->metaDataModel->find($data->bc_id);
             $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
