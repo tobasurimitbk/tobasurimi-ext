@@ -470,7 +470,7 @@ $routes->post('master-barang-lokal/get', 'SalesLokal\Barang::get', ['filter' => 
 // SALES INTERNASIONAL
 // Sales Kontrak
 $routes->get('/sales-kontrak', 'SalesInternasional\SalesKontrak::index', ['filter' => 'Auth']);
-$routes->get('/sales-kontrak/id/(:segment)', 'SalesInternasional\SalesKontrak::getById/$1', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/id/(:segment)', 'SalesInternasional\SalesKontrak::detail/$1', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/print/(:segment)', 'SalesInternasional\SalesKontrak::print/$1', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/create', 'SalesInternasional\SalesKontrak::createView', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/all', 'SalesInternasional\SalesKontrak::all', ['filter' => 'Auth']);
@@ -478,11 +478,9 @@ $routes->post('/sales-kontrak/save', 'SalesInternasional\SalesKontrak::save', ['
 $routes->post('/sales-kontrak/update', 'SalesInternasional\SalesKontrak::update', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/update-status', 'SalesInternasional\SalesKontrak::updateStatus', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete', ['filter' => 'Auth']);
-$routes->get('/sales-kontrak/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
-$routes->get('/sales-kontrak/warehouseAll/(:segment)', 'SalesLokal\OrderForm::getAllWarehouse/$1', ['filter' => 'Auth']);
-$routes->get('/sales-kontrak/stok/(:segment)/(:segment)', 'SalesLokal\OrderForm::getStockDetail/$1/$2', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/get-sales-kontrak-no', 'SalesInternasional\SalesKontrak::getNo', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/customer', 'SalesInternasional\SalesKontrak::dropdownCustomer', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/master-barang', 'SalesInternasional\SalesKontrak::dropdownMasterBarang', ['filter' => 'Auth']);
 
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);

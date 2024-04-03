@@ -83,6 +83,7 @@ class POImportBahanBaku extends BaseController
     public function getByIdPOImportBahanBaku($id = null)
     {
         $id = decrypt($id);
+        $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "IMPORT")->like('multiple_po_id', $id)->first();
         $data = [
             "divisi" => $this->divisisModel->getDivisiAccess(),
             "dataCompany" => $this->companyModel->getCompanies(),
@@ -95,7 +96,8 @@ class POImportBahanBaku extends BaseController
             "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
             "dataShipment" => $this->metadataModel->get_by_name('Shipment'),
             "dataPOImport" => $this->rmImportPOModel->getPOById($id),
-            "dataPOImportDetail" => $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id)
+            "dataPOImportDetail" => $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id),
+            "unPosting" => $unPostingCheck == null ? 0 : 1,
         ];
 
         if ($data["dataPOImport"] == null) {
@@ -141,6 +143,8 @@ class POImportBahanBaku extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($poImportData['data'] as $data) {
+            $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "IMPORT")->like('multiple_po_id', $data->id)->first();
+
             array_push($dataPOImport, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -153,6 +157,7 @@ class POImportBahanBaku extends BaseController
                 "itemCount"     => $data->itemCount,
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
+                "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
         }
 

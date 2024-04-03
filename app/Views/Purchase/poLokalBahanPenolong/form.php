@@ -29,7 +29,7 @@
                         </button>
                     <?php endif; ?>
                 <?php else : ?>
-                    <?php if (can('Pembelian', 'PO Lokal BP', 'ua') && !$poDetail['status_penerimaan']) : ?>
+                    <?php if (can('Pembelian', 'PO Lokal BP', 'ua') && !$poDetail['status_penerimaan'] && !$unPosting) : ?>
                         <button data-status="0" class="btn btn-success posting-spp float-right posting-po">
                             Un Posting
                         </button>
@@ -176,7 +176,7 @@
                                 <option data-barang_id="" data-parent_name="" data-spesifikasi_id="" data-spesifikasi_name="" data-satuan_id="" data-nama_barang="" data-kode_barang="" value=""></option>
                                 <?php foreach ($barang as $s) : ?>
                                     <option data-barang_id="<?= $s['id'] ?>" data-parent_name="<?= $s['parent_name'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" data-spesifikasi_name="<?= strtoupper($s['spesifikasi'])  ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['barang_master_spesifikasi_id'] ?>">
-                                        <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . " " . strtoupper($s['spesifikasi']) . " )" ?>
+                                        <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . " - " . strtoupper($s['spesifikasi']) . " )" ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -385,7 +385,7 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " " + $(this).find("option:selected").data("spesifikasi_name"));
+        $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
         $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
         $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
 
@@ -429,10 +429,10 @@
 
     // HARGA SATUAN DAN QTY CHANE
     $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
-        var hargaSatuan = parseInt($('#harga_satuan').val()) || 0;
+        var hargaSatuan = parseFloat($('#harga_satuan').val()) || 0;
         var qty = parseInt($('#qty').val()) || 1;
-        var biayaTambahan = parseInt($('#biaya_tambahan').val()) || 0;
-        var diskon = parseInt($('#diskon').val()) || 0;
+        var biayaTambahan = parseFloat($('#biaya_tambahan').val()) || 0;
+        var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
@@ -853,7 +853,7 @@
             <?php endif; ?>
 
             table.find('tbody').append(newRow);
-            totalHarga += parseInt(formatCurrency(v.total));
+            totalHarga += parseFloat(formatCurrency(v.total));
         });
         table.find('tfoot').empty();
         var newRow = $('<tr>');
@@ -1049,7 +1049,7 @@
                 barang_id: "<?= $l['barang_id'] ?>",
                 spesifikasi_id: "<?= $l['spesifikasi_id'] ?>",
                 kode_barang: "<?= $l['kode_barang'] ?>",
-                nama_barang: "<?= str_replace('"', '\"', $l['nama_barang']) . " " . $l['spesifikasi_name']  ?>",
+                nama_barang: "<?= str_replace('"', '\"', $l['nama_barang']) . " - " . $l['spesifikasi_name']  ?>",
                 satuan_id: "<?= $l['satuan_id'] ?>",
                 nama_satuan: "<?= $l['nama_satuan'] ?>",
                 harga_satuan: "<?= $l['harga_satuan'] ?>",

@@ -191,6 +191,8 @@ class POLokalBahanPenolong extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($poData['data'] as $data) {
+            $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $data->id)->first();
+
             array_push($dataPOLokal, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -202,7 +204,8 @@ class POLokalBahanPenolong extends BaseController
                 "total"         => "" . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
-                "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED"
+                "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
+                "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
         }
 
@@ -268,6 +271,8 @@ class POLokalBahanPenolong extends BaseController
             return redirect()->to('po-lokal-bahan-penolong');
         }
 
+        $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $id)->first();
+
         $data = [
             "divisi" => $this->divisionModel->getDivisiAccess(),
             "today" => date('Y-m-d'),
@@ -279,6 +284,7 @@ class POLokalBahanPenolong extends BaseController
             "ppn" => $this->taxModel->getTaxByType("ppn"),
             "pph" => $this->taxModel->getTaxByType("pph"),
             "poDetail" => $poDetail,
+            "unPosting" => $unPostingCheck == null ? 0 : 1,
             "listBarang" => $listBarang
 
         ];
@@ -311,7 +317,7 @@ class POLokalBahanPenolong extends BaseController
             'po_no' => $noPoNew,
             'payment_date' => formatDMYtoYMD($this->request->getVar('paymentDate')),
             'po_type' => "Lokal",
-            'purchase_request_id' => $this->request->getVar('spp_id'),
+            'purchase_request_id' => !empty($this->request->getVar('spp_id')) ? $this->request->getVar('spp_id') : $firstData['purchase_request_id'],
             'supplier_id' => $this->request->getVar('supplierID'),
             'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),

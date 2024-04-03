@@ -86,6 +86,8 @@ class POImportBahanPenolong extends BaseController
     public function getByIdPOImportBahanPenolong($id = null)
     {
         $id = decrypt($id);
+        $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "IMPORT")->like('multiple_po_id', $id)->first();
+
         $data = [
             "divisi" => $this->divisionModel->getDivisiAccess(),
             "today" => date("d/m/Y"),
@@ -97,7 +99,8 @@ class POImportBahanPenolong extends BaseController
             "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
             "dataShipment" => $this->metadataModel->get_by_name('Shipment'),
             "dataPOImport" => $this->amPurchaseOrderModel->getPOById($id),
-            "dataPOImportDetail" => $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id)
+            "dataPOImportDetail" => $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id),
+            "unPosting" => $unPostingCheck == null ? 0 : 1,
         ];
 
         if ($data["dataPOImport"] == null) {
@@ -144,6 +147,8 @@ class POImportBahanPenolong extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($poImportData['data'] as $data) {
+            $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "IMPORT")->like('multiple_po_id', $data->id)->first();
+
             array_push($dataPOImport, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -156,6 +161,7 @@ class POImportBahanPenolong extends BaseController
                 "itemCount"     => $data->itemCount,
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
+                "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
         }
 
