@@ -15,15 +15,15 @@ class SuratJalanModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'id_user', 
-        'id_po', 
-        'id_customer', 
-        'multiple_id_so', 
-        'multiple_no_so', 
+        'id_user',
+        'id_po',
+        'id_customer',
+        'multiple_id_so',
+        'multiple_no_so',
         'sales_order_invoice_id',
-        'no_po', 
-        'shipping_date', 
-        'no_surat_jalan', 
+        'no_po',
+        'shipping_date',
+        'no_surat_jalan',
         'note'
     ];
 
@@ -118,12 +118,13 @@ class SuratJalanModel extends Model
         $dataSuratJalan = $this->asObject()
             ->join('users', 'users.id = surat_jalan_so.id_user')
             ->join('customers', 'customers.id = surat_jalan_so.id_customer ')
-            ->join('metadata', 'metadata.id = customers.termin', 'left')
-            ->join('employees', 'employees.id = customers.sales_id ')
+            ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id')
+            ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+            ->join('employees', 'employees.id = sales_order.sales_id ')
             ->select($selectQry)
             ->find($id);
 
-        if (empty($dataSuratJalan)) return null; 
+        if (empty($dataSuratJalan)) return null;
 
         $dataMultpleid = json_decode($dataSuratJalan->multiple_id_so);
         $dataMultpleNo = json_decode($dataSuratJalan->multiple_no_so);
@@ -147,7 +148,7 @@ class SuratJalanModel extends Model
                     $dummyNum += $item;
                 }
             }
-        } 
+        }
 
         $number = $dummyNum + 1;
         // $check = $number % 99999;

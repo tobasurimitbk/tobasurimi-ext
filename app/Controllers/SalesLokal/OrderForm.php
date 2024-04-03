@@ -159,7 +159,9 @@ class OrderForm extends BaseController
                 "destination" => $data->destination,
                 "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->findAll()),
                 "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
-                "keterangan" => $data->keterangan
+                "keterangan" => $data->keterangan,
+                "surat_jalan_so_id" => $data->surat_jalan_so_id,
+                "sales_order_invoice_id" => $data->sales_order_invoice_id,
             ]);
         }
 
@@ -288,7 +290,7 @@ class OrderForm extends BaseController
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
-                "sales_id"              => $customerData->sales_id,
+                "sales_id"              => $postData['id_sales'],
                 "nama_ecommerce"           => $postData['nama_ecommerce'],
                 "order_date"            => $orderDate,
                 "shipping_date"         => $shippingDate,

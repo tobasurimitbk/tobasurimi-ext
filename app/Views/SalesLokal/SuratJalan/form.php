@@ -45,7 +45,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <!-- <input type="text" name="" id="" value="<?= !empty($dataSJ) ? $dataSJ : ''; ?>"> -->
-                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataCustomers)) {
@@ -62,13 +62,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->multiple_id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
+                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? 'disabled' : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {
                                     foreach ($dataSo as $so) {
                                 ?>
-                                        <option value="<?= $so->id; ?>,<?= $so->no_surat_jalan ?>" <?= !empty($data) ? (in_array($so->id, $data->multiple_id_so) ? "selected" : "") : ""; ?>><?= $so->no_surat_jalan; ?></option>
+                                        <option value="<?= $so->id; ?>,<?= $so->no_sales_order ?>" <?= !empty($data) ? (in_array($so->id, $data->multiple_id_so) ? "selected" : "") : ""; ?>><?= $so->no_sales_order; ?></option>
                                 <?php
                                     }
                                 }
@@ -314,13 +314,11 @@
 
                         // console.log(res.dataWarehouse)
                         res.soList.forEach(function(item) {
-                            $(".id_so").append(`<option  value="${item.id}">${item.no_sales_order}</option>`);
+                            $(".id_so").append(`<option  value="${item.id}" data-termin="${item.termin}" data-sales="${item.salesName}">${item.no_sales_order}</option>`);
                         });
 
                         $('#tagihan_ke').val(res.customerData.address);
                         $('#no_telp').val(res.customerData.phone);
-                        $('#termin').val(res.customerData.termin);
-                        $('#salesName').val(res.customerData.salesName);
                     }
                 })
 
@@ -331,20 +329,34 @@
         });
 
         $(".id_so").change(function() {
+            // Simpan konteks this ke dalam variabel
+            let $this = $(this);
+
+            let termin = $this.find("option:selected").data("termin");
+            let sales = $this.find("option:selected").data("sales");
+
+            $('#termin').val(termin);
+            $('#salesName').val(sales);
 
             $.ajax({
                 url: `<?= base_url('/order-form-lokal/getItemList'); ?>`,
                 method: "GET",
                 data: {
-                    ids: $(this).val()
+                    ids: $this.val()
                 },
                 dataType: "json",
                 success: function(res) {
-                    table.clear();
-                    table.rows.add(res).draw(false);
+                    let so = $this.val();
+                    if (so.length != 0) {
+                        table.clear();
+                        table.rows.add(res).draw(false);
+                    } else {
+                        table.clear().draw(false);
+                    }
                 }
             })
         });
+
 
         <?php if (!empty($data)) : ?>
             const itemList = <?= json_encode($data->itemList); ?>;
