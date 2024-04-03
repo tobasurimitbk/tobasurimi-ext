@@ -8,32 +8,13 @@ class SalesKontrakModel extends Model
 {
     protected $DBGroup          = 'default';
     protected $table            = 'sales_contract';
-    protected $primaryKey       = 'sales_contract_id';
+    protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'sales_contract_id',
-        'sales_contract_no',
-        'company_id',
-        'customer_id',
-        'customer_po_no',
-        'loading_port',
-        'dicharge_port',
-        'due_date',
-        'total_amount',
-        'payment_term',
-        'tolerance',
-        'shipment_date',
-        'documents_required',
-        'special_instructions',
-        'status',
-        'createdAt',
-        'updatedAt',
-        'deletedAt'
-    ];
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = true;
@@ -84,7 +65,7 @@ class SalesKontrakModel extends Model
 
         $totalData = $salesDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['status']) {
+        if ($addCondition['search'] || $addCondition['status_posting']) {
             $salesDataQry->groupStart();
         }
 
@@ -94,12 +75,12 @@ class SalesKontrakModel extends Model
                 ->orLike('customers.name', $addCondition['search']);
         }
 
-        if ($addCondition['status']) {
+        if ($addCondition['status_posting']) {
             $salesDataQry
-                ->where('status', $addCondition['status']);
+                ->where('status_posting', $addCondition['status_posting']);
         }
 
-        if ($addCondition['search'] || $addCondition['status']) {
+        if ($addCondition['search'] || $addCondition['status_posting']) {
             $salesDataQry->groupEnd();
         }
 
@@ -134,8 +115,8 @@ class SalesKontrakModel extends Model
         $builder = $this->db->table('sales_contract');
         $builder->select('sales_contract_no');
         $builder->orderBy('sales_contract_no', 'desc')
-        ->where('createdAt >=', $thn . "-01-01 00:00:00")
-        ->where('createdAt <=', $thn . "-12-31 23:59:59");
+            ->where('createdAt >=', $thn . "-01-01 00:00:00")
+            ->where('createdAt <=', $thn . "-12-31 23:59:59");
         $builder->like('sales_contract_no', $lastStr);
         $query = $builder->get();
 

@@ -43,7 +43,7 @@
                         <?php endif; ?>
                 <?php }
                 } ?>
-                <?php if (can('Pembelian', 'PO Import BP', 'ua') && $dataPOImport->status_penerimaan != "1" && $dataPOImport->is_posted == "1") : ?>
+                <?php if (can('Pembelian', 'PO Import BP', 'ua') && $dataPOImport->status_penerimaan != "1" && $dataPOImport->is_posted == "1"  && !$unPosting) : ?>
                     <button data-status="0" class="btn btn-success posting-spp float-right posting-po">
                         Un Posting
                     </button>
@@ -342,8 +342,8 @@
                                 <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                     <option data-barang_id="" data-satuan_id="" data-nama_barang="" data-kode_barang="" data-spesifikasi_id="" value=""></option>
                                     <?php foreach ($barang as $s) : ?>
-                                        <option data-barang_id="<?= $s['id'] ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) . ' ' . strtoupper($s['spesifikasi']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" value="<?= $s['barang_master_spesifikasi_id'] ?>">
-                                            <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . ' ' . strtoupper($s['spesifikasi']) . " )" ?>
+                                        <option data-barang_id="<?= $s['id'] ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) . ' - ' . strtoupper($s['spesifikasi']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" value="<?= $s['barang_master_spesifikasi_id'] ?>">
+                                            <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . ' - ' . strtoupper($s['spesifikasi']) . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -1207,7 +1207,7 @@
                 barang_id: "<?= $d['barang_id'] ?>",
                 spesifikasi_id: "<?= $d['spesifikasi_id'] ?>",
                 kode_barang: "<?= $d['kode_barang'] ?>",
-                nama_barang: <?= json_encode($d['nama_barang'] . " " . $d['spesifikasi']) ?>,
+                nama_barang: <?= json_encode($d['nama_barang'] . " - " . $d['spesifikasi']) ?>,
                 satuan_id: <?= $d['unit'] ?>,
                 nama_satuan: "<?= $d['nama_satuan'] ?>",
                 qty: <?= $d['qty'] ?>,

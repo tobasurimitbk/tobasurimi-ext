@@ -3,16 +3,14 @@
 namespace App\Controllers\SalesInternasional;
 
 use App\Controllers\BaseController;
-use Config\Services;
-
 use App\Models\CustomerModel;
-use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSalesModel;
 use App\Models\CountryModel;
 use App\Models\MetadataModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesOrderExportModel;
-use App\Models\SalesOrderExportDetailModel;
+use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
 use Dompdf\Dompdf;
 
@@ -21,16 +19,16 @@ class SalesKontrak extends BaseController
     protected $token;
     protected $this_company_id;
     protected $this_user_id;
-    protected $encrypter;
     protected $customerModel;
     protected $salesKontrakModel;
     protected $salesKontrakDetailModel;
-    protected $salesOrderExportModel;
-    protected $salesOrderExportDetailModel;
     protected $barangMasterModel;
     protected $stokDetailModel;
     protected $countryModel;
     protected $metaDataModel;
+    protected $satuanModel;
+    protected $barangMasterSalesModel;
+    protected $salesOrderExportModel;
     protected $dompdf;
 
     public function __construct()
@@ -38,16 +36,15 @@ class SalesKontrak extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;
-        $this->encrypter = Services::encrypter();
         $this->customerModel = new CustomerModel();
-        $this->barangMasterModel = new BarangMasterModel();
         $this->salesKontrakModel = new SalesKontrakModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
-        $this->salesOrderExportModel = new SalesOrderExportModel();
-        $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->stokDetailModel = new StockDetailModel();
         $this->countryModel = new CountryModel();
         $this->metaDataModel = new MetadataModel();
+        $this->satuanModel = new SatuansModel();
+        $this->barangMasterSalesModel = new BarangMasterSalesModel();
+        $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -61,44 +58,51 @@ class SalesKontrak extends BaseController
         $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
         $dataCountry = $this->countryModel->findAll();
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
+        $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
+        $dataSatuan = $this->satuanModel->findAll();
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
 
         $data = [
             "dataCustomer" => $dataCustomer,
             "dataCountry" => $dataCountry,
-            "dataValuta" => $dataValuta
+            "dataValuta" => $dataValuta,
+            "dataTipeHarga" => $dataTipeHarga,
+            'dataSatuan' => $dataSatuan,
+            'dataBarang' => $dataBarang
         ];
 
         return view('SalesInternasional/SalesKontrak/form', $data);
     }
 
-    public function getById($id = null)
+    public function detail($id)
     {
-        //Get Buyer From Customer
-        $dataCustomer = $this->customerModel->getCustomer();
+        $id = decrypt($id);
+
+        $dataSalesKontrak = $this->salesKontrakModel->find($id);
+        $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        $dataCountry = $this->countryModel->findAll();
+        $dataValuta = $this->metaDataModel->get_by_name('Valuta');
+        $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
+        $dataSatuan = $this->satuanModel->findAll();
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
+        $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $id)->findAll();
+
+        if ($dataSalesKontrak == null) {
+            return redirect()->to('sales-kontrak');
+        }
 
         $data = [
-            "dataCustomer" => $dataCustomer
+            "dataCustomer" => $dataCustomer,
+            "dataCountry" => $dataCountry,
+            "dataValuta" => $dataValuta,
+            "dataTipeHarga" => $dataTipeHarga,
+            'dataSatuan' => $dataSatuan,
+            'dataBarang' => $dataBarang,
+            'dataSalesKontrak' => $dataSalesKontrak,
+            'dataSalesKontrakDetail' => $dataSalesKontrakDetail,
+            'isClosed' => count($isClosed) == 0 ? '0' : '1',
         ];
-
-        if (!empty($id)) {
-            $dataSO = $this->salesKontrakModel->getById($id);
-            $data["dataSO"] = $dataSO;
-
-            $statusSOExport = "";
-            $dataSOExport = $this->salesOrderExportModel->getBySalesContractId($id);
-
-            if ($dataSOExport) {
-                $statusSOExport = $dataSOExport[0]->status;
-            }
-
-            $data["statusSOExport"] = $statusSOExport;
-
-            $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
-
-            if ($dataSODetail) {
-                $data["dataSODetail"] = $dataSODetail;
-            }
-        }
 
         return view('SalesInternasional/SalesKontrak/form', $data);
     }
@@ -117,13 +121,13 @@ class SalesKontrak extends BaseController
 
         $condition = [
             "sales_contract.company_id"    => $this->this_company_id,
-            "status"      => $this->request->getGet("status")
+            "createdBy" => $this->this_user_id
         ];
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "status"      => $this->request->getGet("status")
+            "status_posting"  => $this->request->getGet("status_posting")
         ];
 
         $limit = $this->request->getGet("length");
@@ -135,16 +139,19 @@ class SalesKontrak extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($salesKontrakData['data'] as $data) {
+            $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $data->id)->findAll();
+
             array_push($dataSalesKontrak, [
                 "no"                    => $no++,
-                "id"                    => $data->sales_contract_id,
-                "sales_contract_no"      => $data->sales_contract_no,
+                "id"                    => encrypt($data->id),
+                "sales_contract_no"     => $data->sales_contract_no,
                 "customer_po_no"        => $data->customer_po_no,
                 "customer_name"         => $data->customer_name,
-                "dicharge_port"         => $data->dicharge_port,
-                "shipment_date"         => $data->shipment_date,
-                "createdAt"             => date('Y-m-d', strtotime($data->createdAt)),
-                "status"                => $data->status
+                "dicharge_port"         => strtoupper($data->dicharge_port),
+                "shipment_date"         => date('d/m/Y', strtotime($data->shipment_date)),
+                "createdAt"             => date('d/m/Y', strtotime($data->createdAt)),
+                "status_posting"        => $data->status_posting,
+                "status_closed"         => count($isClosed) > 0 ? '1' : '0'
             ]);
         }
 
@@ -153,7 +160,6 @@ class SalesKontrak extends BaseController
             "recordsTotal"      => $salesKontrakData['totalData'],
             "recordsFiltered"   => $salesKontrakData['totalFilteredData'],
             "data"              => $dataSalesKontrak,
-            // "response" => $response,
             "payload"           => $payload
         ];
 
@@ -163,625 +169,226 @@ class SalesKontrak extends BaseController
 
     public function save()
     {
-        try {
-            $rules = [
-                "sales_contract_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. SC tidak boleh kosong',
-                    ]
-                ],
-                "customer_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Buyer tidak boleh kosong',
-                    ]
-                ],
-                "customer_po_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. PO boleh kosong',
-                    ]
-                ],
-                "loading_port" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Loading Port tidak boleh kosong',
-                    ]
-                ],
-                "dicharge_port" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Dicharge Port tidak boleh kosong',
-                    ]
-                ],
-                "due_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Due Date tidak boleh kosong',
-                    ]
-                ],
-                "tolerance" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tolerance tidak boleh kosong',
-                    ]
-                ],
-                "shipment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Shipment Date tidak boleh kosong',
-                    ]
-                ],
-                "documents_required" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Document Required tidak boleh kosong',
-                    ]
-                ],
-                "special_instructions" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Special Instructions tidak boleh kosong',
-                    ]
-                ],
-            ];
+        $barangs = json_decode($_POST['listBarang']);
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($this->validate($rules)) {
-                $no = $this->salesKontrakModel->get_no(date('Y'), date('y'));
-
-                $payload = [
-                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                    "sales_contract_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("sales_contract_no"),
-                    "customer_id" => formatter($this->request->getPost("customer_id"), "STR_TO_INT"),
-                    "customer_po_no" => $this->request->getPost("customer_po_no"),
-                    "loading_port" => $this->request->getPost("loading_port"),
-                    "dicharge_port" => $this->request->getPost("dicharge_port"),
-                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("due_date")))) : "",
-                    "total_amount" => $this->request->getPost("total_amount") ? formatter($this->request->getPost("total_amount"), "CURR_TO_INT") : 0,
-                    "tolerance" => $this->request->getPost("tolerance"),
-                    "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("shipment_date")))) : "",
-                    "payment_term" => $this->request->getPost("payment_term"),
-                    "documents_required" => $this->request->getPost("documents_required"),
-                    "special_instructions" => $this->request->getPost("special_instructions"),
-                    "status" => "NEW"
-                ];
-
-                $items = json_decode($this->request->getVar("items"));
-
-                $response =  $this->salesKontrakModel->insert($payload);
-
-                if ($response) {
-                    foreach ($items as $data) {
-                        $detailPayload = [];
-
-                        $detailPayload = [
-                            'sales_contract_id' => $response,
-                            'barang_id' => $data->barang_id,
-                            'unit' => $data->unit,
-                            'qty' => $data->qty,
-                            'remark' => $data->remark,
-                            'price' => $data->price,
-                            'total_price' => $data->total_price,
-                            'warehouses_id' => $data->warehouse_id
-                        ];
-
-                        $responseDetail = $this->salesKontrakDetailModel->insert($detailPayload);
-
-                        if (!$responseDetail) {
-                            $message =  'Data Gagal Disimpan';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                        }
-                    }
-
-                    $data = [
-                        "id" => $response,
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        if (count($barangs) == 0) {
+            return response()->setJSON([
+                'message' => "List barang belum ada",
+                'status' => false,
+                'token' => csrf_token()
+            ]);
         }
-        return;
+
+        $id = $this->salesKontrakModel->insert([
+            'company_id' => $this->this_company_id,
+            'customer_id' => $this->request->getVar('customer_id'),
+            'sales_contract_no' => $this->request->getVar('sales_contract_no'),
+            'currency' => $this->request->getVar('currency'),
+            'customer_po_no' => $this->request->getVar('customer_po_no'),
+            'loading_port' => $this->request->getVar('loading_port'),
+            'dicharge_port' => $this->request->getVar('dicharge_port'),
+            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
+            'total_amount' => $this->request->getVar('total_amount'),
+            'tolerance' => $this->request->getVar('tolerance'),
+            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
+            'total_amount' => $this->request->getVar('total_amount'),
+            'tolerance' => $this->request->getVar('tolerance'),
+            'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'payment_term' => $this->request->getVar('payment_term'),
+            'potongan_harga' => $this->request->getVar('potongan_harga'),
+            'documents_required' => $this->request->getVar('documents_required'),
+            'special_instructions' => $this->request->getVar('special_instructions'),
+            'tipe_harga' => $this->request->getVar('tipe_harga'),
+            'broker' => $this->request->getVar('broker'),
+            'komisi' => $this->request->getVar('komisi'),
+            'print_out_broker' => $this->request->getVar('print_out_broker'),
+            'createdBy' => $this->this_user_id,
+            'keterangan' => $this->request->getVar('keterangan'),
+            'status_posting' => '0'
+        ]);
+
+        foreach ($barangs as $b) {
+            $this->salesKontrakDetailModel->insert([
+                'sales_contract_id' => $id,
+                'barang_master_sales_id' => $b->barang_master_sales_id,
+                'satuan_order_id' => $b->satuan_order_id,
+                'kemasan' => $b->kemasan,
+                'remark' => $b->remark,
+                'qty' => $b->qty,
+                'harga' => $b->harga,
+                'total_harga' => $b->total
+            ]);
+        }
+
+        return response()->setJSON([
+            'id' => encrypt($id),
+            'message' => "Sales Kontrak Berhasil Disimpan",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
     public function update()
     {
-        try {
-            $rules = [
-                "sales_contract_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. SC tidak boleh kosong',
-                    ]
-                ],
-                "customer_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Buyer tidak boleh kosong',
-                    ]
-                ],
-                "customer_po_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No. PO boleh kosong',
-                    ]
-                ],
-                "loading_port" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Loading Port tidak boleh kosong',
-                    ]
-                ],
-                "dicharge_port" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Dicharge Port tidak boleh kosong',
-                    ]
-                ],
-                "due_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Due Date tidak boleh kosong',
-                    ]
-                ],
-                "tolerance" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tolerance tidak boleh kosong',
-                    ]
-                ],
-                "shipment_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Shipment Date tidak boleh kosong',
-                    ]
-                ],
-                "documents_required" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Document Required tidak boleh kosong',
-                    ]
-                ],
-                "special_instructions" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Special Instructions tidak boleh kosong',
-                    ]
-                ],
-            ];
+        $id = decrypt($this->request->getVar('id'));
+        $barangs = json_decode($_POST['listBarang']);
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $no = $this->salesKontrakModel->get_no(date('Y'), date('y'));
-
-                $payload = [
-                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                    "sales_contract_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("sales_contract_no"),
-                    "customer_id" => formatter($this->request->getPost("customer_id"), "STR_TO_INT"),
-                    "customer_po_no" => $this->request->getPost("customer_po_no"),
-                    "loading_port" => $this->request->getPost("loading_port"),
-                    "dicharge_port" => $this->request->getPost("dicharge_port"),
-                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("due_date")))) : "",
-                    "total_amount" => $this->request->getPost("total_amount") ? formatter($this->request->getPost("total_amount"), "CURR_TO_INT") : 0,
-                    "tolerance" => $this->request->getPost("tolerance"),
-                    "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("shipment_date")))) : "",
-                    "payment_term" => $this->request->getPost("payment_term"),
-                    "documents_required" => $this->request->getPost("documents_required"),
-                    "special_instructions" => $this->request->getPost("special_instructions"),
-                ];
-
-                $items = json_decode($this->request->getVar("items"));
-
-                $condition = [
-                    'sales_contract_id' => $id
-                ];
-
-                $response = $this->salesKontrakModel->where($condition)->set($payload)->update();
-
-                if ($response) {
-                    foreach ($items as $data) {
-                        $detailPayload = [];
-
-                        $detailPayload = [
-                            'sales_contract_id' => $id,
-                            'barang_id' => $data->barang_id,
-                            'unit' => $data->unit,
-                            'qty' => $data->qty,
-                            'remark' => $data->remark,
-                            'price' => $data->price,
-                            'total_price' => $data->total_price,
-                            'warehouses_id' => $data->warehouse_id
-                        ];
-
-                        if ($data->isDeleted) {
-                            $responseDetail = $this->salesKontrakDetailModel->delete($data->id);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Dihapus';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
-                        }
-
-                        // kalau update
-                        if ($data->id) {
-                            $conditionDetail = [
-                                'sales_contract_detail_id' => $data->id
-                            ];
-
-                            $responseDetail = $this->salesKontrakDetailModel->where($conditionDetail)->set($detailPayload)->update();
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Diubah';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
-                        }
-
-                        // kalau create
-                        else {
-                            $responseDetail = $this->salesKontrakDetailModel->insert($detailPayload);
-
-                            if (!$responseDetail) {
-                                $message =  'Data Gagal Diubah';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
-                        }
-                    }
-
-                    $data = [
-                        "id" => "",
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        if (count($barangs) == 0) {
+            return response()->setJSON([
+                'message' => "List barang belum ada",
+                'status' => false,
+                'token' => csrf_token()
+            ]);
         }
-        return;
+
+        $this->salesKontrakModel->update($id, [
+            'customer_id' => $this->request->getVar('customer_id'),
+            'customer_po_no' => $this->request->getVar('customer_po_no'),
+            'currency' => $this->request->getVar('currency'),
+            'loading_port' => $this->request->getVar('loading_port'),
+            'dicharge_port' => $this->request->getVar('dicharge_port'),
+            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
+            'total_amount' => $this->request->getVar('total_amount'),
+            'tolerance' => $this->request->getVar('tolerance'),
+            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
+            'total_amount' => $this->request->getVar('total_amount'),
+            'tolerance' => $this->request->getVar('tolerance'),
+            'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'payment_term' => $this->request->getVar('payment_term'),
+            'potongan_harga' => $this->request->getVar('potongan_harga'),
+            'documents_required' => $this->request->getVar('documents_required'),
+            'special_instructions' => $this->request->getVar('special_instructions'),
+            'tipe_harga' => $this->request->getVar('tipe_harga'),
+            'broker' => $this->request->getVar('broker'),
+            'komisi' => $this->request->getVar('komisi'),
+            'print_out_broker' => $this->request->getVar('print_out_broker'),
+            'createdBy' => $this->this_user_id,
+            'keterangan' => $this->request->getVar('keterangan'),
+        ]);
+
+        // get all id detail
+        $id_detail_all = [];
+
+        foreach ($barangs as $b) {
+            // CHECK
+            $check = $this->salesKontrakDetailModel
+                ->where('sales_contract_id', $id)
+                ->where('barang_master_sales_id', $b->barang_master_sales_id)
+                ->first();
+
+            if ($check != null) {
+                $this->salesKontrakDetailModel->update($check['id'], [
+                    'barang_master_sales_id' => $b->barang_master_sales_id,
+                    'satuan_order_id' => $b->satuan_order_id,
+                    'kemasan' => $b->kemasan,
+                    'remark' => $b->remark,
+                    'qty' => $b->qty,
+                    'harga' => $b->harga,
+                    'total_harga' => $b->total
+                ]);
+                array_push($id_detail_all, $check['id']);
+            } else {
+                $this->salesKontrakDetailModel
+                    ->where('sales_contract_id', $id)
+                    ->where('barang_master_sales_id', $b->barang_master_sales_id)
+                    ->delete();
+
+                // INSERT
+                $id_detail_new = $this->salesKontrakDetailModel->insert([
+                    'sales_contract_id' => $id,
+                    'barang_master_sales_id' => $b->barang_master_sales_id,
+                    'satuan_order_id' => $b->satuan_order_id,
+                    'kemasan' => $b->kemasan,
+                    'remark' => $b->remark,
+                    'qty' => $b->qty,
+                    'harga' => $b->harga,
+                    'total_harga' => $b->total
+                ]);
+
+                array_push($id_detail_all,  $id_detail_new);
+            }
+        }
+
+        $this->salesKontrakDetailModel->where('sales_contract_id', $id)->whereNotIn('id', $id_detail_all)->delete();
+
+        return response()->setJSON([
+            'message' => "Sales Kontrak Berhasil Diupdate",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
     public function updateStatus()
     {
-        try {
-            $id = $this->request->getPost("id");
-            $status = $this->request->getPost("status");
+        $id = decrypt($this->request->getVar('id'));
+        $statusPosting = $this->request->getVar('status');
 
-            $payload = [
-                "status" => $status
-            ];
+        $this->salesKontrakModel->update($id, [
+            'status_posting' => $statusPosting
+        ]);
 
-            $condition = [
-                'sales_contract_id' => $id
-            ];
-
-            if ($status === "POSTED") {
-                // CREATE SALES ORDER EXPORT
-                $dataSO = $this->salesKontrakModel->getById($id);
-
-                $payloadExport = [
-                    "sales_order_export_no" => "SC/" . $dataSO->sales_contract_no,
-                    "sales_contract_id" => $id,
-                    "company_id" => $this->this_company_id,
-                    "customer_id" => $dataSO->customer_id,
-                    "customer_po_no" => $dataSO->customer_po_no,
-                    "loading_port" => $dataSO->loading_port,
-                    "dicharge_port" => $dataSO->dicharge_port,
-                    "due_date" => $dataSO->due_date,
-                    "total_amount" => $dataSO->total_amount,
-                    "tolerance" => $dataSO->tolerance,
-                    "shipment_date" => $dataSO->shipment_date,
-                    "payment_term" => $dataSO->payment_term,
-                    "documents_required" => $dataSO->documents_required,
-                    "special_instructions" => $dataSO->special_instructions
-                ];
-
-                $responseExport = $this->salesOrderExportModel->insert($payloadExport);
-
-                if (!$responseExport) {
-                    $message =  'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-
-                $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
-
-                if ($dataSODetail) {
-                    foreach ($dataSODetail as $detail) {
-                        $detailPayloadExport = [];
-
-                        $detailPayloadExport = [
-                            'sales_order_export_id' => $responseExport,
-                            'barang_id' => $detail["barang_id"],
-                            'unit' => $detail["unit"],
-                            'qty' => $detail["qty"],
-                            'remark' => $detail["remark"],
-                            'price' => $detail["price"],
-                            'total_price' => $detail["total_price"]
-                        ];
-
-                        // // masukkan ke detail_stok
-                        if ($detail['warehouses_id'] != null) {
-                            $this->stokDetailModel->addOrReduceStock(
-                                $detail['barang_id'],
-                                $detail['warehouses_id'],
-                                $detail['remark'],
-                                $detail['qty'],
-                                "OUT",
-                                null
-                            );
-                        }
-
-                        $responseDetailExport = $this->salesOrderExportDetailModel->insert($detailPayloadExport);
-
-                        if (!$responseDetailExport) {
-                            $message =  'Data Gagal Disimpan';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                        }
-                    }
-                }
-            }
-            if ($status === "NEW") {
-                // CHECK SALES ORDER EXPORT DATA
-                $find = $this->salesOrderExportModel->getBySalesContractId($id);
-                $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
-                foreach ($dataSODetail as $detail) {
-                    if ($detail['warehouses_id'] != null) {
-                        $this->stokDetailModel->addOrReduceStock(
-                            $detail['barang_id'],
-                            $detail['warehouses_id'],
-                            $detail['remark'],
-                            $detail['qty'],
-                            "IN",
-                            null
-                        );
-                    }
-                }
-                if ($find) {
-                    foreach ($find as $item) {
-                        $this->salesOrderExportModel->delete($item->sales_order_export_id);
-
-                        $find_detail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
-                        foreach ($find_detail as $item_detail) {
-                            $this->salesOrderExportDetailModel->delete($item_detail["sales_order_export_detail_id"]);
-                        }
-                    }
-                }
-            }
-
-            $response = $this->salesKontrakModel->where($condition)->set($payload)->update();
-
-            if ($response) {
-                $data = [
-                    "status"            => true,
-                    "message"   => $status === "POSTED" ? "Data Berhasil diposting" : "Data Berhasil diunposting",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = $status === "POSTED" ? "Data Gagal diposting" : "Data Gagal diunposting";
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        return response()->setJSON([
+            'message' => "Status Posting Sales Kontrak Berhasil Diupdate",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
     public function delete()
     {
-        try {
-            $id = $this->request->getPost("id");
+        $id = decrypt($this->request->getVar('id'));
 
-            if (!empty($id)) {
-                $find = $this->salesKontrakModel->find($id);
-                if ($find) {
-                    $response =  $this->salesKontrakModel->delete($id);
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil dihapus",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Dihapus';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Tidak Ditemukan",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $this->salesKontrakModel->delete($id);
+        $this->salesKontrakDetailModel->where('sales_contract_id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Status Posting Sales Kontrak Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
-    public function print($id = null)
+    public function print($id)
     {
-        if ($id) {
-            $filename = "Sales Kontrak";
+        $filename = "Sales Kontrak";
+        $id = decrypt($id);
 
-            $data = [];
-            $dataSO = $this->salesKontrakModel->getById($id);
-
-            if ($dataSO) {
-                $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
-
-                // var_dump($dataSO);
-                // die;
-
-                if ($dataSODetail) {
-                    $data["dataSO"] = $dataSO;
-                    $data["dataSODetail"] = $dataSODetail;
-                }
-            }
-
-            // load HTML content
-            $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
-
-            // (optional) setup the paper size and orientation
-            $this->dompdf->setPaper('A4', 'portrait');
-
-            // render html as PDF
-            $this->dompdf->render();
-
-            // output the generated pdf
-            $this->dompdf->stream($filename, array("Attachment" => false));
-
-            exit(0);
-
-            // return view('Purchase/poImportBahanPenolong/print', $data);
+        $salesKontrak = $this->salesKontrakModel->find($id);
+        $salesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
+        if ($salesKontrak == null) {
+            return redirect()->to('sales-kontrak');
         }
-    }
-
-    public function dropdownSC()
-    {
-        $dataSO = $this->salesKontrakModel->getNo($this->this_company_id);
 
         $data = [
-            "data" => $dataSO
+            'salesKontrak' => $salesKontrak,
+            'customer' => $this->customerModel->find($salesKontrak['customer_id']),
+            'salesKontrakdetail' => $salesKontrakDetail
         ];
 
-        echo json_encode($data);
-        return;
+        $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
+        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->render();
+        $this->dompdf->stream($filename, array("Attachment" => false));
+
+        exit(0);
     }
+
 
     public function dropdownCustomer()
     {
         $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
         return response()->setJSON([
             'data' => $dataCustomer,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function dropdownMasterBarang()
+    {
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
+        return response()->setJSON([
+            'data' => $dataBarang,
             'token' => csrf_hash(),
             'status' => true
         ]);
