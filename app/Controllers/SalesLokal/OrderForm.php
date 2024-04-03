@@ -374,7 +374,7 @@ class OrderForm extends BaseController
         // validation
         if ($dataSalesOrder == null) {
             $session = session();
-            $session->setFlashdata('error', "Nama Sales tidak ditemukan");
+            $session->setFlashdata('error', "Data Sales tidak ditemukan");
             return redirect()->to('order-form-lokal');
         }
 
@@ -458,7 +458,7 @@ class OrderForm extends BaseController
     public function update()
     {
         $items = json_decode($this->request->getVar("items"));
-        $id = $this->request->getPost("id");
+        $id = decrypt($this->request->getPost("id"));
 
         $postData = $this->request->getPost();
         $postData["items"] = json_decode($postData["items"], true);
@@ -507,20 +507,6 @@ class OrderForm extends BaseController
             return;
         }
 
-        // check customer
-        // $customerData = $this->CustomerModel->asObject()
-        //     ->find($postData['id_customer']);
-
-        // if (empty($customerData)) {
-        //     $data = [
-        //         "status"    => false,
-        //         "message"   => 'Customer tidak ditemukan!',
-        //         'token'     => csrf_hash(),
-        //     ];
-        //     echo json_encode($data);
-        //     return;
-        // }
-
         try {
             $this->SalesOrderModel->db->transException(true)->transStart();
             $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
@@ -561,7 +547,7 @@ class OrderForm extends BaseController
 
                 $totalQty = $totalQty + $row->qty;
                 $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
-                if ($row->id == 0 || $row->id == null) {
+                if ($row->id == 0 || $row->id == null || $row->id == "") {
                     $valueBarang = [
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
@@ -597,7 +583,7 @@ class OrderForm extends BaseController
             $this->SalesOrderModel->db->transComplete();
 
             $data = [
-                "id"        => bin2hex($this->encrypter->encrypt($id)),
+                "id"        => encrypt($id),
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 'token'     => csrf_hash(),
