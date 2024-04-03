@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah</h1>
+        <h1 class="title-name"><?= !empty($dataSalesKontrak) ? "Update Sales Kontrak" : "Tambah Sales Kontrak" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("sales-kontrak"); ?>">
                 Batal
@@ -183,12 +183,6 @@
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput">Price Type</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['payment_term'] : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term">
-                            <label for="floatingInput">Payment Term</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -723,9 +717,6 @@
             currency: {
                 required: true
             },
-            payment_term: {
-                required: true
-            },
             tipe_harga: {
                 required: true
             },
@@ -763,9 +754,6 @@
             },
             currency: {
                 required: "Currency wajib diisi"
-            },
-            payment_term: {
-                required: "Payment term wajib diisi"
             },
             tipe_harga: {
                 required: "Price type wajib diisi"
