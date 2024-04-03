@@ -33,6 +33,7 @@ class Invoice extends BaseController
     protected $SalesOrderModel;
     protected $SalesOrderDetailModel;
     protected $SuratJalanModel;
+    protected $TaxModel;
 
     public function __construct()
     {
@@ -340,8 +341,8 @@ class Invoice extends BaseController
         $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
 
         foreach ($documentData->itemList as $value) {
-            $value->harga_barang = str_replace('Rp', '', toRupiah($value->harga_barang));
-            $value->amount = str_replace('Rp', '', toRupiah($value->amount));
+            $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $value->harga_barang)));
+            $value->amount = toRupiah(floatval(str_replace('Rp', '', $value->amount)));
         }
 
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
@@ -677,17 +678,15 @@ class Invoice extends BaseController
             $soId = $docId;
             $soData = $this->SalesOrderModel->asObject()
                 ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
-                ->join('customers', 'customers.id = sales_order.id_customer')
-                ->join('employees', 'employees.id = sales_order.sales_id')
-                ->join('metadata', 'metadata.id = customers.termin', 'left')
+                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+                ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
                 ->find($docId);
 
             $salesName = $soData->salesName;
             $termin = $soData->termin;
             $customerName = $soData->customerName;
             $customerAddress = $soData->customerAddress;
-            $taxStatus = filter_var($soData->tax_status, FILTER_VALIDATE_BOOLEAN);
-            $includeTax = filter_var($soData->include_pa, FILTER_VALIDATE_BOOLEAN);
         } else {
             $selectQry = "surat_jalan_so.*, 
                           customers.name AS customerName, 
@@ -717,7 +716,7 @@ class Invoice extends BaseController
 
         foreach ($itemList as $item) {
         }
-
+        $no = 1;
         foreach ($itemList as &$item) {
             foreach ($itemTax as $itemT) {
                 $item->taxChecked = str_replace(',', '', $itemT->tax_value);
@@ -729,6 +728,7 @@ class Invoice extends BaseController
 
             $dpp += $itemTotal;
             $taxAmt += $itemTotal * ($item->tax / 100);
+            $item->no = $no++;
         }
 
         $data = (object)[

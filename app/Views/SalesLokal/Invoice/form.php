@@ -431,6 +431,8 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
+
+                    console.log(res.itemList);
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
                     $('#customerAddress').val(res.customerAddress);
