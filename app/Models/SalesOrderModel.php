@@ -109,7 +109,7 @@ class SalesOrderModel extends Model
 
         $totalData = $salesOrderLokal->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_surat_jalan']) {
             $salesOrderLokal->groupStart();
         }
         if ($addCondition['search']) {
@@ -125,7 +125,23 @@ class SalesOrderModel extends Model
         if ($addCondition['dateEnd']) {
             $salesOrderLokal->where('purchase_requests.order_date <=', $addCondition['dateEnd']);
         }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+
+        if ($addCondition['filter_invoice'] == "belum") {
+            $salesOrderLokal->where('sales_order.sales_order_invoice_id', NULL);
+        }
+
+        if ($addCondition['filter_invoice'] == "sudah") {
+            $salesOrderLokal->where('sales_order.sales_order_invoice_id !=', NULL);
+        }
+
+        if ($addCondition['filter_surat_jalan'] == "belum") {
+            $salesOrderLokal->where('sales_order.surat_jalan_so_id', NULL);
+        }
+
+        if ($addCondition['filter_surat_jalan'] == "sudah") {
+            $salesOrderLokal->where('sales_order.surat_jalan_so_id !=', NULL);
+        }
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_surat_jalan']) {
             $salesOrderLokal->groupEnd();
         }
 

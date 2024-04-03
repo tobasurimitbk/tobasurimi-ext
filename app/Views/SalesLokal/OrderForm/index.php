@@ -20,6 +20,26 @@
         <?php endif; ?>
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_surat_jalan" name="filter_surat_jalan" id="filter_surat_jalan">
+                            <option value="" data-code=""></option>
+                            <option value="belum" data-code="">Belum Digunakan Surat Jalan</option>
+                            <option value="sudah" data-code="">Sudah Digunakan Surat Jalan</option>
+                        </select>
+                        <label for="floatingInput">Filter Surat Jalan</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
+                            <option value="" data-code=""></option>
+                            <option value="belum" data-code="">Belum Digunakan Invoice</option>
+                            <option value="sudah" data-code="">Sudah Digunakan Invoice</option>
+                        </select>
+                        <label for="floatingInput">Filter Invoice</label>
+                    </div>
+                </div>
                 <div class="col-md-4 mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Order" value="" />
                 </div>
@@ -43,6 +63,10 @@
                                 <th onclick="changeSort('total_harga')" class="sort">Total Harga</th>
 
                                 <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
+
+                                <th onclick="changeSort('surat_jalan_so_id')" class="sort">Surat Jalan</th>
+
+                                <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
 
                                 <th class="sort">Action</th>
                             </tr>
@@ -119,6 +143,34 @@
     let list_delete = [];
     var row = 0;
 
+
+    $('.filter_surat_jalan, .filter_invoice').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.filter_surat_jalan, .filter_invoice')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.filter_surat_jalan, .filter_invoice')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.filter_surat_jalan, .filter_invoice')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
     $(document).ready(function() {
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -128,6 +180,10 @@
             const data = table.row(this).data();
             location.replace(`<?= base_url("order-form-lokal/id"); ?>/${data.id}`);
         })
+
+        $(".filter_surat_jalan, .filter_invoice").change(function() {
+            table.ajax.reload();
+        });
     })
 
     const table = $('.dataTable').DataTable({
@@ -151,6 +207,8 @@
                 data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
+                data.filter_surat_jalan = $(".filter_surat_jalan").val();
+                data.filter_invoice = $(".filter_invoice").val();
             }
         },
         // scrollX: true,
@@ -163,35 +221,57 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        }, {
-            data: "no_sales_order",
-            className: "text-center"
-        }, {
-            data: "nama_customer",
-            className: "text-center"
-        }, {
-            data: "destination",
-            className: "text-center"
-        }, {
-            data: "qty_barang",
-            className: "text-center"
-        }, {
-            data: "total_harga",
-            className: "text-center"
-        }, {
-            data: "keterangan",
-            className: "text-center"
-        }, {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                return `
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "no_sales_order",
+                className: "text-center"
+            }, {
+                data: "nama_customer",
+                className: "text-center"
+            }, {
+                data: "destination",
+                className: "text-center"
+            }, {
+                data: "qty_barang",
+                className: "text-center"
+            }, {
+                data: "total_harga",
+                className: "text-center"
+            }, {
+                data: "keterangan",
+                className: "text-center"
+            },
+            {
+                data: "surat_jalan_so_id",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data !== "") {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
+            },
+            {
+                data: "sales_order_invoice_id",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data !== "") {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
+            }, {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `
                 <button data-toggle="tooltip" title="Histori Harga Barang" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </button>
@@ -202,8 +282,9 @@
                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                 </button>
                 `
+                }
             }
-        }],
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
