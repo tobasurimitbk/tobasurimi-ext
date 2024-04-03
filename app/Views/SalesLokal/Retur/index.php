@@ -4,8 +4,8 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Data Retur Penjualan</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("retur/create"); ?>">
+        <h1>Return Barang Sales</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("return-barang-sales/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
@@ -24,7 +24,6 @@
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
                         </tbody>
                     </table>
                 </div>
@@ -51,7 +50,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("retur/"); ?>${data.id}`);
+            location.replace(`<?= base_url("return-barang-sales/details/"); ?>${data.id}`);
         })
     })
 
@@ -70,7 +69,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("retur/all"); ?>",
+            url: "<?= base_url("return-barang-sales/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
