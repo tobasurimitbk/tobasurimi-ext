@@ -56,6 +56,58 @@
         </div>
     </div>
 </section>
+<div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historiModalLabel">Histori Harga Barang</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control order_no" name="order_no" id="order_no">
+                            <label for="floatingInput">Nomor Order</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control customer_name" name="customer_name" id="customer_name">
+                            <label for="floatingInput">Customer</label>
+                        </div>
+                    </div>
+                    <!-- <div class="col-sm-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
+                            <label for="floatingInput">Nomor LPB</label>
+                        </div>
+                    </div> -->
+                </div>
+                <table class="table table-inside table-borderd nowrap table-hover-tobasurimi dataTable2" style="width: 100%;" id="tableHistori">
+                    <thead>
+                        <tr>
+                            <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Kode Barang</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Nama Barang</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Qty Order</td>
+                            <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Harga</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -139,7 +191,16 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                return `
+                <button data-toggle="tooltip" title="Histori Harga Barang" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+                <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                    <i class="fa fa-trash"></i>
+                </button>
+                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                </button>
                 `
             }
         }],
@@ -225,6 +286,39 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    function displayHistory(id) {
+        $.ajax({
+            url: "<?= base_url("order-form-lokal/histori-harga"); ?>",
+            data: {
+                id: id
+            },
+            method: "GET",
+            success: function(response) {
+                // console.log(response);
+                $('#order_no').val(response.sales_order.no_sales_order);
+                $('#customer_name').val(response.sales_order.name);
+                const table = $('#tableHistori');
+                var no = 1;
+                table.find('tbody').empty();
+                $.each(response.list_barang, function(i, v) {
+                    var newRow = $('<tr>');
+                    newRow.append($('<td style="text-align:center;">').text(no++));
+                    newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
+                    newRow.append($('<td style="text-align:center;">').text(v.nama_barang));
+                    newRow.append($('<td style="text-align:center;">').text(v.qty));
+                    newRow.append($('<td style="text-align:center;">').text(v.harga_barang));
+                    table.find('tbody').append(newRow);
+                });
+                $('#historiModal').modal('show');
+
+            },
+        });
+    }
+
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 </script>
 <?= $this->endSection(); ?>

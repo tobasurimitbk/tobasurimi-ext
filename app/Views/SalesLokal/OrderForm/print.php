@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Order Form <?= $soData->customerName ?></title>
     <style>
         .company-name {
             font-weight: 700;
@@ -70,11 +71,15 @@
         }
     </style>
 </head>
+
 <body>
     <table class="w-100">
         <tr>
             <td style="width: 60%;padding-right: 100px">
-                <div class="company-name"><?= $companyName ?></div>
+                <div class="company-name">
+                    Toba Fish <br>
+                    <?= $companyName ?>
+                </div>
                 <div>
                     <table class="w-100">
                         <tr>
@@ -114,7 +119,7 @@
             </td>
         </tr>
     </table>
-    
+
     <table class="item-table">
         <tr>
             <th style="height: 1px;">Item</th>
@@ -122,21 +127,21 @@
             <th>Qty</th>
             <th>Satuan</th>
         </tr>
-        <?php foreach($soDet as $detail): ?>
-        <tr>
-            <td class="txt-center" style="width: 80px;height: 1px;"><?= $detail->kodeBarang ?></td>
-            <td><?= $detail->namaBarang ?></td>
-            <td class="txt-center"><?= $detail->qty ?></td>
-            <td class="txt-center"><?= $detail->kodeSatuan ?></td>
-        </tr>
+        <?php foreach ($soDet as $detail) : ?>
+            <tr>
+                <td class="txt-center" style="width: 80px;height: 1px;"><?= $detail->kodeBarang ?></td>
+                <td><?= $detail->namaBarang ?></td>
+                <td class="txt-center"><?= $detail->qty ?></td>
+                <td class="txt-center"><?= $detail->kodeSatuan ?></td>
+            </tr>
         <?php endforeach; ?>
-        <?php for ($i = 0; $i < (9 - count($soDet)); $i++): ?>
-        <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-        </tr>
+        <?php for ($i = 0; $i < (9 - count($soDet)); $i++) : ?>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
         <?php endfor; ?>
     </table>
 
@@ -163,4 +168,5 @@
     </table>
 
 </body>
+
 </html>

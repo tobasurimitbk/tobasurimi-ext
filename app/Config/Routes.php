@@ -411,9 +411,10 @@ $routes->post('/order-form-lokal/save', 'SalesLokal\OrderForm::save', ['filter' 
 $routes->post('/order-form-lokal/update', 'SalesLokal\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/delete', 'SalesLokal\OrderForm::delete', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/delete-detail', 'SalesLokal\OrderForm::deleteOrderForm', ['filter' => 'Auth']);
-$routes->get('/order-form-lokal/print/(:num)', 'SalesLokal\OrderForm::printOrder/$1', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/print/(:segment)', 'SalesLokal\OrderForm::printOrder/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getItemList', 'SalesLokal\OrderForm::getItemListByIds', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getItemList/(:num)', 'SalesLokal\OrderForm::getItemListById/$1', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/histori-harga', 'SalesLokal\OrderForm::HistoriHargaBarang', ['filter' => 'Auth']);
 
 $routes->get('/order-form-lokal/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/generate-no-order-form', 'SalesLokal\OrderForm::generateNomorSalesOrder', ['filter' => 'Auth']);

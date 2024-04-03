@@ -151,7 +151,7 @@ class OrderForm extends BaseController
 
             array_push($dataSalesOrder, [
                 "no" => $no++,
-                "id" => bin2hex($this->encrypter->encrypt($data->id)),
+                "id" => encrypt($data->id),
                 "no_sales_order" => $data->no_sales_order,
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
@@ -338,7 +338,7 @@ class OrderForm extends BaseController
             $this->SalesOrderModel->db->transComplete();
 
             $data = [
-                "id"        => $dataSalesOrder,
+                "id"        => encrypt($dataSalesOrder),
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 "payload"   => $values,
@@ -363,7 +363,7 @@ class OrderForm extends BaseController
     public function getById($id = null)
     {
         //Get data sales order
-        $id = $this->encrypter->decrypt(hex2bin($id));
+        $id = decrypt($id);
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
         // var_dump($dataSalesOrder);
         // exit;
@@ -410,6 +410,7 @@ class OrderForm extends BaseController
         // dd($dataSalesOrder->detail);
         $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
         $dataSalesOrder->shipping_date = $dataSalesOrder->shipping_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->shipping_date)) : "";
+        $dataSalesOrder->id = encrypt($dataSalesOrder->id);
         $data = [
             "data" => $dataSalesOrder,
             "dataCustomers" => $customers,
@@ -795,6 +796,8 @@ class OrderForm extends BaseController
 
         $fileName = 'Order Form';
 
+        $id = decrypt($id);
+
         $companyData = $this->companyModel->asObject()
             ->find($this->this_company_id);
 
@@ -807,13 +810,13 @@ class OrderForm extends BaseController
         $salesOrderData = $this->SalesOrderModel->asObject()
             ->select($soSelectQry)
             ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-            ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
             ->find($id);
 
         $soDet = $this->SalesOrderDetailModel->asObject()
-            ->select('barang_master.barang_name AS namaBarang, barang_master.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
-            ->join('barang_master', 'barang_master.id = sales_order_detail.id_barang')
-            ->join('satuans', 'satuans.id = barang_master.satuan_id')
+            ->select('barang_master_sales.barang_name AS namaBarang, barang_master_sales.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
             ->where('id_sales_order', $id)
             ->findAll();
 
@@ -869,5 +872,42 @@ class OrderForm extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function HistoriHargaBarang()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $id_user = $this->userId;
+        $listHargaBarang = [];
+        $dataSalesOrder = $this->SalesOrderModel
+            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+            ->find($id);
+        $listBarang = $this->SalesOrderDetailModel
+            ->select('sales_order_detail.id AS id_sales_order_detail, sales_order_detail.*, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+            ->where('sales_order_detail.id_sales_order', $id)
+            ->where('sales_order_detail.deletedAt', null)
+            ->findAll();
+
+        foreach ($listBarang as $key => $value) {
+            $listBarang2 = $this->SalesOrderDetailModel
+                ->select('sales_order_detail.id AS id_sales_order_detail, sales_order_detail.*, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang')
+                ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order', 'left')
+                ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+                ->where('sales_order.id_user', $id_user)
+                ->where('sales_order.id_customer', $dataSalesOrder['id_customer'])
+                ->where('sales_order_detail.id_barang', $value['id_barang'])
+                ->where('sales_order_detail.deletedAt', null)
+                ->findAll();
+            // Menggabungkan array $listBarang2 ke $listHargaBarang
+            $listHargaBarang = array_merge($listHargaBarang, $listBarang2);
+        }
+
+        return response()->setJSON([
+            'sales_order' => $dataSalesOrder,
+            'listBarang' => $listBarang,
+            'list_barang' => $listHargaBarang,
+            'token' => csrf_hash()
+        ]);
     }
 }
