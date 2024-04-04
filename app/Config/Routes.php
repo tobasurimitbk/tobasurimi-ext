@@ -730,6 +730,11 @@ $routes->post('/jasa-vendor-in/posting',  'JasaVendor\JasaVendorIn::posting', ['
 $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);
+// BIAYA UDANG
+$routes->get('/biaya-udang', 'JasaVendor\BiayaUdang::index', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/create', 'JasaVendor\BiayaUdang::create', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/save', 'JasaVendor\BiayaUdang::createAction', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/list-barang', 'JasaVendor\BiayaUdang::dropdownBarang', ['filter' => 'Auth']);
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
