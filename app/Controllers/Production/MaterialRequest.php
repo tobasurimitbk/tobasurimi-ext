@@ -46,9 +46,11 @@ class MaterialRequest extends BaseController
     protected $supplierModel;
     protected $materialRequestModel;
     protected $materialRequestDetailsModel;
+    protected $this_user_id;
 
     public function __construct()
     {
+        $this->this_user_id = session()->get("login")->user_id;
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
@@ -515,6 +517,41 @@ class MaterialRequest extends BaseController
             if (!empty($id)) {
                 $this->materialRequestModel->update($id, $payload);
                 $materialRequestData = $this->materialRequestModel->find($id);
+                $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->findAll();
+
+                foreach ($materialRequestDetailData as $key => $value) {
+                    $stok = $this->stockModel->insertStok(
+                        $materialRequestData['company_id'],
+                        $value['warehouse_id'],
+                        $value['divisi_id'],
+                        $value['barang_type'],
+                        $value['barang1_id'],
+                        $value['barang2_id'],
+                        ($value['qty'] * -1)
+                    );
+
+                    // DETAIL
+                    $stokDetail = $this->stockDetailModel->insertStokDetail(
+                        $stok,
+                        $value['qty'],
+                        "Out",
+                        date('Y-m-d'),
+                        $this->this_user_id,
+                        "PRODUKSI",
+                        "-",
+                        $value['note'] ? $value['note'] : "-"
+                    );
+
+                    // SUB DETAIL
+                    $this->stockDetail2Model->insertStokDetail2(
+                        $value['bc_id'],
+                        $value['stock_id'],
+                        $stokDetail,
+                        $value['qty'],
+                        $value['no_aju'],
+                        $materialRequestData['req_no']
+                    );
+                }
 
                 $this->workOrdersModel->update($materialRequestData['work_order_id'], [
                     'is_posted' => 1
