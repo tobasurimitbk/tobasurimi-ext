@@ -99,7 +99,7 @@ class SuratJalan extends BaseController
             $dataNo = json_decode($data->multiple_no_so, true);
             array_push($dataAllSuratJalan, [
                 "no"            => $no++,
-                "id"            => $data->id,
+                "id"            => encrypt($data->id),
                 "no_surat_jalan"      => $data->no_surat_jalan,
                 "no_so"      => implode(', ', $dataNo),
                 "kode_pelanggan"        => $data->kode_pelanggan,
@@ -247,7 +247,10 @@ class SuratJalan extends BaseController
 
     public function getById($id = null)
     {
+        $id = decrypt($id);
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
+        // var_dump($dataSuratJalan);
+        // exit;
 
         if (empty($dataSuratJalan)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);
@@ -265,11 +268,12 @@ class SuratJalan extends BaseController
             ->findAll();
 
         $dataSuratJalan->itemList = $this->SalesOrderDetailModel->getItemListByIds($dataSuratJalan->multiple_id_so);
+        $dataSuratJalan->id = encrypt($dataSuratJalan->id);
 
         // var_dump($dataSuratJalan);
         foreach ($dataSuratJalan->itemList as $value) {
-            $value->harga_barang = str_replace('Rp', '', toRupiah($value->harga_barang));
-            $value->amount = str_replace('Rp', '', toRupiah($value->amount));
+            $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $value->harga_barang)));
+            $value->amount = toRupiah(floatval(str_replace('Rp', '', $value->amount)));
         }
 
         $data = [
@@ -279,6 +283,8 @@ class SuratJalan extends BaseController
             "dataSo" => $dataSo
 
         ];
+        // var_dump($dataSo);
+        // exit;
         //echo json_encode($data);
         return view('SalesLokal/SuratJalan/form', $data);
     }
@@ -296,32 +302,11 @@ class SuratJalan extends BaseController
         //echo json_encode($data);
 
         $validate = $this->validate([
-            "id" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'id tidak boleh kosong',
-                ]
-            ],
-            "id_customer" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'Customer tidak boleh kosong',
-                ]
-            ],
-            "id_so" => 'is_array',
             "shipping_date" => [
                 "rules" => "required",
                 'errors' =>
                 [
                     'required' => 'tanggal pengiriman tidak boleh kosong',
-                ]
-            ],
-            "no_surat_jalan" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'tax status tidak boleh kosong',
                 ]
             ],
         ]);
@@ -330,32 +315,27 @@ class SuratJalan extends BaseController
         if (!$validate) {
             // echo json_encode($payload);
             //return;
-            return redirect()->to('/surat-jalan/id/' . $id)->back()->withInput();
+            return redirect()->to('/surat-jalan/id/' . encrypt($id))->back()->withInput();
         }
 
-        $dataSo = $this->request->getPost('id_so');
+        // $dataSo = $this->request->getPost('id_so');
 
-        $idArray = array();
-        $noArray = array();
+        // $idArray = array();
+        // $noArray = array();
 
-        foreach ($dataSo as $payload) {
-            $delimiter = ",";
-            $parts = explode($delimiter, $payload);
-            array_push($idArray, $parts[0]);
-            array_push($noArray, $parts[1]);
-        }
+        // foreach ($dataSo as $payload) {
+        //     $delimiter = ",";
+        //     $parts = explode($delimiter, $payload);
+        //     array_push($idArray, $parts[0]);
+        //     array_push($noArray, $parts[1]);
+        // }
 
         $shippingDate = $this->request->getPost('shipping_date');
 
         $values = [
-            "id_user" => $this->request->getPost('id_user'),
-            "id_customer" => $this->request->getPost('id_customer'),
-            "id_customer" => $this->request->getPost('id_customer'),
             "shipping_date" =>  $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
             "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
             "no_po" => $this->request->getPost('no_po'),
-            'multiple_id_so' => json_encode($idArray),
-            'multiple_no_so' => json_encode($noArray),
         ];
         try {
 
@@ -422,9 +402,7 @@ class SuratJalan extends BaseController
     public function dropDownSalesOrder($idCustomer)
     {
         $customerData = $this->CustomerModel->asObject()
-            ->select('customers.*, metadata.value AS termin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
-            ->join('metadata', 'metadata.id = customers.termin', 'left')
-            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->select('customers.*')
             ->find($idCustomer);
 
         $condition = [
@@ -435,7 +413,9 @@ class SuratJalan extends BaseController
         ];
         $soList = $this->SalesOrderModel->asObject()
             ->where($condition)
-            ->select(['id', 'no_sales_order'])
+            ->select('sales_order.*, metadata.value AS termin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+            ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->findAll();
 
         $data = [
