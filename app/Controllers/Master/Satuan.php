@@ -88,9 +88,19 @@ class Satuan extends BaseController
 
             if ($this->validate($rules)) {
                 $values = [
-                    "kode_satuan" => $this->request->getPost("kode_satuan"),
-                    "nama_satuan" => $this->request->getPost("nama_satuan")
+                    "kode_satuan" => strtoupper($this->request->getVar("kode_satuan")),
+                    "nama_satuan" => strtoupper($this->request->getVar("nama_satuan"))
                 ];
+
+                $firstData = $this->SatuansModel->where('kode_satuan', strtoupper($values['kode_satuan']))->first();
+
+                if ($firstData != null) {
+                    return response()->setJSON([
+                        'message' => "Kode satuan sudah ada",
+                        'status' => false,
+                        'token' => csrf_hash()
+                    ]);
+                }
 
                 if ($this->SatuansModel->insert($values)) {
                     $data = [
