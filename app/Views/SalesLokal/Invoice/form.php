@@ -77,12 +77,12 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="salesName" value="<?= $documentData->salesName ?? '' ?>" disabled>
                             <label for="floatingInput">Nama Sales</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="termin" name="termin" value="<?= $documentData->termin ?? '' ?>" disabled>
@@ -482,8 +482,8 @@
             let dummyTax = 0;
 
             itemList.map((obj) => {
-                // console.log(obj);
-                const itemAmt = +(obj.amount);
+                console.log(obj);
+                const itemAmt = parseFloat(obj.amount.replace('Rp ', '').replace('.', ''));
                 let taxAmt = 0;
                 discTotal += ((+obj.disc) / 100) * itemAmt;
                 if (taxStatus) {
@@ -494,7 +494,7 @@
                     taxAmt = itemAmt * ((+obj.tax) / 100);
                 }
                 // console.log((dummyTax / 100));
-                // console.log(itemAmt);
+                console.log(itemAmt);
 
                 if (taxStatus && !includeTax) {
                     // taxTotal += taxAmt;
@@ -514,6 +514,17 @@
 
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#taxTotal').html(taxTotalHtml.toLocaleString());
+
+            // console.log("kondisi if");
+            // console.log(dummyGrandTotal);
+            // console.log(discTotal);
+            // console.log("kondisi if else");
+            // console.log(itemSubTotal);
+            // console.log(taxTotalHtml);
+            // console.log(discTotal);
+            // console.log("kondisi else");
+            // console.log(itemSubTotal);
+            // console.log(discTotal);
 
 
             if (taxStatus && includeTax) {

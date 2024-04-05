@@ -193,6 +193,18 @@ class CustomerModel extends Model
         return $this->asArray()->where('tipe_customer', "INTERNASIONAL")->where('deletedAt', null)->where('sales_id', $user_id)->orderBy('createdAt', "DESC")->findAll();
     }
 
+    public function getCustomerLokal()
+    {
+        return $this->asArray()
+            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->where('customers.deletedAt', null)
+            ->where('customers.tipe_customer', 'LOKAL')
+            ->where('employees.deletedAt', null)
+            ->orderBy('createdAt', "DESC")
+            ->findAll();
+    }
+
     public function getCustomerWithMetaData($idCustomer)
     {
         $selectQry = "customers.*,

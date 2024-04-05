@@ -96,14 +96,27 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
-                                <option value=""></option>
-                                <?php foreach ($dataCustomers ?? [] as $customer) : ?>
-                                    <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Nama Konsumen</label>
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataCustomers)) {
+                                        foreach ($dataCustomers as $customer) {
+                                    ?>
+                                            <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['kode']; ?> - <?= $customer['name']; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Nama Konsumen</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -147,7 +160,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="Biaya Kirim">
+                            <input <?= !empty($data) ? 'readonly' : '' ?> onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');formatNumber(this)" autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="Biaya Kirim">
                             <label for="floatingInput">Biaya Kirim</label>
                         </div>
                     </div>
@@ -244,11 +257,20 @@
 
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Nama Barang</label>
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Nama Barang</label>
+                                </div>
+                                <?php if (can('Penjualan Lokal', 'Master Barang', 'c')) : ?>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-success btn-barang-add" id="btn-barang-add" data-toggle="modal" type="button">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -267,7 +289,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                                 <label for="floatingInput">Qty</label>
                             </div>
                         </div>
@@ -275,13 +297,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga" oninput="this.value=this.value.replace(/[^0-9.]/g,'');">
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input step="1" autocomplete="one-time-code" type="number" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
+                                <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
                                 <label for="floatingInput">disc%</label>
                             </div>
                         </div>
@@ -305,6 +327,221 @@
     </div>
 </div>
 
+<div class="modal addCustomerModal" id="addCustomerModal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Customer</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form-customer" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="tipe_customer" value="LOKAL">
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <label for="floatingInput">Nama</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
+                                <label for="floatingInput">NIK (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
+                                <label for="floatingInput"> NPWP (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <textarea autocomplete="one-time-code" class="form-control address" id="address" name="address"></textarea>
+                                <label for="floatingInput">Alamat</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select province_parent_id" name="province_parent_id" id="province_parent_id" onchange="getCityParent()">
+                                            <option value=""></option>
+                                            <?php
+                                            if (!empty($dataProvinces)) {
+                                                foreach ($dataProvinces as $province) {
+                                            ?>
+                                                    <option value="<?= $province["id"]; ?>"><?= strtoupper($province["province_name"]); ?></option>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                        <label for="floatingInput">Provinsi (Opsional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id">
+                                            <option value="" data-code=""></option>
+                                        </select>
+                                        <label for="floatingInput">Kota (Opsional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" minlength="5" maxlength="5" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Kode Pos (Opsional)">
+                                        <label for="floatingInput">Kode Pos (Opsional)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
+                                <label for="floatingInput">No. Telepon (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
+                                <label for="floatingInput">Nama PIC (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email (Opsional)">
+                                <label for="floatingInput">Email (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select currency" id="currency" name="currency">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Mata Uang (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select termin" id="termin" name="termin">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Termin (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <label for="floatingInput">Limit Piutang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select tipe_pelanggan" name="tipe_pelanggan" id="tipe_pelanggan">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Tipe Pelanggan (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
+                                <label for="floatingInput">Nama Sales</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard mr-2 btn-discard-customer" id="btn-discard-customer">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-customer">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal add-modal" id="addMasterBarangModal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Master Barang</h5>
+            </div>
+            <div class="modal-body">
+                <?= csrf_field() ?>
+                <form class="create-form-master-barang" role="form" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" id="kode_barang" class="form-control kode_barang" name="kode_barang" placeholder="Kode Barang">
+                                        <label for="floatingInput">Kode Barang</label>
+                                    </div>
+                                    <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                        <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px;" id="generate_new_code" name="generate_new_code" type="checkbox" onchange="generateCodeMasterBarang()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
+                                <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
+                                    <option value=""></option>
+                                    <?php if (!empty($dataSatuan)) : ?>
+                                        <?php foreach ($dataSatuan as $d) : ?>
+                                            <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
+                                <label for="floatingInput">Harga Pokok</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
+                                <label for="floatingInput">Harga Jual</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-master-barang mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-master-barang">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -499,6 +736,9 @@
 
             reCountTotal();
         });
+        generateCodeMasterBarang();
+        getBarang();
+        $('#auto_generate').prop('checked', true).change();
 
 
         $(".order_date").datepicker({
@@ -515,16 +755,51 @@
             autoclose: true,
         })
 
+        // SATUAN
+        $('.satuan_id').select2({
+            placeholder: "Pilih Satuan",
+            theme: "bootstrap-5",
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.satuan_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.satuan_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.satuan_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.satuan_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         // Customer
         $('.id_customer').select2({
             placeholder: "Pilih Nama Customer",
             allowClear: true,
             theme: "bootstrap-5"
         }).change(function() {
-            const customerAddress = $(this).find(':selected').data('address');
-            const termin = $(this).find(':selected').data('termin');
-            const salesName = $(this).find(':selected').data('salesname');
-            const tipePelanggan = $(this).find(':selected').data('tipepelanggan');
+            const customerAddress = $(this).find(':selected').data('address') ? $(this).find(':selected').data('address') : "";
+            const termin = $(this).find(':selected').data('termin') ? $(this).find(':selected').data('termin') : "";
+            const salesName = $(this).find(':selected').data('salesname') ? $(this).find(':selected').data('salesname') : "";
+            const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
 
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
             $('#termin').val(decodeURIComponent(termin)).change();
@@ -730,6 +1005,491 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        $(".nik").mask("AAAAAAAAAAAAAAAA", {
+            translation: {
+                "A": {
+                    pattern: /[0-9]/,
+                }
+            }
+        })
+
+        $(".parent_postal_code").mask("AAAAA", {
+            translation: {
+                "A": {
+                    pattern: /[0-9]/,
+                }
+            }
+        })
+
+        // TERMIN
+        //CSS SELECT2 FLOATING LABEL
+        $('.termin').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        });
+        $(".termin")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".termin")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".termin")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // MATA UANG
+        //CSS SELECT2 FLOATING LABEL
+        $('.currency').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: false,
+            dropdownParent: $(".add-modal .modal-content")
+        });
+
+        $(".currency")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".currency")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".currency")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // COUNTRY
+        //CSS SELECT2 FLOATING LABEL
+        $(".country_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".country_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        $('.country_id').select2({
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal-internasional .modal-content")
+        })
+
+        $(".country_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-8px');
+
+        // TIPE PELANGGAN
+        //CSS SELECT2 FLOATING LABEL
+        $('.tipe_pelanggan').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        });
+
+        $(".tipe_pelanggan")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".tipe_pelanggan")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".tipe_pelanggan")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // PROVINCE PARENT
+        //CSS SELECT2 FLOATING LABEL
+        $('.province_parent_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        });
+
+        $(".province_parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".province_parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".province_parent_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // CITY PARENT
+        //CSS SELECT2 FLOATING LABEL
+        $('.city_parent_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        });
+
+        $('.city_parent_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.city_parent_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.city_parent_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+
+        $(".phone").mask("0000000000000")
+
+        $(".postal_code").mask("00000")
+
+        $(".no_npwp").mask("000000000000000")
+
+        // CUSTOMER 
+        $('.btn-customer-add').click(function() {
+            $('.name').val(null);
+            $('.country_id').val(null).change();
+            $('.address').val(null);
+            $('#addCustomerModal').modal('show');
+        });
+
+        $('.btn-discard-customer').click(function() {
+            $('#addCustomerModal').modal('hide');
+        });
+
+        var validatorCustomer = $(".create-form-customer").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                address: {
+                    required: true
+                },
+                nik: {
+                    minlength: 16,
+                    maxlength: 16
+                },
+                parent_postal_code: {
+                    minlength: 5,
+                    maxlength: 5
+                },
+                email: {
+                    email: true
+                },
+                piutang: {
+                    required: true
+                }
+            },
+            messages: {
+                name: {
+                    required: "Nama wajib diisi"
+                },
+                address: {
+                    required: "Alamat wajib diisi"
+                },
+                nik: {
+                    minlength: "NIK Minimal 16 Digit",
+                    maxlength: "NIK Maksimal 16 Digit"
+                },
+                parent_postal_code: {
+                    minlength: "Kode Pos Minimal 5 Digit",
+                    maxlength: "Kode Pos Maksimal 5 Digit"
+                },
+                email: {
+                    email: "Email Harus Valid"
+                },
+                piutang: {
+                    required: "Limit piutang wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('.btn-submit-customer').click(function() {
+            if ($('.create-form-customer').valid()) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                const data = new FormData(document.querySelector(".create-form-customer"));
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Customer?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("customer-lokal/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                $("#addCustomerModal").modal("hide");
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $('#addCustomerModal').modal('hide');
+
+                                        })
+                                    getListCustomer();
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+                        });
+                    }
+                })
+
+            }
+        });
+
+        // MASTER BARANG
+        $('.btn-barang-add').click(function() {
+            $('#addMasterBarangModal').modal('show');
+            $('.detail-modal').modal('hide');
+            // reset form master barang
+            validatorMasterBarang.resetForm();
+            validatorMasterBarang.reset();
+            $('#generate_new_code').attr('checked', true);
+            generateCodeMasterBarang();
+            $('.barang_name').val(null);
+            $('.satuan_id').val(null).change();
+            $('.harga_pokok').val(null);
+            $('.harga_jual').val(null);
+        })
+
+        $('.btn-discard-master-barang').click(function() {
+            $(".detail-modal").modal("show")
+            $('#addMasterBarangModal').modal('hide');
+        });
+
+        // VALIDATOR MASTER BARANG
+        var validatorMasterBarang = $(".create-form-master-barang").validate({
+            rules: {
+                kode_barang: {
+                    required: true
+                },
+                barang_name: {
+                    required: true
+                },
+                type_barang: {
+                    required: true
+                },
+                satuan_id: {
+                    required: true
+                },
+                harga_pokok: {
+                    required: true
+                },
+                harga_jual: {
+                    required: true
+                }
+            },
+            messages: {
+                kode_barang: {
+                    required: "Kode barang wajib diisi"
+                },
+                barang_name: {
+                    required: "Nama barang wajib diisi"
+                },
+                type_barang: {
+                    required: "Tipe barang wajib diisi"
+                },
+                satuan_id: {
+                    required: "Satuan wajib diisi"
+                },
+                harga_pokok: {
+                    required: "Harga pokok wajib diisi"
+                },
+                harga_jual: {
+                    required: "Harga jual wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('.btn-submit-form-master-barang').click(function() {
+            if ($('.create-form-master-barang').valid()) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                const data = new FormData(document.querySelector(".create-form-master-barang"));
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Master Barang ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("master-barang-lokal/save"); ?>",
+                            data: data,
+                            method: "POST",
+                            dataType: "json",
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        reverseButtons: true,
+                                        confirmButtonText: 'Oke',
+                                    }).then((result) => {
+                                        // jika sukses
+                                        $(".detail-modal").modal("show")
+                                        $('#addMasterBarangModal').modal('hide');
+                                        // update list data barang
+                                        getBarang();
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        cancelButtonColor: '#d33',
+                                        reverseButtons: true,
+                                        confirmButtonText: 'Oke',
+                                    })
+                                }
+                            }
+                        });
+                    }
+                })
+
+            }
+        });
 
         var validator = $(".create-form").validate({
             rules: {
@@ -1166,23 +1926,8 @@
 
             $(".id_barang").val('')
 
-            $.ajax({
-                url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".id_barang").empty();
-
-                    $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
-
-                    res.dataBarang.forEach(function(item) {
-                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-tax="${+item.tax}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
-                    })
-
-                    $(".id_barang").val("").change();
-                    $(".detail-modal").modal("show");
-                }
-            })
+            getBarang();
+            $(".detail-modal").modal("show");
         });
 
         $(".harga, .qty").keyup(function() {
@@ -1441,6 +2186,78 @@
         } else {
             $(".no_sales_order").attr("readonly", false);
             $(".no_sales_order").val("");
+        }
+    }
+
+    function getListCustomer() {
+        $.ajax({
+            url: `<?= base_url('order-form-lokal/customer'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {},
+            dataType: "json",
+            success: function(res) {
+                $(".id_customer").empty()
+                $(".id_customer").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".id_customer").append(`<option value="${item.id}" data-tipepelanggan="${item.tipe_pelanggan}" data-address="${item.address}" data-termin="${item.termin}" data-salesname="${item.salesName}">${item.kode} - ${item.name}</option>`)
+                })
+                $(".id_customer").val();
+            }
+        });
+    }
+
+    function getBarang() {
+        $.ajax({
+            url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".id_barang").empty();
+
+                $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
+
+                res.dataBarang.forEach(function(item) {
+                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-tax="${+item.tax}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                })
+
+                $(".id_barang").val("").change();
+            }
+        })
+    }
+
+    function generateCodeMasterBarang() {
+        let csrfToken = '<?= csrf_token() ?>';
+        let value = document.getElementById('generate_new_code').checked ? true : false;
+        let csrf = $(`[name="${csrfToken}"]`);
+        let type_barang = "bahan_jadi"
+        if (value) {
+            $("input[name='kode_barang']").attr("readonly", true);
+            $.ajax({
+                url: `<?= base_url("master-barang-lokal/generate-new-code"); ?>`,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {},
+                data: {
+                    type_barang: type_barang
+                },
+                method: "POST",
+                success: function(res) {
+                    csrf.val(res.token);
+                    $("input[name='kode_barang']").attr("readonly", true);
+                    $("input[name='kode_barang']").val(res.codeNew);
+
+                }
+            })
+        } else {
+            $("input[name='kode_barang']").attr("readonly", false);
+            $("input[name='kode_barang']").val("");
         }
     }
 

@@ -420,7 +420,7 @@
         });
 
         $('.btn-add-barang').click(function() {
-            $('.title-name').text("Tambah Bahan Modal");
+            $('.title-name').text("Tambah Bahan Penolong");
             $(".create-form :input:not([name='type'])").val('');
             $('select[name="parent_type_id"]').val(null).change();
             list_items.splice(0, list_items.length);
@@ -454,8 +454,8 @@
                 dataType: "json",
                 success: function(res) {
                     $('.delete-btn').show();
-                    $('.title-name').text("Update Bahan Modal");
-                    // <?php if (!can('Master Barang', 'Bahan Modal', 'u')) : ?>
+                    $('.title-name').text("Update Bahan Penolong");
+                    // <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
                     //     $('.btn-submit-form').hide();
                     // <?php endif; ?>
                     $('input[name="kode_barang"]').attr('readonly', true);

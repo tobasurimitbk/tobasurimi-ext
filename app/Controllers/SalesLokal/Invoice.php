@@ -108,7 +108,7 @@ class Invoice extends BaseController
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             array_push($dataAllSalesOrderInvoice, [
                 "no"                => $no++,
-                "id"                => $data->id,
+                "id"                => encrypt($data->id),
                 "no_faktur"         => $data->no_faktur,
                 "tanggal_faktur"    => $data->tanggal_faktur,
                 "document_type"     => $data->document_type,
@@ -324,6 +324,7 @@ class Invoice extends BaseController
 
     public function getById($id = null)
     {
+        $id = decrypt($id);
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
 

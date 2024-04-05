@@ -5,6 +5,9 @@
 <section class="section">
     <div class="section-header">
         <h1>Sales Order Internasional</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("order-form-internasional/create"); ?>">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </a>
     </div>
     <div class="card">
         <div class="card-body">

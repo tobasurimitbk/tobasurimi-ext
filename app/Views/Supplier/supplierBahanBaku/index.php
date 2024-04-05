@@ -105,7 +105,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control account_receivable" id="account_receivable" name="account_receivable" placeholder="Akun Receivable (Opsional)">
@@ -118,7 +118,7 @@
                                 <label for="floatingInput">Akun Payable (Opsional)</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -969,8 +969,8 @@
                         $(".email").val(res?.data?.email);
                         $(".province_parent_id").val(res?.data?.province_id).change();
                         $(".country_code").val(res?.data?.country_code).change();
-                        $(".account_receivable").val(res?.data?.account_receivable);
-                        $(".account_payable").val(res?.data?.account_payable);
+                        // $(".account_receivable").val(res?.data?.account_receivable);
+                        // $(".account_payable").val(res?.data?.account_payable);
 
                         // AJAX GET CITY
                         $.ajax({
