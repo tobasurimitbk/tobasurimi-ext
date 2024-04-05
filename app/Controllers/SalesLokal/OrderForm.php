@@ -15,10 +15,12 @@ use App\Models\DetailStockBarang;
 use App\Models\StockDetailModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\AllNoModel;
+use App\Models\BanksModel;
 use App\Models\BarangMasterSalesModel;
 use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
-
+use App\Models\ProvincesModel;
+use App\Models\SatuansModel;
 use Error;
 use ErrorException;
 
@@ -39,6 +41,9 @@ class OrderForm extends BaseController
     protected $AllNoModel;
     protected $MetaDataModel;
     protected $employeeModel;
+    protected $ProvincesModel;
+    protected $BanksModel;
+    protected $satuanModel;
 
     private $userId;
 
@@ -58,6 +63,9 @@ class OrderForm extends BaseController
         $this->AllNoModel = new AllNoModel();
         $this->MetaDataModel = new MetadataModel();
         $this->employeeModel = new EmployeesModel();
+        $this->ProvincesModel = new ProvincesModel();
+        $this->BanksModel = new BanksModel();
+        $this->satuanModel = new SatuansModel();
         $this->db = \Config\Database::connect();
 
         $this->userId = session()->get("login")->user_id;
@@ -70,16 +78,12 @@ class OrderForm extends BaseController
 
     public function createView()
     {
+        //Get Provinces
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
+        $dataBanks = $this->BanksModel->search_list(array(), 'name');
+        $dataSatuan = $this->satuanModel->findAll();
         //Get Customers
-        $customers = $this->CustomerModel
-            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName')
-            ->join('employees', 'employees.id = customers.sales_id', 'left')
-            ->where('customers.deletedAt', null)
-            ->where('customers.tipe_customer', 'LOKAL')
-            ->where('employees.deletedAt', null)
-            ->orderBy('customers.name', "ASC")
-            //->where('customers.company_id', $this->this_company_id)
-            ->findAll();
+        $customers = $this->CustomerModel->getCustomerLokal();
 
         $condition = [
             'jabatan_name' => "SALES"
@@ -101,6 +105,9 @@ class OrderForm extends BaseController
             "dataSales" => $sales,
             "companies" => $dataCompany,
             "dataTermin" => $dataTermin,
+            "dataProvinces" => $dataProvinces,
+            "dataBanks" => $dataBanks,
+            'dataSatuan' => $dataSatuan,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
 
@@ -290,8 +297,8 @@ class OrderForm extends BaseController
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
-                "sales_id"              => $postData['id_sales'],
-                "nama_ecommerce"           => $postData['nama_ecommerce'],
+                "sales_id"              => $postData['id_sales'] ? $postData['id_sales'] : "",
+                "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
                 "order_date"            => $orderDate,
                 "shipping_date"         => $shippingDate,
                 "payment_terms"         => $postData['termin'],
@@ -325,12 +332,12 @@ class OrderForm extends BaseController
                 $valueBarang = [
                     "id_sales_order"        => $dataSalesOrder,
                     "id_barang"             => $row->id_barang,
-                    "qty"                   => $row->qty,
+                    "qty"                   => number_format($row->qty, 2, '.', ''),
                     "harga_barang"          => str_replace(',', '', $row->harga_barang),
                     "amount"                => number_format($amountValue, 2, '.', ''),
                     "keterangan"            => $row->keterangan,
                     // "tax"                   => $row->tax,
-                    "discount_percentage"   => $row->disc,
+                    "discount_percentage"   => number_format($row->disc, 2, '.', ''),
                     // "dept"                  => $row->dept,
                     // "id_warehouse"          => $row->warehouse_id,
                 ];
@@ -898,6 +905,16 @@ class OrderForm extends BaseController
             'listBarang' => $listBarang,
             'list_barang' => $listHargaBarang,
             'token' => csrf_hash()
+        ]);
+    }
+
+    public function dropdownCustomer()
+    {
+        $dataCustomer = $this->CustomerModel->getCustomerLokal();
+        return response()->setJSON([
+            'data' => $dataCustomer,
+            'token' => csrf_hash(),
+            'status' => true
         ]);
     }
 }

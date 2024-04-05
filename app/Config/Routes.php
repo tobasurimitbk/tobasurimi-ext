@@ -417,6 +417,7 @@ $routes->get('/order-form-lokal/getItemList/(:num)', 'SalesLokal\OrderForm::getI
 $routes->get('/order-form-lokal/histori-harga', 'SalesLokal\OrderForm::HistoriHargaBarang', ['filter' => 'Auth']);
 
 $routes->get('/order-form-lokal/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/customer', 'SalesLokal\OrderForm::dropdownCustomer', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/generate-no-order-form', 'SalesLokal\OrderForm::generateNomorSalesOrder', ['filter' => 'Auth']);
 
 // Invoice Lokal
