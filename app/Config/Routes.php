@@ -733,8 +733,15 @@ $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' =
 // BIAYA UDANG
 $routes->get('/biaya-udang', 'JasaVendor\BiayaUdang::index', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/create', 'JasaVendor\BiayaUdang::create', ['filter' => 'Auth']);
-$routes->get('/biaya-udang/save', 'JasaVendor\BiayaUdang::createAction', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/save', 'JasaVendor\BiayaUdang::createAction', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/update', 'JasaVendor\BiayaUdang::updateAction', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/delete', 'JasaVendor\BiayaUdang::delete', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/posting', 'JasaVendor\BiayaUdang::posting', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-barang', 'JasaVendor\BiayaUdang::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/get-no', 'JasaVendor\BiayaUdang::getNo', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/id/(:segment)',  'JasaVendor\BiayaUdang::detail/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/print/(:segment)',  'JasaVendor\BiayaUdang::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Auth']);
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);

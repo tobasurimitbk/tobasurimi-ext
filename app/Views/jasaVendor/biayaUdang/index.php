@@ -71,8 +71,8 @@
                 </div>
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control no_rebus" id="no_rebus" name="no_rebus" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Perebusan </label>
+                        <input placeholder="" class="form-control no_pembayaran" id="no_pembayaran" name="no_pembayaran" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Pembayaran </label>
                     </div>
                 </div>
             </div>
@@ -81,8 +81,8 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('no_rebus')">No Rebus</th>
-                            <th onclick="changeSort('proses_rebus.createdAt')">Tanggal</th>
+                            <th onclick="changeSort('no_pembayaran')">No Pembayaran</th>
+                            <th onclick="changeSort('tanggal')">Tanggal</th>
                             <th onclick="changeSort('divisi_id')">Departemen</th>
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
                             <th>Total Item</th>
@@ -118,7 +118,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("proses-rebus/all"); ?>",
+            url: "<?= base_url("biaya-udang/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
@@ -126,7 +126,7 @@
                 data.status = $(".status").val();
                 data.start_date = $(".start_date").val();
                 data.end_date = $(".end_date").val();
-                data.no_rebus = $(".no_rebus").val();
+                data.no_pembayaran = $(".no_pembayaran").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -144,7 +144,7 @@
                 orderable: false
             },
             {
-                data: "no_rebus",
+                data: "no_pembayaran",
                 className: "text-center",
 
             },
@@ -178,12 +178,17 @@
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Jasa Vendor', 'Proses Rebus', 'a')) : ?>
+                        <?php if (can('Jasa Vendor', 'Biaya Udang', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Proses Rebus', 'd')) : ?>
+                        <?php if (can('Jasa Vendor', 'Biaya Udang', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-udang/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        <?php if (can('Jasa Vendor', 'Biaya Udang', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
@@ -289,6 +294,10 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
+    $(".no_pembayaran").keyup(function() {
+        table.ajax.reload();
+    })
+
 
     $('.start_date,.end_date').change(function() {
         table.ajax.reload();
@@ -296,14 +305,14 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("proses-rebus/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("biaya-udang/id"); ?>/${data.id}`);
     });
 
 
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Proses Rebus ?',
+            title: 'Posting Biaya Udang ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -314,7 +323,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("proses-rebus/posting"); ?>",
+                    url: "<?= base_url("biaya-udang/posting"); ?>",
                     data: {
                         id: id
                     },
