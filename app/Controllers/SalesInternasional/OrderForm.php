@@ -3,10 +3,22 @@
 namespace App\Controllers\SalesInternasional;
 
 use App\Controllers\BaseController;
+use App\Models\AllNoModel;
+use App\Models\BanksModel;
+use App\Models\BarangMasterSalesModel;
+use App\Models\CompaniesModel;
 use Config\Services;
 use App\Models\CustomerModel;
+use App\Models\EmployeesModel;
+use App\Models\MetadataModel;
+use App\Models\ProvincesModel;
+use App\models\SalesOrderDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportDetailModel;
+use App\models\SalesOrderModel;
+use App\Models\SatuansModel;
+use App\Models\StockDetailModel;
+use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
 
 class OrderForm extends BaseController
@@ -19,6 +31,20 @@ class OrderForm extends BaseController
     protected $salesOrderExportDetailModel;
     protected $dompdf;
 
+    private $companyModel;
+    protected $SalesOrderModel;
+    protected $BarangMasterSalesModel;
+    protected $WarehousesModel;
+    private $stockDetailModel;
+    protected $SalesOrderDetailModel;
+    protected $db;
+    protected $AllNoModel;
+    protected $MetaDataModel;
+    protected $employeeModel;
+    protected $ProvincesModel;
+    protected $BanksModel;
+    protected $satuanModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -28,6 +54,20 @@ class OrderForm extends BaseController
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->dompdf = new Dompdf();
+
+        $this->companyModel = new CompaniesModel();
+        $this->SalesOrderModel = new SalesOrderModel();
+        $this->BarangMasterSalesModel = new BarangMasterSalesModel();
+        $this->WarehousesModel = new WarehousesModel();
+        $this->stockDetailModel = new StockDetailModel();
+        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
+        $this->AllNoModel = new AllNoModel();
+        $this->MetaDataModel = new MetadataModel();
+        $this->employeeModel = new EmployeesModel();
+        $this->ProvincesModel = new ProvincesModel();
+        $this->BanksModel = new BanksModel();
+        $this->satuanModel = new SatuansModel();
+        $this->db = \Config\Database::connect();
     }
 
     public function index()
@@ -94,11 +134,58 @@ class OrderForm extends BaseController
         return;
     }
 
+    public function createView()
+    {
+        //Get Provinces
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
+        $dataBanks = $this->BanksModel->search_list(array(), 'name');
+        $dataSatuan = $this->satuanModel->findAll();
+        //Get Customers
+        $customers = $this->customerModel->getCustomerLokal();
+
+        $condition = [
+            'jabatan_name' => "SALES"
+        ];
+
+        $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
+
+        $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
+
+        $dataTermin = $this->MetaDataModel
+            ->where('metadata.deletedAt', null)
+            ->where('metadata.name', 'Termin')
+            ->orderBy('CAST(metadata.value AS DECIMAL)', 'ASC')
+            ->findAll();
+
+
+        $data = [
+            "dataCustomers" => $customers,
+            "dataSales" => $sales,
+            "companies" => $dataCompany,
+            "dataTermin" => $dataTermin,
+            "dataProvinces" => $dataProvinces,
+            "dataBanks" => $dataBanks,
+            'dataSatuan' => $dataSatuan,
+            "id_user" => session()->get('login')->user_id,
+            "seller_name" => session()->get('login')->name,
+
+        ];
+
+        return view('SalesInternasional/OrderForm/form', $data);
+    }
+
     public function getById($id = null)
     {
+        //Get Provinces
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
+        $dataBanks = $this->BanksModel->search_list(array(), 'name');
+        $dataSatuan = $this->satuanModel->findAll();
         $dataCustomer = $this->customerModel->getCustomer();
 
         $data = [
+            "dataProvinces" => $dataProvinces,
+            "dataBanks" => $dataBanks,
+            'dataSatuan' => $dataSatuan,
             "dataCustomer" => $dataCustomer
         ];
 

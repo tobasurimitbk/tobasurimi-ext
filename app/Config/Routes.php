@@ -486,6 +486,7 @@ $routes->get('/sales-kontrak/master-barang', 'SalesInternasional\SalesKontrak::d
 
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);
+$routes->get('/order-form-internasional/create', 'SalesInternasional\OrderForm::createView', ['filter' => 'Auth']);
 $routes->get('/order-form-internasional/id/(:segment)', 'SalesInternasional\OrderForm::getById/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-internasional/print/(:segment)', 'SalesInternasional\OrderForm::print/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-internasional/all', 'SalesInternasional\OrderForm::all', ['filter' => 'Auth']);
