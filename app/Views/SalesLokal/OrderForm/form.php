@@ -508,9 +508,11 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                     <option value=""></option>
-                                    <?php foreach ($dataSatuan as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
+                                    <?php if (!empty($dataSatuan)) : ?>
+                                        <?php foreach ($dataSatuan as $d) : ?>
+                                            <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </select>
                                 <label for="floatingInput">Satuan</label>
                             </div>
