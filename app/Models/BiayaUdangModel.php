@@ -273,9 +273,6 @@ class BiayaUdangModel extends Model
         return $result;
     }
 
-
-
-
     public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouse_id)
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;

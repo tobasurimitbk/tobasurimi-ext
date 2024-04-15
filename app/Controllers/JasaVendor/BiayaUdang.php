@@ -252,6 +252,8 @@ class BiayaUdang extends BaseController
             }
         }
 
+        $this->biayaUdangDetailModel->where('biaya_udang_id', $id)->whereNotIn('id', $id_detail_all)->delete();
+
         return response()->setJSON([
             'message' => "Biaya udang berhasil diupdate",
             'token' => csrf_token(),

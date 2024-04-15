@@ -118,7 +118,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("biaya-udang/all"); ?>",
+            url: "<?= base_url("biaya-kepiting/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
@@ -246,7 +246,7 @@
     }).change(function() {
         // GET WAREHOUSES
         $.ajax({
-            url: `<?= base_url('proses-rebus/warehouse'); ?>`,
+            url: `<?= base_url('biaya-kepiting/warehouse'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();

@@ -297,7 +297,6 @@
                     if (Number(tbHargaElement.val()) == 0 || tbHargaElement.val() == undefined || tbHargaElement.val() == '') {
                         dataErrorTbHarga = listBarang[i];
                         isValidTbHarga = false;
-                        console.log(tbHargaElement.val());
                     } else {
                         // assign
                         listBarang[i].tb_harga = tbHargaElement.val();
@@ -307,7 +306,6 @@
                     if (Number(kgFauzyElement.val()) == 0 || kgFauzyElement.val() == undefined || kgFauzyElement.val() == '') {
                         dataErrorDagingFauzy = listBarang[i];
                         isValidDagingFauzy = false;
-                        console.log(kgFauzyElement.val());
                     } else {
                         listBarang[i].kg_fauzy = kgFauzyElement.val();
                     }

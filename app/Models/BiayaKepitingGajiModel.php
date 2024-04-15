@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BiayaKepitingDetailModel extends Model
+class BiayaKepitingGajiModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'biaya_kepiting_detail';
+    protected $table            = 'biaya_kepiting_gaji';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
