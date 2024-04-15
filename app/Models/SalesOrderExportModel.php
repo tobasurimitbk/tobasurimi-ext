@@ -19,23 +19,6 @@ class SalesOrderExportModel extends Model
         'sales_order_export_no',
         'sales_contract_id',
         'company_id',
-        'customer_id',
-        'customer_po_no',
-        'loading_port',
-        'dicharge_port',
-        'due_date',
-        'total_amount',
-        'payment_term',
-        'tolerance',
-        'shipment_date',
-        'documents_required',
-        'special_instructions',
-        'director_name',
-        'marketing_name',
-        'exim_name',
-        'procurement_name',
-        'production_name',
-        'qc_name',
         'status',
         'createdAt',
         'updatedAt',
@@ -71,8 +54,8 @@ class SalesOrderExportModel extends Model
         $availableSort = [
             'sales_order_export_no' => 'sales_order_export.sales_order_export_no',
             'customer_name'         => 'customers.name',
-            'due_date'              => 'sales_order_export.due_date',
-            'shipment_date'         => 'sales_order_export.shipment_date',
+            'due_date'              => 'sales_contract.due_date',
+            'shipment_date'         => 'sales_contract.shipment_date',
             'createdAt'             => 'sales_order_export.createdAt',
             'updatedAt'             => 'sales_order_export.updatedAt',
         ];
@@ -81,12 +64,13 @@ class SalesOrderExportModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_order_export.*, 
+        $selectQry = "sales_order_export.*, sales_contract.*, 
                       customers.name AS customer_name";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('customers', 'customers.id = sales_order_export.customer_id', 'inner')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -97,7 +81,7 @@ class SalesOrderExportModel extends Model
 
         if ($addCondition['search']) {
             $salesDataQry->like('sales_order_export.sales_order_export_no', $addCondition['search'])
-                ->orLike('sales_order_export.customer_po_no', $addCondition['search'])
+                ->orLike('sales_contract.customer_po_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search']);
         }
 

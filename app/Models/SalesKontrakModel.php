@@ -132,4 +132,41 @@ class SalesKontrakModel extends Model
 
         return $generatedNo;
     }
+
+    public function getSalesKontrak($userID)
+    {
+        $salesKontrak = $this->asArray()
+            ->select('sales_contract.*, sales_contract_detail.id AS idContractDetail, sales_contract_detail.qty AS qtyContract, customers.name AS customerName, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
+            // ->join('sales_order_export', 'sales_order_export.sales_contract_id = sales_contract.id', 'left')
+            // ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+            ->join('sales_contract_detail', 'sales_contract_detail.sales_contract_id = sales_contract.id', 'left')
+            ->where('sales_contract.deletedAt', null)
+            ->where('sales_contract.createdBy', $userID)
+            ->orderBy('sales_contract.createdAt', "DESC")
+            ->findAll();
+        // foreach ($salesKontrak as &$value) {
+        //     $salesOrderExport = $this->asArray()->
+        //     if ($value->qtyExport ) {
+        //         # code...
+        //     }
+        // }
+        // $salesKontrak = $this->asArray()
+        //     ->select('sales_contract.*, customers.name AS customerName, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
+        //     ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+        //     ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
+        //     ->join('sales_order_export', 'sales_order_export.sales_contract_id = sales_contract.id', 'left')
+        //     ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+        //     ->join('sales_contract_detail', 'sales_contract_detail.id = sales_order_detail_export.sales_contract_detail_id', 'left')
+        //     ->where('sales_contract.deletedAt', null)
+        //     ->where('sales_contract.createdBy', $userID)
+        //     ->groupBy('sales_contract.id') // Group by sales contract ID
+        //     ->having('SUM(sales_order_detail_export.qty) > sales_contract_detail.qty') // Batasi jika jumlah qty pada sales order export detail lebih besar dari jumlah qty pada sales contract detail
+        //     ->orderBy('createdAt', "DESC")
+        //     ->findAll();
+        // var_dump($salesKontrak);
+        // exit;
+        return $salesKontrak;
+    }
 }

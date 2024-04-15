@@ -360,6 +360,10 @@ class Barang extends BaseController
             $satuan1 = $satuanModel->asObject()->where('id', $data['satuan_1'])->where('deletedAt', null)->first();
             $satuan2 = $satuanModel->asObject()->where('id', $data['satuan_2'])->where('deletedAt', null)->first();
             $satuan3 = $satuanModel->asObject()->where('id', $data['satuan_3'])->where('deletedAt', null)->first();
+
+            $satuan1_kode = isset($satuan1) ? $satuan1->kode_satuan : "-";
+            $satuan2_kode = isset($satuan2) ? $satuan2->kode_satuan : "-";
+            $satuan3_kode = isset($satuan3) ? $satuan3->kode_satuan : "-";
             $accountBarang = $accountBarangModel->asObject()->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
             array_push($rdata, [
                 "no"                    => $no++,
@@ -367,9 +371,9 @@ class Barang extends BaseController
                 "kelompok_barang"       => strtoupper($data['kelompok_barang']),
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => strtoupper($data['barang_name'] . " - " . $data['spesifikasi']),
-                "satuan"                => $satuan1 ? $satuan1->kode_satuan : "-", // Adjust 'some_property' to the actual property you want to display
-                "satuan2"               => $satuan2 ? $satuan2->kode_satuan . " (" . $data['konversi_satuan_2'] . " " . $satuan1->kode_satuan . ")" : "-",
-                "satuan3"               => $satuan3 ? $satuan3->kode_satuan . " (" . $data['konversi_satuan_3'] . " " . $satuan1->kode_satuan . ")" : "-",
+                "satuan"                => $satuan1_kode, // Adjust 'some_property' to the actual property you want to display
+                "satuan2"               => $satuan1_kode == "-" ? "-" : $satuan2_kode . " (" . $data['konversi_satuan_2'] . " " . $satuan1_kode . ")",
+                "satuan3"               => $satuan1_kode == "-" ? "-" : $satuan3_kode . " (" . $data['konversi_satuan_3'] . " " . $satuan1_kode . ")",
                 "akun_coa"               => $accountBarang ? $accountBarang : "",
                 "harga_terakhir_lokal"  => $lokalDetail['hargaTerakhir'],
                 "supplier_terakhir_lokal" => $lokalDetail['supplierTerakhir'],
