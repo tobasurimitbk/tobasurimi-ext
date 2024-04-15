@@ -303,7 +303,7 @@ class BiayaUdang extends BaseController
         $this->dompdf->loadHtml(view('jasaVendor/biayaUdang/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
         $this->dompdf->render();
-        $this->dompdf->stream("Jasa Vendor Barang Masuk", array("Attachment" => false));
+        $this->dompdf->stream("Biaya Udang", array("Attachment" => false));
     }
 
     public function getNo()

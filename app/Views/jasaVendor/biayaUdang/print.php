@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jasa Vendor Barang Masuk</title>
+    <title>Biaya Udang</title>
     <style>
         body {
             font-size: 13px;
