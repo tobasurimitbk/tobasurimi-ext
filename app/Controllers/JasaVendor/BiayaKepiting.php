@@ -349,9 +349,13 @@ class BiayaKepiting extends BaseController
 
         $data = [
             'tanggal' => date('Y-m-d'),
+            'biayaKepiting' => $this->biayaKepitingModel->find($id),
+            'biayaKepitingDetail' => $this->biayaKepitingModel->dropdownBarang($biayaKepiting['jasa_vendor_in_id'], $id)
+
         ];
 
         $data['vendor'] = $this->vendorModel->find($biayaKepiting['vendor_id']);
+        $data['gajiBiayaKepiting'] = $this->biayaKepitingGajiModel->where('biaya_kepiting_id', $biayaKepiting['id'])->findAll();
 
         $this->dompdf->loadHtml(view('jasaVendor/biayaKepiting/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
