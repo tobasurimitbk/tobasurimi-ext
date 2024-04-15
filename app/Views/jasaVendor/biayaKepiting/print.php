@@ -74,7 +74,7 @@
                     <td style="text-align: center;">
                         <h2>
                             <u>
-                                Rincan Pembayaran Biaya Gaji Kopek Kepiting Rebus
+                                Rincan Pembayaran Biaya Gaji Kopek Kepiting Kukus
                             </u>
                             <br>
                         </h2>
@@ -105,143 +105,57 @@
             </table>
 
             <table class="table" style="margin-top: 30px;">
-                <thead style="text-align: center; font-weight:bold;">
+                <thead class="thead-dark">
                     <tr>
-                        <th style="text-align: center;" colspan="4"></th>
-                        <th style="text-align: center;" colspan="1">Size</th>
                         <th style="text-align: center;" colspan="3"></th>
-                        <th style="text-align: center;" colspan="4">Upah Kopek Yang Dibayar</th>
+                        <th style="text-align: center;" colspan="2">Kg Bahan Baku</th>
+                        <th style="text-align: center;" colspan="8"></th>
                     </tr>
                     <tr>
                         <th style="text-align: center;">No</th>
                         <th style="text-align: center;">Tanggal Masuk</th>
-                        <th style="text-align: center;">Tanggal Keluar</th>
-                        <th style="text-align: center;">Jenis</th>
+                        <th style="text-align: center;">Barang</th>
 
 
-                        <th style="text-align: center;">Mentah</th>
+                        <th style="text-align: center;">Qty Sebelum Kopek</th>
+                        <th style="text-align: center;">Rasio (%)</th>
 
-                        <th style="text-align: center;">KG REBUS</th>
-                        <th style="text-align: center;">KG DAGING FAUZY</th>
-                        <th style="text-align: center;">KG DAGING CN</th>
+                        <th style="text-align: center;">JUMBO</th>
+                        <th style="text-align: center;">EX LUMP</th>
+                        <th style="text-align: center;">LUMP</th>
+                        <th style="text-align: center;">SPESIAL</th>
+                        <th style="text-align: center;">CLAW</th>
+                        <th style="text-align: center;">MH</th>
+                        <th style="text-align: center;">CF</th>
 
-                        <th style="text-align: center;">Kg Daging</th>
-                        <th style="text-align: center;">Ratio</th>
-                        <th style="text-align: center;">TB Harga</th>
-                        <th style="text-align: center;">Total Harga</th>
+                        <th style="text-align: center;">TOTAL</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    <?php
-                    $tb_harga_sum = 0;
-                    $kg_rebus_sum = 0;
-                    $kg_fauzy_sum = 0;
-                    $kg_cn_sum = 0;
-                    $kg_daging_sum = 0;
-                    $total_harga = 0;
-                    $i = 0;
-                    ?>
-
+                    <?php $no = 1; ?>
                     <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
                         <?php
-                        $barang_master_id_last = 0;
-                        $tb_harga_last = 0;
-
-                        if ($index == 0) {
-                            $barang_master_id_last = $b['barang_master_id'];
-                            $tb_harga_last = $b['tb_harga'];
-                        } else {
-                            $barang_master_id_last = $biayaKepitingDetail[$index - 1]['barang_master_id'];
-                            $tb_harga_last = $biayaKepitingDetail[$index - 1]['tb_harga'];
-                        }
-
-                        if ($tb_harga_last != $b['tb_harga']) {
-                            $tb_harga_sum += floatval($b['tb_harga']);
-                        }
-
-                        // SUM
-                        $kg_rebus_sum += floatval($b['qty_rebus']);
-                        $kg_fauzy_sum += floatval($b['kg_fauzy']);
-                        $kg_cn_sum += floatval($b['kg_cn']);
-                        $kg_daging_sum += floatval($b['kg_daging']);
+                        $total = $b['jumbo'] + $b['ex_lump'] + $b['lump'] + $b['special'] + $b['claw'] + $b['mh'] + $b['cf'];
                         ?>
-
-                        <?php if ($barang_master_id_last != $b['barang_master_id']) : ?>
-                            <?php
-                            $totalFirst = null;
-                            foreach ($biayaKepitingTotal as $t) :
-                                if ($barang_master_id_last == $t['barang_master_id']) {
-                                    $totalFirst = $t;
-                                }
-                            endforeach;
-                            $total_harga += $totalFirst['total_harga'];
-
-                            ?>
-                            <tr style="text-align: center;">
-                                <td style="text-align: center;" colspan="5">
-                                    <b>SUB TOTAL</b>
-                                </td>
-                                <td><?= $totalFirst['kg_rebus_total'] ?></td>
-                                <td><?= $totalFirst['kg_fauzy_total'] ?></td>
-                                <td><?= $totalFirst['kg_cn_total'] ?></td>
-                                <td><?= $totalFirst['kg_daging_total'] ?></td>
-                                <td><?= number_format($totalFirst['ratio'], 2) ?></td>
-                                <td><?= number_format($tb_harga_last, 2) ?></td>
-                                <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
-                            </tr>
-                        <?php endif; ?>
-
-                        <tr style="text-align: center;">
-                            <td><?= ++$i ?></td>
+                        <tr>
+                            <td><?= $no++ ?></td>
                             <td><?= $b['tanggal_masuk'] ?></td>
-                            <td><?= $b['tanggal_keluar'] ?></td>
-                            <td><?= $b['barang_name'] ?></td>
-                            <td><?= $b['spesifikasi'] ?></td>
-                            <td><?= $b['qty_rebus'] ?></td>
-                            <td><?= $b['kg_fauzy'] ?></td>
-                            <td><?= $b['kg_cn'] ?></td>
-                            <td><?= $b['kg_daging'] ?></td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
+                            <td><?= $b['nama_barang'] ?></td>
+                            <td><?= $b['qty_kopek'] ?></td>
+                            <td>0</td>
+                            <td><?= $b['jumbo'] ?></td>
+                            <td><?= $b['ex_lump'] ?></td>
+                            <td><?= $b['lump'] ?></td>
+                            <td><?= $b['special'] ?></td>
+                            <td><?= $b['claw'] ?></td>
+                            <td><?= $b['mh'] ?></td>
+                            <td><?= $b['cf'] ?></td>
+                            <td><?= $total ?></td>
                         </tr>
 
-                        <?php if ($index == count($biayaKepitingDetail) - 1) : ?>
-                            <?php
-                            $totalFirst = null;
-                            foreach ($biayaKepitingTotal as $t) :
-                                if ($b['barang_master_id'] == $t['barang_master_id']) {
-                                    $totalFirst = $t;
-                                }
-                            endforeach;
-                            $total_harga += $totalFirst['total_harga'];
-
-                            ?>
-                            <tr style="text-align: center;">
-                                <td style="text-align: center;" colspan="5">
-                                    <b>SUB TOTAL</b>
-                                </td>
-                                <td><?= $totalFirst['kg_rebus_total'] ?></td>
-                                <td><?= $totalFirst['kg_fauzy_total'] ?></td>
-                                <td><?= $totalFirst['kg_cn_total'] ?></td>
-                                <td><?= $totalFirst['kg_daging_total'] ?></td>
-                                <td><?= number_format($totalFirst['ratio'], 2) ?></td>
-                                <td><?= number_format($tb_harga_last, 2) ?></td>
-                                <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
-                            </tr>
-                        <?php endif; ?>
                     <?php endforeach; ?>
-
-                    <tr style="text-align: center;">
-                        <td style="text-align: center;" colspan="5"><b>GRAND TOTAL</b></td>
-                        <td><?= $kg_rebus_sum ?></td>
-                        <td><?= $kg_fauzy_sum ?></td>
-                        <td><?= $kg_cn_sum ?></td>
-                        <td><?= $kg_daging_sum ?></td>
-                        <td>-</td>
-                        <td><?= number_format($tb_harga_sum, 2) ?></td>
-                        <td><?= number_format($total_harga, 2) ?></td>
+                    <tr>
+                        <td></td>
                     </tr>
                 </tbody>
 
