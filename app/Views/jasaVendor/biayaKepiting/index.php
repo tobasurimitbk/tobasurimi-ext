@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Pembayaran Udang</h1>
-        <?php if (can("Jasa Vendor", "Biaya Udang", "c")) : ?>
-            <a href="<?= base_url('biaya-udang/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <h1>Pembayaran Kepiting</h1>
+        <?php if (can("Jasa Vendor", "Biaya Kepiting", "c")) : ?>
+            <a href="<?= base_url('biaya-kepiting/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -118,7 +118,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("biaya-udang/all"); ?>",
+            url: "<?= base_url("biaya-kepiting/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
@@ -178,17 +178,17 @@
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Jasa Vendor', 'Biaya Udang', 'a')) : ?>
+                        <?php if (can('Jasa Vendor', 'Biaya Kepiting', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Biaya Udang', 'p')) : ?>
+                        <?php if (can('Jasa Vendor', 'Biaya Kepiting', 'p')) : ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-udang/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Biaya Udang', 'd')) : ?>
+                        <?php if (can('Jasa Vendor', 'Biaya Kepiting', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
@@ -196,14 +196,7 @@
                         </div>
                     `
                     } else {
-                        var res = `
-                        <?php if (can('Jasa Vendor', 'Biaya Udang', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-udang/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                        `;
-
+                        var res = '-';
                         return res;
 
                     }
@@ -253,7 +246,7 @@
     }).change(function() {
         // GET WAREHOUSES
         $.ajax({
-            url: `<?= base_url('biaya-udang/warehouse'); ?>`,
+            url: `<?= base_url('biaya-kepiting/warehouse'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -312,14 +305,14 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("biaya-udang/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("biaya-kepiting/id"); ?>/${data.id}`);
     });
 
 
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Biaya Udang ?',
+            title: 'Posting Biaya Kepiting ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -330,7 +323,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-udang/posting"); ?>",
+                    url: "<?= base_url("biaya-kepiting/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -369,7 +362,7 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Biaya Udang ?',
+            title: 'Hapus Biaya Kepiting ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -380,7 +373,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-udang/delete"); ?>",
+                    url: "<?= base_url("biaya-kepiting/delete"); ?>",
                     data: {
                         id: id
                     },

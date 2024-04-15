@@ -738,8 +738,28 @@ $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' =
 // BIAYA UDANG
 $routes->get('/biaya-udang', 'JasaVendor\BiayaUdang::index', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/create', 'JasaVendor\BiayaUdang::create', ['filter' => 'Auth']);
-$routes->get('/biaya-udang/save', 'JasaVendor\BiayaUdang::createAction', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/save', 'JasaVendor\BiayaUdang::createAction', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/update', 'JasaVendor\BiayaUdang::updateAction', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/delete', 'JasaVendor\BiayaUdang::delete', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/posting', 'JasaVendor\BiayaUdang::posting', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-barang', 'JasaVendor\BiayaUdang::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/get-no', 'JasaVendor\BiayaUdang::getNo', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/id/(:segment)',  'JasaVendor\BiayaUdang::detail/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/print/(:segment)',  'JasaVendor\BiayaUdang::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+// BIAYA KEPITING
+$routes->get('/biaya-kepiting', 'JasaVendor\BiayaKepiting::index', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/create', 'JasaVendor\BiayaKepiting::create', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/get-no', 'JasaVendor\BiayaKepiting::getNo', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/list-barang', 'JasaVendor\BiayaKepiting::dropdownBarang', ['filter' => 'Auth']);
+$routes->post('/biaya-kepiting/save', 'JasaVendor\BiayaKepiting::createAction', ['filter' => 'Auth']);
+$routes->post('/biaya-kepiting/update', 'JasaVendor\BiayaKepiting::updateAction', ['filter' => 'Auth']);
+$routes->post('/biaya-kepiting/delete', 'JasaVendor\BiayaKepiting::delete', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/id/(:segment)',  'JasaVendor\BiayaKepiting::detail/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/print/(:segment)',  'JasaVendor\BiayaKepiting::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/all', 'JasaVendor\BiayaKepiting::all', ['filter' => 'Auth']);
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);

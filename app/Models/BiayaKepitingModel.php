@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BiayaUdangModel extends Model
+class BiayaKepitingModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'biaya_udang';
+    protected $table            = 'biaya_kepiting';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -40,7 +40,6 @@ class BiayaUdangModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-
     public function getList($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
@@ -56,7 +55,7 @@ class BiayaUdangModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "biaya_udang.*,
+        $selectQry = "biaya_kepiting.*,
         divisis.divisi,
         warehouses.warehouse_name,
         vendors.name as vendor_name
@@ -64,11 +63,11 @@ class BiayaUdangModel extends Model
 
         $dataQry = $this->asObject()
             ->select($selectQry)
-            ->join('divisis', 'divisis.id = biaya_udang.divisi_id', 'left')
-            ->join('warehouses', 'warehouses.id = biaya_udang.warehouse_id', 'left')
-            ->join('vendors', 'vendors.id = biaya_udang.vendor_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_kepiting.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = biaya_kepiting.warehouse_id', 'left')
+            ->join('vendors', 'vendors.id = biaya_kepiting.vendor_id', 'left')
             ->where($condition)
-            ->whereIn('biaya_udang.divisi_id', $conditionArr)
+            ->whereIn('biaya_kepiting.divisi_id', $conditionArr)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
@@ -78,11 +77,11 @@ class BiayaUdangModel extends Model
         }
 
         if ($addCondition['divisi_id']) {
-            $dataQry->where('biaya_udang.divisi_id', $addCondition['divisi_id']);
+            $dataQry->where('biaya_kepiting.divisi_id', $addCondition['divisi_id']);
         }
 
         if ($addCondition['warehouse_id']) {
-            $dataQry->like('biaya_udang.warehouse_id', $addCondition['warehouse_id']);
+            $dataQry->like('biaya_kepiting.warehouse_id', $addCondition['warehouse_id']);
         }
 
         if ($addCondition['status'] || $addCondition['status'] == '0') {
@@ -115,38 +114,34 @@ class BiayaUdangModel extends Model
         ];
     }
 
-
     public function dropdownPenerimaanSuratJalan()
     {
         $divisiModel = new DivisisModel();
+        $biayaUdangModel = new BiayaUdangModel();
         $divisiArr = array();
+        $result = array();
 
         foreach ($divisiModel->getDivisiAccess() as $d) {
             array_push($divisiArr, $d['id']);
         }
 
-        $result = $this
+        $resultBiayaKepiting = $this
             ->select('jasa_vendor_in.*,divisis.divisi,vendors.name')
-            ->join('jasa_vendor_in', 'jasa_vendor_in.id = biaya_udang.jasa_vendor_in_id', 'right')
+            ->join('jasa_vendor_in', 'jasa_vendor_in.id = biaya_kepiting.jasa_vendor_in_id', 'right')
             ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-            ->where('biaya_udang.jasa_vendor_in_id', null)
+            ->where('biaya_kepiting.jasa_vendor_in_id', null)
             ->where('jasa_vendor_in.status_posting', '1')
             ->whereIn('jasa_vendor_in.divisi_id', $divisiArr)
             ->findAll();
 
-        return $result;
-    }
 
-    public function getPenerimaanSuratJalanDetail($id)
-    {
-        $result = $this
-            ->select('jasa_vendor_in.*,divisis.divisi,vendors.name')
-            ->join('jasa_vendor_in', 'jasa_vendor_in.id = biaya_udang.jasa_vendor_in_id', 'left')
-            ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
-            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-            ->where('biaya_udang.id', $id)
-            ->first();
+        foreach ($resultBiayaKepiting as $r) {
+            $check = $biayaUdangModel->where('jasa_vendor_in_id', $r['id'])->first();
+            if ($check == null) {
+                array_push($result, $r);
+            }
+        }
 
         return $result;
     }
@@ -154,7 +149,7 @@ class BiayaUdangModel extends Model
     public function dropdownBarang($jasaVendorInID, $id = null)
     {
         $jasaVendorInDetailModel = new JasaVendorInDetailModel();
-        $biayaUdangDetailModel = new BiayaUdangDetailModel();
+        $biayaKepitingDetailModel = new BiayaKepitingDetailModel();
 
         // CREATE
         $selectQryJasaVendorDetail = "
@@ -163,9 +158,10 @@ class BiayaUdangModel extends Model
             jasa_vendor_in.tanggal AS tanggal_masuk,
             jasa_vendor_out.tanggal AS tanggal_keluar,
             SUM(jasa_vendor_in_detail.qty_bersih) as qty_bersih,
-            SUM(jasa_vendor_out_detail.qty) as qty_rebus,
+            SUM(jasa_vendor_out_detail.qty) as qty_kopek,
             barang_master.barang_name,
-            barang_master_spesifikasi.spesifikasi
+            barang_master_spesifikasi.spesifikasi,
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang
         ";
 
         $jasaVendorInDetail = $jasaVendorInDetailModel
@@ -185,90 +181,75 @@ class BiayaUdangModel extends Model
             $jasaVendorInDetail[$i]['tanggal_keluar'] = date('d/m/Y', strtotime($jasaVendorInDetail[$i]['tanggal_keluar']));
 
             if ($id != null) {
-                $biayaUdangDetail = $biayaUdangDetailModel
-                    ->where('biaya_udang_id', $id)
+                $biayaKepitingDetail = $biayaKepitingDetailModel
+                    ->where('biaya_kepiting_id', $id)
                     ->where('jasa_vendor_in_id', $jasaVendorInID)
                     ->where('barang_master_id', $jasaVendorInDetail[$i]['barang_master_id'])
                     ->where('barang_master_spesifikasi_id', $jasaVendorInDetail[$i]['barang_master_spesifikasi_id'])
                     ->first();
 
-                $jasaVendorInDetail[$i]['kg_fauzy'] = $biayaUdangDetail['kg_fauzy'];
-                $jasaVendorInDetail[$i]['kg_cn'] = $biayaUdangDetail['kg_cn'];
-                $jasaVendorInDetail[$i]['kg_daging'] = $biayaUdangDetail['kg_daging'];
-                $jasaVendorInDetail[$i]['tb_harga'] = $biayaUdangDetail['tb_harga'];
+                $jasaVendorInDetail[$i]['jumbo'] = $biayaKepitingDetail['jumbo'];
+                $jasaVendorInDetail[$i]['ex_lump'] = $biayaKepitingDetail['ex_lump'];
+                $jasaVendorInDetail[$i]['lump'] = $biayaKepitingDetail['lump'];
+                $jasaVendorInDetail[$i]['special'] = $biayaKepitingDetail['special'];
+                $jasaVendorInDetail[$i]['claw'] = $biayaKepitingDetail['claw'];
+                $jasaVendorInDetail[$i]['mh'] = $biayaKepitingDetail['mh'];
+                $jasaVendorInDetail[$i]['cf'] = $biayaKepitingDetail['cf'];
             } else {
-                $jasaVendorInDetail[$i]['kg_fauzy'] = 0;
-                $jasaVendorInDetail[$i]['kg_cn'] = 0;
-                $jasaVendorInDetail[$i]['kg_daging'] = 0;
-                $jasaVendorInDetail[$i]['tb_harga'] = 0;
+
+                $jasaVendorInDetail[$i]['jumbo'] = 0;
+                $jasaVendorInDetail[$i]['ex_lump'] = 0;
+                $jasaVendorInDetail[$i]['lump'] = 0;
+                $jasaVendorInDetail[$i]['special'] = 0;
+                $jasaVendorInDetail[$i]['claw'] = 0;
+                $jasaVendorInDetail[$i]['mh'] = 0;
+                $jasaVendorInDetail[$i]['cf'] = 0;
             }
         }
 
         return $jasaVendorInDetail;
     }
 
-    public function getBarangDetail($jasaVendorInID, $id)
+    public function dropdownPerolehanGaji($id = null)
     {
-        $biayaUdangDetail = $this->dropdownBarang($jasaVendorInID, $id);
+        $metaDataModel = new MetadataModel();
+        $biayaKepitingGajiModel = new BiayaKepitingGajiModel();
+        $jenisBiayaKepiting = $metaDataModel->where('name', "Jenis Biaya Kepiting")->findAll();
 
-        if (empty($biayaUdangDetail)) {
-            return [];
-        }
-
-        $result = [];
-        $barang_master_id_last = null;
-        $totals = [
-            'kg_rebus_total' => 0,
-            'kg_fauzy_total' => 0,
-            'kg_cn_total' => 0,
-            'kg_daging_total' => 0
-        ];
-        $tb_harga_last = null;
-
-        foreach ($biayaUdangDetail as $detail) {
-            if ($barang_master_id_last !== $detail['barang_master_id']) {
-                if ($barang_master_id_last !== null) {
-                    $result[] = [
-                        'barang_master_id' => $barang_master_id_last,
-                        'tb_harga' => $tb_harga_last,
-                        'kg_rebus_total' => $totals['kg_rebus_total'],
-                        'kg_fauzy_total' => $totals['kg_fauzy_total'],
-                        'kg_cn_total' => $totals['kg_cn_total'],
-                        'kg_daging_total' => $totals['kg_daging_total']
-                    ];
-                }
-                // Reset totals and tb_harga for the new barang_master_id
-                $totals = [
-                    'kg_rebus_total' => (float)$detail['qty_rebus'],
-                    'kg_fauzy_total' => (float)$detail['kg_fauzy'],
-                    'kg_cn_total' => (float)$detail['kg_cn'],
-                    'kg_daging_total' => (float)$detail['kg_daging']
-                ];
-                $barang_master_id_last = $detail['barang_master_id'];
-                $tb_harga_last = $detail['tb_harga'];
+        foreach ($jenisBiayaKepiting as $i => $j) {
+            if ($id != null) {
+                $biayaKepitingGaji = $biayaKepitingGajiModel->where('biaya_kepiting_id', $id)->where('jenis', $j['description'])->first();
+                $jenisBiayaKepiting[$i]['jumbo'] = $biayaKepitingGaji['jumbo'];
+                $jenisBiayaKepiting[$i]['ex_lump'] = $biayaKepitingGaji['ex_lump'];
+                $jenisBiayaKepiting[$i]['lump'] = $biayaKepitingGaji['lump'];
+                $jenisBiayaKepiting[$i]['special'] = $biayaKepitingGaji['special'];
+                $jenisBiayaKepiting[$i]['claw'] = $biayaKepitingGaji['claw'];
+                $jenisBiayaKepiting[$i]['mh'] = $biayaKepitingGaji['mh'];
+                $jenisBiayaKepiting[$i]['cf'] = $biayaKepitingGaji['cf'];
             } else {
-                // Add to existing totals
-                $totals['kg_rebus_total'] += (float)$detail['qty_rebus'];
-                $totals['kg_fauzy_total'] += (float)$detail['kg_fauzy'];
-                $totals['kg_cn_total'] += (float)$detail['kg_cn'];
-                $totals['kg_daging_total'] += (float)$detail['kg_daging'];
+                $biayaKepitingGaji = $biayaKepitingGajiModel->where('biaya_kepiting_id', $id)->where('jenis', $j['description'])->first();
+                $jenisBiayaKepiting[$i]['jumbo'] = 0;
+                $jenisBiayaKepiting[$i]['ex_lump'] = 0;
+                $jenisBiayaKepiting[$i]['lump'] = 0;
+                $jenisBiayaKepiting[$i]['special'] = 0;
+                $jenisBiayaKepiting[$i]['claw'] = 0;
+                $jenisBiayaKepiting[$i]['mh'] = 0;
+                $jenisBiayaKepiting[$i]['cf'] = 0;
             }
         }
 
-        // Add the last barang_master_id to the result
-        $result[] = [
-            'barang_master_id' => $barang_master_id_last,
-            'tb_harga' => $tb_harga_last,
-            'kg_rebus_total' => $totals['kg_rebus_total'],
-            'kg_fauzy_total' => $totals['kg_fauzy_total'],
-            'kg_cn_total' => $totals['kg_cn_total'],
-            'kg_daging_total' => $totals['kg_daging_total']
-        ];
+        return $jenisBiayaKepiting;
+    }
 
-        for ($i = 0; $i < count($result); $i++) {
-            $result[$i]['total_harga'] = (float)($result[$i]['kg_daging_total'] * $result[$i]['tb_harga']);
-            $result[$i]['ratio'] = ((float)($result[$i]['kg_rebus_total'] / $result[$i]['kg_daging_total']));
-        }
+    public function getPenerimaanSuratJalanDetail($id)
+    {
+        $result = $this
+            ->select('jasa_vendor_in.*,divisis.divisi,vendors.name')
+            ->join('jasa_vendor_in', 'jasa_vendor_in.id = biaya_kepiting.jasa_vendor_in_id', 'left')
+            ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+            ->where('biaya_kepiting.id', $id)
+            ->first();
 
         return $result;
     }
@@ -277,16 +258,16 @@ class BiayaUdangModel extends Model
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
-        $builder = $this->db->table('biaya_udang');
+        $builder = $this->db->table('biaya_kepiting');
         $builder->select('no_pembayaran');
         $builder->orderBy('no_pembayaran', 'desc');
-        $builder->where('biaya_udang.warehouse_id', $warehouse_id);
+        $builder->where('biaya_kepiting.warehouse_id', $warehouse_id);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_pembayaran', $lastStr);
         $query = $builder->get();
 
-        $kode = 'PAY-UDG/' . $warehouseKode;
+        $kode = 'PAY-KPT/' . $warehouseKode;
 
         $lastPenerimaan = '1';
 
