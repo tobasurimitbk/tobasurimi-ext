@@ -3,71 +3,52 @@
 namespace App\Controllers\SalesInternasional;
 
 use App\Controllers\BaseController;
-use App\Models\AllNoModel;
-use App\Models\BanksModel;
 use App\Models\BarangMasterSalesModel;
-use App\Models\CompaniesModel;
-use Config\Services;
+use App\Models\CountryModel;
 use App\Models\CustomerModel;
-use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
-use App\Models\ProvincesModel;
-use App\models\SalesOrderDetailModel;
-use App\Models\SalesOrderExportModel;
+use App\Models\SalesKontrakDetailModel;
+use App\Models\SalesKontrakModel;
 use App\Models\SalesOrderExportDetailModel;
-use App\models\SalesOrderModel;
+use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
-use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
 
 class OrderForm extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    protected $encrypter;
+    protected $this_user_id;
     protected $customerModel;
+    protected $salesKontrakModel;
+    protected $salesKontrakDetailModel;
+    protected $barangMasterModel;
+    protected $stokDetailModel;
+    protected $countryModel;
+    protected $metaDataModel;
+    protected $satuanModel;
+    protected $barangMasterSalesModel;
     protected $salesOrderExportModel;
     protected $salesOrderExportDetailModel;
     protected $dompdf;
-
-    private $companyModel;
-    protected $SalesOrderModel;
-    protected $BarangMasterSalesModel;
-    protected $WarehousesModel;
-    private $stockDetailModel;
-    protected $SalesOrderDetailModel;
-    protected $db;
-    protected $AllNoModel;
-    protected $MetaDataModel;
-    protected $employeeModel;
-    protected $ProvincesModel;
-    protected $BanksModel;
-    protected $satuanModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->encrypter = Services::encrypter();
+        $this->this_user_id = session()->get("login")->user_id;
         $this->customerModel = new CustomerModel();
+        $this->salesKontrakModel = new SalesKontrakModel();
+        $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
+        $this->stokDetailModel = new StockDetailModel();
+        $this->countryModel = new CountryModel();
+        $this->metaDataModel = new MetadataModel();
+        $this->satuanModel = new SatuansModel();
+        $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->dompdf = new Dompdf();
-
-        $this->companyModel = new CompaniesModel();
-        $this->SalesOrderModel = new SalesOrderModel();
-        $this->BarangMasterSalesModel = new BarangMasterSalesModel();
-        $this->WarehousesModel = new WarehousesModel();
-        $this->stockDetailModel = new StockDetailModel();
-        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
-        $this->AllNoModel = new AllNoModel();
-        $this->MetaDataModel = new MetadataModel();
-        $this->employeeModel = new EmployeesModel();
-        $this->ProvincesModel = new ProvincesModel();
-        $this->BanksModel = new BanksModel();
-        $this->satuanModel = new SatuansModel();
-        $this->db = \Config\Database::connect();
     }
 
     public function index()
@@ -110,7 +91,7 @@ class OrderForm extends BaseController
         foreach ($salesData['data'] as $data) {
             array_push($dataSales, [
                 "no"                        => $no++,
-                "id"                        => $data->sales_order_export_id,
+                "id"                        => encrypt($data->sales_order_export_id),
                 "sales_order_export_no"     => $data->sales_order_export_no,
                 "customer_po_no"            => $data->customer_po_no,
                 "customer_name"             => $data->customer_name,
@@ -136,139 +117,304 @@ class OrderForm extends BaseController
 
     public function createView()
     {
-        //Get Provinces
-        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
-        $dataBanks = $this->BanksModel->search_list(array(), 'name');
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        $dataCountry = $this->countryModel->findAll();
+        $dataValuta = $this->metaDataModel->get_by_name('Valuta');
+        $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
         $dataSatuan = $this->satuanModel->findAll();
-        //Get Customers
-        $customers = $this->customerModel->getCustomerLokal();
-
-        $condition = [
-            'jabatan_name' => "SALES"
-        ];
-
-        $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
-
-        $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
-
-        $dataTermin = $this->MetaDataModel
-            ->where('metadata.deletedAt', null)
-            ->where('metadata.name', 'Termin')
-            ->orderBy('CAST(metadata.value AS DECIMAL)', 'ASC')
-            ->findAll();
-
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
 
         $data = [
-            "dataCustomers" => $customers,
-            "dataSales" => $sales,
-            "companies" => $dataCompany,
-            "dataTermin" => $dataTermin,
-            "dataProvinces" => $dataProvinces,
-            "dataBanks" => $dataBanks,
+            "dataCustomer" => $dataCustomer,
+            "dataCountry" => $dataCountry,
+            "dataValuta" => $dataValuta,
+            "dataTipeHarga" => $dataTipeHarga,
             'dataSatuan' => $dataSatuan,
-            "id_user" => session()->get('login')->user_id,
-            "seller_name" => session()->get('login')->name,
-
+            'dataBarang' => $dataBarang
         ];
 
         return view('SalesInternasional/OrderForm/form', $data);
     }
 
-    public function getById($id = null)
+    public function saveOrder()
     {
-        //Get Provinces
-        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
-        $dataBanks = $this->BanksModel->search_list(array(), 'name');
-        $dataSatuan = $this->satuanModel->findAll();
-        $dataCustomer = $this->customerModel->getCustomer();
+        $items = json_decode($this->request->getVar("items"));
 
-        $data = [
-            "dataProvinces" => $dataProvinces,
-            "dataBanks" => $dataBanks,
-            'dataSatuan' => $dataSatuan,
-            "dataCustomer" => $dataCustomer
+        $postData = $this->request->getPost();
+        $postData["items"] = json_decode($postData["items"], true);
+
+        $rules = [
+            "sales_kontrak" => [
+                "rules" => "required|is_natural_no_zero",
+                'errors' => [
+                    'required' => 'Sales Kontrak tidak boleh kosong',
+                ]
+            ],
+            "items" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Barang tidak boleh kosong',
+                ],
+            ],
         ];
 
-        if (!empty($id)) {
-            $dataSO = $this->salesOrderExportModel->getById($id);
-            $data["dataSO"] = $dataSO;
+        if (!$this->validateData($postData, $rules)) {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        }
 
-            $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
+        try {
+            $this->salesOrderExportModel->db->transException(true)->transStart();
 
-            if ($dataSODetail) {
-                $data["dataSODetail"] = $dataSODetail;
+            $values = [
+                "sales_order_export_no"        => $this->generateNomorSalesOrderInternasional(),
+                "sales_contract_id"           => $postData['sales_kontrak'],
+                "company_id"                  => $this->this_company_id,
+                "status"                      => "NEW",
+            ];
+
+            // Create a new validation instance
+            $dataSalesOrder =  $this->salesOrderExportModel->insert($values);
+
+            $totalQty = 0;
+            foreach ($items as $row) {
+                $valueBarang = [
+                    "sales_order_export_id"         => $dataSalesOrder,
+                    "barang_id"                     => $row->barang_master_sales_id,
+                    "barang_name"                   => $row->barang_name,
+                    "barang_kode"                   => $row->kode_barang,
+                    "sales_contract_detail_id"                   => $row->id_detail,
+                    "qty"                           => isset($row->qtyOrder) ? number_format($row->qtyOrder, 2, '.', '') : number_format($row->qty, 2, '.', ''),
+                    "satuan_id"                     => $row->satuan_order_id,
+                    "remark"                        => $row->remark,
+                    "kemasan"                       => $row->kemasan,
+                    "harga_barang"                  => isset($row->hargaOrder) ? number_format($row->hargaOrder, 2, '.', '') : number_format($row->harga, 2, '.', ''),
+                    "total_harga_barang"            => isset($row->totalHargaOrder) ? number_format($row->totalHargaOrder, 2, '.', '') : number_format($row->total, 2, '.', ''),
+                ];
+                $this->salesOrderExportDetailModel->save($valueBarang);
+            }
+
+            $this->salesOrderExportModel->db->transComplete();
+
+            $data = [
+                "id"        => encrypt($dataSalesOrder),
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $values,
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            //echo "Transaction failed: " . $e->getMessage();
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                // "payload"   => $values,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        };
+    }
+
+    public function dropdownSalesKontrak()
+    {
+        $dataSalesKontrakFilter = [];
+        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrak($this->this_user_id);
+        foreach ($dataSalesKontrak as $value) {
+            $totalQtyDetail = 0;
+            $dataDetailExport = $this->salesOrderExportDetailModel
+                ->select('sales_order_export.*, sales_order_detail_export.*, SUM(sales_order_detail_export.qty) AS qtyOrder')
+                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
+                ->where('sales_order_detail_export.sales_contract_detail_id', $value['idContractDetail'])
+                ->where('sales_order_export.status', "POSTED")
+                ->groupBy('sales_order_export.sales_order_export_id') // Ubah ke sales order export ID
+                ->findAll();
+            if (count($dataDetailExport) > 0) { // Periksa apakah ada hasil query
+                foreach ($dataDetailExport as $valueExportDetail) {
+                    $totalQtyDetail += $valueExportDetail['qtyOrder'];
+                }
+                if ($value['qtyContract'] > $totalQtyDetail) {
+                    $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika kondisi terpenuhi
+                }
+            } else {
+                $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika tidak ada hasil query
             }
         }
+        return response()->setJSON([
+            'data' => $dataSalesKontrakFilter,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+
+    public function getDetailSalesKontrak()
+    {
+        $dataSalesKontrakFilter = [];
+        $id = $this->request->getGet("id");
+        // $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrak($this->this_user_id);
+        $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
+        // var_dump($id);
+        // var_dump($dataSalesKontrakDetail);
+        foreach ($dataSalesKontrakDetail as $value) {
+            $totalQtyDetail = 0;
+            $dataDetailExport = $this->salesOrderExportDetailModel
+                ->select('sales_order_export.*, sales_order_detail_export.*, SUM(sales_order_detail_export.qty) AS qtyOrder')
+                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
+                ->where('sales_order_detail_export.sales_contract_detail_id', $value['id_detail'])
+                ->where('sales_order_export.status', "POSTED")
+                ->groupBy('sales_order_export.sales_order_export_id') // Ubah ke sales order export ID
+                ->findAll();
+            if (count($dataDetailExport) > 0) { // Periksa apakah ada hasil query
+                foreach ($dataDetailExport as $valueExportDetail) {
+                    $totalQtyDetail += $valueExportDetail['qtyOrder'];
+                }
+                if ($value['qty'] > $totalQtyDetail) {
+                    $value['qty'] = $value['qty'] - $totalQtyDetail;
+                    $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika kondisi terpenuhi
+                }
+            } else {
+                $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika tidak ada hasil query
+            }
+        }
+        return response()->setJSON([
+            'data' => $dataSalesKontrakFilter,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function generateNomorSalesOrderInternasional()
+    {
+        $code = "SI";
+        $currentYear = date('Y');
+        $currentMonth = date('m');
+        $numberTemplate = $code . "/" . $currentMonth . "/" . $currentYear . "/";
+        $lastData = $this->salesOrderExportModel->asObject()
+            ->like('sales_order_export_no', $numberTemplate)
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->sales_order_export_no);
+            $lastIncrement = intval($asd[3]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $numberTemplate . $paddedNumber;
+        } else {
+            $invNumber = $numberTemplate . '001';
+        }
+
+        // $noSalesOrder = $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
+        return $invNumber;
+    }
+
+    public function getById($id = null)
+    {
+        $id = decrypt($id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        $dataCountry = $this->countryModel->findAll();
+        $dataValuta = $this->metaDataModel->get_by_name('Valuta');
+        $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
+        $dataSatuan = $this->satuanModel->findAll();
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
+        $dataSalesExport = $this->salesOrderExportModel->asObject()
+            ->select('sales_order_export.*, sales_contract.*, customers.name AS customer_name, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
+            ->where('sales_order_export.sales_order_export_id', $id)
+            ->orderBy('sales_order_export.createdAt', "DESC")
+            ->first();
+        $dataSalesExportDetail = $this->salesOrderExportDetailModel->asObject()
+            ->select('sales_order_detail_export.*, satuans.kode_satuan, sales_contract_detail.qty as qtyContract, sales_contract_detail.harga as hargaContract, sales_contract_detail.total_harga as totalHargaContract')
+            ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
+            ->join('sales_contract_detail', 'sales_contract_detail.id = sales_order_detail_export.sales_contract_detail_id', 'left')
+            ->where('sales_order_export_id', $id)
+            ->orderBy('createdAt', "DESC")
+            ->findAll();
+
+        $data = [
+            "id" => encrypt($id),
+            "dataCustomer" => $dataCustomer,
+            "dataCountry" => $dataCountry,
+            "dataValuta" => $dataValuta,
+            "dataTipeHarga" => $dataTipeHarga,
+            'dataSatuan' => $dataSatuan,
+            'dataBarang' => $dataBarang,
+            'dataSalesExport' => $dataSalesExport,
+            'dataSalesExportDetail' => $dataSalesExportDetail,
+        ];
 
         return view('SalesInternasional/OrderForm/form', $data);
     }
 
     public function update()
     {
+        $items = json_decode($this->request->getVar("items"));
+        $id = decrypt($this->request->getPost("id"));
+
+        $postData = $this->request->getPost();
+        $postData["items"] = json_decode($postData["items"], true);
+
         try {
-            $id = $this->request->getPost("id");
 
-            $payload = [
-                "director_name" => $this->request->getPost("director_name"),
-                "marketing_name" => $this->request->getPost("marketing_name"),
-                "exim_name" => $this->request->getPost("exim_name"),
-                "procurement_name" => $this->request->getPost("procurement_name"),
-                "production_name" => $this->request->getPost("production_name"),
-                "qc_name" => $this->request->getPost("qc_name"),
-            ];
-
-            $condition = [
-                'sales_order_export_id' => $id
-            ];
-
-            $response = $this->salesOrderExportModel->where($condition)->set($payload)->update();
-
-            if ($response) {
-                $data = [
-                    "id" => "",
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    "response" => $response,
-                    'token' => csrf_hash()
+            $totalQty = 0;
+            foreach ($items as $row) {
+                $valueBarang = [
+                    "qty"                           => isset($row->qtyOrder) ? number_format($row->qtyOrder, 2, '.', '') : number_format($row->qty, 2, '.', ''),
+                    "harga_barang"                  => isset($row->hargaOrder) ? number_format($row->hargaOrder, 2, '.', '') : number_format($row->harga, 2, '.', ''),
+                    "total_harga_barang"            => isset($row->totalHargaOrder) ? number_format($row->totalHargaOrder, 2, '.', '') : number_format($row->total, 2, '.', ''),
                 ];
-                echo json_encode($data);
-            } else {
-                $message = 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                $this->salesOrderExportDetailModel->update($row->id_detail_sales_order, $valueBarang);
             }
+
+            $this->salesOrderExportModel->db->transComplete();
+
+            $data = [
+                "id"        => encrypt($id),
+                "status"    => true,
+                "message"   => "Data Berhasil diperbaharui",
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
         } catch (\Exception $e) {
+            //echo "Transaction failed: " . $e->getMessage();
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
+                // "payload"   => $values,
+                'token' => csrf_hash(),
             ];
             echo json_encode($data);
-        }
-        return;
+            return;
+        };
     }
 
     public function updateStatus()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
             $status = $this->request->getPost("status");
 
             $payload = [
                 "status" => $status
             ];
 
-            $condition = [
-                'sales_order_export_id' => $id
-            ];
+            // $condition = [
+            //     'sales_order_export_id' => $id
+            // ];
 
-            $response = $this->salesOrderExportModel->where($condition)->set($payload)->update();
+            $response = $this->salesOrderExportModel->update($id, $payload);
 
             if ($response) {
                 $data = [
@@ -299,41 +445,41 @@ class OrderForm extends BaseController
         return;
     }
 
-    public function print($id = null)
-    {
-        if ($id) {
-            $filename = "ORDER FORM";
+    // public function print($id = null)
+    // {
+    //     if ($id) {
+    //         $filename = "ORDER FORM";
 
-            $data = [];
-            $dataSO = $this->salesOrderExportModel->getById($id);
+    //         $data = [];
+    //         $dataSO = $this->salesOrderExportModel->getById($id);
 
-            if ($dataSO) {
-                $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
+    //         if ($dataSO) {
+    //             $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
 
-                // var_dump($dataSO);
-                // die;
+    //             // var_dump($dataSO);
+    //             // die;
 
-                if ($dataSODetail) {
-                    $data["dataSO"] = $dataSO;
-                    $data["dataSODetail"] = $dataSODetail;
-                }
-            }
+    //             if ($dataSODetail) {
+    //                 $data["dataSO"] = $dataSO;
+    //                 $data["dataSODetail"] = $dataSODetail;
+    //             }
+    //         }
 
-            // load HTML content
-            $this->dompdf->loadHtml(view('SalesInternasional/OrderForm/print', $data));
+    //         // load HTML content
+    //         $this->dompdf->loadHtml(view('SalesInternasional/OrderForm/print', $data));
 
-            // (optional) setup the paper size and orientation
-            $this->dompdf->setPaper('A4', 'portrait');
+    //         // (optional) setup the paper size and orientation
+    //         $this->dompdf->setPaper('A4', 'portrait');
 
-            // render html as PDF
-            $this->dompdf->render();
+    //         // render html as PDF
+    //         $this->dompdf->render();
 
-            // output the generated pdf
-            $this->dompdf->stream($filename, array("Attachment" => false));
+    //         // output the generated pdf
+    //         $this->dompdf->stream($filename, array("Attachment" => false));
 
-            exit(0);
+    //         exit(0);
 
-            // return view('Purchase/poImportBahanPenolong/print', $data);
-        }
-    }
+    //         // return view('Purchase/poImportBahanPenolong/print', $data);
+    //     }
+    // }
 }
