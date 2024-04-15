@@ -744,6 +744,11 @@ $routes->get('/biaya-udang/get-no', 'JasaVendor\BiayaUdang::getNo', ['filter' =>
 $routes->get('/biaya-udang/id/(:segment)',  'JasaVendor\BiayaUdang::detail/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/print/(:segment)',  'JasaVendor\BiayaUdang::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+// BIAYA KEPITING
+$routes->get('/biaya-kepiting', 'JasaVendor\BiayaKepiting::index', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/create', 'JasaVendor\BiayaKepiting::create', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);

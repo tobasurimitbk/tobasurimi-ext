@@ -207,6 +207,75 @@ class BiayaUdangModel extends Model
         return $jasaVendorInDetail;
     }
 
+    public function getBarangDetail($jasaVendorInID, $id)
+    {
+        $biayaUdangDetail = $this->dropdownBarang($jasaVendorInID, $id);
+
+        if (empty($biayaUdangDetail)) {
+            return [];
+        }
+
+        $result = [];
+        $barang_master_id_last = null;
+        $totals = [
+            'kg_rebus_total' => 0,
+            'kg_fauzy_total' => 0,
+            'kg_cn_total' => 0,
+            'kg_daging_total' => 0
+        ];
+        $tb_harga_last = null;
+
+        foreach ($biayaUdangDetail as $detail) {
+            if ($barang_master_id_last !== $detail['barang_master_id']) {
+                if ($barang_master_id_last !== null) {
+                    $result[] = [
+                        'barang_master_id' => $barang_master_id_last,
+                        'tb_harga' => $tb_harga_last,
+                        'kg_rebus_total' => $totals['kg_rebus_total'],
+                        'kg_fauzy_total' => $totals['kg_fauzy_total'],
+                        'kg_cn_total' => $totals['kg_cn_total'],
+                        'kg_daging_total' => $totals['kg_daging_total']
+                    ];
+                }
+                // Reset totals and tb_harga for the new barang_master_id
+                $totals = [
+                    'kg_rebus_total' => (float)$detail['qty_rebus'],
+                    'kg_fauzy_total' => (float)$detail['kg_fauzy'],
+                    'kg_cn_total' => (float)$detail['kg_cn'],
+                    'kg_daging_total' => (float)$detail['kg_daging']
+                ];
+                $barang_master_id_last = $detail['barang_master_id'];
+                $tb_harga_last = $detail['tb_harga'];
+            } else {
+                // Add to existing totals
+                $totals['kg_rebus_total'] += (float)$detail['qty_rebus'];
+                $totals['kg_fauzy_total'] += (float)$detail['kg_fauzy'];
+                $totals['kg_cn_total'] += (float)$detail['kg_cn'];
+                $totals['kg_daging_total'] += (float)$detail['kg_daging'];
+            }
+        }
+
+        // Add the last barang_master_id to the result
+        $result[] = [
+            'barang_master_id' => $barang_master_id_last,
+            'tb_harga' => $tb_harga_last,
+            'kg_rebus_total' => $totals['kg_rebus_total'],
+            'kg_fauzy_total' => $totals['kg_fauzy_total'],
+            'kg_cn_total' => $totals['kg_cn_total'],
+            'kg_daging_total' => $totals['kg_daging_total']
+        ];
+
+        for ($i = 0; $i < count($result); $i++) {
+            $result[$i]['total_harga'] = (float)($result[$i]['kg_daging_total'] * $result[$i]['tb_harga']);
+            $result[$i]['ratio'] = ((float)($result[$i]['kg_rebus_total'] / $result[$i]['kg_daging_total']));
+        }
+
+        return $result;
+    }
+
+
+
+
     public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouse_id)
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;

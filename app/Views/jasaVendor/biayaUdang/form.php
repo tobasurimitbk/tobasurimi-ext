@@ -179,6 +179,7 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     var listBarang = [];
+    var listTotal = [];
 
     <?php if (!empty($biayaUdang)) : ?>
         $.ajax({
@@ -192,6 +193,7 @@
             success: function(res) {
                 csrf.val(res.token);
                 listBarang = res.data;
+                listTotal = res.dataTotal;
                 drawTable();
             }
         });
@@ -476,6 +478,7 @@
             success: function(res) {
                 csrf.val(res.token);
                 listBarang = res.data;
+                listTotal = res.dataTotal;
                 drawTable();
             }
         });
@@ -502,11 +505,7 @@
             var kg_fauzy_sum = 0;
             var kg_cn_sum = 0;
             var kg_daging_sum = 0;
-
-            var kg_rebus_last = 0;
-            var kg_fauzy_last = 0;
-            var kg_cn_last = 0;
-            var kg_daging_last = 0;
+            var total_harga = 0;
 
             $.each(listBarang, function(i, v) {
                 var barang_master_id_last = 0;
@@ -533,19 +532,35 @@
 
                 // SUB TOTAL ATAS
                 if (barang_master_id_last != v.barang_master_id) {
+                    var totalFirst = {
+                        'kg_rebus_total': 0,
+                        'kg_fauzy_total': 0,
+                        'kg_cn_total': 0,
+                        'kg_daging_total': 0,
+                        'total_harga': 0,
+                        'ratio': 0
+                    };
+                    $.each(listTotal, function(j, l) {
+                        if (barang_master_id_last == l.barang_master_id) {
+                            totalFirst = l;
+                        }
+                    });
+
+                    total_harga += totalFirst.total_harga;
+
                     var newRow = $('<tr  style="color:whitesmoke; background-color:#fadfbe">');
                     newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>SUB TOTAL</b>"));
-                    newRow.append($('<td>').text(kg_rebus_last.toFixed(2)));
-                    newRow.append($('<td >').text(kg_fauzy_last.toFixed(2)));
-                    newRow.append($('<td>').text(kg_cn_last.toFixed(2)));
-                    newRow.append($('<td>').text(kg_daging_last.toFixed(2)));
-                    newRow.append($('<td>').text("0"));
+                    newRow.append($('<td>').text(totalFirst.kg_rebus_total.toFixed(2)));
+                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2)));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
                             <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" type="text" value="${tb_harga_last}">
                         `
                     ));
-                    newRow.append($('<td >').text("-"));
+                    newRow.append($('<td >').text(totalFirst.total_harga.toFixed(2)));
                     table.find('tbody').append(newRow);
                 }
 
@@ -583,20 +598,35 @@
 
                 // SUB TOTAL BAWAH
                 if ((listBarang.length - 1) == i) {
+                    var totalFirst = {
+                        'kg_rebus_total': 0,
+                        'kg_fauzy_total': 0,
+                        'kg_cn_total': 0,
+                        'kg_daging_total': 0,
+                        'total_harga': 0,
+                        'ratio': 0
+                    };
+                    $.each(listTotal, function(j, l) {
+                        if (v.barang_master_id == l.barang_master_id) {
+                            totalFirst = l;
+                        }
+                    });
+
+                    total_harga += totalFirst.total_harga;
 
                     var newRow = $('<tr  style="color:whitesmoke; background-color:#fadfbe">');
                     newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>SUB TOTAL</b>"));
-                    newRow.append($('<td>').text(kg_rebus_last.toFixed(2)));
-                    newRow.append($('<td >').text(kg_fauzy_last.toFixed(2)));
-                    newRow.append($('<td>').text(kg_cn_last.toFixed(2)));
-                    newRow.append($('<td>').text(kg_daging_last.toFixed(2)));
-                    newRow.append($('<td>').text("0"));
+                    newRow.append($('<td>').text(totalFirst.kg_rebus_total.toFixed(2)));
+                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2)));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
                                 <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" value="${v.tb_harga}">
                         `
                     ));
-                    newRow.append($('<td >').text("-"));
+                    newRow.append($('<td >').text(totalFirst.total_harga.toFixed(2)));
                     table.find('tbody').append(newRow);
                 }
 
@@ -611,7 +641,7 @@
             newRow.append($('<td>').text(kg_daging_sum.toFixed(2)));
             newRow.append($('<td>').text("-"));
             newRow.append($('<td >').text(tb_harga_sum.toFixed(2)));
-            newRow.append($('<td >').text(""));
+            newRow.append($('<td >').text(total_harga.toFixed(2)));
             table.find('tbody').append(newRow);
         }
 

@@ -298,6 +298,7 @@ class BiayaUdang extends BaseController
         ];
 
         $data['vendor'] = $this->vendorModel->find($biayaUdang['vendor_id']);
+        $data['biayaUdangTotal'] = $this->biayaUdangModel->getBarangDetail($biayaUdang['jasa_vendor_in_id'], $id);
 
         $this->dompdf->loadHtml(view('jasaVendor/biayaUdang/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
@@ -329,12 +330,15 @@ class BiayaUdang extends BaseController
         $id = $this->request->getVar('id');
         if (empty($id)) {
             $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInID);
+            $dataTotal = [];
         } else {
             $id = decrypt($id);
             $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInID, $id);
+            $dataTotal = $this->biayaUdangModel->getBarangDetail($jasaVendorInID, $id);
         }
         return response()->setJSON([
             'data' => $data,
+            'dataTotal' => $dataTotal,
             'token' => csrf_hash(),
             'status' => true
         ]);

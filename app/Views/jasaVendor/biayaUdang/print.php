@@ -12,7 +12,7 @@
         }
 
         @page {
-            size: 12.00in 7.50in landscape;
+            size: 12.00in 10.50in landscape;
             margin: 25px;
             padding: 25px;
         }
@@ -43,6 +43,7 @@
             background-color: transparent;
             border-collapse: collapse;
             border: 1px solid black;
+            font-size: 11px;
         }
 
         .table th,
@@ -132,33 +133,27 @@
                 </thead>
 
                 <tbody>
-                    <?php $i = 1; ?>
                     <?php
                     $tb_harga_sum = 0;
                     $kg_rebus_sum = 0;
                     $kg_fauzy_sum = 0;
                     $kg_cn_sum = 0;
                     $kg_daging_sum = 0;
+                    $total_harga = 0;
+                    $i = 0;
                     ?>
-                    <?php
-                    $kg_rebus_last = 0;
-                    $kg_fauzy_last = 0;
-                    $kg_cn_last = 0;
-                    $kg_daging_last = 0;
-                    ?>
-
 
                     <?php foreach ($biayaUdangDetail as $index => $b) : ?>
                         <?php
                         $barang_master_id_last = 0;
                         $tb_harga_last = 0;
 
-                        if ($i == 0) {
+                        if ($index == 0) {
                             $barang_master_id_last = $b['barang_master_id'];
                             $tb_harga_last = $b['tb_harga'];
                         } else {
-                            $barang_master_id_last = $biayaUdangDetail[$i - 1]['barang_master_id'];
-                            $tb_harga_last = $biayaUdangDetail[$i - 1]['tb_harga'];
+                            $barang_master_id_last = $biayaUdangDetail[$index - 1]['barang_master_id'];
+                            $tb_harga_last = $biayaUdangDetail[$index - 1]['tb_harga'];
                         }
 
                         if ($tb_harga_last != $b['tb_harga']) {
@@ -172,33 +167,84 @@
                         $kg_daging_sum += floatval($b['kg_daging']);
                         ?>
 
+                        <?php if ($barang_master_id_last != $b['barang_master_id']) : ?>
+                            <?php
+                            $totalFirst = null;
+                            foreach ($biayaUdangTotal as $t) :
+                                if ($barang_master_id_last == $t['barang_master_id']) {
+                                    $totalFirst = $t;
+                                }
+                            endforeach;
+                            $total_harga += $totalFirst['total_harga'];
+
+                            ?>
+                            <tr style="text-align: center;">
+                                <td style="text-align: center;" colspan="5">
+                                    <b>SUB TOTAL</b>
+                                </td>
+                                <td><?= $totalFirst['kg_rebus_total'] ?></td>
+                                <td><?= $totalFirst['kg_fauzy_total'] ?></td>
+                                <td><?= $totalFirst['kg_cn_total'] ?></td>
+                                <td><?= $totalFirst['kg_daging_total'] ?></td>
+                                <td><?= number_format($totalFirst['ratio'], 2) ?></td>
+                                <td><?= number_format($tb_harga_last, 2) ?></td>
+                                <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
+                            </tr>
+                        <?php endif; ?>
+
                         <tr style="text-align: center;">
-                            <td><?= $i++ ?></td>
+                            <td><?= ++$i ?></td>
                             <td><?= $b['tanggal_masuk'] ?></td>
                             <td><?= $b['tanggal_keluar'] ?></td>
                             <td><?= $b['barang_name'] ?></td>
                             <td><?= $b['spesifikasi'] ?></td>
+                            <td><?= $b['qty_rebus'] ?></td>
                             <td><?= $b['kg_fauzy'] ?></td>
                             <td><?= $b['kg_cn'] ?></td>
                             <td><?= $b['kg_daging'] ?></td>
                             <td>-</td>
                             <td>-</td>
                             <td>-</td>
-                            <td>-</td>
                         </tr>
 
+                        <?php if ($index == count($biayaUdangDetail) - 1) : ?>
+                            <?php
+                            $totalFirst = null;
+                            foreach ($biayaUdangTotal as $t) :
+                                if ($b['barang_master_id'] == $t['barang_master_id']) {
+                                    $totalFirst = $t;
+                                }
+                            endforeach;
+                            $total_harga += $totalFirst['total_harga'];
+
+                            ?>
+                            <tr style="text-align: center;">
+                                <td style="text-align: center;" colspan="5">
+                                    <b>SUB TOTAL</b>
+                                </td>
+                                <td><?= $totalFirst['kg_rebus_total'] ?></td>
+                                <td><?= $totalFirst['kg_fauzy_total'] ?></td>
+                                <td><?= $totalFirst['kg_cn_total'] ?></td>
+                                <td><?= $totalFirst['kg_daging_total'] ?></td>
+                                <td><?= number_format($totalFirst['ratio'], 2) ?></td>
+                                <td><?= number_format($tb_harga_last, 2) ?></td>
+                                <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
+                            </tr>
+                        <?php endif; ?>
                     <?php endforeach; ?>
-                    <tr>
+
+                    <tr style="text-align: center;">
                         <td style="text-align: center;" colspan="5"><b>GRAND TOTAL</b></td>
                         <td><?= $kg_rebus_sum ?></td>
                         <td><?= $kg_fauzy_sum ?></td>
                         <td><?= $kg_cn_sum ?></td>
                         <td><?= $kg_daging_sum ?></td>
                         <td>-</td>
-                        <td><?= $tb_harga_sum ?></td>
-                        <td></td>
+                        <td><?= number_format($tb_harga_sum, 2) ?></td>
+                        <td><?= number_format($total_harga, 2) ?></td>
                     </tr>
                 </tbody>
+
             </table>
 
 
