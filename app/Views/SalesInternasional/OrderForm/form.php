@@ -623,7 +623,7 @@
                 newRow.append($('<td>').text(formatRupiah(item.harga)));
                 newRow.append($('<td>').text(formatRupiah(item.total)));
                 newRow.append($('<td>').html(`
-                <input class="form-control qty-barang-order" oninput="updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
+                <input <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
             `));
                 newRow.append($('<td>').text(formatRupiah(item.hargaOrder)));
                 newRow.append($('<td>').text(formatRupiah(item.totalHargaOrder)));
