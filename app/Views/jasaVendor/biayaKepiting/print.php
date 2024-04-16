@@ -146,6 +146,7 @@
                     <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
                         <?php
                         $total = $b['jumbo'] + $b['ex_lump'] + $b['lump'] + $b['special'] + $b['claw'] + $b['mh'] + $b['cf'];
+                        $rasio = (($b['qty_kopek'] / $total) * 10);
                         $jumboTotal += $b['jumbo'];
                         $exLumpTotal += $b['ex_lump'];
                         $lumpTotal += $b['lump'];
@@ -160,7 +161,7 @@
                             <td><?= $b['tanggal_masuk'] ?></td>
                             <td><?= $b['nama_barang'] ?></td>
                             <td><?= $b['qty_kopek'] ?></td>
-                            <td>0</td>
+                            <td><?= number_format($rasio, 2) . " %" ?></td>
                             <td><?= $b['jumbo'] ?></td>
                             <td><?= $b['ex_lump'] ?></td>
                             <td><?= $b['lump'] ?></td>

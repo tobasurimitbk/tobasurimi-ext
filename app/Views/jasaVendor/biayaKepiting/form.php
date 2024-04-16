@@ -727,11 +727,12 @@
             var mhTotal = 0;
             var cfTotal = 0;
             var totalTotal = 0;
+            var totalRasio = 0;
 
             // DATATABLE 1
             $.each(listBarang, function(i, v) {
                 var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf)
-
+                var rasio = ((v.qty_kopek / total) * 10).toFixed(2);
                 var newRow = $('<tr  style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -741,7 +742,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
                 newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
                 newRow.append($('<td>').text(v.qty_kopek));
-                newRow.append($('<td>').text('0'));
+                newRow.append($('<td>').text(rasio + ' %'));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                             <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control jumbo" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control jumbo" type="text" value="${v.jumbo}">
@@ -790,6 +791,7 @@
                 cfTotal += parseFloat(v.cf);
                 totalTotal += total;
                 qtyKopekTotal += parseFloat(v.qty_kopek);
+                totalRasio += parseFloat(rasio);
 
             });
 
@@ -797,7 +799,7 @@
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
             newRow.append($('<td style="text-align: center;" colspan="3">').html("<b>TOTAL</b>"));
             newRow.append($('<td>').text(qtyKopekTotal.toFixed(2)));
-            newRow.append($('<td>').text(0));
+            newRow.append($('<td>').text(totalRasio.toFixed(2) + ' %'));
             newRow.append($('<td>').text(jumboTotal.toFixed(2)));
             newRow.append($('<td>').text(exLumpTotal.toFixed(2)));
             newRow.append($('<td>').text(lumpTotal.toFixed(2)));
