@@ -218,7 +218,6 @@ class StockDetail2Model extends Model
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('stock', 'stock.id = stock_details.stock_id')
             ->where($condition)
-            ->groupBy('stock_details.stock_id')
             ->findAll();
 
         if (count($dataQry) == 0) {

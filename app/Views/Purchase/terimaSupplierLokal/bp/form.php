@@ -208,8 +208,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" id="tax_inv_no" name="tax_inv_no" placeholder="No Faktur Pajak">
-                                <label for="floatingInput">No Faktur Pajak</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control" id="tax_inv_no" name="tax_inv_no" placeholder="No Faktur Pajak (Opsional)">
+                                <label for="floatingInput">No Faktur Pajak (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -467,9 +467,6 @@
             tax_inv_date: {
                 required: true
             },
-            tax_inv_no: {
-                required: true
-            },
             tax_type: {
                 required: true
             },
@@ -483,9 +480,6 @@
         messages: {
             tax_inv_date: {
                 required: "Tanggal faktur pajak wajib diisi"
-            },
-            tax_inv_no: {
-                required: "No faktur pajak wajib diisi"
             },
             tax_type: {
                 required: "Pilih tipe pajak"
@@ -615,7 +609,6 @@
                         data.append("listPajak", JSON.stringify(list_pajak));
                         data.append("listPenerimaanBarang", JSON.stringify(list_penerimaan_selected));
                         if (id) {
-                            console.log('sini');
                             // UPDATE
                             $.ajax({
                                 url: "<?= base_url("tanda-terima-faktur-lokal-bp/update"); ?>",
@@ -675,52 +668,22 @@
 
     $('#add-tax-btn').click(function() {
         if ($('.pajak-form').valid()) {
-            var isUnique = -1;
-            for (var i = 0; i < list_pajak.length; i++) {
-                if (list_pajak[i].tax_inv_no === $('#tax_inv_no').val()) {
-                    isUnique = i;
-                    break;
-                }
-            }
-            if (isUnique === -1) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Pajak ?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        list_pajak.push({
-                            tax_inv_date: $('#tax_inv_date').val(),
-                            tax_inv_no: $('#tax_inv_no').val(),
-                            tax_type: $('#tax_type').val(),
-                            tax_amt: $('#tax_amt').val(),
-                            tax_status: $('#tax_status').val(),
-                            tax_note: $('#tax_note').val()
-                        });
-                        drawTablePengenaanPajak(list_pajak);
-                        // reset
-                        $('#tax_inv_date').val(null);
-                        $('#tax_inv_no').val(null);
-                        $('#tax_type').val(null).change();
-                        $('#tax_amt').val(null);
-                        $('#tax_status').val(null).change();
-                        $('#tax_note').val(null);
-                    }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Nomor faktur pajak sudah ada !',
-                    confirmButtonColor: '#4e73df',
-                    confirmButtonText: 'Ok'
-                });
-            }
-
+            list_pajak.push({
+                tax_inv_date: $('#tax_inv_date').val(),
+                tax_inv_no: $('#tax_inv_no').val(),
+                tax_type: $('#tax_type').val(),
+                tax_amt: $('#tax_amt').val(),
+                tax_status: $('#tax_status').val(),
+                tax_note: $('#tax_note').val()
+            });
+            drawTablePengenaanPajak(list_pajak);
+            // reset
+            $('#tax_inv_date').val(null);
+            $('#tax_inv_no').val(null);
+            $('#tax_type').val(null).change();
+            $('#tax_amt').val(null);
+            $('#tax_status').val(null).change();
+            $('#tax_note').val(null);
         }
     });
 
@@ -976,7 +939,7 @@
             <?php else : ?>
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input autocomplete="one-time-code" data-id_input_diterima="${v.penerimaan_barang_detail_id}" class="form-control" oninput="preventNegativeInput(this)" type="number" value="${v.qty_akan_diterima}">
+                    <input autocomplete="one-time-code" data-id_input_diterima="${v.penerimaan_barang_detail_id}" class="form-control" oninput="preventNegativeInput(this)" type="text" value="${v.qty_akan_diterima}">
                 `
                 ));
             <?php endif ?>

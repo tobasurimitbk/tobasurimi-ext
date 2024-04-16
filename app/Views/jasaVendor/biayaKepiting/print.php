@@ -208,7 +208,7 @@
                         <td colspan="12">
                             Grand Total Upah Kopek
                         </td>
-                        <td><?= $totalPerolehanGaji ?></td>
+                        <td><?= number_format($totalPerolehanGaji, 2) ?></td>
                     </tr>
                     <tr>
                         <td colspan="5">Presentase Kopek</td>

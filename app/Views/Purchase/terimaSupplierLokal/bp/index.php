@@ -30,6 +30,13 @@
                     </div>
                 </div>
                 <div class="col mb-3">
+                    <select name="status_lunas" id="status_lunas" class="form-select status_lunas">
+                        <option value="">SEMUA</option>
+                        <option value="1">LUNAS</option>
+                        <option value="0">BELUM LUNAS</option>
+                    </select>
+                </div>
+                <div class="col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No Terima Faktur" value="" />
                 </div>
             </div>
@@ -80,6 +87,7 @@
                 data.search = $(".search").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
+                data.status_lunas = $('.status_lunas').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -189,6 +197,10 @@
         orientation: "bottom auto",
         autoclose: true
     });
+
+    $('.status_lunas').change(function() {
+        table.ajax.reload();
+    })
 
     function print(url) {
         window.open(url, "_blank");

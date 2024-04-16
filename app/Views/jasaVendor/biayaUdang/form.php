@@ -624,7 +624,7 @@
                                 <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" value="${v.tb_harga}">
                         `
                     ));
-                    newRow.append($('<td >').text(totalFirst.total_harga.toFixed(2)));
+                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga.toFixed(2))));
                     table.find('tbody').append(newRow);
                 }
 
@@ -639,7 +639,7 @@
             newRow.append($('<td>').text(kg_daging_sum.toFixed(2)));
             newRow.append($('<td>').text("-"));
             newRow.append($('<td >').text('-'));
-            newRow.append($('<td >').text(total_harga.toFixed(2)));
+            newRow.append($('<td >').text(formatRupiah(total_harga.toFixed(2))));
             table.find('tbody').append(newRow);
         }
 
@@ -785,6 +785,13 @@
                 });
             }
         })
+    }
+
+    function formatRupiah(angka) {
+        var reverse = angka.toString().split('').reverse().join('');
+        var ribuan = reverse.match(/\d{1,3}/g);
+        var formatted = ribuan.join('.').split('').reverse().join('');
+        return '' + formatted;
     }
 </script>
 
