@@ -875,13 +875,14 @@
 
                 var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
                 newRow2.append($('<td style="text-align: center;">').html("<b>PRESENTASE KOPEK</b>"));
-                newRow2.append($('<td>').text((jumboTotal * 100 / totalTotal).toFixed(2) + ' %'));
-                newRow2.append($('<td>').text((exLumpTotal * 100 / totalTotal).toFixed(2) + ' %'));
-                newRow2.append($('<td>').text((lumpTotal * 100 / totalTotal).toFixed(2) + ' %'));
-                newRow2.append($('<td>').text((specialTotal * 100 / totalTotal).toFixed(2) + ' %'));
-                newRow2.append($('<td>').text((clawTotal * 100 / totalTotal).toFixed(2) + ' %'));
-                newRow2.append($('<td>').text((mhTotal * 100 / totalTotal).toFixed(2) + ' %'));
-                newRow2.append($('<td>').text((cfTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text((jumboTotal != 0 ? (jumboTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((exLumpTotal != 0 ? (exLumpTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((lumpTotal != 0 ? (lumpTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((specialTotal != 0 ? (specialTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((clawTotal != 0 ? (clawTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((mhTotal != 0 ? (mhTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((cfTotal != 0 ? (cfTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+
                 newRow2.append($('<td>').text('100%'));
                 table2.find('tbody').append(newRow2);
 
@@ -897,12 +898,15 @@
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
-        if (parseFloat(numericValue) <= 0) {
-            inputElement.value = 0;
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            inputElement.value = '0';
         } else {
             inputElement.value = numericValue;
         }
     }
+
 
     const print = function(url) {
         window.open(url, "_blank");

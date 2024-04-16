@@ -839,11 +839,12 @@
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
-        var parsedValue = parseFloat(numericValue);
-        if (!isNaN(parsedValue) && parsedValue >= 0) {
-            inputElement.value = numericValue;
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            inputElement.value = '0';
         } else {
-            inputElement.value = '';
+            inputElement.value = numericValue;
         }
     }
 
