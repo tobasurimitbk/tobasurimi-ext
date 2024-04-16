@@ -11,8 +11,61 @@ class BanksModel extends Model
     protected $useAutoIncrement = true;
     protected $allowedFields = [
         'id',
-        'name'
+        'company_id',
+        'kode_bank',
+        'name',
+        'atas_nama',
+        'no_rekening'
     ];
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_bank' => 'kode_bank',
+            'name' => 'name',
+            'atas_nama' => 'atas_nama',
+            'no_rekening' => 'no_rekening'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            banks.*
+        ";
+
+        $DataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $DataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $DataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $DataQry
+                ->like('kode_bank', $addCondition['search'])
+                ->orLike('name', $addCondition['search'])
+                ->orLike('atas_nama', $addCondition['search'])
+                ->orLike('no_rekening', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $DataQry->groupEnd();
+        }
+        $totalFilteredData = $DataQry->countAllResults(false);
+        $data = $DataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 
     public function get_by_id($id)
     {
