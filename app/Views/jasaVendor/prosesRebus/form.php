@@ -210,13 +210,13 @@
 
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan Rebus</th>
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Qty Rebus</th>
+                                    <th style="text-align: center;">Satuan Rebus</th>
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan Hasil Rebus</th>
                                     <th style="text-align: center;">Qty Hasil Rebus</th>
+                                    <th style="text-align: center;">Satuan Hasil Rebus</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
@@ -602,16 +602,25 @@
                                     processData: false,
                                     contentType: false,
                                     success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('proses-rebus/id/') ?>" + response.id
-                                            }
-                                        });
+                                        if (response.status == false) {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = "<?= base_url('proses-rebus/id/') ?>" + response.id
+                                                }
+                                            });
+                                        }
+
                                     },
                                 });
                             }
@@ -820,7 +829,6 @@
                 newRow.append($('<td style="text-align: center;">').text(v.no_aju));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_date));
                 newRow.append($('<td style="text-align: center;">').text(v.barang));
-                newRow.append($('<td style="text-align: center;">').text(v.satuan));
                 newRow.append($('<td style="text-align: center;">').text(v.stok_total));
 
                 newRow.append($('<td style="text-align: center;">').html(
@@ -828,13 +836,14 @@
                     <input <?= !empty($prosesRebus) ? (($prosesRebus['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_rebus" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
                 ));
+                newRow.append($('<td style="text-align: center;">').text(v.satuan));
                 newRow.append($('<td style="text-align: center;">').text(v.output.barang));
-                newRow.append($('<td style="text-align: center;">').text(v.output.kode_satuan));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <input <?= !empty($prosesRebus) ? (($prosesRebus['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_hasil_rebus" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.output.qty}">
                 `
                 ));
+                newRow.append($('<td style="text-align: center;">').text(v.output.kode_satuan));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <button <?= !empty($prosesRebus) ? (($prosesRebus['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>

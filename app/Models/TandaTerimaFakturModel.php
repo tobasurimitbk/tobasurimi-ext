@@ -161,12 +161,16 @@ class TandaTerimaFakturModel extends Model
             penerimaan_barang_detail.jml_masuk AS qty_lpb, 
             penerimaan_barang_detail.id AS penerimaan_barang_detail_id, 
             penerimaan_barang_detail.harga,
-            satuans.kode_satuan";
+            satuans.kode_satuan,
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang
+            ";
 
         $penerimaanList = $penerimaanBarangModel->select($selectQry)
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
             ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->where($condition)
             ->orderBy('penerimaan_barang.tanggal', "ASC")
             ->findAll();
@@ -190,7 +194,7 @@ class TandaTerimaFakturModel extends Model
                     'po_no' => $penerimaan['po_no'],
                     'tanggal' => date('d/m/Y', strtotime($penerimaan['tanggal'])),
                     'no_penerimaan_barang' => $penerimaan['no_penerimaan_barang'],
-                    'nama_barang_dok' => strtoupper($penerimaan['nama_barang_dok']),
+                    'nama_barang_dok' => strtoupper($penerimaan['barang']),
                     'qty_lpb' => $qtyLpb,
                     'qty_retur' => $qtyRetur,
                     'qty_telah_diterima' => $qtyTelahDiterima == null ? 0 : $qtyTelahDiterima,

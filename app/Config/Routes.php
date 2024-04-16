@@ -640,6 +640,14 @@ $routes->get('/divisi/dropdown', 'Master\Divisi::dropdownDivisi', ['filter' => '
 // TAX
 $routes->get('/tax/dropdown', 'Master\Tax::dropdownTax', ['filter' => 'Auth']);
 
+// BANK
+$routes->get('/bank', 'Master\Bank::index', ['filter' => 'Auth']);
+$routes->get('/bank/all', 'Master\Bank::all', ['filter' => 'Auth']);
+$routes->post('/bank/save', 'Master\Bank::create', ['filter' => 'Auth']);
+$routes->post('/bank/update', 'Master\Bank::update', ['filter' => 'Auth']);
+$routes->post('/bank/delete', 'Master\Bank::delete', ['filter' => 'Auth']);
+$routes->get('/bank/get', 'Master\Bank::get', ['filter' => 'Auth']);
+
 // BARANG
 $routes->get('/barang/dropdown', 'Warehouse\Barang::dropdownBarang', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/parent', 'Warehouse\Barang::dropdownParentBarang', ['filter' => 'Auth']);

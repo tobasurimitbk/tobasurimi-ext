@@ -732,7 +732,7 @@
             // DATATABLE 1
             $.each(listBarang, function(i, v) {
                 var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf)
-                var rasio = total == 0.00 ? 0 : ((v.qty_kopek / total) * 10).toFixed(2);
+                var rasio = total == 0.00 ? 0 : ((total / v.qty_kopek) * 10).toFixed(2);
                 var newRow = $('<tr  style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -826,10 +826,27 @@
                 $('.foot-detail-table-2').append(row2);
             } else {
                 var gajiTotal = 0;
+                var upahKopekJumbo = 0;
+                var upahKopekExLump = 0;
+                var updahKopekLump = 0;
+                var upahKopekSpecial = 0;
+                var updahKopekClaw = 0;
+                var upahKopekMh = 0;
+                var upahKopekCf = 0;
 
                 $.each(listPerolehanGaji, function(i, v) {
                     var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf);
                     gajiTotal += total;
+
+                    if (v.description == 'Upah Kopek') {
+                        upahKopekJumbo += v.jumbo;
+                        upahKopekExLump += v.ex_lump;
+                        updahKopekLump += v.lump;
+                        upahKopekSpecial += v.special;
+                        updahKopekClaw += v.claw;
+                        upahKopekMh += v.mh;
+                        upahKopekCf += v.cf;
+                    }
 
                     var newRow = $('<tr  style="color:whitesmoke;">');
                     newRow.append($('<td>').text(v.description));
@@ -868,12 +885,26 @@
                             <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_cf" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_cf" type="text" value="${v.cf}">
                         `
                     ));
-                    newRow.append($('<td>').text(total.toFixed(2)));
+                    newRow.append($('<td>').text(formatRupiah(total.toFixed(2))));
                     table2.find('tbody').append(newRow);
 
 
 
                 });
+
+
+                var newRow3 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+                newRow3.append($('<td style="text-align: center;">').html("<b>TOTAL UPAH KOPEK</b>"));
+                newRow3.append($('<td>').text((jumboTotal != 0 ? formatRupiah((jumboTotal * upahKopekJumbo).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((exLumpTotal != 0 ? formatRupiah((exLumpTotal * upahKopekExLump).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((lumpTotal != 0 ? formatRupiah((lumpTotal * updahKopekLump).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((specialTotal != 0 ? formatRupiah((specialTotal * upahKopekSpecial).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((clawTotal != 0 ? formatRupiah((clawTotal * updahKopekClaw).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((mhTotal != 0 ? formatRupiah((mhTotal * upahKopekMh).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((cfTotal != 0 ? formatRupiah((cfTotal * upahKopekCf).toFixed(2)) : '0')));
+
+                newRow3.append($('<td>').text(''));
+                table2.find('tbody').append(newRow3);
 
                 var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
                 newRow2.append($('<td style="text-align: center;">').html("<b>PRESENTASE KOPEK</b>"));
@@ -885,13 +916,13 @@
                 newRow2.append($('<td>').text((mhTotal != 0 ? (mhTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
                 newRow2.append($('<td>').text((cfTotal != 0 ? (cfTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
 
-                newRow2.append($('<td>').text('100%'));
+                newRow2.append($('<td>').text(''));
                 table2.find('tbody').append(newRow2);
 
                 // GRAND TOTAL 2    
                 var newRow1 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
                 newRow1.append($('<td style="text-align: center;" colspan="8">').html("<b>GRAND TOTAL UPAH KOPEK</b>"));
-                newRow1.append($('<td>').text(gajiTotal.toFixed(2)));
+                newRow1.append($('<td>').text(formatRupiah(gajiTotal.toFixed(2))));
                 table2.find('tbody').append(newRow1);
             }
         }
@@ -909,6 +940,12 @@
         }
     }
 
+    function formatRupiah(angka) {
+        var reverse = angka.toString().split('').reverse().join('');
+        var ribuan = reverse.match(/\d{1,3}/g);
+        var formatted = ribuan.join('.').split('').reverse().join('');
+        return '' + formatted;
+    }
 
     const print = function(url) {
         window.open(url, "_blank");

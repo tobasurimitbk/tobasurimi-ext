@@ -65,7 +65,8 @@ class TandaTerimaSupBB extends BaseController
             "start"     => $this->request->getGet('dateStart') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('dateStart')), "Y-m-d") : "",
             "finish"     => $this->request->getGet('dateEnd') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('dateEnd')), "Y-m-d") : "",
             "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType")
+            "sortType"  => $this->request->getGet("sortType"),
+            'status_lunas' => $this->request->getGet("status_lunas")
         ];
 
         $limit = $this->request->getGet("length");
@@ -79,18 +80,38 @@ class TandaTerimaSupBB extends BaseController
         foreach ($supplierData['data'] as $data) {
             $jumlahItem = $this->tandaTerimaFakturDetailModel->where('deletedAt', null)->where('tanda_terima_faktur_id', $data->id)->findAll();
             $is_used = $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($data->id);
-            array_push($dataSupplier, [
-                "no"             => $no++,
-                "id"             => $data->id,
-                "faktur_no"      => $data->faktur_no,
-                "supplier_name"  => strtoupper($data->supplierName),
-                "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
-                "jumlah_item"    => count($jumlahItem),
-                "invoice_date"   => $data->invoice_date,
-                "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
-                "recipient"      => $data->recipient,
-                "is_used"        => $is_used == null ? false : true
-            ]);
+
+            if ($addCondition['status_lunas']) {
+                if ($is_used) {
+                    array_push($dataSupplier, [
+                        "no"             => $no++,
+                        "id"             => $data->id,
+                        "faktur_no"      => $data->faktur_no,
+                        "supplier_name"  => strtoupper($data->supplierName),
+                        "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
+                        "jumlah_item"    => count($jumlahItem),
+                        "invoice_date"   => $data->invoice_date,
+                        "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
+                        "recipient"      => $data->recipient,
+                        "is_used"        => $is_used == null ? false : true
+                    ]);
+                }
+            } else {
+                if (!$is_used) {
+                    array_push($dataSupplier, [
+                        "no"             => $no++,
+                        "id"             => $data->id,
+                        "faktur_no"      => $data->faktur_no,
+                        "supplier_name"  => strtoupper($data->supplierName),
+                        "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
+                        "jumlah_item"    => count($jumlahItem),
+                        "invoice_date"   => $data->invoice_date,
+                        "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
+                        "recipient"      => $data->recipient,
+                        "is_used"        => $is_used == null ? false : true
+                    ]);
+                }
+            }
         }
 
         $data = [

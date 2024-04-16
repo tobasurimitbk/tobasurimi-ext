@@ -552,7 +552,7 @@
                     newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(2)));
                     newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(2)));
                     newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(2)));
-                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
                             <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" type="text" value="${tb_harga_last}">
@@ -618,13 +618,13 @@
                     newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(2)));
                     newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(2)));
                     newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(2)));
-                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2)));
+                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
                                 <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" value="${v.tb_harga}">
                         `
                     ));
-                    newRow.append($('<td >').text(totalFirst.total_harga.toFixed(2)));
+                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga.toFixed(2))));
                     table.find('tbody').append(newRow);
                 }
 
@@ -638,8 +638,8 @@
             newRow.append($('<td>').text(kg_cn_sum.toFixed(2)));
             newRow.append($('<td>').text(kg_daging_sum.toFixed(2)));
             newRow.append($('<td>').text("-"));
-            newRow.append($('<td >').text(tb_harga_sum.toFixed(2)));
-            newRow.append($('<td >').text(total_harga.toFixed(2)));
+            newRow.append($('<td >').text('-'));
+            newRow.append($('<td >').text(formatRupiah(total_harga.toFixed(2))));
             table.find('tbody').append(newRow);
         }
 
@@ -785,6 +785,13 @@
                 });
             }
         })
+    }
+
+    function formatRupiah(angka) {
+        var reverse = angka.toString().split('').reverse().join('');
+        var ribuan = reverse.match(/\d{1,3}/g);
+        var formatted = ribuan.join('.').split('').reverse().join('');
+        return '' + formatted;
     }
 </script>
 

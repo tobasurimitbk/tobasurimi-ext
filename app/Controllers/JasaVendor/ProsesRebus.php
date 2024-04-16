@@ -159,6 +159,16 @@ class ProsesRebus extends BaseController
             ]);
         }
 
+        $check = $this->prosesRebusModel->where('no_rebus', $this->request->getVar('no_rebus'))->first();
+
+        if ($check != null) {
+            return response()->setJSON([
+                'message' => "Nomor Rebus Sudah Ada",
+                'token' => csrf_hash(),
+                'status' => false,
+            ]);
+        }
+
         $id = $this->prosesRebusModel->insert([
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
@@ -186,7 +196,7 @@ class ProsesRebus extends BaseController
             'message' => "Proses Rebus Berhasil Disimpan",
             'token' => csrf_hash(),
             'status' => true,
-            'id' => decrypt($id)
+            'id' => encrypt($id)
         ]);
     }
 

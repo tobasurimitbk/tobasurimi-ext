@@ -186,7 +186,7 @@
                                 <td><?= $totalFirst['kg_fauzy_total'] ?></td>
                                 <td><?= $totalFirst['kg_cn_total'] ?></td>
                                 <td><?= $totalFirst['kg_daging_total'] ?></td>
-                                <td><?= number_format($totalFirst['ratio'], 2) ?></td>
+                                <td><?= number_format($totalFirst['ratio'], 2) . ' %' ?></td>
                                 <td><?= number_format($tb_harga_last, 2) ?></td>
                                 <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
                             </tr>
@@ -226,7 +226,7 @@
                                 <td><?= $totalFirst['kg_fauzy_total'] ?></td>
                                 <td><?= $totalFirst['kg_cn_total'] ?></td>
                                 <td><?= $totalFirst['kg_daging_total'] ?></td>
-                                <td><?= number_format($totalFirst['ratio'], 2) ?></td>
+                                <td><?= number_format($totalFirst['ratio'], 2) . ' %' ?></td>
                                 <td><?= number_format($tb_harga_last, 2) ?></td>
                                 <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
                             </tr>
@@ -240,7 +240,7 @@
                         <td><?= $kg_cn_sum ?></td>
                         <td><?= $kg_daging_sum ?></td>
                         <td>-</td>
-                        <td><?= number_format($tb_harga_sum, 2) ?></td>
+                        <td>-</td>
                         <td><?= number_format($total_harga, 2) ?></td>
                     </tr>
                 </tbody>
