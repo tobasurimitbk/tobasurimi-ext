@@ -732,7 +732,7 @@
             // DATATABLE 1
             $.each(listBarang, function(i, v) {
                 var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf)
-                var rasio = ((v.qty_kopek / total) * 10).toFixed(2);
+                var rasio = total == 0.00 ? 0 : ((v.qty_kopek / total) * 10).toFixed(2);
                 var newRow = $('<tr  style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(
                     `
