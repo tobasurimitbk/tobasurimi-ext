@@ -762,6 +762,23 @@ $routes->get('/biaya-kepiting/print/(:segment)',  'JasaVendor\BiayaKepiting::pri
 $routes->get('/biaya-kepiting/all', 'JasaVendor\BiayaKepiting::all', ['filter' => 'Auth']);
 $routes->post('/biaya-udang/posting', 'JasaVendor\BiayaKepiting::posting', ['filter' => 'Auth']);
 
+// Stuffing Lokal
+$routes->get('/pengeluaran-lokal',  'Stuffing\Lokal::index', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/create',  'Stuffing\Lokal::create', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/list-barang-output', 'Stuffing\Lokal::dropdownListOutputVendor', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/all', 'Stuffing\Lokal::all', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/save',  'Stuffing\Lokal::createAction', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/update',  'Stuffing\Lokal::updateAction', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/delete',  'Stuffing\Lokal::delete', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/posting',  'Stuffing\Lokal::posting', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/close',  'Stuffing\Lokal::close', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/id/(:segment)',  'Stuffing\Lokal::detail/$1', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/get-pengeluaran-lokal-no',  'Stuffing\Lokal::getStuffingLokalNo', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/print/(:segment)', 'Stuffing\Lokal::print/$1', ['filter' => 'Auth']);
+
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
 $routes->get('/stock-histori/all', 'Inventori\StokHistori::all', ['filter' => 'Auth']);
