@@ -3,6 +3,8 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\SatuansModel;
 use Exception;
 
@@ -10,11 +12,15 @@ class Satuan extends BaseController
 {
     protected $token;
     protected $SatuansModel;
+    protected $barangModel;
+    protected $barangSpesifikasiModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->SatuansModel = new SatuansModel();
+        $this->barangModel = new BarangMasterModel();
+        $this->barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
     }
 
     public function satuan()
@@ -97,6 +103,16 @@ class Satuan extends BaseController
                 if ($firstData != null) {
                     return response()->setJSON([
                         'message' => "Kode satuan sudah ada",
+                        'status' => false,
+                        'token' => csrf_hash()
+                    ]);
+                }
+
+                $doubleData = $this->SatuansModel->where('nama_satuan', strtoupper($values['nama_satuan']))->first();
+
+                if ($doubleData != null) {
+                    return response()->setJSON([
+                        'message' => "Nama satuan sudah ada",
                         'status' => false,
                         'token' => csrf_hash()
                     ]);
@@ -231,6 +247,19 @@ class Satuan extends BaseController
             $id = decrypt($this->request->getPost("id"));
 
             if (!empty($id)) {
+
+                $checkSudahDigunakan = $this->barangSpesifikasiModel
+                    ->where('satuan_1', $id)
+                    ->first();
+
+                if ($checkSudahDigunakan != null) {
+                    return response()->setJSON([
+                        'message' => "Satuan sudah digunakan",
+                        'status' => false,
+                        'token' => csrf_hash()
+                    ]);
+                }
+
                 $values = [
                     "deletedAt" => date("Y-m-d H:i:s")
                 ];
