@@ -267,7 +267,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3 form-lpb" style="height: 50px;">
                             <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->kemasan_tambahan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" type="kemasan_tambahan" class="form-control kemasan_tambahan" name="kemasan_tambahan" id="kemasan_tambahan" placeholder="Kemasan Tambahan">
-                            <label for="floatingInput">Kemasan Tambahan (Opsional)</label>
+                            <label for="floatingInput">Keterangan Kemasan (Opsional)</label>
                         </div>
                     </div>
                 </div>

@@ -137,7 +137,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
-                            <label for="floatingInput">Kemasan Tambahan (Opsional)</label>
+                            <label for="floatingInput">Keterangan Kemasan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
