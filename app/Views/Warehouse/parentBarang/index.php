@@ -152,6 +152,8 @@
             var type = $("input[name='type']").val();
             $('.title-name').text("Tambah Kategori " + repairStr(type));
             $('.delete-btn').hide();
+            validator.resetForm();
+            validator.reset();
             $('.add-modal').modal('show');
 
         });
@@ -193,6 +195,8 @@
                         $("#id").val(res?.data?.id);
                         $("#parentName").val(res?.data?.parent_name);
                         $("#kategori").val(res?.data?.kategori);
+                        validator.resetForm();
+                        validator.reset();
                         $('.add-modal').modal('show');
                     } else {
                         Swal.fire({
