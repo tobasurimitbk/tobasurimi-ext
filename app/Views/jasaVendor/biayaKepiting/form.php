@@ -826,7 +826,7 @@
                 var gajiTotal = 0;
 
                 $.each(listPerolehanGaji, function(i, v) {
-                    var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.special);
+                    var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf);
                     gajiTotal += total;
 
                     var newRow = $('<tr  style="color:whitesmoke;">');
@@ -863,7 +863,7 @@
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_cf" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_cf" type="text" value="${v.special}">
+                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_cf" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_cf" type="text" value="${v.cf}">
                         `
                     ));
                     newRow.append($('<td>').text(total.toFixed(2)));
@@ -873,11 +873,23 @@
 
                 });
 
+                var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+                newRow2.append($('<td style="text-align: center;">').html("<b>PRESENTASE KOPEK</b>"));
+                newRow2.append($('<td>').text((jumboTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text((exLumpTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text((lumpTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text((specialTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text((clawTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text((mhTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text((cfTotal * 100 / totalTotal).toFixed(2) + ' %'));
+                newRow2.append($('<td>').text('100%'));
+                table2.find('tbody').append(newRow2);
+
                 // GRAND TOTAL 2    
-                var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow.append($('<td style="text-align: center;" colspan="8">').html("<b>GRAND TOTAL UPAH KOPEK</b>"));
-                newRow.append($('<td>').text(gajiTotal.toFixed(2)));
-                table2.find('tbody').append(newRow);
+                var newRow1 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+                newRow1.append($('<td style="text-align: center;" colspan="8">').html("<b>GRAND TOTAL UPAH KOPEK</b>"));
+                newRow1.append($('<td>').text(gajiTotal.toFixed(2)));
+                table2.find('tbody').append(newRow1);
             }
         }
     }

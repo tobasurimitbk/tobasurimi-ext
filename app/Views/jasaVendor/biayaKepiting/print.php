@@ -133,9 +133,27 @@
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
+                    <?php
+                    $jumboTotal = 0;
+                    $exLumpTotal = 0;
+                    $lumpTotal = 0;
+                    $specialTotal = 0;
+                    $clawTotal = 0;
+                    $mhTotal = 0;
+                    $cfTotal = 0;
+                    $totalTotal = 0;
+                    ?>
                     <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
                         <?php
                         $total = $b['jumbo'] + $b['ex_lump'] + $b['lump'] + $b['special'] + $b['claw'] + $b['mh'] + $b['cf'];
+                        $jumboTotal += $b['jumbo'];
+                        $exLumpTotal += $b['ex_lump'];
+                        $lumpTotal += $b['lump'];
+                        $specialTotal += $b['special'];
+                        $clawTotal += $b['claw'];
+                        $mhTotal += $b['mh'];
+                        $cfTotal += $b['cf'];
+                        $totalTotal += $total;
                         ?>
                         <tr>
                             <td><?= $no++ ?></td>
@@ -155,10 +173,54 @@
 
                     <?php endforeach; ?>
                     <tr>
-                        <td></td>
+                        <td colspan="5">
+                            Total Kg di B. baku
+                        </td>
+                        <td><?= $jumboTotal ?></td>
+                        <td><?= $exLumpTotal ?></td>
+                        <td><?= $lumpTotal ?></td>
+                        <td><?= $specialTotal ?></td>
+                        <td><?= $clawTotal ?></td>
+                        <td><?= $mhTotal ?></td>
+                        <td><?= $cfTotal ?></td>
+                        <td><?= ($jumboTotal + $exLumpTotal + $lumpTotal + $specialTotal + $clawTotal + $mhTotal + $cfTotal) ?></td>
+                    </tr>
+                    <?php $totalPerolehanGaji = 0; ?>
+                    <?php foreach ($dataPerolehanGaji as $d) : ?>
+                        <?php
+                        $total = $d['jumbo'] + $d['ex_lump'] + $d['lump'] + $d['special'] + $d['claw'] + $d['mh'] + $d['cf'];
+                        $totalPerolehanGaji += $total;
+                        ?>
+                        <tr>
+                            <td colspan="5"><?= $d['description'] ?></td>
+                            <td><?= number_format($d['jumbo'], 2) ?></td>
+                            <td><?= number_format($d['ex_lump'], 2) ?></td>
+                            <td><?= number_format($d['lump'], 2) ?></td>
+                            <td><?= number_format($d['special'], 2) ?></td>
+                            <td><?= number_format($d['claw'], 2) ?></td>
+                            <td><?= number_format($d['mh'], 2) ?></td>
+                            <td><?= number_format($d['cf'], 2) ?></td>
+                            <td><?= number_format($total, 2) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td colspan="12">
+                            Grand Total Upah Kopek
+                        </td>
+                        <td><?= $totalPerolehanGaji ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Presentase Kopek</td>
+                        <td><?= number_format(($jumboTotal * 100) / $totalTotal, 2) ?> %</td>
+                        <td><?= number_format(($exLumpTotal * 100) / $totalTotal, 2) ?> %</td>
+                        <td><?= number_format(($lumpTotal * 100) / $totalTotal, 2) ?> %</td>
+                        <td><?= number_format(($specialTotal * 100) / $totalTotal, 2) ?> %</td>
+                        <td><?= number_format(($clawTotal * 100) / $totalTotal, 2) ?> %</td>
+                        <td><?= number_format(($mhTotal * 100) / $totalTotal, 2) ?> %</td>
+                        <td><?= number_format(($cfTotal * 100) / $totalTotal, 2) ?> %</td>
+                        <td>100 %</td>
                     </tr>
                 </tbody>
-
             </table>
 
 
