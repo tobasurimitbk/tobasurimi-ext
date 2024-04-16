@@ -101,7 +101,7 @@
                                             }
                                             ?>
                                         </select>
-                                        <label for="floatingInput">AP</label>
+                                        <label for="floatingInput">Akun Pembelian</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -118,7 +118,7 @@
                                             }
                                             ?>
                                         </select>
-                                        <label for="floatingInput">AR</label>
+                                        <label for="floatingInput">Akun Penjualan</label>
                                     </div>
                                 </div>
                             </div>
@@ -260,10 +260,22 @@
                 parentName: {
                     required: true
                 },
+                akun_ap_id: {
+                    required: true
+                },
+                akun_ar_id: {
+                    required: true
+                },
             },
             messages: {
                 parentName: {
                     required: "Nama Barang Wajib Diisi"
+                },
+                akun_ap_id: {
+                    required: "Akun Pembelian Wajib Diisi"
+                },
+                akun_ar_id: {
+                    required: "Akun Penjualan Wajib Diisi"
                 },
             },
             errorElement: 'span',
