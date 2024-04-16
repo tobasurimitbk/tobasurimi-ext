@@ -12,7 +12,7 @@ class BiayaUdangModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = false;
     protected $allowedFields    = [];
 
@@ -119,13 +119,15 @@ class BiayaUdangModel extends Model
     public function dropdownPenerimaanSuratJalan()
     {
         $divisiModel = new DivisisModel();
+        $biayaKepitingModel = new BiayaKepitingModel();
         $divisiArr = array();
+        $result = array();
 
         foreach ($divisiModel->getDivisiAccess() as $d) {
             array_push($divisiArr, $d['id']);
         }
 
-        $result = $this
+        $resultBiayaUdang = $this
             ->select('jasa_vendor_in.*,divisis.divisi,vendors.name')
             ->join('jasa_vendor_in', 'jasa_vendor_in.id = biaya_udang.jasa_vendor_in_id', 'right')
             ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
@@ -134,6 +136,13 @@ class BiayaUdangModel extends Model
             ->where('jasa_vendor_in.status_posting', '1')
             ->whereIn('jasa_vendor_in.divisi_id', $divisiArr)
             ->findAll();
+
+        foreach ($resultBiayaUdang as $r) {
+            $check = $biayaKepitingModel->where('jasa_vendor_in_id', $r['id'])->first();
+            if ($check == null) {
+                array_push($result, $r);
+            }
+        }
 
         return $result;
     }
