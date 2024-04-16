@@ -12,7 +12,7 @@ class BiayaKepitingModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = false;
     protected $allowedFields    = [];
 
@@ -219,13 +219,13 @@ class BiayaKepitingModel extends Model
         foreach ($jenisBiayaKepiting as $i => $j) {
             if ($id != null) {
                 $biayaKepitingGaji = $biayaKepitingGajiModel->where('biaya_kepiting_id', $id)->where('jenis', $j['description'])->first();
-                $jenisBiayaKepiting[$i]['jumbo'] = $biayaKepitingGaji['jumbo'];
-                $jenisBiayaKepiting[$i]['ex_lump'] = $biayaKepitingGaji['ex_lump'];
-                $jenisBiayaKepiting[$i]['lump'] = $biayaKepitingGaji['lump'];
-                $jenisBiayaKepiting[$i]['special'] = $biayaKepitingGaji['special'];
-                $jenisBiayaKepiting[$i]['claw'] = $biayaKepitingGaji['claw'];
-                $jenisBiayaKepiting[$i]['mh'] = $biayaKepitingGaji['mh'];
-                $jenisBiayaKepiting[$i]['cf'] = $biayaKepitingGaji['cf'];
+                $jenisBiayaKepiting[$i]['jumbo'] = $biayaKepitingGaji['jumbo'] ?? 0;
+                $jenisBiayaKepiting[$i]['ex_lump'] = $biayaKepitingGaji['ex_lump'] ?? 0;
+                $jenisBiayaKepiting[$i]['lump'] = $biayaKepitingGaji['lump'] ?? 0;
+                $jenisBiayaKepiting[$i]['special'] = $biayaKepitingGaji['special'] ?? 0;
+                $jenisBiayaKepiting[$i]['claw'] = $biayaKepitingGaji['claw'] ?? 0;
+                $jenisBiayaKepiting[$i]['mh'] = $biayaKepitingGaji['mh'] ?? 0;
+                $jenisBiayaKepiting[$i]['cf'] = $biayaKepitingGaji['cf'] ?? 0;
             } else {
                 $biayaKepitingGaji = $biayaKepitingGajiModel->where('biaya_kepiting_id', $id)->where('jenis', $j['description'])->first();
                 $jenisBiayaKepiting[$i]['jumbo'] = 0;

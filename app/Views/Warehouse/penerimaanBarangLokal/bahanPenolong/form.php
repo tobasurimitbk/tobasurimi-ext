@@ -138,7 +138,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
-                            <label for="floatingInput">Kemasan Tambahan (Opsional)</label>
+                            <label for="floatingInput">Keterangan Kemasan (Opsional)</label>
                         </div>
                     </div>
 
@@ -839,11 +839,12 @@
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
-        var parsedValue = parseFloat(numericValue);
-        if (!isNaN(parsedValue) && parsedValue >= 0) {
-            inputElement.value = numericValue;
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            inputElement.value = '0';
         } else {
-            inputElement.value = '';
+            inputElement.value = numericValue;
         }
     }
 

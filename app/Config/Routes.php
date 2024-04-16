@@ -760,6 +760,7 @@ $routes->post('/biaya-kepiting/delete', 'JasaVendor\BiayaKepiting::delete', ['fi
 $routes->get('/biaya-kepiting/id/(:segment)',  'JasaVendor\BiayaKepiting::detail/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/print/(:segment)',  'JasaVendor\BiayaKepiting::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/all', 'JasaVendor\BiayaKepiting::all', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/posting', 'JasaVendor\BiayaKepiting::posting', ['filter' => 'Auth']);
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
