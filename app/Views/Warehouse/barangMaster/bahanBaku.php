@@ -328,6 +328,10 @@
             $('select[name="parent_type_id"]').val(null).change();
             list_items.splice(0, list_items.length);
             drawTable();
+            validator_spek.resetForm();
+            validator_spek.reset();
+            validator.resetForm();
+            validator.reset();
 
             $('.delete-btn').hide();
             $('input[name="kode_barang"]').attr('readonly', false);
@@ -390,6 +394,10 @@
                             drawTable();
                         });
                     }
+                    validator_spek.resetForm();
+                    validator_spek.reset();
+                    validator.resetForm();
+                    validator.reset();
                     $('.add-modal').modal('show');
                 }
             })
@@ -922,14 +930,14 @@
                     drawTable();
                 } else {
                     let isDuplicate = list_items.some(function(item) {
-                        return item.spesifikasi === spek;
+                        return item.spesifikasi.toUpperCase() === spek.toUpperCase();
                     });
 
                     if (!isDuplicate) {
                         list_items.push({
                             'spek_id': getID(),
                             'spesifikasi_id': "",
-                            'spesifikasi': spek,
+                            'spesifikasi': spek.toUpperCase(),
                             'satuan_1': satuan1_id,
                             'satuan_1_text': satuan1_text,
                             'satuan_2': satuan2_id,
