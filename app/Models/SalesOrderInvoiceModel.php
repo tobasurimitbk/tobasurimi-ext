@@ -1,6 +1,6 @@
 <?php
 
-namespace App\models;
+namespace App\Models;
 
 use CodeIgniter\Model;
 
@@ -151,12 +151,12 @@ class SalesOrderInvoiceModel extends Model
         //     ->like('no_faktur', $numberTemplate, 'before')
         //     ->orderBy('createdAt', 'DESC')
         //     ->first();
-        
+
         $lastData = $this->asObject()
-        ->where("no_faktur LIKE '%$numberTemplate%'")
-        ->orderBy('createdAt', 'DESC')
-        ->first();
-        
+            ->where("no_faktur LIKE '%$numberTemplate%'")
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
         $dummyNum = 0;
         if (!empty($lastData)) {
             $asd = explode('/', $lastData->no_faktur);
@@ -169,11 +169,11 @@ class SalesOrderInvoiceModel extends Model
                 }
             }
             $numbers = $number + 1; // increment nomer invoice
-        
+
             $invNumber = $format . $numbers . $numberTemplate;
-        }else{
+        } else {
             $numbers = 1; // nomer invoice awal jika tidak ada data
-        
+
             $invNumber = $format . $numbers . $numberTemplate;
         }
 
