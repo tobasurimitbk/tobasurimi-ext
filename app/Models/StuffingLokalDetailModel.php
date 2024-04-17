@@ -97,6 +97,9 @@ class StuffingLokalDetailModel extends Model
                 $barangName = $kemasan['name'];
             }
 
+            $stockList['id_stuffing_detail'] = $m['id'];
+            $stockList['divisi_id'] = $m['divisi_id'];
+            $stockList['warehouse_id'] = $m['warehouse_id'];
             $stockList['qty'] = $m['qty'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];

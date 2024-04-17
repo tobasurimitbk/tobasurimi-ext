@@ -144,6 +144,12 @@ class Lokal extends BaseController
     {
         $id = decrypt($id);
         $stuffingLokalModel = $this->stuffingLokalModel->select('stuffing_lokal.*, customers.name as customer_name')->join('customers', 'customers.id = stuffing_lokal.customer_id')->find($id);
+        $salesOrder = $this->salesOrderDetailModel
+            ->select('sales_order_detail.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
+            ->where('sales_order_detail.id_sales_order', $stuffingLokalModel['sales_order_id'])
+            ->where('sales_order_detail.deletedAt', null)
+            ->findAll();
 
         if ($stuffingLokalModel == null) {
             return redirect()->to('pengeluaran-lokal');
@@ -156,6 +162,7 @@ class Lokal extends BaseController
             'orderForm' => $this->salesOrderModel->select('sales_order.*, customers.name as customer_name')->join('customers', 'customers.id = sales_order.id_customer')->where('sales_order.deletedAt', null)->orderBy('sales_order.no_sales_order', "ASC")->findAll(),
             'stuffingLokal' => $stuffingLokalModel,
             'stuffingLokalDetail' => $this->stuffingLokalDetailModel->getStuffingDetail($id),
+            'salesOrder' => $salesOrder,
             'divisi' => $this->divisiModel->getDivisiAccess(),
 
         ];
@@ -203,62 +210,45 @@ class Lokal extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
-        $this->jasaVendorOutModel->update($id, [
-            'vendor_id' => $this->request->getVar('vendor_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'no_kontainer' => $this->request->getVar('no_kontainer'),
-            'keterangan' => $this->request->getVar('keterangan')
-        ]);
-
         $barang = json_decode($this->request->getVar('listBarang'));
 
         // get all id detail
         $id_detail_all = [];
         foreach ($barang as $b) {
-            $check = $this->jasaVendorOutDetailModel
-                ->where('jasa_vendor_out_id', $id)
-                ->where('stock_out_id', $b->stock_id)
-                ->where('bc_out_id', $b->bc_id)
-                ->where('no_aju_out', $b->no_aju)
-                ->first();
-
-            if ($check == null) {
-                // Belum Ada
-                $this->jasaVendorOutDetailModel
-                    ->where('jasa_vendor_out_id', $id)
-                    ->where('stock_out_id', $b->stock_id)
-                    ->where('bc_out_id', $b->bc_id)
-                    ->where('no_aju_out', $b->no_aju)
-                    ->delete();
-
-                $id_detail_new = $this->jasaVendorOutDetailModel->insert([
-                    'jasa_vendor_out_id' => $id,
-                    'stock_out_id' => $b->stock_id,
-                    'bc_out_id' => $b->bc_id,
-                    'no_aju_out' => $b->no_aju,
-                    'stock_in_id' => $b->output->stock_id,
-                    'qty' => $b->qty
+            if (isset($b->id_stuffing_detail)) {
+                $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
+                $this->stuffingLokalDetailModel->update($b->id_stuffing_detail, [
+                    'divisi_id' => $b->divisi_id,
+                    'warehouse_id' => $b->warehouse_id,
+                    'stuffing_lokal_id' => $id,
+                    'stock_id_warehouse' => $b->stock_id,
+                    'bc_id_warehouse' => $b->bc_id,
+                    'no_aju_warehouse' => $b->no_aju,
+                    'barang1_id_warehouse' => $checkStock['barang1_id'],
+                    'barang2_id_warehouse' => $checkStock['barang2_id'],
+                    'barang_id_order' => $b->output->id_barang,
+                    'qty' => $b->output->qty
                 ]);
-                array_push($id_detail_all,  $id_detail_new);
             } else {
-                // ada
-                $this->jasaVendorOutDetailModel->update($check['id'], [
-                    'jasa_vendor_out_id' => $id,
-                    'stock_out_id' => $b->stock_id,
-                    'bc_out_id' => $b->bc_id,
-                    'no_aju_out' => $b->no_aju,
-                    'stock_in_id' => $b->output->stock_id,
-                    'qty' => $b->qty
+                $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
+                $this->stuffingLokalDetailModel->insert([
+                    'divisi_id' => $b->divisi_id,
+                    'warehouse_id' => $b->warehouse_id,
+                    'stuffing_lokal_id' => $id,
+                    'stock_id_warehouse' => $b->stock_id,
+                    'bc_id_warehouse' => $b->bc_id,
+                    'no_aju_warehouse' => $b->no_aju,
+                    'barang1_id_warehouse' => $checkStock['barang1_id'],
+                    'barang2_id_warehouse' => $checkStock['barang2_id'],
+                    'barang_id_order' => $b->output->id_barang,
+                    'qty' => $b->output->qty
                 ]);
-                array_push($id_detail_all, $check['id']);
             }
         }
-        $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->whereNotIn('id', $id_detail_all)->delete();
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil diupdate",
+            'message' => "Pengeluaran Lokal berhasil diupdate",
             'token' => csrf_hash(),
         ]);
     }
@@ -266,12 +256,12 @@ class Lokal extends BaseController
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->jasaVendorOutModel->delete($id);
-        $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->delete();
+        $this->stuffingLokalModel->delete($id);
+        $this->stuffingLokalDetailModel->where('stuffing_lokal_id', $id)->delete();
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil dihapus",
+            'message' => "Pengeluaran Lokal berhasil dihapus",
             'token' => csrf_hash(),
         ]);
     }
@@ -349,58 +339,59 @@ class Lokal extends BaseController
         ]);
     }
 
-    public function print($id)
-    {
-        $id = decrypt($id);
-        $selectQryJasaVendor = "
-            jasa_vendor_out.*,
-            vendors.name as vendor_name,
-            vendors.address
-        ";
+    // public function print($id)
+    // {
+    //     $id = decrypt($id);
+    //     $selectQryJasaVendor = "
+    //         jasa_vendor_out.*,
+    //         vendors.name as vendor_name,
+    //         vendors.address
+    //     ";
 
-        $jasaVendorOut = $this->jasaVendorOutModel->select($selectQryJasaVendor)
-            ->join('vendors', 'vendors.id = jasa_vendor_out.vendor_id')
-            ->where('jasa_vendor_out.id', $id)
-            ->first();
+    //     $jasaVendorOut = $this->jasaVendorOutModel->select($selectQryJasaVendor)
+    //         ->join('vendors', 'vendors.id = jasa_vendor_out.vendor_id')
+    //         ->where('jasa_vendor_out.id', $id)
+    //         ->first();
 
-        if ($jasaVendorOut == null) {
-            return redirect()->to('jasa-vendor-out');
-        }
+    //     if ($jasaVendorOut == null) {
+    //         return redirect()->to('jasa-vendor-out');
+    //     }
 
-        $selectQryJasaVendorDetail = "
-            SUM(jasa_vendor_out_detail.qty) as qty,
-            satuans.kode_satuan,
-            barang_master.barang_name,
-            barang_master_spesifikasi.spesifikasi
-        ";
+    //     $selectQryJasaVendorDetail = "
+    //         SUM(jasa_vendor_out_detail.qty) as qty,
+    //         satuans.kode_satuan,
+    //         barang_master.barang_name,
+    //         barang_master_spesifikasi.spesifikasi
+    //     ";
 
-        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->select($selectQryJasaVendorDetail)
-            ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
-            ->where('jasa_vendor_out_id', $jasaVendorOut['id'])
-            ->groupBy('jasa_vendor_out_detail.stock_out_id')
-            ->findAll();
+    //     $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->select($selectQryJasaVendorDetail)
+    //         ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
+    //         ->join('barang_master', 'barang_master.id = stock.barang1_id')
+    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+    //         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+    //         ->where('jasa_vendor_out_id', $jasaVendorOut['id'])
+    //         ->groupBy('jasa_vendor_out_detail.stock_out_id')
+    //         ->findAll();
 
-        $data = [
-            'jasaVendorOut' => $jasaVendorOut,
-            'jasaVendorDetail' => $jasaVendorOutDetail
-        ];
+    //     $data = [
+    //         'jasaVendorOut' => $jasaVendorOut,
+    //         'jasaVendorDetail' => $jasaVendorOutDetail
+    //     ];
 
-        $this->dompdf->loadHtml(view('Stuffing/Lokal/print', $data));
-        $this->dompdf->setPaper('A4', 'portrait');
-        $this->dompdf->render();
-        $this->dompdf->stream("Jasa Vendor Barang Keluar", array("Attachment" => false));
-    }
+    //     $this->dompdf->loadHtml(view('Stuffing/Lokal/print', $data));
+    //     $this->dompdf->setPaper('A4', 'portrait');
+    //     $this->dompdf->render();
+    //     $this->dompdf->stream("Jasa Vendor Barang Keluar", array("Attachment" => false));
+    // }
 
-    public function dropdownListOutputVendor()
+    public function dropdownListOrder()
     {
         $data = $this->salesOrderDetailModel
             ->select('sales_order_detail.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
             ->where('sales_order_detail.id_sales_order', $this->request->getVar('sales_order_id'))
-            ->where('sales_order_detail.deletedAt', null)->findAll();
+            ->where('sales_order_detail.deletedAt', null)
+            ->findAll();
 
         return response()->setJSON([
             'token' => csrf_hash(),

@@ -21,9 +21,9 @@
                         </button>
                     <?php endif; ?>
                     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
+                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
                             Print
-                        </button>
+                        </button> -->
                     <?php endif; ?>
                     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -32,9 +32,9 @@
                     <?php endif; ?>
                 <?php else : ?>
                     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
+                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
                             Print
-                        </button>
+                        </button> -->
                     <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
@@ -80,7 +80,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($stuffingLokal) ? ($stuffingLokal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
+                            <select <?= !empty($stuffingLokal) ? ($stuffingLokal['status_posting'] ? 'disabled' : 'disabled') : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($orderForm as $v) : ?>
                                     <option <?= !empty($stuffingLokal) ? ($stuffingLokal['sales_order_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>" data-id_customer="<?= $v['id_customer'] ?>" data-name_customer="<?= $v['customer_name'] ?>">
@@ -371,6 +371,7 @@
         // APPEND 
         <?php foreach ($stuffingLokalDetail as $m) : ?>
             listStockSelected.push({
+                id_stuffing_detail: "<?= $m['id_stuffing_detail'] ?>",
                 id: "<?= $m['id'] ?>",
                 bc_id: "<?= $m['bc_id'] ?>",
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
@@ -384,6 +385,8 @@
                 type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
                 qty: "<?= $m['qty'] ?>",
+                divisi_id: "<?= $m['divisi_id'] ?>",
+                warehouse_id: "<?= $m['warehouse_id'] ?>",
                 output: {
                     id_barang: "<?= $m['output']['id_barang'] ?>",
                     barang: "<?= $m['output']['barang'] ?>",
@@ -392,9 +395,25 @@
             });
         <?php endforeach; ?>
         drawTableSelectedItem(listStockSelected);
-        <?php if ($stuffingLokal['status_posting']) : ?>
-            $('.detail-form-layout').hide()
-        <?php endif; ?>
+        // <?php if ($stuffingLokal['status_posting']) : ?>
+        //     $('.detail-form-layout').hide()
+        // <?php endif; ?>
+    <?php endif; ?>
+
+    <?php if (!empty($salesOrder)) : ?>
+        $.ajax({
+            url: `<?= base_url('pengeluaran-lokal/list-barang-output'); ?>`,
+            method: "GET",
+            data: {
+                sales_order_id: $(".sales_order_id option:selected").val()
+            },
+            dataType: "json",
+            success: function(res) {
+                listStockOrder = [];
+                listStockOrder = res.data;
+                drawTableOrderBarang(res.data);
+            }
+        });
     <?php endif; ?>
 
     $('#sales_order_id').select2({
@@ -415,7 +434,7 @@
         allowClear: true
     }).change(function() {
         listStockAsal = [];
-        listStockSelected = [];
+        // listStockSelected = [];
         drawTableAsalBarang(listStockAsal);
         drawTableSelectedItem(listStockSelected);
         // GET BARANG
@@ -430,7 +449,7 @@
         // GET WAREHOUSES
         getListWarehouse();
         listStockAsal = [];
-        listStockSelected = [];
+        // listStockSelected = [];
         drawTableAsalBarang(listStockAsal);
         drawTableSelectedItem(listStockSelected);
         // GET BARANG
@@ -534,6 +553,7 @@
                 confirmButtonText: 'Ok'
             });
         } else {
+            console.log(listStockSelected);
             $.each(listStockAsal, function(i, v) {
                 var currentID = Number(v.id);
 
@@ -549,17 +569,11 @@
 
                     if (!isIDSelected) {
                         var isDuplicateOutput = listStockSelected.some(function(item) {
-                            console.log(barangIn.val());
-                            console.log(parseFloat(item.qty));
-                            console.log(parseFloat(qty));
-                            return item.output.id_barang == barangIn.val() && item.qty + parseFloat(qty) <= parseFloat(barangIn.data("qty_barang"));
+                            return item.output.id_barang == dataIdBarangOrder && parseFloat(item.qty) + parseFloat(qty) <= parseFloat(dataQtyBarangOrder);
                         });
 
                         if (!isDuplicateOutput) {
                             listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            console.log(divisi_id);
-                            console.log(warehouse_id);
-                            console.log(tipe_barang);
                             listStockAsal[i].divisi_id = $('#divisi_id option:selected').val();
                             listStockAsal[i].warehouse_id = $('#warehouse_id option:selected').val();
                             listStockAsal[i].tipe_barang = $('#type_barang option:selected').val();
@@ -581,6 +595,8 @@
                     }
                 }
             });
+            console.log(listStockSelected);
+
             drawTableSelectedItem(listStockSelected);
         }
     });
@@ -633,8 +649,6 @@
                             let id = $('#id').val();
                             let data = new FormData(document.querySelector(".create-form"));
                             data.append('listBarang', JSON.stringify(listStockSelected));
-
-                            console.log(data);
 
                             if (id) {
                                 // UPDATE
@@ -806,7 +820,6 @@
                 // LIST STOK PER BC
                 listStockAsal = [];
                 listStockAsal = res.data;
-                console.log(res.data);
                 drawTableAsalBarang(res.data);
             }
         });
@@ -1121,7 +1134,7 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Hapus',
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -1147,7 +1160,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                location.reload();
+                                window.location.replace("<?= base_url("pengeluaran-lokal"); ?>");
                             });
                         }
                     },

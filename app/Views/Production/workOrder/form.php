@@ -430,31 +430,37 @@
 
         var validator = $(".create-form").validate({
             rules: {
-                barang_id: {
+                wo_no: {
                     required: true
                 },
-                production_amt: {
+                user_production: {
                     required: true
                 },
-                satuan_id: {
+                date_production: {
                     required: true
                 },
-                target: {
+                department_id: {
+                    required: true
+                },
+                warehouse_id: {
                     required: true
                 }
             },
             messages: {
-                barang_id: {
-                    required: "Barang wajib diisi"
+                wo_no: {
+                    required: "Kode produksi wajib diisi"
                 },
-                production_amt: {
-                    required: "Hasil wajib diisi"
+                user_production: {
+                    required: "Pembuat dokumen wajib diisi"
                 },
-                satuan_id: {
-                    required: "Satuan wajib diisi"
+                date_production: {
+                    required: "Tanggal pembuatan dokumen wajib diisi"
                 },
-                target: {
-                    required: "Target wajib diisi"
+                department_id: {
+                    required: "Department wajib diisi"
+                },
+                warehouse_id: {
+                    required: "Warehouse wajib diisi"
                 }
             },
             errorElement: 'span',

@@ -67,7 +67,7 @@
                             <th onclick="changeSort('no_stuffing')">No Stuffing</th>
                             <th onclick="changeSort('createdAt')">Tanggal</th>
                             <th>Total Item</th>
-                            <th onclick="changeSort('customer_name')">Vendor</th>
+                            <th onclick="changeSort('customer_name')">Customer</th>
                             <th onclick="changeSort('status_closed')">Status</th>
                             <th>Action</th>
                         </tr>
@@ -158,23 +158,37 @@
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'a')) : ?>
+                        <?php if (can('Stuffing', 'Pengeluaran Lokal', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'd')) : ?>
+                        <?php if (can('Stuffing', 'Pengeluaran Lokal', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
                         </div>
                     `
+                        //     return `
+                        //     <div class="mt-0">
+                        //     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'a')) : ?>
+                        //         <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                        //             <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                        //         </button>
+                        //     <?php endif; ?>
+                        //     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
+                        //         <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        //             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                        //         </button>
+                        //     <?php endif; ?>
+                        //     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'd')) : ?>
+                        //         <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                        //             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        //         </button>
+                        //     <?php endif; ?>
+                        //     </div>
+                        // `
                     } else {
                         var res = '';
 
@@ -186,12 +200,12 @@
                             `;
                         }
 
-                        <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
-                            res += `
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            `;
+                        <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
+                            // res += `
+                            //     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            //         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            //     </button>
+                            // `;
 
                         <?php endif; ?>
 
@@ -310,7 +324,7 @@
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Jasa Vendor Barang Keluar ?',
+            title: 'Posting Stuffing Pengeluaran Lokal ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -360,12 +374,12 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Jasa Vendori Barang Keluar ?',
+            title: 'Hapus Stuffing Pengeluaran Lokal ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Hapus',
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -404,7 +418,7 @@
     const closed = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Close Jasa Vendori Barang Keluar ?',
+            title: 'Close Stuffing Pengeluaran Lokal ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
