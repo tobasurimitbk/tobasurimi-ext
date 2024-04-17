@@ -121,13 +121,13 @@
                             <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
                         </button>
                     `;
-                    if (id_production_result) {
-                        buttonsHTML += `
-                            <button class="btn btn-warning to-production-result" onclick="toProductionResult('${id_production_result}')" >
-                                <i class="fa fa-folder fa-sm" aria-hidden="true"></i>
-                            </button>
-                        `;
-                    }
+                    // if (id_production_result) {
+                    //     buttonsHTML += `
+                    //         <button class="btn btn-warning to-production-result" onclick="toProductionResult('${id_production_result}')" >
+                    //             <i class="fa fa-folder fa-sm" aria-hidden="true"></i>
+                    //         </button>
+                    //     `;
+                    // }
                     // Tombol hapus selalu ditampilkan
                     buttonsHTML += `
                         <button class="btn btn-danger" onclick="remove('${id}')" >
