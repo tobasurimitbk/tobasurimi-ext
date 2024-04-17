@@ -307,8 +307,8 @@ $routes->get('/po-import-bahan-penolong/dropdown/get-detail-barang-spp', 'Purcha
 $routes->get('/tanda-terima-faktur-lokal-bp', 'Purchase\TandaTerimaSupBB::index', ['filter' => 'Auth']);
 $routes->get('/tanda-terima-faktur-lokal-bp/all', 'Purchase\TandaTerimaSupBB::all', ['filter' => 'Auth']);
 $routes->get('/tanda-terima-faktur-lokal-bp/create', 'Purchase\TandaTerimaSupBB::create', ['filter' => 'Auth']);
-$routes->get('/tanda-terima-faktur-lokal-bp/id/(:num)', 'Purchase\TandaTerimaSupBB::update/$1', ['filter' => 'Auth']);
-$routes->get('/tanda-terima-faktur-lokal-bp/print/(:num)', 'Purchase\TandaTerimaSupBB::print/$1', ['filter' => 'Auth']);
+$routes->get('/tanda-terima-faktur-lokal-bp/id/(:segment)', 'Purchase\TandaTerimaSupBB::update/$1', ['filter' => 'Auth']);
+$routes->get('/tanda-terima-faktur-lokal-bp/print/(:segment)', 'Purchase\TandaTerimaSupBB::print/$1', ['filter' => 'Auth']);
 $routes->get('/tanda-terima-faktur-lokal-bp/generate-tanda-terima-no', 'Purchase\TandaTerimaSupBB::generateTandaTerimaFakturNumber', ['filter' => 'Auth']);
 $routes->get('/tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang', 'Purchase\TandaTerimaSupBB::listPenerimaanBarang', ['filter' => 'Auth']);
 $routes->post('/tanda-terima-faktur-lokal-bp/create', 'Purchase\TandaTerimaSupBB::createAction', ['filter' => 'Auth']);

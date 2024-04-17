@@ -247,21 +247,6 @@
 
             </table>
 
-
-            <br><br><br>
-            <table style="width: 100%;margin-top:20px;">
-                <tr>
-                    <td style="text-align: center;">
-                        <b>DIPERIKSA OLEH</b>
-                    </td>
-                    <td style="text-align: center;">
-                        <b>DIKETAHUI OLEH</b>
-                    </td>
-                    <td style="text-align: center;">
-                        <b>DITIMBANG OLEH</b>
-                    </td>
-                </tr>
-            </table>
         </div>
 
     <?php endif; ?>

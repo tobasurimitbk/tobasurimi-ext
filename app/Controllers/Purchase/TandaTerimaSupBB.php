@@ -85,7 +85,7 @@ class TandaTerimaSupBB extends BaseController
                 if ($is_used) {
                     array_push($dataSupplier, [
                         "no"             => $no++,
-                        "id"             => $data->id,
+                        "id"             => encrypt($data->id),
                         "faktur_no"      => $data->faktur_no,
                         "supplier_name"  => strtoupper($data->supplierName),
                         "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
@@ -100,7 +100,7 @@ class TandaTerimaSupBB extends BaseController
                 if (!$is_used) {
                     array_push($dataSupplier, [
                         "no"             => $no++,
-                        "id"             => $data->id,
+                        "id"             => encrypt($data->id),
                         "faktur_no"      => $data->faktur_no,
                         "supplier_name"  => strtoupper($data->supplierName),
                         "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
@@ -137,6 +137,7 @@ class TandaTerimaSupBB extends BaseController
 
     public function update($id)
     {
+        $id = decrypt($id);
         if ($this->tandaTerimaFakturModel->find($id) == null) {
             return redirect()->to('tanda-terima-faktur-lokal-bp');
         }
@@ -205,13 +206,13 @@ class TandaTerimaSupBB extends BaseController
         return response()->setJSON([
             'token' => csrf_hash(),
             'message' => "Tanda terima faktur berhasil dibuat",
-            'id' => $id
+            'id' => encrypt($id)
         ]);
     }
 
     public function updateAction()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
 
         $this->tandaTerimaFakturModel->update($id, [
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
@@ -267,7 +268,7 @@ class TandaTerimaSupBB extends BaseController
 
     public function delete()
     {
-        $id = $this->request->getVar('id');
+        $id = decrypt($this->request->getVar('id'));
         $this->tandaTerimaFakturModel->where('id', $id)->delete();
         $this->tandaTerimaFakturDetailModel->where('tanda_terima_faktur_id', $id)->delete();
         $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->delete();
@@ -280,6 +281,7 @@ class TandaTerimaSupBB extends BaseController
 
     public function print($id)
     {
+        $id = decrypt($id);
         if ($this->tandaTerimaFakturModel->find($id) == null) {
             return redirect()->to('tanda-terima-faktur-lokal-bp');
         }

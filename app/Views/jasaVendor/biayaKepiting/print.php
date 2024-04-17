@@ -142,11 +142,19 @@
                     $mhTotal = 0;
                     $cfTotal = 0;
                     $totalTotal = 0;
+                    // Upah Kopek
+                    $upahKopekJumbo = 0;
+                    $upahKopekExLump = 0;
+                    $upahKopekLump = 0;
+                    $upahKopekSpecial = 0;
+                    $upahKopekClaw = 0;
+                    $upahKopekMh = 0;
+                    $upahKopekCf = 0;
                     ?>
                     <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
                         <?php
                         $total = $b['jumbo'] + $b['ex_lump'] + $b['lump'] + $b['special'] + $b['claw'] + $b['mh'] + $b['cf'];
-                        $rasio = (($b['qty_kopek'] / $total) * 10);
+                        $rasio = $total == 0 ? 0 : (($total / $b['qty_kopek']) * 10);
                         $jumboTotal += $b['jumbo'];
                         $exLumpTotal += $b['ex_lump'];
                         $lumpTotal += $b['lump'];
@@ -191,6 +199,16 @@
                         <?php
                         $total = $d['jumbo'] + $d['ex_lump'] + $d['lump'] + $d['special'] + $d['claw'] + $d['mh'] + $d['cf'];
                         $totalPerolehanGaji += $total;
+
+                        if ($d['description'] == 'Upah Kopek') {
+                            $upahKopekJumbo += $d['jumbo'];
+                            $upahKopekExLump += $d['ex_lump'];
+                            $upahKopekLump += $d['lump'];
+                            $upahKopekSpecial += $d['special'];
+                            $upahKopekClaw += $d['claw'];
+                            $upahKopekMh += $d['mh'];
+                            $upahKopekCf += $d['cf'];
+                        }
                         ?>
                         <tr>
                             <td colspan="5"><?= $d['description'] ?></td>
@@ -205,10 +223,15 @@
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td colspan="12">
-                            Grand Total Upah Kopek
-                        </td>
-                        <td><?= number_format($totalPerolehanGaji, 2) ?></td>
+                        <td colspan="5">Total Upah Kopek</td>
+                        <td><?= number_format(($jumboTotal * $upahKopekJumbo), 2) ?></td>
+                        <td><?= number_format(($exLumpTotal * $upahKopekExLump), 2) ?></td>
+                        <td><?= number_format(($lumpTotal * $upahKopekLump), 2) ?></td>
+                        <td><?= number_format(($specialTotal * $upahKopekSpecial), 2) ?></td>
+                        <td><?= number_format(($clawTotal * $upahKopekCf), 2) ?></td>
+                        <td><?= number_format(($mhTotal * $upahKopekMh), 2) ?></td>
+                        <td><?= number_format(($cfTotal * $upahKopekCf), 2) ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td colspan="5">Presentase Kopek</td>
@@ -221,6 +244,14 @@
                         <td><?= number_format(($cfTotal * 100) / $totalTotal, 2) ?> %</td>
                         <td>100 %</td>
                     </tr>
+                    <tr>
+                        <td colspan="12">
+                            Grand Total Upah Kopek
+                        </td>
+                        <td><?= number_format($totalPerolehanGaji, 2) ?></td>
+                    </tr>
+
+
                 </tbody>
             </table>
 
@@ -229,13 +260,13 @@
             <table style="width: 100%;margin-top:20px;">
                 <tr>
                     <td style="text-align: center;">
-                        <b>DIPERIKSA OLEH</b>
+                        <b>DIBUAT</b>
                     </td>
                     <td style="text-align: center;">
-                        <b>DIKETAHUI OLEH</b>
+                        <b>DIPERIKSA</b>
                     </td>
                     <td style="text-align: center;">
-                        <b>DITIMBANG OLEH</b>
+                        <b>DISETUJUI</b>
                     </td>
                 </tr>
             </table>

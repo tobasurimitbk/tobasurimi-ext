@@ -158,7 +158,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="5">Detail Dokumen Pabean</th>
+                                    <th style="text-align: center;" colspan="6">Detail Dokumen Pabean</th>
                                     <th style="text-align: center;" colspan="3">Daftar Barang Keluar</th>
                                     <th style="text-align: center;" colspan="4">Daftar Barang Masuk</th>
                                 </tr>
@@ -168,6 +168,7 @@
                                     <th style="text-align: center;">Dokumen Pabean</th>
                                     <th style="text-align: center;">No Aju</th>
                                     <th style="text-align: center;">Tgl Penerimaan</th>
+                                    <th style="text-align: center;">Supplier</th>
 
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
@@ -537,6 +538,7 @@
                 newRow.append($('<td>').text(v.bc_name));
                 newRow.append($('<td>').text(v.no_aju));
                 newRow.append($('<td>').text(v.stock_date));
+                newRow.append($('<td>').text(v.supplier_name));
                 newRow.append($('<td>').text(v.barang_out));
                 newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.qty_out));

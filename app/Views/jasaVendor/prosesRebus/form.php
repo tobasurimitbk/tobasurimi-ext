@@ -174,6 +174,7 @@
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju</th>
                                         <th style="text-align: center;">Tanggal Penerimaan</th>
+                                        <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty</th>
@@ -773,6 +774,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
