@@ -331,11 +331,11 @@ class Lokal extends BaseController
     public function close()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->jasaVendorOutModel->update($id, ['status_closed' => '1']);
+        $this->stuffingLokalModel->update($id, ['status_closed' => '1']);
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil diclose",
+            'message' => "Pengeluaran Lokal berhasil diclose",
             'token' => csrf_hash(),
         ]);
     }
