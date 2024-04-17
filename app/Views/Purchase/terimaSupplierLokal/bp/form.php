@@ -12,14 +12,14 @@
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
-                    <button onclick="remove('<?= $dataTandaTerimaFaktur['id'] ?>')" class="btn btn-hapus delete-parent float-right">
+                    <button onclick="remove('<?= encrypt($dataTandaTerimaFaktur['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                         Hapus
                     </button>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/{$dataTandaTerimaFaktur['id']}") ?>')">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/" . encrypt($dataTandaTerimaFaktur['id'])) ?>')">
                         Print
                     </button>
                 <?php else : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/{$dataTandaTerimaFaktur['id']}") ?>')">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/" . encrypt($dataTandaTerimaFaktur['id'])) ?>')">
                         Print
                     </button>
                 <?php endif; ?>
@@ -32,256 +32,268 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <?= csrf_field() ?>
-                <input type="hidden" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['id'] : '' ?>" name="id" class="id" id="id">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Faktur Penerimaan Barang</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Pengenaan Pajak</a>
+                </li>
+
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <br><br>
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+                        <?= csrf_field() ?>
+                        <input type="hidden" value="<?= !empty($dataTandaTerimaFaktur) ? encrypt($dataTandaTerimaFaktur['id']) : '' ?>" name="id" class="id" id="id">
+                        <div class="row">
+                            <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? 'readonly' : '' ?> type="text" class="form-control no_tanda_terima_faktur" id="no_tanda_terima_faktur" name="no_tanda_terima_faktur" placeholder="No Tanda Terima Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_no'] : $noTandaTerima ?>">
-                                    <label for="floatingInput">No Terima Faktur</label>
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input readonly autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? 'readonly' : '' ?> type="text" class="form-control no_tanda_terima_faktur" id="no_tanda_terima_faktur" name="no_tanda_terima_faktur" placeholder="No Tanda Terima Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_no'] : $noTandaTerima ?>">
+                                            <label for="floatingInput">No Terima Faktur</label>
+                                        </div>
+                                        <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                            <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($dataTandaTerimaFaktur) ? 'display:none' : '' ?> " class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($dataTandaTerimaFaktur) ? 'display:none' : '' ?> " class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= date('d/m/Y') ?>" class="form-control input-picker datepicker" id="tanggal_terima" name="tanggal_terima" placeholder="Tanggal Terima Faktur">
+                                        <label for="floatingInput">Tanggal Terima</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <?php if (!empty($dataTandaTerimaFaktur)) : ?>
+                                    <input autocomplete="one-time-code" name="supplier_id" value="<?= $dataTandaTerimaFaktur['supplier_id'] ?>" type="hidden" class="form-control ">
+                                <?php endif; ?>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataSupplier as $supplier) : ?>
+                                            <option value="<?= $supplier['id'] ?>"><?= $supplier['name'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Supplier</label>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= date('d/m/Y') ?>" class="form-control input-picker datepicker" id="tanggal_terima" name="tanggal_terima" placeholder="Tanggal Terima Faktur">
-                                <label for="floatingInput">Tanggal Terima</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" readonly autocomplete="one-time-code" value="" class="form-control nominal_faktur" id="nominal_faktur" name="nominal_faktur" placeholder="Nominal Faktur">
+                                    <label for="floatingInput">Nominal Faktur</label>
+                                </div>
                             </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= !empty($dataTandaTerimaFaktur) ? ($dataTandaTerimaFaktur['jatuh_tempo'] ? date("d/m/Y", strtotime($dataTandaTerimaFaktur['jatuh_tempo'])) : "") : ""; ?>" class="form-control input-picker datepicker" id="jatuh_tempo" name="jatuh_tempo" placeholder="Jatuh Tempo">
+                                            <label for="floatingInput">Jatuh Tempo</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <?php if (!empty($dataTandaTerimaFaktur)) : ?>
-                            <input autocomplete="one-time-code" name="supplier_id" value="<?= $dataTandaTerimaFaktur['supplier_id'] ?>" type="hidden" class="form-control ">
+
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label class="form-label font-weight-bold lable-title">Daftar Penerimaan Barang</label>
+                            </div>
+                            <div class="col-md-12 col-table-button-tts">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th style="text-align: center;"><input type="checkbox" id="parent"></th>
+                                                <th style="text-align: center;" class="sort">No PO</th>
+                                                <th style="text-align: center;" class="sort">Tgl LPB</th>
+                                                <th style="text-align: center;" class="sort">No LPB</th>
+                                                <th style="text-align: center;" class="sort">Nama Barang</th>
+                                                <th style="text-align: center;" class="sort">Qty LPB</th>
+                                                <th style="text-align: center;" class="sort">Qty Retur</th>
+                                                <th style="text-align: center;" class="sort">Qty Telah Terima</th>
+                                                <th style="text-align: center;" class="sort">Qty Akan Diterima</th>
+                                                <th style="text-align: center;" class="sort">Satuan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="body-table" id="body-table">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button type="button" <?= ($isUsed) ? 'disabled' : '' ?> class="btn btn-primary" id="select-item-btn">Pilih</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label class="form-label font-weight-bold lable-title">Daftar penerimaan barang yang akan dibuat tanda terima</label>
+                            </div>
+                            <div class="col-md-12 mb-5">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th style="text-align: center;">No PO</th>
+                                                <th style="text-align: center;">Tgl LPB</th>
+                                                <th style="text-align: center;">No LPB</th>
+                                                <th style="text-align: center;">Nama Barang</th>
+                                                <th style="text-align: center;">Qty</th>
+                                                <th style="text-align: center;">satuan</th>
+                                                <th style="text-align: center;">Total</th>
+                                                <th style="text-align: center;">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="body-table">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control potongan" onkeyup="hitungPotonganTambahan()" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['potongan'] : '' ?> " placeholder="Keterangan">
+                                    <label for="floatingInput">Potongan (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" onkeyup="hitungPotonganTambahan()" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['tambahan'] : '' ?> " placeholder="Keterangan">
+                                    <label for="floatingInput">Penambahan (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" readonly type="text" class="form-control total_tambahan_potongan" id="total_tambahan_potongan" name="total_tambahan_potongan" value="0" />
+                                    <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['recipient'] : session()->get("login")->name ?>" type="text" class="form-control penerima" name="penerima" id="penerima" placeholder="Penerima">
+                                    <label for="floatingInput">Penerima</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <textarea <?= $isUsed ? 'disabled' : '' ?> style="height: 10px;" autocomplete="one-time-code" class="form-control information text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"><?= $dataTandaTerimaFaktur['information'] ?? ""; ?></textarea>
+                                    <label for="floatingInput">Keterangan (Opsional)</label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <form id="pajak-form" class="pajak-form">
+
+                        <?php if (!$isUsed) : ?>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" class="form-control input-picker datepicker" id="tax_inv_date" name="tax_inv_date" placeholder="Tanggal Faktur Pajak">
+                                            <label for="floatingInput">Tanggal Faktur Pajak</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control" id="tax_inv_no" name="tax_inv_no" placeholder="No Faktur Pajak (Opsional)">
+                                        <label for="floatingInput">No Faktur Pajak (Opsional)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="tax_type" id="tax_type">
+                                            <option value="" disabled selected></option>
+                                            <option value="PPN Masukan">PPN Masukan</option>
+                                            <option value="PPN Masukan 11%">PPN Masukan 11%</option>
+                                            <option value="PPh Pasal 21">PPh Pasal 21</option>
+                                            <option value="PPh Pasal 23">PPh Pasal 23</option>
+                                            <option value="PPh Pasal 4 (2)">PPh Pasal 4 (2)</option>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Pilih Pajak</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="number" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
+                                        <label for="floatingInput">Jumlah</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="tax_status" id="tax_status">
+                                            <option value="" disabled selected></option>
+                                            <option value="Pajak dipungut oleh negara">Pajak dipungut oleh negara</option>
+                                            <option value="Pajak dikembalikan lagi">Pajak dikembalikan lagi</option>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Status</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <textarea style="height: 10px;" autocomplete="one-time-code" class="form-control information text-area-all" id="tax_note" name="tax_note" placeholder="Keterangan"></textarea>
+                                        <label for="floatingInput">Keterangan (Opsional)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-table-button-tts">
+                                    <button type="button" <?= ($isUsed) ? 'disabled' : '' ?> class="btn btn-primary" id="add-tax-btn">Tambah Pengenaan Pajak</button>
+                                </div>
+                            </div>
                         <?php endif; ?>
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
-                                <option value=""></option>
-                                <?php foreach ($dataSupplier as $supplier) : ?>
-                                    <option value="<?= $supplier['id'] ?>"><?= $supplier['name'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Supplier</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" readonly autocomplete="one-time-code" value="" class="form-control nominal_faktur" id="nominal_faktur" name="nominal_faktur" placeholder="Nominal Faktur">
-                            <label for="floatingInput">Nominal Faktur</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= !empty($dataTandaTerimaFaktur) ? ($dataTandaTerimaFaktur['jatuh_tempo'] ? date("d/m/Y", strtotime($dataTandaTerimaFaktur['jatuh_tempo'])) : "") : ""; ?>" class="form-control input-picker datepicker" id="jatuh_tempo" name="jatuh_tempo" placeholder="Jatuh Tempo">
-                                    <label for="floatingInput">Jatuh Tempo</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="taxTable" width="100%" cellspacing="0">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th style="text-align: center;">No</th>
+                                                <th style="text-align: center;">Tgl Faktur Pajak</th>
+                                                <th style="text-align: center;">No Faktur Pajak</th>
+                                                <th style="text-align: center;">Pajak</th>
+                                                <th style="text-align: center;">Jumlah</th>
+                                                <th style="text-align: center;">Status</th>
+                                                <th style="text-align: center;">Keterangan</th>
+                                                <th style="text-align: center;">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="body-table">
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Daftar Penerimaan Barang</label>
-                    </div>
-                    <div class="col-md-12 col-table-button-tts">
-                        <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th style="text-align: center;"><input type="checkbox" id="parent"></th>
-                                        <th style="text-align: center;" class="sort">No PO</th>
-                                        <th style="text-align: center;" class="sort">Tgl LPB</th>
-                                        <th style="text-align: center;" class="sort">No LPB</th>
-                                        <th style="text-align: center;" class="sort">Nama Barang</th>
-                                        <th style="text-align: center;" class="sort">Qty LPB</th>
-                                        <th style="text-align: center;" class="sort">Qty Retur</th>
-                                        <th style="text-align: center;" class="sort">Qty Telah Terima</th>
-                                        <th style="text-align: center;" class="sort">Qty Akan Diterima</th>
-                                        <th style="text-align: center;" class="sort">Satuan</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="body-table" id="body-table">
-
-                                </tbody>
-                            </table>
-                        </div>
-                        <button type="button" <?= ($isUsed) ? 'disabled' : '' ?> class="btn btn-primary" id="select-item-btn">Pilih</button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Daftar penerimaan barang yang akan dibuat tanda terima</label>
-                    </div>
-                    <div class="col-md-12 mb-5">
-                        <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th style="text-align: center;">No PO</th>
-                                        <th style="text-align: center;">Tgl LPB</th>
-                                        <th style="text-align: center;">No LPB</th>
-                                        <th style="text-align: center;">Nama Barang</th>
-                                        <th style="text-align: center;">Qty</th>
-                                        <th style="text-align: center;">satuan</th>
-                                        <th style="text-align: center;">Total</th>
-                                        <th style="text-align: center;">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="body-table">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control potongan" onkeyup="hitungPotonganTambahan()" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['potongan'] : '' ?> " placeholder="Keterangan">
-                            <label for="floatingInput">Potongan (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" onkeyup="hitungPotonganTambahan()" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['tambahan'] : '' ?> " placeholder="Keterangan">
-                            <label for="floatingInput">Penambahan (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" readonly type="text" class="form-control total_tambahan_potongan" id="total_tambahan_potongan" name="total_tambahan_potongan" value="0" />
-                            <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['recipient'] : session()->get("login")->name ?>" type="text" class="form-control penerima" name="penerima" id="penerima" placeholder="Penerima">
-                            <label for="floatingInput">Penerima</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <textarea <?= $isUsed ? 'disabled' : '' ?> style="height: 10px;" autocomplete="one-time-code" class="form-control information text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"><?= $dataTandaTerimaFaktur['information'] ?? ""; ?></textarea>
-                            <label for="floatingInput">Keterangan (Opsional)</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Pengenaan Pajak</label>
-                    </div>
-                </div>
-            </form>
-            <form id="pajak-form" class="pajak-form">
-                <?php if (!$isUsed) : ?>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker datepicker" id="tax_inv_date" name="tax_inv_date" placeholder="Tanggal Faktur Pajak">
-                                    <label for="floatingInput">Tanggal Faktur Pajak</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" id="tax_inv_no" name="tax_inv_no" placeholder="No Faktur Pajak (Opsional)">
-                                <label for="floatingInput">No Faktur Pajak (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select" name="tax_type" id="tax_type">
-                                    <option value="" disabled selected></option>
-                                    <option value="PPN Masukan">PPN Masukan</option>
-                                    <option value="PPN Masukan 11%">PPN Masukan 11%</option>
-                                    <option value="PPh Pasal 21">PPh Pasal 21</option>
-                                    <option value="PPh Pasal 23">PPh Pasal 23</option>
-                                    <option value="PPh Pasal 4 (2)">PPh Pasal 4 (2)</option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Pilih Pajak</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="number" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
-                                <label for="floatingInput">Jumlah</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select" name="tax_status" id="tax_status">
-                                    <option value="" disabled selected></option>
-                                    <option value="Pajak dipungut oleh negara">Pajak dipungut oleh negara</option>
-                                    <option value="Pajak dikembalikan lagi">Pajak dikembalikan lagi</option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Status</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <textarea style="height: 10px;" autocomplete="one-time-code" class="form-control information text-area-all" id="tax_note" name="tax_note" placeholder="Keterangan"></textarea>
-                                <label for="floatingInput">Keterangan (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 col-table-button-tts">
-                            <button type="button" <?= ($isUsed) ? 'disabled' : '' ?> class="btn btn-primary" id="add-tax-btn">Tambah Pengenaan Pajak</button>
-                        </div>
-                    </div>
-                <?php endif; ?>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="taxTable" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Tgl Faktur Pajak</th>
-                                        <th style="text-align: center;">No Faktur Pajak</th>
-                                        <th style="text-align: center;">Pajak</th>
-                                        <th style="text-align: center;">Jumlah</th>
-                                        <th style="text-align: center;">Status</th>
-                                        <th style="text-align: center;">Keterangan</th>
-                                        <th style="text-align: center;">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="body-table">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </form>
-
+            </div>
         </div>
     </div>
 </section>

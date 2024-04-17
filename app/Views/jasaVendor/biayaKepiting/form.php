@@ -916,7 +916,7 @@
                 newRow2.append($('<td>').text((mhTotal != 0 ? (mhTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
                 newRow2.append($('<td>').text((cfTotal != 0 ? (cfTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
 
-                newRow2.append($('<td>').text(''));
+                newRow2.append($('<td>').text('100%'));
                 table2.find('tbody').append(newRow2);
 
                 // GRAND TOTAL 2    

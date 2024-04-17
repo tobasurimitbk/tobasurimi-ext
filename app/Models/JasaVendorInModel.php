@@ -123,6 +123,7 @@ class JasaVendorInModel extends Model
         $stockModel = new StockModel();
         $metaDataModel = new MetadataModel();
         $stockDetail2Model = new StockDetail2Model();
+        $supplierModel = new SupplierModel();
 
         $jasaVendorOutData = $jasaVendorOutDetailModel->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)->where('deletedAt', null)->findAll();
         $result = array();
@@ -146,6 +147,13 @@ class JasaVendorInModel extends Model
                 ->where('jasa_vendor_out_detail_id', $j['id'])
                 ->first();
 
+            $noLpb = $stockListOutDetail != null ? $stockListOutDetail['no_dokumen_1'] : '';
+
+            $supplier = $supplierModel->select('suppliers.*')
+                ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
+                ->where('penerimaan_barang.no_penerimaan_barang', $noLpb)
+                ->first();
+
             if ($jasaVendorInID == null) {
                 $result[] = [
                     'jasa_vendor_out_detail_id' => $j['id'],
@@ -154,6 +162,7 @@ class JasaVendorInModel extends Model
                     'stock_in_id' => $j['stock_in_id'],
                     'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                     'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
+                    'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
                     'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                     'bc_id' => $j['bc_out_id'],
                     'no_aju' => $j['no_aju_out'],
@@ -174,6 +183,7 @@ class JasaVendorInModel extends Model
                         'stock_in_id' => $j['stock_in_id'],
                         'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                         'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
+                        'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
                         'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                         'bc_id' => $j['bc_out_id'],
                         'no_aju' => $j['no_aju_out'],
