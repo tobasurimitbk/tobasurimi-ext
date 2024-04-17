@@ -9,24 +9,34 @@
             </a>
             <?php if (!empty($dataTandaTerimaFaktur)) : ?>
                 <?php if (!$isUsed) : ?>
+                    <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'u')) : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                            Simpan
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'd')) : ?>
+                        <button onclick="remove('<?= encrypt($dataTandaTerimaFaktur['id']) ?>')" class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'p')) : ?>
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/" . encrypt($dataTandaTerimaFaktur['id'])) ?>')">
+                            Print
+                        </button>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'p')) : ?>
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/" . encrypt($dataTandaTerimaFaktur['id'])) ?>')">
+                            Print
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php else : ?>
+                <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
-                    <button onclick="remove('<?= encrypt($dataTandaTerimaFaktur['id']) ?>')" class="btn btn-hapus delete-parent float-right">
-                        Hapus
-                    </button>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/" . encrypt($dataTandaTerimaFaktur['id'])) ?>')">
-                        Print
-                    </button>
-                <?php else : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/" . encrypt($dataTandaTerimaFaktur['id'])) ?>')">
-                        Print
-                    </button>
                 <?php endif; ?>
-            <?php else : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                    Simpan
-                </button>
             <?php endif; ?>
         </div>
     </div>
