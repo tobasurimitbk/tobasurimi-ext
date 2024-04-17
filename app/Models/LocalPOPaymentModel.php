@@ -334,8 +334,9 @@ class LocalPOPaymentModel extends Model
 
         foreach ($rmDetail as $rm) {
             $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $rm['rm_purchase_order_id'])->first();
-            $supplierHarga = $supplierHargaModel->select('supplier_harga.spesifikasi, barang_master.barang_name')
+            $supplierHarga = $supplierHargaModel->select('barang_master_spesifikasi.spesifikasi, barang_master.barang_name, ')
                 ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id')
                 ->where('supplier_harga.id', $rm['supplier_harga_id'])
                 ->first();
 
@@ -352,7 +353,7 @@ class LocalPOPaymentModel extends Model
                 'lpbNo' => $lpbDetail['no_penerimaan_barang'],
                 'tanggalPo' => date('d/m/Y', \strtotime($rmPurchaseOrder['po_date'])),
                 'poNo' => $rmPurchaseOrder['po_no'],
-                'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
+                'barang' => $supplierHarga['barang_name'] . " - " . $supplierHarga['spesifikasi'] . "",
                 'totalOrder' => $rm['qty'],
                 'totalDiterima' => $rm['qty_diterima'],
                 'totalHarga' => toRupiah($harga)
@@ -414,8 +415,9 @@ class LocalPOPaymentModel extends Model
 
         foreach ($rmDetail as $rm) {
             $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $rm['rm_purchase_order_id'])->first();
-            $supplierHarga = $supplierHargaModel->select('supplier_harga.spesifikasi, barang_master.barang_name')
+            $supplierHarga = $supplierHargaModel->select('barang_master_spesifikasi.spesifikasi, barang_master.barang_name, ')
                 ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id')
                 ->where('supplier_harga.id', $rm['supplier_harga_id'])
                 ->first();
 
@@ -430,7 +432,7 @@ class LocalPOPaymentModel extends Model
                 'lpbNo' => $lpb['no_penerimaan_barang'],
                 'tanggalPo' => date('d/m/Y', \strtotime($rmPurchaseOrder['po_date'])),
                 'poNo' => $rmPurchaseOrder['po_no'],
-                'barang' => $supplierHarga['barang_name'] . " (" . $supplierHarga['spesifikasi'] . ")",
+                'barang' => $supplierHarga['barang_name'] . " - " . $supplierHarga['spesifikasi'] . "",
                 'totalOrder' => $rm['qty'],
                 'totalDiterima' => $rm['qty_diterima'],
                 'totalHarga' => toRupiah($harga)
@@ -445,7 +447,7 @@ class LocalPOPaymentModel extends Model
         ];
     }
 
-    public function getListLPBNotPaid($supplierID)
+    public function getListLPBNotPaid($supplierID, $divisiID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $resLPB = [];
@@ -455,7 +457,8 @@ class LocalPOPaymentModel extends Model
             'status_post' => 'FINISH',
             'tipe_bahan' => 'BAKU',
             'status_penerimaan' => 'LOKAL',
-            'supplier_id' => $supplierID
+            'supplier_id' => $supplierID,
+            'divisi_id' => $divisiID
         ];
 
         $lpbList = $penerimaanBarangModel->where($conditionPenerimaanBarang)->findAll();

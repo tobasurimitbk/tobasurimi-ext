@@ -4,12 +4,10 @@ namespace App\Controllers\Pembayaran;
 
 use App\Controllers\BaseController;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
-
+use App\Models\BanksModel;
+use App\Models\DivisisModel;
 use App\Models\SupplierModel;
 use App\Models\LocalPOPaymentModel;
-use App\Models\LocalPOPaymentDetailModel;
-use App\Models\LocalPOInvSummaryModel;
-use App\Models\LocalPOInvSumDetailModel;
 use App\Models\PajakTandaTerimaFakturModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\TandaTerimaFakturDetailModel;
@@ -24,6 +22,8 @@ class PembayaranPOLokal extends BaseController
     protected $this_company_id;
     protected $Sub_AkunsModel;
     protected $jurnalController;
+    protected $banksModel;
+    protected $divisiModel;
 
     public function __construct()
     {
@@ -31,6 +31,8 @@ class PembayaranPOLokal extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->jurnalController = new JurnalUmum();
+        $this->banksModel = new BanksModel();
+        $this->divisiModel = new DivisisModel();
     }
 
     public function pembayaranPOLokalBP()
@@ -134,7 +136,7 @@ class PembayaranPOLokal extends BaseController
             $poNoArr = [];
 
             foreach ($poIDAmt as $p) {
-                \array_push($poIDArr, $p->poID);
+                array_push($poIDArr, $p->poID);
             }
 
             foreach ($poNOAmt as $p) {
@@ -142,7 +144,6 @@ class PembayaranPOLokal extends BaseController
             }
 
             $resPoID =  str_replace('"', "", json_encode(array_values(array_unique($poIDArr))));
-            $resPoNo =  str_replace("\\", "", json_encode(array_values(array_unique($poNoArr))));
             $resPoNo =  str_replace('"', "", json_encode(array_values(array_unique($poNoArr))));
 
             $lpb = $penerimaanBarangModel->where('id', $this->request->getVar('lpb'))->first();
@@ -307,6 +308,10 @@ class PembayaranPOLokal extends BaseController
             ->findAll();
 
         $penerimaanData = $penerimaanBarangModel->asObject()->where('deletedAt', NULL)->findAll();
+        $bankList = $this->banksModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->orderBy('name', "ASC")
+            ->findAll();
 
         if ($localPOPaymentModel->where('id', $id)->first() == null) {
             return redirect()->to('pembayaran-po-lokal-bb');
@@ -317,6 +322,7 @@ class PembayaranPOLokal extends BaseController
             "detail" => $localPOPaymentModel->getBB($id, $this->this_company_id),
             "subsAkuns" => $subAkunsModel,
             "penerimaanData" => $penerimaanData,
+            "bankList" => $bankList
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
@@ -397,11 +403,18 @@ class PembayaranPOLokal extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
+        $bankList = $this->banksModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->orderBy('name', "ASC")
+            ->findAll();
 
+        $divisiList = $this->divisiModel->getDivisiAccess();
 
         $data = [
             "suppliers" => $supplierList,
-            "subsAkuns" => $subAkunsModel
+            "subsAkuns" => $subAkunsModel,
+            "bankList" => $bankList,
+            "divisi" => $divisiList
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
@@ -424,8 +437,13 @@ class PembayaranPOLokal extends BaseController
     public function getListDokumenLPBNotPaidBB()
     {
         $supplierID = $this->request->getVar('supplierID');
+        $divisiID = $this->request->getVar('divisiID');
         $localPOPaymentModel = new LocalPOPaymentModel();
-        $res = $localPOPaymentModel->getListLPBNotPaid($supplierID);
+        if (!empty($supplierID) && !empty($divisiID)) {
+            $res = $localPOPaymentModel->getListLPBNotPaid($supplierID, $divisiID);
+        } else {
+            $res = [];
+        }
         return response()->setJson([
             'data' => $res,
             'token' => csrf_hash()
