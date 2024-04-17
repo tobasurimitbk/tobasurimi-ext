@@ -226,12 +226,12 @@
         })
     }
     const toMaterialRequest = function(id) {
-        console.log(id);
-        if (id != 0) {
-            window.location.href = "<?= base_url('material-request/details'); ?>/" + id;
-        } else {
-            window.location.href = "<?= base_url('material-request'); ?>";
-        }
+        // console.log(id);
+        // if (id != 0) {
+        //     window.location.href = "<?= base_url('material-request/details'); ?>/" + id;
+        // } else {
+        window.location.href = "<?= base_url('material-request'); ?>";
+        // }
     }
     const toProductionResult = function(id) {
         console.log(id);
