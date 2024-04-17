@@ -495,6 +495,7 @@ $routes->get('/order-form-internasional/get/detail-sales-kontrak', 'SalesInterna
 $routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::saveOrder', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update-status', 'SalesInternasional\OrderForm::updateStatus', ['filter' => 'Auth']);
+$routes->post('/order-form-internasional/generate-no-order-form', 'SalesInternasional\OrderForm::generateNomorSalesOrderInternasional', ['filter' => 'Auth']);
 
 // Master Barang Internasional
 $routes->get('master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);
@@ -786,6 +787,23 @@ $routes->post('/pengeluaran-lokal/close',  'Stuffing\Lokal::close', ['filter' =>
 $routes->get('/pengeluaran-lokal/id/(:segment)',  'Stuffing\Lokal::detail/$1', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/get-pengeluaran-lokal-no',  'Stuffing\Lokal::getStuffingLokalNo', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/print/(:segment)', 'Stuffing\Lokal::print/$1', ['filter' => 'Auth']);
+
+// Stuffing Internasional
+$routes->get('/pengeluaran-internasional',  'Stuffing\Internasional::index', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/create',  'Stuffing\Internasional::create', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/list-barang-output', 'Stuffing\Internasional::dropdownListOrder', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/all', 'Stuffing\Internasional::all', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/save',  'Stuffing\Internasional::createAction', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/update',  'Stuffing\Internasional::updateAction', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/delete',  'Stuffing\Internasional::delete', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/posting',  'Stuffing\Internasional::posting', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/close',  'Stuffing\Internasional::close', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/id/(:segment)',  'Stuffing\Internasional::detail/$1', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/get-pengeluaran-internasional-no',  'Stuffing\Internasional::getStuffingLokalNo', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/print/(:segment)', 'Stuffing\Internasional::print/$1', ['filter' => 'Auth']);
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);

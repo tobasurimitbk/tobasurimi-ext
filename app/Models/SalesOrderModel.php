@@ -19,11 +19,13 @@ class SalesOrderModel extends Model
     protected $protectedField = true;
 
     protected $allowedFields = [
+        'id_company',
         'id_user',
         'id_po',
         'id_customer',
         'jenis_penjualan',
         'sales_id',
+        'bc_type',
         'nama_ecommerce',
         'no_sales_order',
         'no_po',
@@ -51,7 +53,6 @@ class SalesOrderModel extends Model
         'tax_status',
         'include_pa',
         'paid_amt',
-        'id_company',
     ];
 
     // Dates

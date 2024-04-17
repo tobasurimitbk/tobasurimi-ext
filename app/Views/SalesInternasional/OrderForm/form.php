@@ -41,6 +41,19 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" <?= !empty($dataSalesExport) ? 'readonly' : '' ?> class="form-control no_sales_order" id="no_sales_order" name="no_sales_order" placeholder="No. Sales Order" required <?= !empty($dataSalesExport) ? 'disabled value="' . $dataSalesExport->sales_contract_id . '"' : '' ?>>
+                                    <label for="floatingInput">No. Order</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px; <?= !empty($dataSalesExport) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <?php if (!empty($dataSalesExport)) { ?>
                                 <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->sales_contract_id ?>" type="hidden" class="form-control sales_kontrak_id" id="sales_kontrak_id" name="sales_kontrak_id" placeholder="Sales Kontrak">
                                 <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->sales_contract_no ?>" type="text" class="form-control sales_kontrak_no" id="sales_kontrak_no" name="sales_kontrak_no" placeholder="Sales Kontrak">
@@ -54,13 +67,26 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
+                            <select <?= !empty($dataSalesExport) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
+                                <option value="">Pilih Dokumen Pabean</option>
+                                <?php foreach ($dataAJU as $aju) : ?>
+                                    <option <?= !empty($dataSalesExport) ? ($dataSalesExport->bc_type === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Dokumen Pabean (Opsional)</label>
+                        </div>
+                        <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->customer_name ?? "" ?>" type="text" class="form-control customer_name" id="customer_name" name="customer_name" placeholder="Customer Name">
                                 <label for="floatingInput">Customer</label>
                             </div>
                         </div>
-
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -68,14 +94,14 @@
                             <label for="floatingInput">No. PO (Opsional)</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->loading_port ?? "" ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
                             <label for="floatingInput">Loading Port</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->dicharge_port ?? "" ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
@@ -95,14 +121,14 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->payment_term ?? "" ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
                             <label for="floatingInput">Payment Term (Opsional)</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->tolerance ?? "" ?>" type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
@@ -122,14 +148,14 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly oninput="preventNegativeInput(this)" value="<?= $dataSalesExport->currencyName ?? "" ?>" autocomplete="one-time-code" type="text" class="form-control currency" id="currency" name="currency" placeholder="Currency">
                             <label for="floatingInput">Currency</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly oninput="preventNegativeInput(this)" value="<?= $dataSalesExport->tipe_harga ?? "" ?>" autocomplete="one-time-code" type="text" class="form-control tipe_harga" id="tipe_harga" name="tipe_harga" placeholder="Tipe Harga">
@@ -402,6 +428,45 @@
                 }
             })
         })
+
+        var validator = $(".create-form").validate({
+            rules: {
+                no_sales_order: {
+                    required: true
+                },
+                sales_kontrak: {
+                    required: true
+                }
+            },
+            messages: {
+                no_sales_order: {
+                    required: "No sales order wajib diisi"
+                },
+                sales_kontrak: {
+                    required: "Sales kontrak wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
 
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
@@ -724,6 +789,37 @@
             inputElement.value = '0';
         } else {
             inputElement.value = numericValue;
+        }
+    }
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        if (value) {
+            $.ajax({
+                url: "<?= base_url("order-form-internasional/generate-no-order-form"); ?>",
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $(".no_sales_order").val(response.data);
+                },
+
+            });
+            $(".no_sales_order").attr("readonly", true);
+        } else {
+            $(".no_sales_order").attr("readonly", false);
+            $(".no_sales_order").val("");
         }
     }
 </script>

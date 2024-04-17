@@ -167,6 +167,18 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
+                            <select <?= !empty($data) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
+                                <option value="">Pilih Dokumen Pabean</option>
+                                <?php foreach ($dataAJU as $aju) : ?>
+                                    <option <?= !empty($data) ? ($data->bc_type === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Dokumen Pabean (Opsional)</label>
+                        </div>
+                        <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 80px;">
                             <textarea autocomplete="one-time-code" <?= !empty($data) ? 'disabled=true' : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>

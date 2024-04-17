@@ -129,13 +129,14 @@ class Lokal extends BaseController
 
     public function create()
     {
+        $dataAJU = $this->metaDataModel->getBCUsed('so_lokal');
         $data = [
             'tanggal' => date('Y-m-d'),
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'orderForm' => $this->salesOrderModel->select('sales_order.*, customers.name as customer_name')->join('customers', 'customers.id = sales_order.id_customer')->where('sales_order.deletedAt', null)->orderBy('sales_order.no_sales_order', "ASC")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
-
+            "dataAJU" => $dataAJU,
         ];
         return view('Stuffing/Lokal/form', $data);
     }
@@ -143,13 +144,20 @@ class Lokal extends BaseController
     public function detail($id)
     {
         $id = decrypt($id);
-        $stuffingLokalModel = $this->stuffingLokalModel->select('stuffing_lokal.*, customers.name as customer_name')->join('customers', 'customers.id = stuffing_lokal.customer_id')->find($id);
+        $stuffingLokalModel = $this->stuffingLokalModel
+            ->select('stuffing_lokal.*, sales_order.bc_type, customers.name as customer_name')
+            ->join('customers', 'customers.id = stuffing_lokal.customer_id')
+            ->join('sales_order', 'sales_order.id = stuffing_lokal.sales_order_id')
+            ->find($id);
         $salesOrder = $this->salesOrderDetailModel
-            ->select('sales_order_detail.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
+            ->select('sales_order_detail.*, sales_order.bc_type, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
+            ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order')
             ->where('sales_order_detail.id_sales_order', $stuffingLokalModel['sales_order_id'])
             ->where('sales_order_detail.deletedAt', null)
             ->findAll();
+
+        $dataAJU = $this->metaDataModel->getBCUsed('so_lokal');
 
         if ($stuffingLokalModel == null) {
             return redirect()->to('pengeluaran-lokal');
@@ -164,7 +172,7 @@ class Lokal extends BaseController
             'stuffingLokalDetail' => $this->stuffingLokalDetailModel->getStuffingDetail($id),
             'salesOrder' => $salesOrder,
             'divisi' => $this->divisiModel->getDivisiAccess(),
-
+            "dataAJU" => $dataAJU,
         ];
 
         return view('Stuffing/Lokal/form', $data);

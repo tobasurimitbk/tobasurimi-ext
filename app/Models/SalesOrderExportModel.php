@@ -18,6 +18,7 @@ class SalesOrderExportModel extends Model
         'sales_order_export_id',
         'sales_order_export_no',
         'sales_contract_id',
+        'bc_type',
         'company_id',
         'status',
         'createdAt',

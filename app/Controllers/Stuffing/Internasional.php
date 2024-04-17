@@ -1,20 +1,28 @@
 <?php
 
-namespace App\Controllers\JasaVendor;
+namespace App\Controllers\Stuffing;
 
 use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorOutDetailModel;
 use App\Models\JasaVendorOutModel;
 use App\Models\MetadataModel;
+use App\Models\SalesOrderDetailModel;
+use App\Models\SalesOrderExportDetailModel;
+use App\Models\SalesOrderExportModel;
+use App\Models\SalesOrderModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StuffingInternasionalDetailModel;
+use App\Models\StuffingInternasionalModel;
+use App\Models\StuffingLokalDetailModel;
+use App\Models\StuffingLokalModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
 
-class JasaVendorOut extends BaseController
+class Internasional extends BaseController
 {
     protected $vendorModel;
     protected $this_user_id;
@@ -27,6 +35,10 @@ class JasaVendorOut extends BaseController
     protected $jasaVendorOutModel;
     protected $jasaVendorOutDetailModel;
     protected $warehouseModel;
+    protected $salesOrderModel;
+    protected $salesOrderDetailModel;
+    protected $stuffingInternasionalModel;
+    protected $stuffingInternasionalDetailModel;
     protected $dompdf;
 
     public function __construct()
@@ -42,6 +54,10 @@ class JasaVendorOut extends BaseController
         $this->jasaVendorOutModel = new JasaVendorOutModel();
         $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->salesOrderModel = new SalesOrderExportModel();
+        $this->salesOrderDetailModel = new SalesOrderExportDetailModel();
+        $this->stuffingInternasionalModel = new StuffingInternasionalModel();
+        $this->stuffingInternasionalDetailModel = new StuffingInternasionalDetailModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -50,7 +66,7 @@ class JasaVendorOut extends BaseController
         $data = [
             'dataDivisi' => $this->divisiModel->getDivisiAccess()
         ];
-        return view('jasaVendor/out/index', $data);
+        return view('Stuffing/Internasional/index', $data);
     }
 
     public function all()
@@ -66,12 +82,10 @@ class JasaVendorOut extends BaseController
         $addCondition = [
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
-            "divisi_id" => $this->request->getVar("divisi_id"),
-            "warehouse_id" => $this->request->getVar('warehouse_id'),
             "status" => $this->request->getVar("status"),
             "start_date" => $this->request->getVar('start_date'),
             "end_date" => $this->request->getVar('end_date'),
-            "no_surat_jalan" => $this->request->getVar("no_surat_jalan"),
+            "no_stuffing" => $this->request->getVar("no_stuffing"),
         ];
 
         $limit = $this->request->getVar("length");
@@ -80,33 +94,27 @@ class JasaVendorOut extends BaseController
         $dataResult = array();
 
         $condition = [
-            'jasa_vendor_out.company_id' => $this->this_company_id,
-            'jasa_vendor_out.deletedAt' => null,
+            'stuffing_internasional.company_id' => $this->this_company_id,
+            'stuffing_internasional.deletedAt' => null,
         ];
 
-        foreach ($this->divisiModel->getDivisiAccess() as $d) {
-            array_push($divisiArr, $d['id']);
-        }
-
-        $dataQry = $this->jasaVendorOutModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
+        $dataQry = $this->stuffingInternasionalModel->getList($condition, $addCondition, $limit, $offset);
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
 
-            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
-                ->where('jasa_vendor_out_id', $data->id)
+            $stuffingInternasionalDetailModel = $this->stuffingInternasionalDetailModel
+                ->where('stuffing_internasional_id', $data->id)
                 ->where('deletedAt', null)
                 ->findAll();
 
             array_push($dataResult, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "no_surat_jalan"        => $data->no_surat_jalan,
+                "no_stuffing"        => $data->no_stuffing,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
-                "divisi"                => $data->divisi,
-                "warehouse_name"        => $data->warehouse_name,
-                "total_item"            => count($jasaVendorOutDetail),
-                "vendor_name"           => $data->vendor_name,
+                "total_item"            => count($stuffingInternasionalDetailModel),
+                "customer_name"           => $data->customer_name,
                 "status_posting"        => $data->status_posting,
                 "status_closed"         => $data->status_closed == "1" ? "CLOSED" : "OPEN",
             ]);
@@ -129,64 +137,86 @@ class JasaVendorOut extends BaseController
             'tanggal' => date('Y-m-d'),
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
+            'orderForm' => $this->salesOrderModel
+                ->select('sales_order_export.*, customers.name as customer_name, sales_contract.customer_id')
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->join('customers', 'customers.id = sales_contract.customer_id')
+                ->where('sales_order_export.deletedAt', null)
+                ->orderBy('sales_order_export.sales_order_export_no', "ASC")
+                ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
 
         ];
-        return view('jasaVendor/out/form', $data);
+        return view('Stuffing/Internasional/form', $data);
     }
 
     public function detail($id)
     {
         $id = decrypt($id);
-        $jasaVendorOut = $this->jasaVendorOutModel->find($id);
+        $stuffingInternasionalModel = $this->stuffingInternasionalModel->select('stuffing_internasional.*, customers.name as customer_name')->join('customers', 'customers.id = stuffing_internasional.customer_id')->find($id);
+        $salesOrder = $this->salesOrderDetailModel
+            ->select('sales_order_detail_export.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id')
+            ->where('sales_order_detail_export.sales_order_export_id', $stuffingInternasionalModel['sales_order_export_id'])
+            ->where('sales_order_detail_export.deletedAt', null)
+            ->findAll();
 
-        if ($jasaVendorOut == null) {
-            return redirect()->to('jasa-vendor-out');
+        if ($stuffingInternasionalModel == null) {
+            return redirect()->to('pengeluaran-lokal');
         }
 
         $data = [
+            'tanggal' => date('Y-m-d'),
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
+            'orderForm' => $this->salesOrderModel
+                ->select('sales_order_export.*, customers.name as customer_name, sales_contract.customer_id')
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->join('customers', 'customers.id = sales_contract.customer_id')
+                ->where('sales_order_export.deletedAt', null)
+                ->orderBy('sales_order_export.sales_order_export_no', "ASC")
+                ->findAll(),
+            'stuffingInternasional' => $stuffingInternasionalModel,
+            'stuffingInternasionalDetail' => $this->stuffingInternasionalDetailModel->getStuffingDetail($id),
+            'salesOrder' => $salesOrder,
             'divisi' => $this->divisiModel->getDivisiAccess(),
-            'jasaVendorOut' => $jasaVendorOut,
-            'warehouse' => $this->warehouseModel->where('deletedAt', null)->where('divisi_id', $jasaVendorOut['divisi_id'])->orderBy('warehouse_name', "ASC")->findAll(),
-            'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetail($id)
 
         ];
 
-        return view('jasaVendor/out/form', $data);
+        return view('Stuffing/Internasional/form', $data);
     }
 
     public function createAction()
     {
-        $id = $this->jasaVendorOutModel->insert([
+        $id = $this->stuffingInternasionalModel->insert([
             'company_id' => $this->this_company_id,
-            'vendor_id' => $this->request->getVar('vendor_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+            'customer_id' => $this->request->getVar('customer_id'),
+            'sales_order_export_id' => $this->request->getVar('sales_order_id'),
+            'no_stuffing' => $this->request->getVar('no_stuffing'),
             'tanggal' => date('Y-m-d'),
-            'tipe_barang' => "bahan_baku",
-            'no_kontainer' => $this->request->getVar('no_kontainer'),
-            'keterangan' => $this->request->getVar('keterangan'),
         ]);
 
         $barang = json_decode($this->request->getVar('listBarang'));
 
         foreach ($barang as $b) {
-            $this->jasaVendorOutDetailModel->insert([
-                'jasa_vendor_out_id' => $id,
-                'stock_out_id' => $b->stock_id,
-                'bc_out_id' => $b->bc_id,
-                'no_aju_out' => $b->no_aju,
-                'stock_in_id' => $b->output->stock_id,
-                'qty' => $b->qty
+            $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
+            $this->stuffingInternasionalDetailModel->insert([
+                'divisi_id' => $b->divisi_id,
+                'warehouse_id' => $b->warehouse_id,
+                'stuffing_internasional_id' => $id,
+                'stock_id_warehouse' => $b->stock_id,
+                'bc_id_warehouse' => $b->bc_id,
+                'no_aju_warehouse' => $b->no_aju,
+                'barang1_id_warehouse' => $checkStock['barang1_id'],
+                'barang2_id_warehouse' => $checkStock['barang2_id'],
+                'barang_id_order' => $b->output->id_barang,
+                'qty' => $b->output->qty
             ]);
         }
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil disimpan",
+            'message' => "Pengeluaran Internasional berhasil disimpan",
             'token' => csrf_hash(),
             'id' => encrypt($id)
         ]);
@@ -196,62 +226,44 @@ class JasaVendorOut extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
-        $this->jasaVendorOutModel->update($id, [
-            'vendor_id' => $this->request->getVar('vendor_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'no_kontainer' => $this->request->getVar('no_kontainer'),
-            'keterangan' => $this->request->getVar('keterangan')
-        ]);
-
         $barang = json_decode($this->request->getVar('listBarang'));
 
         // get all id detail
         $id_detail_all = [];
         foreach ($barang as $b) {
-            $check = $this->jasaVendorOutDetailModel
-                ->where('jasa_vendor_out_id', $id)
-                ->where('stock_out_id', $b->stock_id)
-                ->where('bc_out_id', $b->bc_id)
-                ->where('no_aju_out', $b->no_aju)
-                ->first();
-
-            if ($check == null) {
-                // Belum Ada
-                $this->jasaVendorOutDetailModel
-                    ->where('jasa_vendor_out_id', $id)
-                    ->where('stock_out_id', $b->stock_id)
-                    ->where('bc_out_id', $b->bc_id)
-                    ->where('no_aju_out', $b->no_aju)
-                    ->delete();
-
-                $id_detail_new = $this->jasaVendorOutDetailModel->insert([
-                    'jasa_vendor_out_id' => $id,
-                    'stock_out_id' => $b->stock_id,
-                    'bc_out_id' => $b->bc_id,
-                    'no_aju_out' => $b->no_aju,
-                    'stock_in_id' => $b->output->stock_id,
-                    'qty' => $b->qty
+            if (isset($b->id_stuffing_detail)) {
+                $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
+                $this->stuffingInternasionalDetailModel->update($b->id_stuffing_detail, [
+                    'divisi_id' => $b->divisi_id,
+                    'warehouse_id' => $b->warehouse_id,
+                    'stock_id_warehouse' => $b->stock_id,
+                    'bc_id_warehouse' => $b->bc_id,
+                    'no_aju_warehouse' => $b->no_aju,
+                    'barang1_id_warehouse' => $checkStock['barang1_id'],
+                    'barang2_id_warehouse' => $checkStock['barang2_id'],
+                    'barang_id_order' => $b->output->id_barang,
+                    'qty' => $b->output->qty
                 ]);
-                array_push($id_detail_all,  $id_detail_new);
             } else {
-                // ada
-                $this->jasaVendorOutDetailModel->update($check['id'], [
-                    'jasa_vendor_out_id' => $id,
-                    'stock_out_id' => $b->stock_id,
-                    'bc_out_id' => $b->bc_id,
-                    'no_aju_out' => $b->no_aju,
-                    'stock_in_id' => $b->output->stock_id,
-                    'qty' => $b->qty
+                $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
+                $this->stuffingInternasionalDetailModel->insert([
+                    'divisi_id' => $b->divisi_id,
+                    'warehouse_id' => $b->warehouse_id,
+                    'stuffing_internasional_id' => $id,
+                    'stock_id_warehouse' => $b->stock_id,
+                    'bc_id_warehouse' => $b->bc_id,
+                    'no_aju_warehouse' => $b->no_aju,
+                    'barang1_id_warehouse' => $checkStock['barang1_id'],
+                    'barang2_id_warehouse' => $checkStock['barang2_id'],
+                    'barang_id_order' => $b->output->id_barang,
+                    'qty' => $b->output->qty
                 ]);
-                array_push($id_detail_all, $check['id']);
             }
         }
-        $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->whereNotIn('id', $id_detail_all)->delete();
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil diupdate",
+            'message' => "Pengeluaran Internasional berhasil diupdate",
             'token' => csrf_hash(),
         ]);
     }
@@ -259,12 +271,12 @@ class JasaVendorOut extends BaseController
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->jasaVendorOutModel->delete($id);
-        $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->delete();
+        $this->stuffingInternasionalModel->delete($id);
+        $this->stuffingInternasionalDetailModel->where('stuffing_internasional_id', $id)->delete();
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil dihapus",
+            'message' => "Pengeluaran Internasional berhasil dihapus",
             'token' => csrf_hash(),
         ]);
     }
@@ -275,11 +287,12 @@ class JasaVendorOut extends BaseController
 
         // BARANG OUT KE VENDOR
         // Insert To Inventori (-)
-        $jasaVendorOut = $this->jasaVendorOutModel->find($id);
-        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->where('deletedAt', null)->findAll();
+        $stuffingInternasional = $this->stuffingInternasionalModel->find($id);
+        $salesOrder = $this->salesOrderModel->find($stuffingInternasional['sales_order_export_id']);
+        $stuffingInternasionalDetail = $this->stuffingInternasionalDetailModel->where('stuffing_internasional_id', $id)->where('deletedAt', null)->findAll();
 
-        foreach ($jasaVendorOutDetail as $j) {
-            $stock = $this->stockModel->find($j['stock_out_id']);
+        foreach ($stuffingInternasionalDetail as $j) {
+            $stock = $this->stockModel->find($j['stock_id_warehouse']);
             $qty = $j['qty'];
 
             if ($stock['tipe_barang'] == "kemasan") {
@@ -289,9 +302,9 @@ class JasaVendorOut extends BaseController
             }
 
             $stok = $this->stockModel->insertStok(
-                $jasaVendorOut['company_id'],
-                $jasaVendorOut['warehouse_id'],
-                $jasaVendorOut['divisi_id'],
+                $stuffingInternasional['company_id'],
+                $j['warehouse_id'],
+                $j['divisi_id'],
                 $stock['tipe_barang'],
                 $stock['barang1_id'],
                 $barang2_id,
@@ -305,27 +318,27 @@ class JasaVendorOut extends BaseController
                 "Out",
                 date('Y-m-d'),
                 $this->this_user_id,
-                "JASA VENDOR",
-                "-",
-                $jasaVendorOut['keterangan']
+                "PENJUALAN",
+                $salesOrder['no_sales_order'],
+                "-"
             );
 
             // SUB DETAIL
             $this->stockDetail2Model->insertStokDetail2(
-                $j['bc_out_id'],
-                $j['stock_out_id'],
+                $j['bc_id_warehouse'],
+                $j['stock_id_warehouse'],
                 $stokDetail,
                 $qty,
-                $j['no_aju_out'],
-                $jasaVendorOut['no_surat_jalan']
+                $j['no_aju_warehouse'],
+                $stuffingInternasional['no_stuffing']
             );
         }
 
-        $this->jasaVendorOutModel->update($id, ['status_posting' => '1']);
+        $this->stuffingInternasionalModel->update($id, ['status_posting' => '1']);
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil diposting",
+            'message' => "Pengeluaran Internasional berhasil diposting",
             'token' => csrf_hash(),
         ]);
     }
@@ -333,97 +346,80 @@ class JasaVendorOut extends BaseController
     public function close()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->jasaVendorOutModel->update($id, ['status_closed' => '1']);
+        $this->stuffingInternasionalModel->update($id, ['status_closed' => '1']);
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil diclose",
+            'message' => "Pengeluaran Internasional berhasil diclose",
             'token' => csrf_hash(),
         ]);
     }
 
-    public function print($id)
+    // public function print($id)
+    // {
+    //     $id = decrypt($id);
+    //     $selectQryJasaVendor = "
+    //         jasa_vendor_out.*,
+    //         vendors.name as vendor_name,
+    //         vendors.address
+    //     ";
+
+    //     $jasaVendorOut = $this->jasaVendorOutModel->select($selectQryJasaVendor)
+    //         ->join('vendors', 'vendors.id = jasa_vendor_out.vendor_id')
+    //         ->where('jasa_vendor_out.id', $id)
+    //         ->first();
+
+    //     if ($jasaVendorOut == null) {
+    //         return redirect()->to('jasa-vendor-out');
+    //     }
+
+    //     $selectQryJasaVendorDetail = "
+    //         SUM(jasa_vendor_out_detail.qty) as qty,
+    //         satuans.kode_satuan,
+    //         barang_master.barang_name,
+    //         barang_master_spesifikasi.spesifikasi
+    //     ";
+
+    //     $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->select($selectQryJasaVendorDetail)
+    //         ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
+    //         ->join('barang_master', 'barang_master.id = stock.barang1_id')
+    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+    //         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+    //         ->where('jasa_vendor_out_id', $jasaVendorOut['id'])
+    //         ->groupBy('jasa_vendor_out_detail.stock_out_id')
+    //         ->findAll();
+
+    //     $data = [
+    //         'jasaVendorOut' => $jasaVendorOut,
+    //         'jasaVendorDetail' => $jasaVendorOutDetail
+    //     ];
+
+    //     $this->dompdf->loadHtml(view('Stuffing/Internasional/print', $data));
+    //     $this->dompdf->setPaper('A4', 'portrait');
+    //     $this->dompdf->render();
+    //     $this->dompdf->stream("Jasa Vendor Barang Keluar", array("Attachment" => false));
+    // }
+
+    public function dropdownListOrder()
     {
-        $id = decrypt($id);
-        $selectQryJasaVendor = "
-            jasa_vendor_out.*,
-            vendors.name as vendor_name,
-            vendors.address
-        ";
-
-        $jasaVendorOut = $this->jasaVendorOutModel->select($selectQryJasaVendor)
-            ->join('vendors', 'vendors.id = jasa_vendor_out.vendor_id')
-            ->where('jasa_vendor_out.id', $id)
-            ->first();
-
-        if ($jasaVendorOut == null) {
-            return redirect()->to('jasa-vendor-out');
-        }
-
-        $selectQryJasaVendorDetail = "
-            SUM(jasa_vendor_out_detail.qty) as qty,
-            satuans.kode_satuan,
-            barang_master.barang_name,
-            barang_master_spesifikasi.spesifikasi
-        ";
-
-        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->select($selectQryJasaVendorDetail)
-            ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
-            ->where('jasa_vendor_out_id', $jasaVendorOut['id'])
-            ->groupBy('jasa_vendor_out_detail.stock_out_id')
+        $data = $this->salesOrderDetailModel
+            ->select('sales_order_detail_export.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id')
+            ->where('sales_order_detail_export.sales_order_export_id', $this->request->getVar('sales_order_id'))
+            ->where('sales_order_detail_export.deletedAt', null)
             ->findAll();
 
-        $data = [
-            'jasaVendorOut' => $jasaVendorOut,
-            'jasaVendorDetail' => $jasaVendorOutDetail
-        ];
-
-        $this->dompdf->loadHtml(view('jasaVendor/out/print', $data));
-        $this->dompdf->setPaper('A4', 'portrait');
-        $this->dompdf->render();
-        $this->dompdf->stream("Jasa Vendor Barang Keluar", array("Attachment" => false));
-    }
-
-    public function dropdownListOutputVendor()
-    {
-        $stockID = $this->request->getVar('stock_id');
-
-        $response = array();
-        if (!empty($stockID)) {
-            $data = $this->stockModel->getBarangAndStock(
-                $this->request->getVar('type_barang'),
-                $this->request->getVar('divisi_id'),
-                $this->request->getVar('warehouse_id')
-            );
-
-            foreach ($data as $d) {
-                if ($d['stock_id'] != $stockID) {
-                    array_push($response, $d);
-                }
-            }
-        }
-
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
-            'data' => $response
+            'data' => $data
         ]);
     }
 
-    public function getJasaVendorOutNo()
+    public function getStuffingLokalNo()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $warehouse_id = $this->request->getVar('warehouse_id');
-
-        if (empty($warehouse_id)) {
-            $no = $this->jasaVendorOutModel->get_no(date('m'), date('Y'), $last_day, "", $warehouse_id);
-        } else {
-            $warehouse = $this->warehouseModel->where('id', $warehouse_id)->first();
-            $no = $this->jasaVendorOutModel->get_no(date('m'), date('Y'), $last_day, strtoupper($warehouse['code_warehouse']), $warehouse_id);
-        }
+        $no = $this->stuffingInternasionalModel->get_no(date('m'), date('Y'), $last_day, "");
         return response()->setJSON([
             'status' => true,
             'data' => $no,

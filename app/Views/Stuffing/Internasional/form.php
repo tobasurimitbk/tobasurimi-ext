@@ -3,36 +3,36 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($stuffingLokal) ? "Tambah Pengeluaran Lokal" : "Update Pengeluaran Lokal" ?></h1>
+        <h1><?= empty($stuffingInternasional) ? "Tambah Pengeluaran Internasional" : "Update Pengeluaran Internasional" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pengeluaran-lokal"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pengeluaran-internasional"); ?>">
                 Batal
             </a>
-            <?php if (!empty($stuffingLokal)) : ?>
-                <?php if ($stuffingLokal['status_posting'] == "0") : ?>
-                    <?php if (can('Stuffing', 'Pengeluaran Lokal', 'd')) : ?>
-                        <button class="btn btn-hapus delete-parent float-right" onclick="remove('<?= encrypt($stuffingLokal['id']); ?>')">
+            <?php if (!empty($stuffingInternasional)) : ?>
+                <?php if ($stuffingInternasional['status_posting'] == "0") : ?>
+                    <?php if (can('Stuffing', 'Pengeluaran Internasional', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right" onclick="remove('<?= encrypt($stuffingInternasional['id']); ?>')">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Stuffing', 'Pengeluaran Lokal', 'a')) : ?>
-                        <button class="btn btn-success posting-spp float-right posting-mutasi" onclick="posting('<?= encrypt($stuffingLokal['id']); ?>')">
+                    <?php if (can('Stuffing', 'Pengeluaran Internasional', 'a')) : ?>
+                        <button class="btn btn-success posting-spp float-right posting-mutasi" onclick="posting('<?= encrypt($stuffingInternasional['id']); ?>')">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
+                    <?php if (can('Stuffing', 'Pengeluaran Internasional', 'p')) : ?>
+                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-internasional/print/"); ?><?= encrypt($stuffingInternasional['id']); ?>')">
                             Print
                         </button> -->
                     <?php endif; ?>
-                    <?php if (can('Stuffing', 'Pengeluaran Lokal', 'u')) : ?>
+                    <?php if (can('Stuffing', 'Pengeluaran Internasional', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Simpan
                         </button>
                     <?php endif; ?>
                 <?php else : ?>
-                    <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
+                    <?php if (can('Stuffing', 'Pengeluaran Internasional', 'p')) : ?>
+                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-internasional/print/"); ?><?= encrypt($stuffingInternasional['id']); ?>')">
                             Print
                         </button> -->
                     <?php endif; ?>
@@ -52,14 +52,14 @@
                 </div>
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id" id="id" value="<?= !empty($stuffingLokal) ? encrypt($stuffingLokal['id']) : '' ?>" class="id">
+                <input type="hidden" name="id" id="id" value="<?= !empty($stuffingInternasional) ? encrypt($stuffingInternasional['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" disabled class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($stuffingLokal) ? $stuffingLokal['tanggal'] : $tanggal)); ?>">
+                                    <input autocomplete="one-time-code" disabled class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($stuffingInternasional) ? $stuffingInternasional['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -68,47 +68,34 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($stuffingLokal) ? 'disabled=true' : ''; ?> value="<?= !empty($stuffingLokal) ? $stuffingLokal['no_stuffing'] : ""; ?>" type="text" class="form-control no_stuffing" id="no_stuffing" name="no_stuffing" placeholder="No. Stuffing Lokal">
-                                    <label for="floatingInput">No. Stuffing Lokal</label>
+                                    <input readonly autocomplete="one-time-code" <?= !empty($stuffingInternasional) ? 'disabled=true' : ''; ?> value="<?= !empty($stuffingInternasional) ? $stuffingInternasional['no_stuffing'] : ""; ?>" type="text" class="form-control no_stuffing" id="no_stuffing" name="no_stuffing" placeholder="No. Stuffing Internasional">
+                                    <label for="floatingInput">No. Stuffing Internasional</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($stuffingLokal) ? ($stuffingLokal['status_posting'] ? 'disabled' : 'disabled') : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
+                            <select <?= !empty($stuffingInternasional) ? ($stuffingInternasional['status_posting'] ? 'disabled' : 'disabled') : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($orderForm as $v) : ?>
-                                    <option <?= !empty($stuffingLokal) ? ($stuffingLokal['sales_order_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>" data-id_customer="<?= $v['id_customer'] ?>" data-name_customer="<?= $v['customer_name'] ?>" data-bc_type="<?= $v['bc_type'] ?>">
-                                        <?= strtoupper($v['no_sales_order']); ?>
+                                    <option <?= !empty($stuffingInternasional) ? ($stuffingInternasional['sales_order_export_id'] == $v['sales_order_export_id'] ? 'selected' : '') : '' ?> value="<?= $v['sales_order_export_id'] ?>" data-id_customer="<?= $v['customer_id'] ?>" data-name_customer="<?= $v['customer_name'] ?>">
+                                        <?= strtoupper($v['sales_order_export_no']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Sales Order</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="hidden" value="<?= !empty($stuffingLokal) ? $stuffingLokal['customer_id'] : '' ?>" class="form-control customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example" />
-                            <input type="text" <?= !empty($stuffingLokal) ? ($stuffingLokal['status_posting'] ? 'readonly' : 'readonly') : 'readonly' ?> placeholder="Nama Customer" value="<?= !empty($stuffingLokal) ? $stuffingLokal['customer_name'] : '' ?>" class="form-control customer_name" id="customer_name" name="customer_name" aria-label="Floating label select example" />
+                            <input type="hidden" value="<?= !empty($stuffingInternasional) ? $stuffingInternasional['customer_id'] : '' ?>" class="form-control customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example" />
+                            <input type="text" <?= !empty($stuffingInternasional) ? ($stuffingInternasional['status_posting'] ? 'readonly' : 'readonly') : 'readonly' ?> placeholder="Nama Customer" value="<?= !empty($stuffingInternasional) ? $stuffingInternasional['customer_name'] : '' ?>" class="form-control customer_name" id="customer_name" name="customer_name" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Nama Customer</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
-                            <select disabled <?= !empty($stuffingLokal) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataAJU as $aju) : ?>
-                                    <option <?= !empty($stuffingLokal) ? ($stuffingLokal['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Dokumen Pabean</label>
                         </div>
                     </div>
                 </div>
@@ -143,7 +130,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= !empty($stuffingLokal) ? ($stuffingLokal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                    <select <?= !empty($stuffingInternasional) ? ($stuffingInternasional['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($divisi as $d) : ?>
                                             <option value="<?= $d['id'] ?>">
@@ -156,7 +143,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= !empty($stuffingLokal) ? ($stuffingLokal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                                    <select <?= !empty($stuffingInternasional) ? ($stuffingInternasional['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php if (!empty($warehouse)) : ?>
                                             <?php foreach ($warehouse as $w) : ?>
@@ -359,10 +346,10 @@
         }
     });
 
-    <?php if (!empty($stuffingLokal)) : ?>
+    <?php if (!empty($stuffingInternasional)) : ?>
         // GET LIST BARANG 
         $.ajax({
-            url: `<?= base_url('pengeluaran-lokal/list-barang-stock-init'); ?>`,
+            url: `<?= base_url('pengeluaran-internasional/list-barang-stock-init'); ?>`,
             method: "GET",
             beforeSend: function() {},
             complete: function() {},
@@ -382,7 +369,7 @@
             }
         });
         // APPEND 
-        <?php foreach ($stuffingLokalDetail as $m) : ?>
+        <?php foreach ($stuffingInternasionalDetail as $m) : ?>
             listStockSelected.push({
                 id_stuffing_detail: "<?= $m['id_stuffing_detail'] ?>",
                 id: "<?= $m['id'] ?>",
@@ -408,14 +395,14 @@
             });
         <?php endforeach; ?>
         drawTableSelectedItem(listStockSelected);
-        // <?php if ($stuffingLokal['status_posting']) : ?>
+        // <?php if ($stuffingInternasional['status_posting']) : ?>
         //     $('.detail-form-layout').hide()
         // <?php endif; ?>
     <?php endif; ?>
 
     <?php if (!empty($salesOrder)) : ?>
         $.ajax({
-            url: `<?= base_url('pengeluaran-lokal/list-barang-output'); ?>`,
+            url: `<?= base_url('pengeluaran-internasional/list-barang-output'); ?>`,
             method: "GET",
             data: {
                 sales_order_id: $(".sales_order_id option:selected").val()
@@ -436,10 +423,8 @@
     }).change(function() {
         let customer_id = $('#sales_order_id option:selected').data('id_customer');
         let customer_name = $('#sales_order_id option:selected').data('name_customer');
-        let bc_type = $('#sales_order_id option:selected').data('bc_type');
         $('#customer_id').val(customer_id);
         $('#customer_name').val(customer_name);
-        $('#aju_document_type').val(bc_type).change();
         getListBarangOutput();
     });
 
@@ -668,7 +653,7 @@
                             if (id) {
                                 // UPDATE
                                 $.ajax({
-                                    url: "<?= base_url("pengeluaran-lokal/update"); ?>",
+                                    url: "<?= base_url("pengeluaran-internasional/update"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -697,7 +682,7 @@
                             } else {
                                 // INSERT
                                 $.ajax({
-                                    url: "<?= base_url("pengeluaran-lokal/save"); ?>",
+                                    url: "<?= base_url("pengeluaran-internasional/save"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -718,7 +703,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('pengeluaran-lokal/id/') ?>" + response.id
+                                                window.location.href = "<?= base_url('pengeluaran-internasional/id/') ?>" + response.id
                                             }
                                         });
                                     },
@@ -765,7 +750,7 @@
 
     function getListWarehouse() {
         $.ajax({
-            url: `<?= base_url('pengeluaran-lokal/warehouse'); ?>`,
+            url: `<?= base_url('pengeluaran-internasional/warehouse'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -791,7 +776,7 @@
     function getListBarang() {
         // GET LIST BARANG
         $.ajax({
-            url: `<?= base_url('pengeluaran-lokal/list-barang-stock-init'); ?>`,
+            url: `<?= base_url('pengeluaran-internasional/list-barang-stock-init'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -819,7 +804,7 @@
     function getListDokumenPabean() {
         // GET LIST STOCK PER DOKUMEN PABEAN
         $.ajax({
-            url: `<?= base_url('pengeluaran-lokal/list-stock-dokumen-bc'); ?>`,
+            url: `<?= base_url('pengeluaran-internasional/list-stock-dokumen-bc'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -842,7 +827,7 @@
 
     function getListBarangOutput() {
         $.ajax({
-            url: `<?= base_url('pengeluaran-lokal/list-barang-output'); ?>`,
+            url: `<?= base_url('pengeluaran-internasional/list-barang-output'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -992,14 +977,14 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                    <input onchange="definisiQtyInput()" <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this);updateOrder($(this));" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                    <input onchange="definisiQtyInput()" <?= !empty($stuffingInternasional) ? (($stuffingInternasional['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this);updateOrder($(this));" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
             ));
             newRow.append($('<td style="text-align: center;">').text(v.output.barang));
             newRow.append($('<td style="text-align: center;">').text(v.output.qty));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                    <button <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($stuffingInternasional) ? (($stuffingInternasional['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
             ));
             table.find('tbody').append(newRow);
@@ -1068,7 +1053,7 @@
     function changeStatus() {
         $(".no_stuffing").attr("readonly", true);
         $.ajax({
-            url: `<?= base_url("pengeluaran-lokal/get-pengeluaran-lokal-no"); ?>`,
+            url: `<?= base_url("pengeluaran-internasional/get-pengeluaran-internasional-no"); ?>`,
             method: "GET",
             dataType: "json",
             success: function(res) {
@@ -1094,7 +1079,7 @@
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Stuffing Pengeluaran Lokal ?',
+            title: 'Posting Stuffing Pengeluaran Internasional ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -1105,7 +1090,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("pengeluaran-lokal/posting"); ?>",
+                    url: "<?= base_url("pengeluaran-internasional/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -1144,7 +1129,7 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Stuffing Pengeluaran Lokal ?',
+            title: 'Hapus Stuffing Pengeluaran Internasional ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -1155,7 +1140,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("pengeluaran-lokal/delete"); ?>",
+                    url: "<?= base_url("pengeluaran-internasional/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -1175,7 +1160,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.replace("<?= base_url("pengeluaran-lokal"); ?>");
+                                window.location.replace("<?= base_url("pengeluaran-internasional"); ?>");
                             });
                         }
                     },

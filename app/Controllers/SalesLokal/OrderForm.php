@@ -85,6 +85,8 @@ class OrderForm extends BaseController
         //Get Customers
         $customers = $this->CustomerModel->getCustomerLokal();
 
+        $dataAJU = $this->MetaDataModel->getBCUsed('so_lokal');
+
         $condition = [
             'jabatan_name' => "SALES"
         ];
@@ -110,7 +112,7 @@ class OrderForm extends BaseController
             'dataSatuan' => $dataSatuan,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
-
+            "dataAJU" => $dataAJU,
         ];
 
         return view('SalesLokal/OrderForm/form', $data);
@@ -294,6 +296,7 @@ class OrderForm extends BaseController
 
             $values = [
                 "no_sales_order"        => $postData['no_sales_order'],
+                "bc_type"        => $postData['aju_document_type'],
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
@@ -376,6 +379,8 @@ class OrderForm extends BaseController
         //Get data sales order
         $id = decrypt($id);
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
+
+        $dataAJU = $this->MetaDataModel->getBCUsed('so_lokal');
         // var_dump($dataSalesOrder);
         // exit;
 
@@ -430,6 +435,7 @@ class OrderForm extends BaseController
             "dataMetaData"  => $metadatas,
             "id_user" => $dataSalesOrder->id_user,
             "dataTermin" => $dataTermin,
+            "dataAJU" => $dataAJU,
             // "seller_name" => $dataSalesOrder->seller_name,
 
         ];

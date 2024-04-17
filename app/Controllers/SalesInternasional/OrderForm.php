@@ -123,6 +123,7 @@ class OrderForm extends BaseController
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
+        $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
 
         $data = [
             "dataCustomer" => $dataCustomer,
@@ -130,7 +131,8 @@ class OrderForm extends BaseController
             "dataValuta" => $dataValuta,
             "dataTipeHarga" => $dataTipeHarga,
             'dataSatuan' => $dataSatuan,
-            'dataBarang' => $dataBarang
+            'dataBarang' => $dataBarang,
+            "dataAJU" => $dataAJU,
         ];
 
         return view('SalesInternasional/OrderForm/form', $data);
@@ -173,8 +175,9 @@ class OrderForm extends BaseController
             $this->salesOrderExportModel->db->transException(true)->transStart();
 
             $values = [
-                "sales_order_export_no"        => $this->generateNomorSalesOrderInternasional(),
+                "sales_order_export_no"        => $postData['no_sales_order'],
                 "sales_contract_id"           => $postData['sales_kontrak'],
+                "bc_type"                     => $postData['aju_document_type'],
                 "company_id"                  => $this->this_company_id,
                 "status"                      => "NEW",
             ];
@@ -314,7 +317,13 @@ class OrderForm extends BaseController
         }
 
         // $noSalesOrder = $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
-        return $invNumber;
+        // return $invNumber;
+
+        return response()->setJSON([
+            'data' => $invNumber,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
     public function getById($id = null)
@@ -341,6 +350,7 @@ class OrderForm extends BaseController
             ->where('sales_order_export_id', $id)
             ->orderBy('createdAt', "DESC")
             ->findAll();
+        $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
 
         $data = [
             "id" => encrypt($id),
@@ -352,6 +362,7 @@ class OrderForm extends BaseController
             'dataBarang' => $dataBarang,
             'dataSalesExport' => $dataSalesExport,
             'dataSalesExportDetail' => $dataSalesExportDetail,
+            "dataAJU" => $dataAJU,
         ];
 
         return view('SalesInternasional/OrderForm/form', $data);
