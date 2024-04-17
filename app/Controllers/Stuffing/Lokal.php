@@ -272,11 +272,12 @@ class Lokal extends BaseController
 
         // BARANG OUT KE VENDOR
         // Insert To Inventori (-)
-        $jasaVendorOut = $this->jasaVendorOutModel->find($id);
-        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->where('deletedAt', null)->findAll();
+        $stuffingLokal = $this->stuffingLokalModel->find($id);
+        $salesOrder = $this->salesOrderModel->find($stuffingLokal['sales_order_id']);
+        $stuffingLokalDetail = $this->stuffingLokalDetailModel->where('stuffing_lokal_id', $id)->where('deletedAt', null)->findAll();
 
-        foreach ($jasaVendorOutDetail as $j) {
-            $stock = $this->stockModel->find($j['stock_out_id']);
+        foreach ($stuffingLokalDetail as $j) {
+            $stock = $this->stockModel->find($j['stock_id_warehouse']);
             $qty = $j['qty'];
 
             if ($stock['tipe_barang'] == "kemasan") {
@@ -286,9 +287,9 @@ class Lokal extends BaseController
             }
 
             $stok = $this->stockModel->insertStok(
-                $jasaVendorOut['company_id'],
-                $jasaVendorOut['warehouse_id'],
-                $jasaVendorOut['divisi_id'],
+                $stuffingLokal['company_id'],
+                $j['warehouse_id'],
+                $j['divisi_id'],
                 $stock['tipe_barang'],
                 $stock['barang1_id'],
                 $barang2_id,
@@ -302,27 +303,27 @@ class Lokal extends BaseController
                 "Out",
                 date('Y-m-d'),
                 $this->this_user_id,
-                "JASA VENDOR",
-                "-",
-                $jasaVendorOut['keterangan']
+                "PENJUALAN",
+                $salesOrder['no_sales_order'],
+                "-"
             );
 
             // SUB DETAIL
             $this->stockDetail2Model->insertStokDetail2(
-                $j['bc_out_id'],
-                $j['stock_out_id'],
+                $j['bc_id_warehouse'],
+                $j['stock_id_warehouse'],
                 $stokDetail,
                 $qty,
-                $j['no_aju_out'],
-                $jasaVendorOut['no_surat_jalan']
+                $j['no_aju_warehouse'],
+                $stuffingLokal['no_stuffing']
             );
         }
 
-        $this->jasaVendorOutModel->update($id, ['status_posting' => '1']);
+        $this->stuffingLokalModel->update($id, ['status_posting' => '1']);
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Jasa vendor pengeluaran barang berhasil diposting",
+            'message' => "Pengeluaran Lokal berhasil diposting",
             'token' => csrf_hash(),
         ]);
     }
