@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah</h1>
+        <h1 class="title-name"><?= !empty($detail) ? "Update Pembayaran PO Lokal Bahan Baku" : "Tambah Pembayaran PO Lokal Bahan Baku" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-lokal-bb"); ?>">
                 Batal
@@ -21,27 +21,56 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Pembayaran</label>
+                </div>
+            </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="bank_id" id="bank_id">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($bankList as $b) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->name) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kode Bank</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
-                                    <label for="floatingInput">No. Pembayaran</label>
+                                    <input autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
+                                    <label for="floatingInput">Tanggal Pembayaran</label>
                                 </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($detail) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
-                            <label for="floatingInput">Tanggal Pembayaran</label>
+                            <input autocomplete="one-time-code" disabled type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
+                            <label for="floatingInput">No. Pembayaran</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating  form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -90,10 +119,6 @@
                         </div>
                         <div class="harian-form">
                             <?php if (!empty($detail)) : ?>
-                                <!-- <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                    <input <?= !empty($detail) ? 'disabled' : '' ?> value="<?= !empty($detail) ? $detail['pembayaranDetail']['lpb_no'] : '' ?>" type="text" class="form-control">
-                                    <label for="floatingInput" style="z-index: 1;">Nomor LPB</label>
-                                </div> -->
                                 <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                     <select class="form-select" disabled>
                                         <?php foreach ($penerimaanData as $value) : ?>
@@ -114,37 +139,32 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($detail) ? toRupiah($detail['pembayaranDetail']['amount']) : '' ?>" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly>
-                            <label for="floatingInput">Nominal Pembayaran</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
+
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? 'disabled' : '' ?> autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
                             <label for="floatingInput">Tanggal Jatuh Tempo</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select " name="payment_method" id="payment_method">
-                                <option disabled selected value=""></option>
+                                <option disabled selected value="">Pilih Metode Pembayaran</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Cash">Cash</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Debit" ? 'selected' : '') : '' ?> value="Debit">Debit</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
+                            <input name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
                                 <option disabled selected value=""></option>
@@ -155,7 +175,7 @@
                             <label for="floatingInput" style="z-index: 1;">Debit</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
                                 <option disabled selected value=""></option>
@@ -164,6 +184,35 @@
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Nominal & Status Pembayaran</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran mb-3" style="height: 50px;">
+                            <input oninput="preventNegativeInput(this)" name="nominal_pembayaran" id="nominal_pembayaran" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Nominal Pembayaran">
+                            <label for="floatingInput">Total Pembayaran</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran mb-3" style="height: 50px;">
+                            <input oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Nominal Pembayaran">
+                            <label for="floatingInput">Potongan / Diskon</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="status_lunas" id="status_lunas">
+                                <option disabled selected value="">Pilih Status Pelunasan</option>
+                                <option value="1">LUNAS</option>
+                                <option value="1">BELUM LUNAS</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Status Pelunasan</label>
                         </div>
                     </div>
                 </div>
@@ -224,7 +273,7 @@
                                     <?php else : ?>
                                         <tr>
                                             <td colspan="6" style="text-align: right;">
-                                                <b> Total</b>
+                                                <b> GRAND TOTAL</b>
                                             </td>
                                             <td style="text-align: center;">
                                                 <b>0</b>
@@ -243,12 +292,11 @@
                     </div>
                 </div>
             </form>
+
         </div>
     </div>
 </section>
 
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
-<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
 <?php if (!empty($detail)) : ?>
     <?php if ($detail['pembayaranDetail']['type_bayar'] == "Bulanan") : ?>
         <script>
@@ -367,10 +415,31 @@
             autoclose: true
         });
 
-
-        $('#no_dokumen, #lpb, #akun_kas, #akun_selisih').select2({
-            placeholder: "",
+        $('#bank_id').select2({
+            placeholder: "Pilih kode bank",
             theme: "bootstrap-5"
+        });
+
+        $('#lpb').select2({
+            placeholder: "Pilih No Penerimaan Barang",
+            theme: "bootstrap-5"
+        });
+
+        $('#akun_kas').select2({
+            placeholder: "Pilih akun debit",
+            theme: "bootstrap-5"
+        });
+
+        $('#akun_selisih').select2({
+            placeholder: "Pilih akun kredit",
+            theme: "bootstrap-5"
+        });
+
+        $('#divisi_id').select2({
+            placeholder: "Pilih Departemen",
+            theme: "bootstrap-5"
+        }).change(function() {
+            generateLPBNo();
         });
 
         $('#bulan').change(function() {
@@ -545,17 +614,17 @@
                 table.find('tbody').append(newRow);
             });
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align:right;" colspan="6"><b>Total</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="6"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:center;"><b>' + data.totalOrder + '</b></td>'));
             newRow.append($('<td style="text-align:center;"><b>' + data.totalDiterima + '</b></td>'));
             newRow.append($('<td style="text-align:center;"><b>' + data.totalHarga + '</b></td>'));
             table.find('tbody').append(newRow);
 
-            $('#nominal_pembayaran').val(data.totalHarga);
+            $('#nominal_pembayaran').val(data.totalHarga.replace('Rp', ''));
         }
 
         $('#tipe_pembayaran').select2({
-            placeholder: "",
+            placeholder: "Pilih Tipe Bayar",
             theme: "bootstrap-5"
         }).change(function() {
             var tipeBayar = $(this).val();
@@ -579,12 +648,12 @@
             newRow.append($('<td style="text-align:right;" colspan="6"><b>Total</b></td>'));
             newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
-            newRow.append($('<td style="text-align:center;"><b>Rp 0.0</b></td>'));
+            newRow.append($('<td style="text-align:center;"><b>0.0</b></td>'));
             table.find('tbody').append(newRow);
         });
 
         $('#supplier_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Supplier",
             theme: "bootstrap-5"
         }).change(function(e) {
             if ($('#tipe_pembayaran').val() == "HARIAN") {
@@ -600,6 +669,7 @@
         const csrf = $(`[name="${csrfToken}"]`);
         var formData = new FormData();
         formData.append("supplierID", $('#supplier_id').val());
+        formData.append("divisiID", $('#divisi_id').val());
 
         $.ajax({
             url: "<?= base_url("pembayaran-po-lokal-bb/get-lpb-not-paid"); ?>",
@@ -660,6 +730,18 @@
     }
 </script>
 <script>
+    function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            inputElement.value = '0';
+        } else {
+            inputElement.value = numericValue;
+        }
+    }
+
     function formatRupiah(angka) {
         if (angka === null) {
             angka = 0;

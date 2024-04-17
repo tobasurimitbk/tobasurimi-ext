@@ -107,9 +107,20 @@ class Bank extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $kodeBank = strtoupper($this->request->getVar('kode_bank'));
 
+        $bankWithSameCode = $this->banksModel
+            ->where('company_id', $this->this_company_id)
+            ->where('kode_bank', $kodeBank)
+            ->where('id !=', $id)
+            ->first();
+
+        if ($bankWithSameCode) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Kode bank sudah digunakan oleh bank lain.",
+                'token' => csrf_hash()
+            ]);
+        }
         $this->banksModel->update($id, [
-            'company_id' => $this->this_company_id,
-            'kode_bank' => $kodeBank,
             'name' => $this->request->getVar('name'),
             'atas_nama' => $this->request->getVar('atas_nama'),
             'no_rekening' => $this->request->getVar('no_rekening')
@@ -121,6 +132,7 @@ class Bank extends BaseController
             'token' => csrf_hash()
         ]);
     }
+
 
     public function delete()
     {
