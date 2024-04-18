@@ -55,18 +55,21 @@ class PembayaranPOLokal extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
+        $divisiList = $this->divisiModel->getDivisiAccess();
+
         $data = [
             "suppliers" => $supplierList,
-            "subsAkuns" => $subAkunsModel
+            "subsAkuns" => $subAkunsModel,
+            "divisi" => $divisiList
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
     }
 
-    public function getTandaTerimaFaktur($supplierID)
+    public function getTandaTerimaFaktur($supplierID, $divisiID)
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
-        $res = $tandaTerimaFakturModel->getListTandaTerimaFakturNotProcessed($supplierID);
+        $res = $tandaTerimaFakturModel->getListTandaTerimaFakturNotProcessed($supplierID, $divisiID);
         return response()->setJSON([
             'data' => $res,
             'status' => true
@@ -93,6 +96,8 @@ class PembayaranPOLokal extends BaseController
             $localPOPaymentModel = new LocalPOPaymentModel();
 
             $id = $localPOPaymentModel->insert([
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $this->request->getVar('divisi_id'),
                 'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
@@ -112,7 +117,7 @@ class PembayaranPOLokal extends BaseController
                 'message' => "Kwitansi pembayaran lokal bahan penolong berhasil dibuat",
                 'status' => true,
                 'token' => csrf_hash(),
-                'id' => $id
+                'id' => decrypt($id)
             ]);
         } catch (Exception $e) {
             return response()->setJSON([
@@ -294,13 +299,19 @@ class PembayaranPOLokal extends BaseController
             ->findAll();
 
         $detail = $localPOPaymentModel->get($id);
+        $divisiList = $this->divisiModel->getDivisiAccess();
+
+        if ($detail == null) {
+            return redirect()->to('pembayaran-po-lokal-bp');
+        }
 
         $data = [
             "suppliers" => $supplierList,
             "detail" => $localPOPaymentModel->get($id),
             "subsAkuns" => $subAkunsModel,
             'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $detail['tandaTerimaSupplier']['id']),
-            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $detail['tandaTerimaSupplier']['id'])
+            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $detail['tandaTerimaSupplier']['id']),
+            "divisi" => $divisiList
         ];
 
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
@@ -351,6 +362,8 @@ class PembayaranPOLokal extends BaseController
     // PRINT PEMBAYARAN PO BP
     public function pembayaranPOLokalBPPrint($id)
     {
+        $id = decrypt($id);
+
         $dompdf = new Dompdf();
         $localPOPaymentModel = new LocalPOPaymentModel();
         $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
@@ -360,6 +373,7 @@ class PembayaranPOLokal extends BaseController
         }
 
         $detail = $localPOPaymentModel->get($id);
+
         $data = [
             "detail" => $localPOPaymentModel->get($id),
             'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $detail['tandaTerimaSupplier']['id']),

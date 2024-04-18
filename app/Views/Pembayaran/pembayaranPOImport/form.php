@@ -3,14 +3,22 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah</h1>
+        <h1 class="title-name"><?= (!empty($paymentData) ? 'Tambah Pembayaran Internasional' : 'Update Pembayaran Internasional') ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
                 Batal
             </a>
-            <!-- <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button> -->
+            <?php if (empty($paymentData)) : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php else : ?>
+                <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
+                    <button onclick="remove('<?= encrypt($paymentData['id']) ?>')" class="btn btn-hapus delete-parent float-right">
+                        Hapus
+                    </button>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -70,6 +78,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($paymentData) ? 'disabled' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option <?= !empty($paymentData) ? ($paymentData['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <?php if (!empty($paymentData)) : ?>
                                 <select class="form-select " name="import_po" id="import_po" <?= empty($paymentData) ?: "disabled" ?>>
                                     <option selected value="<?= encrypt($poDetail->id) ?>"><?= $poDetail->po_no ?></option>
@@ -83,6 +104,9 @@
                             <?php endif;  ?>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
@@ -93,13 +117,11 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control" id="payment_amt" <?= !empty($paymentData) ? "readonly" : "" ?> name="payment_amt" value="<?= "" . number_format($paymentData['payment_amt'] ?? 0, 2, ',', '.')  ?>">
+                                    <input autocomplete="one-time-code" oninput="preventNegativeInput(this)" type="text" class="form-control" id="payment_amt" <?= !empty($paymentData) ? "readonly" : "" ?> name="payment_amt" value="<?= "" . number_format($paymentData['payment_amt'] ?? 0, 2, ',', '.')  ?>">
                                     <label for="floatingInput">Total Bayar</label>
                                 </div>
                             </div>
@@ -111,14 +133,15 @@
                             <label for="floatingInput">Sisa Bayar</label>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" <?= !empty($paymentData) ? "readonly" : "" ?> name="current_exchange_rate" value="<?= "" . number_format($paymentData['current_exchange_rate'] ??  0, 2, ',', '.')  ?>">
+                            <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" <?= !empty($paymentData) ? "readonly" : "" ?> name="current_exchange_rate" value="<?= "" . number_format($paymentData['current_exchange_rate'] ??  0, 2, ',', '.')  ?>">
                             <label for="floatingInput">Kurs saat ini</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -140,6 +163,9 @@
                             </div>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select " <?= !empty($paymentData) ? "disabled" : "" ?> name="payment_method" id="payment_method">
@@ -151,32 +177,6 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Debit</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
@@ -193,10 +193,35 @@
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
+
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <textarea autocomplete="one-time-code" name="note" class="form-control information text-area-all" <?= !empty($paymentData) ? "readonly" : "" ?>><?= $paymentData->note ?? '-' ?></textarea>
                             <label for="floatingInput">Note</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating  mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($paymentData) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($paymentData) ? ($paymentData['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Debit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating  mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($paymentData) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($paymentData) ? ($paymentData['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -273,7 +298,6 @@
         $('#current_exchange_rate').val(kurs);
         detailBarang.ajax.reload();
         riwayatBayar.ajax.reload();
-        console.log('Test');
     });
 
     $('#tipe_pembayaran').select2({
@@ -300,18 +324,32 @@
         allowClear: true
     });
 
-    $('#akun_kas, #akun_selisih').select2({
-        placeholder: "",
+    $('#divisi_id').select2({
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
     });
 
-    $('#supplier_id, #po_type').change(function() {
+    $('#akun_kas').select2({
+        placeholder: "Pilih Akun Kas",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+    $('#akun_selisih').select2({
+        placeholder: "Pilih Akun Selisih (Opsional)",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+
+    $('#supplier_id, #po_type, #divisi_id').change(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
         var formData = new FormData();
         formData.append("po_type", $('#po_type').val());
         formData.append("supplier_id", $('#supplier_id').val());
+        formData.append("divisi_id", $('#divisi_id').val());
 
         $.ajax({
             url: "<?= base_url("pembayaran-po-import/po-belum-lunas"); ?>",
@@ -542,6 +580,9 @@
             note: {
                 required: true
             },
+            akun_kas: {
+                required: true
+            },
         },
         messages: {
             no_pembayaran: {
@@ -588,6 +629,9 @@
             },
             note: {
                 required: "Note wajib diisi"
+            },
+            akun_kas: {
+                required: "Debit wajib diisi"
             },
         },
         errorElement: 'span',
@@ -693,6 +737,59 @@
             $(".no_pembayaran").attr("readonly", false);
             $(".no_pembayaran").val("");
         }
+    }
+
+    function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            inputElement.value = '0';
+        } else {
+            inputElement.value = numericValue;
+        }
+    }
+
+    function remove(id) {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Pembayaran Ini ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('id', id);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-import/delete"); ?>",
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        }).then((result) => {
+                            window.location.href = "<?= base_url('pembayaran-po-import') ?>"
+                        });
+
+                    },
+                });
+            }
+        });
     }
 </script>
 

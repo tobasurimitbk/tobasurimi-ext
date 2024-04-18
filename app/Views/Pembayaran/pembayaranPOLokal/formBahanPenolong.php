@@ -4,14 +4,14 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Pembayaran Lokal Bahan Penolong</h1>
+        <h1 class="title-name"><?= !empty($detail) ? "Update Pembayaran PO Lokal Bahan Penolong" : "Tambah Pembayaran PO Lokal Bahan Penolong" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-lokal-bp"); ?>">
                 Batal
             </a>
             <?php if (!empty($detail)) : ?>
                 <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
-                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . $detail['pembayaranDetail']['id'] ?? '') ?>">
+                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
                         <i class="fa-solid fa-print"></i> Print
                     </a>
                 <?php endif; ?>
@@ -24,6 +24,11 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Pembayaran</label>
+                </div>
+            </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="" />
                 <input type="hidden" name="tanda_terima_faktur_id" class="tanda_terima_faktur_id">
@@ -43,9 +48,14 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_date'] . '"' : '' ?>>
-                            <label for="floatingInput">Tanggal Pembayaran</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
+                                <label for="floatingInput">Tanggal Pembayaran</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -63,6 +73,21 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="tanda_terima_supplier" id="tanda_terima_supplier">
                                 <option value=""></option>
                                 <?php if (!empty($detail)) : ?>
@@ -74,39 +99,39 @@
                             <label for="floatingInput" style="z-index: 1;">Tanda Terima Supplier</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" onkeyup="this.value = formatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly <?= !empty($detail) ? 'disabled value="' . " " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  . '"' : '' ?>>
                             <label for="floatingInput">Nominal Pembayaran</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-6" style="display: none;">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" readonly <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
                             <label for="floatingInput">Tanggal Jatuh Tempo</label>
                         </div>
-                    </div> -->
+                    </div>
                     <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value=""></option>
-                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Bank">Bank</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Bank" ? 'selected' : '') : '' ?> value="Bank">Bank</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Cash">Cash</option>
-                                <!-- <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Debit" ? 'selected' : '') : '' ?> value="Debit">Debit</option> -->
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? 'disabled' : '' ?> name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
@@ -118,9 +143,6 @@
                             <label for="floatingInput" style="z-index: 1;">Debit</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
@@ -133,11 +155,10 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-subtitle-modal mt-3">
                     <div class="row">
                         <div class="col-md-12">
-                            <label class="form-label font-weight-bold modal-sub-title">Item List</label>
+                            <label class="form-label font-weight-bold modal-sub-title">Item Tanda Terima Supplier</label>
                         </div>
                     </div>
                 </div>
@@ -223,8 +244,6 @@
     </div>
 </section>
 
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
-<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
 <script>
     $(document).ready(function() {
         const table = $('#dataTable');
@@ -257,6 +276,9 @@
                 },
                 akun_kas: {
                     required: true
+                },
+                divisi_id: {
+                    required: true
                 }
             },
             messages: {
@@ -283,6 +305,9 @@
                 },
                 akun_kas: {
                     required: "Akun kas wajib diisi"
+                },
+                divisi_id: {
+                    required: "Departemen wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -310,6 +335,8 @@
             },
         });
 
+        $('.jatuh_tempo_element').hide();
+
         $("#payment_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -317,13 +344,30 @@
             autoclose: true
         });
 
-        $('#akun_kas, #akun_selisih').select2({
-            placeholder: "",
+        $('#akun_kas').select2({
+            placeholder: "Akun Debit",
             theme: "bootstrap-5"
         });
 
+        $('#payment_method').select2({
+            placeholder: "Metode Pembayaran",
+            theme: "bootstrap-5"
+        });
+
+        $('#akun_selisih').select2({
+            placeholder: "Akun Selisih (Opsional)",
+            theme: "bootstrap-5"
+        });
+
+        $('#divisi_id').select2({
+            placeholder: "Pilih Departemen",
+            theme: "bootstrap-5"
+        }).change(function() {
+            getListTandaTerimaSupplier();
+        });
+
         $('#tanda_terima_supplier').select2({
-            placeholder: "",
+            placeholder: "Pilih Tanda Terima Supplier",
             theme: "bootstrap-5"
         }).change(function() {
             var id = $('#tanda_terima_supplier').val();
@@ -383,30 +427,10 @@
         });
 
         $('#supplier_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Supplier",
             theme: "bootstrap-5"
         }).change(function(e) {
-            table.find('tbody').empty();
-            $("#tanda_terima_supplier").empty();
-            $.ajax({
-                url: '<?= base_url('pembayaran-po-lokal-bp/get-rekap-faktur/') ?>' + $(this).val(),
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.data.length == 0) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Nomor tanda terima supplier tidak ada',
-                            confirmButtonColor: '#4e73df',
-                        });
-                    } else {
-                        $("#tanda_terima_supplier").append(`<option value=""></option>`);
-                        res.data.forEach(function(item) {
-                            $("#tanda_terima_supplier").append(`<option  value="${item.id}">${item.faktur_no}</option>`);
-                        });
-                    }
-                }
-            });
+            getListTandaTerimaSupplier();
         });
 
         $(".btn-submit-form").click(function() {
@@ -470,6 +494,38 @@
         })
     })
 
+    function getListTandaTerimaSupplier() {
+        // get vat
+        var supplier_id = $('#supplier_id').val();
+        var divisi_id = $('#divisi_id').val();
+
+        if (supplier_id != "" && divisi_id != "") {
+            var table = $('#dataTable');
+            table.find('tbody').empty();
+            $("#tanda_terima_supplier").empty();
+            $.ajax({
+                url: '<?= base_url('pembayaran-po-lokal-bp/get-rekap-faktur/') ?>' + supplier_id + '/' + divisi_id,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.data.length == 0) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Nomor tanda terima supplier tidak ada',
+                            confirmButtonColor: '#4e73df',
+                        });
+                    } else {
+                        $("#tanda_terima_supplier").append(`<option value=""></option>`);
+                        res.data.forEach(function(item) {
+                            $("#tanda_terima_supplier").append(`<option  value="${item.id}">${item.faktur_no}</option>`);
+                        });
+                    }
+                }
+            });
+        }
+
+    }
+
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         const csrfToken = '<?= csrf_token() ?>';
@@ -505,8 +561,7 @@
             $(".no_bukti_pembayaran").val("");
         }
     }
-</script>
-<script>
+
     function formatRupiah(angka) {
         if (angka === null) {
             angka = 0;

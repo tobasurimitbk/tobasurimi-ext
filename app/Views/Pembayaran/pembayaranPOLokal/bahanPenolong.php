@@ -141,7 +141,7 @@
                     let id = row?.id;
                     return `
                         <div class="mt-0">
-                            <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">

@@ -17,6 +17,7 @@ class TandaTerimaFakturModel extends Model
     protected $allowedFields    = [
         'company_id',
         'supplier_id',
+        'divisi_id',
         'faktur_no',
         'jatuh_tempo',
         'nominal_faktur',
@@ -60,6 +61,7 @@ class TandaTerimaFakturModel extends Model
     {
         $availableSort = [
             'receive_date'  => 'tanda_terima_faktur.receive_date',
+            'divisi_id' => 'tanda_terima_faktur.divisi_id',
             'faktur_no'     => 'tanda_terima_faktur.faktur_no',
             'suppliers.name' => 'suppliers.name',
             'nominal_faktur' => 'nominal_faktur',
@@ -72,13 +74,15 @@ class TandaTerimaFakturModel extends Model
 
         $selectQry = "tanda_terima_faktur.*, 
                       suppliers.name AS supplierName,
-                      users.name AS userName";
+                      users.name AS userName,
+                      divisis.divisi";
 
         $tandaTerimaQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id')
-            ->join('users', 'users.id = tanda_terima_faktur.user_id');
+            ->join('users', 'users.id = tanda_terima_faktur.user_id')
+            ->join('divisis', 'divisis.id = tanda_terima_faktur.divisi_id');
 
         if ($addCondition['search']) {
             $tandaTerimaQry->groupStart();
@@ -125,10 +129,11 @@ class TandaTerimaFakturModel extends Model
         return $res;
     }
 
-    public function getListTandaTerimaFakturNotProcessed($supplierID)
+    public function getListTandaTerimaFakturNotProcessed($supplierID, $divisiID)
     {
         $condition = [
             'tanda_terima_faktur.supplier_id' => $supplierID,
+            'tanda_terima_faktur.divisi_id' => $divisiID,
             'local_po_payments.tanda_terima_faktur_id' => null,
             'tanda_terima_faktur.deletedAt' => null
         ];
@@ -143,14 +148,15 @@ class TandaTerimaFakturModel extends Model
         return $res;
     }
 
-    public function getListPenerimaanBarangLokalBPNotProcessed($supplierID)
+    public function getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
     {
         $condition = [
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
             'penerimaan_barang_detail.jml_masuk !=' => 0,
-            'penerimaan_barang.supplier_id' => $supplierID
+            'penerimaan_barang.supplier_id' => $supplierID,
+            'penerimaan_barang.divisi_id' => $divisiID
         ];
 
         $penerimaanBarangModel = new PenerimaanBarangModel();

@@ -5,12 +5,15 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran PO Import</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-import/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Pembayaran', 'Internasional', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-import/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
+            <?= csrf_field() ?>
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
@@ -37,12 +40,13 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th>No. Pembayaran</th>
                                 <th>Supplier</th>
                                 <th>Currency</th>
                                 <th>Amount</th>
                                 <th>Payment Date</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -119,6 +123,27 @@
             {
                 data: "payment_date",
                 className: "text-center"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    let form = '';
+                    <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
+                        form += `
+                        <div class="mt-0">
+                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    
+                        `;
+                    <?php endif; ?>
+                    return form;
+                }
             }
         ],
         columnDefs: [{
@@ -172,6 +197,49 @@
             const data = table.row(this).data();
             location.replace(`<?= base_url("pembayaran-po-import/id/"); ?>${data.id}`);
         })
-    })
+    });
+
+    const remove = function(id) {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Pembayaran Ini ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('id', id);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-import/delete"); ?>",
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                // update table
+                                table.ajax.reload();
+                            });
+                        }
+                    },
+                });
+            }
+        });
+    }
 </script>
 <?= $this->endSection(); ?>

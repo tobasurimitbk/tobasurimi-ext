@@ -46,13 +46,14 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="" class="sort">Tgl Terima</th>
-                                <th onclick="" class="sort">No Terima Faktur</th>
-                                <th onclick="" class="sort">Supplier</th>
-                                <th onclick="" class="sort">Nominal Faktur</th>
-                                <th onclick="">Jumlah Item</th>
-                                <th onclick="" class="sort">Penerima</th>
-                                <th onclick="" class="sort">Action</th>
+                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
+                                <th onclick="changeSort('receive_date')" class="sort">Tgl Terima</th>
+                                <th onclick="changeSort('faktur_no')" class="sort">No Terima Faktur</th>
+                                <th onclick="changeSort('suppliers.name')" class="sort">Supplier</th>
+                                <th onclick="changeSort('nominal_faktur')" class="sort">Nominal Faktur</th>
+                                <th>Jumlah Item</th>
+                                <th onclick="changeSort('recipient')" class="sort">Penerima</th>
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -65,7 +66,7 @@
 </section>
 
 <script>
-    let sort = "id";
+    let sort = "receive_date";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
@@ -108,6 +109,10 @@
                 width: "5%"
             },
             {
+                data: "divisi",
+                className: "text-center"
+            },
+            {
                 data: "receive_date",
                 className: "text-center"
             },
@@ -125,7 +130,9 @@
             },
             {
                 data: "jumlah_item",
-                className: "text-center"
+                className: "text-center",
+                searchable: false,
+                sortable: false,
             },
             {
                 data: "recipient",
@@ -150,7 +157,7 @@
                     } else {
                         return `
                         <div class="mt-0">
-                            <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
@@ -201,6 +208,15 @@
     $('.status_lunas').change(function() {
         table.ajax.reload();
     })
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 
     function print(url) {
         window.open(url, "_blank");

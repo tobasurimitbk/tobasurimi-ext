@@ -117,6 +117,17 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select <?= $dataTandaTerimaFaktur ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                        <option value=""></option>
+                                        <?php foreach ($divisi as $d) : ?>
+                                            <option <?= !empty($dataTandaTerimaFaktur) ? ($dataTandaTerimaFaktur['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -405,31 +416,21 @@
         theme: "bootstrap-5"
     });
 
+    $('#divisi_id').select2({
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5"
+    }).change(function() {
+        listDaftarPenerimaanBarang();
+    });
+
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5"
     }).change(function() {
-        <?php if (empty($dataTandaTerimaFaktur)) : ?>
-
-            $.ajax({
-                url: `<?= base_url("tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang"); ?>`,
-                method: "GET",
-                data: {
-                    supplierID: $(this).val()
-                },
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        list_penerimaan_barang = res.data;
-                        drawTableDaftarPenerimaanBarang(res.data);
-                    }
-                }
-            });
-        <?php endif; ?>
-
+        listDaftarPenerimaanBarang();
     });
 
-    $("#supplier_id,#tax_status,#tax_type")
+    $("#supplier_id,#tax_status,#tax_type,#divisi_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -558,6 +559,9 @@
             },
             penerima: {
                 required: true
+            },
+            divisi_id: {
+                required: true
             }
         },
         messages: {
@@ -581,6 +585,9 @@
             },
             penerima: {
                 required: "Penerima wajib diisi"
+            },
+            divisi_id: {
+                required: "Departemen wajib diisi"
             }
         },
         errorElement: 'span',
@@ -1071,6 +1078,27 @@
 
     function print(url) {
         window.open(url, "_blank");
+    }
+
+    function listDaftarPenerimaanBarang() {
+        <?php if (empty($dataTandaTerimaFaktur)) : ?>
+
+            $.ajax({
+                url: `<?= base_url("tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang"); ?>`,
+                method: "GET",
+                data: {
+                    supplierID: $('#supplier_id').val(),
+                    divisiID: $('#divisi_id').val()
+                },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        list_penerimaan_barang = res.data;
+                        drawTableDaftarPenerimaanBarang(res.data);
+                    }
+                }
+            });
+        <?php endif; ?>
     }
 </script>
 

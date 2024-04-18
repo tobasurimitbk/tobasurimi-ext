@@ -5,9 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Master Barang Sales Lokal</h1>
-        <button class="btn btn-show-form btn-add float-right">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Penjualan Lokal', 'Master Barang', 'c')) : ?>
+            <button class="btn btn-show-form btn-add float-right">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">

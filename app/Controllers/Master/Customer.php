@@ -138,13 +138,13 @@ class Customer extends BaseController
                     ]
                 ],
                 "no_npwp" => [
-                    'rules' => 'min_length[15]',
+                    'rules' => 'permit_empty|min_length[15]',
                     'errors' => [
                         'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
                     ]
                 ],
                 "phone" => [
-                    'rules' => 'min_length[12]',
+                    'rules' => 'permit_empty|min_length[12]',
                     'errors' => [
                         'min_length' => 'Nomor HP harus diisi minimal 12 digit'
                     ]
@@ -241,13 +241,13 @@ class Customer extends BaseController
                     ]
                 ],
                 "no_npwp" => [
-                    'rules' => 'min_length[15]',
+                    'rules' => 'permit_empty|min_length[15]',
                     'errors' => [
                         'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
                     ]
                 ],
                 "phone" => [
-                    'rules' => 'min_length[12]',
+                    'rules' => 'permit_empty|min_length[12]',
                     'errors' => [
                         'min_length' => 'Nomor HP harus diisi minimal 12 digit'
                     ]

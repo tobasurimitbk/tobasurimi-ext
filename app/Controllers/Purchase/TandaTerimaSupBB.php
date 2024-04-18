@@ -3,6 +3,7 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\DivisisModel;
 use App\Models\PajakTandaTerimaFakturModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
@@ -19,6 +20,7 @@ class TandaTerimaSupBB extends BaseController
     protected $tandaTerimaFakturModel;
     protected $tandaTerimaFakturDetailModel;
     protected $pajakTandaTerimaFakturModel;
+    protected $divisiModel;
     protected $dompdf;
     protected $user_id;
     protected $this_company_id;
@@ -33,6 +35,7 @@ class TandaTerimaSupBB extends BaseController
         $this->tandaTerimaFakturModel = new TandaTerimaFakturModel();
         $this->tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
         $this->pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
+        $this->divisiModel = new DivisisModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -55,7 +58,7 @@ class TandaTerimaSupBB extends BaseController
         ];
 
         $condition = [
-            "company_id"            => $this->this_company_id,
+            "tanda_terima_faktur.company_id"  => $this->this_company_id,
             "faktur_type"           => "LOKAL",
             "tipe_bahan"            => "PENOLONG"
         ];
@@ -87,6 +90,7 @@ class TandaTerimaSupBB extends BaseController
                         "no"             => $no++,
                         "id"             => encrypt($data->id),
                         "faktur_no"      => $data->faktur_no,
+                        "divisi"         => $data->divisi,
                         "supplier_name"  => strtoupper($data->supplierName),
                         "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
                         "jumlah_item"    => count($jumlahItem),
@@ -102,6 +106,7 @@ class TandaTerimaSupBB extends BaseController
                         "no"             => $no++,
                         "id"             => encrypt($data->id),
                         "faktur_no"      => $data->faktur_no,
+                        "divisi"         => $data->divisi,
                         "supplier_name"  => strtoupper($data->supplierName),
                         "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
                         "jumlah_item"    => count($jumlahItem),
@@ -130,6 +135,7 @@ class TandaTerimaSupBB extends BaseController
         $data = [
             'dataSupplier' => $this->supplierModel->getSupplierByType("BAHAN PENOLONG"),
             'noTandaTerima' => $this->tandaTerimaFakturModel->getNo(),
+            'divisi' => $this->divisiModel->getDivisiAccess(),
             'isUsed' => false
         ];
         return view('Purchase/terimaSupplierLokal/bp/form', $data);
@@ -138,7 +144,9 @@ class TandaTerimaSupBB extends BaseController
     public function update($id)
     {
         $id = decrypt($id);
-        if ($this->tandaTerimaFakturModel->find($id) == null) {
+        $tandaTerimaFakturDetail = $this->tandaTerimaFakturModel->find($id);
+
+        if ($tandaTerimaFakturDetail == null) {
             return redirect()->to('tanda-terima-faktur-lokal-bp');
         }
 
@@ -147,8 +155,9 @@ class TandaTerimaSupBB extends BaseController
             'dataTandaTerimaFaktur' => $this->tandaTerimaFakturModel->find($id),
             'dataDetailTandaTerimaFaktur' => $this->tandaTerimaFakturDetailModel->getDetail($id),
             'dataPajak' => $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->where('deletedAt', null)->findAll(),
-            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($this->tandaTerimaFakturModel->find($id)['supplier_id']),
-            'isUsed' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($id) == null ? false : true
+            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($tandaTerimaFakturDetail['supplier_id'], $tandaTerimaFakturDetail['divisi_id']),
+            'isUsed' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($id) == null ? false : true,
+            'divisi' => $this->divisiModel->getDivisiAccess(),
         ];
 
         return view('Purchase/terimaSupplierLokal/bp/form', $data);
@@ -159,6 +168,7 @@ class TandaTerimaSupBB extends BaseController
         $id = $this->tandaTerimaFakturModel->insert([
             'company_id' => $this->this_company_id,
             'supplier_id' => $this->request->getVar('supplier_id'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
             'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
             'nominal_faktur' => repairDouble($this->request->getVar('total_tambahan_potongan')),
@@ -388,10 +398,11 @@ class TandaTerimaSupBB extends BaseController
     public function listPenerimaanBarang()
     {
         $supplierID = $this->request->getVar('supplierID');
+        $divisiID = $this->request->getVar('divisiID');
 
         return response()->setJSON([
             'status' => true,
-            'data' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($supplierID)
+            'data' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
         ]);
     }
 

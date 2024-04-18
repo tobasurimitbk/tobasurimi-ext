@@ -69,7 +69,6 @@
             </tr>
         </tbody>
     </table>
-
     <table style="margin-top: 40px;">
         <tbody>
             <tr>
@@ -93,9 +92,14 @@
                 <td><?= date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date'])); ?></td>
             </tr>
             <tr>
-                <td>Nominal Pembayaran</td>
+                <td>Potongan</td>
                 <td>:</td>
-                <td>Rp. <?= number_format($detail['pembayaranDetail']['amount'] ?? 0, 2, ',', '.')  ?></td>
+                <td><?= number_format($detail['pembayaranDetail']['potongan_harga'] ?? 0, 2)  ?></td>
+            </tr>
+            <tr>
+                <td>Total Dibayar (Termasuk Diskon)</td>
+                <td>:</td>
+                <td><?= number_format($detail['pembayaranDetail']['amount'], 2)  ?></td>
             </tr>
             <tr>
                 <td>Metode Pembayaran</td>
@@ -145,7 +149,7 @@
             <?php endforeach; ?>
             <tr>
                 <td colspan="6" style="text-align: right;">
-                    Total
+                    Total Tagihan
                 </td>
                 <td style="text-align: center;">
                     <b><?= $detail['itemList']['totalOrder'] ?></b>
@@ -157,6 +161,35 @@
                     <b><?= str_replace("Rp", "", $detail['itemList']['totalHarga'])  ?></b>
                 </td>
             </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Total Dibayar
+                </td>
+                <td style="text-align: center;">
+
+                </td>
+                <td style="text-align: center;">
+
+                </td>
+                <td style="text-align: center;">
+                    <b><?= number_format($detail['pembayaranDetail']['harga_sebelum_diskon'], 2)  ?></b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Diskon
+                </td>
+                <td style="text-align: center;">
+
+                </td>
+                <td style="text-align: center;">
+
+                </td>
+                <td style="text-align: center;">
+                    <b><?= number_format($detail['pembayaranDetail']['potongan_harga'] ?? 0, 2)  ?></b>
+                </td>
+            </tr>
+
         </tbody>
     </table>
 
