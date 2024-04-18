@@ -8,9 +8,9 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
+            <!-- <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
-            </button>
+            </button> -->
         </div>
     </div>
     <div class="card">

@@ -58,7 +58,7 @@
                                         <label for="floatingInput">Kode Kemasan</label>
                                     </div>
                                     <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                        <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px;" id="generate_new_code" name="generate_new_code" type="checkbox" onchange="generateNewCode()">
+                                        <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px;" id="generate_new_code" name="generate_new_code" type="checkbox" checked onchange="generateNewCode()">
                                     </div>
                                 </div>
                             </div>
@@ -204,6 +204,7 @@
 
     $('.btn-add').click(function() {
         resetForm();
+        generateNewCode();
         $('.input-generate').show();
         $('#add_modal').modal('show');
         $('.delete-btn').hide();
@@ -327,6 +328,8 @@
         },
     });
 
+    $('#generate_new_code').attr('checked', true);
+
     $('.btn-submit-form').click(function() {
         if ($('.create-form').valid()) {
             let id = $('.id').val();
@@ -370,6 +373,15 @@
                                             table.ajax.reload();
                                             $('#add_modal').modal('hide');
                                             resetForm();
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            cancelButtonColor: '#d33',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
                                         })
                                     }
                                 }
@@ -500,10 +512,12 @@
         $(".parent_type_id").val(null).change();
         $('.kode_satuan').val(null).change();
         $('.satuan_id').val(null).change();
-        $("#generate_new_code").attr('checked', false).change();
+        // $("#generate_new_code").attr('checked', false).change();
         $('.kode').attr('readonly', false);
         $(".kode").val(null);
         $(".name").val(null);
+        validator.resetForm();
+        validator.reset();
 
     }
 
@@ -517,10 +531,6 @@
                 url: `<?= base_url("kemasan/generate-new-code"); ?>`,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    setLoading();
-                },
-                complete: function() {
-                    stopLoading();
                 },
                 method: "POST",
                 success: function(res) {

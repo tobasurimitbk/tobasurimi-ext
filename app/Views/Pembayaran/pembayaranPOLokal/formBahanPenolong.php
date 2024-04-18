@@ -4,15 +4,17 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah</h1>
+        <h1 class="title-name">Tambah Pembayaran Lokal Bahan Penolong</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-lokal-bp"); ?>">
                 Batal
             </a>
             <?php if (!empty($detail)) : ?>
-                <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . $detail['pembayaranDetail']['id'] ?? '') ?>">
-                    <i class="fa-solid fa-print"></i> Print
-                </a>
+                <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
+                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . $detail['pembayaranDetail']['id'] ?? '') ?>">
+                        <i class="fa-solid fa-print"></i> Print
+                    </a>
+                <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-form">
                     Simpan
@@ -80,14 +82,12 @@
                             <label for="floatingInput">Nominal Pembayaran</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" readonly <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
                             <label for="floatingInput">Tanggal Jatuh Tempo</label>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
+                    </div> -->
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select " name="payment_method" id="payment_method">
@@ -99,14 +99,14 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? 'disabled' : '' ?> name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
@@ -118,6 +118,9 @@
                             <label for="floatingInput" style="z-index: 1;">Debit</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">

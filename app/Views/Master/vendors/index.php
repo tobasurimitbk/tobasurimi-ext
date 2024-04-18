@@ -647,12 +647,15 @@
                 // supplier_buyer: {
                 //     required: true
                 // },
-                // province_parent_id: {
-                //     required: true
-                // },
-                // city_parent_id: {
-                //     required: true
-                // },
+                province_parent_id: {
+                    required: true
+                },
+                city_parent_id: {
+                    required: true
+                },
+                postal_code: {
+                    required: true
+                }
                 // ap_id: {
                 //     required: true
                 // },
@@ -690,12 +693,15 @@
                 // supplier_buyer: {
                 //     required: "Supplier / Buyer wajib diisi"
                 // },
-                // province_parent_id: {
-                //     required: "Provinsi wajib diisi"
-                // },
-                // city_parent_id: {
-                //     required: "Kota wajib diisi"
-                // },
+                province_parent_id: {
+                    required: "Provinsi wajib diisi"
+                },
+                city_parent_id: {
+                    required: "Kota wajib diisi"
+                },
+                postal_code: {
+                    required: "Kode pos wajib diisi"
+                }
                 // ap_id: {
                 //     required: "Akun AP wajib diisi"
                 // },

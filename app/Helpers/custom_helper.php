@@ -261,7 +261,7 @@ function repairDouble($nominal)
 
 function toRupiah($nominal)
 {
-   return "Rp " . number_format($nominal, 2, ',', '.');
+   return "" . number_format($nominal, 2, ',', '.');
 }
 
 function getLastDay()
