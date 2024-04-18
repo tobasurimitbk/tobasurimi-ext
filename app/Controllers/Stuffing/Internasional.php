@@ -142,6 +142,8 @@ class Internasional extends BaseController
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('sales_order_export.deletedAt', null)
+                ->where('sales_order_export.status', 'POSTED')
+                ->where('sales_order_export.used', 'NOT USED')
                 ->orderBy('sales_order_export.sales_order_export_no', "ASC")
                 ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
@@ -174,6 +176,8 @@ class Internasional extends BaseController
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('sales_order_export.deletedAt', null)
+                ->where('sales_order_export.status', 'POSTED')
+                ->where('sales_order_export.used', 'NOT USED')
                 ->orderBy('sales_order_export.sales_order_export_no', "ASC")
                 ->findAll(),
             'stuffingInternasional' => $stuffingInternasionalModel,

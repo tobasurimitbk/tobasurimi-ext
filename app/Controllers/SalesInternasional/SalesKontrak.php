@@ -151,7 +151,9 @@ class SalesKontrak extends BaseController
                 "shipment_date"         => date('d/m/Y', strtotime($data->shipment_date)),
                 "createdAt"             => date('d/m/Y', strtotime($data->createdAt)),
                 "status_posting"        => $data->status_posting,
-                "status_closed"         => count($isClosed) > 0 ? '1' : '0'
+                "status_closed"         => count($isClosed) > 0 ? '1' : '0',
+                "keterangan_unpost"         => $data->keterangan_unpost,
+                "jumlah_unpost"             => $data->jumlah_unpost,
             ]);
         }
 
@@ -322,9 +324,15 @@ class SalesKontrak extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $statusPosting = $this->request->getVar('status');
+        $keterangan = $this->request->getPost("keterangan");
+        $checkUnpost = $this->salesKontrakModel->find($id);
+
+        $jmlh = (float) $checkUnpost['jumlah_unpost'];
 
         $this->salesKontrakModel->update($id, [
-            'status_posting' => $statusPosting
+            'status_posting' => $statusPosting,
+            "keterangan_unpost" => $keterangan,
+            "jumlah_unpost" => $statusPosting == "0" ? $jmlh + 1 : $jmlh,
         ]);
 
         return response()->setJSON([

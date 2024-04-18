@@ -98,7 +98,10 @@ class OrderForm extends BaseController
                 "dicharge_port"             => $data->dicharge_port,
                 "shipment_date"             => $data->shipment_date,
                 "createdAt"                 => date('Y-m-d', strtotime($data->createdAt)),
-                "status"                    => $data->status
+                "status"                    => $data->status,
+                "used"                      => $data->used,
+                "keterangan_unpost"         => $data->keterangan_unpost,
+                "jumlah_unpost"             => $data->jumlah_unpost,
             ]);
         }
 
@@ -180,6 +183,7 @@ class OrderForm extends BaseController
                 "bc_type"                     => $postData['aju_document_type'],
                 "company_id"                  => $this->this_company_id,
                 "status"                      => "NEW",
+                "used"                        => "NOT USED",
             ];
 
             // Create a new validation instance
@@ -230,7 +234,7 @@ class OrderForm extends BaseController
     public function dropdownSalesKontrak()
     {
         $dataSalesKontrakFilter = [];
-        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrak($this->this_user_id);
+        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakForOrderForm($this->this_user_id, '1');
         foreach ($dataSalesKontrak as $value) {
             $totalQtyDetail = 0;
             $dataDetailExport = $this->salesOrderExportDetailModel
@@ -416,14 +420,17 @@ class OrderForm extends BaseController
         try {
             $id = decrypt($this->request->getPost("id"));
             $status = $this->request->getPost("status");
+            $keterangan = $this->request->getPost("keterangan");
+
+            $checkUnpost = $this->salesOrderExportModel->find($id);
+
+            $jmlh = (float) $checkUnpost['jumlah_unpost'];
 
             $payload = [
-                "status" => $status
+                "status" => $status,
+                "keterangan_unpost" => $keterangan,
+                "jumlah_unpost" => $status == "NEW" ? $jmlh + 1 : $jmlh,
             ];
-
-            // $condition = [
-            //     'sales_order_export_id' => $id
-            // ];
 
             $response = $this->salesOrderExportModel->update($id, $payload);
 

@@ -37,6 +37,8 @@
                                 <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
                                 <th onclick="changeSort('createdAt')" class="sort">Tanggal Pembuatan</th>
+                                <th class="sort">Keterangan Unpost</th>
+                                <th class="sort">Jumlah Unpost</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -50,6 +52,31 @@
         </div>
     </div>
 </section>
+
+<div class="modal unpost-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Unposting Sales Kontrak</h5>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id_sales_order" class="id_sales_order" id="id_sales_order">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost">
+                            <label for="floatingInput">Keterangan Unpost</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="button" onclick="updateStatus('NEW', '0')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -110,6 +137,12 @@
                 data: "createdAt",
                 className: "text-center"
             }, {
+                data: "keterangan_unpost",
+                className: "text-center"
+            }, {
+                data: "jumlah_unpost",
+                className: "text-center"
+            }, {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
@@ -131,7 +164,7 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let status_posting = row?.status_posting;
-                    let status_closed = row.status_closed;
+                    let status_closed = row?.status_closed;
 
                     if (status_posting === "0") {
                         return `
@@ -167,7 +200,7 @@
                         if (status_closed == "0") {
                             res += `
                             <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'ua')) : ?>
-                                <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-danger posting-spp">
+                                <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 'UNPOST')" class="btn btn-danger posting-spp">
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
                             <?php endif; ?>
@@ -197,51 +230,66 @@
         }
     });
 
-
     const updateStatus = function(id, status) {
-        Swal.fire({
-            icon: 'question',
-            title: status == '1' ? 'Yakin akan diposting ?' : 'Batalkan Posting ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("sales-kontrak/update-status"); ?>",
-                    data: {
-                        id: id,
-                        status: status
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        }
-                    },
-                });
+        if (status == "UNPOST") {
+            $(".id_sales_order").val(id);
+            $(".unpost-modal").modal("show");
+        } else {
+            if (id == 'NEW') {
+                id = $(".id_sales_order").val();
+                ket = $(".keterangan_unpost").val();
+            } else {
+                id = id;
+                ket = "-";
             }
-        })
+            Swal.fire({
+                icon: 'question',
+                title: status == '1' ? 'Yakin akan diposting ?' : 'Batalkan Posting ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $(".id_sales_order").val("");
+                    $(".keterangan_unpost").val("");
+                    $(".unpost-modal").modal("hide");
+                    $.ajax({
+                        url: "<?= base_url("sales-kontrak/update-status"); ?>",
+                        data: {
+                            id: id,
+                            status: status,
+                            keterangan: ket,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        }
     }
 
     const remove = function(id, tipe) {
@@ -289,7 +337,6 @@
         })
     }
 
-
     const print = function(url) {
         window.open(url, "_blank");
     }
@@ -298,6 +345,12 @@
 
     $(".status_posting").change(function() {
         table.ajax.reload();
+    })
+
+    $(".btn-hide-detail").click(function() {
+        $(".id_sales_order").val("");
+        $(".keterangan_unpost").val("");
+        $(".unpost-modal").modal("hide");
     })
 
     $(".search").keyup(function() {

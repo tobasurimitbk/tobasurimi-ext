@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,121 +95,138 @@
         }
     </style>
 </head>
+
 <body>
-<?php if(!empty($dataSO) && !empty($dataSODetail)){ ?>
-    <div class="header">
-        <div class="txt-center"><label class="label-header">ORDER FORM</label></div>
-        <div class="txt-center"><label class="label-header">NO. <?= $dataSO->sales_order_export_no; ?></label></div>
-        <div class="d-flex flex-column">
-            <div class="txt-left">
-                <label class="label-header">DATE: <?= date('F d, Y', strtotime($dataSO->createdAt)); ?></label>
+    <?php if (!empty($dataSO) && !empty($dataSODetail)) { ?>
+        <div class="header">
+            <div class="txt-center"><label class="label-header">ORDER FORM</label></div>
+            <div class="txt-center"><label class="label-header">NO. <?= $dataSO->sales_order_export_no; ?></label></div>
+            <div class="d-flex flex-column">
+                <div class="txt-left">
+                    <label class="label-header">DATE: <?= date('F d, Y', strtotime($dataSO->createdAt)); ?></label>
+                </div>
+                <div class="txt-right po-customer">
+                    <label class="label-header">PO CUST: <?= $dataSO->customer_po_no; ?></label>
+                </div>
+                <div class="txt-right po-customer">
+                    <label class="label-header">Revision: <?= $dataSO->jumlah_unpost; ?></label>
+                </div>
             </div>
-            <div class="txt-right po-customer">
-                <label class="label-header">PO CUST: <?= $dataSO->customer_po_no; ?></label>
-            </div>
+            <div class="txt-left"><label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label></div>
+            <div class="mt-1 justify-content-center"><label class="label-header">THIS SALES CONTRACT
+                    IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER
+                    AGREES TO SELL THE UNDER MENTIONED COMMODITIES AS PER THE TERMS AND CONDITIONS STIPULATED BELOW:</label></div>
         </div>
-        <div class="txt-left"><label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label></div>
-        <div class="mt-1 justify-content-center"><label class="label-header">THIS SALES CONTRACT 
-        IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER 
-        AGREES TO SELL THE UNDER MENTIONED COMMODITIES AS PER THE TERMS AND CONDITIONS STIPULATED BELOW:</label></div>
-    </div>
-    <table class="mt-1 item-table border-collapse">
-        <thead>
-            <tr>
-                <th>
-                    <label class="label-header">DESCRIPTION OF GOODS</label>
-                </th>
-                <th>
-                    <label class="label-header">QTY</label>
-                </th>
-                <th>
-                    <label class="label-header">UNIT PRICE FOB/CNF</label>
-                </th>
-                <th>
-                    <label class="label-header">TOTAL AMOUNT (US$)</label>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-            $total_qty = 0;
-            $total_amount = 0;
-            foreach($dataSODetail as $detail){
-                $total_qty = $total_qty + formatter($detail["qty"], "STR_TO_INT");
-                $total_amount = $total_amount + formatter($detail["total_price"], "STR_TO_INT");
-            ?>
-            <tr>
-                <td><label class="label-header"><?= $detail["kode_barang"]; ?> <?= $detail["nama_barang"]; ?></label></td>
-                <td><label class="label-header"><?= formatter($detail["qty"], "STR_TO_INT"); ?></label></td>
-                <td><label class="label-header"><?= number_format(formatter($detail["price"], "STR_TO_INT")); ?></label></td>
-                <td><label class="label-header"><?= number_format(formatter($detail["total_price"], "STR_TO_INT")); ?></label></td>
-            </tr>
-            <tr>
-                <td><label class="label-child"><?= $detail["remark"]; ?></label></td>
-                <td colspan="3"></td>
-            </tr>
-            <?php } ?>
-            <tr>
-                <td><label class="label-header">TOTAL</label></td>
-                <td><label class="label-header"><?= $total_qty; ?></label></td>
-                <td></td>
-                <td><label class="label-header"><?= number_format($total_amount); ?></label></td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="header">
-        <div class="mt-1 txt-left"><label class="label-header">TOTAL AMOUNT: <?= $dataSO->total_amount ? number_format($dataSO->total_amount) : 0; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">TOLERANCE: <?= $dataSO->tolerance; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">DUE DATE: <?= date('d M Y', strtotime($dataSO->due_date)); ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">ESTIMATED SHIPMENT DATE: <?= date('d M Y', strtotime($dataSO->shipment_date)); ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">PORT LOADING: <?= $dataSO->loading_port; ?></label></div>
-        <div class="txt-left"><label class="label-header">PORT OF DISCHARGE: <?= $dataSO->dicharge_port; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">PAYMENT TERM: <?= $dataSO->payment_term; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">DOCUMENT REQUIRED:</label></div>
-        <div class="txt-left"><label class="label-header"><?=  nl2br($dataSO->documents_required); ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">SPECIAL INSTRUCTIONS:</label></div>
-        <div class="txt-left"><label class="label-header"><?= nl2br($dataSO->special_instructions); ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">FOR THOSE ITEMS WHICH ARE NOT COVERED IN 
-        THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.</label></div>
-    </div>
-    <table class="mt-1 sign-table border-collapse">
-        <thead>
-            <tr>
-                <th style="width: 110px;">
-                    <label class="label-header">M. Director,</label>
-                </th>
-                <th style="width: 110px;">
-                    <label class="label-header">Marketing,</label>
-                </th>
-                <th style="width: 110px;">
-                    <label class="label-header">Exim,</label>
-                </th>
-                <th style="width: 110px;">
-                    <label class="label-header">Procure,</label>
-                </th>
-                <th style="width: 110px;">
-                    <label class="label-header">Production,</label>
-                </th>
-                <th>
-                    <label class="label-header">QC,</label>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="height: 80px;"></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->director_name; ?></label></div></td>
-                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->marketing_name; ?></label></div></td>
-                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->exim_name; ?></label></div></td>
-                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->procurement_name; ?></label></div></td>
-                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->production_name; ?></label></div></td>
-                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->qc_name; ?></label></div></td>
-            </tr>
-        </tbody>
-    </table>
-<?php } ?>
+        <table class="mt-1 item-table border-collapse">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="label-header">DESCRIPTION OF GOODS</label>
+                    </th>
+                    <th>
+                        <label class="label-header">QTY</label>
+                    </th>
+                    <th>
+                        <label class="label-header">UNIT PRICE FOB/CNF</label>
+                    </th>
+                    <th>
+                        <label class="label-header">TOTAL AMOUNT (US$)</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $total_qty = 0;
+                $total_amount = 0;
+                foreach ($dataSODetail as $detail) {
+                    $total_qty = $total_qty + formatter($detail["qty"], "STR_TO_INT");
+                    $total_amount = $total_amount + formatter($detail["total_price"], "STR_TO_INT");
+                ?>
+                    <tr>
+                        <td><label class="label-header"><?= $detail["kode_barang"]; ?> <?= $detail["nama_barang"]; ?></label></td>
+                        <td><label class="label-header"><?= formatter($detail["qty"], "STR_TO_INT"); ?></label></td>
+                        <td><label class="label-header"><?= number_format(formatter($detail["price"], "STR_TO_INT")); ?></label></td>
+                        <td><label class="label-header"><?= number_format(formatter($detail["total_price"], "STR_TO_INT")); ?></label></td>
+                    </tr>
+                    <tr>
+                        <td><label class="label-child"><?= $detail["remark"]; ?></label></td>
+                        <td colspan="3"></td>
+                    </tr>
+                <?php } ?>
+                <tr>
+                    <td><label class="label-header">TOTAL</label></td>
+                    <td><label class="label-header"><?= $total_qty; ?></label></td>
+                    <td></td>
+                    <td><label class="label-header"><?= number_format($total_amount); ?></label></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="header">
+            <div class="mt-1 txt-left"><label class="label-header">TOTAL AMOUNT: <?= $dataSO->total_amount ? number_format($dataSO->total_amount) : 0; ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">TOLERANCE: <?= $dataSO->tolerance; ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">DUE DATE: <?= date('d M Y', strtotime($dataSO->due_date)); ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">ESTIMATED SHIPMENT DATE: <?= date('d M Y', strtotime($dataSO->shipment_date)); ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">PORT LOADING: <?= $dataSO->loading_port; ?></label></div>
+            <div class="txt-left"><label class="label-header">PORT OF DISCHARGE: <?= $dataSO->dicharge_port; ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">PAYMENT TERM: <?= $dataSO->payment_term; ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">DOCUMENT REQUIRED:</label></div>
+            <div class="txt-left"><label class="label-header"><?= nl2br($dataSO->documents_required); ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">SPECIAL INSTRUCTIONS:</label></div>
+            <div class="txt-left"><label class="label-header"><?= nl2br($dataSO->special_instructions); ?></label></div>
+            <div class="mt-1 txt-left"><label class="label-header">FOR THOSE ITEMS WHICH ARE NOT COVERED IN
+                    THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.</label></div>
+        </div>
+        <table class="mt-1 sign-table border-collapse">
+            <thead>
+                <tr>
+                    <th style="width: 110px;">
+                        <label class="label-header">M. Director,</label>
+                    </th>
+                    <th style="width: 110px;">
+                        <label class="label-header">Marketing,</label>
+                    </th>
+                    <th style="width: 110px;">
+                        <label class="label-header">Exim,</label>
+                    </th>
+                    <th style="width: 110px;">
+                        <label class="label-header">Procure,</label>
+                    </th>
+                    <th style="width: 110px;">
+                        <label class="label-header">Production,</label>
+                    </th>
+                    <th>
+                        <label class="label-header">QC,</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="height: 80px;"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="width: 110px;">
+                        <div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->director_name; ?></label></div>
+                    </td>
+                    <td style="width: 110px;">
+                        <div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->marketing_name; ?></label></div>
+                    </td>
+                    <td style="width: 110px;">
+                        <div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->exim_name; ?></label></div>
+                    </td>
+                    <td style="width: 110px;">
+                        <div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->procurement_name; ?></label></div>
+                    </td>
+                    <td style="width: 110px;">
+                        <div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->production_name; ?></label></div>
+                    </td>
+                    <td style="width: 110px;">
+                        <div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->qc_name; ?></label></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    <?php } ?>
 </body>
+
 </html>

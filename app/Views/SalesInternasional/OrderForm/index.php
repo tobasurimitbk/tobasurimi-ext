@@ -9,6 +9,7 @@
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
+    <?= csrf_field() ?>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
@@ -35,6 +36,9 @@
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
                                 <th onclick="changeSort('createdAt')" class="sort">Tanggal Pembuatan</th>
                                 <th onclick="changeSort('status')" class="sort">Status</th>
+                                <th class="sort">Keterangan Unpost</th>
+                                <th class="sort">Jumlah Unpost</th>
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -47,7 +51,33 @@
     </div>
 </section>
 
+<div class="modal unpost-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Unposting Sales Order</h5>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id_sales_order" class="id_sales_order" id="id_sales_order">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost">
+                            <label for="floatingInput">Keterangan Unpost</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="button" onclick="updateStatus('NEW', 'NEW')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
     let sort = "sales_order_export_no";
     let sortType = "desc";
 
@@ -110,6 +140,60 @@
         }, {
             data: "status",
             className: "text-center"
+        }, {
+            data: "keterangan_unpost",
+            className: "text-center"
+        }, {
+            data: "jumlah_unpost",
+            className: "text-center"
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                let status = row?.status;
+                let used = row?.used;
+                if (status == "NEW") {
+                    if (used == "NOT USED") {
+                        return `
+                            <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 'POSTED')" class="btn btn-success posting-spp">
+                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `
+                    } else {
+                        return `
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `
+                    }
+                } else {
+                    if (used == "NOT USED") {
+                        return `
+                            <button data-toggle="tooltip" title="Un Posting" onclick="updateStatus('${id}', 'UNPOST')" type="button" class="btn btn-danger" >
+                                <i class="fa fa-ban" aria-hidden="true"></i>
+                            </button>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `
+                    } else {
+                        return `
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `
+                    }
+                }
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -140,7 +224,75 @@
             const data = table.row(this).data();
             location.replace(`<?= base_url("order-form-internasional/id/"); ?>${data.id}`);
         })
+
+        $(".btn-hide-detail").click(function() {
+            $(".id_sales_order").val("");
+            $(".keterangan_unpost").val("");
+            $(".unpost-modal").modal("hide");
+        })
     })
+
+    const updateStatus = function(id, status) {
+        if (status == "UNPOST") {
+            $(".id_sales_order").val(id);
+            $(".unpost-modal").modal("show");
+        } else {
+            if (id == 'NEW') {
+                id = $(".id_sales_order").val();
+                ket = $(".keterangan_unpost").val();
+            } else {
+                id = id;
+                ket = "-";
+            }
+            Swal.fire({
+                icon: 'question',
+                title: status == 'POSTED' ? 'Yakin akan diposting ?' : 'Batalkan Posting ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $(".id_sales_order").val("");
+                    $(".keterangan_unpost").val("");
+                    $(".unpost-modal").modal("hide");
+                    $.ajax({
+                        url: "<?= base_url("order-form-internasional/update-status"); ?>",
+                        data: {
+                            id: id,
+                            status: status,
+                            keterangan: ket,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

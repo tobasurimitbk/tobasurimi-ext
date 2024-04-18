@@ -77,7 +77,7 @@ class SalesKontrakModel extends Model
 
         if ($addCondition['status_posting']) {
             $salesDataQry
-                ->where('status_posting', $addCondition['status_posting']);
+                ->where('sales_contract.status_posting', $addCondition['status_posting']);
         }
 
         if ($addCondition['search'] || $addCondition['status_posting']) {
@@ -167,6 +167,21 @@ class SalesKontrakModel extends Model
         //     ->findAll();
         // var_dump($salesKontrak);
         // exit;
+        return $salesKontrak;
+    }
+
+    public function getSalesKontrakForOrderForm($userID, $status)
+    {
+        $salesKontrak = $this->asArray()
+            ->select('sales_contract.*, sales_contract_detail.id AS idContractDetail, sales_contract_detail.qty AS qtyContract, customers.name AS customerName, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
+            ->join('sales_contract_detail', 'sales_contract_detail.sales_contract_id = sales_contract.id', 'left')
+            ->where('sales_contract.deletedAt', null)
+            ->where('sales_contract.status_posting', $status)
+            ->where('sales_contract.createdBy', $userID)
+            ->orderBy('sales_contract.createdAt', "DESC")
+            ->findAll();
         return $salesKontrak;
     }
 }

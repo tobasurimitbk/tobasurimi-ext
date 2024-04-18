@@ -21,6 +21,9 @@ class SalesOrderExportModel extends Model
         'bc_type',
         'company_id',
         'status',
+        'keterangan_unpost',
+        'jumlah_unpost',
+        'used',
         'createdAt',
         'updatedAt',
         'deletedAt'

@@ -85,6 +85,10 @@
             margin-top: -20px !important;
         }
 
+        .rev-customer {
+            margin-top: -20px !important;
+        }
+
         .justify-content-center {
             justify-content: center !important;
         }
@@ -103,7 +107,14 @@
                 <label class="label-header">PO CUST: <?= $salesKontrak['customer_po_no']; ?></label>
             </div>
         </div>
-        <div class="txt-left"><label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label></div>
+        <div class="d-flex flex-column">
+            <div class="txt-left">
+                <label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label>
+            </div>
+            <div class="txt-right rev-customer">
+                <label class="label-header">Revision: <?= $salesKontrak['jumlah_unpost']; ?></label>
+            </div>
+        </div>
         <div class="mt-1 justify-content-center"><label class="label-header">THIS SALES CONTRACT
                 IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER
                 AGREES TO SELL THE UNDER MENTIONED COMMODITIES AS PER THE TERMS AND CONDITIONS STIPULATED BELOW:</label></div>
