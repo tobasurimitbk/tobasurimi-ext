@@ -138,6 +138,38 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" name="no_invoice" class="form-control no_invoice" id="no_invoice" value="<?= $paymentData['no_invoice'] ?? '' ?>" placeholder="No Invoice">
+                                    <label for="floatingInput">No Invoice (Opsional)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" name="invoice_emkl" class="form-control" id="invoice_emkl" value="<?= $paymentData['invoice_emkl'] ?? '' ?>" placeholder="Invoice EMKL">
+                                    <label for="floatingInput">No Invoice EMKL (Opsional)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" name="no_aju" class="form-control" id="no_aju" value="<?= $paymentData['no_aju'] ?? '' ?>" placeholder="No Aju">
+                                    <label for="floatingInput">No Aju (Opsional)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" <?= !empty($paymentData) ? "readonly" : "" ?> name="current_exchange_rate" value="<?= "" . number_format($paymentData['current_exchange_rate'] ??  0, 2, ',', '.')  ?>">
                             <label for="floatingInput">Kurs saat ini</label>
                         </div>

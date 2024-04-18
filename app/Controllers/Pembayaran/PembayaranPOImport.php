@@ -175,6 +175,9 @@ class PembayaranPOImport extends BaseController
             'payment_method' => $this->request->getVar('payment_method'),
             'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
             'note' => $this->request->getVar('note'),
+            'no_invoice' => $this->request->getVar('no_invoice'),
+            'invoice_emkl' => $this->request->getVar('invoice_emkl'),
+            'no_aju' => $this->request->getVar('no_aju'),
             'akun_kas' => $this->request->getVar('akun_kas'),
             'akun_selisih' => $this->request->getVar('akun_selisih'),
         ]);
