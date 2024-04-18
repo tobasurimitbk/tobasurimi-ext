@@ -159,7 +159,6 @@ class OrderForm extends BaseController
                 $customerName = $datasC["name"];
             }
 
-
             array_push($dataSalesOrder, [
                 "no" => $no++,
                 "id" => encrypt($data->id),

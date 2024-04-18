@@ -143,7 +143,6 @@
     let list_delete = [];
     var row = 0;
 
-
     $('.filter_surat_jalan, .filter_invoice').select2({
         placeholder: "",
         theme: "bootstrap-5",
@@ -253,8 +252,7 @@
                         return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
                     }
                 }
-            },
-            {
+            }, {
                 data: "sales_order_invoice_id",
                 className: "text-center",
                 render: function(data, type, row) {

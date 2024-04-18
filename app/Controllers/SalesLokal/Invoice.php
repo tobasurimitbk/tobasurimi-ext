@@ -691,17 +691,16 @@ class Invoice extends BaseController
         } else {
             $selectQry = "surat_jalan_so.*, 
                           customers.name AS customerName, 
-                          customers.address AS customerAddress, 
-                          CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
+                          customers.address AS customerAddress,  
                           IFNULL(metadata.value, '-') AS termin";
             $suratJalanData = $this->SuratJalanModel->asObject()
                 ->select($selectQry)
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer')
-                ->join('employees', 'employees.id = customers.sales_id')
+                // ->join('employees', 'employees.id = customers.sales_id')
                 ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->find($docId);
 
-            $salesName = $suratJalanData->salesName;
+            // $salesName = $suratJalanData->salesName;
             $termin = $suratJalanData->termin;
             $soId = json_decode($suratJalanData->multiple_id_so);
             $customerName = $suratJalanData->customerName;

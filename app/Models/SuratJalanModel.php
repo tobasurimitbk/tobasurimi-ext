@@ -84,6 +84,13 @@ class SuratJalanModel extends Model
             $SuratJalan
                 ->like('no_surat_jalan', $addCondition['search']);
         }
+        if ($addCondition['filter_invoice'] == "belum") {
+            $SuratJalan->where('sales_order_invoice_id', NULL);
+        }
+
+        if ($addCondition['filter_invoice'] == "sudah") {
+            $SuratJalan->where('sales_order_invoice_id !=', NULL);
+        }
         if ($addCondition['dateStart']) {
             $SuratJalan->where('surat_jalan_so.shipping_date >=',  $addCondition['dateStart']);
         }

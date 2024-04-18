@@ -82,6 +82,7 @@ class SuratJalan extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
+            "filter_invoice"        => $this->request->getGet("filter_invoice"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
@@ -104,7 +105,8 @@ class SuratJalan extends BaseController
                 "no_so"      => implode(', ', $dataNo),
                 "kode_pelanggan"        => $data->kode_pelanggan,
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date))
+                "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date)),
+                "sales_order_invoice_id" => $data->sales_order_invoice_id,
             ]);
         }
         //dd($dataAllSuratJalan);

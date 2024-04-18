@@ -11,6 +11,21 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
+                            <option value="" data-code=""></option>
+                            <option value="belum" data-code="">Belum Digunakan Invoice</option>
+                            <option value="sudah" data-code="">Sudah Digunakan Invoice</option>
+                        </select>
+                        <label for="floatingInput">Filter Invoice</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Surat Jalan" value="" />
+                </div>
+            </div>
             <div class="row">
                 <div class="table-responsive">
                     <?= csrf_field() ?>
@@ -23,6 +38,7 @@
                                 <th onclick="changeSort('no_so')" class="sort">No Order</th>
                                 <th onclick="changeSort('no_surat_jalan')" class="sort">No Surat Jalan</th>
                                 <th onclick="changeSort('shipping_date')" class="sort">Shipping Date</th>
+                                <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -47,6 +63,33 @@
     let list_delete = [];
     var row = 0;
 
+    $('.filter_invoice').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.filter_invoice')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.filter_invoice')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.filter_invoice')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
     $(document).ready(function() {
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -56,6 +99,10 @@
             const data = table.row(this).data();
             location.replace(`<?= base_url("surat-jalan/id"); ?>/${data.id}`);
         })
+
+        $(".filter_invoice").change(function() {
+            table.ajax.reload();
+        });
     })
 
     const table = $('.dataTable').DataTable({
@@ -79,6 +126,7 @@
                 data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
+                data.filter_invoice = $(".filter_invoice").val();
             }
         },
         // scrollX: true,
@@ -109,6 +157,16 @@
         }, {
             data: "shipping_date",
             className: "text-center"
+        }, {
+            data: "sales_order_invoice_id",
+            className: "text-center",
+            render: function(data, type, row) {
+                if (data && data !== "") {
+                    return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                } else { // Otherwise, display a dash "-"
+                    return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                }
+            }
         }, {
             data: "id",
             className: "text-center actions",
