@@ -299,7 +299,7 @@ class OrderForm extends BaseController
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
-                "sales_id"              => $postData['id_sales'] ? $postData['id_sales'] : "",
+                "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : 0,
                 "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
                 "order_date"            => $orderDate,
                 "shipping_date"         => $shippingDate,
