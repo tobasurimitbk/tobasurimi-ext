@@ -78,10 +78,10 @@ class SalesOrderDetailModel extends Model
 
         foreach ($datas as &$data) {
             $amount = ($data->amount);
-            $basePrice = ($amount / $data->qty) / ((100 - $data->disc) / 100);
+            // $basePrice = ($amount / $data->qty) / ((100 - $data->disc) / 100);
             $totalPrice = ($amount / $data->qty) / ((100 - $data->disc) / 100);
 
-            $data->harga_barang = number_format($basePrice);
+            // $data->harga_barang = number_format($basePrice);
             $data->total_harga_barang = number_format($totalPrice);
         }
 
