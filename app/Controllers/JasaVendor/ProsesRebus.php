@@ -63,8 +63,8 @@ class ProsesRebus extends BaseController
             "divisi_id" => $this->request->getVar("divisi_id"),
             "warehouse_id" => $this->request->getVar('warehouse_id'),
             "status" => $this->request->getVar("status"),
-            "start_date" => $this->request->getVar('start_date'),
-            "end_date" => $this->request->getVar('end_date'),
+            "start_date" =>  $this->request->getVar("start_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("start_date")), "Y-m-d") : "",
+            "end_date" =>  $this->request->getVar("end_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("end_date")), "Y-m-d") : "",
             "no_rebus" => $this->request->getVar("no_rebus"),
         ];
 

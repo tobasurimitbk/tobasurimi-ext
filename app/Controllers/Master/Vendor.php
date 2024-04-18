@@ -111,7 +111,11 @@ class Vendor extends BaseController
         try {
             $rules = [
                 "kode" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[vendors.kode]",
+                    'errors' => [
+                        'required' => 'Kode vendor harus diisi',
+                        'is_unique' => 'Kode vendor sudah ada'
+                    ]
                 ],
                 "name" => [
                     "rules" => "required"
@@ -129,11 +133,20 @@ class Vendor extends BaseController
                     "rules" => "required"
                 ],
                 "email" => [
-                    "rules" => "required"
+                    "rules" => "required|valid_email",
+                    'errors' => [
+                        'valid_email' => 'Email harus valid'
+                    ]
                 ],
                 "no_rekening" => [
                     "rules" => "required"
                 ],
+                'postal_code' => [
+                    'rules' => 'permit_empty|regex_match[/^\d{5}$/]',
+                    'errors' => [
+                        'regex_match' => 'Kode pos harus terdiri dari 5 digit angka'
+                    ]
+                ]
                 // "supplier_buyer" => [
                 //     "rules" => "required"
                 // ],
@@ -205,12 +218,14 @@ class Vendor extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
         } catch (\Exception $e) {
             $data = [
@@ -228,7 +243,10 @@ class Vendor extends BaseController
         try {
             $rules = [
                 "kode" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Kode vendor harus diisi',
+                    ]
                 ],
                 "name" => [
                     "rules" => "required"
@@ -246,11 +264,20 @@ class Vendor extends BaseController
                     "rules" => "required"
                 ],
                 "email" => [
-                    "rules" => "required"
+                    "rules" => "required|valid_email",
+                    'errors' => [
+                        'valid_email' => 'Email harus valid'
+                    ]
                 ],
                 "no_rekening" => [
                     "rules" => "required"
                 ],
+                'postal_code' => [
+                    'rules' => 'permit_empty|regex_match[/^\d{5}$/]',
+                    'errors' => [
+                        'regex_match' => 'Kode pos harus terdiri dari 5 digit angka'
+                    ]
+                ]
                 // "supplier_buyer" => [
                 //     "rules" => "required"
                 // ],
@@ -328,14 +355,14 @@ class Vendor extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = 'Data Gagal Diubah';
+                    $errorList = $this->validator->getErrors();
                     $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => "",
-                        'token' => csrf_hash()
+                        "status"    => false,
+                        "message"   => $errorList[array_keys($errorList)[0]],
+                        'token'     => csrf_hash()
                     ];
                     echo json_encode($data);
+                    return;
                 }
             }
         } catch (\Exception $e) {

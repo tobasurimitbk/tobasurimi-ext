@@ -94,7 +94,11 @@ class Company extends BaseController
                     "rules" => "required"
                 ],
                 "company" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[companies.company]",
+                    'errors' => [
+                        'required' => 'Nama Company harus diisi',
+                        'is_unique' => 'Nama Company sudah ada'
+                    ]
                 ],
                 "address" => [
                     "rules" => "required"
@@ -110,7 +114,13 @@ class Company extends BaseController
                 ],
                 "city_id" => [
                     "rules" => "required"
-                ]
+                ],
+                "email" => [
+                    "rules" => "permit_empty|valid_email",
+                    'errors' => [
+                        'valid_email' => 'Email harus valid'
+                    ]
+                ],
             ];
 
             if ($this->validate($rules)) {
@@ -121,7 +131,7 @@ class Company extends BaseController
                 $logo = "";
 
                 $values = [
-                    "company" => $this->request->getPost("company"),
+                    "company" => strtoupper($this->request->getVar("company")),
                     "holding_company" => $this->request->getPost("holding_company"),
                     "address" => $this->request->getPost("address"),
                     "phone" => $this->request->getPost("phone"),
@@ -168,12 +178,14 @@ class Company extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
         } catch (\Exception $e) {
             $data = [
@@ -194,7 +206,10 @@ class Company extends BaseController
                     "rules" => "required"
                 ],
                 "company" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama Company harus diisi',
+                    ]
                 ],
                 "address" => [
                     "rules" => "required"
@@ -210,7 +225,13 @@ class Company extends BaseController
                 ],
                 "city_id" => [
                     "rules" => "required"
-                ]
+                ],
+                "email" => [
+                    "rules" => "permit_empty|valid_email",
+                    'errors' => [
+                        'valid_email' => 'Email harus valid'
+                    ]
+                ],
             ];
 
             if ($this->validate($rules)) {
@@ -221,7 +242,7 @@ class Company extends BaseController
                 $file = $this->request->getFile("logo");
 
                 $values = [
-                    "company" => $this->request->getPost("company"),
+                    "company" => strtoupper($this->request->getVar("company")),
                     "holding_company" => $this->request->getPost("holding_company"),
                     "address" => $this->request->getPost("address"),
                     "phone" => $this->request->getPost("phone"),
@@ -230,6 +251,19 @@ class Company extends BaseController
                     "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
                     "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
                 ];
+
+                $companySameName = $this->CompaniesModel
+                    ->where('company', $values['company'])
+                    ->where('id !=', $id)
+                    ->first();
+
+                if ($companySameName) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Nama Company sudah digunakan.",
+                        'token' => csrf_hash()
+                    ]);
+                }
 
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
@@ -268,12 +302,14 @@ class Company extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
         } catch (\Exception $e) {
             $data = [

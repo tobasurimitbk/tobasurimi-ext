@@ -80,6 +80,10 @@ class ProsesRebusModel extends Model
             $dataQry->like('proses_rebus.warehouse_id', $addCondition['warehouse_id']);
         }
 
+        if ($addCondition['no_rebus']) {
+            $dataQry->like('proses_rebus.no_rebus', $addCondition['no_rebus']);
+        }
+
         if ($addCondition['status'] || $addCondition['status'] == '0') {
             $dataQry->where('status_posting', $addCondition['status']);
         }

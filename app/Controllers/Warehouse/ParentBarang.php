@@ -62,6 +62,22 @@ class ParentBarang extends BaseController
         $parentName = $this->request->getVar('parentName');
         $id = decrypt($this->request->getVar('id'));
 
+        $first = $parentBarangModel->find($id);
+
+        $parentBarangSameName = $parentBarangModel
+            ->where('parent_name', $parentName)
+            ->where('parent_type', $first['parent_type'])
+            ->where('id !=', $id)
+            ->first();
+
+        if ($parentBarangSameName) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Kategori barang sudah digunakan.",
+                'token' => csrf_hash()
+            ]);
+        }
+
         $parentBarangModel->update($id, [
             'parent_name' => strtoupper($parentName),
         ]);

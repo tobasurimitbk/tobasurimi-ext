@@ -88,6 +88,23 @@ class Kemasan extends BaseController
     public function update()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        $kemasanSameName = $this->kemasanModel
+            ->where('company_id', $this->this_company_id)
+            ->where('name', strtoupper($this->request->getVar('name')))
+            ->where('satuan_id', $this->request->getVar('satuan_id'))
+            ->where('parent_type_id', $this->request->getVar('parent_type_id'))
+            ->where('id !=', $id)
+            ->first();
+
+        if ($kemasanSameName) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Nama Kemasan sudah digunakan.",
+                'token' => csrf_hash()
+            ]);
+        }
+
         $this->kemasanModel->update($id, [
             'company_id' => $this->this_company_id,
             'kode' => $this->request->getVar('kode'),

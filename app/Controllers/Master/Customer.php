@@ -124,9 +124,10 @@ class Customer extends BaseController
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required",
+                    "rules" => "required|min_length[3]",
                     'errors' => [
-                        'required' => 'Nama tidak boleh kosong'
+                        'required' => 'Nama tidak boleh kosong',
+                        'min_length' => 'Nama harus memiliki minimal 3 karakter'
                     ]
                 ],
 
@@ -134,6 +135,18 @@ class Customer extends BaseController
                     "rules" => "permit_empty|valid_email",
                     'errors' => [
                         'valid_email' => 'Email harus valid'
+                    ]
+                ],
+                "no_npwp" => [
+                    'rules' => 'min_length[15]',
+                    'errors' => [
+                        'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
+                    ]
+                ],
+                "phone" => [
+                    'rules' => 'min_length[12]',
+                    'errors' => [
+                        'min_length' => 'Nomor HP harus diisi minimal 12 digit'
                     ]
                 ]
             ];
@@ -214,15 +227,29 @@ class Customer extends BaseController
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required",
+                    "rules" => "required|min_length[3]",
                     'errors' => [
-                        'required' => 'Nama tidak boleh kosong'
+                        'required' => 'Nama tidak boleh kosong',
+                        'min_length' => 'Nama harus memiliki minimal 3 karakter'
                     ]
                 ],
+
                 "email" => [
                     "rules" => "permit_empty|valid_email",
                     'errors' => [
                         'valid_email' => 'Email harus valid'
+                    ]
+                ],
+                "no_npwp" => [
+                    'rules' => 'min_length[15]',
+                    'errors' => [
+                        'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
+                    ]
+                ],
+                "phone" => [
+                    'rules' => 'min_length[12]',
+                    'errors' => [
+                        'min_length' => 'Nomor HP harus diisi minimal 12 digit'
                     ]
                 ]
             ];

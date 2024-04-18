@@ -109,7 +109,7 @@
             data: "no",
             className: "text-center",
             sortable: false,
-            width: "10%"
+            width: "1%"
         }, {
             data: "name",
             className: "text-center",

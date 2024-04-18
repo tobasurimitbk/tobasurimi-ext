@@ -9,9 +9,11 @@
                 Batal
             </a>
             <?php if (!empty($detail)) : ?>
-                <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bb/print/' . $detail['pembayaranDetail']['id'] ?? '') ?>">
-                    <i class="fa-solid fa-print"></i> Print
-                </a>
+                <?php if (can('Pembayaran', 'Lokal BB', 'p')) : ?>
+                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bb/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
+                        <i class="fa-solid fa-print"></i> Print
+                    </a>
+                <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-form">
                     Simpan
@@ -31,11 +33,17 @@
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" disabled type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
+                            <label for="floatingInput">No. Pembayaran</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="bank_id" id="bank_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($bankList as $b) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->name) ?></option>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Kode Bank</label>
@@ -55,17 +63,11 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" disabled type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
-                            <label for="floatingInput">No. Pembayaran</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
                         <div class="form-floating  form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
-                                    <option value="<?= $d['id'] ?>">
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
                                         <?= $d['divisi']; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -141,9 +143,14 @@
                 <div class="row">
 
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($detail) ? 'disabled' : '' ?> autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
-                            <label for="floatingInput">Tanggal Jatuh Tempo</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input <?= !empty($detail) ? 'disabled' : '' ?> autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
+                                <label for="floatingInput">Tanggal Jatuh Tempo</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -158,7 +165,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                            <input <?= !empty($detail) ? 'disabled' : '' ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
@@ -195,22 +202,22 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran mb-3" style="height: 50px;">
-                            <input oninput="preventNegativeInput(this)" name="nominal_pembayaran" id="nominal_pembayaran" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Nominal Pembayaran">
+                            <input <?= !empty($detail) ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" name="nominal_pembayaran" id="nominal_pembayaran" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['harga_sebelum_diskon'] : '' ?>" type="text" class="form-control" placeholder="Nominal Pembayaran">
                             <label for="floatingInput">Total Pembayaran</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran mb-3" style="height: 50px;">
-                            <input oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Nominal Pembayaran">
+                            <input <?= !empty($detail) ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['potongan_harga'] : '' ?>" type="text" class="form-control" placeholder="Nominal Pembayaran">
                             <label for="floatingInput">Potongan / Diskon</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="status_lunas" id="status_lunas">
-                                <option disabled selected value="">Pilih Status Pelunasan</option>
-                                <option value="1">LUNAS</option>
-                                <option value="1">BELUM LUNAS</option>
+                                <option selected value="">Pilih Status Pelunasan</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_lunas'] == '1' ? 'selected' : '') : '' ?> value="1">LUNAS</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_lunas'] == '0' ? 'selected' : '') : '' ?> value="0">BELUM LUNAS</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Status Pelunasan</label>
                         </div>
@@ -332,6 +339,18 @@
                 no_bukti_pembayaran: {
                     required: true
                 },
+                bank_id: {
+                    required: true
+                },
+                divisi_id: {
+                    required: true
+                },
+                pembayaran_oleh: {
+                    required: true
+                },
+                status_lunas: {
+                    required: true
+                },
                 payment_date: {
                     required: true
                 },
@@ -360,6 +379,18 @@
             messages: {
                 no_bukti_pembayaran: {
                     required: "No. Pembayaran wajib diisi"
+                },
+                bank_id: {
+                    required: "Kode bank wajib diisi"
+                },
+                divisi_id: {
+                    required: "Departemen wajib diisi"
+                },
+                pembayaran_oleh: {
+                    required: "Pembayaran oleh wajib diisi"
+                },
+                status_lunas: {
+                    required: "Status pelunasan wajib diisi"
                 },
                 payment_date: {
                     required: "Tanggal pembayaran wajib diisi"
@@ -415,9 +446,15 @@
             autoclose: true
         });
 
+        $('#payment_date').change(function() {
+            changeStatus();
+        });
+
         $('#bank_id').select2({
             placeholder: "Pilih kode bank",
             theme: "bootstrap-5"
+        }).change(function() {
+            changeStatus();
         });
 
         $('#lpb').select2({
@@ -474,7 +511,7 @@
                     }
 
                     drawTable(response.data);
-
+                    $('#nominal_pembayaran').val(response.data.sisaNumber);
                 }
             });
         });
@@ -503,7 +540,7 @@
                 success: function(response) {
                     csrf.val(response.token);
                     drawTable(response.data);
-
+                    $('#nominal_pembayaran').val(response.data.sisaNumber);
                 }
             });
         });
@@ -537,20 +574,8 @@
                             cancelButtonText: 'Batal',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                var formData = new FormData();
+                                let formData = new FormData(document.querySelector(".create-form"));
                                 formData.append("no_bukti_pembayaran", $('#no_bukti_pembayaran').val());
-                                formData.append("payment_date", $('#payment_date').val());
-                                formData.append("supplier_id", $('#supplier_id').val());
-                                formData.append("tipe_pembayaran", $('#tipe_pembayaran').val());
-                                formData.append("jenis_dokumen", $('#jenis_dokumen').val());
-                                formData.append("bulan", $('#bulan').val());
-                                formData.append("lpb", $('#lpb').val());
-                                formData.append("nominal_pembayaran", $('#nominal_pembayaran').val());
-                                formData.append("payment_method", $('#payment_method').val());
-                                formData.append("pembayaran_oleh", $('#pembayaran_oleh').val());
-                                formData.append("jatuh_tempo", $('#jatuh_tempo').val());
-                                formData.append("akun_kas", $('#akun_kas').val());
-                                formData.append("akun_selisih", $('#akun_selisih').val());
                                 formData.append("poIDList", JSON.stringify(listPoID));
                                 formData.append("poNoList", JSON.stringify(listPoNo));
 
@@ -558,7 +583,11 @@
                                     url: "<?= base_url("pembayaran-po-lokal-bb/create"); ?>",
                                     data: formData,
                                     beforeSend: function(xhr) {
+                                        setLoading();
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
                                     },
                                     method: "POST",
                                     dataType: "json",
@@ -575,6 +604,12 @@
                                                 .then(() => {
                                                     window.location.href = `<?= base_url("pembayaran-po-lokal-bb/id/"); ?>` + response.id;
                                                 })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            });
                                         }
                                     },
                                 });
@@ -619,8 +654,6 @@
             newRow.append($('<td style="text-align:center;"><b>' + data.totalDiterima + '</b></td>'));
             newRow.append($('<td style="text-align:center;"><b>' + data.totalHarga + '</b></td>'));
             table.find('tbody').append(newRow);
-
-            $('#nominal_pembayaran').val(data.totalHarga.replace('Rp', ''));
         }
 
         $('#tipe_pembayaran').select2({
@@ -694,42 +727,39 @@
     }
 
     function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
+        var bank_id = $('#bank_id').val();
+        var payment_date = $('#payment_date').val();
         var formData = new FormData();
         formData.append("type", "Bahan Baku");
-        if (value) {
-            $(".no_bukti_pembayaran").attr("readonly", true);
-            $.ajax({
-                url: "<?= base_url("pembayaran-po-lokal-bp/generate-no-pembayaran"); ?>",
-                data: formData,
-                method: "POST",
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    $(".no_bukti_pembayaran").val(response.paymentNo);
-                },
-                onError: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terjadi kesalahan pada sistem',
-                        confirmButtonColor: '#4e73df',
-                    });
-                }
-            });
-        } else {
-            $(".no_bukti_pembayaran").attr("readonly", false);
-            $(".no_bukti_pembayaran").val("");
-        }
+        formData.append("bank_id", bank_id);
+        formData.append("payment_date", payment_date)
+
+        $.ajax({
+            url: "<?= base_url("pembayaran-po-lokal-bb/generate-no-pembayaran"); ?>",
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                $(".no_bukti_pembayaran").val(response.paymentNo);
+            },
+            onError: function(response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi kesalahan pada sistem',
+                    confirmButtonColor: '#4e73df',
+                });
+            }
+        });
     }
-</script>
-<script>
+
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
