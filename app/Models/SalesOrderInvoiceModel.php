@@ -179,4 +179,73 @@ class SalesOrderInvoiceModel extends Model
 
         return $invNumber;
     }
+
+    public function getAllSalesOrderInvoiceReport($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'tgl_invoice'          => 'sales_order_invoice.tgl_faktur',
+            'no_sales_order'          => 'sales_order.no_sales_order',
+            'no_faktur'          => 'sales_order_invoice.no_faktur',
+            'nama_pelanggan'            => 'customers.name',
+            'keterangan'      => 'sales_order_invoice.keterangan',
+            'createdAt'         => 'sales_order_invoice.createdAt',
+            'updatedAt'         => 'sales_order_invoice.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'sales_order_invoice.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_invoice.*,
+                      DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+                      customers.name AS nama_pelanggan,
+                      customers.kode AS kode_pelanggan,
+                      IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no";
+
+        $salesOrderInvoiceLokal = $this->asObject()
+            ->select($selectQry)
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
+            ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesOrderInvoiceLokal->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+            $salesOrderInvoiceLokal->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $salesOrderInvoiceLokal
+                ->like('no_faktur', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search']);
+        }
+
+        if ($addCondition['filter']) {
+            $salesOrderInvoiceLokal->where('customers.id', $addCondition['filter']);
+        }
+
+        if ($addCondition['startdate']) {
+            $salesOrderInvoiceLokal->where('tanggal_faktur >=', $addCondition['startdate']);
+        }
+
+        if ($addCondition['lastdate']) {
+            $salesOrderInvoiceLokal->where('tanggal_faktur <=', $addCondition['lastdate']);
+        }
+
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+            $salesOrderInvoiceLokal->groupEnd();
+        }
+
+        $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);
+        $data = $salesOrderInvoiceLokal->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

@@ -472,6 +472,7 @@ class SuratJalan extends BaseController
 
     public function printSJ($id)
     {
+        $id = decrypt($id);
         $domPdf = new Dompdf();
 
         $fileName = 'Order Form';
@@ -492,19 +493,19 @@ class SuratJalan extends BaseController
                         customers.name AS customerName, 
                         customers.address AS customerAddress,
                         metadata.value AS termin,
-                        barangs.nama_barang AS namaBarang, 
-                        barangs.kode_barang AS kodeBarang, 
+                        barang_master_sales.barang_name AS namaBarang, 
+                        barang_master_sales.kode_barang AS kodeBarang, 
                         sales_order_detail.qty AS qty, 
                         satuans.kode_satuan AS kodeSatuan,
                         sales_order_detail.discount_percentage AS disc_pct,
                         sales_order_detail.amount AS amt";
         $salesOrderData = $this->SalesOrderModel->asObject()
             ->select($soSelectQry)
-            ->join('customers', 'customers.id = sales_order.id_customer')
-            ->join('metadata', 'metadata.id = customers.termin')
-            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
-            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
             ->whereIn('sales_order.id', $soIds)
             ->findAll();
 

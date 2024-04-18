@@ -445,7 +445,7 @@ $routes->get('/surat-jalan/all', 'SalesLokal\SuratJalan::all', ['filter' => 'Aut
 $routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::save', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/update', 'SalesLokal\SuratJalan::update', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' => 'Auth']);
-$routes->get('/surat-jalan/print/(:num)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/print/(:segment)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/generate-no-surat-jalan', 'SalesLokal\SuratJalan::generateNomorSuratJalan', ['filter' => 'Auth']);
 
 // Retur Pembelian
@@ -1348,11 +1348,18 @@ $routes->post('/akun-department/get', 'Accounting\AccountDepartment\AccountDepar
 //Laporan
 //Accounting
 $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);
+
 $routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/all', 'Laporan\Accounting\Pembelian::allTransaksi', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+$routes->get('/laporan-accounting/penjualan', 'Laporan\Accounting\Penjualan::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan', 'Laporan\Accounting\Penjualan::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/all', 'Laporan\Accounting\Penjualan::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/hutang', 'Laporan\Accounting\Hutang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang', 'Laporan\Accounting\Hutang::index', ['filter' => 'Auth']);

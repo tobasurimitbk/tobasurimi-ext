@@ -21,16 +21,18 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-            <div class="card card-statistic-1">
-                <div class="card-icon bg-danger">
-                    <i class="far fa-file"></i>
-                </div>
-                <div class="card-wrap">
-                    <div class="card-header">
-                        <h4>Laporan Penjualan</h4>
+            <a href="<?= base_url('laporan-accounting/penjualan') ?>">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-danger">
+                        <i class="far fa-file"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Laporan Penjualan</h4>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
             <a href="<?= base_url('laporan-accounting/hutang') ?>">
