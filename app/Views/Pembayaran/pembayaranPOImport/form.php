@@ -133,7 +133,6 @@
                             <label for="floatingInput">Sisa Bayar</label>
                         </div>
                     </div>
-
                 </div>
                 <div class="row">
                     <div class="col-md-4">

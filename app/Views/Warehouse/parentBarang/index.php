@@ -152,6 +152,8 @@
             var type = $("input[name='type']").val();
             $('.title-name').text("Tambah Kategori " + repairStr(type));
             $('.delete-btn').hide();
+            $('#parentName').val(null);
+            $('#id').val(null);
             validator.resetForm();
             validator.reset();
             $('.add-modal').modal('show');

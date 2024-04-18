@@ -35,14 +35,24 @@ class Barang extends BaseController
 
     public function create()
     {
-        $check = $this->barangMasterSalesModel->where('barang_name', $this->request->getVar('barang_name'))->orWhere('kode_barang', $this->request->getVar('kode_barang'))->where('company_id', $this->this_company_id)->where('type_barang_sales', "LOKAL")->first();
-        if ($check != null) {
+        $kodeBarang = $this->barangMasterSalesModel->where('kode_barang', $this->request->getVar('barang_name'))->where('company_id', $this->this_company_id)->where('type_barang_sales', "LOKAL")->first();
+        if ($kodeBarang != null) {
             return response()->setJSON([
                 'status' => false,
                 'token' => csrf_hash(),
-                'message' => "Kode barang atau nama barang sudah ada"
+                'message' => "Kode barang " . $kodeBarang['kode_barang'] . " sudah ada"
             ]);
         }
+
+        $namaBarang = $this->barangMasterSalesModel->where('barang_name', strtoupper($this->request->getVar('barang_name')))->where('company_id', $this->this_company_id)->where('type_barang_sales', "LOKAL")->first();
+        if ($namaBarang != null) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Nama barang " . $namaBarang['barang_name'] . " sudah ada"
+            ]);
+        }
+
 
         $this->barangMasterSalesModel->insert([
             'company_id' => $this->this_company_id,
@@ -65,6 +75,21 @@ class Barang extends BaseController
     public function update()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        $check = $this->barangMasterSalesModel
+            ->where('barang_name', strtoupper($this->request->getVar('barang_name')))
+            ->where('company_id', $this->this_company_id)->where('type_barang_sales', "LOKAL")
+            ->where('id !=', $id)
+            ->first();
+
+
+        if ($check) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Nama barang sudah ada.",
+                'token' => csrf_hash()
+            ]);
+        }
 
         $this->barangMasterSalesModel->update($id, [
             'company_id' => $this->this_company_id,
