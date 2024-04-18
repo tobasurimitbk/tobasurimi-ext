@@ -69,7 +69,6 @@
                                     <option selected value="">Pilih Metode Pembayaran</option>
                                     <option value="Bank">Bank</option>
                                     <option value="Cash">Cash</option>
-                                    <option value="Debit">Debit</option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                             </div>
