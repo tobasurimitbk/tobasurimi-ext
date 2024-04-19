@@ -35,7 +35,7 @@ class Barang extends BaseController
 
     public function create()
     {
-        $kodeBarang = $this->barangMasterSalesModel->where('kode_barang', $this->request->getVar('barang_name'))->where('company_id', $this->this_company_id)->where('type_barang_sales', "LOKAL")->first();
+        $kodeBarang = $this->barangMasterSalesModel->where('kode_barang', $this->request->getVar('kode_barang'))->where('company_id', $this->this_company_id)->where('type_barang_sales', "LOKAL")->first();
         if ($kodeBarang != null) {
             return response()->setJSON([
                 'status' => false,
