@@ -169,7 +169,7 @@ class TandaTerimaSupBB extends BaseController
             'company_id' => $this->this_company_id,
             'supplier_id' => $this->request->getVar('supplier_id'),
             'divisi_id' => $this->request->getVar('divisi_id'),
-            'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
+            'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : date('Y-m-d'),
             'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
             'nominal_faktur' => repairDouble($this->request->getVar('total_tambahan_potongan')),
             'invoice_date' => date('Y-m-d'),
