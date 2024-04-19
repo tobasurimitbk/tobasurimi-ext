@@ -119,7 +119,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= $dataTandaTerimaFaktur ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                    <select <?= !empty($dataTandaTerimaFaktur) ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                         <option value=""></option>
                                         <?php foreach ($divisi as $d) : ?>
                                             <option <?= !empty($dataTandaTerimaFaktur) ? ($dataTandaTerimaFaktur['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>

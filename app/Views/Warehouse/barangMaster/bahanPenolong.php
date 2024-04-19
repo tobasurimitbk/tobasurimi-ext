@@ -4,9 +4,14 @@
 <section class="section">
     <div class="section-header">
         <h1>Bahan Penolong</h1>
-        <button class="btn btn-show-form btn-add btn-add-barang float-right">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Master Barang', 'Bahan Penolong', 'c')) : ?>
+            <button class="btn btn-discard btn-dropdown-export btn-upload-excel float-right" type="button">
+                <i class="fas fa-file-excel"></i> Import
+            </button>
+            <button class="btn btn-show-form btn-add btn-add-barang float-right">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -288,6 +293,31 @@
         </div>
     </div>
 </div>
+
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Master Barang Bahan Penolong</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_MASTER_BARANG.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel" method="post">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     let sort = "nomor";

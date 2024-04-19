@@ -694,6 +694,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete-spek', 'Warehouse\Barang::deleteSpek');
     $routes->post('generate-new-code', 'Warehouse\Barang::generateNewCode');
     $routes->get('generate-new-code', 'Warehouse\Barang::generateNewCode');
+    $routes->post('import', 'Warehouse\Barang::import');
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);

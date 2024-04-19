@@ -13,6 +13,7 @@ use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
 use App\Models\DivisisModel;
 use Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Barang extends BaseController
 {
@@ -107,6 +108,7 @@ class Barang extends BaseController
         $spek = json_decode($this->request->getVar("items"));
 
         $barang = $barangModel->where('kode_barang', $this->request->getVar('kode_barang'))
+            ->where('company_id', $this->this_company_id)
             ->where('type_barang', $type)
             ->where('deletedAt', null)
             ->first();
@@ -120,6 +122,7 @@ class Barang extends BaseController
         }
 
         $barangName = $barangModel->where('UPPER(barang_name)', strtoupper($this->request->getVar('barang_name')))
+            ->where('company_id', $this->this_company_id)
             ->where('type_barang', $type)
             ->where('deletedAt', null)
             ->first();
@@ -375,8 +378,8 @@ class Barang extends BaseController
             $satuan3 = $satuanModel->asObject()->where('id', $data['satuan_3'])->where('deletedAt', null)->first();
 
             $satuan1_kode = isset($satuan1) ? $satuan1->kode_satuan : "-";
-            $satuan2_kode = isset($satuan2) ? $satuan2->kode_satuan : "-";
-            $satuan3_kode = isset($satuan3) ? $satuan3->kode_satuan : "-";
+            $satuan2_kode = (isset($satuan2) && $data['satuan_2'] != 0) ? $satuan2->kode_satuan : "-";
+            $satuan3_kode = (isset($satuan3) && $data['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
             $accountBarang = $accountBarangModel->asObject()->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
             array_push($rdata, [
                 "no"                    => $no++,
@@ -385,8 +388,8 @@ class Barang extends BaseController
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => strtoupper($data['barang_name'] . " - " . $data['spesifikasi']),
                 "satuan"                => $satuan1_kode, // Adjust 'some_property' to the actual property you want to display
-                "satuan2"               => $satuan1_kode == "-" ? "-" : $satuan2_kode . " (" . $data['konversi_satuan_2'] . " " . $satuan1_kode . ")",
-                "satuan3"               => $satuan1_kode == "-" ? "-" : $satuan3_kode . " (" . $data['konversi_satuan_3'] . " " . $satuan1_kode . ")",
+                "satuan2"               => $satuan2_kode == "-" ? "-" : $satuan2_kode . " (" . $data['konversi_satuan_2'] . " " . $satuan1_kode . ")",
+                "satuan3"               => $satuan3_kode == "-" ? "-" : $satuan3_kode . " (" . $data['konversi_satuan_3'] . " " . $satuan1_kode . ")",
                 "akun_coa"               => $accountBarang ? $accountBarang : "",
                 "harga_terakhir_lokal"  => $lokalDetail['hargaTerakhir'],
                 "supplier_terakhir_lokal" => $lokalDetail['supplierTerakhir'],
@@ -573,5 +576,143 @@ class Barang extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function import()
+    {
+        $parentBarangModel = new ParentBarangModel();
+        $barangMasterModel = new BarangMasterModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $satuanModel = new SatuansModel();
+
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+            $type_barang = $this->request->getVar('type_barang');
+
+            $file = $this->request->getFile('file');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+            $gagalArr = [];
+            $berhasilTotal = 0;
+
+            // INSERT MASTER BARANG
+            for ($i = 0; $i < count($data); $i++) {
+                // VALIDASI KODE BARANG
+                $kodeBarang = $barangMasterModel->where('kode_barang', trim($data[$i][1]))
+                    ->where('company_id', $this->this_company_id)
+                    ->where('type_barang', $type_barang)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                // VALIDASI NAMA BARANG
+                $barangName = $barangMasterModel->where('UPPER(barang_name)', trim($data[$i][2]))
+                    ->where('company_id', $this->this_company_id)
+                    ->where('type_barang', $type_barang)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                // VALIDASI KATEGORI BARANG (PARENT BARANG)
+                $parentBarang = $parentBarangModel->where('parent_name', trim($data[$i][0]))
+                    ->where('company_id', $this->this_company_id)
+                    ->where('parent_type', $type_barang)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                // if excel null
+                if ($data[$i][1] != null) {
+                    if ($kodeBarang == null && $barangName == null && $parentBarang != null) {
+                        // MASTER BARANG INSERTED
+                        $barangMasterModel->insert([
+                            'company_id' => $this->this_company_id,
+                            'parent_type_id' => $parentBarang['id'],
+                            'kode_barang' => trim($data[$i][1]),
+                            'barang_name' => strtoupper(trim($data[$i][2])),
+                            'type_barang' => $type_barang,
+                            'minimum_stock' => 0,
+                        ]);
+                    }
+                }
+            }
+
+            // INSERT SPESIFIKASI
+            for ($i = 0; $i < count($data); $i++) {
+                // VALIDASI SATUAN
+                $satuan = $satuanModel->where('kode_satuan', trim($data[$i][4]))->first();
+                // CARI BARANG MASTER NYA 
+                $barangMaster = $barangMasterModel->where('kode_barang', trim($data[$i][1]))
+                    ->where('company_id', $this->this_company_id)
+                    ->where('type_barang', $type_barang)
+                    ->where('deletedAt', null)
+                    ->first();
+                if ($data[$i][1] != null) {
+                    if ($satuan != null && $barangMaster != null) {
+                        // CHECK BARANG MASTER SPESIFIKASI NAME
+                        $barangMasterSpesifikasi = $barangMasterSpesifikasiModel
+                            ->where('barang_master_id', $barangMaster['id'])
+                            ->where('spesifikasi', strtoupper(trim($data[$i][3])))
+                            ->first();
+
+                        if ($barangMasterSpesifikasi == null) {
+                            $barangMasterSpesifikasiModel->insert([
+                                'barang_master_id' => $barangMaster['id'],
+                                'spesifikasi' => strtoupper(trim($data[$i][3])),
+                                'satuan_1' => $satuan['id'],
+                                'satuan_2' => 0,
+                                'konversi_satuan_2' => 1,
+                                'satuan_3' => 0,
+                                'konversi_satuan_3' =>  1,
+                                'harga_pokok' => 0,
+                                'harga_jual' => 0,
+                            ]);
+                            $berhasilTotal++;
+                        } else {
+                            array_push($gagalArr, $data[$i]);
+                        }
+                    } else {
+                        array_push($gagalArr, $data[$i]);
+                    }
+                }
+            }
+
+            $gagalTotal = count($gagalArr);
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data, Gagal Import : $gagalTotal",
+                'status' => true,
+                'gagal' => $gagalArr,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
     }
 }
