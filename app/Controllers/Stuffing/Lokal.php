@@ -134,7 +134,13 @@ class Lokal extends BaseController
             'tanggal' => date('Y-m-d'),
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
-            'orderForm' => $this->salesOrderModel->select('sales_order.*, customers.name as customer_name')->join('customers', 'customers.id = sales_order.id_customer')->where('sales_order.deletedAt', null)->orderBy('sales_order.no_sales_order', "ASC")->findAll(),
+            'orderForm' => $this->salesOrderModel
+                ->select('sales_order.*, customers.name as customer_name')
+                ->join('customers', 'customers.id = sales_order.id_customer')
+                ->where('sales_order.deletedAt', null)
+                ->where('sales_order.used', 'NOT USED')
+                ->orderBy('sales_order.no_sales_order', "ASC")
+                ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
             "dataAJU" => $dataAJU,
         ];
@@ -188,6 +194,10 @@ class Lokal extends BaseController
             'tanggal' => date('Y-m-d'),
         ]);
 
+        $this->salesOrderModel->update($this->request->getVar('sales_order_id'), [
+            'used' => 'USED'
+        ]);
+
         $barang = json_decode($this->request->getVar('listBarang'));
 
         foreach ($barang as $b) {
@@ -202,7 +212,7 @@ class Lokal extends BaseController
                 'barang1_id_warehouse' => $checkStock['barang1_id'],
                 'barang2_id_warehouse' => $checkStock['barang2_id'],
                 'barang_id_order' => $b->output->id_barang,
-                'qty' => $b->output->qty
+                'qty' => $b->qty
             ]);
         }
 
@@ -235,7 +245,7 @@ class Lokal extends BaseController
                     'barang1_id_warehouse' => $checkStock['barang1_id'],
                     'barang2_id_warehouse' => $checkStock['barang2_id'],
                     'barang_id_order' => $b->output->id_barang,
-                    'qty' => $b->output->qty
+                    'qty' => $b->qty
                 ]);
             } else {
                 $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
@@ -249,7 +259,7 @@ class Lokal extends BaseController
                     'barang1_id_warehouse' => $checkStock['barang1_id'],
                     'barang2_id_warehouse' => $checkStock['barang2_id'],
                     'barang_id_order' => $b->output->id_barang,
-                    'qty' => $b->output->qty
+                    'qty' => $b->qty
                 ]);
             }
         }
@@ -264,6 +274,10 @@ class Lokal extends BaseController
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
+        $checkStuffing = $this->stuffingLokalModel->find($id);
+        $this->salesOrderModel->update($checkStuffing['sales_order_id'], [
+            'used' => 'NOT USED'
+        ]);
         $this->stuffingLokalModel->delete($id);
         $this->stuffingLokalDetailModel->where('stuffing_lokal_id', $id)->delete();
 

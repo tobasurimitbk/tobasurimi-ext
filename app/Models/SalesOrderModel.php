@@ -53,6 +53,7 @@ class SalesOrderModel extends Model
         'tax_status',
         'include_pa',
         'paid_amt',
+        'used',
     ];
 
     // Dates

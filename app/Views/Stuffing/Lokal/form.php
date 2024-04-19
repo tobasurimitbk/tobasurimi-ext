@@ -634,13 +634,13 @@
                     var input_user = parseFloat(element.val());
                     var stok_max = parseFloat(element.data('stok_total'));
 
-                    if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                    if (isNaN(input_user) || input_user == undefined || input_user == 0) {
                         dataError = listStockSelected[i];
                         isValid = false;
-                    } else {
-                        listStockSelected[i].qty = input_user;
                     }
                 });
+
+                console.log(listStockSelected);
 
                 if (!isValid) {
                     Swal.fire({
@@ -754,12 +754,21 @@
             var input_user = parseFloat(element.val());
             var stok_max = parseFloat(element.data('stok_total'));
 
-            if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                dataError = listStockSelected[i];
-                isValid = false;
+            if (input_user > stok_max && input_user > listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = stok_max;
+            } else if (input_user > stok_max && input_user < listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = stok_max;
+            } else if (input_user < stok_max && input_user > listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = listStockSelected[i].output.qty;
+            } else if (input_user < stok_max && input_user < listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = input_user;
             } else {
                 listStockSelected[i].qty = input_user;
             }
+            console.log(input_user);
+            console.log(listStockSelected[i].qty);
+            console.log(listStockSelected[i].output.qty);
+            console.log(stok_max);
         });
     }
 
@@ -855,16 +864,14 @@
             },
             dataType: "json",
             success: function(res) {
-                // $(".spesifikasi_in_id").empty()
-                // $(".spesifikasi_in_id").append(`<option value=""></option>`)
-                // res.data.forEach(function(item) {
-                //     $(".spesifikasi_in_id").append(`<option data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-qty_barang="${item.qty}" value="${item.id_barang}">(${item.kode_barang}) ${item.nama_barang} Qty : ${item.qty}</option>`)
-                // })
-                // $(".spesifikasi_in_id").val();
-
-                listStockOrder = [];
-                listStockOrder = res.data;
-                drawTableOrderBarang(res.data);
+                if (res.data.length != 0) {
+                    listStockOrder = [];
+                    listStockOrder = res.data;
+                    drawTableOrderBarang(listStockOrder);
+                } else {
+                    listStockOrder = [];
+                    drawTableOrderBarang(listStockOrder);
+                }
             }
         });
     }
@@ -922,52 +929,28 @@
     }
 
     function drawTableOrderBarang(data) {
-        if ($.fn.DataTable.isDataTable('#dataTableSalesOrder')) {
-            $('#dataTableSalesOrder').DataTable().clear().draw();
-            table.destroy();
-        }
-        const tableSales = $('#dataTableSalesOrder');
-        $.each(data, function(i, v) {
+        const tableSales = $('#dataTableSalesOrder').DataTable();
+
+        // Clear the existing rows
+        tableSales.clear().draw();
+
+        // Add new rows
+        data.forEach(function(v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <div class="form-check">
-                    <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="checkbox">
-                </div>
-            `
+            <div class="form-check">
+                <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="checkbox">
+            </div>
+        `
             ));
             newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
             newRow.append($('<td style="text-align: center;">').text(v.qty));
-            tableSales.find('tbody').append(newRow);
+            tableSales.row.add(newRow).draw(false);
         });
-
-        dataTables = $('#dataTableSalesOrder').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        dataTables.draw();
     }
+
 
     function drawTableSelectedItem(data) {
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
@@ -1048,10 +1031,11 @@
 
     function updateOrder(input) {
         var index = input.data('index');
-        var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val()); // Ambil nilai qty yang diinputkan
+        var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val());
         var item = listStockSelected[index];
-        var maxQty = parseFloat(item.output.qty);
-        var qty = Math.min(maxQty, qtyInput);
+        var maxQty = parseFloat(item.stok_total);
+        var maxOutputQty = parseFloat(item.output.qty);
+        var qty = Math.min(maxQty, qtyInput, maxOutputQty);
         input.val(qty);
     }
 

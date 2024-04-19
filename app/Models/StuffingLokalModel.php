@@ -106,8 +106,7 @@ class StuffingLokalModel extends Model
         $builder = $this->db->table('stuffing_lokal');
         $builder->select('no_stuffing');
         $builder->orderBy('no_stuffing', 'desc');
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
+        $builder->where('deletedAt', null);
         $builder->like('no_stuffing', $lastStr);
         $query = $builder->get();
 
@@ -118,7 +117,8 @@ class StuffingLokalModel extends Model
         if (!empty($query->getResultArray())) {
             foreach ($query->getResultArray() as $string) {
                 $explode = explode('/', $string['no_stuffing']);
-                $number = intval($explode[2]);
+                // var_dump($explode);
+                $number = intval($explode[1]);
 
                 if ($number > $lastPenerimaan) {
                     $lastPenerimaan = $number;
