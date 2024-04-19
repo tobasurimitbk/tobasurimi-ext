@@ -12,10 +12,11 @@
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
             <li><button class="dropdown-item" onclick="pdf('<?= base_url("spp/print-table"); ?>')">PDF</button></li>
         </ul>
-
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Pembelian', 'SPP', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
