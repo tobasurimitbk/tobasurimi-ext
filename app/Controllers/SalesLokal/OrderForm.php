@@ -20,7 +20,9 @@ use App\Models\BarangMasterSalesModel;
 use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
 use App\Models\ProvincesModel;
+use App\Models\SalesOrderInvoiceModel;
 use App\Models\SatuansModel;
+use App\Models\SuratJalanModel;
 use Error;
 use ErrorException;
 
@@ -44,6 +46,8 @@ class OrderForm extends BaseController
     protected $ProvincesModel;
     protected $BanksModel;
     protected $satuanModel;
+    protected $suratJalanModel;
+    protected $salesOrderInvoiceModel;
 
     private $userId;
 
@@ -67,6 +71,8 @@ class OrderForm extends BaseController
         $this->BanksModel = new BanksModel();
         $this->satuanModel = new SatuansModel();
         $this->db = \Config\Database::connect();
+        $this->suratJalanModel = new SuratJalanModel();
+        $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
 
         $this->userId = session()->get("login")->user_id;
     }
@@ -294,7 +300,7 @@ class OrderForm extends BaseController
             $estimatedFreight = str_replace(',', '', $postData['estimated_freight']);
 
             $values = [
-                "no_sales_order"        => $postData['no_sales_order'],
+                "no_sales_order"        => strtoupper($postData['no_sales_order']),
                 "bc_type"        => $postData['aju_document_type'],
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
@@ -306,16 +312,23 @@ class OrderForm extends BaseController
                 "payment_terms"         => $postData['termin'],
                 "keterangan"            => $postData['parent_keterangan'],
                 "destination"           => $customerData->address,
-                // "discount_rupiah"       => $postData('discount_rupiah'),
-                // "discount_percentage"   => $postData('discount_percentage'),
-                // "ppn"                   => $postData['taxAmt'],
                 "estimated_freight"     => $estimatedFreight,
-                // "tax_status"            => $postData['tax_status'],
-                // "include_pa"            => $postData['include_tax'],
                 "total_harga"           => $postData['total'],
                 "id_company"            => $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL'
             ];
+
+            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
+            if ($checkSO) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "No Sales Order Sudah Digunakan",
+                    "payload"   => $values,
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             // Create a new validation instance
             $dataSalesOrder =  $this->SalesOrderModel->insert($values);
@@ -435,12 +448,7 @@ class OrderForm extends BaseController
             "id_user" => $dataSalesOrder->id_user,
             "dataTermin" => $dataTermin,
             "dataAJU" => $dataAJU,
-            // "seller_name" => $dataSalesOrder->seller_name,
-
         ];
-
-
-        //echo json_encode($data);
 
         return view('SalesLokal/OrderForm/form', $data);
     }
@@ -527,38 +535,8 @@ class OrderForm extends BaseController
             $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'])));
             $estimatedFreight = str_replace(',', '', $postData['estimated_freight']);
 
-            // $values = [
-            //     "no_sales_order"        => $postData['no_sales_order'],
-            //     "id_user"               => $this->userId,
-            //     "id_customer"           => $postData['id_customer'],
-            //     "jenis_penjualan"           => $postData['jenis_penjualan'],
-            //     "sales_id"              => $customerData->sales_id,
-            //     "nama_ecommerce"           => $postData['nama_ecommerce'],
-            //     "order_date"            => $orderDate,
-            //     "shipping_date"         => $shippingDate,
-            //     "payment_terms"         => $postData['termin'],
-            //     "keterangan"            => $postData['parent_keterangan'],
-            //     "destination"           => $customerData->address,
-            //     // "discount_rupiah"       => $postData('discount_rupiah'),
-            //     // "discount_percentage"   => $postData('discount_percentage'),
-            //     // "ppn"                   => $postData['taxAmt'],
-            //     "estimated_freight"     => $estimatedFreight,
-            //     // "tax_status"            => $postData['tax_status'],
-            //     // "include_pa"            => $postData['include_tax'],
-            //     "total_harga"           => $postData['total'],
-            //     "id_company"            => $this->this_company_id,
-            //     "tipe_sales_order"      => 'LOKAL'
-            // ];
-
-            // Create a new validation instance
-            // $dataSalesOrder =  $this->SalesOrderModel->update($id, $values);
-
             $totalQty = 0;
             foreach ($items as $row) {
-
-                // $this->BarangModel->builder()->decrement('stok', $row->qty);
-                // $this->stockDetailModel->addOrReduceStock($row->id_barang, $row->warehouse_id, 'New', $row->qty, 'Out', '');
-
                 $totalQty = $totalQty + $row->qty;
                 $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
                 if ($row->id == 0 || $row->id == null || $row->id == "") {
@@ -621,26 +599,27 @@ class OrderForm extends BaseController
     {
         try {
             // $id = $this->request->getPost("id");
-            $id = $this->encrypter->decrypt(hex2bin($this->request->getPost("id")));
+            $id = decrypt($this->request->getPost("id"));
 
 
             if (!empty($id)) {
-                $this->db->transBegin();
+                $checkSJ = $this->SalesOrderModel->where('id', $id)->where('surat_jalan_so_id !=', null)->orWhere('sales_order_invoice_id !=', null)->findAll();
 
+                if ($checkSJ) {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Data Order sudah digunakan tidak dapat dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
                 $this->SalesOrderModel->delete($id);
                 $dataDetail = $this->SalesOrderDetailModel->where('id_sales_order', $id)->findAll();
 
                 foreach ($dataDetail as $item) {
-                    $itemStock = $this->stockDetailModel
-                        ->asObject()
-                        ->where('barang_id', $item['id_barang'])
-                        ->where('warehouse_id', $item['id_warehouse'])
-                        ->first();
-                    // $stok = ['qty' => $itemStock->qty + $item['qty']];
-                    $this->stockDetailModel->addOrReduceStock($item['id_barang'], $item['id_warehouse'], 'New', $item['qty'], 'In', '');;
                     $this->SalesOrderDetailModel->delete($item['id']);
                 }
-                $this->db->transCommit();
 
                 $data = [
                     "status"            => true,
@@ -850,12 +829,24 @@ class OrderForm extends BaseController
         $code = "SLL";
         $currentYear = date('Y');
         $currentMonth = date('m');
-        $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
-        $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
-        $noSalesOrder = "SLL/" . $number . "/" . $currentYear . "/" . $currentMonth;
+        $numberTemplate = $code . "/" . $currentMonth . "/" . $currentYear . "/";
+        $lastData = $this->SalesOrderModel->asObject()
+            ->like('no_sales_order', $numberTemplate)
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->no_sales_order);
+            $lastIncrement = intval($asd[3]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $numberTemplate . $paddedNumber;
+        } else {
+            $invNumber = $numberTemplate . '001';
+        }
 
         return response()->setJSON([
-            'data' => $noSalesOrder,
+            'data' => $invNumber,
             'token' => csrf_hash(),
             'status' => true
         ]);
