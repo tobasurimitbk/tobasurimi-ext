@@ -133,6 +133,7 @@ class Internasional extends BaseController
 
     public function create()
     {
+        $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
         $data = [
             'tanggal' => date('Y-m-d'),
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
@@ -147,7 +148,7 @@ class Internasional extends BaseController
                 ->orderBy('sales_order_export.sales_order_export_no', "ASC")
                 ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
-
+            "dataAJU" => $dataAJU,
         ];
         return view('Stuffing/Internasional/form', $data);
     }
@@ -155,16 +156,21 @@ class Internasional extends BaseController
     public function detail($id)
     {
         $id = decrypt($id);
-        $stuffingInternasionalModel = $this->stuffingInternasionalModel->select('stuffing_internasional.*, customers.name as customer_name')->join('customers', 'customers.id = stuffing_internasional.customer_id')->find($id);
+        $stuffingInternasionalModel = $this->stuffingInternasionalModel
+            ->select('stuffing_internasional.*, sales_order_export.bc_type, customers.name as customer_name')
+            ->join('customers', 'customers.id = stuffing_internasional.customer_id')
+            ->join('sales_order_export', 'sales_order_export.sales_order_export_id = stuffing_internasional.sales_order_export_id')
+            ->find($id);
         $salesOrder = $this->salesOrderDetailModel
             ->select('sales_order_detail_export.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id')
             ->where('sales_order_detail_export.sales_order_export_id', $stuffingInternasionalModel['sales_order_export_id'])
             ->where('sales_order_detail_export.deletedAt', null)
             ->findAll();
+        $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
 
         if ($stuffingInternasionalModel == null) {
-            return redirect()->to('pengeluaran-lokal');
+            return redirect()->to('pengeluaran-internasional');
         }
 
         $data = [
@@ -176,15 +182,13 @@ class Internasional extends BaseController
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('sales_order_export.deletedAt', null)
-                ->where('sales_order_export.status', 'POSTED')
-                ->where('sales_order_export.used', 'NOT USED')
                 ->orderBy('sales_order_export.sales_order_export_no', "ASC")
                 ->findAll(),
             'stuffingInternasional' => $stuffingInternasionalModel,
             'stuffingInternasionalDetail' => $this->stuffingInternasionalDetailModel->getStuffingDetail($id),
             'salesOrder' => $salesOrder,
             'divisi' => $this->divisiModel->getDivisiAccess(),
-
+            "dataAJU" => $dataAJU,
         ];
 
         return view('Stuffing/Internasional/form', $data);
@@ -198,6 +202,10 @@ class Internasional extends BaseController
             'sales_order_export_id' => $this->request->getVar('sales_order_id'),
             'no_stuffing' => $this->request->getVar('no_stuffing'),
             'tanggal' => date('Y-m-d'),
+        ]);
+
+        $this->salesOrderModel->update($this->request->getVar('sales_order_id'), [
+            'used' => 'USED'
         ]);
 
         $barang = json_decode($this->request->getVar('listBarang'));
@@ -214,7 +222,7 @@ class Internasional extends BaseController
                 'barang1_id_warehouse' => $checkStock['barang1_id'],
                 'barang2_id_warehouse' => $checkStock['barang2_id'],
                 'barang_id_order' => $b->output->id_barang,
-                'qty' => $b->output->qty
+                'qty' => $b->qty
             ]);
         }
 
@@ -246,7 +254,7 @@ class Internasional extends BaseController
                     'barang1_id_warehouse' => $checkStock['barang1_id'],
                     'barang2_id_warehouse' => $checkStock['barang2_id'],
                     'barang_id_order' => $b->output->id_barang,
-                    'qty' => $b->output->qty
+                    'qty' => $b->qty
                 ]);
             } else {
                 $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
@@ -260,7 +268,7 @@ class Internasional extends BaseController
                     'barang1_id_warehouse' => $checkStock['barang1_id'],
                     'barang2_id_warehouse' => $checkStock['barang2_id'],
                     'barang_id_order' => $b->output->id_barang,
-                    'qty' => $b->output->qty
+                    'qty' => $b->qty
                 ]);
             }
         }
@@ -275,6 +283,10 @@ class Internasional extends BaseController
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
+        $checkStuffing = $this->stuffingInternasionalModel->find($id);
+        $this->salesOrderModel->update($checkStuffing['sales_order_export_id'], [
+            'used' => 'NOT USED'
+        ]);
         $this->stuffingInternasionalModel->delete($id);
         $this->stuffingInternasionalDetailModel->where('stuffing_internasional_id', $id)->delete();
 
@@ -323,7 +335,7 @@ class Internasional extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "PENJUALAN",
-                $salesOrder['no_sales_order'],
+                $salesOrder['sales_order_export_no'],
                 "-"
             );
 

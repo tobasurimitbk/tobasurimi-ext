@@ -52,6 +52,7 @@ class StuffingLokalDetailModel extends Model
         $barangMasterSalesModel = new BarangMasterSalesModel();
         $barangMasterSalesModel = new BarangMasterSalesModel();
         $metaDataModel = new MetadataModel();
+        $salesOrderDetailModel = new SalesOrderDetailModel();
 
         $result = array();
         $stuffingLokalDetail = $this->asArray()
@@ -79,12 +80,11 @@ class StuffingLokalDetailModel extends Model
                 $barangName = $kemasan['name'];
             }
 
-            $stockOutput = $barangMasterSalesModel
+            $stockOutput = $salesOrderDetailModel
                 ->select('barang_master_sales.*, sales_order_detail.qty')
-                ->join('sales_order_detail', 'sales_order_detail.id_barang = barang_master_sales.id', 'left')
-                ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order', 'left')
+                ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
                 ->where('barang_master_sales.id', $m['barang_id_order'])
-                ->where('sales_order_detail.id_sales_order', $m['sales_order_id'])
+                ->where('sales_order_detail.sales_order_export_id', $m['sales_order_export_id'])
                 ->first();
 
             if ($stockOutput) {

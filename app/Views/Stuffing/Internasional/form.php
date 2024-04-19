@@ -55,7 +55,7 @@
                 <input type="hidden" name="id" id="id" value="<?= !empty($stuffingInternasional) ? encrypt($stuffingInternasional['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -78,24 +78,37 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($stuffingInternasional) ? ($stuffingInternasional['status_posting'] ? 'disabled' : 'disabled') : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($orderForm as $v) : ?>
-                                    <option <?= !empty($stuffingInternasional) ? ($stuffingInternasional['sales_order_export_id'] == $v['sales_order_export_id'] ? 'selected' : '') : '' ?> value="<?= $v['sales_order_export_id'] ?>" data-id_customer="<?= $v['customer_id'] ?>" data-name_customer="<?= $v['customer_name'] ?>">
-                                        <?= strtoupper($v['sales_order_export_no']); ?>
+                                    <option <?= !empty($stuffingInternasional) ? ($stuffingInternasional['sales_order_export_id'] == $v['sales_order_export_id'] ? 'selected' : '') : '' ?> value="<?= $v['sales_order_export_id'] ?>" data-id_customer="<?= $v['customer_id'] ?>" data-name_customer="<?= $v['customer_name'] ?>" data-bc_type="<?= $v['bc_type'] ?>">
+                                        <?= strtoupper($v['sales_order_export_no']); ?> - <?= strtoupper($v['customer_name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Sales Order</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="hidden" value="<?= !empty($stuffingInternasional) ? $stuffingInternasional['customer_id'] : '' ?>" class="form-control customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example" />
                             <input type="text" <?= !empty($stuffingInternasional) ? ($stuffingInternasional['status_posting'] ? 'readonly' : 'readonly') : 'readonly' ?> placeholder="Nama Customer" value="<?= !empty($stuffingInternasional) ? $stuffingInternasional['customer_name'] : '' ?>" class="form-control customer_name" id="customer_name" name="customer_name" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Nama Customer</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
+                            <select disabled <?= !empty($stuffingInternasional) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataAJU as $aju) : ?>
+                                    <option <?= !empty($stuffingInternasional) ? ($stuffingInternasional['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Dokumen Pabean</label>
                         </div>
                     </div>
                 </div>
@@ -423,8 +436,10 @@
     }).change(function() {
         let customer_id = $('#sales_order_id option:selected').data('id_customer');
         let customer_name = $('#sales_order_id option:selected').data('name_customer');
+        let bc_type = $('#sales_order_id option:selected').data('bc_type');
         $('#customer_id').val(customer_id);
         $('#customer_name').val(customer_name);
+        $('#aju_document_type').val(bc_type).change();
         getListBarangOutput();
     });
 
@@ -569,7 +584,7 @@
 
                     if (!isIDSelected) {
                         var isDuplicateOutput = listStockSelected.some(function(item) {
-                            return item.output.id_barang == dataIdBarangOrder && parseFloat(item.qty) + parseFloat(qty) <= parseFloat(dataQtyBarangOrder);
+                            return item.output.id_barang == dataIdBarangOrder && parseFloat(item.qty) + parseFloat(qty) >= parseFloat(dataQtyBarangOrder);
                         });
 
                         if (!isDuplicateOutput) {
@@ -619,11 +634,9 @@
                     var input_user = parseFloat(element.val());
                     var stok_max = parseFloat(element.data('stok_total'));
 
-                    if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                    if (isNaN(input_user) || input_user == undefined || input_user == 0) {
                         dataError = listStockSelected[i];
                         isValid = false;
-                    } else {
-                        listStockSelected[i].qty = input_user;
                     }
                 });
 
@@ -739,9 +752,14 @@
             var input_user = parseFloat(element.val());
             var stok_max = parseFloat(element.data('stok_total'));
 
-            if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                dataError = listStockSelected[i];
-                isValid = false;
+            if (input_user > stok_max && input_user > listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = stok_max;
+            } else if (input_user > stok_max && input_user < listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = stok_max;
+            } else if (input_user < stok_max && input_user > listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = listStockSelected[i].output.qty;
+            } else if (input_user < stok_max && input_user < listStockSelected[i].output.qty) {
+                listStockSelected[i].qty = input_user;
             } else {
                 listStockSelected[i].qty = input_user;
             }
@@ -907,51 +925,26 @@
     }
 
     function drawTableOrderBarang(data) {
-        if ($.fn.DataTable.isDataTable('#dataTableSalesOrder')) {
-            $('#dataTableSalesOrder').DataTable().clear().draw();
-            table.destroy();
-        }
-        const tableSales = $('#dataTableSalesOrder');
-        $.each(data, function(i, v) {
+        const tableSales = $('#dataTableSalesOrder').DataTable();
+
+        // Clear the existing rows
+        tableSales.clear().draw();
+
+        // Add new rows
+        data.forEach(function(v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <div class="form-check">
-                    <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="checkbox">
-                </div>
-            `
+            <div class="form-check">
+                <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="radio" name="selectedItem">
+            </div>
+        `
             ));
             newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
             newRow.append($('<td style="text-align: center;">').text(v.qty));
-            tableSales.find('tbody').append(newRow);
+            tableSales.row.add(newRow).draw(false);
         });
-
-        dataTables = $('#dataTableSalesOrder').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        dataTables.draw();
     }
 
     function drawTableSelectedItem(data) {
@@ -1033,10 +1026,11 @@
 
     function updateOrder(input) {
         var index = input.data('index');
-        var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val()); // Ambil nilai qty yang diinputkan
+        var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val());
         var item = listStockSelected[index];
-        var maxQty = parseFloat(item.output.qty);
-        var qty = Math.min(maxQty, qtyInput);
+        var maxQty = parseFloat(item.stok_total);
+        var maxOutputQty = parseFloat(item.output.qty);
+        var qty = Math.min(maxQty, qtyInput, maxOutputQty);
         input.val(qty);
     }
 
