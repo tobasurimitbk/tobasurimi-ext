@@ -43,11 +43,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" <?= !empty($dataSalesExport) ? 'readonly' : '' ?> class="form-control no_sales_order" id="no_sales_order" name="no_sales_order" placeholder="No. Sales Order" required <?= !empty($dataSalesExport) ? 'disabled value="' . $dataSalesExport->sales_contract_id . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" type="text" <?= !empty($dataSalesExport) ? 'readonly' : '' ?> class="form-control no_sales_order" id="no_sales_order" name="no_sales_order" placeholder="No. Sales Order" required <?= !empty($dataSalesExport) ? 'disabled value="' . $dataSalesExport->sales_order_export_no . '"' : '' ?>>
                                     <label for="floatingInput">No. Order</label>
-                                </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px; <?= !empty($dataSalesExport) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -254,6 +251,7 @@
             <?php } ?>
         <?php } else { ?>
             getSalesKontrak();
+            changeStatus()
         <?php } ?>
 
         // Sales Kontrak
@@ -688,7 +686,7 @@
                 newRow.append($('<td>').text(formatRupiah(item.harga)));
                 newRow.append($('<td>').text(formatRupiah(item.total)));
                 newRow.append($('<td>').html(`
-                <input <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
+                <input <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="preventNegativeInput(this);updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
             `));
                 newRow.append($('<td>').text(formatRupiah(item.hargaOrder)));
                 newRow.append($('<td>').text(formatRupiah(item.totalHargaOrder)));
@@ -793,34 +791,34 @@
     }
 
     function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
+        // let value = document.getElementById('auto_generate').checked ? true : false;
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
-        if (value) {
-            $.ajax({
-                url: "<?= base_url("order-form-internasional/generate-no-order-form"); ?>",
-                method: "POST",
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    setLoading();
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    $(".no_sales_order").val(response.data);
-                },
+        // if (value) {
+        $.ajax({
+            url: "<?= base_url("order-form-internasional/generate-no-order-form"); ?>",
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                $(".no_sales_order").val(response.data);
+            },
 
-            });
-            $(".no_sales_order").attr("readonly", true);
-        } else {
-            $(".no_sales_order").attr("readonly", false);
-            $(".no_sales_order").val("");
-        }
+        });
+        $(".no_sales_order").attr("readonly", true);
+        // } else {
+        //     $(".no_sales_order").attr("readonly", false);
+        //     $(".no_sales_order").val("");
+        // }
     }
 </script>
 <?= $this->endSection(); ?>

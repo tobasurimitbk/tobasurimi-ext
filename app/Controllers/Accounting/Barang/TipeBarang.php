@@ -143,7 +143,7 @@ class TipeBarang extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data['id'],
-                "parent_name"           => $data['barang_name'],
+                "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
                 "ap_id"                 => $dataNamaAP,
                 "ar_id"                 => $dataNamaAR,
             ]);

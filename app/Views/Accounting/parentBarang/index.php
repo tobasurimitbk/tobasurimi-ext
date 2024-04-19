@@ -47,7 +47,7 @@
             <div class="row mt-3">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
+                        <thead class="thead-dark text-center">
                             <tr>
                                 <th>No.</th>
                                 <th>Barang</th>
@@ -178,7 +178,7 @@
                 width: "5%"
             }, {
                 data: "parent_name",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
             }, {
                 data: "ap_id",

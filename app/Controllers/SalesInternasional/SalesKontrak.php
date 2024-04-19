@@ -139,7 +139,9 @@ class SalesKontrak extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($salesKontrakData['data'] as $data) {
-            $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $data->id)->findAll();
+            $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $data->id)->where('deletedAt', null)->findAll();
+            // var_dump($isClosed);
+            // exit;
 
             array_push($dataSalesKontrak, [
                 "no"                    => $no++,
