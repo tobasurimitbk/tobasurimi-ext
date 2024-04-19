@@ -217,7 +217,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-master-barang">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
@@ -302,7 +302,7 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-secondary text-black" role="alert">
-                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_MASTER_BARANG.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                    UNDUH FORMAT EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_MASTER_BP.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
                 </div>
                 <form class="form-excel" method="post">
                     <div class="form-floating" style="height: 50px;">
@@ -471,6 +471,18 @@
             $('.add-modal').modal('hide');
         });
 
+        // upload excel
+        $('.btn-upload-excel').click(function() {
+            $('#file').val(null);
+            $('#import_excel_modal').modal('show');
+
+        });
+
+        $('.btn-discard-import-excel').click(function() {
+            $('#import_excel_modal').modal('hide');
+        });
+
+
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             let data = table.row(this).data();
             let id = data.id;
@@ -489,9 +501,9 @@
                 success: function(res) {
                     $('.delete-btn').show();
                     $('.title-name').text("Update Bahan Penolong");
-                    // <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
-                    //     $('.btn-submit-form').hide();
-                    // <?php endif; ?>
+                    <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
+                        $('.btn-submit-master-barang').hide();
+                    <?php endif; ?>
                     $('input[name="kode_barang"]').attr('readonly', true);
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
@@ -529,7 +541,7 @@
                 }
             })
         })
-        $('.btn-submit-form').click(function(e) {
+        $('.btn-submit-master-barang').click(function(e) {
             e.preventDefault();
             if (list_items.length === 0) {
                 Swal.fire({
@@ -838,6 +850,75 @@
             tablePoLokal.ajax.reload();
         })
 
+    });
+
+    $('.btn-submit-excel').click(function() {
+        if ($('.form-excel').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Import Excel?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let formData = new FormData(document.querySelector(".form-excel"));
+                    formData.append('type_barang', "bahan_penolong");
+                    $.ajax({
+                        url: "<?= base_url("barang-master/import"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+
+                }
+            })
+        }
+    });
+
+
+    var validator_excel = $(".form-excel").validate({
+        rules: {
+            file: {
+                required: true
+            },
+        },
+        messages: {
+            file: {
+                required: "File wajib diisi"
+            },
+        },
     });
 
     var validator_spek = $(".spek-form").validate({
@@ -1401,7 +1482,7 @@
     });
 
     $('.filter_coa').select2({
-        placeholder: "",
+        placeholder: "Filter Akun",
         theme: "bootstrap-5",
         allowClear: true,
     })

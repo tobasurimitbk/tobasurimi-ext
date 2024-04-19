@@ -5,6 +5,9 @@
     <div class="section-header">
         <h1>Kemasan</h1>
         <?php if (can('Master Barang', 'Kemasan', 'c')) : ?>
+            <button class="btn btn-discard btn-dropdown-export btn-upload-excel float-right" type="button">
+                <i class="fas fa-file-excel"></i> Import
+            </button>
             <button class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </button>
@@ -99,7 +102,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-parent">Simpan</button>
                 <?php if (can('Master Barang', 'Kemasan', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <?php endif; ?>
@@ -108,13 +111,37 @@
     </div>
 </div>
 
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Master Kemasan</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH FORMAT EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_MASTER_KEMASAN.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel" method="post">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     let sort = "id";
     let sortType = "desc";
 
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -198,6 +225,18 @@
         }
     });
 
+    // upload excel
+    $('.btn-upload-excel').click(function() {
+        $('#file').val(null);
+        $('#import_excel_modal').modal('show');
+
+    });
+
+    $('.btn-discard-import-excel').click(function() {
+        $('#import_excel_modal').modal('hide');
+    });
+
+
     $(".search").keyup(function() {
         table.ajax.reload();
     });
@@ -275,6 +314,73 @@
         })
     });
 
+    $('.btn-submit-excel').click(function() {
+        if ($('.form-excel').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Import Excel?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let formData = new FormData(document.querySelector(".form-excel"));
+                    $.ajax({
+                        url: "<?= base_url("kemasan/import"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+
+                }
+            })
+        }
+    });
+
+
+    var validator_excel = $(".form-excel").validate({
+        rules: {
+            file: {
+                required: true
+            },
+        },
+        messages: {
+            file: {
+                required: "File wajib diisi"
+            },
+        },
+    });
 
     var validator = $(".create-form").validate({
         rules: {
@@ -330,7 +436,7 @@
 
     $('#generate_new_code').attr('checked', true);
 
-    $('.btn-submit-form').click(function() {
+    $('.btn-submit-form-parent').click(function() {
         if ($('.create-form').valid()) {
             let id = $('.id').val();
             let data = new FormData(document.querySelector('.create-form'));

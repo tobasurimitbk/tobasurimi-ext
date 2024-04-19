@@ -706,6 +706,7 @@ $routes->post('/kemasan/delete', 'Warehouse\Kemasan::delete', ['filter' => 'Auth
 $routes->post('/kemasan/get', 'Warehouse\Kemasan::get', ['filter' => 'Auth']);
 $routes->get('/kemasan/all', 'Warehouse\Kemasan::all', ['filter' => 'Auth']);
 $routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode', ['filter' => 'Auth']);
+$routes->post('/kemasan/import', 'Warehouse\Kemasan::import', ['filter' => 'Auth']);
 
 // JASA VENDOR
 // REBUSAN
