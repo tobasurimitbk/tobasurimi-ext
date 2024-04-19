@@ -584,8 +584,10 @@
 
                     if (!isIDSelected) {
                         var isDuplicateOutput = listStockSelected.some(function(item) {
-                            return item.output.id_barang == dataIdBarangOrder && parseFloat(item.qty) + parseFloat(qty) <= parseFloat(dataQtyBarangOrder);
+                            return item.output.id_barang == dataIdBarangOrder && parseFloat(item.qty) + parseFloat(qty) >= parseFloat(dataQtyBarangOrder);
                         });
+
+                        console.log(isDuplicateOutput);
 
                         if (!isDuplicateOutput) {
                             listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
@@ -610,7 +612,6 @@
                     }
                 }
             });
-            console.log(listStockSelected);
 
             drawTableSelectedItem(listStockSelected);
         }
@@ -639,8 +640,6 @@
                         isValid = false;
                     }
                 });
-
-                console.log(listStockSelected);
 
                 if (!isValid) {
                     Swal.fire({
@@ -765,10 +764,6 @@
             } else {
                 listStockSelected[i].qty = input_user;
             }
-            console.log(input_user);
-            console.log(listStockSelected[i].qty);
-            console.log(listStockSelected[i].output.qty);
-            console.log(stok_max);
         });
     }
 
@@ -940,7 +935,7 @@
             newRow.append($('<td style="text-align: center;">').html(
                 `
             <div class="form-check">
-                <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="checkbox">
+                <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="radio" name="selectedItem">
             </div>
         `
             ));
@@ -950,6 +945,7 @@
             tableSales.row.add(newRow).draw(false);
         });
     }
+
 
 
     function drawTableSelectedItem(data) {
