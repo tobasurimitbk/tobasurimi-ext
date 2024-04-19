@@ -241,7 +241,8 @@ class LocalPOPaymentModel extends Model
                 'totalDiterima' => $rm['qty_diterima'],
                 'akun_kas' => "-",
                 'akun_selisih' => "-",
-                'totalHarga' => toRupiah($harga)
+                'totalHarga' => toRupiah($harga),
+                'totalHargaNumber' => $harga
             ];
         }
 
@@ -250,6 +251,7 @@ class LocalPOPaymentModel extends Model
             'totalOrder' => $totalOrder,
             'totalDiterima' => $totalDiterima,
             'totalHarga' => toRupiah($hargaTotal),
+            'totalHargaNumber' => $hargaTotal
         ];
 
         $result['itemList'] = $itemList;
@@ -263,6 +265,7 @@ class LocalPOPaymentModel extends Model
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $supplierHargaModel = new SupplierHargaModel();
+        $barangMasterModel = new BarangMasterModel();
 
         $query = "
         SELECT *
@@ -276,7 +279,6 @@ class LocalPOPaymentModel extends Model
         ";
 
         $lpb = $this->db->query($query)->getResultArray();
-
         if (count($lpb) == 0) {
             return [
                 'detail' => 0,
@@ -298,7 +300,6 @@ class LocalPOPaymentModel extends Model
         $conditionLocalPay = [
             'deletedAt' => null,
             'supplier_id' => $supplierID,
-            'status_lunas' => '0',
             'type_po' => "Bahan Baku"
         ];
 
@@ -306,7 +307,7 @@ class LocalPOPaymentModel extends Model
         $payLpbLatest = $localPaymentModel->where($conditionLocalPay)->findAll();
 
         foreach ($payLpbLatest as $p) {
-            foreach (json_decode(\json_decode($p['multiple_po_id'])) as $pm) {
+            foreach (json_decode(($p['multiple_po_id'])) as $pm) {
                 array_push($poIsPay, $pm);
             }
         }
@@ -337,7 +338,11 @@ class LocalPOPaymentModel extends Model
         $totalSudahDibayar = 0;
 
         // cari nominal sudah dibayar
-        $localPoPayment = $localPaymentModel->whereIn('multiple_po_id', $poNotPay)->findAll();
+        if (count($poIsPay) == 0) {
+            $localPoPayment = [];
+        } else {
+            $localPoPayment = $localPaymentModel->whereIn('multiple_po_id', $poIsPay)->findAll();
+        }
 
         foreach ($localPoPayment as $l) {
             $totalSudahDibayar += $l['harga_sebelum_diskon'];
@@ -353,10 +358,10 @@ class LocalPOPaymentModel extends Model
 
         foreach ($rmDetail as $rm) {
             $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $rm['rm_purchase_order_id'])->first();
-            $supplierHarga = $supplierHargaModel->select('barang_master_spesifikasi.spesifikasi, barang_master.barang_name, ')
-                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id')
-                ->where('supplier_harga.id', $rm['supplier_harga_id'])
+            $supplierHarga = $barangMasterModel->select('barang_master_spesifikasi.spesifikasi, barang_master.barang_name')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id')
+                ->where('barang_master_spesifikasi.barang_master_id', $rm['barang1_id'])
+                ->where('barang_master_spesifikasi.id', $rm['barang2_id'])
                 ->first();
 
             $lpbDetail = $penerimaanBarangModel->where($conditionLpb)->like('multiple_po_id', $rm['rm_purchase_order_id'])->first();
@@ -372,7 +377,7 @@ class LocalPOPaymentModel extends Model
                 'lpbNo' => $lpbDetail['no_penerimaan_barang'],
                 'tanggalPo' => date('d/m/Y', \strtotime($rmPurchaseOrder['po_date'])),
                 'poNo' => $rmPurchaseOrder['po_no'],
-                'barang' => $supplierHarga['barang_name'] . " - " . $supplierHarga['spesifikasi'] . "",
+                'barang' => $supplierHarga != null ?  $supplierHarga['barang_name'] . " - " . $supplierHarga['spesifikasi'] . "" : "-",
                 'totalOrder' => $rm['qty'],
                 'totalDiterima' => $rm['qty_diterima'],
                 'totalHarga' => toRupiah($harga),
@@ -410,7 +415,6 @@ class LocalPOPaymentModel extends Model
 
         $conditionLocalPay = [
             'deletedAt' => null,
-            'status_lunas' => '0',
             'supplier_id' => $supplierID,
             'type_po' => "Bahan Baku"
         ];
@@ -439,7 +443,11 @@ class LocalPOPaymentModel extends Model
         $totalSudahDibayar = 0;
 
         // cari nominal sudah dibayar
-        $localPoPayment = $localPaymentModel->whereIn('multiple_po_id', $poIsPay)->findAll();
+        if (count($poIsPay) != 0) {
+            $localPoPayment = $localPaymentModel->whereIn('multiple_po_id', $poIsPay)->findAll();
+        } else {
+            $localPoPayment = [];
+        }
 
         foreach ($localPoPayment as $l) {
             $totalSudahDibayar += $l['harga_sebelum_diskon'];
@@ -524,7 +532,6 @@ class LocalPOPaymentModel extends Model
             'deletedAt' => null,
             'type_po' => $typePO,
             'supplier_id' => $supplierID,
-            'status_lunas' => '0'
         ];
 
         $paymentList = $localPaymentModel->where($conditionLocalPayment)->findAll();

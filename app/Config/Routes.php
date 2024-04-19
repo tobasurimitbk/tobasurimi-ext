@@ -353,7 +353,7 @@ $routes->post('/rekap-faktur/delete', 'Purchase\RekapFaktur::deleteRekap', ['fil
 // PEMBAYARAN PO LOKAL BP
 $routes->get('/pembayaran-po-lokal-bp', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBP', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-lokal-bp/get-rekap-faktur/(:segment)', 'Pembayaran\PembayaranPOLokal::getTandaTerimaFaktur/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal-bp/get-rekap-faktur/(:segment)/(:segment)', 'Pembayaran\PembayaranPOLokal::getTandaTerimaFaktur/$1/$2', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/get-item-list/(:segment)', 'Pembayaran\PembayaranPOLokal::getItemListByTandaTerimaFaktur/$1', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/generate-no-pembayaran', 'Pembayaran\PembayaranPOLokal::generatePaymentNo', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBPAction', ['filter' => 'Auth']);
@@ -392,6 +392,14 @@ $routes->post('/pembayaran-po-import/generate-no-pembayaran', 'Pembayaran\Pembay
 $routes->post('/pembayaran-po-import/po-belum-lunas', 'Pembayaran\PembayaranPOImport::listPembayaranPOBelumLunas', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all-po', 'Pembayaran\PembayaranPOImport::allPO', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all-riwayat-pembayaran', 'Pembayaran\PembayaranPOImport::allRiwayatPembayaran', ['filter' => 'Auth']);
+
+// PEMBAYARAN LAIN LAIN
+$routes->get('/pembayaran-lain', 'Pembayaran\OtherPayment::index', ['filter' => 'Auth']);
+$routes->get('/pembayaran-lain/create', 'Pembayaran\OtherPayment::create', ['filter' => 'Auth']);
+$routes->post('/pembayaran-lain/save', 'Pembayaran\OtherPayment::createAction', ['filter' => 'Auth']);
+$routes->get('/pembayaran-lain/get', 'Pembayaran\OtherPayment::get', ['filter' => 'Auth']);
+$routes->post('/pembayaran-lain/delete', 'Pembayaran\OtherPayment::delete', ['filter' => 'Auth']);
+$routes->get('/pembayaran-lain/all', 'Pembayaran\OtherPayment::all', ['filter' => 'Auth']);
 
 // penerimaan pembayaran SO
 $routes->get('/penerimaan-penjualan-lokal', 'Penerimaan\SalesOrderPayment::index', ['filter' => 'Auth']);
