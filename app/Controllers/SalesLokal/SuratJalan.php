@@ -205,17 +205,27 @@ class SuratJalan extends BaseController
 
             // start transaction
             $this->SuratJalanModel->db->transException(true)->transStart();
-
             $values = [
                 "id_user"       => $this->userId,
                 "id_customer"   => $this->request->getPost('id_customer'),
                 "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-                "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
+                "no_surat_jalan" => strtoupper($this->request->getVar('no_surat_jalan')),
                 "no_po"         => $this->request->getPost('no_po'),
                 "note"          => $this->request->getPost('note'),
                 'multiple_id_so' => json_encode($idArray),
                 'multiple_no_so' => json_encode($noArray),
             ];
+            $checkSJ = $this->SuratJalanModel->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
+            if ($checkSJ) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "No Surat Jalan Sudah Digunakan",
+                    "payload"   => $values,
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
             $dataSuratJalan =  $this->SuratJalanModel->insert($values);
 
             $this->SalesOrderModel->whereIn('id', $idArray)

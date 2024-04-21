@@ -86,7 +86,7 @@
                                 <option value=""></option>
                                 <?php foreach ($orderForm as $v) : ?>
                                     <option <?= !empty($stuffingLokal) ? ($stuffingLokal['sales_order_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>" data-id_customer="<?= $v['id_customer'] ?>" data-name_customer="<?= $v['customer_name'] ?>" data-bc_type="<?= $v['bc_type'] ?>">
-                                        <?= strtoupper($v['no_sales_order']); ?>
+                                        <?= strtoupper($v['no_sales_order']); ?> - <?= strtoupper($v['customer_name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -945,8 +945,6 @@
             tableSales.row.add(newRow).draw(false);
         });
     }
-
-
 
     function drawTableSelectedItem(data) {
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {

@@ -320,9 +320,6 @@ class OrderForm extends BaseController
             $invNumber = $numberTemplate . '001';
         }
 
-        // $noSalesOrder = $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
-        // return $invNumber;
-
         return response()->setJSON([
             'data' => $invNumber,
             'token' => csrf_hash(),

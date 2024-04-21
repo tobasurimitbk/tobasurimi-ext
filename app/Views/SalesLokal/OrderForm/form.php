@@ -687,7 +687,6 @@
             ?>
         <?php
         } ?>
-        console.log(list_items);
 
         $('.dataTable tbody').on('click', 'button', function() {
             let rowData = table.row($(this).parents('tr')).data();
@@ -739,13 +738,14 @@
                 })
             } else {
                 // Hapus item dari array JavaScript dan gambar ulang tabel
+                console.log(list_items);
+                console.log(table);
                 let indexToRemove = list_items.findIndex(item => item.no === dataNo);
                 if (indexToRemove !== -1) {
                     list_items.splice(indexToRemove, 1);
                     table.clear().rows.add(list_items).draw();
                 }
             }
-
             reCountTotal();
         });
         generateCodeMasterBarang();
@@ -1800,12 +1800,6 @@
                         data.append("tax_status", taxStatus)
                         data.append("include_tax", includeTaxStatus)
                         data.append("items", JSON.stringify(update_list_items))
-                        // data.append("items", update_list_items)
-
-                        // var object = {};
-                        // data.forEach((value, key) => object[key] = value);
-                        // var json = JSON.stringify(object);
-                        // console.log(json, JSON.stringify(update_list_items))
 
 
 
@@ -2030,7 +2024,9 @@
                                     satuan: selectedData.satuan,
                                     disc: discountPercentage,
                                     discAmt: discAmt,
-                                    isDeleted: false
+                                    isDeleted: false,
+
+                                    barangTotal: amount,
                                 });
 
                                 table.row.add({
@@ -2094,7 +2090,6 @@
                     }
                 }
             }
-            console.log(list_items);
         });
 
         $('#estimated_freight').keyup(function() {
@@ -2114,6 +2109,7 @@
             let taxTotalHtml = 0;
             const estimatedFreightVal = $('#estimated_freight').val() || '0';
             const estimatedFreight = +estimatedFreightVal.replace(/\,/g, '');
+
 
             itemList.map((obj) => {
                 itemSubTotal += +obj.barangTotal;
@@ -2135,9 +2131,6 @@
 
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#discTotal').html(discTotal.toLocaleString());
-            // $('#taxTotal').html(taxTotalHtml.toLocaleString());
-
-            // if (includeTax) taxTotal = 0;
 
             const grandTotal = itemSubTotal + estimatedFreight + taxTotal - discTotal;
             $('#grandTotal').html(grandTotal.toLocaleString());
