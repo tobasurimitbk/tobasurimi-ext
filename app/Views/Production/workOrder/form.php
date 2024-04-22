@@ -812,10 +812,57 @@
     const deleteRowDetail = function(id) {
         const indexToRemove = list_items.findIndex(item => item.barang_detail_id === id);
         if (indexToRemove !== -1) {
-            list_items.splice(indexToRemove, 1);
+            // Check if there's work_order_detail_id
+            if (list_items[indexToRemove].work_order_detail_id) {
+                // If work_order_detail_id exists, execute Ajax
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Yakin akan di hapus?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("work-order/delete-detail"); ?>",
+                            data: {
+                                id: list_items[indexToRemove].work_order_detail_id,
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            location.reload();
+                                        })
+                                }
+                            },
+                        });
+                    }
+                });
+            } else {
+                // If work_order_detail_id does not exist, simply remove the item from the list
+                list_items.splice(indexToRemove, 1);
+                drawTable();
+                $(".btn-show-detail").css("display", "");
+            }
         }
-        drawTable();
-        $(".btn-show-detail").css("display", "");
     }
 
     // Update
@@ -837,7 +884,12 @@
         <?php endforeach; ?>
         console.log(list_items);
         drawTable();
-        $(".btn-show-detail").css("display", "none");
+        <?php if (!empty($dataWorkOrderDetails)) : ?>
+            $(".btn-show-detail").css("display", "none");
+        <?php endif; ?>
+        <?php if (empty($dataWorkOrderDetails)) : ?>
+            $(".btn-show-detail").css("display", "");
+        <?php endif; ?>
     <?php endif; ?>
 </script>
 

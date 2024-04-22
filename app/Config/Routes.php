@@ -551,6 +551,7 @@ $routes->get('/work-order/all', 'Production\WorkOrder::all', ['filter' => 'Auth'
 $routes->post('/work-order/save', 'Production\WorkOrder::create', ['filter' => 'Auth']);
 $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' => 'Auth']);
 $routes->post('/work-order/delete', 'Production\WorkOrder::deleteWO', ['filter' => 'Auth']);
+$routes->post('/work-order/delete-detail', 'Production\WorkOrder::deleteWODetail', ['filter' => 'Auth']);
 
 // Material Request
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);

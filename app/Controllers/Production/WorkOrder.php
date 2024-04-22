@@ -97,6 +97,7 @@ class WorkOrder extends BaseController
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = work_order_details.barang2_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
                 ->where('work_order_id', $id)
+                ->where('work_order_details.deletedAt', null)
                 ->get()->getResult();
             $data["dataWorkOrders"] = $dataWorkOrders;
             $data["dataWorkOrderDetails"] = $dataWorkOrderDetails;
@@ -306,6 +307,18 @@ class WorkOrder extends BaseController
 
         return response()->setJSON([
             'message' => "Work Order Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function deleteWODetail()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->workOrderDetailsModel->where('id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Barang Work Order Berhasil Dihapus",
             'token' => csrf_hash(),
             'status' => true
         ]);
