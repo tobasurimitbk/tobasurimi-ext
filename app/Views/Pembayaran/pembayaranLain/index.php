@@ -142,8 +142,31 @@
     <?= csrf_field() ?>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
+            <div class="row justify-content-end row-col-spp">
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Pembayaran">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Pembayaran">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mb-3">
+                    <select class="form-select status_posting" name="status_posting" id="status_posting" aria-label="Floating label select example">
+                        <option value="ALL">STATUS : SEMUA</option>
+                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
+                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
+                    </select>
+                </div>
+                <div class="col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -153,12 +176,12 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th>No. Pembayaran</th>
-                                <th>Departemen</th>
-                                <th>Tanggal</th>
-                                <th>Metode Pembayaran</th>
-                                <th>Valas</th>
-                                <th>Nominal</th>
+                                <th onclick="changeSort('no_pembayaran')">No. Pembayaran</th>
+                                <th onclick="changeSort('divisi_id')">Departemen</th>
+                                <th onclick="changeSort('tanggal')">Tanggal</th>
+                                <th onclick="changeSort('metode_pembayaran')">Metode Pembayaran</th>
+                                <th onclick="changeSort('valas')">Valas</th>
+                                <th onclick="changeSort('nominal_pembayaran')">Nominal</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -198,6 +221,9 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.status_posting = $(".status_posting").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -249,16 +275,28 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let form = '';
-                    <?php if (can('Pembayaran', 'Lain - Lain', 'd')) : ?>
-                        form += `
-                        <div class="mt-0">
+                    let status_posting = row?.status_posting;
+
+                    form += ` <div class="mt-0">`;
+                    if (status_posting == '0') {
+                        <?php if (can('Pembayaran', 'Lain - Lain', 'd')) : ?>
+                            form += `
                             <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    
+                            </button>                    
                         `;
-                    <?php endif; ?>
+                        <?php endif; ?>
+                        form += `
+                        <?php if (can('Pembayaran', 'Lain - Lain', 'a')) : ?>
+                            <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                    `;
+                    } else {
+                        form += '-';
+                    }
+                    form += ` </div>`;
                     return form;
                 }
             }
@@ -366,24 +404,42 @@
             autoclose: true
         });
 
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
         $('#divisi_id').select2({
             placeholder: "Pilih Departemen",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal')
         });
 
         $('#valas').select2({
             placeholder: "Pilih Mata Uang",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal')
         });
 
         $('#akun_kas').select2({
             placeholder: "Pilih Debit",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal')
         });
 
         $('#akun_selisih').select2({
             placeholder: "Pilih Kredit (Opsional)",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal')
         });
 
         $(".dataTable_info").addClass("pt-0");
@@ -407,12 +463,20 @@
             table.ajax.reload();
         })
 
+        $(".dateStart, .dateEnd").change(function() {
+            table.ajax.reload();
+        })
+
+        $(".status_posting").change(function() {
+            table.ajax.reload();
+        });
+
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;
-            $(".title-name").text("Update");
+            $(".title-name").text("Update Pembayaran Lain");
 
             validator.resetForm();
             validator.reset();
@@ -422,10 +486,18 @@
                 data: {
                     id: id
                 },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
+                        resetForm();
+                        $('#id').val(res?.data?.id);
                         $("#no_pembayaran").val(res?.data?.no_pembayaran);
                         $('#tanggal').val(res?.data?.tanggal);
                         $('#divisi_id').val(res?.data?.divisi_id).change();
@@ -437,7 +509,11 @@
                         $('#akun_kas').val(res?.data?.akun_kas).change();
                         $('#akun_selisih').val(res?.data?.akun_selisih).change();
                         $('#keterangan').val(res?.data?.keterangan);
-                        disabledForm();
+                        if (res?.data?.status_posting === "1") {
+                            disabledForm();
+                        } else {
+                            $("#no_pembayaran").attr('disabled', true);
+                        }
                         $(".add-modal").modal("show")
                     } else {
                         Swal.fire({
@@ -464,45 +540,89 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
+                        let id = $('.id').val();
                         let data = new FormData(document.querySelector(".create-form"));
-                        $.ajax({
-                            url: "<?= base_url("pembayaran-lain/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading()
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
+                        if (id) {
+                            $.ajax({
+                                url: "<?= base_url("pembayaran-lain/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    setLoading();
+                                },
+                                complete: function() {
+                                    stopLoading()
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
+
+                                        resetForm();
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
+                                    }
+                                },
+
+                            });
+                        } else {
+                            $.ajax({
+                                url: "<?= base_url("pembayaran-lain/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    setLoading();
+                                },
+                                complete: function() {
+                                    stopLoading()
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
+
+                                        resetForm();
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
                                         })
+                                    }
+                                },
 
-                                    resetForm();
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            },
+                            });
+                        }
 
-                        });
+
 
                     }
                 })
@@ -532,7 +652,11 @@
                     method: "POST",
                     dataType: "json",
                     beforeSend: function(xhr) {
+                        setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     processData: false,
                     contentType: false,
@@ -582,6 +706,7 @@
         $('#akun_selisih').attr('disabled', false);
         $('#keterangan').attr('disabled', false);
 
+        $("#id").val(null).change();
         $("#no_pembayaran").val(null).change();
         $('#tanggal').val(null).change();
         $('#divisi_id').val(null).change();
@@ -595,6 +720,60 @@
         $('#keterangan').val(null).change();
 
         $('.btn-submit-form').show();
+    }
+
+    const posting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting Pembayaran ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-lain/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
     }
 
     function preventNegativeInput(inputElement) {

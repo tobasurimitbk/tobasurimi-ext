@@ -39,6 +39,13 @@
                     </select>
                 </div>
                 <div class="col mb-3">
+                    <select class="form-select status_posting" name="status_posting" id="status_posting" aria-label="Floating label select example">
+                        <option value="ALL">STATUS : SEMUA</option>
+                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
+                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
+                    </select>
+                </div>
+                <div class="col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -47,7 +54,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th>No. Pembayaran</th>
                                 <th>Tipe Bayar</th>
                                 <th>Supplier</th>
@@ -70,6 +77,7 @@
 <script>
     let sort = "id";
     let sortType = "desc";
+    const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -95,6 +103,7 @@
                 data.paymentDate = $(".paymentDate").val();
                 data.type_po = "Bahan Baku";
                 data.type_bayar = $(".type_bayar").val();
+                data.status_posting = $(".status_posting").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -149,18 +158,36 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
-                    return `
-                    
-                    
-                        <div class="mt-0">
-                        <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    `
+                    let form = '';
+                    let status_posting = row?.status_posting;
+                    form += ` <div class="mt-0">`;
+                    if (status_posting == '0') {
+                        form += `
+                            <?php if (can('Pembayaran', 'Lokal BB', 'd')) : ?>
+                                <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if (can('Pembayaran', 'Lokal BB', 'p')) : ?>
+                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+                    } else {
+                        form += '-';
+                    }
+
+                    form += ` </div>`;
+
+                    return form;
                 }
             }
         ],
@@ -211,6 +238,10 @@
             table.ajax.reload();
         })
 
+        $(".status_posting").change(function() {
+            table.ajax.reload();
+        });
+
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             location.replace(`<?= base_url("pembayaran-po-lokal-bb/id/"); ?>${data.id}`);
@@ -219,6 +250,51 @@
     const print = function(url) {
         window.open(url, "_blank");
     }
+    const posting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting Pembayaran ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-lokal-bb/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
     const remove = function(id) {
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);

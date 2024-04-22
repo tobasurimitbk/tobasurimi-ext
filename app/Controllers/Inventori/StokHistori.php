@@ -109,48 +109,64 @@ class StokHistori extends BaseController
             if ($data->kemasan_id == 0) {
                 // BARANG
                 $barang = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
-                $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+                $satuan_1 = null;
+                if ($barang != null) {
+                    $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+                }
                 $barangMaster = $this->barangMasterModel->find($data->barang1_id);
                 $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
-                $parentBarang = $this->parentBarangModel->find($barangMaster['parent_type_id']);
+                $parentBarang = null;
+                if ($barangMaster != null) {
+                    $parentBarang = $this->parentBarangModel->find($barangMaster['parent_type_id']);
+                }
                 $divisi = $this->divisiModel->find($data->divisi_id);
                 $warehouse = $this->warehouseModel->find($data->warehouse_id);
 
-                array_push($dataResult, [
-                    "no" => $no++,
-                    'parent_type' => $parentBarang != null ? strtoupper(str_replace('_', ' ', $parentBarang['parent_type'])) : '',
-                    'parent_name' => $parentBarang != null ? $parentBarang['parent_name'] : '',
-                    'kode_barang' => $barangMaster['kode_barang'],
-                    "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
-                    "divisi" => $divisi != null ? strtoupper($divisi['divisi']) : '',
-                    "warehouse" => $warehouse != null ? strtoupper($warehouse['warehouse_name']) : '',
-                    "dokumen_pabean" => $bcName . " / " . $data->no_aju,
-                    "sumber" => $data->sumber,
-                    "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
-                    "dokumen" => $no_dokumen,
-                    "stok" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
-                ]);
+                if ($barangMasterSpesifikasi != null && $barangMaster != null && $parentBarang != null) {
+                    array_push($dataResult, [
+                        "no" => $no++,
+                        'parent_type' => $parentBarang != null ? strtoupper(str_replace('_', ' ', $parentBarang['parent_type'])) : '',
+                        'parent_name' => $parentBarang != null ? $parentBarang['parent_name'] : '',
+                        'kode_barang' => $barangMaster['kode_barang'] ?? '',
+                        "barang" => strtoupper(($barangMaster['barang_name'] ?? '') . " - " . ($barangMasterSpesifikasi['spesifikasi'] ?? '')),
+                        "divisi" => $divisi != null ? strtoupper($divisi['divisi']) : '',
+                        "warehouse" => $warehouse != null ? strtoupper($warehouse['warehouse_name']) : '',
+                        "dokumen_pabean" => $bcName . " / " . $data->no_aju,
+                        "sumber" => $data->sumber,
+                        "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
+                        "dokumen" => $no_dokumen,
+                        "stok" =>  $in_out . " " . $data->stok_total . ($satuan_1 != null ? " " . $satuan_1['kode_satuan'] : ''),
+                    ]);
+                }
             } else {
                 $kemasan = $this->kemasanModel->find($data->kemasan_id);
-                $satuan_1 = $this->satuanModel->find($kemasan['satuan_id']);
-                $parentBarang = $this->parentBarangModel->find($kemasan['parent_type_id']);
+                $satuan_1 = null;
+                if ($kemasan != null) {
+                    $satuan_1 = $this->satuanModel->find($kemasan['satuan_id']);
+                }
+                $parentBarang = null;
+                if ($kemasan != null) {
+                    $parentBarang = $this->parentBarangModel->find($kemasan['parent_type_id']);
+                }
                 $divisi = $this->divisiModel->find($data->divisi_id);
                 $warehouse = $this->warehouseModel->find($data->warehouse_id);
 
-                array_push($dataResult, [
-                    "no" => $no++,
-                    'parent_type' => $parentBarang != null ? strtoupper(str_replace('_', ' ', $parentBarang['parent_type'])) : '',
-                    'parent_name' => $parentBarang != null ? $parentBarang['parent_name'] : '',
-                    'kode_barang' => $kemasan['kode'],
-                    "barang" => strtoupper($kemasan['name']),
-                    "divisi" => $divisi != null ? strtoupper($divisi['divisi']) : '',
-                    "warehouse" => $warehouse != null ? strtoupper($warehouse['warehouse_name']) : '',
-                    "dokumen_pabean" => $bcName . " / " . $data->no_aju,
-                    "sumber" => $data->sumber,
-                    "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
-                    "dokumen" => $no_dokumen,
-                    "stok" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
-                ]);
+                if ($kemasan != null && $parentBarang != null) {
+                    array_push($dataResult, [
+                        "no" => $no++,
+                        'parent_type' => $parentBarang != null ? strtoupper(str_replace('_', ' ', $parentBarang['parent_type'])) : '',
+                        'parent_name' => $parentBarang != null ? $parentBarang['parent_name'] : '',
+                        'kode_barang' => $kemasan['kode'] ?? '',
+                        "barang" => strtoupper($kemasan['name'] ?? ''),
+                        "divisi" => $divisi != null ? strtoupper($divisi['divisi']) : '',
+                        "warehouse" => $warehouse != null ? strtoupper($warehouse['warehouse_name']) : '',
+                        "dokumen_pabean" => $bcName . " / " . $data->no_aju,
+                        "sumber" => $data->sumber,
+                        "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
+                        "dokumen" => $no_dokumen,
+                        "stok" =>  $in_out . " " . $data->stok_total . ($satuan_1 != null ? " " . $satuan_1['kode_satuan'] : ''),
+                    ]);
+                }
             }
         }
 

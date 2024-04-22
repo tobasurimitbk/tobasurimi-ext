@@ -76,6 +76,29 @@ class Bank extends BaseController
 
     public function create()
     {
+        $rules = [
+            "no_rekening" => [
+                "rules" => "required|numeric|exact_length[10,15]",
+                'errors' => [
+                    'required' => 'No rekening harus diisi',
+                    'numeric' => 'No rekening wajib berupa angka',
+                    'exact_length' => 'Panjang digit no rekening harus 10 sampai 15 digit'
+                ]
+            ],
+
+        ];
+
+        if (!$this->validate($rules)) {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        }
+
         $kodeBank = strtoupper($this->request->getVar('kode_bank'));
         $bankFirst = $this->banksModel->where('company_id', $this->this_company_id)->where('kode_bank', $kodeBank)->first();
 
@@ -106,6 +129,30 @@ class Bank extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $kodeBank = strtoupper($this->request->getVar('kode_bank'));
+
+        $rules = [
+            "no_rekening" => [
+                "rules" => "required|numeric|exact_length[10,15]",
+                'errors' => [
+                    'required' => 'No rekening harus diisi',
+                    'numeric' => 'No rekening wajib berupa angka',
+                    'exact_length' => 'Panjang digit no rekening harus 10 sampai 15 digit'
+                ]
+            ],
+
+        ];
+
+        if (!$this->validate($rules)) {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        }
+
 
         $bankWithSameCode = $this->banksModel
             ->where('company_id', $this->this_company_id)

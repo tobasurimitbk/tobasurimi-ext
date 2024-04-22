@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= (!empty($paymentData) ? 'Tambah Pembayaran Internasional' : 'Update Pembayaran Internasional') ?></h1>
+        <h1 class="title-name"><?= (!empty($paymentData) ? 'Update Pembayaran PO Import' : 'Tambah Pembayaran PO Import') ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
                 Batal
@@ -13,10 +13,22 @@
                     Simpan
                 </button>
             <?php else : ?>
-                <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
-                    <button onclick="remove('<?= encrypt($paymentData['id']) ?>')" class="btn btn-hapus delete-parent float-right">
-                        Hapus
-                    </button>
+                <?php if ($paymentData['status_posting'] == "0") : ?>
+                    <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
+                        <button onclick="remove('<?= encrypt($paymentData['id']) ?>')" class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Pembayaran', 'Internasional', 'a')) : ?>
+                        <button onclick="posting('<?= encrypt($paymentData['id']) ?>')" class="btn btn-success posting-spp float-right posting">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Pembayaran', 'Internasional', 'u')) : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                            Simpan
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
@@ -27,7 +39,7 @@
                 Detail Pembayaran
             </label>
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($paymentData) ? encrypt($paymentData['id']) : "" ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -139,7 +151,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" name="no_invoice" class="form-control no_invoice" id="no_invoice" value="<?= $paymentData['no_invoice'] ?? '' ?>" placeholder="No Invoice">
+                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '') : "" ?> autocomplete="one-time-code" type="text" name="no_invoice" class="form-control no_invoice" id="no_invoice" value="<?= $paymentData['no_invoice'] ?? '' ?>" placeholder="No Invoice">
                                     <label for="floatingInput">No Invoice (Opsional)</label>
                                 </div>
                             </div>
@@ -149,7 +161,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" name="invoice_emkl" class="form-control" id="invoice_emkl" value="<?= $paymentData['invoice_emkl'] ?? '' ?>" placeholder="Invoice EMKL">
+                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" name="invoice_emkl" class="form-control" id="invoice_emkl" value="<?= $paymentData['invoice_emkl'] ?? '' ?>" placeholder="Invoice EMKL">
                                     <label for="floatingInput">No Invoice EMKL (Opsional)</label>
                                 </div>
                             </div>
@@ -159,7 +171,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" name="no_aju" class="form-control" id="no_aju" value="<?= $paymentData['no_aju'] ?? '' ?>" placeholder="No Aju">
+                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" name="no_aju" class="form-control" id="no_aju" value="<?= $paymentData['no_aju'] ?? '' ?>" placeholder="No Aju">
                                     <label for="floatingInput">No Aju (Opsional)</label>
                                 </div>
                             </div>
@@ -169,14 +181,14 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" <?= !empty($paymentData) ? "readonly" : "" ?> name="current_exchange_rate" value="<?= "" . number_format($paymentData['current_exchange_rate'] ??  0, 2, ',', '.')  ?>">
+                            <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" name="current_exchange_rate" value="<?= "" . number_format($paymentData['current_exchange_rate'] ??  0, 2, ',', '.')  ?>">
                             <label for="floatingInput">Kurs saat ini</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="payment_date" type="text" <?= !empty($paymentData) ? 'readonly' : '' ?> value="<?= !empty($paymentData) ? date('d/m/Y', strtotime($paymentData['payment_date'])) : '' ?>" class="form-control payment_date" id="payment_date">
+                                <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" name="payment_date" type="text" value="<?= !empty($paymentData) ? date('d/m/Y', strtotime($paymentData['payment_date'])) : '' ?>" class="form-control payment_date" id="payment_date">
                                 <label>Tanggal Pembayaran</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -188,7 +200,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control" name="termin" <?= !empty($paymentData) ? "readonly" : "" ?> id="termin" value="<?= $paymentData->termin ?? '-' ?>" placeholder="Termin">
+                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" class="form-control" name="termin" id="termin" value="<?= !empty($paymentData) ? $paymentData['termin'] : '-' ?>" placeholder="Termin">
                                     <label for="floatingInput">Termin Pembayaran</label>
                                 </div>
                             </div>
@@ -199,7 +211,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select " <?= !empty($paymentData) ? "disabled" : "" ?> name="payment_method" id="payment_method">
+                            <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option selected value="">Pilih Payment Method</option>
                                 <option value="CASH" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'CASH') ? 'selected' : '' ?>>Cash</option>
                                 <option value="TRANSFER" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'TRANSFER') ? 'selected' : '' ?>>Transfer</option>
@@ -212,7 +224,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control" id="voucher_no" <?= !empty($paymentData) ? "readonly" : "" ?> name="voucher_no" value="<?= $paymentData->voucher_no ?? '-' ?>" placeholder="No. Voucher">
+                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" class="form-control" id="voucher_no" name="voucher_no" value="<?= !empty($paymentData) ? $paymentData['voucher_no'] : '-' ?>" placeholder="No. Voucher">
                                     <label for="floatingInput">No. Voucher</label>
                                 </div>
                             </div>
@@ -220,7 +232,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" readonly name="pembayaran_oleh" class="form-control" placeholder="Pembayaran Oleh">
+                            <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" value="<?= !empty($paymentData) ? $paymentData['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" name="pembayaran_oleh" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
@@ -229,13 +241,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea autocomplete="one-time-code" name="note" class="form-control information text-area-all" <?= !empty($paymentData) ? "readonly" : "" ?>><?= $paymentData->note ?? '-' ?></textarea>
+                            <textarea <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" name="note" class="form-control information text-area-all"><?= !empty($paymentData) ? $paymentData['note'] : '-' ?></textarea>
                             <label for="floatingInput">Note</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating  mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($paymentData) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
+                            <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select" name="akun_kas" id="akun_kas">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= !empty($paymentData) ? ($paymentData['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -246,7 +258,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating  mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($paymentData) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
+                            <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select" name="akun_selisih" id="akun_selisih">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= !empty($paymentData) ? ($paymentData['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -701,39 +713,77 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const data = $(".create-form").serializeArray();
-                    $.ajax({
-                        url: "<?= base_url("pembayaran-po-import/create"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
+                    let id = $('.id').val();
+                    if (id) {
+                        $.ajax({
+                            url: "<?= base_url("pembayaran-po-import/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            location.reload();
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
-                                    .then(() => {
-                                        window.location.href = `<?= base_url("pembayaran-po-import"); ?>/id/${response.id}`;
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                            }
-                        },
+                                }
+                            },
 
-                    });
+                        });
+                    } else {
+                        $.ajax({
+                            url: "<?= base_url("pembayaran-po-import/create"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = `<?= base_url("pembayaran-po-import"); ?>/id/${response.id}`;
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                }
+                            },
+
+                        });
+                    }
+
                 }
             })
         }
@@ -805,6 +855,10 @@
                     dataType: "json",
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     processData: false,
                     contentType: false,
@@ -821,6 +875,52 @@
                 });
             }
         });
+    }
+
+    const posting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting Pembayaran ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-import/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    location.reload()
+                                })
+                        }
+                    },
+
+                });
+            }
+        })
     }
 </script>
 

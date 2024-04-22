@@ -32,6 +32,13 @@
                     </div>
                 </div>
                 <div class="col mb-3">
+                    <select class="form-select status_posting" name="status_posting" id="status_posting" aria-label="Floating label select example">
+                        <option value="ALL">STATUS : SEMUA</option>
+                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
+                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
+                    </select>
+                </div>
+                <div class="col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -41,11 +48,12 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th>No. Pembayaran</th>
-                                <th>Supplier</th>
-                                <th>Currency</th>
-                                <th>Amount</th>
-                                <th>Payment Date</th>
+                                <th onclick="changeSort('kode')">No. Pembayaran</th>
+                                <th onclick="changeSort('divisi')">Departemen</th>
+                                <th onclick="changeSort('name')">Supplier</th>
+                                <th onclick="changeSort('currency')">Currency</th>
+                                <th onclick="changeSort('payment_amt')">Amount</th>
+                                <th onclick="changeSort('createdAt')">Payment Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -62,6 +70,7 @@
 <script>
     let sort = "payment_no";
     let sortType = "desc";
+    const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -85,6 +94,7 @@
                 data.search = $(".search").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
+                data.status_posting = $(".status_posting").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -106,6 +116,10 @@
             },
             {
                 data: "payment_no",
+                className: "text-center"
+            },
+            {
+                data: "divisi",
                 className: "text-center"
             },
             {
@@ -132,20 +146,41 @@
                 render: function(data, type, row) {
                     let id = row?.id;
                     let form = '';
-                    <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
+                    let status_posting = row?.status_posting;
+
+                    form += ` <div class="mt-0">`;
+                    if (status_posting == '0') {
                         form += `
-                        <div class="mt-0">
-                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    
+                            <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
                         `;
-                    <?php endif; ?>
+
+                        form += `
+                            <?php if (can('Pembayaran', 'Internasional', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+                    } else {
+                        form += '-';
+                    }
+
+                    form += ` </div>`;
+
                     return form;
                 }
             }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -193,11 +228,70 @@
             table.ajax.reload();
         })
 
+        $(".status_posting").change(function() {
+            table.ajax.reload();
+        });
+
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             location.replace(`<?= base_url("pembayaran-po-import/id/"); ?>${data.id}`);
         })
     });
+
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
+
+    const posting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting Pembayaran ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-import/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
 
     const remove = function(id) {
         const csrfToken = '<?= csrf_token() ?>';
@@ -221,7 +315,11 @@
                     method: "POST",
                     dataType: "json",
                     beforeSend: function(xhr) {
+                        setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     processData: false,
                     contentType: false,
