@@ -483,7 +483,7 @@
 
             itemList.map((obj) => {
                 console.log(obj);
-                const itemAmt = parseFloat(obj.amount.replace('Rp ', '').replace('.', ''));
+                const itemAmt = parseFloat(obj.amount.replace('Rp ', ''));
                 let taxAmt = 0;
                 discTotal += ((+obj.disc) / 100) * itemAmt;
                 if (taxStatus) {
