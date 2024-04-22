@@ -92,10 +92,8 @@ class WorkOrder extends BaseController
 
         if (!empty($id)) {
             $dataWorkOrders = $this->workOrdersModel->asObject()->find($id);
-            $dataWorkOrderDetails = $this->workOrderDetailsModel->asObject()->select('work_order_details.*, barang_master.kode_barang, satuans.nama_satuan')
+            $dataWorkOrderDetails = $this->workOrderDetailsModel->asObject()->select('work_order_details.*, barang_master.kode_barang')
                 ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = work_order_details.barang2_id', 'left')
-                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
                 ->where('work_order_id', $id)
                 ->where('work_order_details.deletedAt', null)
                 ->get()->getResult();
@@ -185,10 +183,8 @@ class WorkOrder extends BaseController
                 $this->workOrderDetailsModel->insert([
                     'work_order_id' => $id,
                     'barang1_id' => decrypt($s->barang_id),
-                    'barang2_id' => decrypt($s->barang_spesifikasi_id),
                     'nama_barang' => $s->nama_barang,
                     'qty' => $s->qty,
-                    'unit' => $s->satuan_id,
                     'note' => $s->keterangan,
                 ]);
             }
@@ -253,20 +249,16 @@ class WorkOrder extends BaseController
                 if (decrypt($s->work_order_detail_id) != "") {
                     $this->workOrderDetailsModel->update(decrypt($s->work_order_detail_id), [
                         'barang1_id' => decrypt($s->barang_id),
-                        'barang2_id' => decrypt($s->barang_spesifikasi_id),
                         'nama_barang' => $s->nama_barang,
                         'qty' => $s->qty,
-                        'unit' => $s->satuan_id,
                         'note' => $s->keterangan,
                     ]);
                 } else {
                     $this->workOrderDetailsModel->insert([
                         'work_order_id' => $id,
                         'barang1_id' => decrypt($s->barang_id),
-                        'barang2_id' => decrypt($s->barang_spesifikasi_id),
                         'nama_barang' => $s->nama_barang,
                         'qty' => $s->qty,
-                        'unit' => $s->satuan_id,
                         'note' => $s->keterangan,
                     ]);
                 }

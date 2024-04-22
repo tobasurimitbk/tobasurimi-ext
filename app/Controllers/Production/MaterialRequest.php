@@ -95,7 +95,7 @@ class MaterialRequest extends BaseController
             ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
-            ->where('work_orders.is_posted', "0")
+            // ->where('work_orders.is_posted', "0")
             ->where('work_orders.deletedAt', null)
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
@@ -373,8 +373,8 @@ class MaterialRequest extends BaseController
                         'ref_no' => $s->bc_type,
                         'stock_date' => $stockDetailBarang->stock_date,
                         'barang_type' => $s->type_barang,
-                        'qty' => $s->qty_request,
-                        'qty2' => $s->qty_request_kaleng,
+                        'qty' => $s->qty,
+                        'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
                     ];
                 } else {
@@ -394,6 +394,7 @@ class MaterialRequest extends BaseController
                         'barang_type' => $s->type_barang,
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
+                        'qty_isi' => $s->qty_isi,
                     ];
                 }
                 $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -428,14 +429,15 @@ class MaterialRequest extends BaseController
                 if (!empty($s->id_material_request_detail)) {
                     if ($s->type_barang == "bahan_jadi") {
                         $dataMaterialDetail = [
-                            'qty' => $s->qty_request,
-                            'qty2' => $s->qty_request_kaleng,
+                            'qty' => $s->qty,
+                            'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
                         ];
                     } else {
                         $dataMaterialDetail = [
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
+                            'qty_isi' => $s->qty_isi,
                         ];
                     }
                     $this->materialRequestDetailsModel->update($s->id_material_request_detail, $dataMaterialDetail);
@@ -457,8 +459,8 @@ class MaterialRequest extends BaseController
                             'ref_no' => $s->bc_type,
                             'stock_date' => $stockDetailBarang->stock_date,
                             'barang_type' => $s->type_barang,
-                            'qty' => $s->qty_request,
-                            'qty2' => $s->qty_request_kaleng,
+                            'qty' => $s->qty,
+                            'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
                         ];
                     } else {
@@ -478,6 +480,7 @@ class MaterialRequest extends BaseController
                             'barang_type' => $s->type_barang,
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
+                            'qty_isi' => $s->qty_isi,
                         ];
                     }
                     $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -527,13 +530,13 @@ class MaterialRequest extends BaseController
                         $value['barang_type'],
                         $value['barang1_id'],
                         $value['barang2_id'],
-                        ($value['qty'] * -1)
+                        ($value['qty2'] * -1)
                     );
 
                     // DETAIL
                     $stokDetail = $this->stockDetailModel->insertStokDetail(
                         $stok,
-                        $value['qty'],
+                        $value['qty2'],
                         "Out",
                         date('Y-m-d'),
                         $this->this_user_id,
@@ -547,7 +550,7 @@ class MaterialRequest extends BaseController
                         $value['bc_id'],
                         $value['stock_id'],
                         $stokDetail,
-                        $value['qty'],
+                        $value['qty2'],
                         $value['no_aju'],
                         $materialRequestData['req_no']
                     );

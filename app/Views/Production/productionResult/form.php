@@ -204,7 +204,7 @@
                                                     <th>Jenis Barang</th>
                                                     <th>Nama Barang</th>
                                                     <th>Satuan</th>
-                                                    <th>Qty Target</th>
+                                                    <!-- <th>Qty Target</th> -->
                                                     <th>Qty Hasil</th>
                                                 </tr>
                                             </thead>
@@ -1049,7 +1049,7 @@
         if (list_items_barang_jadi.length === 0) {
             row += `
                 <tr>
-                    <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                    <td colspan="6" class="text-center">Data Barang Tidak Ada</td>
                 </tr>
             `;
             $('.tfoot').append(row);
@@ -1061,7 +1061,7 @@
                 row += '<td>' + item.type_barang_text + '</td>';
                 row += '<td>' + item.barang_name + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
-                row += '<td>' + item.qty + '</td>';
+                // row += '<td>' + item.qty + '</td>';
                 row += '<td>' + `
         <input class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) ? "readonly" : ""; ?>>` +
                     '</td>';

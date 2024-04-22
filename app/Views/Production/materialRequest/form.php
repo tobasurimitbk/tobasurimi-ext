@@ -49,7 +49,7 @@
                                 <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?></option>
+                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             <?php } ?>
@@ -267,8 +267,8 @@
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Kaleng</th>
-                                <th style="text-align: center;">Berat Isi Kaleng</th>
-                                <th style="text-align: center;">Berat Isi Direquest</th>
+                                <th style="text-align: center;">Qty Kaleng Direquest</th>
+                                <th style="text-align: center;">Qty Isi Direquest</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -308,6 +308,7 @@
                     no_dokumen_2: "-",
                     qty: "<?= $materialRequestDetails->qty ?>",
                     qty2: "<?= $materialRequestDetails->qty2 ?>",
+                    qty_isi: "<?= $materialRequestDetails->qty_isi ?>",
                     satuan: "<?= $materialRequestDetails->kode_satuan ?>",
                     stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
                     stock_id: "<?= $materialRequestDetails->stock_id ?>",
@@ -329,8 +330,9 @@
                     no_aju: "<?= $materialRequestDetails->no_aju ?>",
                     no_dokumen_1: "-",
                     no_dokumen_2: "-",
-                    qty: "<?= $materialRequestDetails->qty2 ?>",
-                    qty2: "<?= $materialRequestDetails->qty_isi ?>",
+                    qty: "<?= $materialRequestDetails->qty ?>",
+                    qty2: "<?= $materialRequestDetails->qty2 ?>",
+                    qty_isi: "<?= $materialRequestDetails->qty_isi ?>",
                     satuan: "<?= $materialRequestDetails->kode_satuan ?>",
                     stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
                     stock_id: "<?= $materialRequestDetails->stock_id ?>",
@@ -354,6 +356,7 @@
                     no_dokumen_2: "-",
                     qty: "<?= $materialRequestDetails->qty ?>",
                     qty2: "<?= $materialRequestDetails->qty2 ?>",
+                    qty_isi: "<?= $materialRequestDetails->qty_isi ?>",
                     satuan: "<?= $materialRequestDetails->kode_satuan ?>",
                     stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
                     stock_id: "<?= $materialRequestDetails->stock_id ?>",
@@ -719,8 +722,9 @@
                             dataError = listStockSelectedBahanBaku[i];
                             isValid = false;
                         } else {
-                            listStockSelectedBahanBaku[i].qty = input_user;
-                            listStockSelectedBahanBaku[i].qty2 = input_user_sortir;
+                            listStockSelectedBahanBaku[i].qty = stok_max;
+                            listStockSelectedBahanBaku[i].qty2 = input_user;
+                            listStockSelectedBahanBaku[i].qty_isi = input_user_sortir;
                         }
                     });
 
@@ -733,7 +737,8 @@
                             dataError = listStockSelectedBahan[i];
                             isValid = false;
                         } else {
-                            listStockSelectedBahan[i].qty = input_user;
+                            listStockSelectedBahan[i].qty = stok_max;
+                            listStockSelectedBahan[i].qty2 = input_user;
                         }
                     });
 
@@ -742,18 +747,15 @@
                         var elementRequest = $('input[data-id="' + v.id + '"].qty-jadi-request');
                         var input_user = parseFloat(element.val());
                         var input_user_request = parseFloat(elementRequest.val());
-                        var stok_max = parseFloat(element.data('stok_total')) * parseFloat(input_user);
-                        var stok_request = parseFloat(input_user_request) / parseFloat(input_user);
+                        var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (input_user_request > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || isNaN(input_user_request) || input_user_request == undefined || input_user_request == 0) {
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || isNaN(input_user_request) || input_user_request == undefined || input_user_request == 0) {
                             dataError = listStockSelectedBahanJadi[i];
                             isValid = false;
                         } else {
-                            listStockSelectedBahanJadi[i].qty = input_user_request;
+                            listStockSelectedBahanJadi[i].qty = stok_max;
                             listStockSelectedBahanJadi[i].qty2 = input_user;
-                            listStockSelectedBahanJadi[i].qty_request = stok_request;
-                            listStockSelectedBahanJadi[i].qty_isi = input_user;
-                            listStockSelectedBahanJadi[i].qty_request_kaleng = input_user_request;
+                            listStockSelectedBahanJadi[i].qty_isi = input_user_request;
                         }
                     });
 
@@ -1120,6 +1122,7 @@
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
                         listStockAsal[i].qty2 = 0;
+                        listStockAsal[i].qty_isi = 0;
                         listStockAsal[i].departmentID = departmentID;
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
@@ -1137,6 +1140,7 @@
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
                         listStockAsal[i].qty2 = 0;
+                        listStockAsal[i].qty_isi = 0;
                         listStockAsal[i].departmentID = departmentID;
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
@@ -1154,6 +1158,7 @@
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
                         listStockAsal[i].qty2 = 0;
+                        listStockAsal[i].qty_isi = 0;
                         listStockAsal[i].departmentID = departmentID;
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
@@ -1196,12 +1201,12 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty2}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty_isi}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1264,7 +1269,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1332,7 +1337,7 @@
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty_isi}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(

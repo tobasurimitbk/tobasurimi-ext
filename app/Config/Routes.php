@@ -1367,7 +1367,6 @@ $routes->post('/akun-department/get', 'Accounting\AccountDepartment\AccountDepar
 $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/all', 'Laporan\Accounting\Pembelian::allTransaksi', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
@@ -1408,6 +1407,11 @@ $routes->get('/laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo:
 $routes->post('/laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/neracasaldo/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\NeracaSaldo::exportPDF/$1/$2', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/neracasaldo/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\NeracaSaldo::exportExcel/$1/$2', ['filter' => 'Auth']);
+
+$routes->get('/laporan-accounting/rekap-kopek', 'Laporan\Accounting\RekapKopek::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/rekap-kopek/all', 'Laporan\Accounting\RekapKopek::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/rekap-kopek/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::LaporanKopekPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/rekap-kopek/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 // Supplier Lokal BB
 $routes->get('/laporan-supplier-lokal-bb', 'Laporan\Supplier\LaporanSupplierLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\KwitansiTb::index', ['filter' => 'Auth']);

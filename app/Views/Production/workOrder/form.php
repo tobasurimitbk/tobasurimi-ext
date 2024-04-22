@@ -99,7 +99,7 @@
                                 <th style="width: 10px;">No</th>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
-                                <th>Satuan</th>
+                                <!-- <th>Satuan</th> -->
                                 <th>Qty Target</th>
                                 <th>Qty Hasil</th>
                                 <th>Keterangan</th>
@@ -109,7 +109,7 @@
                         <tbody class="body-detail-table" id="body-detail-table">
                         <tfoot class="tfoot">
                             <tr>
-                                <td colspan="8" class="text-center">Tidak Ada Data</td>
+                                <td colspan="7" class="text-center">Tidak Ada Data</td>
                             </tr>
                         </tfoot>
                         </tbody>
@@ -131,7 +131,6 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="barang_spesifikasi_id" class="barang_spesifikasi_id" id="barang_spesifikasi_id">
                     <input autocomplete="one-time-code" type="hidden" class="barang_detail_id" name="barang_detail_id" id="barang_detail_id" />
                     <input autocomplete="one-time-code" type="hidden" class="barang_id" name="barang_id" id="barang_id" />
                     <input autocomplete="one-time-code" type="hidden" class="header_barang_name" name="header_barang_name" id="header_barang_name" />
@@ -140,7 +139,7 @@
                     <input autocomplete="one-time-code" type="hidden" class="work_order_detail_id" name="work_order_detail_id" id="work_order_detail_id" />
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
                                 <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
@@ -149,14 +148,20 @@
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" readonly type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">Qty Target</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="hidden" class="satuan_id" name="satuan_id">
@@ -172,7 +177,7 @@
                                 <label for="floatingInput">Qty Target</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3">
@@ -258,7 +263,10 @@
             dropdownParent: $(".detail-modal .modal-content"),
             tags: false,
             allowClear: true
-        })
+        }).change(function() {
+            changeKodeBarang();
+        });
+
 
         //CSS SELECT2 FLOATING LABEL
         $('.kode_barang')
@@ -304,7 +312,7 @@
             $(".nama_barang").val('')
             $(".qty").val('')
             $(".satuan").val('')
-            $(".satuan_id").val('')
+            // $(".satuan_id").val('')
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
@@ -315,7 +323,7 @@
             $(".spp_type_bypass").val(type)
             if (type) {
                 $.ajax({
-                    url: `<?= base_url("barang/dropdown/type"); ?>`,
+                    url: `<?= base_url("barang/dropdown/type-nospec"); ?>`,
                     method: "GET",
                     dataType: "json",
                     data: {
@@ -325,7 +333,7 @@
                         $(".kode_barang").empty();
                         $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                         res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                         })
                         $(".kode_barang").val("").change();
                         $(".detail-modal").modal("show");
@@ -338,37 +346,6 @@
                     confirmButtonColor: '#4e73df',
                 })
             }
-
-            $(".kode_barang").change(function() {
-                if ($(".kode_barang option:selected").val()) {
-                    let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
-                    let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
-                    let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
-                    let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-                    let barang_spesifikasi_id = $(".kode_barang option:selected").data("barang_spesifikasi_id") ? $(".kode_barang option:selected").data("barang_spesifikasi_id") : "";
-                    let barang_name_master = $(".kode_barang option:selected").data("barang_name_master");
-                    // let spp_type = $('.spp_type').val().trim();
-
-
-                    // if (list_items.length === 0 && spp_type === "Lokal BB") {
-                    //     $('.header_barang_name').val(barang_name_master);
-                    // }
-
-                    $(".kode").val($(".kode_barang option:selected").val());
-                    $(".nama_barang").val(nama);
-                    $(".barang_id").val(barang_id);
-                    $(".barang_spesifikasi_id").val(barang_spesifikasi_id);
-                    $(".satuan").val(satuan);
-                    $(".satuan_id").val(satuan_id);
-                } else {
-                    $(".kode").val("");
-                    $(".nama_barang").val("");
-                    $(".barang_id").val("");
-                    $(".barang_spesifikasi_id").val("");
-                    $(".satuan").val("");
-                    $(".satuan_id").val("");
-                }
-            })
         })
 
         var validator_detail = $(".detail-form").validate({
@@ -385,9 +362,6 @@
                 harga: {
                     required: true
                 },
-                satuan: {
-                    required: true
-                }
             },
             messages: {
                 kode_barang: {
@@ -402,9 +376,6 @@
                 harga: {
                     required: "Harga wajib diisi"
                 },
-                satuan: {
-                    required: "Satuan wajib diisi"
-                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -614,30 +585,26 @@
             validator_detail.resetForm();
             validator_detail.reset();
             let barang_id = "";
-            let barang_spesifikasi_id = "";
             let barang_detail_id = $(this).data('barang_detail_id');
 
             $.each(list_items, function(i, v) {
                 if (v.barang_detail_id === barang_detail_id) {
                     $(".barang_detail_id").val(v.barang_detail_id);
                     $(".barang_id").val(v.barang_id);
-                    $(".barang_spesifikasi_id").val(v.barang_spesifikasi_id);
                     $(".kode_barang").val(v.kode_barang);
                     $(".nama_barang").val(v.nama_barang);
-                    $(".nama_satuan").val(v.nama_satuan);
                     $(".work_order_detail_id").val(v.work_order_detail_id);
                     $(".satuan_id").val(v.satuan_id);
                     $(".qty").val(v.qty);
                     $(".keterangan").val(v.keterangan);
 
                     barang_id = v.barang_id;
-                    barang_spesifikasi_id = v.barang_spesifikasi_id;
                 }
             });
             type = "bahan_jadi";
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/type"); ?>`,
+                url: `<?= base_url("barang/dropdown/type-nospec"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
@@ -647,12 +614,10 @@
                     $(".kode_barang").empty();
                     $(".kode_barang").append(`<option data-barang_name_master=""  data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                     res.data.forEach(function(item) {
-                        if (barang_id === item.id && barang_spesifikasi_id === item.barang_master_spesifikasi_id) {
-                            $(".satuan_id").val(item.satuan_1);
-                            $(".satuan").val(item.nama_satuan);
-                            $(".kode_barang").append(`<option selected data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        if (barang_id === item.id) {
+                            $(".kode_barang").append(`<option selected data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                         } else {
-                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                         }
                     })
 
@@ -671,10 +636,8 @@
         let barang_detail_id = $(".barang_detail_id").val();
         let barang_id = $(".barang_id").val()
         let work_order_detail_id = $(".work_order_detail_id").val()
-        let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
         let kode_barang = $(".kode_barang").val()
         let nama_barang = $(".nama_barang").val()
-        let nama_satuan = $(".satuan").val()
         let satuan_id = $(".satuan_id").val()
         let qty = $(".qty").val()
         let keterangan = $(".keterangan").val() ? $(".keterangan").val() : '-'
@@ -690,11 +653,8 @@
                     if (v.barang_detail_id === barang_detail_id) {
                         list_items[i].barang_id = barang_id;
                         list_items[i].work_order_detail_id = work_order_detail_id;
-                        list_items[i].barang_spesifikasi_id = barang_spesifikasi_id;
                         list_items[i].kode_barang = kode_barang;
                         list_items[i].nama_barang = nama_barang;
-                        list_items[i].nama_satuan = nama_satuan;
-                        list_items[i].satuan_id = satuan_id;
                         list_items[i].qty = qty;
                         list_items[i].keterangan = keterangan;
                     }
@@ -710,11 +670,8 @@
                         'barang_detail_id': getID(),
                         'work_order_detail_id': "",
                         'barang_id': barang_id,
-                        'barang_spesifikasi_id': barang_spesifikasi_id,
                         'kode_barang': kode_barang,
                         'nama_barang': nama_barang,
-                        'nama_satuan': nama_satuan,
-                        'satuan_id': satuan_id,
                         'qty': qty,
                         'qty_hasil': 0,
                         'keterangan': keterangan
@@ -752,14 +709,30 @@
     }
     const resetFormDetail = function() {
         $(".barang_detail_id").val('');
-        $(".barang_id").val('').val(null).change()
-        $(".barang_spesifikasi_id").val('');
+        $(".barang_id").val('').val(null).change();
         $(".kode").val(null).change()
         $(".nama_barang").val('')
         $(".satuan").val('')
         $(".satuan_id").val('')
         $(".qty").val('')
         $(".keterangan").val('')
+    }
+    const changeKodeBarang = function() {
+        if ($(".kode_barang option:selected").val()) {
+            let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
+            let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
+            let barang_name_master = $(".kode_barang option:selected").data("barang_name_master");
+
+            console.log('masuk');
+            console.log(nama);
+            $(".kode").val($(".kode_barang option:selected").val()).change();
+            $(".nama_barang").val(nama).change();
+            $(".barang_id").val(barang_id).change();
+        } else {
+            $(".kode").val("");
+            $(".nama_barang").val("");
+            $(".barang_id").val("");
+        }
     }
     const drawTable = function() {
         $('.body-detail-table').empty();
@@ -779,7 +752,6 @@
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.nama_barang + '</td>';
-                row += '<td>' + item.nama_satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
                 row += '<td>' + item.qty_hasil + '</td>';
                 row += '<td>' + item.keterangan + '</td>';
@@ -872,11 +844,8 @@
                 'barang_detail_id': getID(),
                 'work_order_detail_id': "<?= encrypt($d->id) ?>",
                 'barang_id': "<?= encrypt($d->barang1_id) ?>",
-                'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
                 'kode_barang': "<?= $d->kode_barang ?>",
                 'nama_barang': "<?= $d->nama_barang ?>",
-                'nama_satuan': "<?= $d->nama_satuan ?>",
-                'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",
                 'qty_hasil': "<?= $d->qty_hasil ?>",
                 'keterangan': "<?= $d->note ?>"

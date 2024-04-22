@@ -553,7 +553,6 @@ class Barang extends BaseController
         for ($i = 0; $i < count($dataBarang); $i++) {
             $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
             $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
-            $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
         }
 
         $data = [
