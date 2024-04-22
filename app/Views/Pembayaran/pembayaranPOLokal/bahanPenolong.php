@@ -31,6 +31,13 @@
                     </div>
                 </div>
                 <div class="col mb-3">
+                    <select class="form-select status_posting" name="status_posting" id="status_posting" aria-label="Floating label select example">
+                        <option value="ALL">STATUS : SEMUA</option>
+                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
+                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
+                    </select>
+                </div>
+                <div class="col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -63,6 +70,7 @@
 <script>
     let sort = "id";
     let sortType = "desc";
+    const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -144,17 +152,34 @@
                     let id = row?.id;
                     let form = '';
                     let status_posting = row?.status_posting;
+                    form += ` <div class="mt-0">`;
+                    if (status_posting == '0') {
+                        form += `
+                            <?php if (can('Pembayaran', 'Lokal BP', 'd')) : ?>
+                                <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
 
-                    return `
-                        <div class="mt-0">
-                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    `
+                            <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
+                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+                    } else {
+                        form += '-';
+                    }
+
+                    form += ` </div>`;
+
+                    return form;
                 }
             }
         ],
@@ -204,6 +229,11 @@
         $(".dueDate, .paymentDate").change(function() {
             table.ajax.reload();
         })
+
+
+        $(".status_posting").change(function() {
+            table.ajax.reload();
+        });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
@@ -255,6 +285,51 @@
             }
         });
     }
+    const posting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting Pembayaran ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-lokal-bp/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

@@ -9,6 +9,18 @@
                 Batal
             </a>
             <?php if (!empty($detail)) : ?>
+                <?php if ($detail['pembayaranDetail']['status_posting'] == "0") : ?>
+                    <?php if (can('Pembayaran', 'Lokal BB', 'd')) : ?>
+                        <button onclick="remove('<?= encrypt($detail['pembayaranDetail']['id']) ?>')" class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
+                        <button onclick="posting('<?= encrypt($detail['pembayaranDetail']['id']) ?>')" class="btn btn-success posting-spp float-right posting">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
                 <?php if (can('Pembayaran', 'Lokal BB', 'p')) : ?>
                     <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bb/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
                         <i class="fa-solid fa-print"></i> Print
@@ -329,6 +341,8 @@
     </script>
 <?php endif; ?>
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
+
     $(document).ready(function() {
         const table = $('#dataTable');
         var listPoNo = [];
@@ -696,6 +710,97 @@
             }
         });
     });
+
+    function remove(id) {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Pembayaran Ini ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('id', id);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-lokal-bb/delete"); ?>",
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        }).then((result) => {
+                            location.reload();
+                        });
+
+                    },
+                });
+            }
+        });
+    }
+
+    function posting(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting Pembayaran ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-po-lokal-bb/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    location.reload()
+                                })
+                        }
+                    },
+
+                });
+            }
+        })
+    }
 
     function generateLPBNo() {
         const csrfToken = '<?= csrf_token() ?>';

@@ -84,6 +84,7 @@ class LocalPOPaymentModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "local_po_payments.id AS id,
+                      local_po_payments.status_posting,
                       local_po_payments.payment_no AS payment_no, 
                       local_po_payments.type_bayar,
                       DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y') AS due_date, 
@@ -514,7 +515,7 @@ class LocalPOPaymentModel extends Model
         ];
 
         $lpbList = $penerimaanBarangModel->where($conditionPenerimaanBarang)->findAll();
-        $poPayed = static::summaryArrPOIsPayed($supplierID, "Bahan Baku");
+        $poPayed = static::summaryArrPOIsPayed($supplierID, $divisiID, "Bahan Baku");
 
         foreach ($lpbList as $l) {
             $poID = array_diff((json_decode($l['multiple_po_id'])), $poPayed['po_id']);
@@ -532,7 +533,7 @@ class LocalPOPaymentModel extends Model
         return $resLPB;
     }
 
-    static function summaryArrPOIsPayed($supplierID, $typePO)
+    static function summaryArrPOIsPayed($supplierID, $divisiID, $typePO)
     {
         $localPaymentModel = new LocalPOPaymentModel();
 
@@ -540,6 +541,7 @@ class LocalPOPaymentModel extends Model
             'deletedAt' => null,
             'type_po' => $typePO,
             'supplier_id' => $supplierID,
+            'divisi_id' => $divisiID
         ];
 
         $paymentList = $localPaymentModel->where($conditionLocalPayment)->findAll();

@@ -95,6 +95,17 @@ class PembayaranPOLokal extends BaseController
         try {
             $localPOPaymentModel = new LocalPOPaymentModel();
 
+            // CHECK
+            $check = $localPOPaymentModel->where('company_id', $this->this_company_id)->where('type_po', "Bahan Penolong")->where('payment_no',  $this->request->getVar('no_bukti_pembayaran'))->first();
+
+            if ($check != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No pembayaran sudah digunakan",
+                    'status' => false
+                ]);
+            }
+
             $id = $localPOPaymentModel->insert([
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
@@ -109,9 +120,8 @@ class PembayaranPOLokal extends BaseController
                 'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
+                'status_posting' => '0'
             ]);
-
-            $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
 
             return response()->setJSON([
                 'message' => "Kwitansi pembayaran lokal bahan penolong berhasil dibuat",
@@ -198,10 +208,9 @@ class PembayaranPOLokal extends BaseController
                 'month' => $this->request->getVar('bulan'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
+                'status_posting' => '0'
 
             ]);
-
-            $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
 
             return response()->setJSON([
                 'message' => "Kwitansi pembayaran lokal bahan baku berhasil dibuat",
@@ -277,7 +286,8 @@ class PembayaranPOLokal extends BaseController
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => strtoupper($data->payment_method),
                 "amount"            => number_format($data->amount ?? 0, 0, ',', '.'),
-                "tipe_bayar"        => strtoupper($data->type_bayar)
+                "tipe_bayar"        => strtoupper($data->type_bayar),
+                'status_posting'    => $data->status_posting
             ]);
         }
 
@@ -609,6 +619,21 @@ class PembayaranPOLokal extends BaseController
             'token' => csrf_hash(),
             'success' => true,
             'console' => $type
+        ]);
+    }
+
+    public function posting()
+    {
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
+        $id = decrypt($this->request->getVar('id'));
+        $localPOPaymentModel->update($id, ['status_posting' => '1']);
+        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Pembayaran berhasil diposting"
         ]);
     }
 }

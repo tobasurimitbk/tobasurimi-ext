@@ -359,6 +359,7 @@ $routes->post('/pembayaran-po-lokal-bp/generate-no-pembayaran', 'Pembayaran\Pemb
 $routes->post('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBPAction', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBP/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBPPrint/$1', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bp/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal/all', 'Pembayaran\PembayaranPOLokal::allPembayaranPOLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::delete', ['filter' => 'Auth']);
 // PEMBAYARAN PO LOKAL BB
@@ -369,6 +370,7 @@ $routes->post('/pembayaran-po-lokal-bb/get-list-po-no-paid', 'Pembayaran\Pembaya
 $routes->post('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBBAction', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBB/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBBPrint/$1', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO LOKAL
 $routes->get('/pembayaran-po-lokal', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokal', ['filter' => 'Auth']);
