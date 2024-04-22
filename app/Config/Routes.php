@@ -392,6 +392,7 @@ $routes->post('/pembayaran-po-import/generate-no-pembayaran', 'Pembayaran\Pembay
 $routes->post('/pembayaran-po-import/po-belum-lunas', 'Pembayaran\PembayaranPOImport::listPembayaranPOBelumLunas', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all-po', 'Pembayaran\PembayaranPOImport::allPO', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all-riwayat-pembayaran', 'Pembayaran\PembayaranPOImport::allRiwayatPembayaran', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-import/posting', 'Pembayaran\PembayaranPOImport::posting', ['filter' => 'Auth']);
 
 // PEMBAYARAN LAIN LAIN
 $routes->get('/pembayaran-lain', 'Pembayaran\OtherPayment::index', ['filter' => 'Auth']);
@@ -400,7 +401,8 @@ $routes->post('/pembayaran-lain/save', 'Pembayaran\OtherPayment::createAction', 
 $routes->get('/pembayaran-lain/get', 'Pembayaran\OtherPayment::get', ['filter' => 'Auth']);
 $routes->post('/pembayaran-lain/delete', 'Pembayaran\OtherPayment::delete', ['filter' => 'Auth']);
 $routes->get('/pembayaran-lain/all', 'Pembayaran\OtherPayment::all', ['filter' => 'Auth']);
-
+$routes->post('/pembayaran-lain/posting', 'Pembayaran\OtherPayment::posting', ['filter' => 'Auth']);
+$routes->post('/pembayaran-lain/update', 'Pembayaran\OtherPayment::updateAction', ['filter' => 'Auth']);
 // penerimaan pembayaran SO
 $routes->get('/penerimaan-penjualan-lokal', 'Penerimaan\SalesOrderPayment::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-penjualan-lokal/create', 'Penerimaan\SalesOrderPayment::create', ['filter' => 'Auth']);

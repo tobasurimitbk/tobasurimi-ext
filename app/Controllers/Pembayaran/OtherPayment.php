@@ -7,6 +7,7 @@ use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\OtherPaymentModel;
 use App\Models\Sub_AkunsModel;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 
 class OtherPayment extends BaseController
 {
@@ -15,12 +16,14 @@ class OtherPayment extends BaseController
     protected $otherPaymentModel;
     protected $metaDataModel;
     protected $subAkunsModel;
+    protected $jurnalController;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->divisiModel = new DivisisModel();
         $this->otherPaymentModel = new OtherPaymentModel();
+        $this->jurnalController = new JurnalUmum();
         $this->metaDataModel = new MetadataModel();
         $this->subAkunsModel = new Sub_AkunsModel();
     }
@@ -60,7 +63,10 @@ class OtherPayment extends BaseController
         $addCondition = [
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType")
+            "sortType"  => $this->request->getGet("sortType"),
+            "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "status_posting" => $this->request->getGet('status_posting'),
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
@@ -75,8 +81,9 @@ class OtherPayment extends BaseController
                 "divisi"            => $data['divisi'],
                 "tanggal"           => date('d/m/Y', strtotime($data['tanggal'])),
                 "no_pembayaran"     => $data['no_pembayaran'],
-                "metode_pembayaran" => $data['metode_pembayaran'],
+                "metode_pembayaran" => strtoupper($data['metode_pembayaran']),
                 "valas"             => $data['valas_name'],
+                "status_posting"    => $data['status_posting'],
                 "nominal"           => number_format($data['nominal'], 2)
             ]);
         }
@@ -127,6 +134,30 @@ class OtherPayment extends BaseController
         ]);
     }
 
+    public function updateAction()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $this->otherPaymentModel->update($id, [
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'tanggal' =>  $this->request->getPost("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
+            'bayar_ke' => $this->request->getVar('bayar_ke'),
+            'valas' => $this->request->getVar('valas'),
+            'metode_pembayaran' => $this->request->getVar('metode_pembayaran'),
+            'nominal' => $this->request->getVar('nominal_pembayaran'),
+            'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
+            'akun_kas' => $this->request->getVar('akun_kas'),
+            'akun_selisih' => $this->request->getVar('akun_selisih'),
+            'keterangan' => $this->request->getVar('keterangan')
+        ]);
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Pembayaran lain-lain berhasil diupdate",
+        ]);
+    }
+
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
@@ -144,11 +175,24 @@ class OtherPayment extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $data = $this->otherPaymentModel->find($id);
         $data['tanggal'] = date('d/m/Y', strtotime($data['tanggal']));
-        $data['nominal'] = number_format($data['nominal'], 2);
+        $data['id'] = encrypt($data['id']);
         return response()->setJSON([
             'status' => true,
             'data' => $data,
             'token' => csrf_hash()
+        ]);
+    }
+
+    public function posting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->otherPaymentModel->update($id, ['status_posting' => '1']);
+        $result = $this->jurnalController->insertDataPembayaran($id, "LAIN-LAIN");
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Pembayaran berhasil diposting"
         ]);
     }
 }

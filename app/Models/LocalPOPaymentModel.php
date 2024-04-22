@@ -38,6 +38,7 @@ class LocalPOPaymentModel extends Model
         'amount',
         'akun_kas',
         'akun_selisih',
+        'status_posting',
         'deletedAt'
     ];
 
@@ -130,6 +131,13 @@ class LocalPOPaymentModel extends Model
 
         if ($addCondition['dueDate'] != "") {
             $supplierDataQry->where("DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y')", $addCondition['dueDate']);
+        }
+
+        if ($addCondition['status_posting']) {
+            if ($addCondition['status_posting'] != "ALL") {
+                $addCondition['status_posting'] = $addCondition['status_posting'] == "SUDAH POSTING" ? '1' : '0';
+                $supplierDataQry->where('local_po_payments.status_posting', $addCondition['status_posting']);
+            }
         }
 
         if ($addCondition['paymentDate'] != "") {

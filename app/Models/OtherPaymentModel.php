@@ -47,6 +47,7 @@ class OtherPaymentModel extends Model
             'no_pembayaran' => 'no_pembayaran',
             'tanggal' => 'tanggal',
             'valas' => 'valas',
+            'metode_pembayaran' => 'metode_pembayaran',
             'nominal_pembayaran' => 'nominal_pembayaran'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -78,6 +79,23 @@ class OtherPaymentModel extends Model
                 ->orLike('no_pembayaran', $addCondition['search'])
                 ->orLike('tanggal', $addCondition['search'])
                 ->orLike('nominal', $addCondition['search']);
+        }
+
+
+        if ($addCondition['status_posting']) {
+            if ($addCondition['status_posting'] != "ALL") {
+                $addCondition['status_posting'] = $addCondition['status_posting'] == "SUDAH POSTING" ? '1' : '0';
+                $dataQry->where('other_payment.status_posting', $addCondition['status_posting']);
+            }
+        }
+
+        // date filter start
+        if ($addCondition['startDate']) {
+            $dataQry->where('other_payment.tanggal >=', $addCondition['startDate']);
+        }
+
+        if ($addCondition['lastDate']) {
+            $dataQry->where('other_payment.tanggal <=', $addCondition['lastDate']);
         }
 
         if ($addCondition['search']) {

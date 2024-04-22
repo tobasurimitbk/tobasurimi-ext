@@ -5,9 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran PO Lokal Bahan Penolong</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal-bp/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Pembayaran', 'Lokal BP', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal-bp/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -84,6 +86,7 @@
                 data.search = $(".search").val();
                 data.dueDate = $(".dueDate").val();
                 data.paymentDate = $(".paymentDate").val();
+                data.status_posting = $(".status_posting").val();
                 data.type_po = "Bahan Penolong";
                 data.sort = sort;
                 data.sortType = sortType;
@@ -139,6 +142,9 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
+                    let form = '';
+                    let status_posting = row?.status_posting;
+
                     return `
                         <div class="mt-0">
                             <button onclick="remove('${id}')" class="btn btn-danger delete-parent">

@@ -35,6 +35,7 @@ class ImportPOPaymentModel extends Model
         'payment_method',
         'akun_kas',
         'akun_selisih',
+        'status_posting',
         'note'
     ];
 
@@ -66,8 +67,10 @@ class ImportPOPaymentModel extends Model
     {
         $availableSort = [
             'kode'              => 'import_po_payments.payment_no',
+            'divisi'           => 'divisis.divisi',
             'name'              => 'suppliers.name',
-            'postal_code'       => 'suppliers.postal_code',
+            'currency'       => 'import_po_payments.currency',
+            'payment_amt'       => 'import_po_payments.payment_amt',
             'createdAt'         => 'import_po_payments.createdAt'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -77,11 +80,12 @@ class ImportPOPaymentModel extends Model
 
         $selectQry = "import_po_payments.*, 
                       DATE_FORMAT(import_po_payments.payment_date, '%d/%m/%Y') AS payment_date,
-                      suppliers.name AS supplier_name";
+                      suppliers.name AS supplier_name,divisis.divisi";
         $paymentDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = import_po_payments.supplier_id')
+            ->join('divisis', 'divisis.id = import_po_payments.divisi_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $paymentDataQry->countAllResults(false);
@@ -91,7 +95,15 @@ class ImportPOPaymentModel extends Model
                 ->like('suppliers.name', $addCondition['search'])
                 ->orLike('import_po_payments.payment_no', $addCondition['search'])
                 ->orLike('import_po_payments.currency', $addCondition['search'])
+                ->orLike('divisi', $addCondition['search'])
                 ->groupEnd();
+        }
+
+        if ($addCondition['status_posting']) {
+            if ($addCondition['status_posting'] != "ALL") {
+                $addCondition['status_posting'] = $addCondition['status_posting'] == "SUDAH POSTING" ? '1' : '0';
+                $paymentDataQry->where('import_po_payments.status_posting', $addCondition['status_posting']);
+            }
         }
 
         // date filter start
