@@ -75,12 +75,15 @@ class Lokal extends BaseController
             "sorttype" => $this->request->getVar("sortType"),
         ];
 
+        $start_date = $this->request->getVar('start_date');
+        $end_date = $this->request->getVar('end_date');
+
         $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "status" => $this->request->getVar("status"),
-            "start_date" => $this->request->getVar('start_date'),
-            "end_date" => $this->request->getVar('end_date'),
+            "sort"        => $this->request->getVar("sort"),
+            "sortType"    => $this->request->getVar("sortType"),
+            "status"      => $this->request->getVar("status"),
+            "start_date"  => $start_date ? date_format(date_create_from_format('d/m/Y', $start_date), 'Y-m-d') : "",
+            "end_date"    => $end_date ? date_format(date_create_from_format('d/m/Y', $end_date), 'Y-m-d') : "",
             "no_stuffing" => $this->request->getVar("no_stuffing"),
         ];
 
