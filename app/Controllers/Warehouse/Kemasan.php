@@ -7,6 +7,7 @@ use App\Models\KemasanModel;
 use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
 use Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Kemasan extends BaseController
 {
@@ -233,6 +234,98 @@ class Kemasan extends BaseController
                 'codeNew' => $codeName . "-????",
                 'token' => csrf_hash()
             ]);
+        }
+    }
+
+    public function import()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+
+            $file = $this->request->getFile('file');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+            $gagalArr = [];
+            $berhasilTotal = 0;
+
+            // INSERT MASTER KEMASAN
+            for ($i = 0; $i < count($data); $i++) {
+
+                // VALIDASI KODE KEMASAN
+                $kodeKemasan = $this->kemasanModel->where('kode', trim($data[$i][1]))
+                    ->where('company_id', $this->this_company_id)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                // VALIDASI NAMA KEMASAN
+                $kemasanName = $this->kemasanModel->where('name', trim($data[$i][2]))
+                    ->where('company_id', $this->this_company_id)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                // VALIDASI KATEGORI BARANG
+                $satuan = $this->satuanModel->where('kode_satuan', trim($data[$i][3]))->first();
+
+                // PARENT BARANG 
+                $parentBarang = $this->parentBarangModel->where('company_id', $this->this_company_id)->where('parent_name', trim($data[$i][0]))->where('parent_type', "kemasan")->first();
+
+                // if excel null
+                if ($data[$i][1] != null) {
+                    if ($kodeKemasan == null && $kemasanName == null && $satuan != null && $parentBarang != null) {
+                        // KEMASAN INSERTED
+                        $this->kemasanModel->insert([
+                            'company_id' => $this->this_company_id,
+                            'kode' => trim($data[$i][1]),
+                            'name' => strtoupper(trim($data[$i][2])),
+                            'satuan_id' => $satuan['id'],
+                            'parent_type_id' => $parentBarang['id'],
+                        ]);
+                        $berhasilTotal++;
+                    } else {
+                        array_push($gagalArr, $data[$i]);
+                    }
+                }
+            }
+
+            $gagalTotal = count($gagalArr);
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data, Gagal Import : $gagalTotal",
+                'status' => true,
+                'gagal' => $gagalArr,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
         }
     }
 }

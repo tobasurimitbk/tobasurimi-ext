@@ -5,13 +5,14 @@
 <section class="section">
     <div class="section-header">
         <h1>Permintaan Pembelian</h1>
-
-        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-            Export
-        </button>
-        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item" onclick="pdf('<?= base_url("spp/print-table"); ?>')">PDF</button></li>
-        </ul>
+        <?php if (can('Pembelian', 'SPP', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("spp/print-table"); ?>')">PDF</button></li>
+            </ul>
+        <?php endif; ?>
         <?php if (can('Pembelian', 'SPP', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah

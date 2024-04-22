@@ -255,17 +255,6 @@
 
     let list_items = [];
 
-    // upload excel
-    $('.btn-upload-excel').click(function() {
-        $('#file').val(null);
-        $('#import_excel_modal').modal('show');
-
-    });
-
-    $('.btn-discard-import-excel').click(function() {
-        $('#import_excel_modal').modal('hide');
-    });
-
     $(document).ready(function() {
         const table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -384,6 +373,18 @@
         $('.btn-discard').click(function() {
             $('.add-modal').modal('hide');
         });
+
+        // upload excel
+        $('.btn-upload-excel').click(function() {
+            $('#file').val(null);
+            $('#import_excel_modal').modal('show');
+
+        });
+
+        $('.btn-discard-import-excel').click(function() {
+            $('#import_excel_modal').modal('hide');
+        });
+
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             let data = table.row(this).data();
