@@ -165,6 +165,17 @@ class TandaTerimaSupBB extends BaseController
 
     public function createAction()
     {
+        $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
+        $check = $this->tandaTerimaFakturModel->where('faktur_no', $fakturNo)->first();
+
+        if ($check == null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Nomor faktur sudah ada",
+                'status' => false
+            ]);
+        }
+
         $id = $this->tandaTerimaFakturModel->insert([
             'company_id' => $this->this_company_id,
             'supplier_id' => $this->request->getVar('supplier_id'),
@@ -216,6 +227,7 @@ class TandaTerimaSupBB extends BaseController
         return response()->setJSON([
             'token' => csrf_hash(),
             'message' => "Tanda terima faktur berhasil dibuat",
+            'status' => true,
             'id' => encrypt($id)
         ]);
     }

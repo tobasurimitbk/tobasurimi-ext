@@ -74,7 +74,7 @@
                             <div class="col-md-4">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= date('d/m/Y') ?>" class="form-control input-picker datepicker" id="tanggal_terima" name="tanggal_terima" placeholder="Tanggal Terima Faktur">
+                                        <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= !empty($dataTandaTerimaFaktur) ? date('d/m/Y', strtotime($dataTandaTerimaFaktur['receive_date'])) : date('d/m/Y') ?>" class="form-control input-picker datepicker" id="tanggal_terima" name="tanggal_terima" placeholder="Tanggal Terima Faktur">
                                         <label for="floatingInput">Tanggal Terima</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -675,16 +675,25 @@
                                 processData: false,
                                 contentType: false,
                                 success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp/id/') ?>" + response.id
-                                        }
-                                    });
+                                    if (response.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp/id/') ?>" + response.id
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                    }
+
                                 },
                             });
                         }

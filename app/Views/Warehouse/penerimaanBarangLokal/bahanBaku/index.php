@@ -5,9 +5,20 @@
 <section class="section">
     <div class="section-header">
         <h1>Penerimaan Barang Lokal Baku</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-lokal-bb/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-lokal-bp/print-table"); ?>')">PDF</button></li>
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-lokal-bp/export-excel"); ?>')">EXCEL</button></li>
+            </ul>
+        <?php endif; ?>
+        <?php if (can('Warehouse', 'P. Barang Lokal BB', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-lokal-bb/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -344,6 +355,24 @@
 
     const print = function(url) {
         window.open(url, "_blank");
+    }
+
+    const pdf = function(url) {
+        let search = $(".search").val();
+        let status = $(".status").val();
+        let dateStart = $(".dateStart").val();
+        let dateEnd = $(".dateEnd").val();
+
+        window.open(url + `?search=${search}&status=${status}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+    }
+
+    const excel = function(url) {
+        let search = $(".search").val();
+        let status = $(".status").val();
+        let dateStart = $(".dateStart").val();
+        let dateEnd = $(".dateEnd").val();
+
+        window.open(url + `?search=${search}&status=${status}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "");
     }
 
     const changeSort = function(val) {

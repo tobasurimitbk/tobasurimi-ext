@@ -20,6 +20,9 @@ use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PenerimaanBarangImportBB extends BaseController
 {
@@ -139,6 +142,150 @@ class PenerimaanBarangImportBB extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function printTable()
+    {
+        $filename = "PENERIMAAN BARANG DARI PO IMPORT BAHAN BAKU";
+
+        $condition = [
+            "penerimaan_barang.company_id" => $this->this_company_id,
+            "status_penerimaan" => "IMPORT",
+            "penerimaan_barang.deletedAt" => null,
+            "penerimaan_barang_detail.deletedAt" => null,
+            "tipe_bahan" => "BAKU"
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "status" => $this->request->getVar("status"),
+            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
+
+        $dataPenerimaanBarang = [];
+
+        $no = 1;
+
+        foreach ($penerimaanBarangData['data'] as $data) {
+            array_push($dataPenerimaanBarang, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "divisi"                => $data->divisi,
+                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
+                "warehouse_name"        => $data->warehouse_name,
+                "tipe_bahan"            => $data->tipe_bahan,
+                "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "supplier_name"         => $data->supplier_name,
+                "itemCount"             => $data->itemCount,
+                "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
+                "status_post"           => $data->status_post,
+            ]);
+        }
+
+        $data = [
+            "data"  => $dataPenerimaanBarang,
+        ];
+        $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangImport/bahanBaku/print-table', $data));
+        $this->dompdf->setPaper('A4', 'landscape');
+        $this->dompdf->render();
+        $this->dompdf->stream($filename, array("Attachment" => false));
+        exit(0);
+    }
+
+    public function exportExcel()
+    {
+
+        $filename = "EXPORT_LPB_IMPORT_BB";
+
+        $condition = [
+            "penerimaan_barang.company_id" => $this->this_company_id,
+            "status_penerimaan" => "IMPORT",
+            "penerimaan_barang.deletedAt" => null,
+            "penerimaan_barang_detail.deletedAt" => null,
+            "tipe_bahan" => "BAKU"
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "status" => $this->request->getVar("status"),
+            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
+
+        $dataPenerimaanBarang = [];
+
+        $no = 1;
+
+        foreach ($penerimaanBarangData['data'] as $data) {
+            array_push($dataPenerimaanBarang, [
+                "NO"                    => $no++,
+                "DEPARTEMEN"            => $data->divisi,
+                "NO PENERIMAAN BARANG"  => $data->no_penerimaan_barang,
+                "NO PO"                 => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
+                "GUDANG"                => $data->warehouse_name,
+                "TANGGAL"               => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "SUPPLIER"              => $data->supplier_name,
+                "JUMLAH ITEM"           => $data->itemCount,
+            ]);
+        }
+
+        $data = [
+            "data"  => $dataPenerimaanBarang,
+        ];
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->getStyle('A1:H1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+
+        if (empty($dataPenerimaanBarang)) {
+            $sheet->setCellValue('A1', 'Tidak Ada Data Penerimaan Barang');
+        } else {
+            $header = array_keys($dataPenerimaanBarang[0]);
+            $sheet->fromArray($header, null, 'A1');
+            $sheet->getStyle('A1:H1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+            ]);
+
+            $rowData = array_map('array_values', $dataPenerimaanBarang);
+            $sheet->fromArray($rowData, null, 'A2');
+
+            foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+
+        ob_start();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        $excelOutput = ob_get_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        header('Content-Length: ' . strlen($excelOutput));
+
+        echo $excelOutput;
+        exit();
     }
 
     public function create()

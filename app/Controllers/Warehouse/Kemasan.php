@@ -290,7 +290,7 @@ class Kemasan extends BaseController
                 $satuan = $this->satuanModel->where('kode_satuan', trim($data[$i][3]))->first();
 
                 // PARENT BARANG 
-                $parentBarang = $this->parentBarangModel->where('company_id', $this->this_company_id)->where('parent_name', trim($data[$i][0]))->first();
+                $parentBarang = $this->parentBarangModel->where('company_id', $this->this_company_id)->where('parent_name', trim($data[$i][0]))->where('parent_type', "kemasan")->first();
 
                 // if excel null
                 if ($data[$i][1] != null) {

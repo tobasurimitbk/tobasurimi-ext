@@ -154,7 +154,7 @@ class PembayaranPOLokal extends BaseController
             $lpb = $penerimaanBarangModel->where('id', $this->request->getVar('lpb'))->first();
 
             $hargaSebelumDiskon = $this->request->getVar('nominal_pembayaran');
-            $potonganHarga = $this->request->getVar('potongan_harga');
+            $potonganHarga = $this->request->getVar('potongan');
             $amount = $hargaSebelumDiskon - $potonganHarga;
 
             if ($amount < 0) {

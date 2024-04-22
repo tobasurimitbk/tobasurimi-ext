@@ -837,6 +837,7 @@ $routes->get('/stock-list/stock-log-mutasi', 'Inventori\StokList::allStokMutasi'
 $routes->get('/stock-list/stock-log-jasa-vendor', 'Inventori\StokList::allStokJasaVendor', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-produksi', 'Inventori\StokList::allStokProduksi', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-rebus', 'Inventori\StokList::allStokRebus', ['filter' => 'Auth']);
+$routes->post('/stock-list/import', 'Inventori\StokList::import', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);
@@ -897,7 +898,8 @@ $routes->post('/penerimaan-barang-lokal-bp/delete', 'Warehouse\PenerimaanBarangL
 $routes->post('/penerimaan-barang-lokal-bp/posting', 'Warehouse\PenerimaanBarangLokalBP::posting', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/get-divisi', 'Warehouse\PenerimaanBarangLokalBP::dropdownDivisiPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-
+$routes->get('/penerimaan-barang-lokal-bp/print-table', 'Warehouse\PenerimaanBarangLokalBP::printTable', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/export-excel', 'Warehouse\PenerimaanBarangLokalBP::exportExcel', ['filter' => 'Auth']);
 // PENERIMAAN BARANG LOKAL BB
 $routes->get('/penerimaan-barang-lokal-bb', 'Warehouse\PenerimaanBarangLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/all', 'Warehouse\PenerimaanBarangLokalBB::all', ['filter' => 'Auth']);
@@ -913,6 +915,8 @@ $routes->post('/penerimaan-barang-lokal-bb/delete', 'Warehouse\PenerimaanBarangL
 $routes->post('/penerimaan-barang-lokal-bb/posting', 'Warehouse\PenerimaanBarangLokalBB::posting', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/get-divisi', 'Warehouse\PenerimaanBarangLokalBB::dropdownDivisiPOLokalBB', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/print-table', 'Warehouse\PenerimaanBarangLokalBB::printTable', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/export-excel', 'Warehouse\PenerimaanBarangLokalBB::exportExcel', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG IMPORT BB
 $routes->get('/penerimaan-barang-import-bb', 'Warehouse\PenerimaanBarangImportBB::index', ['filter' => 'Auth']);
@@ -929,7 +933,8 @@ $routes->post('/penerimaan-barang-import-bb/delete', 'Warehouse\PenerimaanBarang
 $routes->post('/penerimaan-barang-import-bb/posting', 'Warehouse\PenerimaanBarangImportBB::posting', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import-bb/get-divisi', 'Warehouse\PenerimaanBarangImportBB::dropdownDivisiPOImportBB', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import-bb/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-
+$routes->get('/penerimaan-barang-import-bb/print-table', 'Warehouse\PenerimaanBarangImportBB::printTable', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bb/export-excel', 'Warehouse\PenerimaanBarangImportBB::exportExcel', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG IMPORT BP
 $routes->get('/penerimaan-barang-import-bp', 'Warehouse\PenerimaanBarangImportBP::index', ['filter' => 'Auth']);
@@ -946,7 +951,8 @@ $routes->post('/penerimaan-barang-import-bp/delete', 'Warehouse\PenerimaanBarang
 $routes->post('/penerimaan-barang-import-bp/posting', 'Warehouse\PenerimaanBarangImportBP::posting', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import-bp/get-divisi', 'Warehouse\PenerimaanBarangImportBP::dropdownDivisiPOImportBP', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import-bp/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-
+$routes->get('/penerimaan-barang-import-bp/print-table', 'Warehouse\PenerimaanBarangImportBP::printTable', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bp/export-excel', 'Warehouse\PenerimaanBarangImportBP::exportExcel', ['filter' => 'Auth']);
 // PENERIMAAN BARANG LOKAL 
 // $routes->get('/penerimaan-barang-lokal', 'Warehouse\PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
 // $routes->get('/penerimaan-barang-lokal/all', 'Warehouse\PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
