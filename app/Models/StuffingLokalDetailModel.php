@@ -84,7 +84,7 @@ class StuffingLokalDetailModel extends Model
                 ->select('barang_master_sales.*, sales_order_detail.qty')
                 ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
                 ->where('barang_master_sales.id', $m['barang_id_order'])
-                ->where('sales_order_detail.sales_order_export_id', $m['sales_order_export_id'])
+                ->where('sales_order_detail.id_sales_order', $m['sales_order_id'])
                 ->first();
 
             if ($stockOutput) {
