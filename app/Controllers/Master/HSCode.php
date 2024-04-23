@@ -134,7 +134,11 @@ class HSCode extends BaseController
                     "rules" => "required"
                 ],
                 "code" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[hs_codes.code]",
+                    'errors' => [
+                        'required' => 'HS Codes wajib diisi',
+                        'is_unique' => 'HS Codes sudah ada'
+                    ]
                 ],
                 "uraian_barang" => [
                     "rules" => "required"
@@ -171,12 +175,14 @@ class HSCode extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
         } catch (\Exception $e) {
             $data = [
@@ -216,6 +222,19 @@ class HSCode extends BaseController
                     "uraian_barang" => $this->request->getPost("uraian_barang"),
                     "unit" => $this->request->getPost("unit")
                 ];
+
+                $hsCodeSameName = $this->HsCodesModel
+                    ->where('code', $values['code'])
+                    ->where('id !=', $id)
+                    ->first();
+
+                if ($hsCodeSameName) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "HS Code sudah digunakan.",
+                        'token' => csrf_hash()
+                    ]);
+                }
 
                 if ($this->HsCodesModel->update($id, $values)) {
                     $data = [

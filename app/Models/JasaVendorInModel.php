@@ -130,7 +130,6 @@ class JasaVendorInModel extends Model
 
         foreach ($jasaVendorOutData as $j) {
             $stockBarangOut = $stockModel->find($j['stock_out_id']);
-            $stockBarangIn = $stockModel->find($j['stock_in_id']);
             $stockListOutDetail = $stockDetail2Model->getStockListDetail(
                 $j['stock_out_id'],
                 $j['bc_out_id'],
@@ -138,7 +137,6 @@ class JasaVendorInModel extends Model
             );
 
             $barangOut = self::getDetailBarang($stockBarangOut);
-            $barangIn = self::getDetailBarang($stockBarangIn);
 
             $bc = $metaDataModel->find($j['bc_out_id']);
             $jasaVendorInDetail = $jasaVendorInDetailModel
@@ -159,7 +157,6 @@ class JasaVendorInModel extends Model
                     'jasa_vendor_out_detail_id' => $j['id'],
                     'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                     'stock_out_id' => $j['stock_out_id'],
-                    'stock_in_id' => $j['stock_in_id'],
                     'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                     'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
                     'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
@@ -169,8 +166,6 @@ class JasaVendorInModel extends Model
                     'barang_out' => $barangOut != null ? strtoupper($barangOut['barang']) : "-",
                     'satuan_out' => $barangOut != null ? $barangOut['kode_satuan'] : "-",
                     'qty_out' => $j['qty'],
-                    'barang_in' => $barangIn != null ? strtoupper($barangIn['barang']) : "-",
-                    'satuan_in' => $barangIn != null ? $barangIn['kode_satuan'] : "-",
                     'qty_kotor' => 0,
                     'qty_bersih' => 0,
                 ];
@@ -180,7 +175,6 @@ class JasaVendorInModel extends Model
                         'jasa_vendor_out_detail_id' => $j['id'],
                         'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                         'stock_out_id' => $j['stock_out_id'],
-                        'stock_in_id' => $j['stock_in_id'],
                         'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                         'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
                         'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
@@ -190,8 +184,6 @@ class JasaVendorInModel extends Model
                         'barang_out' => $barangOut != null ? strtoupper($barangOut['barang']) : "-",
                         'satuan_out' => $barangOut != null ? $barangOut['kode_satuan'] : "-",
                         'qty_out' => $j['qty'],
-                        'barang_in' => $barangIn != null ? strtoupper($barangIn['barang']) : "-",
-                        'satuan_in' => $barangIn != null ? $barangIn['kode_satuan'] : "-",
                         'qty_kotor' => $jasaVendorInDetail != null ? $jasaVendorInDetail['qty_kotor'] : 0,
                         'qty_bersih' =>   $jasaVendorInDetail != null ? $jasaVendorInDetail['qty_bersih'] : 0,
                     ];

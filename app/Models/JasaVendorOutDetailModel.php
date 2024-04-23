@@ -60,7 +60,6 @@ class JasaVendorOutDetailModel extends Model
                 $m['no_aju_out']
             );
             $stock = $stockModel->find($m['stock_out_id']);
-            $stockOutput = $stockModel->find($m['stock_in_id']);
 
             if ($stock['kemasan_id'] == 0) {
                 $barangMaster = $barangMasterModel->find($stock['barang1_id']);
@@ -71,15 +70,6 @@ class JasaVendorOutDetailModel extends Model
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
                 $satuan = $satuanModel->find($kemasan['satuan_id']);
                 $barangName = $kemasan['name'];
-            }
-
-            if ($stockOutput['kemasan_id'] == 0) {
-                $barangMaster = $barangMasterModel->find($stockOutput['barang1_id']);
-                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stockOutput['barang2_id']);
-                $barangNameOutput = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            } else {
-                $kemasan = $kemasanModel->find($stockOutput['kemasan_id']);
-                $barangNameOutput = $kemasan['name'];
             }
 
             $stockList['qty'] = $m['qty'];
@@ -93,10 +83,6 @@ class JasaVendorOutDetailModel extends Model
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = ($stockList['stok_total']);
             $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
-            $stockList['output'] = [
-                'barang' => $barangNameOutput,
-                'stock_id' => $stockOutput['id']
-            ];
 
             array_push($result, $stockList);
         }

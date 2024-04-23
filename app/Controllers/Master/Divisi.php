@@ -117,9 +117,18 @@ class Divisi extends BaseController
 
             if ($this->validate($rules)) {
 
+                $first = $this->DivisisModel->where('company_id', $this->this_company_id)->where('divisi', strtoupper($this->request->getVar('divisi')))->first();
+                if ($first != null) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'token' => csrf_hash(),
+                        'message' => "Departemen " . strtoupper($this->request->getVar('divisi')) . " sudah ada"
+                    ]);
+                }
+
                 $divisiInserted = $this->DivisisModel->insert([
                     "company_id" => $this->this_company_id,
-                    "divisi" => $this->request->getPost("divisi"),
+                    "divisi" => strtoupper($this->request->getVar("divisi")),
                     "jam_kerja_id" => $this->request->getPost('jam_kerja_id')
                 ]);
 
@@ -183,9 +192,18 @@ class Divisi extends BaseController
 
                 $id = $this->request->getPost("id");
 
+                $first = $this->DivisisModel->where('company_id', $this->this_company_id)->where('divisi', strtoupper($this->request->getVar('divisi')))->where('id !=', $id)->first();
+                if ($first != null) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'token' => csrf_hash(),
+                        'message' => "Departemen " . strtoupper($this->request->getVar('divisi')) . " sudah digunakan"
+                    ]);
+                }
+
                 $this->DivisisModel->update($id, [
                     "company_id" => $this->this_company_id,
-                    "divisi" => $this->request->getPost("divisi"),
+                    "divisi" => strtoupper($this->request->getVar("divisi")),
                     "jam_kerja_id" => $this->request->getPost('jam_kerja_id')
                 ]);
 

@@ -232,7 +232,6 @@
 
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
-                    setLoading()
                     let data = new FormData(document.querySelector("#formPost"));
                     let id = $("input[name='jamKerjaID']").val();
 
@@ -243,6 +242,10 @@
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading()
+                            },
+                            complete: function() {
+                                stopLoading();
                             },
                             method: "POST",
                             dataType: "json",
@@ -282,6 +285,10 @@
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading()
+                            },
+                            complete: function() {
+                                stopLoading();
                             },
                             method: "POST",
                             dataType: "json",

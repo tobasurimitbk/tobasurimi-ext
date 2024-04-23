@@ -3,13 +3,18 @@
 namespace App\Controllers\JasaVendor;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorOutDetailModel;
 use App\Models\JasaVendorOutModel;
+use App\Models\KemasanModel;
 use App\Models\MetadataModel;
+use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\SupplierModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
@@ -27,6 +32,11 @@ class JasaVendorOut extends BaseController
     protected $jasaVendorOutModel;
     protected $jasaVendorOutDetailModel;
     protected $warehouseModel;
+    protected $barangMasterModel;
+    protected $barangMasterSpesifikasiModel;
+    protected $kemasanModel;
+    protected $satuanModel;
+    protected $supplierModel;
     protected $dompdf;
 
     public function __construct()
@@ -42,6 +52,11 @@ class JasaVendorOut extends BaseController
         $this->jasaVendorOutModel = new JasaVendorOutModel();
         $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $this->kemasanModel = new KemasanModel();
+        $this->satuanModel = new SatuansModel();
+        $this->supplierModel = new SupplierModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -179,7 +194,6 @@ class JasaVendorOut extends BaseController
                 'stock_out_id' => $b->stock_id,
                 'bc_out_id' => $b->bc_id,
                 'no_aju_out' => $b->no_aju,
-                'stock_in_id' => $b->output->stock_id,
                 'qty' => $b->qty
             ]);
         }
@@ -230,7 +244,6 @@ class JasaVendorOut extends BaseController
                     'stock_out_id' => $b->stock_id,
                     'bc_out_id' => $b->bc_id,
                     'no_aju_out' => $b->no_aju,
-                    'stock_in_id' => $b->output->stock_id,
                     'qty' => $b->qty
                 ]);
                 array_push($id_detail_all,  $id_detail_new);
@@ -241,7 +254,6 @@ class JasaVendorOut extends BaseController
                     'stock_out_id' => $b->stock_id,
                     'bc_out_id' => $b->bc_id,
                     'no_aju_out' => $b->no_aju,
-                    'stock_in_id' => $b->output->stock_id,
                     'qty' => $b->qty
                 ]);
                 array_push($id_detail_all, $check['id']);
@@ -387,31 +399,69 @@ class JasaVendorOut extends BaseController
         $this->dompdf->stream("Jasa Vendor Barang Keluar", array("Attachment" => false));
     }
 
-    public function dropdownListOutputVendor()
+    public function dropdownListBarangIsInit()
     {
-        $stockID = $this->request->getVar('stock_id');
-
-        $response = array();
-        if (!empty($stockID)) {
-            $data = $this->stockModel->getBarangAndStock(
-                $this->request->getVar('type_barang'),
-                $this->request->getVar('divisi_id'),
-                $this->request->getVar('warehouse_id')
-            );
-
-            foreach ($data as $d) {
-                if ($d['stock_id'] != $stockID) {
-                    array_push($response, $d);
-                }
-            }
-        }
-
+        $data = $this->stockModel->getBarangRebusAndStock(
+            $this->request->getVar('type_barang'),
+            $this->request->getVar('divisi_id'),
+            $this->request->getVar('warehouse_id')
+        );
         return response()->setJSON([
+            'data' => $data,
             'token' => csrf_hash(),
-            'status' => true,
-            'data' => $response
+            'status' => true
         ]);
     }
+
+    public function getListStockByStockID()
+    {
+        if (!empty($this->request->getVar('stock_id'))) {
+            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
+                $this->request->getVar('stock_id')
+            );
+            $stock = $this->stockModel->find($this->request->getVar('stock_id'));
+            if ($stock['kemasan_id'] == 0) {
+                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+            } else {
+                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+                $barangName = $kemasan['name'];
+            }
+            $resultArr = array();
+
+            for ($i = 0; $i < count($dataResult); $i++) {
+                $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
+                $supplier = $this->supplierModel->select('suppliers.*')
+                    ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
+                    ->where('penerimaan_barang.no_penerimaan_barang', $dataResult[$i]['no_dokumen_1'])
+                    ->first();
+
+                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+                $dataResult[$i]['barang'] = strtoupper($barangName);
+                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+                $dataResult[$i]['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
+                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+
+                if ($dataResult[$i]['stok_total'] > 0) {
+                    array_push($resultArr, $dataResult[$i]);
+                }
+            }
+            return response()->setJSON([
+                'data' => $resultArr,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+    }
+
 
     public function getJasaVendorOutNo()
     {

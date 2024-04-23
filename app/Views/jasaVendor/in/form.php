@@ -160,7 +160,7 @@
                                 <tr>
                                     <th style="text-align: center;" colspan="6">Detail Dokumen Pabean</th>
                                     <th style="text-align: center;" colspan="3">Daftar Barang Keluar</th>
-                                    <th style="text-align: center;" colspan="4">Daftar Barang Masuk</th>
+                                    <th style="text-align: center;" colspan="2">Daftar Barang Masuk</th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">No</th>
@@ -175,18 +175,15 @@
                                     <th style="text-align: center;">Satuan Output</th>
                                     <th style="text-align: center;">Qty Keluar</th>
 
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan Masuk</th>
-                                    <th style="text-align: center;">Qty Kotor</th>
-                                    <th style="text-align: center;">Qty Bersih</th>
-
+                                    <th style="text-align: center;">Total Barang Masuk</th>
+                                    <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="13" style="text-align: center;">
+                                    <td colspan="11" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -542,18 +539,11 @@
                 newRow.append($('<td>').text(v.barang_out));
                 newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.qty_out));
-                newRow.append($('<td>').text(v.barang_in));
-                newRow.append($('<td>').text(v.satuan_in));
-                newRow.append($('<td>').html(
+                newRow.append($('<td>').text(0));
+                newRow.append($('<td style="text-align: center;">').html(
                     `
-                        <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control qty-kotor" style="height: 40px; padding-bottom: 10px;" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.jasa_vendor_out_detail_id}" class="form-control" type="text" value="${v.qty_kotor}">
-                    `
-                ));
-
-                newRow.append($('<td>').html(
-                    `
-                        <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control qty-bersih" style="height: 40px; padding-bottom: 10px;" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.jasa_vendor_out_detail_id}" class="form-control" type="text" value="${v.qty_bersih}">
-                    `
+                    <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-primary" onclick="displayModal(${v.id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                `
                 ));
                 table.find('tbody').append(newRow);
             });

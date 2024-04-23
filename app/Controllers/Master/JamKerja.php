@@ -95,7 +95,7 @@ class JamKerja extends BaseController
         $jenisJamKerja = $this->request->getVar('jenisJamKerja');
 
         // check duplikat
-        if ($modelJamKerja->where('jenis', $jenisJamKerja)->first() != null) {
+        if ($modelJamKerja->where('company_id', $this->this_company_id)->where('jenis', $jenisJamKerja)->first() != null) {
             return \response()->setJSON([
                 'message' => "Jam Kerja $jenisJamKerja sudah ada, silahkan coba dengan nama lain",
                 'status' => false
@@ -103,7 +103,7 @@ class JamKerja extends BaseController
         }
 
         $jamKerja = $modelJamKerja->insert([
-            'jenis' => $this->request->getVar('jenisJamKerja'),
+            'jenis' => strtoupper($this->request->getVar('jenisJamKerja')),
             'jam_terlambat' => $this->request->getVar('jamTerlambat'),
             'company_id' =>  $this->this_company_id
         ]);
@@ -160,7 +160,22 @@ class JamKerja extends BaseController
         $modelJamKerjaDetail = new JamKerjaDetailModel();
         $modelMetaData = new MetadataModel();
 
-        $modelJamKerja->set('jenis', $this->request->getVar('jenisJamKerja'))
+        $jamKerjaSameName = $modelJamKerja
+            ->where('company_id', $this->this_company_id)
+            ->where('jenis', strtoupper($this->request->getVar('jenisJamKerja')))
+            ->where('id !=', $this->request->getVar('jamKerjaID'))
+            ->first();
+
+        if ($jamKerjaSameName) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Jam kerja sudah digunakan.",
+                'token' => csrf_hash()
+            ]);
+        }
+
+
+        $modelJamKerja->set('jenis', strtoupper($this->request->getVar('jenisJamKerja')))
             ->set('company_id', $this->this_company_id)
             ->set('jam_terlambat', $this->request->getVar('jamTerlambat'))
             ->where('id', $this->request->getVar('jamKerjaID'))
