@@ -192,12 +192,49 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
-
     </div>
 </section>
+
+<div class="modal add-modal" id="update_detail_barang" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Barang Masuk</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form-lokal" role="form" method="POST" enctype="multipart/form-data">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <label for="floatingInput"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
+                                <label for="floatingInput">NIK (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
+                                <label for="floatingInput"> NPWP (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-parent-lokal">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -483,6 +520,7 @@
         }
     });
 
+
     $("#vendor_id,#divisi_id,#warehouse_id,.multiple_jasa_vendor_out_id")
         .parent('div')
         .children('span')
@@ -490,6 +528,10 @@
         .children('span')
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
+
+    function displayDetailModal(id) {
+        $('#update_detail_barang').modal('show')
+    }
 
     function getListDivisi() {
         // GET LIST DIVISI
@@ -542,7 +584,7 @@
                 newRow.append($('<td>').text(0));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-primary" onclick="displayModal(${v.id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                    <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-primary" onclick="displayDetailModal(${v.id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);

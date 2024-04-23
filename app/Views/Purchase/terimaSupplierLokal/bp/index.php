@@ -37,7 +37,7 @@
                     </select>
                 </div>
                 <div class="col mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No Terima Faktur" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>
             <div class="row">
