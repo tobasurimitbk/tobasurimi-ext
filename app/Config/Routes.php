@@ -750,7 +750,8 @@ $routes->get('/jasa-vendor-in/create', 'JasaVendor\JasaVendorIn::create', ['filt
 $routes->get('/jasa-vendor-in/divisi', 'JasaVendor\JasaVendorIn::dropdownDivisi', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/warehouse', 'JasaVendor\JasaVendorIn::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/list-jasa-vendor-out', 'JasaVendor\JasaVendorIn::dropdownNoJasaVendorOut', ['filter' => 'Auth']);
-$routes->get('/jasa-vendor-in/list-barang', 'JasaVendor\JasaVendorIn::dropdownListBarang', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/list-barang', 'JasaVendor\JasaVendorIn::dropdownListBarangKeluar', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/list-barang-masuk', 'JasaVendor\JasaVendorIn::dropdownListBarangMasuk', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/get-jasa-vendor-in-no',  'JasaVendor\JasaVendorIn::getJasaVendorInNo', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createAction', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateAction', ['filter' => 'Auth']);

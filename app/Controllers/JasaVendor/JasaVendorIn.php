@@ -461,7 +461,7 @@ class JasaVendorIn extends BaseController
     }
 
 
-    public function dropdownListBarang()
+    public function dropdownListBarangKeluar()
     {
         $id = decrypt($this->request->getVar('id'));
         $jasaVendorOutID = json_decode($this->request->getVar('multiple_jasa_vendor_out_id'));
@@ -483,6 +483,31 @@ class JasaVendorIn extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+    }
+
+    public function dropdownListBarangMasuk()
+    {
+        $stockID = $this->request->getVar('stock_out_id');
+        $response = array();
+        if (!empty($stockID)) {
+            $data = $this->stockModel->getBarangRebusAndStock(
+                $this->request->getVar('type_barang'),
+                $this->request->getVar('divisi_id'),
+                $this->request->getVar('warehouse_id')
+            );
+
+            foreach ($data as $d) {
+                if ($d['stock_id'] != $stockID) {
+                    array_push($response, $d);
+                }
+            }
+        }
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $response
+        ]);
     }
 
     public function dropdownDivisi()

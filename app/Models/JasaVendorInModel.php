@@ -163,11 +163,13 @@ class JasaVendorInModel extends Model
                     'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                     'bc_id' => $j['bc_out_id'],
                     'no_aju' => $j['no_aju_out'],
+                    'kode_barang_out' => $barangOut != null ? $barangOut['kode_barang'] : "-",
                     'barang_out' => $barangOut != null ? strtoupper($barangOut['barang']) : "-",
                     'satuan_out' => $barangOut != null ? $barangOut['kode_satuan'] : "-",
                     'qty_out' => $j['qty'],
                     'qty_kotor' => 0,
                     'qty_bersih' => 0,
+                    'list_barang_masuk' => []
                 ];
             } else {
                 if ($jasaVendorInDetail != null) {
@@ -181,11 +183,13 @@ class JasaVendorInModel extends Model
                         'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                         'bc_id' => $j['bc_out_id'],
                         'no_aju' => $j['no_aju_out'],
+                        'kode_barang_out' => $barangOut != null ? $barangOut['kode_barang'] : "-",
                         'barang_out' => $barangOut != null ? strtoupper($barangOut['barang']) : "-",
                         'satuan_out' => $barangOut != null ? $barangOut['kode_satuan'] : "-",
                         'qty_out' => $j['qty'],
                         'qty_kotor' => $jasaVendorInDetail != null ? $jasaVendorInDetail['qty_kotor'] : 0,
                         'qty_bersih' =>   $jasaVendorInDetail != null ? $jasaVendorInDetail['qty_bersih'] : 0,
+                        'list_barang_masuk' => []
                     ];
                 }
             }
@@ -199,7 +203,7 @@ class JasaVendorInModel extends Model
         $barangMasterModel = new BarangMasterModel();
 
         $barang = $barangMasterModel
-            ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan")
+            ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang")
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('barang_master_spesifikasi.id', $stock['barang2_id'])
