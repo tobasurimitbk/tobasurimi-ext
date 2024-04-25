@@ -12,7 +12,7 @@
         }
 
         @page {
-            size: 9.00in 5.50in landscape;
+            size: 13.00in 8.50in landscape;
             margin: 25px;
             padding: 25px;
         }
@@ -126,8 +126,8 @@
                         <tr style="text-align: center; font-weight:bold;">
                             <td><?= strtoupper($j['barang_name']) . "-" . strtoupper($j['spesifikasi']) ?></td>
                             <td><?= $j['kode_satuan'] ?></td>
-                            <td><?= $j['qty_kotor'] ?></td>
-                            <td><?= $j['qty_bersih'] ?></td>
+                            <td><?= number_format($j['qty_kotor'], 2) ?></td>
+                            <td><?= number_format($j['qty_bersih'], 2) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
