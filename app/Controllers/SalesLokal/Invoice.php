@@ -375,6 +375,7 @@ class Invoice extends BaseController
         foreach ($documentData->itemList as &$value) {
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
                 if ($value->id_barang == $valueDetail['id_barang_invoice']) {
+                    $value->id_detail_invoice = $valueDetail['id'];
                     $value->qty_input = toRupiah(floatval(str_replace('Rp', '', $valueDetail['qty_invoice'])));
                     $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $valueDetail['harga_barang_invoice'])));
                     $value->amount = toRupiah(floatval(str_replace('Rp', '', $valueDetail['amount_invoice'])));
@@ -534,17 +535,30 @@ class Invoice extends BaseController
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
 
             foreach ($postItemsData as $value) {
-                $valuesDetail = [
-                    "id_sales_order_invoice"        => $dataSalesOrderInvoice,
-                    "id_barang_invoice"             => $value['id_barang'],
-                    "qty_invoice"                   => $value['qty_input'],
-                    "keterangan_invoice"            => "-",
-                    "discount_percentage_invoice"   => $value['disc'],
-                    "harga_barang_invoice"          => $value['harga_barang'],
-                    "tax_invoice"                   => $value['tax'],
-                    "amount_invoice"                => $value['total_harga_barang'],
-                ];
-                $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+                if (isset($value['id_detail_invoice'])) {
+                    $valuesDetail = [
+                        "id_barang_invoice"             => $value['id_barang'],
+                        "qty_invoice"                   => $value['qty_input'],
+                        "keterangan_invoice"            => "-",
+                        "discount_percentage_invoice"   => $value['disc'],
+                        "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                        "tax_invoice"                   => str_replace(',', '', $value['tax']),
+                        "amount_invoice"                => str_replace(',', '', $value['total_harga_barang']),
+                    ];
+                    $this->SalesOrderInvoiceDetailModel->update($value['id_detail_invoice'], $valuesDetail);
+                } else {
+                    $valuesDetail = [
+                        "id_sales_order_invoice"        => $dataSalesOrderInvoice,
+                        "id_barang_invoice"             => $value['id_barang'],
+                        "qty_invoice"                   => $value['qty_input'],
+                        "keterangan_invoice"            => "-",
+                        "discount_percentage_invoice"   => $value['disc'],
+                        "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                        "tax_invoice"                   => str_replace(',', '', $value['tax']),
+                        "amount_invoice"                => str_replace(',', '', $value['total_harga_barang']),
+                    ];
+                    $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+                }
             }
             $updateData = [$documentData->id, ['sales_order_invoice_id' => $payload['id']]];
             if ($postData['doc_type'] === 'pesanan') {
