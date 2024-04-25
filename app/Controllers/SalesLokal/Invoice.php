@@ -13,7 +13,7 @@ use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
 use App\Models\TaxModel;
 use App\Models\AllNoModel;
-
+use App\Models\SalesOrderInvoiceDetailModel;
 use Config\Services;
 use Dompdf\Dompdf;
 use ErrorException;
@@ -33,6 +33,7 @@ class Invoice extends BaseController
     protected $SalesOrderModel;
     protected $SalesOrderDetailModel;
     protected $SuratJalanModel;
+    protected $SalesOrderInvoiceDetailModel;
     protected $TaxModel;
 
     public function __construct()
@@ -51,6 +52,7 @@ class Invoice extends BaseController
         $this->SalesOrderModel = new SalesOrderModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->SuratJalanModel = new SuratJalanModel();
+        $this->SalesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->TaxModel = new TaxModel();
     }
 
@@ -191,17 +193,37 @@ class Invoice extends BaseController
         try {
 
             $postData = $this->request->getPost();
+            $postItemsData = json_decode($this->request->getPost('items'), true);
             $documentData = null;
 
             if ($postData['doc_type'] === 'pesanan') {
                 $documentData = $this->SalesOrderModel->asObject()
-                    ->where('surat_jalan_so_id', null)
-                    ->where('sales_order_invoice_id', null)
                     ->find($postData['doc_id']);
+
+                // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
+                if (!empty($postItemsData)) {
+                    foreach ($postItemsData as $value) {
+                        // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
+                        $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
+
+                        $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
+                        $this->SalesOrderDetailModel->update($value['id'], $data);
+                    }
+                }
             } else {
                 $documentData = $this->SuratJalanModel->asObject()
-                    ->where('sales_order_invoice_id', null)
                     ->find($postData['doc_id']);
+
+                // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
+                if (!empty($postItemsData)) {
+                    foreach ($postItemsData as $value) {
+                        // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
+                        $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
+
+                        $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
+                        $this->SalesOrderDetailModel->update($value['id'], $data);
+                    }
+                }
             }
 
             if (empty($documentData)) {
@@ -216,13 +238,6 @@ class Invoice extends BaseController
 
             // start transaction
             $this->SalesOrderInvoiceModel->db->transException(true)->transStart();
-
-            /* $code = "LKL/INV";
-            $currentYear = date('Y');
-            $currentMonth = date('m');
-            $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
-            $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
-            $noFaktur = $code . $number . "/" . $currentYear . "/" . $currentMonth; */
             $noFaktur = $postData['no_faktur'];
 
             $values = [
@@ -247,6 +262,20 @@ class Invoice extends BaseController
             ];
 
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->insert($values);
+
+            foreach ($postItemsData as $value) {
+                $valuesDetail = [
+                    "id_sales_order_invoice"        => $dataSalesOrderInvoice,
+                    "id_barang_invoice"             => $value['id_barang'],
+                    "qty_invoice"                   => $value['qty_input'],
+                    "keterangan_invoice"            => "-",
+                    "discount_percentage_invoice"   => $value['disc'],
+                    "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                    "tax_invoice"                   => str_replace(',', '', $value['tax']),
+                    "amount_invoice"                => str_replace(',', '', $value['total_harga_barang']),
+                ];
+                $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+            }
 
             $updateData = [$documentData->id, ['sales_order_invoice_id' => $dataSalesOrderInvoice]];
             if ($postData['doc_type'] === 'pesanan') {
@@ -327,6 +356,7 @@ class Invoice extends BaseController
         $id = decrypt($id);
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
+        $dataSalesInvoiceOrderDetail = $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $id)->findAll();
 
         if (empty($dataSalesInvoiceOrder)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);
@@ -341,9 +371,15 @@ class Invoice extends BaseController
 
         $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
 
-        foreach ($documentData->itemList as $value) {
-            $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $value->harga_barang)));
-            $value->amount = toRupiah(floatval(str_replace('Rp', '', $value->amount)));
+
+        foreach ($documentData->itemList as &$value) {
+            foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
+                if ($value->id_barang == $valueDetail['id_barang_invoice']) {
+                    $value->qty_input = toRupiah(floatval(str_replace('Rp', '', $valueDetail['qty_invoice'])));
+                    $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $valueDetail['harga_barang_invoice'])));
+                    $value->amount = toRupiah(floatval(str_replace('Rp', '', $valueDetail['amount_invoice'])));
+                }
+            }
         }
 
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
@@ -419,6 +455,7 @@ class Invoice extends BaseController
             }
 
             $postData = $this->request->getPost();
+            $postItemsData = json_decode($this->request->getPost('items'), true);
 
             $soInvData = $this->SalesOrderInvoiceModel->asObject()
                 ->find($payload['id']);
@@ -440,6 +477,17 @@ class Invoice extends BaseController
                     ->orWhere('id', $soInvData->document_id)
                     ->groupEnd()
                     ->find($postData['doc_id']);
+
+                // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
+                if (!empty($postItemsData)) {
+                    foreach ($postItemsData as $value) {
+                        // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
+                        $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
+
+                        $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
+                        $this->SalesOrderDetailModel->update($value['id'], $data);
+                    }
+                }
             } else {
                 $documentData = $this->SuratJalanModel->asObject()
                     ->groupStart()
@@ -447,6 +495,17 @@ class Invoice extends BaseController
                     ->orWhere('id', $soInvData->document_id)
                     ->groupEnd()
                     ->find($postData['doc_id']);
+
+                // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
+                if (!empty($postItemsData)) {
+                    foreach ($postItemsData as $value) {
+                        // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
+                        $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
+
+                        $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
+                        $this->SalesOrderDetailModel->update($value['id'], $data);
+                    }
+                }
             }
 
             if (empty($documentData)) {
@@ -474,6 +533,19 @@ class Invoice extends BaseController
             ];
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
 
+            foreach ($postItemsData as $value) {
+                $valuesDetail = [
+                    "id_sales_order_invoice"        => $dataSalesOrderInvoice,
+                    "id_barang_invoice"             => $value['id_barang'],
+                    "qty_invoice"                   => $value['qty_input'],
+                    "keterangan_invoice"            => "-",
+                    "discount_percentage_invoice"   => $value['disc'],
+                    "harga_barang_invoice"          => $value['harga_barang'],
+                    "tax_invoice"                   => $value['tax'],
+                    "amount_invoice"                => $value['total_harga_barang'],
+                ];
+                $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+            }
             $updateData = [$documentData->id, ['sales_order_invoice_id' => $payload['id']]];
             if ($postData['doc_type'] === 'pesanan') {
                 $this->SalesOrderModel->update(...$updateData);
@@ -640,6 +712,7 @@ class Invoice extends BaseController
     private function getDocNumberList(string $documentType, int $documentId = null): array
     {
         $documentList = [];
+        // exit;
 
         if ($documentType === 'pesanan') {
             $documentList = $this->SalesOrderModel->asObject()
@@ -650,14 +723,14 @@ class Invoice extends BaseController
                 ->select('id, no_surat_jalan AS doc_no');
         }
 
-        $documentList->groupStart();
-        $documentList->where('sales_order_invoice_id', null);
+        // $documentList->where('sales_order_invoice_id', null);
 
         if (!empty($documentId)) {
-            $documentList->orWhere('id', $documentId);
+            $documentList->groupStart();
+            $documentList->where('id', $documentId);
+            $documentList->groupEnd();
         }
 
-        $documentList->groupEnd();
 
         return $documentList->findAll();
     }
@@ -729,6 +802,8 @@ class Invoice extends BaseController
             $dpp += $itemTotal;
             $taxAmt += $itemTotal * ($item->tax / 100);
             $item->no = $no++;
+            $item->amount = number_format($item->amount);
+            $item->harga_barang = number_format($item->harga_barang);
         }
 
         $data = (object)[

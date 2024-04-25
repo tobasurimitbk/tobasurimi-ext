@@ -154,7 +154,9 @@
                                     <th>No.</th>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
-                                    <th>Qty</th>
+                                    <th>Qty Awal</th>
+                                    <th>Qty Sekarang</th>
+                                    <th>Qty Invoice</th>
                                     <th>Satuan</th>
                                     <th>Harga Satuan</th>
                                     <th>Discount (%)</th>
@@ -199,10 +201,84 @@
     // Get the current date
     var currentDate = new Date();
 
+    let list_items = [];
+
     // Format the date to your desired representation
     // var formattedDate = currentDate.toLocaleString().slice(0, 9); // You can use other formatting methods if needed
     // var formattedDateFront = moment(currentDate).format("DD/MM/YYYY")
     var tanggalFaktur = moment(currentDate).format("YYYY-MM-DD")
+
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        info: false,
+        paging: false,
+        fixedHeader: true,
+        display: "stripe",
+        searching: false,
+        ordering: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+            },
+            {
+                data: "kode_barang",
+                className: "text-center"
+            },
+            {
+                data: "nama_barang",
+                className: "text-center"
+            },
+            {
+                data: "qty",
+                className: "text-center"
+            },
+            {
+                data: "qty_sekarang",
+                className: "text-center"
+            },
+            {
+                data: null,
+                className: "text-center",
+                render: function(data, type, row, meta) {
+                    var qtyValue = row.qty_input !== undefined ? row.qty_input : row.qty_sekarang;
+                    if (type === 'display') {
+                        return '<input onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" value="' + qtyValue + '">';
+                    } else {
+                        return qtyValue;
+                    }
+                }
+            },
+            {
+                data: "satuan",
+                className: "text-center"
+            },
+            {
+                data: "harga_barang",
+                className: "text-center"
+            },
+            {
+                data: "disc",
+                className: "text-center"
+            },
+            {
+                data: "amount",
+                className: "text-center"
+            }
+        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
     // Display the date on the webpage
     $(document).ready(function() {
 
@@ -215,62 +291,6 @@
                 $('#includeTaxText').html('(Termasuk Pajak)');
             <?php endif; ?>
         <?php endif; ?>
-
-        const table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            info: false,
-            paging: false,
-            fixedHeader: true,
-            display: "stripe",
-            searching: false,
-            ordering: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                },
-                {
-                    data: "kode_barang",
-                    className: "text-center"
-                },
-                {
-                    data: "nama_barang",
-                    className: "text-center"
-                },
-                {
-                    data: "qty",
-                    className: "text-center"
-                },
-                {
-                    data: "satuan",
-                    className: "text-center"
-                },
-                {
-                    data: "harga_barang",
-                    className: "text-center"
-                },
-                {
-                    data: "disc",
-                    className: "text-center"
-                },
-                {
-                    data: "amount",
-                    className: "text-center"
-                }
-            ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
 
         // $(".tanggal_faktur").val(formattedDateFront);
 
@@ -425,13 +445,13 @@
             const docType = $('#doc_type').val();
 
             table.clear();
+            list_items
 
             $.ajax({
                 url: `<?= base_url('/invoice-penjualan-lokal/getDocumentData/'); ?>${docType}/${docId}`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-
                     console.log(res.itemList);
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
@@ -443,6 +463,9 @@
 
                     // add datatable data here
                     table.rows.add(res.itemList).draw(false);
+                    res.itemList.forEach(function(item) {
+                        list_items.push(item);
+                    });
 
                     // add total here
                     $('#itemSubTotal').html(res.dpp);
@@ -462,84 +485,11 @@
 
         <?php if (!empty($documentData)) : ?>
             const itemList = <?= json_encode($documentData->itemList) ?>;
-            console.log(itemList);
             table.rows.add(itemList).draw(false);
             // $('#itemSubTotal').html('<?= $documentData->dpp ?>');
             // $('#taxTotal').html('<?= $documentData->tax ?>');
             // $('#grandTotal').html('<?= $documentData->total ?>');
         <?php endif; ?>
-
-        const reCountTotal = () => {
-            const taxStatus = $('#tax_status').is(':checked');
-            const includeTax = $('#include_tax').is(':checked');
-            const itemList = table.rows().data();
-
-            let itemSubTotal = 0;
-            let itemSubTotalTermasukPajak = 0;
-            let discTotal = 0;
-            let dummyGrandTotal = 0;
-            let taxTotalHtml = 0;
-            let dummyTax = 0;
-
-            itemList.map((obj) => {
-                console.log(obj);
-                const itemAmt = parseFloat(obj.amount.replace('Rp ', ''));
-                let taxAmt = 0;
-                discTotal += ((+obj.disc) / 100) * itemAmt;
-                if (taxStatus) {
-                    dummyTax = (+obj.taxChecked);
-                    taxAmt = itemAmt * ((+obj.taxChecked) / 100);
-                } else {
-                    dummyTax = (+obj.tax);
-                    taxAmt = itemAmt * ((+obj.tax) / 100);
-                }
-                // console.log((dummyTax / 100));
-                console.log(itemAmt);
-
-                if (taxStatus && !includeTax) {
-                    // taxTotal += taxAmt;
-                    itemSubTotal += itemAmt;
-                    taxTotalHtml += taxAmt;
-                } else if (taxStatus && includeTax) {
-                    itemSubTotal += itemAmt - taxAmt;
-                    dummyGrandTotal += itemAmt;
-                    taxTotalHtml += taxAmt;
-                } else {
-                    // taxTotal += taxAmt;
-                    itemSubTotal += itemAmt;
-                    taxTotalHtml += taxAmt;
-                }
-                // console.log(itemSubTotal);
-            });
-
-            $('#itemSubTotal').html(itemSubTotal.toLocaleString());
-            $('#taxTotal').html(taxTotalHtml.toLocaleString());
-
-            // console.log("kondisi if");
-            // console.log(dummyGrandTotal);
-            // console.log(discTotal);
-            // console.log("kondisi if else");
-            // console.log(itemSubTotal);
-            // console.log(taxTotalHtml);
-            // console.log(discTotal);
-            // console.log("kondisi else");
-            // console.log(itemSubTotal);
-            // console.log(discTotal);
-
-
-            if (taxStatus && includeTax) {
-                $('#includeTaxText').html('(Termasuk Pajak)');
-                grandTotal = dummyGrandTotal - discTotal;
-            } else if (taxStatus && !includeTax) {
-                $('#includeTaxText').html('');
-                grandTotal = itemSubTotal + taxTotalHtml - discTotal;
-            } else {
-                $('#includeTaxText').html('');
-                grandTotal = itemSubTotal - discTotal;
-            }
-
-            $('#grandTotal').html(grandTotal.toLocaleString());
-        };
 
         $('#tax_status').on('input change paste', function() {
 
@@ -626,6 +576,19 @@
 
     $(".btn-submit").click(function() {
         if ($(".create-form").valid()) {
+            $.each(list_items, function(i, v) {
+                var element = $('input[data-id="' + v.id + '"].input-qty');
+                var input_user = parseFloat(element.val());
+                var stok_max = parseFloat(v.qty_sekarang);
+
+                if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                    dataError = list_items[i];
+                    isValid = false;
+                } else {
+                    list_items[i].qty_sekarang = stok_max;
+                    list_items[i].qty_input = input_user;
+                }
+            });
             Swal.fire({
                 icon: 'question',
                 title: 'Simpan Data?',
@@ -640,6 +603,7 @@
                     const csrf = $(`[name="${csrfToken}"]`);
                     setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
+                    data.append("items", JSON.stringify(list_items));
 
                     const ppn = $('#taxTotal').html();
                     const dpp = $('#itemSubTotal').html()
@@ -748,6 +712,84 @@
             })
         }
     });
+
+    const reCountTotal = () => {
+        const taxStatus = $('#tax_status').is(':checked');
+        const includeTax = $('#include_tax').is(':checked');
+        const itemList = table.rows().data();
+
+        let itemSubTotal = 0;
+        let itemSubTotalTermasukPajak = 0;
+        let discTotal = 0;
+        let dummyGrandTotal = 0;
+        let taxTotalHtml = 0;
+        let dummyTax = 0;
+
+        list_items.map((obj) => {
+            const itemAmt = parseFloat(obj.amount.replace(',', ''));
+            let taxAmt = 0;
+            discTotal += ((+obj.disc) / 100) * itemAmt;
+            if (taxStatus) {
+                dummyTax = (+obj.taxChecked);
+                taxAmt = itemAmt * ((+obj.taxChecked) / 100);
+            } else {
+                dummyTax = (+obj.tax);
+                taxAmt = itemAmt * ((+obj.tax) / 100);
+            }
+
+            if (taxStatus && !includeTax) {
+                itemSubTotal += itemAmt;
+                taxTotalHtml += taxAmt;
+            } else if (taxStatus && includeTax) {
+                itemSubTotal += itemAmt - taxAmt;
+                dummyGrandTotal += itemAmt;
+                taxTotalHtml += taxAmt;
+            } else {
+                itemSubTotal += itemAmt;
+                taxTotalHtml += taxAmt;
+            }
+        });
+
+        $('#itemSubTotal').html(itemSubTotal.toLocaleString());
+        $('#taxTotal').html(taxTotalHtml.toLocaleString());
+
+
+        if (taxStatus && includeTax) {
+            $('#includeTaxText').html('(Termasuk Pajak)');
+            grandTotal = dummyGrandTotal - discTotal;
+        } else if (taxStatus && !includeTax) {
+            $('#includeTaxText').html('');
+            grandTotal = itemSubTotal + taxTotalHtml - discTotal;
+        } else {
+            $('#includeTaxText').html('');
+            grandTotal = itemSubTotal - discTotal;
+        }
+
+        $('#grandTotal').html(grandTotal.toLocaleString());
+    };
+
+    function definisiQtyInput() {
+        $.each(list_items, function(i, v) {
+            var element = $('input[data-id="' + v.id + '"].input-qty');
+            var input_user = parseFloat(element.val());
+            var stok_max = parseFloat(v.qty_sekarang);
+
+            if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                dataError = list_items[i];
+                isValid = false;
+            } else {
+                list_items[i].qty_sekarang = stok_max;
+                list_items[i].qty_input = input_user;
+
+                // Calculate the amount and format it using .toLocaleString()
+                var amount = parseFloat(v.disc.replace(',', '')) != 0 ? ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100) * parseFloat(v.qty_input) : parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
+                list_items[i].amount = amount.toLocaleString();
+            }
+        });
+        table.clear();
+        table.rows.add(list_items).draw(false);
+        reCountTotal();
+    }
 </script>
 
 <?= $this->endSection(); ?>
