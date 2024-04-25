@@ -59,7 +59,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" disabled class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($jasaVendorIn) ? $jasaVendorIn['tanggal'] : $tanggal)); ?>">
+                                    <input <?= !empty($jasaVendorIn) ? 'readonly' : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($jasaVendorIn) ? $jasaVendorIn['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -140,13 +140,13 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorIn) ? $jasaVendorIn['no_surat_jalan_vendor'] : '' ?>" class="form-control no_surat_jalan_vendor" id="no_surat_jalan_vendor" name="no_surat_jalan_vendor" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">No Surat Jalan Vendor</label>
+                            <label for="floatingInput" style="z-index: 1;">No Surat Jalan Vendor (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorIn) ? $jasaVendorIn['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Keterangan</label>
+                            <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -216,13 +216,13 @@
                         <div class="col-md-6">
                             <div class="input-group">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select stock_in_id" name="stock_in_id" id="stock_in_id">
+                                    <select <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] == '1' ? 'disabled' : '') : '' ?> class="form-select stock_in_id" name="stock_in_id" id="stock_in_id">
                                         <option value=""></option>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">Pilih Barang Masuk</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
-                                    <button class="btn btn-success btn-stock-in-add" id="btn-stock-in-add" data-toggle="modal" type="button">
+                                    <button <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] == '1' ? 'disabled' : '') : '' ?> class="btn btn-success btn-stock-in-add" id="btn-stock-in-add" data-toggle="modal" type="button">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -265,7 +265,15 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-barang-masuk mr-2">Batal</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <?php if (!empty($jasaVendorIn)) : ?>
+                    <?php if ($jasaVendorIn['status_posting'] != '1') : ?>
+                        <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                    <?php else : ?>
+
+                    <?php endif; ?>
+                <?php else : ?>
+                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -304,6 +312,13 @@
         // LIST DIVISI
         getListDivisi();
         listBarang = [];
+    });
+
+    $("#tanggal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
     });
 
     $('#divisi_id').select2({
@@ -370,12 +385,6 @@
             warehouse_id: {
                 required: true
             },
-            no_surat_jalan_vendor: {
-                required: true
-            },
-            keterangan: {
-                required: true
-            },
         },
         messages: {
             no_penerimaan_surat_jalan: {
@@ -390,12 +399,7 @@
             warehouse_id: {
                 required: "Warehouse wajib diisi"
             },
-            no_surat_jalan_vendor: {
-                required: "No surat jalan vendor wajib diisi"
-            },
-            keterangan: {
-                required: "Keterangan wajib diisi"
-            },
+
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -475,7 +479,7 @@
                 if (!isValidBarang) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Barang keluar untuk ' + barangError.barang_out + ' dengan dokumen ' + barangError.bc_name + ' dan no aju ' + barangError.no_aju + ', sudah ada !',
+                        title: 'Barang keluar ' + barangError.barang_out + ' dengan dokumen ' + barangError.bc_name + ' dan no aju ' + barangError.no_aju + ', output barang nya belum ada !',
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
                     });
@@ -809,7 +813,7 @@
                 newRow.append($('<td>').text(v.list_barang_masuk.length + ' Barang'));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-primary" onclick="displayDetailModal(${v.jasa_vendor_out_detail_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.jasa_vendor_out_detail_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);

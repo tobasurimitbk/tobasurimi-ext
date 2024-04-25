@@ -110,7 +110,7 @@ class JasaVendorIn extends BaseController
                 "id"                    => encrypt($data->id),
                 "no_penerimaan_surat_jalan"        => $data->no_penerimaan_surat_jalan,
                 "no_surat_jalan"        => str_replace(['"', ']', '['], "",  $data->multiple_jasa_vendor_out_no),
-                "no_surat_jalan_vendor" => $data->no_surat_jalan_vendor,
+                "no_surat_jalan_vendor" => $data->no_surat_jalan_vendor == "" ? "-" : $data->no_surat_jalan_vendor,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
                 "warehouse_name"        => $data->warehouse_name,
@@ -209,17 +209,13 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
-        $qty_bersih_current = 0;
+        $check = $this->jasaVendorInModel->where('no_penerimaan_surat_jalan', $this->request->getVar('no_penerimaan_surat_jalan'))->first();
 
-        foreach ($barangs as $b) {
-            $qty_bersih_current += $b->qty_bersih;
-        }
-
-        if ($qty_bersih_current == 0) {
+        if ($check != null) {
             return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "Isikan minimal 1 qty bersih barang yang akan masuk",
-                'status' => false
+                'status' => false,
+                'message' => "Nomor penerimaan surat jalan sudah ada",
+                'token' => csrf_hash()
             ]);
         }
 
@@ -228,7 +224,7 @@ class JasaVendorIn extends BaseController
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'vendor_id' => $this->request->getVar('vendor_id'),
-            'tanggal' => date('Y-m-d'),
+            'tanggal' =>  $this->request->getPost("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
             "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
             'no_penerimaan_surat_jalan' => $this->request->getVar('no_penerimaan_surat_jalan'),
             'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
@@ -237,17 +233,20 @@ class JasaVendorIn extends BaseController
         ]);
 
         foreach ($barangs as $b) {
-            if ($b->qty_bersih != 0) {
-                $this->jasaVendorInDetailModel->insert([
-                    'jasa_vendor_in_id' => $id,
-                    'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
-                    'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
-                    'stock_in_id' => $b->stock_in_id,
-                    'bc_in_id' => $b->bc_id,
-                    'no_aju_in' => $b->no_aju,
-                    'qty_kotor' => $b->qty_kotor,
-                    'qty_bersih' => $b->qty_bersih
-                ]);
+            // LIST BARANG MASUK
+            foreach ($b->list_barang_masuk as $c) {
+                if ($c->qty_bersih != 0) {
+                    $this->jasaVendorInDetailModel->insert([
+                        'jasa_vendor_in_id' => $id,
+                        'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
+                        'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
+                        'stock_in_id' => $c->stock_in_id,
+                        'bc_in_id' => $b->bc_id,
+                        'no_aju_in' => $b->no_aju,
+                        'qty_kotor' => $c->qty_kotor,
+                        'qty_bersih' => $c->qty_bersih
+                    ]);
+                }
             }
         }
 
@@ -255,7 +254,7 @@ class JasaVendorIn extends BaseController
             'message' => "Jasa Vendor Barang Masuk Berhasil Disimpan",
             'token' => csrf_hash(),
             'status' => true,
-            'id' => decrypt($id)
+            'id' => encrypt($id)
         ]);
     }
 
@@ -273,21 +272,6 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
-        $qty_bersih_current = 0;
-
-        foreach ($barangs as $b) {
-            $qty_bersih_current += $b->qty_bersih;
-        }
-
-        if ($qty_bersih_current == 0) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "Isikan minimal 1 qty bersih barang yang akan masuk",
-                'status' => false
-            ]);
-        }
-
-
         $id = decrypt($this->request->getVar('id'));
 
         $this->jasaVendorInModel->update($id, [
@@ -304,12 +288,14 @@ class JasaVendorIn extends BaseController
         $id_detail_all = [];
 
         foreach ($barangs as $b) {
-            if ($b->qty_bersih != 0) {
+            // LIST BARANG MASUK
+            foreach ($b->list_barang_masuk as $c) {
                 // CHECK
                 $check = $this->jasaVendorInDetailModel
                     ->where('jasa_vendor_in_id', $id)
                     ->where('jasa_vendor_out_id', $b->jasa_vendor_out_id)
                     ->where('jasa_vendor_out_detail_id', $b->jasa_vendor_out_detail_id)
+                    ->where('stock_in_id', $c->stock_in_id)
                     ->first();
 
                 if ($check != null) {
@@ -317,11 +303,11 @@ class JasaVendorIn extends BaseController
                         'jasa_vendor_in_id' => $id,
                         'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
                         'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
-                        'stock_in_id' => $b->stock_in_id,
+                        'stock_in_id' => $c->stock_in_id,
                         'bc_in_id' => $b->bc_id,
                         'no_aju_in' => $b->no_aju,
-                        'qty_kotor' => $b->qty_kotor,
-                        'qty_bersih' => $b->qty_bersih
+                        'qty_kotor' => $c->qty_kotor,
+                        'qty_bersih' => $c->qty_bersih
                     ]);
                     array_push($id_detail_all, $check['id']);
                 } else {
@@ -331,6 +317,7 @@ class JasaVendorIn extends BaseController
                         ->where('jasa_vendor_in_id', $id)
                         ->where('jasa_vendor_out_id', $b->jasa_vendor_out_id)
                         ->where('jasa_vendor_out_detail_id', $b->jasa_vendor_out_detail_id)
+                        ->where('stock_in_id', $c->stock_in_id)
                         ->delete();
 
                     // INSERT
@@ -338,11 +325,11 @@ class JasaVendorIn extends BaseController
                         'jasa_vendor_in_id' => $id,
                         'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
                         'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
-                        'stock_in_id' => $b->stock_in_id,
+                        'stock_in_id' => $c->stock_in_id,
                         'bc_in_id' => $b->bc_id,
                         'no_aju_in' => $b->no_aju,
-                        'qty_kotor' => $b->qty_kotor,
-                        'qty_bersih' => $b->qty_bersih
+                        'qty_kotor' => $c->qty_kotor,
+                        'qty_bersih' => $c->qty_bersih
                     ]);
                     array_push($id_detail_all,  $id_detail_new);
                 }
