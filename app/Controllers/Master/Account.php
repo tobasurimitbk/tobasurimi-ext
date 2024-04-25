@@ -63,30 +63,25 @@ class Account extends BaseController
 
     public function dropdownHeaderAccount()
     {
-        $search = $this->request->getGet('search');
-        $page = $this->request->getGet('page') ?? 1;
-        $limit = 10;
-        $offset = ($page - 1) * 10;
+        // $search = $this->request->getGet('search');
+        // $page = $this->request->getGet('page') ?? 1;
+        // $limit = 10;
+        // $offset = ($page - 1) * 10;
 
         $dataQry = $this->HeaderAkunsModel;
 
-        if (!empty($search)) {
-            $dataQry->like('nama_header', $search);
-        }
+        // if (!empty($search)) {
+        //     $dataQry->like('nama_header', $search);
+        // }
 
         $totalData = $dataQry->countAllResults(false);
-        $subAccData = $dataQry->select('id, nama_header AS text')
+        $subAccData = $dataQry->select('id, nama_header AS text, no_header AS no')
             ->where('company_id', $this->this_company_id)
-            ->where('deletedAt is null')
             ->orderBy('nama_header', 'asc')
-            ->findAll($limit, $offset);
-
+            ->findAll();
 
         $data = [
-            "results"   => $subAccData,
-            "pagination" => [
-                "more"  => $offset < $totalData
-            ]
+            "results"   => $subAccData
         ];
 
         echo json_encode($data);

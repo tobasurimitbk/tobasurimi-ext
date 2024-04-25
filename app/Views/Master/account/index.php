@@ -1042,19 +1042,20 @@
 
             $(".status_sub").prop("checked", true);
 
-            // $.ajax({
-            //     url: `<?= base_url("header-account/dropdown"); ?>`,
-            //     method: "GET",
-            //     dataType: "json",
-            //     success: function(res) {
-            //         $(".header_id_sub").empty()
-            //         $(".header_id_sub").val('').change();
-            //         $(".header_id_sub").append(`<option value=""></option>`)
-            //         res.data.forEach(function(item) {
-            //             $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
-            //         })
-            //     }
-            // })
+            $.ajax({
+                url: `<?= base_url("header-account/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".header_id_sub").empty()
+                    $(".header_id_sub").val('').change();
+                    $(".header_id_sub").append(`<option value=""></option>`)
+                    res.results.forEach(function(item) {
+                        console.log(item);
+                        $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.no} - ${item.text}</option>`)
+                    })
+                }
+            })
             // $('.header_id_sub').select2(select2header_id_sub);
 
             $.ajax({
