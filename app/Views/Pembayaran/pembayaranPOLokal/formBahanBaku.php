@@ -342,11 +342,12 @@
 <?php endif; ?>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    const table = $('#dataTable');
+    var listPoNo = [];
+    var listPoID = [];
 
     $(document).ready(function() {
-        const table = $('#dataTable');
-        var listPoNo = [];
-        var listPoID = [];
+
 
         var validator = $(".create-form").validate({
             rules: {
@@ -491,6 +492,7 @@
             theme: "bootstrap-5"
         }).change(function() {
             generateLPBNo();
+            resetTable();
         });
 
         $('#bulan').change(function() {
@@ -687,16 +689,7 @@
                 generateLPBNo();
             }
             // clear res
-            listPoID.length = 0;
-            listPoNo.length = 0;
-            const table = $('#dataTable');
-            table.find('tbody').empty();
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align:right;" colspan="6"><b>Total</b></td>'));
-            newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
-            newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
-            newRow.append($('<td style="text-align:center;"><b>0.0</b></td>'));
-            table.find('tbody').append(newRow);
+            resetTable();
         });
 
         $('#supplier_id').select2({
@@ -708,8 +701,23 @@
             } else {
                 $('#bulan').val("");
             }
+            resetTable();
         });
     });
+
+    function resetTable() {
+        // clear res
+        listPoID.length = 0;
+        listPoNo.length = 0;
+        const table = $('#dataTable');
+        table.find('tbody').empty();
+        var newRow = $('<tr>');
+        newRow.append($('<td style="text-align:right;" colspan="6"><b>Total</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>0.0</b></td>'));
+        table.find('tbody').append(newRow);
+    }
 
     function remove(id) {
         const csrfToken = '<?= csrf_token() ?>';

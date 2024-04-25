@@ -86,7 +86,10 @@ class TandaTerimaFakturModel extends Model
 
         if ($addCondition['search']) {
             $tandaTerimaQry->groupStart();
-            $tandaTerimaQry->like('faktur_no', $addCondition['search']);
+            $tandaTerimaQry->like('faktur_no', $addCondition['search'])
+                ->orLike('divisi', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
             $tandaTerimaQry->groupEnd();
         }
 

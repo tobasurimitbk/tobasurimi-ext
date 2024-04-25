@@ -11,27 +11,38 @@
             </a>
             <?php if (!empty($dataSalesKontrak)) { ?>
                 <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                    <button class="btn btn-hapus delete-parent float-right">
-                        Hapus
-                    </button>
+                    <?php ?>
+                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
                 <?php } ?>
                 <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                    <button class="btn btn-success posting-spp posting-so float-right" onclick="updateStatusPosting('1')">
-                        Posting
-                    </button>
+                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'a')) : ?>
+                        <button class="btn btn-success posting-spp posting-so float-right" onclick="updateStatusPosting('1')">
+                            Posting
+                        </button>
+                    <?php endif; ?>
                 <?php } ?>
                 <?php if ($dataSalesKontrak['status_posting'] && !$isClosed) { ?>
-                    <button class="btn btn-success posting-spp unposting-so float-right" onclick="updateStatusPosting('0')">
-                        Un Posting
-                    </button>
+                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'ua')) : ?>
+                        <button class="btn btn-success posting-spp unposting-so float-right" onclick="updateStatusPosting('0')">
+                            Un Posting
+                        </button>
+                    <?php endif; ?>
                 <?php } ?>
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("sales-kontrak/print/"); ?><?= encrypt($dataSalesKontrak['id']); ?>')">
-                    Print
-                </button>
-                <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                        Simpan
+                <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("sales-kontrak/print/"); ?><?= encrypt($dataSalesKontrak['id']); ?>')">
+                        Print
                     </button>
+                <?php endif; ?>
+                <?php if (!$dataSalesKontrak['status_posting']) { ?>
+                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'u')) : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                            Simpan
+                        </button>
+                    <?php endif; ?>
                 <?php } ?>
             <?php } else { ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">

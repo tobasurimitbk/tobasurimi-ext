@@ -170,17 +170,7 @@
                                     <option value=""></option>
 
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi (Kirim Ke Vendor)</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi_in_id" id="spesifikasi_in_id" name="spesifikasi_in_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi (Output Dari Vendor)</label>
+                                <label for="floatingInput" style="z-index: 1;">Udang / Kepiting (Kirim Ke Vendor)</label>
                             </div>
                         </div>
 
@@ -190,7 +180,7 @@
 
                 <div class="row mt-3">
                     <div class="col mb-0">
-                        <label class="form-label font-weight-bold lable-title">List Inventori Barang</label>
+                        <label class="form-label font-weight-bold lable-title">List Inventori Barang (Hanya Menampilkan Barang yang mempunyai Stok)</label>
                     </div>
                     <div class="col-md-12 col-table-button-tts">
                         <div class="table-responsive">
@@ -236,7 +226,6 @@
                                     <th style="text-align: center;">Satuan</th>
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Qty Dikeluarkan</th>
-                                    <th style="text-align: center;">Output Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
@@ -344,10 +333,6 @@
                 type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
                 qty: "<?= $m['qty'] ?>",
-                output: {
-                    barang: "<?= $m['output']['barang'] ?>",
-                    stock_id: "<?= $m['output']['stock_id'] ?>"
-                }
             });
         <?php endforeach; ?>
         drawTableSelectedItem(listStockSelected);
@@ -404,22 +389,12 @@
     });
 
     $('#spesifikasi_id').select2({
-        placeholder: "Pilih Barang - Spesifikasi (Kirim Ke Vendor)",
+        placeholder: "Pilih Udang / Kepiting (Kirim Ke Vendor)",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
         // LIST DOKUMEN PABEAN
         getListDokumenPabean();
-        getListBarangOutput();
-    });
-
-
-    $('#spesifikasi_in_id').select2({
-        placeholder: "Pilih Barang - Spesifikasi (Output Dari Vendor)",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-
     });
 
     // VALIDATOR
@@ -493,37 +468,26 @@
             return $(this).data("id");
         }).get();
         var id_selected = getIDListDataSelected();
-        var barangIn = $('#spesifikasi_in_id option:selected');
 
-        if (barangIn.data('stock_id') == "" || barangIn.data('stock_id') == undefined) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Barang Output Wajib Dipilih !',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Ok'
-            });
-        } else {
-            $.each(listStockAsal, function(i, v) {
-                var currentID = Number(v.id);
+        $.each(listStockAsal, function(i, v) {
+            var currentID = Number(v.id);
+            if ($.inArray(currentID, dataIds) !== -1) {
+                var isIDSelected = $.grep(listStockSelected, function(item) {
+                    return item.id == Number(currentID);
+                }).length > 0;
 
-                if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelected, function(item) {
-                        return item.id == Number(currentID);
-                    }).length > 0;
-
-                    if (!isIDSelected) {
-                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                        listStockAsal[i].qty = 0;
-                        listStockAsal[i].output = {
-                            barang: barangIn.data('barang'),
-                            stock_id: barangIn.data('stock_id')
-                        }
-                        listStockSelected.push(listStockAsal[i]);
-                    }
+                if (!isIDSelected) {
+                    listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                    listStockAsal[i].qty = 0;
+                    listStockSelected.push(listStockAsal[i]);
                 }
-            });
-            drawTableSelectedItem(listStockSelected);
-        }
+            }
+        });
+        drawTableSelectedItem(listStockSelected);
+        // reset barang kirim ke vendor dan list bc nya
+        $('#spesifikasi_id').val(null).change();
+        drawTableAsalBarang([]);
+
     });
 
     $('.btn-submit-parent').click(function() {
@@ -643,7 +607,7 @@
     });
 
 
-    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#spesifikasi_in_id")
+    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -736,35 +700,6 @@
         });
     }
 
-    function getListBarangOutput() {
-        $.ajax({
-            url: `<?= base_url('jasa-vendor-out/list-barang-output'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
-                type_barang: $(".type_barang option:selected").val(),
-                divisi_id: $(".divisi_id option:selected").val(),
-                warehouse_id: $(".warehouse_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".spesifikasi_in_id").empty()
-                $(".spesifikasi_in_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".spesifikasi_in_id").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                })
-                $(".spesifikasi_in_id").val();
-            }
-        });
-    }
-
-
     function drawTableAsalBarang(data) {
         if ($.fn.DataTable.isDataTable('#dataTable')) {
             $('#dataTable').DataTable().clear().draw();
@@ -844,7 +779,6 @@
                     <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
             ));
-            newRow.append($('<td style="text-align: center;">').text(v.output.barang));
             newRow.append($('<td style="text-align: center;">').html(
                 `
                     <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>

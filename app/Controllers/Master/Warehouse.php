@@ -118,10 +118,27 @@ class Warehouse extends BaseController
         try {
             $rules = [
                 "code_warehouse" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[warehouses.code_warehouse]",
+                    'errors' => [
+                        'required' => 'Warehouse wajib diisi',
+                        'is_unique' => 'Kode warehouse sudah ada'
+                    ]
                 ],
                 "warehouse_name" => [
                     "rules" => "required"
+                ],
+                "phone" => [
+                    "rules" => "permit_empty|min_length[10]|max_length[16]",
+                    'errors' => [
+                        'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
+                        'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit'
+                    ]
+                ],
+                "zip_code" => [
+                    "rules" => "permit_empty|exact_length[5]",
+                    'errors' => [
+                        'exact_length' => 'Kode pos wajib diisi tepat 5 digit'
+                    ]
                 ],
                 // "address" => [
                 //     "rules" => "required"
@@ -135,9 +152,7 @@ class Warehouse extends BaseController
                 // "zip_code" => [
                 //     "rules" => "required"
                 // ],
-                // "phone" => [
-                //     "rules" => "required"
-                // ],
+
                 // "email" => [
                 //     "rules" => "required"
                 // ],
@@ -181,12 +196,14 @@ class Warehouse extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
         } catch (\Exception $e) {
             $data = [
@@ -204,10 +221,26 @@ class Warehouse extends BaseController
         try {
             $rules = [
                 "code_warehouse" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Warehouse wajib diisi',
+                    ]
                 ],
                 "warehouse_name" => [
                     "rules" => "required"
+                ],
+                "phone" => [
+                    "rules" => "permit_empty|min_length[10]|max_length[16]",
+                    'errors' => [
+                        'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
+                        'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit'
+                    ]
+                ],
+                "zip_code" => [
+                    "rules" => "permit_empty|exact_length[5]",
+                    'errors' => [
+                        'exact_length' => 'Kode pos wajib diisi tepat 5 digit'
+                    ]
                 ],
                 // "address" => [
                 //     "rules" => "required"
@@ -216,9 +249,6 @@ class Warehouse extends BaseController
                 //     "rules" => "required"
                 // ],
                 // "city_id" => [
-                //     "rules" => "required"
-                // ],
-                // "zip_code" => [
                 //     "rules" => "required"
                 // ],
                 // "phone" => [
@@ -249,6 +279,19 @@ class Warehouse extends BaseController
                     "kawasan_id" => $this->request->getPost("kawasan_id")
                 ];
 
+                $warehouseSameName = $this->WarehousesModel
+                    ->where('code_warehouse', $values['code_warehouse'])
+                    ->where('id !=', $id)
+                    ->first();
+
+                if ($warehouseSameName) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Kode warehouse sudah digunakan.",
+                        'token' => csrf_hash()
+                    ]);
+                }
+
                 if ($this->WarehousesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
@@ -267,6 +310,15 @@ class Warehouse extends BaseController
                     ];
                     echo json_encode($data);
                 }
+            } else {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
             }
         } catch (\Exception $e) {
             $data = [

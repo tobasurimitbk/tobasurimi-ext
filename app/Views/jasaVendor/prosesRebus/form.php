@@ -501,7 +501,6 @@
                 var isValidHasilRebus = true;
                 var dataErrorRebus = null;
                 var dataErrorHasilRebus = null;
-                console.log(listStockSelected);
                 $.each(listStockSelected, function(i, v) {
                     var element_rebus = $('input[data-id="' + v.id + '"].qty_rebus');
                     var element_hasil_rebus = $('input[data-id="' + v.id + '"].qty_hasil_rebus');

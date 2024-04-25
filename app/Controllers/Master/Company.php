@@ -104,10 +104,20 @@ class Company extends BaseController
                     "rules" => "required"
                 ],
                 "phone" => [
-                    "rules" => "required"
+                    "rules" => "required|min_length[10]|max_length[16]",
+                    'errors' => [
+                        'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
+                        'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit',
+                        'required' => 'Nomor telpon harus diisi',
+                    ]
                 ],
                 "zip_code" => [
-                    "rules" => "required"
+                    "rules" => "required|exact_length[5]",
+                    'errors' => [
+                        'exact_length' => 'Kode pos wajib diisi tepat 5 digit',
+                        'required' => 'Kode pos harus diisi',
+
+                    ]
                 ],
                 "province_id" => [
                     "rules" => "required"
@@ -215,10 +225,20 @@ class Company extends BaseController
                     "rules" => "required"
                 ],
                 "phone" => [
-                    "rules" => "required"
+                    "rules" => "required|min_length[10]|max_length[16]",
+                    'errors' => [
+                        'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
+                        'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit',
+                        'required' => 'Nomor telpon harus diisi',
+                    ]
                 ],
                 "zip_code" => [
-                    "rules" => "required"
+                    "rules" => "required|exact_length[5]",
+                    'errors' => [
+                        'exact_length' => 'Kode pos wajib diisi tepat 5 digit',
+                        'required' => 'Kode pos harus diisi',
+
+                    ]
                 ],
                 "province_id" => [
                     "rules" => "required"

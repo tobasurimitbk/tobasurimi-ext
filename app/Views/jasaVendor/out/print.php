@@ -12,7 +12,7 @@
         }
 
         @page {
-            size: 10.00in 5.50in landscape;
+            size: 12.00in 7.50in landscape;
             margin: 25px;
             padding: 25px;
         }

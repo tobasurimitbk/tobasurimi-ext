@@ -475,7 +475,11 @@
                                 url: "<?= base_url("pembayaran-po-lokal-bp/create"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
+                                    setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
                                 },
                                 method: "POST",
                                 dataType: "json",
@@ -492,6 +496,12 @@
                                             .then(() => {
                                                 window.location.href = `<?= base_url("pembayaran-po-lokal-bp/id/"); ?>` + response.id;
                                             })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
                                     }
                                 },
                                 onError: function(response) {

@@ -125,6 +125,21 @@ class Bagian extends BaseController
     {
         $bagianModel = new BagianModel();
 
+        $check = $bagianModel
+            ->where('nama_bagian', $this->request->getVar('namaBagian'))
+            ->where('division_id', $this->request->getVar('divisionID'))
+            ->where('id !=', $id)
+            ->where('deletedAt', null)
+            ->first();
+
+        if ($check != null) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Nama bagian " . $check['nama_bagian'] . " sudah ada",
+                'token' => csrf_hash()
+            ]);
+        }
+
         $bagianModel->update($id, [
             'nama_bagian' => $this->request->getVar('namaBagian'),
         ]);
