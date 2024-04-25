@@ -128,7 +128,7 @@ class BiayaKepiting extends BaseController
     {
         $data = [
             'tanggal' => date('Y-m-d'),
-            'jasaVendorIn' => $this->biayaKepitingModel->dropdownPenerimaanSuratJalan(),
+            'jasaVendorIn' => $this->biayaKepitingModel->dropdownJasaVendorIn(),
         ];
 
         return view('jasaVendor/biayaKepiting/form', $data);

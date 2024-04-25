@@ -773,6 +773,8 @@ $routes->get('/biaya-udang/id/(:segment)',  'JasaVendor\BiayaUdang::detail/$1', 
 $routes->get('/biaya-udang/print/(:segment)',  'JasaVendor\BiayaUdang::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/list-divisi', 'JasaVendor\BiayaUdang::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/list-jasa-vendor-in', 'JasaVendor\BiayaUdang::dropdownJasaVendorIn', ['filter' => 'Auth']);
 // BIAYA KEPITING
 $routes->get('/biaya-kepiting', 'JasaVendor\BiayaKepiting::index', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/create', 'JasaVendor\BiayaKepiting::create', ['filter' => 'Auth']);

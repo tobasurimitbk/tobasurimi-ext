@@ -114,7 +114,7 @@ class BiayaKepitingModel extends Model
         ];
     }
 
-    public function dropdownPenerimaanSuratJalan()
+    public function dropdownJasaVendorIn()
     {
         $divisiModel = new DivisisModel();
         $biayaUdangModel = new BiayaUdangModel();
@@ -137,8 +137,8 @@ class BiayaKepitingModel extends Model
 
 
         foreach ($resultBiayaKepiting as $r) {
-            $check = $biayaUdangModel->where('jasa_vendor_in_id', $r['id'])->first();
-            if ($check == null) {
+            $checkBiayaUdang = $biayaUdangModel->like('multiple_jasa_vendor_in_id', $r['id'])->first();
+            if ($checkBiayaUdang == null) {
                 array_push($result, $r);
             }
         }

@@ -14,7 +14,7 @@
         <div class="card-body">
             <?= csrf_field() ?>
             <div class="row mb-4">
-                <div class="col-sm-4 mt-2">
+                <div class="col-sm-4">
                     <div class="form-floating">
                         <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                             <option value=""></option>
@@ -25,15 +25,7 @@
                         <label style="z-index: 1;">Departemen</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                        </select>
-                        <label style="z-index: 1;">Warehouse</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
+                <div class="col-sm-4">
                     <div class="form-floating">
                         <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
                             <option value="">SEMUA</option>
@@ -43,8 +35,8 @@
                         <label style="z-index: 1;">Status Posting</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                <div class="col-sm-4">
+                    <div class="form-floating mb-2" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Dibuat" />
@@ -56,8 +48,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                <div class="col-sm-4">
+                    <div class="form-floating mb-2" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Selesai" />
@@ -69,12 +61,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating" style="height: 50px;">
+                <div class="col-sm-4">
+                    <div class="form-floating mb-2" style="height: 50px;">
                         <input placeholder="" class="form-control no_pembayaran" id="no_pembayaran" name="no_pembayaran" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Pembayaran </label>
                     </div>
                 </div>
+
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
@@ -84,7 +77,7 @@
                             <th onclick="changeSort('no_pembayaran')">No Pembayaran</th>
                             <th onclick="changeSort('tanggal')">Tanggal</th>
                             <th onclick="changeSort('divisi_id')">Departemen</th>
-                            <th onclick="changeSort('warehouse_id')">Warehouse</th>
+                            <th onclick="changeSort('multiple_jasa_vendor_in_no')">No Penerimaan Surat Jalan</th>
                             <th>Total Item</th>
                             <th>Action</th>
                         </tr>
@@ -122,7 +115,6 @@
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
-                data.warehouse_id = $(".warehouse_id").val();
                 data.status = $(".status").val();
                 data.start_date = $(".start_date").val();
                 data.end_date = $(".end_date").val();
@@ -157,8 +149,8 @@
                 className: "text-center",
             },
             {
-                data: "warehouse_name",
-                className: "text-center"
+                data: "multiple_jasa_vendor_in_no",
+                className: "text-center",
             },
             {
                 data: "total_item",
@@ -274,14 +266,6 @@
                 $(".warehouse_id").val();
             }
         });
-        table.ajax.reload();
-    });
-
-    $('#warehouse_id').select2({
-        placeholder: "Pilih Warehouse",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
         table.ajax.reload();
     });
 

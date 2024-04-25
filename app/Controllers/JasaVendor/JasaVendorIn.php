@@ -209,7 +209,7 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
-        $check = $this->jasaVendorInModel->where('no_penerimaan_surat_jalan', $this->request->getVar('no_penerimaan_surat_jalan'))->first();
+        $check = $this->jasaVendorInModel->where('company_id', $this->this_company_id)->where('no_penerimaan_surat_jalan', $this->request->getVar('no_penerimaan_surat_jalan'))->first();
 
         if ($check != null) {
             return response()->setJSON([

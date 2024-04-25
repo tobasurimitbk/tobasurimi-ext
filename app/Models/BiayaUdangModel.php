@@ -47,8 +47,8 @@ class BiayaUdangModel extends Model
             'no_pembayaran' => 'no_pembayaran',
             'tanggal' => 'tanggal',
             'divisi_id' => 'divisi_id',
-            'warehouse_id' => 'warehouse_id',
             'vendor_id' => 'vendor_id',
+            'multiple_jasa_vendor_in_no' => 'multiple_jasa_vendor_in_no',
             'no_pembayaran' => 'no_pembayaran',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -58,14 +58,12 @@ class BiayaUdangModel extends Model
 
         $selectQry = "biaya_udang.*,
         divisis.divisi,
-        warehouses.warehouse_name,
         vendors.name as vendor_name
         ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->join('divisis', 'divisis.id = biaya_udang.divisi_id', 'left')
-            ->join('warehouses', 'warehouses.id = biaya_udang.warehouse_id', 'left')
             ->join('vendors', 'vendors.id = biaya_udang.vendor_id', 'left')
             ->where($condition)
             ->whereIn('biaya_udang.divisi_id', $conditionArr)
@@ -73,16 +71,12 @@ class BiayaUdangModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['warehouse_id'] || $addCondition['status'] || $addCondition['no_pembayaran'] || $addCondition['start_date'] || $addCondition['end_date']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_pembayaran'] || $addCondition['start_date'] || $addCondition['end_date']) {
             $dataQry->groupStart();
         }
 
         if ($addCondition['divisi_id']) {
             $dataQry->where('biaya_udang.divisi_id', $addCondition['divisi_id']);
-        }
-
-        if ($addCondition['warehouse_id']) {
-            $dataQry->like('biaya_udang.warehouse_id', $addCondition['warehouse_id']);
         }
 
         if ($addCondition['status'] || $addCondition['status'] == '0') {
@@ -101,7 +95,7 @@ class BiayaUdangModel extends Model
             $dataQry->where('tanggal <=', $addCondition['end_date']);
         }
 
-        if ($addCondition['divisi_id'] || $addCondition['warehouse_id'] || $addCondition['status'] || $addCondition['no_pembayaran'] || $addCondition['start_date'] || $addCondition['end_date']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_pembayaran'] || $addCondition['start_date'] || $addCondition['end_date']) {
             $dataQry->groupEnd();
         }
 
@@ -116,30 +110,24 @@ class BiayaUdangModel extends Model
     }
 
 
-    public function dropdownPenerimaanSuratJalan()
+    public function dropdownJasaVendorIn($divisiID)
     {
-        $divisiModel = new DivisisModel();
+        $jasaVendorInModel = new JasaVendorInModel();
         $biayaKepitingModel = new BiayaKepitingModel();
-        $divisiArr = array();
         $result = array();
 
-        foreach ($divisiModel->getDivisiAccess() as $d) {
-            array_push($divisiArr, $d['id']);
-        }
-
-        $resultBiayaUdang = $this
-            ->select('jasa_vendor_in.*,divisis.divisi,vendors.name')
-            ->join('jasa_vendor_in', 'jasa_vendor_in.id = biaya_udang.jasa_vendor_in_id', 'right')
+        $resultBiayaUdang = $jasaVendorInModel
+            ->select('jasa_vendor_in.id, jasa_vendor_in.no_penerimaan_surat_jalan')
             ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-            ->where('biaya_udang.jasa_vendor_in_id', null)
             ->where('jasa_vendor_in.status_posting', '1')
-            ->whereIn('jasa_vendor_in.divisi_id', $divisiArr)
+            ->where('jasa_vendor_in.divisi_id', $divisiID)
             ->findAll();
 
         foreach ($resultBiayaUdang as $r) {
-            $check = $biayaKepitingModel->where('jasa_vendor_in_id', $r['id'])->first();
-            if ($check == null) {
+            $checkBiayaKepiting = $biayaKepitingModel->where('jasa_vendor_in_id', $r['id'])->first();
+            $checkBiayaUdang = $this->like('multiple_jasa_vendor_in_id', $r['id'])->first();
+            if ($checkBiayaKepiting == null && $checkBiayaUdang == null) {
                 array_push($result, $r);
             }
         }
@@ -147,20 +135,61 @@ class BiayaUdangModel extends Model
         return $result;
     }
 
-    public function getPenerimaanSuratJalanDetail($id)
+    public function getJasaVendorInNo($jasaVendorInArrID)
     {
-        $result = $this
-            ->select('jasa_vendor_in.*,divisis.divisi,vendors.name')
-            ->join('jasa_vendor_in', 'jasa_vendor_in.id = biaya_udang.jasa_vendor_in_id', 'left')
-            ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
-            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-            ->where('biaya_udang.id', $id)
-            ->first();
+        $jasaVendorInModel = new JasaVendorInModel();
+        $result = array();
+        $dataQry = $jasaVendorInModel->whereIn('id', $jasaVendorInArrID)->where('deletedAt', null)->findAll();
+
+        foreach ($dataQry as $d) {
+            array_push($result, $d['no_penerimaan_surat_jalan']);
+        }
 
         return $result;
     }
 
-    public function dropdownBarang($jasaVendorInID, $id = null)
+    public function dropdownDivisi($vendorID)
+    {
+        $divisiModel = new DivisisModel();
+        $biayaKepitingModel = new BiayaKepitingModel();
+        $jasaVendorInModel = new JasaVendorInModel();
+
+        $divisiArr = array();
+        $result = array();
+
+        foreach ($divisiModel->getDivisiAccess() as $d) {
+            array_push($divisiArr, $d['id']);
+        }
+
+        $resultBiayaUdang = $jasaVendorInModel
+            ->select('DISTINCT(divisis.id), divisis.divisi, jasa_vendor_in.id AS jasa_vendor_in_id')
+            ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+            ->where('jasa_vendor_in.status_posting', '1')
+            ->where('jasa_vendor_in.vendor_id', $vendorID)
+            ->whereIn('jasa_vendor_in.divisi_id', $divisiArr)
+            ->findAll();
+
+        foreach ($resultBiayaUdang as $r) {
+            $checkBiayaKepiting = $biayaKepitingModel->where('jasa_vendor_in_id', $r['jasa_vendor_in_id'])->first();
+            $checkBiayaUdang = $this->like('multiple_jasa_vendor_in_id', $r['jasa_vendor_in_id'])->first();
+            if ($checkBiayaKepiting == null && $checkBiayaUdang == null) {
+                array_push($result, $r);
+            }
+        }
+
+        if (count($result) != 0) {
+            $idArr = array_column($result, 'id');
+            $uniqueID = array_unique($idArr);
+            $uniqueArr =  array_intersect_key($result, $uniqueID);
+            $result = $uniqueArr;
+        }
+
+        return $result;
+    }
+
+
+    public function dropdownBarang($jasaVendorInArrID, $id = null)
     {
         $jasaVendorInDetailModel = new JasaVendorInDetailModel();
         $biayaUdangDetailModel = new BiayaUdangDetailModel();
@@ -174,7 +203,8 @@ class BiayaUdangModel extends Model
             SUM(jasa_vendor_in_detail.qty_bersih) as qty_bersih,
             SUM(jasa_vendor_out_detail.qty) as qty_rebus,
             barang_master.barang_name,
-            barang_master_spesifikasi.spesifikasi
+            barang_master_spesifikasi.spesifikasi,
+            jasa_vendor_in.id AS jasa_vendor_in_id
         ";
 
         $jasaVendorInDetail = $jasaVendorInDetailModel
@@ -185,27 +215,29 @@ class BiayaUdangModel extends Model
             ->join('stock', 'stock.id = jasa_vendor_in_detail.stock_in_id')
             ->join('barang_master', 'barang_master.id = stock.barang1_id')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-            ->where('jasa_vendor_in_id', $jasaVendorInID)
+            ->whereIn('jasa_vendor_in_id', $jasaVendorInArrID)
             ->groupBy('jasa_vendor_in_detail.stock_in_id')
             ->findAll();
 
         for ($i = 0; $i < count($jasaVendorInDetail); $i++) {
-            $jasaVendorInDetail[$i]['tanggal_masuk'] = date('d/m/Y', strtotime($jasaVendorInDetail[$i]['tanggal_masuk']));
+            $jasaVendorInDetail[$i]['tanggal_masuk'] = date('Y-m-d', strtotime($jasaVendorInDetail[$i]['tanggal_masuk']));
             $jasaVendorInDetail[$i]['tanggal_keluar'] = date('d/m/Y', strtotime($jasaVendorInDetail[$i]['tanggal_keluar']));
 
             if ($id != null) {
                 $biayaUdangDetail = $biayaUdangDetailModel
                     ->where('biaya_udang_id', $id)
-                    ->where('jasa_vendor_in_id', $jasaVendorInID)
+                    ->where('jasa_vendor_in_id', $jasaVendorInDetail[$i]['jasa_vendor_in_id'])
                     ->where('barang_master_id', $jasaVendorInDetail[$i]['barang_master_id'])
                     ->where('barang_master_spesifikasi_id', $jasaVendorInDetail[$i]['barang_master_spesifikasi_id'])
                     ->first();
 
+                $jasaVendorInDetail[$i]['tanggal_po'] = $biayaUdangDetail['tanggal_po'];
                 $jasaVendorInDetail[$i]['kg_fauzy'] = $biayaUdangDetail['kg_fauzy'];
                 $jasaVendorInDetail[$i]['kg_cn'] = $biayaUdangDetail['kg_cn'];
                 $jasaVendorInDetail[$i]['kg_daging'] = $biayaUdangDetail['kg_daging'];
                 $jasaVendorInDetail[$i]['tb_harga'] = $biayaUdangDetail['tb_harga'];
             } else {
+                $jasaVendorInDetail[$i]['tanggal_po'] = $jasaVendorInDetail[$i]['tanggal_masuk'];
                 $jasaVendorInDetail[$i]['kg_fauzy'] = 0;
                 $jasaVendorInDetail[$i]['kg_cn'] = 0;
                 $jasaVendorInDetail[$i]['kg_daging'] = 0;
@@ -216,9 +248,9 @@ class BiayaUdangModel extends Model
         return $jasaVendorInDetail;
     }
 
-    public function getBarangDetail($jasaVendorInID, $id)
+    public function getBarangDetail($jasaVendorInArrID, $id)
     {
-        $biayaUdangDetail = $this->dropdownBarang($jasaVendorInID, $id);
+        $biayaUdangDetail = $this->dropdownBarang($jasaVendorInArrID, $id);
 
         if (empty($biayaUdangDetail)) {
             return [];
@@ -282,20 +314,20 @@ class BiayaUdangModel extends Model
         return $result;
     }
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouse_id)
+    public function get_no($bln, $thn, $last_day, $divisi, $divisi_id)
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('biaya_udang');
         $builder->select('no_pembayaran');
         $builder->orderBy('no_pembayaran', 'desc');
-        $builder->where('biaya_udang.warehouse_id', $warehouse_id);
+        $builder->where('biaya_udang.divisi_id', $divisi_id);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_pembayaran', $lastStr);
         $query = $builder->get();
 
-        $kode = 'PAY-UDG/' . $warehouseKode;
+        $kode = 'PAY-UDG/' . $divisi;
 
         $lastPenerimaan = '1';
 

@@ -62,7 +62,6 @@ class BiayaUdang extends BaseController
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
             "divisi_id" => $this->request->getVar("divisi_id"),
-            "warehouse_id" => $this->request->getVar('warehouse_id'),
             "status" => $this->request->getVar("status"),
             "start_date" => $this->request->getVar('start_date'),
             "end_date" => $this->request->getVar('end_date'),
@@ -97,9 +96,9 @@ class BiayaUdang extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "no_pembayaran"        => $data->no_pembayaran,
+                "multiple_jasa_vendor_in_no"        => str_replace(['"', ']', '['], "",  $data->multiple_jasa_vendor_in_no),
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
-                "warehouse_name"        => $data->warehouse_name,
                 "total_item"            => count($biayaUdangDetailModel),
                 "vendor_name"           => $data->vendor_name,
                 "status_posting"        => $data->status_posting
@@ -121,7 +120,7 @@ class BiayaUdang extends BaseController
     {
         $data = [
             'tanggal' => date('Y-m-d'),
-            'jasaVendorIn' => $this->biayaUdangModel->dropdownPenerimaanSuratJalan()
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
         ];
 
         return view('jasaVendor/biayaUdang/form', $data);
@@ -139,7 +138,8 @@ class BiayaUdang extends BaseController
         $data = [
             'tanggal' => date('Y-m-d'),
             'biayaUdang' => $this->biayaUdangModel->find($id),
-            'jasaVendorInDetail' => $this->biayaUdangModel->getPenerimaanSuratJalanDetail($id),
+            'divisi' => $this->divisiModel->getDivisiAccess(),
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
         ];
 
         return view('jasaVendor/biayaUdang/form', $data);
@@ -148,7 +148,9 @@ class BiayaUdang extends BaseController
     public function createAction()
     {
         $listBarang = json_decode($_POST['listBarang']);
-        $jasaVendorIn = $this->jasaVendorInModel->find($this->request->getVar('jasa_vendor_in_id'));
+        $jasaVendorInNo = $this->biayaUdangModel->getJasaVendorInNo(
+            $this->request->getVar('multiple_jasa_vendor_in_id')
+        );
 
         if (count($listBarang) == 0) {
             return response()->setJSON([
@@ -158,12 +160,22 @@ class BiayaUdang extends BaseController
             ]);
         }
 
+        $check = $this->biayaUdangModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_pembayaran'))->first();
+
+        if ($check != null) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Nomor pembayaran sudah ada",
+                'token' => csrf_hash()
+            ]);
+        }
+
         $id = $this->biayaUdangModel->insert([
             'company_id' => $this->this_company_id,
-            'divisi_id' => $jasaVendorIn['divisi_id'],
-            'jasa_vendor_in_id' => $jasaVendorIn['id'],
-            'vendor_id' => $jasaVendorIn['vendor_id'],
-            'warehouse_id' => $jasaVendorIn['warehouse_id'],
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'multiple_jasa_vendor_in_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_in_id'))),
+            'multiple_jasa_vendor_in_no' =>  str_replace(['\\"', '\\', '"'], '', json_encode($jasaVendorInNo)),
+            'vendor_id' => $this->request->getVar('vendor_id'),
             'no_pembayaran' => $this->request->getVar('no_pembayaran'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'keterangan' => $this->request->getVar('keterangan'),
@@ -173,9 +185,10 @@ class BiayaUdang extends BaseController
         foreach ($listBarang as $b) {
             $this->biayaUdangDetailModel->insert([
                 'biaya_udang_id' => $id,
-                'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
+                'jasa_vendor_in_id' => $b->jasa_vendor_in_id,
                 'barang_master_id' => $b->barang_master_id,
                 'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
+                'tanggal_po' => $b->tanggal_po,
                 'kg_fauzy' => $b->kg_fauzy,
                 'kg_cn' => $b->kg_cn,
                 'kg_daging' => $b->kg_daging,
@@ -225,6 +238,7 @@ class BiayaUdang extends BaseController
                     'biaya_udang_id' => $id,
                     'barang_master_id' => $b->barang_master_id,
                     'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
+                    'tanggal_po' => $b->tanggal_po,
                     'kg_fauzy' => $b->kg_fauzy,
                     'kg_cn' => $b->kg_cn,
                     'kg_daging' => $b->kg_daging,
@@ -243,6 +257,7 @@ class BiayaUdang extends BaseController
                     'biaya_udang_id' => $id,
                     'barang_master_id' => $b->barang_master_id,
                     'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
+                    'tanggal_po' => $b->tanggal_po,
                     'kg_fauzy' => $b->kg_fauzy,
                     'kg_cn' => $b->kg_cn,
                     'kg_daging' => $b->kg_daging,
@@ -296,11 +311,11 @@ class BiayaUdang extends BaseController
         $data = [
             'tanggal' => date('Y-m-d'),
             'biayaUdang' => $this->biayaUdangModel->find($id),
-            'biayaUdangDetail' => $this->biayaUdangModel->dropdownBarang($biayaUdang['jasa_vendor_in_id'], $id)
+            'biayaUdangDetail' => $this->biayaUdangModel->dropdownBarang(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id)
         ];
 
         $data['vendor'] = $this->vendorModel->find($biayaUdang['vendor_id']);
-        $data['biayaUdangTotal'] = $this->biayaUdangModel->getBarangDetail($biayaUdang['jasa_vendor_in_id'], $id);
+        $data['biayaUdangTotal'] = $this->biayaUdangModel->getBarangDetail(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
 
         $this->dompdf->loadHtml(view('jasaVendor/biayaUdang/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
@@ -311,13 +326,13 @@ class BiayaUdang extends BaseController
     public function getNo()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $warehouseID = $this->request->getVar('warehouse_id');
+        $divisiID = $this->request->getVar('divisi_id');
 
-        if (empty($warehouseID)) {
-            $no = $this->biayaUdangModel->get_no(date('m'), date('Y'), $last_day, "", $warehouseID);
+        if (empty($divisiID)) {
+            $no = $this->biayaUdangModel->get_no(date('m'), date('Y'), $last_day, "", $divisiID);
         } else {
-            $warehouse = $this->warehouseModel->where('id', $warehouseID)->first();
-            $no = $this->biayaUdangModel->get_no(date('m'), date('Y'), $last_day, strtoupper($warehouse['code_warehouse']), $warehouseID);
+            $divisi = $this->divisiModel->where('id', $divisiID)->first();
+            $no = $this->biayaUdangModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisiID);
         }
         return response()->setJSON([
             'status' => true,
@@ -328,19 +343,52 @@ class BiayaUdang extends BaseController
 
     public function dropdownBarang()
     {
-        $jasaVendorInID = $this->request->getVar('jasa_vendor_in_id');
+        $jasaVendorInArrID = json_decode($this->request->getVar('multiple_jasa_vendor_in_id'));
         $id = $this->request->getVar('id');
         if (empty($id)) {
-            $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInID);
+            $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInArrID);
             $dataTotal = [];
         } else {
             $id = decrypt($id);
-            $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInID, $id);
-            $dataTotal = $this->biayaUdangModel->getBarangDetail($jasaVendorInID, $id);
+            $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInArrID, $id);
+            $dataTotal = $this->biayaUdangModel->getBarangDetail($jasaVendorInArrID, $id);
         }
         return response()->setJSON([
             'data' => $data,
             'dataTotal' => $dataTotal,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function dropdownJasaVendorIn()
+    {
+        $divisiID = $this->request->getVar('divisi_id');
+        if (empty($divisiID)) {
+            $data = [];
+        } else {
+            $data = $this->biayaUdangModel->dropdownJasaVendorIn($divisiID);
+        }
+
+        return response()->setJSON([
+            'data' => $data,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function dropdownDivisi()
+    {
+        $vendorID = $this->request->getVar('vendor_id');
+
+        if (empty($vendorID)) {
+            $data = [];
+        } else {
+            $data = $this->biayaUdangModel->dropdownDivisi($vendorID);
+        }
+
+        return response()->setJSON([
+            'data' => $data,
             'token' => csrf_hash(),
             'status' => true
         ]);
