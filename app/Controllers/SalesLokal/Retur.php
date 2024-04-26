@@ -263,6 +263,7 @@ class Retur extends BaseController
 
         foreach ($returnDataDetail as &$value) {
             $value->no = $no++;
+            $value->id_return = encrypt($value->id);
         }
 
         $returnData->id_invoice = encrypt($returnData->id_invoice);
@@ -282,6 +283,103 @@ class Retur extends BaseController
 
     public function update()
     {
+        $postData = $this->request->getPost();
+        $returnData = json_decode($postData["returnedItems"], true);
+
+        $rules = [
+            "id_customer" => [
+                "rules" => "required|numeric",
+                'errors' => [
+                    'required' => 'Customer tidak boleh kosong',
+                ]
+            ],
+            "id_invoice" => [
+                "rules" => "required",
+                "errors" => [
+                    "required" => 'Invoice tidak boleh kosong!'
+                ]
+            ],
+            "return_date" => [
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
+                    'required' => 'Tanggal return tidak boleh kosong',
+                ]
+            ],
+            "note" => [
+                "rules" => "permit_empty",
+                'errors' => [
+                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
+            "returnedItems" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Barang tidak boleh kosong',
+                ],
+            ],
+        ];
+
+        if (!$this->validateData($postData, $rules)) {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        }
+
+        $returnDate = $postData['return_date'];
+        $idInvoice = decrypt($postData['id_invoice']);
+
+        try {
+
+            foreach ($returnData as $value) {
+                if ($value['id_return']) {
+                    $valueDetail = [
+                        'id_barang_return'              => $value['id_barang'],
+                        'qty_return'                    => $value['qtyReturn'],
+                        'keterangan_return'             => "-",
+                        'discount_percentage_return'    => $value['disc'],
+                        'harga_barang_return'           => $value['harga_barang'],
+                        'tax_return'                    => isset($value['tax']) ? $value['tax'] : 0,
+                        'amount_return'                 => $value['amount'],
+                    ];
+                    $this->soReturnDetailModel->update(decrypt($value['id_return']), $valueDetail);
+                } else {
+                    $valueDetail = [
+                        'id_sales_order_return'         => $idInvoice,
+                        'id_barang_return'              => $value['id_barang'],
+                        'qty_return'                    => $value['qtyReturn'],
+                        'keterangan_return'             => "-",
+                        'discount_percentage_return'    => $value['disc'],
+                        'harga_barang_return'           => $value['harga_barang'],
+                        'tax_return'                    => isset($value['tax']) ? $value['tax'] : 0,
+                        'amount_return'                 => $value['amount'],
+                    ];
+                    $this->soReturnDetailModel->insert($valueDetail);
+                }
+            }
+
+            $data = [
+                "id"        => $postData['id_invoice'],
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            //echo "Transaction failed: " . $e->getMessage();
+            $data = [
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        };
     }
 
     public function delete()

@@ -253,6 +253,7 @@
             var isValid = true;
             var dataError = null;
             $(".id_customer").attr("disabled", false)
+            $(".id_invoice").attr("disabled", false)
             const dataTab = table.rows().every(function(rowIdx) {
                 const inputVal = $(this.node()).first().find('input').val();
                 const rowData = table.row(rowIdx).data();
