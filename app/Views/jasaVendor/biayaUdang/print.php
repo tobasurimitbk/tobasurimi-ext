@@ -126,7 +126,7 @@
                         <th style="text-align: center;">KG DAGING CN</th>
 
                         <th style="text-align: center;">Kg Daging</th>
-                        <th style="text-align: center;">Ratio</th>
+                        <th style="text-align: center; width:50px">Ratio</th>
                         <th style="text-align: center;">TB Harga</th>
                         <th style="text-align: center;">Total Harga</th>
                     </tr>

@@ -589,7 +589,8 @@
     $('#stock_in_id').select2({
         placeholder: "Pilih Barang Masuk",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: true,
+        dropdownParent: $('#update_detail_barang')
     }).change(function() {
         // LIST STOK BARANG MASUK
 

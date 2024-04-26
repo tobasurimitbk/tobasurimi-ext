@@ -83,33 +83,44 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($biayaUdang) ? 'disabled' : '' ?> class="form-select jasa_vendor_in_id" id="jasa_vendor_in_id" name="jasa_vendor_in_id" aria-label="Floating label select example">
+                            <select <?= !empty($biayaUdang) ? 'disabled' : '' ?> class="form-select vendor_id" id="vendor_id" name="vendor_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php if (!empty($jasaVendorIn)) : ?>
-                                    <?php foreach ($jasaVendorIn as $j) : ?>
-                                        <option data-warehouse_id="<?= $j['warehouse_id'] ?>" data-vendor="<?= strtoupper($j['name']) ?>" data-divisi="<?= strtoupper($j['divisi']) ?>" value="<?= $j['id'] ?>">
-                                            <?= $j['no_penerimaan_surat_jalan'] ?>
+                                <?php foreach ($vendor as $v) : ?>
+                                    <option <?= !empty($biayaUdang) ? ($biayaUdang['vendor_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>">
+                                        <?= strtoupper($v['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Vendor</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($biayaUdang) ? 'disabled' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php if (!empty($divisi)) : ?>
+                                    <?php foreach ($divisi as $d) : ?>
+                                        <option <?= $biayaUdang['divisi_id'] == $d['id'] ? 'selected' : '' ?> value="<?= $d['id'] ?>">
+                                            <?= $d['divisi'] ?>
                                         </option>
                                     <?php endforeach; ?>
-                                <?php else : ?>
-                                    <option selected value="<?= $jasaVendorInDetail['id'] ?>">
-                                        <?= $jasaVendorInDetail['no_penerimaan_surat_jalan'] ?>
-                                    </option>
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Pilih No Surat Jalan</label>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($biayaUdang) ? $jasaVendorInDetail['name'] : '' ?>" autocomplete="one-time-code" disabled type="text" class="form-control vendor" id="vendor" name="vendor" placeholder="Vendor">
-                            <label for="floatingInput">Vendor</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($biayaUdang) ? $jasaVendorInDetail['divisi'] : '' ?>" autocomplete="one-time-code" disabled type="text" class="form-control divisi" id="divisi" name="divisi" placeholder="Departemen">
-                            <label for="floatingInput">Departemen</label>
+                            <select <?= !empty($biayaUdang) ? 'disabled' : '' ?> multiple class="form-select multiple_jasa_vendor_in_id" id="multiple_jasa_vendor_in_id" name="multiple_jasa_vendor_in_id[]" aria-label="Floating label select example">
+                                <option value=""></option>
+
+                                <?php if (!empty($biayaUdang)) : ?>
+                                    <?php foreach (json_decode($biayaUdang['multiple_jasa_vendor_in_id']) as $i => $p) : ?>
+                                        <option selected value="<?= $p ?>"><?= json_decode($biayaUdang['multiple_jasa_vendor_in_no'])[$i] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Penerimaan Surat Jalan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -139,8 +150,8 @@
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tanggal Masuk</th>
                                     <th style="text-align: center;">Tanggal Keluar</th>
+                                    <th style="text-align: center;">Tanggal Purchase Order</th>
                                     <th style="text-align: center;">Jenis</th>
 
 
@@ -182,11 +193,12 @@
     var listTotal = [];
 
     <?php if (!empty($biayaUdang)) : ?>
+        let arr = $('.multiple_jasa_vendor_in_id').val();
         $.ajax({
             url: `<?= base_url('biaya-udang/list-barang'); ?>`,
             method: "GET",
             data: {
-                jasa_vendor_in_id: $(".jasa_vendor_in_id option:selected").val(),
+                multiple_jasa_vendor_in_id: JSON.stringify(arr),
                 id: $('.id').val()
             },
             dataType: "json",
@@ -206,18 +218,37 @@
         autoclose: true
     });
 
-    $('.jasa_vendor_in_id').select2({
+
+    $('#vendor_id').select2({
+        placeholder: "Pilih Vendor",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // DROPDOWN DIVISI
+        getListDivisi();
+    });
+
+    $('#divisi_id').select2({
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // DROPDOWN JASA VENDOR IN
+        getListJasaVendorIn();
+        // AUTO GENERATE NOMOR
+        changeStatus();
+    });
+
+
+    $('.multiple_jasa_vendor_in_id').select2({
         placeholder: "Pilih Surat Jalan",
         theme: "bootstrap-5",
     }).change(function() {
-        var selected = $('.jasa_vendor_in_id option:selected');
-        $('.vendor').val(selected.data('vendor'));
-        $('.divisi').val(selected.data('divisi'));
-        changeStatus();
+        // GET LIST BARANG
         listDataBarang();
     });
 
-    $(".jasa_vendor_in_id")
+    $(".multiple_jasa_vendor_in_id,#vendor_id,#divisi_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -231,16 +262,10 @@
             tanggal: {
                 required: true
             },
-            jasa_vendor_in_id: {
-                required: true
-            },
         },
         messages: {
             tanggal: {
                 required: "Tanggal wajib diisi"
-            },
-            jasa_vendor_in_id: {
-                required: "Penerimaan surat jalan wajib diisi"
             },
         },
         errorElement: 'span',
@@ -287,14 +312,18 @@
                 var isValidKgDaging = true;
                 var dataErrorKgDaging = null;
 
+                var isValidTanggalPO = true;
+                var dataErrorTanggalPO = null;
+
                 $.each(listBarang, function(i, v) {
                     var tbHargaElement = $('input[data-barang_master_id="' + v.barang_master_id + '"].tb_harga');
                     var kgFauzyElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_fauzy');
                     var kgCnElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_cn');
                     var kgDagingElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_daging');
+                    var tanggalPOElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].tanggal_po');
 
                     // asign value tb harga
-                    if (Number(tbHargaElement.val()) == 0 || tbHargaElement.val() == undefined || tbHargaElement.val() == '') {
+                    if (tbHargaElement.val() == undefined || tbHargaElement.val() == '') {
                         dataErrorTbHarga = listBarang[i];
                         isValidTbHarga = false;
                     } else {
@@ -303,7 +332,7 @@
                     }
 
                     // asign value kg fauzy
-                    if (Number(kgFauzyElement.val()) == 0 || kgFauzyElement.val() == undefined || kgFauzyElement.val() == '') {
+                    if (kgFauzyElement.val() == undefined || kgFauzyElement.val() == '') {
                         dataErrorDagingFauzy = listBarang[i];
                         isValidDagingFauzy = false;
                     } else {
@@ -311,7 +340,7 @@
                     }
 
                     // asign value cn
-                    if (Number(kgCnElement.val()) == 0 || kgCnElement.val() == undefined || kgCnElement.val() == '') {
+                    if (kgCnElement.val() == undefined || kgCnElement.val() == '') {
                         dataErrorDagingCn = listBarang[i];
                         isValidDagingCn = false;
                     } else {
@@ -319,11 +348,19 @@
                     }
 
                     // asign value daging
-                    if (Number(kgDagingElement.val()) == 0 || kgDagingElement.val() == undefined || kgDagingElement.val() == '') {
+                    if (kgDagingElement.val() == undefined || kgDagingElement.val() == '') {
                         dataErrorDagingCn = listBarang[i];
                         isValidKgDaging = false;
                     } else {
                         listBarang[i].kg_daging = kgDagingElement.val();
+                    }
+
+                    // asign value tanggal po
+                    if (tanggalPOElement.val() == undefined || tanggalPOElement.val() == "") {
+                        dataErrorTanggalPO = listBarang[i];
+                        isValidTanggalPO = false;
+                    } else {
+                        listBarang[i].tanggal_po = tanggalPOElement.val();
                     }
 
                 });
@@ -352,7 +389,21 @@
                 } else if (!isValidTbHarga) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Tb harga untuk barang ' + dataErrorTbHarga.barang_name + ', spesifikasi tidak valid',
+                        title: 'Tb harga untuk barang ' + dataErrorTbHarga.barang_name + ' tidak valid',
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                } else if (!isValidTanggalPO) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Tb harga untuk barang ' + dataErrorTbHarga.barang_name + ' tidak valid',
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                } else if (!isValidTanggalPO) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Tanggal Purchase Order untuk barang ' + dataErrorTanggalPO.barang_name + ', spesifikasi ' + dataErrorTanggalPO.spesifikasi + ' tidak valid',
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
                     });
@@ -460,6 +511,7 @@
     });
 
     function listDataBarang() {
+        let arr = $('.multiple_jasa_vendor_in_id').val();
         $.ajax({
             url: `<?= base_url('biaya-udang/list-barang'); ?>`,
             method: "GET",
@@ -470,7 +522,7 @@
                 stopLoading();
             },
             data: {
-                jasa_vendor_in_id: $(".jasa_vendor_in_id option:selected").val(),
+                multiple_jasa_vendor_in_id: JSON.stringify(arr),
             },
             dataType: "json",
             success: function(res) {
@@ -569,8 +621,12 @@
                             ${no++} 
                         `
                 ));
-                newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
                 newRow.append($('<td style="text-align: center;">').text(v.tanggal_keluar));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                        <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tanggal_po" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control tanggal_po" type="date" value="${v.tanggal_po}">
+                    `
+                ));
                 newRow.append($('<td style="text-align: center;">').text(v.barang_name));
                 newRow.append($('<td style="text-align: center;">').text(v.spesifikasi));
                 newRow.append($('<td>').text(v.qty_rebus));
@@ -645,6 +701,58 @@
 
     }
 
+    function getListDivisi() {
+        // GET LIST DIVISI
+        $.ajax({
+            url: `<?= base_url('biaya-udang/list-divisi'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                vendor_id: $(".vendor_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".divisi_id").empty()
+                $(".divisi_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".divisi_id").append(`<option value="${item.id}">${item.divisi}</option>`)
+                })
+                $(".divisi_id").val();
+            }
+        });
+    }
+
+    function getListJasaVendorIn() {
+        $.ajax({
+            url: `<?= base_url('biaya-udang/list-jasa-vendor-in'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $('.divisi_id option:selected').val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".multiple_jasa_vendor_in_id").empty()
+                $(".multiple_jasa_vendor_in_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".multiple_jasa_vendor_in_id").append(`<option value="${item.id}">${item.no_penerimaan_surat_jalan}</option>`)
+                })
+                $(".multiple_jasa_vendor_in_id").val();
+
+            }
+        });
+    }
+
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
@@ -653,7 +761,7 @@
                 url: `<?= base_url("biaya-udang/get-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouse_id: $('#jasa_vendor_in_id option:selected').data('warehouse_id')
+                    divisi_id: $('#divisi_id option:selected').val()
                 },
                 dataType: "json",
                 success: function(res) {
