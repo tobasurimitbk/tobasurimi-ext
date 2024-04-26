@@ -460,18 +460,22 @@ $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' 
 $routes->get('/surat-jalan/print/(:segment)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/generate-no-surat-jalan', 'SalesLokal\SuratJalan::generateNomorSuratJalan', ['filter' => 'Auth']);
 
+// Return barang sales
+$routes->get('/return-barang-sales', 'SalesLokal\Retur::index', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/create', 'SalesLokal\Retur::createView', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/details/(:segment)', 'SalesLokal\Retur::getById/$1', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/all', 'SalesLokal\Retur::all', ['filter' => 'Auth']);
+$routes->post('/return-barang-sales/save', 'SalesLokal\Retur::save', ['filter' => 'Auth']);
+$routes->post('/return-barang-sales/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
+$routes->post('/return-barang-sales/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-detail-invoice/(:segment)', 'SalesLokal\Retur::getInvoiceNumberList/$1', ['filter' => 'Auth']);
+
 // Retur Pembelian
 $routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);
 $routes->get('/retur-barang/create', 'Purchase\ReturPembelian::create', ['filter' => 'Auth']);
 $routes->get('/retur-barang/generate-new-no', 'Purchase\ReturPembelian::generateNo', ['filter' => 'Auth']);
 $routes->get('/retur-barang/generate-penerimaan-barang', 'Purchase\ReturPembelian::getPenerimaanBarangList', ['filter' => 'Auth']);
 
-$routes->get('/return-barang-sales', 'SalesLokal\Retur::index', ['filter' => 'Auth']);
-$routes->get('/return-barang-sales/details/(:num)', 'SalesLokal\Retur::getById/$1', ['filter' => 'Auth']);
-$routes->get('/return-barang-sales/all', 'SalesLokal\Retur::all', ['filter' => 'Auth']);
-$routes->post('/return-barang-sales/save', 'SalesLokal\Retur::save', ['filter' => 'Auth']);
-$routes->post('/return-barang-sales/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
-$routes->post('/return-barang-sales/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
 
 // MASTER BARANG LOKAL
 $routes->get('master-barang-lokal', 'SalesLokal\Barang::bahanJadiView', ['filter' => 'Auth']);

@@ -744,8 +744,6 @@ class Invoice extends BaseController
             $documentList->where('id', $documentId);
             $documentList->groupEnd();
         }
-
-
         return $documentList->findAll();
     }
 

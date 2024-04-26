@@ -6,25 +6,26 @@ use CodeIgniter\Model;
 
 class SalesOrderReturnModel extends Model
 {
-    protected $DBGroup          = 'default';
-    protected $table            = 'sales_order_returns';
-    protected $primaryKey       = 'id';
+
+    protected $table      = 'sales_order_return';
+    protected $primaryKey = 'id';
+
     protected $useAutoIncrement = true;
-    protected $insertID         = 0;
-    protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'return_no',
-        'customer_id',
-        'sales_order_inv_id',
-        'return_date',
+
+    protected $returnType     = 'array';
+    protected $useSoftDeletes = true;
+    protected $protectedField = true;
+
+    protected $allowedFields = [
+        'id_user',
+        'id_invoice',
+        'no_return',
+        'tanggal_return',
         'note',
-        'returned_item'
     ];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -47,31 +48,30 @@ class SalesOrderReturnModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getAllSOReturn($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getAllReturn($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_surat_jalan'    => 'surat_jalan_so.no_surat_jalan',
-            'no_so'             => 'surat_jalan_so.multiple_no_so',
-            'kode_pelanggan'    => 'customers.kode',
-            'nama_pelanggan'    => 'customers.name',
-            'shipping_date'     => 'sales_order_returns.shipping_date',
-            'createdAt'         => 'sales_order_returns.createdAt'
+            'no_return'         => 'sales_order_return.no_return',
+            'kode_customer'    => 'customers.kode',
+            'nama_customer'    => 'customers.name',
+            'shipping_date'     => 'sales_order_return.tanggal_return',
+            'createdAt'         => 'sales_order_return.createdAt'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_returns.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_return.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_order_returns.id AS id,
-                      sales_order_returns.return_no AS returnNo,
-                      sales_order_returns.return_date AS returnDate,
+        $selectQry = "sales_order_return.id AS id,
+                      sales_order_return.no_return AS returnNo,
+                      sales_order_return.tanggal_return AS returnDate,
                       sales_order_invoice.no_faktur AS invNo,
                       customers.name AS customerName";
 
         $soReturn = $this->asObject()
             ->select($selectQry)
-            ->join('customers', 'customers.id = sales_order_returns.customer_id')
-            ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_returns.sales_order_inv_id')
+            ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice')
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -82,13 +82,14 @@ class SalesOrderReturnModel extends Model
         }
         if ($addCondition['search']) {
             $soReturn
-                ->like('no_surat_jalan', $addCondition['search']);
+                ->like('sales_order_return.no_return', $addCondition['search'])
+                ->orLike('sales_order_invoice.no_faktur', $addCondition['search']);
         }
         if ($addCondition['dateStart']) {
-            $soReturn->where('surat_jalan_so.shipping_date >=',  $addCondition['dateStart']);
+            $soReturn->where('sales_order_return.tanggal_return >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $soReturn->where('surat_jalan_so.shipping_date <=', $addCondition['dateEnd']);
+            $soReturn->where('sales_order_return.tanggal_return <=', $addCondition['dateEnd']);
         }
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $soReturn->groupEnd();
@@ -102,5 +103,41 @@ class SalesOrderReturnModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+
+    public function generateNoReturn(): string
+    {
+        $format = "RETURN";
+        $month = idate('m');
+        $year = date('Y');
+        $formatMonth = str_pad($month, 2, 0, STR_PAD_LEFT);
+        $numberTemplate = "/$year/$formatMonth/";
+
+        $lastData = $this->asObject()
+            ->where("no_return LIKE '%$numberTemplate%'")
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $dummyNum = 0;
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->no_return);
+            foreach ($asd as $key => $item) {
+                if ($key === 3) {
+                    if (preg_match('/^(.*?)(\d+)$/', $item, $matches)) {
+                        $prefix = $matches[1]; // "inv"
+                        $number = $matches[2]; // "nomer invoice"
+                    }
+                }
+            }
+            $numbers = $number + 1; // increment nomer invoice
+
+            $invNumber = $format . $numberTemplate . $numbers;
+        } else {
+            $numbers = 1; // nomer invoice awal jika tidak ada data
+
+            $invNumber = $format . $numberTemplate . $numbers;
+        }
+
+        return $invNumber;
     }
 }

@@ -5,33 +5,47 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?></h1>
+        <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Return Barang</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("retur"); ?>">Batal</a>
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("return-barang-sales"); ?>">Batal</a>
             <button class="btn btn-show-form btn-save float-right btn-submit">Simpan</button>
         </div>
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="create-form form-add-spp form-add-pinjaman-karyawan" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form " role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" disabled value=" <?= $data->return_no ?? ""; ?>" placeholder="Nomor surat Return">
+                            <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" readonly value="<?= !empty($data) ? $data->no_return : $noReturn; ?>" placeholder="Nomor surat Return">
                             <label for="floatingInput">Nomor Surat Return</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control input-picker shipping_date" id="return_date" name="return_date" value="<?= $data->return_date ?? ""; ?>">
+                            <input autocomplete="one-time-code" " class=" form-control input-picker shipping_date" id="return_date" name="return_date" value="<?= $data->return_date ?? ""; ?>" <?= !empty($data) ? 'readonly'  : ''; ?>>
                             <label for="floatingInput">Tanggal Return</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->customer_id === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_invoice" name="id_invoice" id="id_invoice" <?= !empty($data) ? 'disabled'  : ''; ?>>
+                                <option value=""></option>
+                                <?php foreach ($dataInvoice ?? [] as $invoice) : ?>
+                                    <option data-customer_id="<?= $invoice->customer_id; ?>" data-customer_name="<?= $invoice->customer_name; ?>" data-customer_address="<?= $invoice->customer_address; ?>" value="<?= $invoice->id; ?>" <?= !empty($data) ? ($data->id_invoice === $invoice->id ? "selected" : "") : ""; ?>><?= $invoice->no_faktur; ?> - <?= $invoice->customer_kode; ?> <?= $invoice->customer_name; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">No. Invoice - Customer</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select readonly class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->customer_id === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer) : ?>
                                     <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
@@ -40,64 +54,22 @@
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control" id="customerAddress" name="customerAddress" disabled value="<?= $data->customerAddress ?? ''; ?>">
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control" id="nama_sales" name="nama_sales" disabled value=" <?= $data->no_surat_retur ?? ""; ?>" placeholder="Nomor surat Return">
                             <label for="floatingInput">Nama Sales</label>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_inv" name="id_inv" id="id_inv" <?= !empty($data) ? ($data->sales_order_inv_id === true ? 'disabled=true' : '') : ''; ?>>
-                                <option value=""></option>
-                                <?php if (!empty($invData)) : ?>
-                                    <option value="<?= $invData->id ?>" selected><?= $invData->no_faktur ?></option>
-                                <?php endif; ?>
-                            </select>
-                            <label for="floatingInput">SO</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
+                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan"><?= $data->note ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="mb-3" style="height: 50px;">
-                                    <label for="floatingInput">Pajak</label>
-                                    <div class="switch-form-pinjaman-karyawan">
-                                        <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" disabled name="tax_status" id="tax_status" type="checkbox" <?= ($invData->tax_status ?? false) ? 'checked' : ''; ?>>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-9">
-                                <div class="mb-3" style="height: 50px;">
-                                    <label for="floatingInput">Include Pajak</label>
-                                    <div class="switch-form-pinjaman-karyawan">
-                                        <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" disabled name="include_tax" id="include_tax" type="checkbox" <?= ($invData->include_pa ?? false) ? 'checked' : ''; ?>>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -106,7 +78,7 @@
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-12">
-                            <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                            <label class="form-label font-weight-bold modal-sub-title">List Barang Return</label>
                         </div>
                     </div>
                 </div>
@@ -119,7 +91,8 @@
                                     <th>No.</th>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
-                                    <th>Qty</th>
+                                    <th>Qty Invoice</th>
+                                    <th>Qty Return</th>
                                     <th>Satuan</th>
                                     <th>Harga Satuan</th>
                                     <th>Discount (%)</th>
@@ -165,10 +138,15 @@
                     className: "text-center"
                 },
                 {
-                    data: `<?= empty($data) ? "qty" : "returnQty" ?>`,
+                    data: "qty",
+                    className: "text-center",
+                },
+                {
+                    data: null,
                     className: "text-center",
                     render: function(data, type, row) {
-                        return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${data}">`
+                        var qty = row.qtyReturn ? row.qtyReturn : row.qty;
+                        return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${qty}">`
                     }
                 },
                 {
@@ -205,45 +183,33 @@
         // Customer
         $('.id_customer').select2({
             placeholder: "",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            disabled: true
         })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.id_customer')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.id_customer')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_customer')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // INV
-        $('.id_inv').select2({
+        // invoice
+        $('.id_invoice').select2({
             placeholder: "",
-            theme: "bootstrap-5"
-        })
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            const customerAddress = $(this).find(':selected').data('customer_address') ? $(this).find(':selected').data('customer_address') : "";
+            const customerId = $(this).find(':selected').data('customer_id') ? $(this).find(':selected').data('customer_id') : "";
+            // const customerName = $(this).find(':selected').data('customer_name') ? $(this).find(':selected').data('customer_name') : "";
+            // const salesName = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
+
+            $('#id_customer').val(customerId).change();
+            $('#customerAddress').val(customerAddress);
+        });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_inv')
+        $('.id_customer, .id_invoice')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_inv')
+        $('.id_customer, .id_invoice')
             .parent('div')
             .children('span')
             .children('span')
@@ -251,12 +217,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_inv')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        $('.id_inv')
+        $('.id_customer, .id_invoice')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -268,174 +229,168 @@
             autoclose: true
         });
 
-        $(".id_customer").change(function() {
-            if ($(".id_customer").val()) {
-                const customerId = $(".id_customer").val();
+        $(".id_invoice").change(function() {
+            if ($(".id_invoice").val()) {
+                const id = $(this).val();
+
                 $.ajax({
-                    url: `<?= base_url('/customer/getLocalInvoiceList/'); ?>${customerId}`,
+                    url: `<?= base_url('return-barang-sales/get-detail-invoice/'); ?>${id}`,
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".id_inv").empty();
-                        $(".id_inv").prepend(`<option value=""></option>`);
 
-                        $('#customerAddress').val(res.address);
-
-                        res.invList.forEach(function(item) {
-                            $(".id_inv").append(`<option  value="${item.id}">${item.no_faktur}</option>`);
-                        });
-
-                        $(".id_inv").val('').trigger('select2.change');
-                        $('#nama_sales').val(res.salesName)
+                        table.clear();
+                        table.rows.add(res).draw(false);
                     }
                 })
 
             } else {
                 $(".id_customer").attr("readonly", false)
-                $(".id_inv").val("");
             }
-        });
-
-        $(".id_inv").change(function() {
-            const id = $(this).val();
-
-            $.ajax({
-                url: `<?= base_url('/invoice-penjualan-lokal/getItemList/'); ?>${id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    // $('#tax_status').prop('checked', res.SOData.taxStatus);
-                    // $('#include_tax').prop('checked', res.SOData.includeTax);
-
-                    table.clear();
-                    table.rows.add(res.itemList).draw(false);
-                }
-            })
         });
 
         $(".btn-submit").click(function() {
-            if ($(".create-form").valid()) {
+            var isValid = true;
+            var dataError = null;
+            $(".id_customer").attr("disabled", false)
+            const dataTab = table.rows().every(function(rowIdx) {
+                const inputVal = $(this.node()).first().find('input').val();
+                const rowData = table.row(rowIdx).data();
+                if (parseFloat(rowData.qty) < parseFloat(inputVal)) {
+                    isValid = false;
+                } else {
+                    rowData.qtyReturn = inputVal;
+                }
+
+                table.row(rowIdx).data(rowData);
+            });
+            const newTableData = table.rows().data().toArray();
+            if (!isValid) {
                 Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
+                    icon: 'error',
+                    title: 'Qty return tidak boleh lebih besar dari Qty Invoice',
                     confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading();
+                    confirmButtonText: 'Ok'
+                });
+            } else {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading();
 
-                        const id = $(".id").val();
-                        let data = new FormData(document.querySelector(".create-form"));
-                        const dataTab = table.rows().every(function(rowIdx) {
-                            const inputVal = $(this.node()).first().find('input').val();
-                            const rowData = table.row(rowIdx).data();
-                            rowData.returnQty = inputVal;
+                            const id = $(".id").val();
+                            let data = new FormData(document.querySelector(".create-form"));
+                            data.append('returnedItems', JSON.stringify(newTableData));
 
-                            table.row(rowIdx).data(rowData);
-                        });
-                        const newTableData = table.rows().data().toArray();
-                        data.append('returnedItems', JSON.stringify(newTableData));
-
-                        // // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("retur/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
+                            // // UPDATE
+                            if (id) {
+                                $.ajax({
+                                    url: "<?= base_url("return-barang-sales/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("return-barang-sales"); ?>";
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
                                             })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url("retur"); ?>";
-                                            })
-                                    } else {
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
                                         })
                                         stopLoading()
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                        // CREATE
-                        else {
-                            $.ajax({
-                                url: "<?= base_url("retur/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
+                                });
+                            }
+                            // CREATE
+                            else {
+                                $.ajax({
+                                    url: "<?= base_url("return-barang-sales/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("return-barang-sales"); ?>";
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
                                             })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url("retur"); ?>";
-                                            })
-                                    } else {
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
                                         })
                                         stopLoading()
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
+                                });
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }
         });
 
-        <?php if (!empty($data)) : ?>
-            const itemList = <?= json_encode($data->itemList); ?>;
+        <?php if (!empty($dataDetail)) : ?>
+            var itemList = [];
+            <?php foreach ($dataDetail as $value) : ?>
+                itemList.push(<?= json_encode($value); ?>);
+            <?php endforeach; ?>
             table.rows.add(itemList).draw(false);
         <?php endif; ?>
 
@@ -446,19 +401,13 @@
             id_customer: {
                 required: true
             },
-            id_po: {
-                required: true
-            },
-            id_inv: {
-                required: true
-            },
-            no_po: {
-                required: true
-            },
-            no_surat_jalan: {
-                required: true
-            },
             shipping_date: {
+                required: true
+            },
+            id_invoice: {
+                required: true
+            },
+            no_surat_retur: {
                 required: true
             },
         },
@@ -466,20 +415,14 @@
             id_customer: {
                 required: "Customer wajib diisi"
             },
-            id_po: {
-                required: "PO wajib diisi"
-            },
-            id_inv: {
-                required: "SO wajib diisi"
-            },
-            no_po: {
-                required: "No PO wajib diisi"
-            },
-            no_surat_jalan: {
-                required: "No Surat jalan wajib diisi"
-            },
             shipping_date: {
-                required: "Tanggal pengiriman wajib diisi"
+                required: "Tanggal return wajib diisi"
+            },
+            id_invoice: {
+                required: "No invoice wajib diisi"
+            },
+            no_surat_retur: {
+                required: "No surat return wajib diisi"
             },
         },
         errorElement: 'span',
