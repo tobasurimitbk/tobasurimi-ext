@@ -8,16 +8,18 @@
         <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Return Barang</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("return-barang-sales"); ?>">Batal</a>
-            <button class="btn btn-hapus delete-parent float-right btn-delete">
-                Hapus
-            </button>
+            <?php if (!empty($data)) : ?>
+                <button class="btn btn-hapus delete-parent float-right btn-delete">
+                    Hapus
+                </button>
+            <?php endif; ?>
             <button class="btn btn-show-form btn-save float-right btn-submit">Simpan</button>
         </div>
     </div>
     <div class="card">
         <div class="card-body">
             <form class="create-form " role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="text" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
