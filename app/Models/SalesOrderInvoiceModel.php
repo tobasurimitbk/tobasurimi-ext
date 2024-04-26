@@ -22,6 +22,7 @@ class SalesOrderInvoiceModel extends Model
     protected $allowedFields = [
         'id_user',
         'id_po',
+        'id_sales_order_return',
         'document_type',
         'document_id',
         'id_customer',

@@ -1372,6 +1372,15 @@ $routes->post('/akun-department/save', 'Accounting\AccountDepartment\AccountDepa
 $routes->post('/akun-department/update', 'Accounting\AccountDepartment\AccountDepartmentController::updateAccountDepartment', ['filter' => 'Auth']);
 $routes->post('/akun-department/delete', 'Accounting\AccountDepartment\AccountDepartmentController::deleteAccountDepartment', ['filter' => 'Auth']);
 $routes->post('/akun-department/get', 'Accounting\AccountDepartment\AccountDepartmentController::get', ['filter' => 'Auth']);
+//Setting Akun Costing
+$routes->get('/setting-akun-costing', 'Accounting\AccountDepartment\AccountDepartmentController::index', ['filter' => 'Auth']);
+$routes->get('/setting-akun-costing/all', 'Accounting\AccountDepartment\AccountDepartmentController::allAccountDepartment', ['filter' => 'Auth']);
+$routes->get('/setting-akun-costing/id/(:segment)', 'Accounting\AccountDepartment\AccountDepartmentController::getByIdAccountModule/$1', ['filter' => 'Auth']);
+$routes->post('/setting-akun-costing/save', 'Accounting\AccountDepartment\AccountDepartmentController::saveAccountDepartment', ['filter' => 'Auth']);
+$routes->post('/setting-akun-costing/update', 'Accounting\AccountDepartment\AccountDepartmentController::updateAccountDepartment', ['filter' => 'Auth']);
+$routes->post('/setting-akun-costing/delete', 'Accounting\AccountDepartment\AccountDepartmentController::deleteAccountDepartment', ['filter' => 'Auth']);
+$routes->post('/setting-akun-costing/get', 'Accounting\AccountDepartment\AccountDepartmentController::get', ['filter' => 'Auth']);
+
 //Laporan
 //Accounting
 $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);

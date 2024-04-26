@@ -56,6 +56,7 @@ class Retur extends BaseController
         $invoiceList = $this->soInvModel->asObject()
             ->select('sales_order_invoice.*, customers.id as customer_id, customers.name as customer_name, customers.kode as customer_kode, customers.address as customer_address')
             ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->where('id_sales_order_return', null)
             ->findAll();
 
         $noReturn = $this->soReturnModel->generateNoReturn();
@@ -189,6 +190,8 @@ class Retur extends BaseController
             ];
             $id =  $this->soReturnModel->insert($values);
 
+            $this->soInvModel->update($idInvoice, ['id_sales_order_return' =>  $id]);
+
             foreach ($returnData as $value) {
                 $valueDetail = [
                     'id_sales_order_return'         => $id,
@@ -267,6 +270,7 @@ class Retur extends BaseController
         }
 
         $returnData->id_invoice = encrypt($returnData->id_invoice);
+        $returnData->id = encrypt($returnData->id);
 
         foreach ($invoiceList as &$value) {
             $value->id = encrypt($value->id);
@@ -384,6 +388,40 @@ class Retur extends BaseController
 
     public function delete()
     {
+        try {
+            $id = decrypt($this->request->getPost("id"));
+            if (!empty($id)) {
+                $dataDetail = $this->soInvDetailModel->where('id_sales_order_return', $id)->findAll();
+
+                foreach ($dataDetail as $item) {
+                    $this->soInvDetailModel->delete($item['id']);
+                }
+                $this->soInvModel->delete($id);
+
+                $data = [
+                    "status"            => true,
+                    "message"    => "Data Return Berhasil Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 
     public function getInvoiceNumberList($documentId = null)

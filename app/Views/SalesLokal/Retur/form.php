@@ -8,13 +8,16 @@
         <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Return Barang</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("return-barang-sales"); ?>">Batal</a>
+            <button class="btn btn-hapus delete-parent float-right btn-delete">
+                Hapus
+            </button>
             <button class="btn btn-show-form btn-save float-right btn-submit">Simpan</button>
         </div>
     </div>
     <div class="card">
         <div class="card-body">
             <form class="create-form " role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="text" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -249,6 +252,52 @@
             }
         });
 
+        $(".btn-delete").click(function() {
+            const csrf = $(`[name="${csrfToken}"]`);
+            var dataId = $(".id").val();
+            console.log(dataId);
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url("return-barang-sales/delete"); ?>",
+                        data: {
+                            id: dataId,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        });
         $(".btn-submit").click(function() {
             var isValid = true;
             var dataError = null;
