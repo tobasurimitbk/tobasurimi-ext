@@ -5,9 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Tanda Terima Faktur Penerimaan Lokal Bahan Penolong</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("tanda-terima-faktur-lokal-bp/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("tanda-terima-faktur-lokal-bp/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <?= csrf_field() ?>

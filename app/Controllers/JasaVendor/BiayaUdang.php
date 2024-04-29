@@ -174,7 +174,7 @@ class BiayaUdang extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'multiple_jasa_vendor_in_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_in_id'))),
-            'multiple_jasa_vendor_in_no' =>  str_replace(['\\"', '\\', '"'], '', json_encode($jasaVendorInNo)),
+            'multiple_jasa_vendor_in_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorInNo)),
             'vendor_id' => $this->request->getVar('vendor_id'),
             'no_pembayaran' => $this->request->getVar('no_pembayaran'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",

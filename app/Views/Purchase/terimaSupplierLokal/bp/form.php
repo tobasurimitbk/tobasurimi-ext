@@ -1,5 +1,10 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    label {
+        margin-top: -4.5px;
+    }
+</style>
 <section class="section">
     <div class="section-header">
         <h1 class="title-name"><?= !empty($dataTandaTerimaFaktur) ? "Update Tanda Terima Faktur Penerimaan Lokal Bahan Penolong" : "Tambah Tanda Terima Faktur Penerimaan Lokal Bahan Penolong" ?></h1>

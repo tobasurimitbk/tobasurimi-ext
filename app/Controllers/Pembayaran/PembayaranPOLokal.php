@@ -82,11 +82,19 @@ class PembayaranPOLokal extends BaseController
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
         $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
 
+        $statusPph = $this->request->getVar('status_pph');
+        $detail = $tandaTerimaFakturModel->getByID($tandaTerimaFakturID);
+
+        $taxDipungutNegara = $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID);
+        $pphNilai = $statusPph == '1' ? 0.0025 : 0;
+        $pphResult = $pphNilai * ($detail['nominal_faktur'] + $taxDipungutNegara['taxAmt']);
+
         return response()->setJSON([
             'detail' => $tandaTerimaFakturModel->getByID($tandaTerimaFakturID),
             'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID),
             'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID),
-            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID)
+            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID),
+            'pph' => $pphResult
         ]);
     }
 
@@ -118,6 +126,7 @@ class PembayaranPOLokal extends BaseController
                 'payment_method' => $this->request->getVar('payment_method'),
                 'type_po' => "Bahan Penolong",
                 'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
+                'status_pph' => $this->request->getVar('status_pph'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
                 'status_posting' => '0'
@@ -127,7 +136,7 @@ class PembayaranPOLokal extends BaseController
                 'message' => "Kwitansi pembayaran lokal bahan penolong berhasil dibuat",
                 'status' => true,
                 'token' => csrf_hash(),
-                'id' => decrypt($id)
+                'id' => \encrypt($id)
             ]);
         } catch (Exception $e) {
             return response()->setJSON([
@@ -322,13 +331,15 @@ class PembayaranPOLokal extends BaseController
             ->findAll();
 
         $id = decrypt($id);
+        $paymentDetail = $localPOPaymentModel->find($id);
+
+        if ($paymentDetail == null) {
+            return redirect()->to('pembayaran-po-lokal-bp');
+        }
 
         $detail = $localPOPaymentModel->get($id);
         $divisiList = $this->divisiModel->getDivisiAccess();
 
-        if ($detail == null) {
-            return redirect()->to('pembayaran-po-lokal-bp');
-        }
 
         $data = [
             "suppliers" => $supplierList,
