@@ -199,6 +199,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
+                    setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
                     let id = $(".id").val();
                     if (id) {
@@ -215,6 +216,7 @@
                             success: function(response) {
                                 csrf.val(response.token);
                                 if (response.status) {
+                                    stopLoading()
                                     Swal.fire({
                                             icon: 'success',
                                             title: response.message,
@@ -224,8 +226,25 @@
                                             table.ajax.reload()
                                             $(".add-modal").modal("hide")
                                         })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+
                                 }
                             },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
                         });
                     } else {
                         $.ajax({
@@ -241,6 +260,7 @@
                             success: function(response) {
                                 csrf.val(response.token);
                                 if (response.status) {
+                                    stopLoading()
                                     Swal.fire({
                                             icon: 'success',
                                             title: response.message,
@@ -250,7 +270,24 @@
                                             table.ajax.reload()
                                             $(".add-modal").modal("hide")
                                         })
+
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
                                 }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
                             }
                         });
                     }

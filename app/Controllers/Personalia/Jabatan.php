@@ -69,15 +69,35 @@ class Jabatan extends BaseController
     }
 
     public function saveJabatan()
+
     {
+        $JabatanModel = new JabatanModel();
+        $jabatan_name = $this->request->getPost('jabatan_name');
+
+        $getJabatanNull = $JabatanModel->select('id')
+            ->where('jabatan_name', $jabatan_name)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        //cek nama jabatan duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getJabatanNull)) {
+            $rule_is_unique = 'required|is_unique[jabatans.jabatan_name]';
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "jabatan_name" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'Nama Jabatan harus diisi',
+                        'is_unique' => 'Nama Jabatan sudah ada'
+                    ]
                 ]
             ];
 
-            $JabatanModel = new JabatanModel();
+
 
             if ($this->validate($rules)) {
                 $insertData = [
@@ -107,9 +127,13 @@ class Jabatan extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
                     "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
+                    "message"    => $errors,
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
@@ -127,17 +151,53 @@ class Jabatan extends BaseController
 
     public function updateJabatan()
     {
+        $JabatanModel = new JabatanModel();
+
+        $id = $this->request->getPost("id");
+
+        $jabatan_name = $this->request->getPost('jabatan_name');
+
+        $getJabatanNull = $JabatanModel->select('id')
+            ->where('jabatan_name', $jabatan_name)
+            ->where('deletedAt', null)
+            ->where('id !=', $id)
+            ->findAll();
+
+        //cek jabatan duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getJabatanNull)) {
+
+            //cek jabatan yg diedit masih sama dengan yg di ID?
+            $getJabatanNow = $JabatanModel->select('id')
+                ->where('jabatan_name', $jabatan_name)
+                ->where('deletedAt', null)
+                ->where('id', $id)
+                ->first();
+
+            //jika sama
+            if (!empty($getJabatanNow)) {
+                $rule_is_unique = 'required';
+            } else {
+                $rule_is_unique = 'required|is_unique[jabatans.jabatan_name]';
+            }
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "jabatan_name" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'Nama Jabatan harus diisi',
+                        'is_unique' => 'Nama Jabatan sudah ada'
+                    ]
                 ]
             ];
 
-            $JabatanModel = new JabatanModel();
+
 
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+
 
                 $payload = [
                     "jabatan_name" => $this->request->getPost("jabatan_name")
@@ -153,10 +213,14 @@ class Jabatan extends BaseController
                 ];
                 echo json_encode($data);
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
-                    "status"    => false,
-                    "message"   => "Data Gagal Diubah",
-                    'token'     => csrf_hash()
+                    "status"     => false,
+                    "message"    => $errors,
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
             }
