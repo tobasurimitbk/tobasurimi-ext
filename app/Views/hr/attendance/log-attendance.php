@@ -176,11 +176,11 @@
                                 ?>
                                 <tr>
                                     <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
+                                        &nbsp;<?php echo strtoupper($res_user[$i]["employeeName"]); ?></td>
                                     <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
+                                        &nbsp;<?php echo strtoupper($res_user[$i]["divisi"]); ?></td>
                                     <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo $res_user[$i]["namaBagian"]; ?></td>
+                                        &nbsp;<?php echo strtoupper($res_user[$i]["namaBagian"]); ?></td>
                                     </td>
                                     <?php
                                     for ($j = 1; $j <= $last_date; $j++) :

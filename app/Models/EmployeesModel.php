@@ -314,7 +314,8 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $companyID,
-            //'users.id' => null,
+            'divisis.deletedAt' => null,
+            'bagian.deletedAt' => null,
             'employees.status' => "Aktif"
         ];
 
@@ -349,6 +350,8 @@ class EmployeesModel extends Model
     public function getEmployeesAndDivisi($company_id)
     {
         $arrCondition = [
+            'divisis.deletedAt' => null,
+            'bagian.deletedAt' => null,
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
             'employees.status' => "Aktif"

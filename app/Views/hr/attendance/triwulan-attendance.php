@@ -100,7 +100,7 @@
                     <tr>
                         <td><?= $no++; ?></td>
                         <td><?= $d['id']; ?></td>
-                        <td><?= $d['name']; ?></td>
+                        <td><?= strtoupper($d['name']); ?></td>
                         <td>
                             <?php foreach ($d['kehadiran'] as $k) : ?>
                                 <?php if ($k['yearMonth'] == $startMonth) : ?>

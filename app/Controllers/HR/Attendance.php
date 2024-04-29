@@ -17,6 +17,8 @@ use CodeIgniter\I18n\Time;
 use DateTime;
 use Dompdf\Dompdf;
 use Locale;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Attendance extends BaseController
 {
@@ -202,11 +204,10 @@ class Attendance extends BaseController
         }
 
         // remove all if exist and insert again
-        $AttendanceModel->where([
-            'MONTH(periode)' => $month,
-            'YEAR(periode)' => $year,
-            'company_id' => $this->this_company_id
-        ])->delete();
+        $AttendanceModel->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->where('company_id', $this->this_company_id)
+            ->delete();
 
         $res = $AttendanceModel->generate(
             $employeeData,
@@ -256,12 +257,11 @@ class Attendance extends BaseController
             ]);
         }
 
-        $AttendanceModel->where([
-            'MONTH(periode)' => $month,
-            'YEAR(periode)' => $year,
-            'company_id' => $this->this_company_id,
-            'employee_id' => $employeeID
-        ])->delete();
+        $AttendanceModel->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->where('company_id', $this->this_company_id)
+            ->where('employee_id', $employeeID)
+            ->delete();
 
         if (count($employeeData) == 0) {
             return $this->response->setJSON([
@@ -749,7 +749,6 @@ class Attendance extends BaseController
             $startDateTimestamp += 86400;
         }
 
-        // Menghitung $startMonth dan $endMonth
         $resStartEndMonth = static::getTotalDatesAndGroubMonth($allDates);
 
         $data = [

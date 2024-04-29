@@ -2,18 +2,6 @@
 header("Content-type: application/vnd-ms-excel");
 header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . ".xls");
 ?>
-<b>
-    Unit: <?= $company['company'] ?><br>
-    Departemen: <?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?><br>
-    Bulan: <?= date('F - Y', strtotime($yearMonth)) ?> <br>
-    Periode: <?= $startDate ?> s.d <?= $endDate ?> <br>
-    Golongan: <?= $golongan != null ? $golongan['golongan_name'] : "Semua Golongan" ?>
-</b>
-<br>
-<b>
-    Rekap Data Absensi Final
-</b>
-<br>
 <table border="1">
     <thead>
         <tr align="center" style="font-weight: bold;">
@@ -44,13 +32,13 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
             <tr align="center; font-weight:bold; color:white;">
                 <td style="color: black; font-weight:normal;"><?= $nomor++; ?></td>
                 <td style="color: black; font-weight:normal;">
-                    &nbsp; <?= $e['name']; ?>
+                    &nbsp; <?= strtoupper($e['name']); ?>
                 </td>
                 <td style="color: black; font-weight:normal;">
-                    &nbsp;<?= $e["divisi"]; ?></td>
+                    &nbsp;<?= strtoupper($e["divisi"]); ?></td>
                 </td>
                 <td style="color: black; font-weight:normal;">
-                    &nbsp;<?= $e["namaBagian"]; ?></td>
+                    &nbsp;<?= strtoupper($e["namaBagian"]); ?></td>
                 </td>
                 <?php $j = 1; ?>
                 <?php foreach ($allDates as $a) : ?>
