@@ -6,6 +6,9 @@
     <div class="section-header">
         <h1 class="title-name">Tambah SPP</h1>
         <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("spp"); ?>">
+                Batal
+            </a>
             <?php if (!empty($dataSPP)) { ?>
                 <?php if ($dataSPP->is_posted === "0") { ?>
                     <?php if (can('Pembelian', 'SPP', 'd')) : ?>
@@ -33,10 +36,6 @@
                 <?php endif; ?>
 
             <?php } ?>
-
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("spp"); ?>">
-                Batal
-            </a>
 
             <?php if (!empty($dataSPP)) {
                 if ($dataSPP->is_posted === "0") { ?>
