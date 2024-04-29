@@ -82,13 +82,35 @@ class AttendancesUnit extends BaseController
 
     public function saveData()
     {
+        $ip = $this->request->getPost("ip");
+
+        $company_id = $this->this_company_id;
+
+        $getIp = $this->AttendancesUnitModel->select('id')
+            ->where('ip', $ip)
+            ->where('company_id', $company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+
+        //cek ip duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getIp)) {
+            $rule_is_unique = 'required|is_unique[attendances_unit.ip]';
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "nama" => [
                     "rules" => "required"
                 ],
                 "ip" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'IP harus diisi',
+                        'is_unique' => 'IP sudah ada'
+                    ]
                 ],
                 "unit_key" => [
                     "rules" => "required"
@@ -128,10 +150,14 @@ class AttendancesUnit extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"     => false,
+                    "message"    => $errors,
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
             }
@@ -148,13 +174,49 @@ class AttendancesUnit extends BaseController
 
     public function updateData()
     {
+        $id = $this->request->getPost("id");
+        $company_id = $this->this_company_id;
+        $ip = $this->request->getPost("ip");
+
+        $getIpNull = $this->AttendancesUnitModel->select('id')
+            ->where('ip', $ip)
+            ->where('company_id', $company_id)
+            ->where('deletedAt', null)
+            ->where('id !=', $id)
+            ->findAll();
+
+        //cek name duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getIpNull)) {
+
+            //cek name yg diedit masih sama dengan yg di ID?
+            $getIpNow = $this->AttendancesUnitModel->select('id')
+                ->where('ip', $ip)
+                ->where('company_id', $company_id)
+                ->where('deletedAt', null)
+                ->where('id', $id)
+                ->first();
+
+            //jika sama
+            if (!empty($getIpNow)) {
+                $rule_is_unique = 'required';
+            } else {
+                $rule_is_unique = 'required|is_unique[attendances_unit.ip]';
+            }
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "nama" => [
                     "rules" => "required"
                 ],
                 "ip" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'IP harus diisi',
+                        'is_unique' => 'IP sudah ada'
+                    ]
                 ],
                 "unit_key" => [
                     "rules" => "required"
@@ -165,8 +227,6 @@ class AttendancesUnit extends BaseController
                 if ($this->request->getPost("master") == 1) {
                     $this->AttendancesUnitModel->set('master', 0)->where('company_id', $this->this_company_id)->update();
                 }
-
-                $id = $this->request->getPost("id");
 
                 $values = [
                     "company_id" => $this->this_company_id,
@@ -195,10 +255,14 @@ class AttendancesUnit extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
+                    "status"     => false,
+                    "message"    => $errors,
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
             }

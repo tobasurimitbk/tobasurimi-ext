@@ -74,10 +74,29 @@ class Tunjangan extends BaseController
 
     public function saveTunjangan()
     {
+
+        $name = $this->request->getPost("nama");
+
+        $getNameNull = $this->TunjanganModel->select('id')
+            ->where('name', $name)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        //cek nama duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getNameNull)) {
+            $rule_is_unique = 'required|is_unique[tunjangan.name]';
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "nama" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'Nama harus diisi',
+                        'is_unique' => 'Nama sudah ada'
+                    ]
                 ],
                 "tipe" => [
                     "rules" => "required"
@@ -124,9 +143,13 @@ class Tunjangan extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
                     "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
+                    "message"    => $errors,
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
@@ -144,10 +167,44 @@ class Tunjangan extends BaseController
 
     public function updateTunjangan()
     {
+        $id = $this->request->getPost("id");
+
+        $name = $this->request->getPost("nama");
+
+        $getNameNull = $this->TunjanganModel->select('id')
+            ->where('name', $name)
+            ->where('deletedAt', null)
+            ->where('id !=', $id)
+            ->findAll();
+
+        //cek name duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getNameNull)) {
+
+            //cek name yg diedit masih sama dengan yg di ID?
+            $getNameNow = $this->TunjanganModel->select('id')
+                ->where('name', $name)
+                ->where('deletedAt', null)
+                ->where('id', $id)
+                ->first();
+
+            //jika sama
+            if (!empty($getNameNow)) {
+                $rule_is_unique = 'required';
+            } else {
+                $rule_is_unique = 'required|is_unique[tunjangan.name]';
+            }
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "nama" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'Nama harus diisi',
+                        'is_unique' => 'Nama sudah ada'
+                    ]
                 ],
                 "tipe" => [
                     "rules" => "required"
@@ -156,7 +213,7 @@ class Tunjangan extends BaseController
 
             if ($this->validate($rules)) {
 
-                $id = $this->request->getPost("id");
+
                 $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari') ?? 0;
                 $isCadangan = $this->request->getPost('isCadangan') ?? 0;
 
@@ -195,10 +252,14 @@ class Tunjangan extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
+                    "status"     => false,
+                    "message"    => $errors,
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
             }
