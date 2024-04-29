@@ -9,6 +9,7 @@ class CompaniesModel extends Model
     protected $table = 'companies';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
+    protected $useSoftDeletes   = true;
     protected $allowedFields = [
         'id',
         'logo',
@@ -25,7 +26,9 @@ class CompaniesModel extends Model
         'updatedAt',
         'deletedAt'
     ];
-
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
 
     public function get_by_in_id($id)
     {
@@ -82,7 +85,7 @@ class CompaniesModel extends Model
         $builder = $this->db->table('companies');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }

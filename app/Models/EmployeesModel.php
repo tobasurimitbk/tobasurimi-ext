@@ -333,9 +333,9 @@ class EmployeesModel extends Model
 
         $this->builder()
             ->select("employees.*, users.id as users_id, users.name as users_name, divisis.divisi, bagian.nama_bagian")
-            ->join('users', 'users.employee_id = employees.id', 'left')
-            ->join('divisis', 'divisis.id = employees.division_id', 'left')
-            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
+            ->join('users', 'users.employee_id = employees.id')
+            ->join('divisis', 'divisis.id = employees.division_id')
+            ->join('bagian', 'bagian.id = employees.bagian_id')
             ->groupStart()->where($arrCondition)->groupEnd();
 
 
