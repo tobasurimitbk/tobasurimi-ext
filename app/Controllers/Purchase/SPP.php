@@ -301,6 +301,18 @@ class SPP extends BaseController
         ]);
     }
 
+    public function deleteSPPDetail()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->SppDetailModel->delete($id);
+
+        return response()->setJSON([
+            'message' => "SPP Detail Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
     public function printTable()
     {
         $filename = "Data SPP";

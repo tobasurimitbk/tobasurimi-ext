@@ -409,6 +409,7 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     let list_items = [];
+    let list_items_spek = [];
 
     <?php if (empty($dataSPP)) : ?>
         $(document).ready(function() {
@@ -1002,7 +1003,7 @@
                             list_items[i].keterangan = keterangan;
                         }
                     });
-                    drawTable();
+                    drawTableDetail();
                     $(".detail-modal").modal("hide");
                 }
             } else {
@@ -1023,7 +1024,7 @@
                     }
 
                     resetFormDetail();
-                    drawTable();
+                    drawTableDetail();
                     $(".detail-modal").modal("hide");
                 }
             }
@@ -1107,7 +1108,7 @@
                 row += '<td>' + `
                     <button class="btn btn-warning edit-table-detail-spek" data-spek_id="${item.spek_id}">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.spek_id}', '${item.spesifikasi_id}')">
+                    </button><button class="btn btn-danger" onclick="deleteRowSpek('${item.spek_id}', '${item.spesifikasi_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>` +
                     '</td>';
@@ -1142,7 +1143,7 @@
     });
 
 
-    const deleteRowDetail = function(id, spesifikasi_id) {
+    const deleteRowSpek = function(id, spesifikasi_id) {
         if (spesifikasi_id) {
             Swal.fire({
                 icon: 'question',
@@ -1194,12 +1195,71 @@
                 }
             })
         } else {
-            const indexToRemove = list_items.findIndex(item => item.spek_id === id);
+            const indexToRemove = list_items_spek.findIndex(item => item.spek_id === id);
+            if (indexToRemove !== -1) {
+                list_items_spek.splice(indexToRemove, 1);
+            }
+        }
+        drawTable();
+    }
+
+    const deleteRowDetail = function(id, detail_id) {
+        if (detail_id) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data Detail?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("spp/delete-detail"); ?>",
+                        data: {
+                            id: detail_id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    });
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    });
+                }
+            })
+        } else {
+            const indexToRemove = list_items.findIndex(item => item.barang_detail_id === id);
             if (indexToRemove !== -1) {
                 list_items.splice(indexToRemove, 1);
             }
         }
-        drawTable();
+        drawTableDetail();
     }
 
     const changeDepartment = function() {
@@ -1387,7 +1447,7 @@
             $('.add-modal').modal('show');
             $('#tbody2').empty();
 
-            list_items.splice(0, list_items.length);
+            list_items_spek.splice(0, list_items_spek.length);
             drawTable();
             validator_spek.resetForm();
             validator_spek.reset();
@@ -1458,7 +1518,7 @@
         });
         $('#btn-submit-form-barang').click(function(e) {
             e.preventDefault();
-            if (list_items.length === 0) {
+            if (list_items_spek.length === 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Masukkan Spesifikasi Barang Dahulu',
@@ -1480,7 +1540,7 @@
                             let id = $('input[name="id"]').val();
                             let csrf = $(`[name="${csrfToken}"]`);
                             let data = new FormData(document.querySelector(".create-form-barang"));
-                            data.append("items", JSON.stringify(list_items));
+                            data.append("items", JSON.stringify(list_items_spek));
 
                             if (id) {
                                 $.ajax({
@@ -1569,58 +1629,6 @@
                     })
                 }
             }
-        });
-        $(".delete-btn").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $("#id").val();
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("barang-master/delete"); ?>",
-                        data: {
-                            id: id
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        table.ajax.reload()
-                                        $(".add-modal").modal("hide")
-                                    });
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    });
-                }
-            })
         });
     });
 
@@ -2090,28 +2098,28 @@
         if ($(".create-form-barang").valid()) {
             if ($(".spek-form").valid()) {
                 if (spek_id) {
-                    $.each(list_items, function(i, v) {
+                    $.each(list_items_spek, function(i, v) {
                         if (v.spek_id === spek_id) {
-                            list_items[i].spesifikasi = spek;
-                            list_items[i].satuan_1 = satuan1_id;
-                            list_items[i].satuan_1_text = satuan1_text;
-                            list_items[i].satuan_2 = satuan2_id;
-                            list_items[i].satuan_2_text = satuan2_text;
-                            list_items[i].konversi_satuan_2 = konversi_satuan_2;
-                            list_items[i].satuan_3 = satuan3_id;
-                            list_items[i].satuan_3_text = satuan3_text;
-                            list_items[i].konversi_satuan_3 = konversi_satuan_3;
+                            list_items_spek[i].spesifikasi = spek;
+                            list_items_spek[i].satuan_1 = satuan1_id;
+                            list_items_spek[i].satuan_1_text = satuan1_text;
+                            list_items_spek[i].satuan_2 = satuan2_id;
+                            list_items_spek[i].satuan_2_text = satuan2_text;
+                            list_items_spek[i].konversi_satuan_2 = konversi_satuan_2;
+                            list_items_spek[i].satuan_3 = satuan3_id;
+                            list_items_spek[i].satuan_3_text = satuan3_text;
+                            listlist_items_spek_items[i].konversi_satuan_3 = konversi_satuan_3;
                         }
                     });
                     resetFormDetail();
                     drawTable();
                 } else {
-                    let isDuplicate = list_items.some(function(item) {
+                    let isDuplicate = list_items_spek.some(function(item) {
                         return item.spesifikasi.toUpperCase() === spek.toUpperCase();
                     });
 
                     if (!isDuplicate) {
-                        list_items.push({
+                        list_items_spek.push({
                             'spek_id': getID(),
                             'spesifikasi_id': "",
                             'spesifikasi': spek.toUpperCase(),
@@ -2138,11 +2146,59 @@
         }
     }
 
+    const drawTableDetail = function() {
+        $('.body-detail-table').empty();
+        $('.tfoot').empty();
+        var row = '';
+        var no = 1;
+        if (list_items.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                    </tr>
+                `;
+            $('.tfoot').append(row);
+        } else {
+            list_items.map(item => {
+                row += '<tr style="color:whitesmoke;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.nama_barang + '</td>';
+                row += '<td>' + item.nama_satuan + '</td>';
+                row += '<td>' + item.qty + '</td>';
+                row += '<td>' + item.keterangan + '</td>';
+                <?php if (!empty($dataSPP)) : ?>
+                    <?php if ($dataSPP->is_posted == '0') : ?>
+                        row += '<td>' + `
+                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}', '${item.purchase_detail_id}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>` +
+                            '</td>';
+                    <?php endif; ?>
+                <?php else : ?>
+                    row += '<td>' + `
+                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}', '${item.purchase_detail_id}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>` +
+                        '</td>';
+                <?php endif; ?>
+
+                no++;
+            });
+            $('.body-detail-table').append(row);
+        }
+    }
+
     // Update
     <?php if (!empty($dataSPP)) : ?>
         <?php foreach ($dataSPPDetail as $i => $d) : ?>
             list_items.push({
                 'barang_detail_id': getID(),
+                'purchase_detail_id': "<?= encrypt($d->id) ?>",
                 'barang_id': "<?= encrypt($d->barang1_id) ?>",
                 'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
                 'kode_barang': "<?= $d->kode_barang ?>",
@@ -2153,7 +2209,7 @@
                 'keterangan': "<?= $d->note ?>"
             });
         <?php endforeach; ?>
-        drawTable();
+        drawTableDetail();
     <?php endif; ?>
 </script>
 <script>
