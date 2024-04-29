@@ -514,14 +514,9 @@
 <section class="section">
     <div class="section-header">
         <h1>Supplier Bahan Baku</h1>
-        <div class="col-button-tambah-spp">
-            <!-- <button class="btn btn-show-form-laporan btn-warning btn-print float-right" target="_blank" style="color: #ffffff;" data-btn="laporan-modal">
-                <i class="fa fa-print mr-2"></i>Print
-            </button> -->
-            <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </button>
-        </div>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
     </div>
     <div class="card">
         <div class="card-body">
