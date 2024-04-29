@@ -71,6 +71,48 @@ class Golongan extends BaseController
     public function create()
     {
         $golonganModel = new GolonganModel();
+
+        $golongan_name = $this->request->getVar('golonganName');
+
+        $getGolonganNameNull = $golonganModel->select('id')
+            ->where('golongan_name', $golongan_name)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        //cek name duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getGolonganNameNull)) {
+            $rule_is_unique = 'required|is_unique[golongan.golongan_name]';
+        } else {
+            $rule_is_unique = 'required';
+        }
+
+        $validate = $this->validate([
+            'golonganName' => [
+                'rules' => $rule_is_unique,
+                'errors' => [
+                    'required' => 'Golongan harus diisi',
+                    'is_unique' => 'Golongan sudah ada'
+                ]
+            ]
+
+        ]);
+
+        if (!$validate) {
+
+            $errors = '';
+            foreach ($this->validator->getErrors() as $key => $row) {
+                $errors .= $row . '. ';
+            }
+
+            $data = [
+                "status"     => false,
+                "message"    => $errors,
+                'token'     => csrf_hash()
+            ];
+            return json_encode($data);
+        }
+
+
         $nominalPinjaman = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalPinjaman'));
         $nominalPinjaman = str_replace(",", ".", $nominalPinjaman);
         $angkaDesimalNominal = number_format((float) $nominalPinjaman, 3, '.', '');
@@ -91,6 +133,63 @@ class Golongan extends BaseController
     public function update()
     {
         $golonganModel = new GolonganModel();
+
+        $id = $this->request->getVar('id');
+
+        $golonganName = $this->request->getVar('golonganName');
+
+        $getGolonganNull = $golonganModel->select('id')
+            ->where('golongan_name', $golonganName)
+            ->where('deletedAt', null)
+            ->where('id !=', $id)
+            ->findAll();
+
+        //cek name duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getGolonganNull)) {
+
+            //cek name yg diedit masih sama dengan yg di ID?
+            $getGolonganNow = $golonganModel->select('id')
+                ->where('golongan_name', $golonganName)
+                ->where('deletedAt', null)
+                ->where('id', $id)
+                ->first();
+
+            //jika sama
+            if (!empty($getGolonganNow)) {
+                $rule_is_unique = 'required';
+            } else {
+                $rule_is_unique = 'required|is_unique[golongan.golongan_name]';
+            }
+        } else {
+            $rule_is_unique = 'required';
+        }
+
+        $validate = $this->validate([
+            'golonganName' => [
+                'rules' => $rule_is_unique,
+                'errors' => [
+                    'required' => 'Golongan harus diisi',
+                    'is_unique' => 'Golongan sudah ada'
+                ]
+            ]
+
+        ]);
+
+        if (!$validate) {
+
+            $errors = '';
+            foreach ($this->validator->getErrors() as $key => $row) {
+                $errors .= $row . '. ';
+            }
+
+            $data = [
+                "status"     => false,
+                "message"    => $errors,
+                'token'     => csrf_hash()
+            ];
+            return json_encode($data);
+        }
+
         $nominalPinjaman = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalPinjaman'));
         $nominalPinjaman = str_replace(",", ".", $nominalPinjaman);
         $angkaDesimalNominal = number_format((float) $nominalPinjaman, 3, '.', '');
