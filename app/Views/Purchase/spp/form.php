@@ -388,7 +388,7 @@
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="body-detail-table" id="body-detail-table" id="tbody2" style="cursor: pointer;">
+                                    <tbody class="body-detail-table-spek" id="body-detail-table-spek" id="tbody2" style="cursor: pointer;">
                                     </tbody>
                                 </table>
                             </div>
@@ -1085,11 +1085,11 @@
     }
 
     const drawTable = function() {
-        $('.body-detail-table').empty();
+        $('.body-detail-table-spek').empty();
         $('.tfoot').empty();
         var row = '';
         var no = 1;
-        if (list_items.length === 0) {
+        if (list_items_spek.length === 0) {
             row += `
                     <tr>
                         <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
@@ -1097,7 +1097,7 @@
                 `;
             $('.tfoot').append(row);
         } else {
-            list_items.map(item => {
+            list_items_spek.map(item => {
                 row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.spesifikasi + '</td>';
@@ -1115,7 +1115,7 @@
 
                 no++;
             });
-            $('.body-detail-table').append(row);
+            $('.body-detail-table-spek').append(row);
         }
     }
 
@@ -1128,7 +1128,7 @@
         validator_spek.reset();
         let spek_id = $(this).data('spek_id');
 
-        $.each(list_items, function(i, v) {
+        $.each(list_items_spek, function(i, v) {
             if (v.spek_id === spek_id) {
                 $("#spek_id").val(v.spek_id);
                 $("#spesifikasi_id").val(v.id);
@@ -2095,6 +2095,11 @@
         let spek_id = $("#spek_id").val();
         let spesifikasi_id = $("#spesifikasi_id").val();
 
+        console.log(spek);
+        console.log(satuan1_id);
+        console.log(satuan2_id);
+        console.log(spesifikasi_id);
+
         if ($(".create-form-barang").valid()) {
             if ($(".spek-form").valid()) {
                 if (spek_id) {
@@ -2108,7 +2113,7 @@
                             list_items_spek[i].konversi_satuan_2 = konversi_satuan_2;
                             list_items_spek[i].satuan_3 = satuan3_id;
                             list_items_spek[i].satuan_3_text = satuan3_text;
-                            listlist_items_spek_items[i].konversi_satuan_3 = konversi_satuan_3;
+                            list_items_spek[i].konversi_satuan_3 = konversi_satuan_3;
                         }
                     });
                     resetFormDetail();
