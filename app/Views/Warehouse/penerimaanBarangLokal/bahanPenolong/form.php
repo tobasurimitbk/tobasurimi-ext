@@ -493,7 +493,8 @@
                 $(".warehouse_id").val();
             }
         });
-
+        listData = [];
+        drawTable(listData);
     });
 
     $('.kemasan_id').select2({
@@ -852,7 +853,7 @@
         const table = $('#dataTable');
         table.find('tbody').empty();
 
-        if (listData.result.length == 0) {
+        if (listData.length == 0) {
             table.find('tfoot').empty();
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
@@ -922,8 +923,6 @@
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
         }
-
-
     }
 
     function editModal(am_purchase_order_id, am_purchase_order_details_id) {

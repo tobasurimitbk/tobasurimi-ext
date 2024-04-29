@@ -490,7 +490,8 @@
                 $(".warehouse_id").val();
             }
         });
-
+        listData = [];
+        drawTable(listData);
     });
 
     $('.kemasan_id').select2({
