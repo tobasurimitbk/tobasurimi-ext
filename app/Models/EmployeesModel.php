@@ -220,9 +220,9 @@ class EmployeesModel extends Model
 
         $builder = $this->db->table('employees')
             ->select("employees.*, users.id as users_id, users.name as users_name, bagian.nama_bagian")
-            ->join('users', 'users.employee_id = employees.id', 'left')
-            ->join('divisis', 'divisis.id = employees.division_id', 'left')
-            ->join('bagian', 'employees.bagian_id = bagian.id', 'left');
+            ->join('users', 'users.employee_id = employees.id')
+            ->join('divisis', 'divisis.id = employees.division_id')
+            ->join('bagian', 'employees.bagian_id = bagian.id');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
 
@@ -283,8 +283,8 @@ class EmployeesModel extends Model
 
         $builder = $this->db->table('employees')
             ->select("employees.*, divisis.divisi, bagian.nama_bagian")
-            ->join('divisis', 'employees.division_id = divisis.id', 'left')
-            ->join('bagian', 'employees.bagian_id = bagian.id', 'left');
+            ->join('divisis', 'employees.division_id = divisis.id')
+            ->join('bagian', 'employees.bagian_id = bagian.id');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
 
@@ -359,8 +359,8 @@ class EmployeesModel extends Model
 
         $builder = $this->db->table('employees')
             ->select("employees.*, divisis.divisi, bagian.nama_bagian AS namaBagian")
-            ->join('divisis', 'divisis.id = employees.division_id', 'left')
-            ->join('bagian', 'bagian.id = employees.bagian_id', 'left');
+            ->join('divisis', 'divisis.id = employees.division_id')
+            ->join('bagian', 'bagian.id = employees.bagian_id');
         $builder->where($arrCondition);
         $query = $builder->get();
 

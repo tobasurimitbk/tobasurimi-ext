@@ -267,8 +267,8 @@ class AttendancesModel extends Model
 
         $employeeData = $employeeModel->select('*')
             ->select("employees.*, divisis.divisi, bagian.nama_bagian")
-            ->join('divisis', 'employees.division_id = divisis.id', 'left')
-            ->join('bagian', 'employees.bagian_id = bagian.id', 'left')
+            ->join('divisis', 'employees.division_id = divisis.id')
+            ->join('bagian', 'employees.bagian_id = bagian.id')
             ->groupStart()->where($arrCondition)->groupEnd()
             ->get()
             ->getResultArray();
