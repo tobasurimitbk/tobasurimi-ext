@@ -77,18 +77,32 @@
                     </div>
                 </div>
                 <div class="row">
-                    <!-- <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="salesName" value="<?= $documentData->salesName ?? '' ?>" disabled>
-                            <label for="floatingInput">Nama Sales</label>
-                        </div>
-                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="termin" name="termin" value="<?= $documentData->termin ?? '' ?>" disabled>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <option value=""></option>
+                                <option value="1" <?= !empty($data) ? ($data->jenis_penjualan == 1 ? "selected" : "") : ""; ?>>By Sales</option>
+                                <option value="2" <?= !empty($data) ? ($data->jenis_penjualan == 2 ? "selected" : "") : ""; ?>>By Office</option>
+                                <option value="3" <?= !empty($data) ? ($data->jenis_penjualan == 3 ? "selected" : "") : ""; ?>>By Ecommerce</option>
+                            </select>
+                            <label for="floatingInput">Jenis Penjualan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control" id="salesName" value="<?= $documentData->salesName ?? '' ?>" disabled>
+                            <label for="floatingInput">Nama Sales</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via_id === true ? 'disabled=true' : '') : ''; ?>>
@@ -100,18 +114,15 @@
                             <label for="floatingInput">Ship Via (Opsional)</label>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 70px;">
                             <textarea autocomplete="one-time-code" style="height: 100%;" <?= !empty($data->keterangan) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= $data->keterangan ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <div class="row">
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="mb-3" style="height: 50px;">
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
@@ -457,9 +468,6 @@
                     $('#customerName').val(res.customerName);
                     $('#customerAddress').val(res.customerAddress);
                     $('#termin').val(res.termin);
-                    // $('#salesName').val();
-                    // $('#tax_status').prop('checked', res.taxStatus);
-                    // $('#include_tax').prop('checked', res.includeTax)
 
                     // add datatable data here
                     table.rows.add(res.itemList).draw(false);

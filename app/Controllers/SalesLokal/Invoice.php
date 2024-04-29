@@ -765,7 +765,7 @@ class Invoice extends BaseController
             $soData = $this->SalesOrderModel->asObject()
                 ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
                 ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+                ->join('employees', 'employees.id = customers.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
                 ->find($docId);
 
@@ -777,15 +777,16 @@ class Invoice extends BaseController
             $selectQry = "surat_jalan_so.*, 
                           customers.name AS customerName, 
                           customers.address AS customerAddress,  
-                          IFNULL(metadata.value, '-') AS termin";
+                          IFNULL(metadata.value, '-') AS termin,
+                          CONCAT(employees.nip , " - ", employees.name) AS salesName";
             $suratJalanData = $this->SuratJalanModel->asObject()
                 ->select($selectQry)
-                ->join('customers', 'customers.id = surat_jalan_so.id_customer')
-                // ->join('employees', 'employees.id = customers.sales_id')
+                ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
+                ->join('employees', 'employees.id = customers.sales_id', 'left')
                 ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->find($docId);
 
-            // $salesName = $suratJalanData->salesName;
+            $salesName = $suratJalanData->salesName;
             $termin = $suratJalanData->termin;
             $soId = json_decode($suratJalanData->multiple_id_so);
             $customerName = $suratJalanData->customerName;
@@ -798,9 +799,6 @@ class Invoice extends BaseController
         $dpp = 0;
         $taxAmt = 0;
         $taxChecked = 0;
-
-        foreach ($itemList as $item) {
-        }
         $no = 1;
         foreach ($itemList as &$item) {
             foreach ($itemTax as $itemT) {

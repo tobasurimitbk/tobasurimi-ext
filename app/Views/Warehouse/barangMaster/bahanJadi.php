@@ -215,8 +215,8 @@
                                         <tr>
                                             <th scope="col">No</th>
                                             <th scope="col">Spesifikasi</th>
-                                            <th scope="col">Harga Pokok</th>
-                                            <th scope="col">Harga Jual</th>
+                                            <!-- <th scope="col">Harga Pokok</th>
+                                            <th scope="col">Harga Jual</th> -->
                                             <th scope="col">Satuan 1</th>
                                             <th scope="col">Satuan 2</th>
                                             <th scope="col">Satuan 3</th>
@@ -1020,7 +1020,7 @@
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                 },
-                method: "POST",
+                method: "GET",
                 success: function(res) {
                     csrf.val(res.token);
                     $("input[name='kode_barang']").attr("readonly", true);
@@ -1136,7 +1136,7 @@
         if (list_items.length === 0) {
             row += `
                     <tr>
-                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                        <td colspan="5" class="text-center">Data Barang Tidak Ada</td>
                     </tr>
                 `;
             $('.tfoot').append(row);
@@ -1145,8 +1145,8 @@
                 row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.spesifikasi + '</td>';
-                row += '<td>' + item.harga_pokok + '</td>';
-                row += '<td>' + item.harga_jual + '</td>';
+                // row += '<td>' + item.harga_pokok + '</td>';
+                // row += '<td>' + item.harga_jual + '</td>';
                 row += '<td>' + item.satuan_1_text + '</td>';
                 row += '<td>' + item.satuan_2_text + '(' + item.konversi_satuan_2 + ' ' + item.satuan_1_text + ')</td>';
                 row += '<td>' + item.satuan_3_text + '(' + item.konversi_satuan_3 + ' ' + item.satuan_1_text + ')</td>';

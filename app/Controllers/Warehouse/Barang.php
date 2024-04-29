@@ -428,12 +428,12 @@ class Barang extends BaseController
         }
 
         $lastBarang = $barangModel->asObject()
-            ->where('company_id', $this->this_company_id)
+            // ->where('company_id', $this->this_company_id)
             ->where('type_barang', $type)
             ->where('deletedAt', null)
             ->like('kode_barang', $codeName . '-____')
             ->orderBy('kode_barang', 'DESC')
-            ->first();
+            ->findAll();
 
 
         if (empty($lastBarang)) {
@@ -443,17 +443,22 @@ class Barang extends BaseController
             ]);
         }
         try {
+            foreach ($lastBarang as $value) {
+                $lastCode = $value->kode_barang;
+                $lastCodeExp = explode('-', $lastCode);
+                $length = strlen($lastCodeExp[1]);
+                if ($length == 4) {
+                    $lastIncrement = (int)$lastCodeExp[1];
 
-            $lastCode = $lastBarang->kode_barang;
-            $lastCodeExp = explode('-', $lastCode);
-            $lastIncrement = (int)$lastCodeExp[1];
-            $newIncrement = str_pad(($lastIncrement + 1), 4, '0', STR_PAD_LEFT);
+                    $newIncrement = str_pad(($lastIncrement + 1), 4, '0', STR_PAD_LEFT);
 
-            return response()->setJSON([
-                'codeNew' => $codeName . "-" . $newIncrement,
-                'token' => csrf_hash(),
+                    return response()->setJSON([
+                        'codeNew' => $codeName . "-" . $newIncrement,
+                        'token' => csrf_hash(),
 
-            ]);
+                    ]);
+                }
+            }
         } catch (Exception $e) {
             return response()->setJSON([
                 'codeNew' => $codeName . "-????",
