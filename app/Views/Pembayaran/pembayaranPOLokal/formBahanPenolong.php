@@ -131,10 +131,19 @@
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value=""></option>
-                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Bank" ? 'selected' : '') : '' ?> value="Bank">Bank</option>
-                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Cash">Cash</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Bank" ? 'selected' : '') : '' ?> value="Bank">BANK</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Cash">CASH</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select status_pph" name="status_pph" id="status_pph">
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_pph'] == "1" ? 'selected' : '') : '' ?> value="1">PPH 2.5 %</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_pph'] == "0" ? 'selected' : '') : 'selected' ?> value="0">TIDAK ADA</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Status PPH</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -143,9 +152,6 @@
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
@@ -157,6 +163,8 @@
                             <label for="floatingInput" style="z-index: 1;">Debit</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
@@ -235,11 +243,21 @@
                                             </td>
                                             <td><?= " " . number_format($tax_dikembalikan_lagi['taxAmt'], 2, ',', '.')  ?></td>
                                         </tr>
+                                        <?php
+                                        $pphNilai = $detail['pembayaranDetail']['status_pph'] ? 0.0025 : 0;
+                                        $pphResult = $pphNilai * ($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']);
+                                        ?>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right;">
+                                                Pajak Penghasilan (2.5 %) (+)
+                                            </td>
+                                            <td><?= " " . number_format($pphResult, 2, ',', '.')  ?></td>
+                                        </tr>
                                         <tr>
                                             <td colspan="6" style="text-align: right;">
                                                 Sub Total
                                             </td>
-                                            <td><?= " " . number_format(($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']), 2, ',', '.')  ?></td>
+                                            <td><?= " " . number_format($pphResult + ($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']), 2, ',', '.')  ?></td>
                                         </tr>
                                     <?php else : ?>
                                         <tr>
@@ -262,7 +280,6 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     $(document).ready(function() {
-        const table = $('#dataTable');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -295,6 +312,9 @@
                 },
                 divisi_id: {
                     required: true
+                },
+                status_pph: {
+                    required: true
                 }
             },
             messages: {
@@ -324,6 +344,9 @@
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
+                },
+                status_pph: {
+                    required: "Pilih status pph"
                 }
             },
             errorElement: 'span',
@@ -370,6 +393,13 @@
             theme: "bootstrap-5"
         });
 
+        $('#status_pph').select2({
+            placeholder: "Status PPH",
+            theme: "bootstrap-5"
+        }).change(function() {
+            listBarangDetail();
+        });
+
         $('#akun_selisih').select2({
             placeholder: "Akun Selisih (Opsional)",
             theme: "bootstrap-5"
@@ -386,60 +416,7 @@
             placeholder: "Pilih Tanda Terima Supplier",
             theme: "bootstrap-5"
         }).change(function() {
-            var id = $('#tanda_terima_supplier').val();
-            $.ajax({
-                url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    // detail append
-                    var detail = res.detail;
-                    var dateSplit = detail.jatuh_tempo.split('-');
-                    var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt);
-                    $('.nominal_pembayaran').val(formatRupiah(subTotal));
-                    $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
-                    $('.tanda_terima_faktur_id').val(detail.id);
-                    // list append
-                    table.find('tbody').empty();
-                    var no = 1;
-                    $.each(res.list, function(i, v) {
-                        var dateSplit = v.lpb_date.split('-');
-                        var newRow = $('<tr>');
-                        newRow.append($('<td>').text(no++));
-                        newRow.append($('<td>').text(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]));
-                        newRow.append($('<td>').text(v.lpb_no));
-                        newRow.append($('<td>').text(v.item_name));
-                        newRow.append($('<td>').text(v.qty));
-                        newRow.append($('<td>').text(v.unit));
-                        newRow.append($('<td>').text(formatRupiah(v.price)));
-                        table.find('tbody').append(newRow);
-                    });
-                    var newRow1 = $('<tr>');
-                    newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
-                    newRow1.append($('<td>').text(formatRupiah(detail.tambahan)));
-                    table.find('tbody').append(newRow1);
-                    var newRow2 = $('<tr>');
-                    newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
-                    newRow2.append($('<td>').text(formatRupiah(detail.potongan)));
-                    table.find('tbody').append(newRow2);
-                    var newRow3 = $('<tr>');
-                    newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
-                    newRow3.append($('<td>').text(formatRupiah(detail.nominal_faktur)));
-                    table.find('tbody').append(newRow3);
-                    var newRow4 = $('<tr>');
-                    newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
-                    newRow4.append($('<td>').text(formatRupiah(res.tax_dipungut_negara.taxAmt)));
-                    table.find('tbody').append(newRow4);
-                    var newRow5 = $('<tr>');
-                    newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
-                    newRow5.append($('<td>').text(formatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
-                    table.find('tbody').append(newRow5);
-                    var newRow6 = $('<tr>');
-                    newRow6.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
-                    newRow6.append($('<td>').text(formatRupiah(subTotal)));
-                    table.find('tbody').append(newRow6);
-                }
-            })
+            listBarangDetail();
         });
 
         $('#supplier_id').select2({
@@ -519,6 +496,77 @@
             }
         })
     })
+
+    function listBarangDetail() {
+        var id = $('#tanda_terima_supplier').val();
+        $.ajax({
+            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id,
+            method: "GET",
+            data: {
+                status_pph: $('#status_pph').val()
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            success: function(res) {
+                const table = $('#dataTable');
+                // detail append
+                var detail = res.detail;
+                var dateSplit = detail.jatuh_tempo.split('-');
+                var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.pph);
+                $('.nominal_pembayaran').val(formatRupiah(subTotal));
+                $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
+                $('.tanda_terima_faktur_id').val(detail.id);
+                // list append
+                table.find('tbody').empty();
+                var no = 1;
+                $.each(res.list, function(i, v) {
+                    var dateSplit = v.lpb_date.split('-');
+                    var newRow = $('<tr>');
+                    newRow.append($('<td>').text(no++));
+                    newRow.append($('<td>').text(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]));
+                    newRow.append($('<td>').text(v.lpb_no));
+                    newRow.append($('<td>').text(v.item_name));
+                    newRow.append($('<td>').text(v.qty));
+                    newRow.append($('<td>').text(v.unit));
+                    newRow.append($('<td>').text(formatRupiah(v.price)));
+                    table.find('tbody').append(newRow);
+                });
+                var newRow1 = $('<tr>');
+                newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
+                newRow1.append($('<td>').text(formatRupiah(detail.tambahan)));
+                table.find('tbody').append(newRow1);
+                var newRow2 = $('<tr>');
+                newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
+                newRow2.append($('<td>').text(formatRupiah(detail.potongan)));
+                table.find('tbody').append(newRow2);
+                var newRow3 = $('<tr>');
+                newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
+                newRow3.append($('<td>').text(formatRupiah(detail.nominal_faktur)));
+                table.find('tbody').append(newRow3);
+                var newRow4 = $('<tr>');
+                newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
+                newRow4.append($('<td>').text(formatRupiah(res.tax_dipungut_negara.taxAmt)));
+                table.find('tbody').append(newRow4);
+                var newRow5 = $('<tr>');
+                newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
+                newRow5.append($('<td>').text(formatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
+                table.find('tbody').append(newRow5);
+                var newRow6 = $('<tr>');
+                newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
+                newRow6.append($('<td>').text(formatRupiah(res.pph.toFixed(2))));
+                table.find('tbody').append(newRow6);
+                var newRow7 = $('<tr>');
+                newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
+                newRow7.append($('<td>').text(formatRupiah(subTotal)));
+                table.find('tbody').append(newRow7);
+            }
+        })
+    }
 
     function remove(id) {
         const csrfToken = '<?= csrf_token() ?>';
@@ -624,6 +672,12 @@
                 url: '<?= base_url('pembayaran-po-lokal-bp/get-rekap-faktur/') ?>' + supplier_id + '/' + divisi_id,
                 method: "GET",
                 dataType: "json",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     if (res.data.length == 0) {
                         Swal.fire({

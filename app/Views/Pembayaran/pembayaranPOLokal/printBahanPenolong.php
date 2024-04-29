@@ -169,11 +169,21 @@
                 </td>
                 <td><?= " " . number_format($tax_dikembalikan_lagi['taxAmt'], 2, ',', '.')  ?></td>
             </tr>
+            <?php
+            $pphNilai = $detail['pembayaranDetail']['status_pph'] ? 0.0025 : 0;
+            $pphResult = $pphNilai * ($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']);
+            ?>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Pajak Penghasilan (2.5 %) (+)
+                </td>
+                <td><?= " " . number_format($pphResult, 2, ',', '.')  ?></td>
+            </tr>
             <tr>
                 <td colspan="6" style="text-align: right;">
                     Sub Total
                 </td>
-                <td><?= " " . number_format(($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']), 2, ',', '.')  ?></td>
+                <td><?= " " . number_format($pphResult + ($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']), 2, ',', '.')  ?></td>
             </tr>
         </tbody>
     </table>

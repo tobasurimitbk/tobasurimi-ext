@@ -98,8 +98,6 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div <?= !empty($detail) ? 'disabled' : '' ?> class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" name="tipe_pembayaran" id="tipe_pembayaran">
@@ -110,6 +108,8 @@
                             <label for="floatingInput" style="z-index: 1;">Tipe Bayar</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <input type="text" name="jenis_dokumen" class="form-control" id="jenis_dokumen" readonly>
@@ -150,20 +150,7 @@
                                 </div>
                             <?php endif; ?>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
 
-                    <div class="col-md-4">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($detail) ? 'disabled' : '' ?> autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date']))  . '"' : '' ?>>
-                                <label for="floatingInput">Tanggal Jatuh Tempo</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
-                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -175,14 +162,14 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? 'disabled' : '' ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
@@ -381,9 +368,6 @@
                 nominal_pembayaran: {
                     required: true
                 },
-                jatuh_tempo: {
-                    required: true
-                },
                 payment_method: {
                     required: true
                 },
@@ -418,9 +402,6 @@
                 },
                 nominal_pembayaran: {
                     required: "Nominal pembayaran wajib diisi"
-                },
-                jatuh_tempo: {
-                    required: "Tanggal jatuh tempo wajib diisi"
                 },
                 payment_method: {
                     required: "Metode pembayaran wajib diisi"

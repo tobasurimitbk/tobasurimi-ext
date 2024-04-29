@@ -39,6 +39,7 @@ class LocalPOPaymentModel extends Model
         'akun_kas',
         'akun_selisih',
         'status_posting',
+        'status_pph',
         'deletedAt'
     ];
 

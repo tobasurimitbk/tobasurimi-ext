@@ -60,6 +60,8 @@
                             <select <?= !empty($paymentData) ? "disabled" : "" ?> class="form-select tipe_pembayaran" name="tipe_pembayaran" id="tipe_pembayaran">
                                 <option disabled selected value=""></option>
                                 <option value="DP" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'DP') ? 'selected' : '' ?>>DP</option>
+                                <option value="SIMPANAN" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'SIMPANAN') ? 'selected' : '' ?>>SIMPANAN</option>
+                                <option value="PINJAMAN SUPPLIER" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'PINJAMAN SUPPLIER') ? 'selected' : '' ?>>PINJAMAN SUPPLIER</option>
                                 <option value="PELUNASAN" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'PELUNASAN') ? 'selected' : '' ?>>PELUNASAN</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Tipe Pembayaran</label>
@@ -213,9 +215,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option selected value="">Pilih Payment Method</option>
-                                <option value="CASH" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'CASH') ? 'selected' : '' ?>>Cash</option>
-                                <option value="TRANSFER" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'TRANSFER') ? 'selected' : '' ?>>Transfer</option>
-                                <option value="LC" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'LC') ? 'selected' : '' ?>>LC</option>
+                                <option value="CASH" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'CASH') ? 'selected' : '' ?>>CASH</option>
+                                <option value="BANK" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'BANK') ? 'selected' : '' ?>>BANK</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
@@ -228,6 +229,15 @@
                                     <label for="floatingInput">No. Voucher</label>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($paymentData) ? 'disabled' : '' ?> class="form-select status_pph" name="status_pph" id="status_pph">
+                                <option <?= !empty($paymentData) ? ($paymentData['status_pph'] == "1" ? 'selected' : '') : '' ?> value="1">PPH 2.5 %</option>
+                                <option <?= !empty($paymentData) ? ($paymentData['status_pph'] == "0" ? 'selected' : '') : 'selected' ?> value="0">TIDAK ADA</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Status PPH</label>
                         </div>
                     </div>
                     <div class="col-md-4">
