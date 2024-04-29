@@ -101,13 +101,13 @@
                 <tr align="center">
                     <td><?= $nomor++; ?></td>
                     <td style="vertical-align:middle;z-index:1" nowrap>
-                        &nbsp;<?= $res_user[$i]["employeeName"]; ?>
+                        &nbsp;<?= strtoupper($res_user[$i]["employeeName"]); ?>
                     </td>
                     <td>
-                        &nbsp;<?= $res_user[$i]["divisi"]; ?>
+                        &nbsp;<?= strtoupper($res_user[$i]["divisi"]); ?>
                     </td>
                     <td>
-                        &nbsp;<?= $res_user[$i]["namaBagian"]; ?>
+                        &nbsp;<?= strtoupper($res_user[$i]["namaBagian"]); ?>
                     </td>
                     <?php
                     for ($j = 1; $j <= $last_date; $j++) :

@@ -103,13 +103,13 @@
                 <tr align="center; font-weight:bold; color:white;">
                     <td style="color: black; font-weight:normal;"><?= $nomor++; ?></td>
                     <td style="color: black; font-weight:normal;">
-                        &nbsp; <?= $e['name']; ?>
+                        &nbsp; <?= strtoupper($e['name']); ?>
                     </td>
                     <td style="color: black; font-weight:normal;">
-                        &nbsp;<?= $e["divisi"]; ?></td>
+                        &nbsp;<?= strtoupper($e["divisi"]); ?></td>
                     </td>
                     <td style="color: black; font-weight:normal;">
-                        &nbsp;<?= $e["namaBagian"]; ?></td>
+                        &nbsp;<?= strtoupper($e["namaBagian"]); ?></td>
                     </td>
                     <?php $j = 1; ?>
                     <?php foreach ($allDates as $a) : ?>

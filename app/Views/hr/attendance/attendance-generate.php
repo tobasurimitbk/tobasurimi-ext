@@ -195,13 +195,13 @@
                                     <?php if ($isGenerate) : ?>
                                         <tr>
                                             <td style="vertical-align:middle;z-index:1; text-align:center;" nowrap>
-                                                &nbsp; <?= $e['name']; ?>
+                                                &nbsp; <?= strtoupper($e['name']); ?>
                                             </td>
                                             <td style="vertical-align:middle;z-index:1; text-align:center;" nowrap>
-                                                &nbsp;<?= $e["divisi"]; ?></td>
+                                                &nbsp;<?= strtoupper($e["divisi"]); ?></td>
                                             </td>
                                             <td style="vertical-align:middle;z-index:1; text-align:center;" nowrap>
-                                                &nbsp;<?= $e["nama_bagian"]; ?></td>
+                                                &nbsp;<?= strtoupper($e["nama_bagian"]); ?></td>
                                             </td>
                                             <?php $j = 1; ?>
                                             <?php foreach ($allDates as $a) : ?>
@@ -713,6 +713,10 @@
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                                 // show loading
                                 $('#loadingSpinner').show();
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
                             },
                             processData: false,
                             contentType: false,
@@ -816,7 +820,11 @@
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                                 // show loading
+                                setLoading();
                                 $('#loadingSpinner').show();
+                            },
+                            complete: function() {
+                                stopLoading();
                             },
                             processData: false,
                             contentType: false,
@@ -870,7 +878,11 @@
                 url: "<?= base_url("get-attendance"); ?>",
                 data: formData,
                 beforeSend: function(xhr) {
+                    setLoading();
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    stopLoading();
                 },
                 method: "POST",
                 dataType: "json",
@@ -907,7 +919,7 @@
                         $('#reason').val(attendance.reason);
                     }
 
-                    $('#updateModal').show();
+                    $('#updateModal').modal('show');
                 },
                 onError: function(response) {
                     Swal.fire({
@@ -972,53 +984,70 @@
         // update attendance
         $('#updateAttendanceForm').submit(function(e) {
             e.preventDefault();
-            // set variable
-            const csrf = $(`[name="${csrfToken}"]`);
-            var attendenceID = $('#attendenceID').val();
-            var statusKehadiran = $('#statusKehadiran').val();
-            var reason = $('#reason').val();
-            var checkIn = $('#checkin').val();
-            var checkOut = $('#checkout').val();
-            var isApproved = $('#isApproved').val();
-            // append to form
-            var formData = new FormData();
-            formData.append('attendenceID', attendenceID);
-            formData.append('statusKehadiran', statusKehadiran);
-            formData.append("reason", reason);
-            formData.append("reason", reason);
-            formData.append("checkIn", checkIn);
-            formData.append("checkOut", checkOut);
-            formData.append("isApproved", isApproved);
+            Swal.fire({
+                icon: 'question',
+                title: 'Update Presensi ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // set variable
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    var attendenceID = $('#attendenceID').val();
+                    var statusKehadiran = $('#statusKehadiran').val();
+                    var reason = $('#reason').val();
+                    var checkIn = $('#checkin').val();
+                    var checkOut = $('#checkout').val();
+                    var isApproved = $('#isApproved').val();
+                    // append to form
+                    var formData = new FormData();
+                    formData.append('attendenceID', attendenceID);
+                    formData.append('statusKehadiran', statusKehadiran);
+                    formData.append("reason", reason);
+                    formData.append("reason", reason);
+                    formData.append("checkIn", checkIn);
+                    formData.append("checkOut", checkOut);
+                    formData.append("isApproved", isApproved);
 
-            $.ajax({
-                url: "<?= base_url("update-attendance"); ?>",
-                data: formData,
-                method: "POST",
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    }).then((result) => {
-                        location.reload();
-                    });;
-                    stopLoading()
-                },
-                onError: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terjadi kesalahan pada sistem',
-                        confirmButtonColor: '#4e73df',
+                    $.ajax({
+                        url: "<?= base_url("update-attendance"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                location.reload();
+                            });;
+                            stopLoading()
+                        },
+                        onError: function(response) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi kesalahan pada sistem',
+                                confirmButtonColor: '#4e73df',
+                            });
+                            stopLoading()
+                        }
                     });
-                    stopLoading()
                 }
-            });
+            })
         });
         // Search employee
         $("select[name='select2EmployeesName']").select2({

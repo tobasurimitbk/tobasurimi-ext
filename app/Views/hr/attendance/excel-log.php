@@ -2,17 +2,6 @@
 header("Content-type: application/vnd-ms-excel");
 header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".xls");
 ?>
-<b>
-    Unit: <?= $company['company'] ?><br>
-    Departemen: <?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?><br>
-    Bulan: <?= date('F - Y', strtotime($yearMonth)) ?> <br>
-    Golongan: <?= $golongan != null ? $golongan['golongan_name'] : "Semua Golongan" ?>
-</b>
-<br>
-<b>
-    Rekap Data Log Absensi
-</b>
-<br>
 <table border="1">
     <thead>
         <tr align="center" style="font-weight: bold;">
@@ -44,13 +33,13 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
             <tr align="center">
                 <td><?= $nomor++; ?></td>
                 <td style="vertical-align:middle;z-index:9999" nowrap>
-                    <?= $res_user[$i]["employeeName"]; ?>
+                    <?= strtoupper($res_user[$i]["employeeName"]); ?>
                 </td>
                 <td style="vertical-align:middle;z-index:9999" nowrap>
-                    <?= $res_user[$i]["divisi"]; ?>
+                    <?= strtoupper($res_user[$i]["divisi"]); ?>
                 </td>
                 <td style="vertical-align:middle;z-index:9999" nowrap>
-                    <?= $res_user[$i]["namaBagian"]; ?>
+                    <?= strtoupper($res_user[$i]["namaBagian"]); ?>
                 </td>
                 <?php
                 for ($j = 1; $j <= $last_date; $j++) :

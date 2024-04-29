@@ -176,11 +176,11 @@
                                 ?>
                                 <tr>
                                     <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
+                                        &nbsp;<?php echo strtoupper($res_user[$i]["employeeName"]); ?></td>
                                     <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
+                                        &nbsp;<?php echo strtoupper($res_user[$i]["divisi"]); ?></td>
                                     <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo $res_user[$i]["namaBagian"]; ?></td>
+                                        &nbsp;<?php echo strtoupper($res_user[$i]["namaBagian"]); ?></td>
                                     </td>
                                     <?php
                                     for ($j = 1; $j <= $last_date; $j++) :
@@ -415,61 +415,62 @@
                 </div>
             </div>
         </div>
-        <div class="modal" id="detailModal" tabindex="2">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><label class="title-name"></label> Detail Log Attendance</h5>
-                    </div>
-                    <form id="updateAttendanceForm" role="form" method="POST">
-                        <div class="modal-body">
-                            <?= csrf_field() ?>
-                            <div class="form-floating mb-2" style="height: 50px;">
-                                <input type="text" class="form-control" id="employeeName" disabled>
-                                <label for="employeeName">Employe Name</label>
-                            </div>
-                            <div class="form-floating mb-2" style="height: 50px;">
-                                <input type="text" name="tanggal" class="form-control" id="tanggal" disabled>
-                                <label for="tanggal">Tanggal</label>
-                            </div>
-                            <div class="form-floating mb-2" style="height: 50px;">
-                                <input type="text" name="statusKehadiran" class="form-control" id="statusKehadiran" disabled>
-                                <label for="status">Status Kehadiran</label>
-                            </div>
 
-                            <div class="form-floating mb-2" style="height: 50px;">
-                                <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
-                                <label for="status">Keterangan Tambahan</label>
-                            </div>
-
-                            <div class="form-floating mb-2" style="height: 50px;">
-                                <input type="text" name="jamTerlambat" class="form-control" id="jamTerlambat" disabled>
-                                <label for="jamTerlambat">Jam Terlambat</label>
-                            </div>
-
-                            <div class="row mb-2" id="formInOut">
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-2" style="height: 50px;">
-                                        <input type="text" class="form-control" id="checkIn" name="checkIn" disabled maxlength="30">
-                                        <label for="checkin">CheckIN</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-2" style="height: 50px;">
-                                        <input type="text" class="form-control" id="checkOut" name="checkOut" disabled maxlength="30">
-                                        <label for="checkout">CheckOut</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-hide-form btn-discard mr-3">Close</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 </section>
+<div class="modal" id="detailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><label class="title-name"></label> Detail Log Attendance</h5>
+            </div>
+            <form id="updateAttendanceForm" role="form" method="POST">
+                <div class="modal-body">
+                    <?= csrf_field() ?>
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <input type="text" class="form-control" id="employeeName" disabled>
+                        <label for="employeeName">Employe Name</label>
+                    </div>
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <input type="text" name="tanggal" class="form-control" id="tanggal" disabled>
+                        <label for="tanggal">Tanggal</label>
+                    </div>
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <input type="text" name="statusKehadiran" class="form-control" id="statusKehadiran" disabled>
+                        <label for="status">Status Kehadiran</label>
+                    </div>
+
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
+                        <label for="status">Keterangan Tambahan</label>
+                    </div>
+
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <input type="text" name="jamTerlambat" class="form-control" id="jamTerlambat" disabled>
+                        <label for="jamTerlambat">Jam Terlambat</label>
+                    </div>
+
+                    <div class="row mb-2" id="formInOut">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="text" class="form-control" id="checkIn" name="checkIn" disabled maxlength="30">
+                                <label for="checkin">CheckIN</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="text" class="form-control" id="checkOut" name="checkOut" disabled maxlength="30">
+                                <label for="checkout">CheckOut</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
     function printReport() {
         document.location.href = 'log-attendance?month=' + document.getElementById('month').value + '&year=' + document.getElementById('year').value;
@@ -561,7 +562,11 @@
             url: "<?= base_url("log-attendance/detail"); ?>",
             data: formData,
             beforeSend: function(xhr) {
+                setLoading();
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                stopLoading();
             },
             method: "POST",
             dataType: "json",
@@ -580,7 +585,7 @@
                 $('#checkOut').val(data.checkOut);
                 $('#jamTerlambat').val(data.jamTerlambat);
 
-                $('#detailModal').show();
+                $('#detailModal').modal('show');
             },
             onError: function(response) {
                 Swal.fire({
@@ -592,7 +597,7 @@
         });
     });
     $('.btn-discard').click(function() {
-        $('#detailModal').hide();
+        $('#detailModal').modal('hide');
     });
 </script>
 
