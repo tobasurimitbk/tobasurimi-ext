@@ -19,6 +19,11 @@
                             Hapus
                         </button>
                     <?php endif; ?>
+                    <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
+                        <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-import/print/' . encrypt($paymentData['id']) ?? '') ?>">
+                            Print
+                        </a>
+                    <?php endif; ?>
                     <?php if (can('Pembayaran', 'Internasional', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($paymentData['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
@@ -231,7 +236,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? 'disabled' : '' ?> class="form-select status_pph" name="status_pph" id="status_pph">
                                 <option <?= !empty($paymentData) ? ($paymentData['status_pph'] == "1" ? 'selected' : '') : '' ?> value="1">PPH 2.5 %</option>
@@ -394,6 +399,11 @@
         theme: "bootstrap-5",
         allowClear: true
     });
+
+    $('#status_pph').select2({
+        placeholder: "Status PPH",
+        theme: "bootstrap-5"
+    }).change(function() {});
 
 
     $('#supplier_id, #po_type, #divisi_id').change(function() {
@@ -636,6 +646,9 @@
             akun_kas: {
                 required: true
             },
+            status_pph: {
+                required: true
+            }
         },
         messages: {
             no_pembayaran: {
@@ -686,6 +699,9 @@
             akun_kas: {
                 required: "Debit wajib diisi"
             },
+            status_pph: {
+                required: "Pilih status pph"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',

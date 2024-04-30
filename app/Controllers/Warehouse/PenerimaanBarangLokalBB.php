@@ -801,7 +801,7 @@ class PenerimaanBarangLokalBB extends BaseController
             ]);
         }
 
-        return response()->setJSON($this->rmPurchaseOrderDetailModel->getListLPBBahanBaku($rmPurchaseOrderID, $penerimaanBarangID));
+        return response()->setJSON($this->rmPurchaseOrderDetailModel->getListLPBBahanBaku($rmPurchaseOrderID, "LOKAL", "BAKU", $penerimaanBarangID));
     }
 
     public function dropdownDivisiPOLokalBB()

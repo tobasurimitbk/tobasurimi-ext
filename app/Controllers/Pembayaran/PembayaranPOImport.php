@@ -10,8 +10,10 @@ use App\Models\AMPurchaseOrderModel;
 use App\Models\KursModel;
 use App\Models\MetadataModel;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\Sub_AkunsModel;
+use Dompdf\Dompdf;
 
 class PembayaranPOImport extends BaseController
 {
@@ -25,6 +27,9 @@ class PembayaranPOImport extends BaseController
     protected $metaDataModel;
     protected $jurnalController;
     protected $divisiModel;
+    protected $companyModel;
+    protected $dompdf;
+
 
     public function __construct()
     {
@@ -38,6 +43,8 @@ class PembayaranPOImport extends BaseController
         $this->metaDataModel = new MetadataModel();
         $this->jurnalController = new JurnalUmum();
         $this->divisiModel = new DivisisModel();
+        $this->companyModel = new CompaniesModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function pembayaranPOImport()
@@ -193,6 +200,7 @@ class PembayaranPOImport extends BaseController
             'no_aju' => $this->request->getVar('no_aju'),
             'akun_kas' => $this->request->getVar('akun_kas'),
             'akun_selisih' => $this->request->getVar('akun_selisih'),
+            'status_pph' => $this->request->getVar('status_pph')
         ]);
 
         return response()->setJSON([
@@ -227,6 +235,7 @@ class PembayaranPOImport extends BaseController
             'note' => $this->request->getVar('note'),
             'akun_kas' => $this->request->getVar('akun_kas'),
             'akun_selisih' => $this->request->getVar('akun_selisih'),
+            'status_pph' => $this->request->getVar('status_pph')
 
         ]);
 
@@ -245,6 +254,74 @@ class PembayaranPOImport extends BaseController
             'status' => true,
             'token' => csrf_hash()
         ]);
+    }
+
+    public function print($id)
+    {
+        $id = decrypt($id);
+        $detail = $this->importPOPaymentModel->where('id', $id)->first();
+
+        if ($detail == null) {
+            return redirect()->to('pembayaran-po-import');
+        }
+
+        $data = [
+            "detail" => $detail,
+            "company" => $this->companyModel->find($detail['company_id']),
+            'supplier' => $this->supplierModel->find($detail['supplier_id']),
+            'poList' => null,
+        ];
+
+        if ($data['detail'] == null) {
+            return redirect()->to('pembayaran-po-import');
+        }
+
+
+        if ($data['detail']['po_type'] == "BAHAN BAKU") {
+            // BAHAN BAKU
+            $condition = [
+                'rm_import_po_details.deletedAt' => null,
+                'rm_import_po_details.rm_import_po_id' => $detail['po_id']
+            ];
+            $addCondition = [
+                'po_type' => "BAKU"
+            ];
+            $poDetail = $this->rmImportPOModel->find($detail['po_id']);
+        } else {
+            // BAHAN PENOLONG
+            $condition = [
+                'am_purchase_order_details.deletedAt' => null,
+                'am_purchase_order_details.am_purchase_order_id' => $detail['po_id']
+            ];
+            $addCondition = [
+                'po_type' => "PENOLONG"
+            ];
+            $poDetail = $this->amPurchaseOrderModel->find($detail['po_id']);
+        }
+
+        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition, 1000, 0);
+        $result = array();
+        foreach ($poList['data'] as $p) {
+            array_push($result, [
+                'barang' => $p->barang_name . ' - ' . $p->spesifikasi,
+                'qty' => $p->qty,
+                'total' => $p->total,
+                'po_no' => $poDetail['po_no'],
+                'tgl_po' => $poDetail['po_date'],
+            ]);
+        }
+
+        $data['poList'] = $result;
+
+        \dd($data);
+        die;
+
+        $this->dompdf->loadHtml(view('Pembayaran/pembayaranPOImport/print', $data));
+        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->render();
+        $this->dompdf->stream("Pembayaran Purchase Order Internasional ", array("Attachment" => false));
+
+        exit(0);
     }
 
 

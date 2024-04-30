@@ -792,7 +792,7 @@ class PenerimaanBarangImportBB extends BaseController
             ]);
         }
 
-        return response()->setJSON($this->rmImportPoDetail->getListLPBBahanBaku($rmPurchaseOrderID, $penerimaanBarangID));
+        return response()->setJSON($this->rmImportPoDetail->getListLPBBahanBaku($rmPurchaseOrderID, "IMPORT", "BAKU", $penerimaanBarangID));
     }
 
     public function dropdownDivisiPOImportBB()

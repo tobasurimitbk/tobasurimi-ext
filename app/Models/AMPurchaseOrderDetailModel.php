@@ -133,7 +133,7 @@ class AMPurchaseOrderDetailModel extends Model
         return $query->getRow();
     }
 
-    public function getListLPBBahanPenolong($amPurchaseOrderID, $penerimaanBarangID = null)
+    public function getListLPBBahanPenolong($amPurchaseOrderID, $statusPenerimaan, $tipeBahan, $penerimaanBarangID = null)
     {
         $res = [];
         $condition = [
@@ -152,7 +152,7 @@ class AMPurchaseOrderDetailModel extends Model
         ";
 
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
-        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
 
         $barangs = $amPurchaseOrderModel
             ->select($selectQry)
@@ -174,11 +174,15 @@ class AMPurchaseOrderDetailModel extends Model
 
         foreach ($barangs as $b) {
 
-            $allLPB = $penerimaanBarangDetailModel
+            $allLPB = $penerimaanBarangModel
                 ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
                 ->where('purchase_order_id', $b['am_purchase_order_id'])
                 ->where('purchase_order_details_id', $b['id'])
-                ->where('deletedAt', null)
+                ->where('tipe_bahan', $tipeBahan)
+                ->where('status_penerimaan', $statusPenerimaan)
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
                 ->groupBy('purchase_order_id', 'purchase_order_details_id')
                 ->findAll();
 
@@ -187,10 +191,15 @@ class AMPurchaseOrderDetailModel extends Model
                 $jmlMasukAll = $a['jmlMasuk'];
             }
 
-            $firstLPB =  $penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangID)
+            $firstLPB =  $penerimaanBarangModel
+                ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+                ->where('penerimaan_barang_id', $penerimaanBarangID)
                 ->where('purchase_order_id', $b['am_purchase_order_id'])
+                ->where('tipe_bahan', $tipeBahan)
+                ->where('status_penerimaan', $statusPenerimaan)
                 ->where('purchase_order_details_id', $b['id'])
-                ->where('deletedAt', null)
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
                 ->first();
 
             $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];

@@ -147,7 +147,7 @@ class EmployeesModel extends Model
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
         $requete = "SELECT employees.*, divisis.divisi as divisionName FROM employees ";
-        $requete .= "LEFT JOIN divisis ON (employees.division_id = divisis.id) ";
+        $requete .= "INNER JOIN divisis ON (employees.division_id = divisis.id) ";
         $requete .= "WHERE employees.deletedAt IS NULL AND divisis.deletedAt IS NULL";
 
         if (isset($values["name"])) {

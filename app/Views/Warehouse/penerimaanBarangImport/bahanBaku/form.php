@@ -751,7 +751,7 @@
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            window.location.href = "<?= base_url("penerimaan-barang-import-bb"); ?>" + '/id/' + response.id;
+                                            window.location.href = "<?= base_url("penerimaan-barang-import-bb"); ?>";
                                         });
                                     } else {
                                         Swal.fire({
