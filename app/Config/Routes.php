@@ -1432,6 +1432,11 @@ $routes->get('/laporan-accounting/rekap-kopek', 'Laporan\Accounting\RekapKopek::
 $routes->get('/laporan-accounting/rekap-kopek/all', 'Laporan\Accounting\RekapKopek::allTransaksi', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/rekap-kopek/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::LaporanKopekPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/rekap-kopek/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+$routes->get('/laporan-accounting/costing', 'Laporan\Accounting\Costing::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/costing/all', 'Laporan\Accounting\Costing::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/costing/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::LaporanKopekPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/costing/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 // Supplier Lokal BB
 $routes->get('/laporan-supplier-lokal-bb', 'Laporan\Supplier\LaporanSupplierLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\KwitansiTb::index', ['filter' => 'Auth']);
