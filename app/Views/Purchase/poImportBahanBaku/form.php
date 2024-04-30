@@ -903,7 +903,7 @@
                                             reverseButtons: true,
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
-                                            window.location.href = "<?= base_url('po-import-bahan-baku/id/') ?>" + response.id
+                                            window.location.href = "<?= base_url('po-import-bahan-baku') ?>"
                                         })
                                     }
                                 }

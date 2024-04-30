@@ -771,7 +771,7 @@
                                             reverseButtons: true,
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
-                                            window.location.href = "<?= base_url('po-lokal-bahan-penolong/id/') ?>" + response.id
+                                            window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
 
                                         })
                                     }
