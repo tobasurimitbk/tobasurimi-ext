@@ -763,7 +763,7 @@
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            window.location.href = "<?= base_url("penerimaan-barang-lokal-bp"); ?>" + '/id/' + response.id;
+                                            window.location.href = "<?= base_url("penerimaan-barang-lokal-bp"); ?>";
                                         });
                                     } else {
                                         Swal.fire({
@@ -852,7 +852,7 @@
     function drawTable(listData) {
         const table = $('#dataTable');
         table.find('tbody').empty();
-
+        console.log(listData);
         if (listData.length == 0) {
             table.find('tfoot').empty();
             var newRow = $('<tr>');

@@ -7,15 +7,11 @@
     <title>Po Lokal Bahan Baku</title>
     <style>
         body {
-            font-size: 13px;
+            height: 100%;
+            font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        @page {
-            size: 8.27in 5.50in portrait;
-            margin: 29px;
-            padding: 29px;
-        }
 
         .pagebreak {
             clear: both;
@@ -106,6 +102,10 @@
             border: 1px solid black;
         }
 
+        .table-bordered tr {
+            border-bottom: 1px solid black;
+        }
+
         .border-collapse {
             border-collapse: collapse;
         }
@@ -140,24 +140,12 @@
             margin-top: 2rem
         }
 
-        .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 90px;
-        }
 
-
-
-        body {
-            font-size: 13px;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        }
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
+            margin: 29px;
+            padding: 29px;
         }
 
         .header {
@@ -193,6 +181,10 @@
 
         .mt-2 {
             margin-top: 2rem;
+        }
+
+        .mt-3 {
+            margin-top: 3rem;
         }
 
         .border-collapse {
@@ -254,8 +246,8 @@
         }
 
         .footer {
-            position: absolute;
             /* bottom: 0; */
+            position: absolute;
             height: 90px;
         }
 
@@ -362,7 +354,7 @@
                     <?php } ?>
                 </tr>
             </table>
-            <table class="w-100 sign-table border-collapse signed-info footer">
+            <table class="w-100 sign-table border-collapse signed-info footer mt-3">
 
                 <tr>
                     <th>
@@ -441,7 +433,7 @@
             </table>
 
             <div class="w-100">
-                <div class="footer txt-right">
+                <div class="txt-right">
                     <div>Yang Menerima</div>
                     <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
                 </div>
@@ -451,41 +443,40 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    PT TOBASURIMI INDUSTRIES<br>
+                    PT TOBASURIMI INDUSTRIES (<?= $dataPO->companyName ?>)<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
-                <div style="padding: 0.5rem">
-                    Kwitansi Harian<br>
-                    No. PO : <?= $dataPO->po_no ?><br>
-                    Tanggal: <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?>
+                <div style="padding: 0.5rem; text-align: center;">
+                    <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI HARIAN</div>
+                    <div>No: <?= $dataPO->po_no ?></div>
                 </div>
             </div>
 
-            <table class="w-100 mt-2">
+            <table class="w-100">
                 <tr>
-                    <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
-                    <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top; width: 55%;"><?= $dataPO->companyName ?></td>
+                    <td style="vertical-align: top; width: 20%;">Sudah Terima Dari <br> (Received From)</td>
+                    <td style="vertical-align: top; width: 2%;">: </td>
+                    <td style="vertical-align: top; width: 55%; text-transform: uppercase;">PT TOBASURIMI INDUSTRIES (<?= $dataPO->companyName ?>)</td>
                 </tr>
                 <tr>
-                    <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
+                    <td style="vertical-align: top;">Banyaknya Uang <br> (Amount)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;"><?= terbilang(formatter(($nilai_total_harian), "STR_TO_FLOAT")) ?></td>
+                    <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total_harian), "STR_TO_FLOAT"))) ?></td>
                 </tr>
                 <tr>
-                    <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
+                    <td style="vertical-align: top;">Untuk Pembayaran <br> (For Payment)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">PEMBELIAN <?= $dataPO->itemName ?> SEBANYAK <?= $dataPO->totalQty ?> KG DARI <?= $dataPO->supplierName ?></td>
+                    <td style="vertical-align: top;">Pembayaran <?= strtoupper($dataPO->itemName) ?> sebanyak <?= $dataPO->totalQty ?> KG dari <?= strtoupper($dataPO->supplierName) ?></td>
                 </tr>
             </table>
 
-            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
+            <table class="mt-05" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
-                <tr>
+                <tr class="table-bordered">
                     <td>PPh</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
@@ -494,6 +485,7 @@
                         <td class="txt-right">0.00</td>
                     <?php } ?>
                 </tr>
+
                 <tr>
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
@@ -506,7 +498,8 @@
             </table>
 
             <div class="w-100">
-                <div class="footer txt-right">
+                <div class="txt-right">
+                    <div> Medan, <?= $dataPO->po_date ? date("d-M-Y", strtotime($dataPO->po_date)) : ""; ?></div>
                     <div>Yang Menerima</div>
                     <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
                 </div>

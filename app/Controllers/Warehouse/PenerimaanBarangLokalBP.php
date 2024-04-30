@@ -792,7 +792,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 'result' => []
             ]);
         }
-        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, $penerimaanBarangID));
+        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, "LOKAL", "PENOLONG", $penerimaanBarangID));
     }
 
     public function generatePONo()

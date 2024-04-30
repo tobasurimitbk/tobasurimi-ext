@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="<?= base_url(); ?>assets/img/favicon.png" type="image/png" />
     <link href="<?= base_url() ?>assets/css/bootstrap.min.css?v=<?= time(); ?>" rel="stylesheet">
     <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js?v=<?= time(); ?>"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- General CSS Files -->
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap1.min.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/all.css?v=<?= time(); ?>">

@@ -801,7 +801,7 @@ class PenerimaanBarangImportBP extends BaseController
             ]);
         }
 
-        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, $penerimaanBarangID));
+        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, "IMPORT", "PENOLONG", $penerimaanBarangID));
     }
 
     public function dropdownDivisiPOImportBP()

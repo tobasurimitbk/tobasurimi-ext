@@ -396,6 +396,7 @@ $routes->post('/pembayaran-po-import/po-belum-lunas', 'Pembayaran\PembayaranPOIm
 $routes->get('/pembayaran-po-import/all-po', 'Pembayaran\PembayaranPOImport::allPO', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all-riwayat-pembayaran', 'Pembayaran\PembayaranPOImport::allRiwayatPembayaran', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/posting', 'Pembayaran\PembayaranPOImport::posting', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import/print/(:segment)', 'Pembayaran\PembayaranPOImport::print/$1', ['filter' => 'Auth']);
 
 // PEMBAYARAN LAIN LAIN
 $routes->get('/pembayaran-lain', 'Pembayaran\OtherPayment::index', ['filter' => 'Auth']);

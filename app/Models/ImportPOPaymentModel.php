@@ -33,6 +33,7 @@ class ImportPOPaymentModel extends Model
         'payment_date',
         'termin',
         'payment_method',
+        'status_pph',
         'akun_kas',
         'akun_selisih',
         'status_posting',
