@@ -1031,7 +1031,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_adjusment").val(res?.data);
+                        $(".no_adjusment").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

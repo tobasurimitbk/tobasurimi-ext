@@ -175,7 +175,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
                     return `
                         <a class="btn btn-warning" href="<?= base_url(); ?>divisi/bagian/${id}" style="box-shadow: none !important;">
                             Set Bagian
@@ -271,8 +271,8 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".divisi").val(res?.data?.divisi);
-                        $("select[name='jam_kerja_id']").val(res?.data?.jam_kerja_id);
+                        $(".divisi").val(res.data.divisi);
+                        $("select[name='jam_kerja_id']").val(res.data.jam_kerja_id);
                         validator.resetForm();
                         validator.reset();
 

@@ -239,8 +239,8 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $("#nama").val(res?.data?.name);
-                        $(".date_create").val(res?.data?.date);
+                        $("#nama").val(res.data.name);
+                        $(".date_create").val(res.data.date);
 
                         $(".add-modal").modal("show")
                     } else {

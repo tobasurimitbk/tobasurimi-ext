@@ -1043,7 +1043,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_tanda_terima_faktur").val(res?.data);
+                        $(".no_tanda_terima_faktur").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

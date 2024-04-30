@@ -648,18 +648,18 @@
                 success: function(res) {
                     if (res.data) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
-                        $(".address").val(res?.data?.address);
-                        $(".no_npwp").val(res?.data?.no_npwp);
-                        $(".phone").val(res?.data?.phone);
+                        $(".name").val(res.data.name);
+                        $(".address").val(res.data.address);
+                        $(".no_npwp").val(res.data.no_npwp);
+                        $(".phone").val(res.data.phone);
 
-                        $(".contact_person").val(res?.data?.contact_person);
-                        $(".email").val(res?.data?.email);
-                        $(".parent_postal_code").val(res?.data?.postal_code);
-                        $(".province_parent_id").val(res?.data?.province_id).change();
-                        $(".piutang").val(res?.data?.piutang).change();
+                        $(".contact_person").val(res.data.contact_person);
+                        $(".email").val(res.data.email);
+                        $(".parent_postal_code").val(res.data.postal_code);
+                        $(".province_parent_id").val(res.data.province_id).change();
+                        $(".piutang").val(res.data.piutang).change();
 
-                        $(".nik").val(res?.data?.nik);
+                        $(".nik").val(res.data.nik);
 
 
                         validator.resetForm();
@@ -685,7 +685,7 @@
                                     $(".termin").append(`<option value="${item.id}">${item.value}</option>`)
                                 })
 
-                                $(".termin").val(res?.data?.termin).change();
+                                $(".termin").val(res.data.termin).change();
                             }
                         })
 
@@ -709,13 +709,13 @@
                                     $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
                                 })
 
-                                $(".currency").attr('disabled', true).val(res?.data?.currency).change();
+                                $(".currency").attr('disabled', true).val(res.data.currency).change();
                             }
                         })
 
                         // AJAX GET CITY
                         $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
                             method: "GET",
                             beforeSend: function() {
                                 setLoading();
@@ -732,7 +732,7 @@
                                     $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name.toUpperCase()}</option>`)
                                 })
 
-                                $(".city_parent_id").val(res?.data?.city_id).change();
+                                $(".city_parent_id").val(res.data.city_id).change();
                             }
                         })
 
@@ -756,7 +756,7 @@
                                     $(".tipe_pelanggan").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
                                 })
 
-                                $(".tipe_pelanggan").val(res?.data?.tipe_pelanggan).change();
+                                $(".tipe_pelanggan").val(res.data.tipe_pelanggan).change();
                                 $(".add-modal").modal("show");
                             }
                         })

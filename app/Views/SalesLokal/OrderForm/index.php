@@ -268,7 +268,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
                     return `
                 <button data-toggle="tooltip" title="Histori Harga Barang" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                     <i class="fa-solid fa-clock-rotate-left"></i>

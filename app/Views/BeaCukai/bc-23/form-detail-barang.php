@@ -571,7 +571,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `<button type="button" class="btn btn-danger" onclick="removePungutan('${row?.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
+                    return `<button type="button" class="btn btn-danger" onclick="removePungutan('${row.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                 }
             }
 
@@ -628,10 +628,10 @@
                 width: "5%",
                 searchable: false,
                 render: function(data, type, row) {
-                    var is_used = row?.is_used;
-                    var seri_dokumen = row?.seri_dokumen;
-                    var barang_dokumen_id = row?.barang_dokumen_id;
-                    var bc_dokumen_id = row?.bc_dokumen_id;
+                    var is_used = row.is_used;
+                    var seri_dokumen = row.seri_dokumen;
+                    var barang_dokumen_id = row.barang_dokumen_id;
+                    var bc_dokumen_id = row.bc_dokumen_id;
                     if (is_used) {
                         // delete
                         return `

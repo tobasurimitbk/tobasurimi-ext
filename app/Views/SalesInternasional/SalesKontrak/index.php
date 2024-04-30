@@ -162,9 +162,9 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let status_posting = row?.status_posting;
-                    let status_closed = row?.status_closed;
+                    let id = row.id;
+                    let status_posting = row.status_posting;
+                    let status_closed = row.status_closed;
 
                     if (status_posting === "0") {
                         return `

@@ -109,7 +109,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let kimia = row?.kimia;
+                    let kimia = row.kimia;
                     if (kimia != 1) {
                         return `
                                 <div class="mt-0">

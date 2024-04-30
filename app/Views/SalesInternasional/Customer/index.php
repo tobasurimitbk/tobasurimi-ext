@@ -279,9 +279,9 @@
                 success: function(res) {
                     if (res.data) {
                         $(".internasional_id").val(id);
-                        $(".name").val(res?.data?.name);
-                        $(".address").val(res?.data?.address);
-                        $(".country_id").val(res?.data?.country_id).change();
+                        $(".name").val(res.data.name);
+                        $(".address").val(res.data.address);
+                        $(".country_id").val(res.data.country_id).change();
                         validatorInternasional.resetForm();
                         validatorInternasional.reset();
 

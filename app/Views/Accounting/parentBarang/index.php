@@ -240,9 +240,9 @@
                     if (res.status) {
                         console.log(res);
                         $("#id").val(id);
-                        $("#parentName").val(res?.data?.barang_name);
-                        $("#akun_ap_id").val(res?.data?.ap_id).change();
-                        $("#akun_ar_id").val(res?.data?.ar_id).change();
+                        $("#parentName").val(res.data.barang_name);
+                        $("#akun_ap_id").val(res.data.ap_id).change();
+                        $("#akun_ar_id").val(res.data.ar_id).change();
                         $('.add-modal').modal('show');
                     } else {
                         Swal.fire({

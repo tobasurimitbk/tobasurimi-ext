@@ -613,10 +613,10 @@
                 data: "status",
                 className: "text-center actions",
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
                     return `
                     <div class="">
-                        <button data-no="${row?.no}" data-id="${row?.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                        <button data-no="${row.no}" data-id="${row.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
                     </div>
                 `
                 }
@@ -1725,7 +1725,7 @@
                         if (item.id == id_barang) {
                             valData = item.id_barang
                         }
-                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${idWarehouse}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id_barang}" value="${item.id_barang}" ${item.id_barang==id_barang?'selected':''}>${item.nama_barang}</option>`);
+                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-satuan="${item.nama_satuan}" data-warehouse_id="${idWarehouse}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id_barang}" value="${item.id_barang}" ${item.id_barang==id_barang?'selected':''}>${item.nama_barang}</option>`);
                     })
 
                     $(".id_barang").val(valData).change();
@@ -2228,7 +2228,7 @@
                 $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
 
                 res.dataBarang.forEach(function(item) {
-                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-tax="${+item.tax}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-tax="${+item.tax}" data-satuan="${item.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
                 })
 
                 $(".id_barang").val("").change();

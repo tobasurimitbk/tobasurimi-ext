@@ -239,8 +239,8 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if (res?.status) {
-                        $(".kode").val(res?.data)
+                    if (res.status) {
+                        $(".kode").val(res.data)
                         $(".add-modal").modal("show");
                     } else {
                         Swal.fire({
@@ -274,12 +274,12 @@
                         validator.reset();
 
                         $(".id").val(id);
-                        $(".kode").val(res?.data?.kode);
-                        $(".name").val(res?.data?.name);
-                        $(".address").val(res?.data?.address);
-                        $(".fax").val(res?.data?.fax);
-                        $(".phone").val(res?.data?.phone);
-                        $(".contact_person").val(res?.data?.contact_person);
+                        $(".kode").val(res.data.kode);
+                        $(".name").val(res.data.name);
+                        $(".address").val(res.data.address);
+                        $(".fax").val(res.data.fax);
+                        $(".phone").val(res.data.phone);
+                        $(".contact_person").val(res.data.contact_person);
 
                         $(".add-modal").modal("show");
 

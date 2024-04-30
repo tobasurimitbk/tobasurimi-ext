@@ -152,9 +152,9 @@
             searchable: false,
             sortable: false,
             render: function(data, type, row) {
-                let id = row?.id;
-                let status = row?.status;
-                let used = row?.used;
+                let id = row.id;
+                let status = row.status;
+                let used = row.used;
                 if (status == "NEW") {
                     if (used == "NOT USED") {
                         return `

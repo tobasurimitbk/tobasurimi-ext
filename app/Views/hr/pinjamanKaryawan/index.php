@@ -322,10 +322,10 @@
             //     width: "5%",
             //     searchable: false,
             //     render: function(data, type, row) {
-            //         let id = row?.id;
-            //         let is_boleh_minjam = row?.isBolehMinjam;
-            //         let employeeName = row?.name;
-            //         let status_pinjaman = row?.statusPinjaman;
+            //         let id = row.id;
+            //         let is_boleh_minjam = row.isBolehMinjam;
+            //         let employeeName = row.name;
+            //         let status_pinjaman = row.statusPinjaman;
             //         if (status_pinjaman == 1) {
             //             return '-';
             //         } else {
@@ -363,8 +363,8 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let startDate = row?.mulaiAbsen;
-                    let endDate = row?.selesaiAbsen;
+                    let startDate = row.mulaiAbsen;
+                    let endDate = row.selesaiAbsen;
                     return startDate + ' - ' + endDate;
                 }
             },
@@ -382,10 +382,10 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let nominalPinjaman = row?.nominalPinjaman;
-                    let is_boleh_minjam = row?.isBolehMinjam;
-                    let status_pinjaman = row?.statusPinjaman;
-                    let id = row?.id;
+                    let nominalPinjaman = row.nominalPinjaman;
+                    let is_boleh_minjam = row.isBolehMinjam;
+                    let status_pinjaman = row.statusPinjaman;
+                    let id = row.id;
                     return formatRupiah(nominalPinjaman);
                 }
             },
@@ -396,8 +396,8 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let is_boleh_minjam = row?.isBolehMinjam;
-                    let status_pinjaman = row?.statusPinjaman;
+                    let is_boleh_minjam = row.isBolehMinjam;
+                    let status_pinjaman = row.statusPinjaman;
                     let htmlRes = '';
 
                     if (is_boleh_minjam == 0) {
@@ -429,14 +429,14 @@
             //         searchable: false,
             //         sortable: false,
             //         render: function(data, type, row) {
-            //             let employeeID = row?.employeeID;
-            //             let employeeName = row?.name;
-            //             let yearMonth = row?.monthYear;
-            //             let startDate = row?.mulaiAbsen;
-            //             let finishDate = row?.selesaiAbsen;
-            //             let tipeGol = row?.tipeGol;
-            //             let status_pinjaman = row?.statusPinjaman;
-            //             let id = row?.id;
+            //             let employeeID = row.employeeID;
+            //             let employeeName = row.name;
+            //             let yearMonth = row.monthYear;
+            //             let startDate = row.mulaiAbsen;
+            //             let finishDate = row.selesaiAbsen;
+            //             let tipeGol = row.tipeGol;
+            //             let status_pinjaman = row.statusPinjaman;
+            //             let id = row.id;
 
             //             if (status_pinjaman == 1) {
             //                 return '-';

@@ -197,8 +197,8 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id_nobukti").val(id);
-                        $(".nama_tipe_transaksi").val(res?.data?.value);
-                        $(".no_bukti").val(res?.data?.description);
+                        $(".nama_tipe_transaksi").val(res.data.value);
+                        $(".no_bukti").val(res.data.description);
 
                         validator_nobukti.resetForm();
                         validator_nobukti.reset();

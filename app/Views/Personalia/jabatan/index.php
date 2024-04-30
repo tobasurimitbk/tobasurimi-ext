@@ -192,7 +192,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".jabatan_name").val(res?.data?.jabatan_name);
+                        $(".jabatan_name").val(res.data.jabatan_name);
 
                         $(".add-modal").modal("show")
                     } else {

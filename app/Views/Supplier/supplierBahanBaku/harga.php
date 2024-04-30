@@ -192,12 +192,12 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let bahan_baku = row?.bahan_baku;
-                    let spesifikasi_id = row?.spesifikasi_id;
-                    let harga_umum = row?.harga_umum_normal;
-                    let harga_bulanan = row?.harga_bulanan_normal;
-                    let harga_harian = row?.harga_harian_normal;
+                    let id = row.id;
+                    let bahan_baku = row.bahan_baku;
+                    let spesifikasi_id = row.spesifikasi_id;
+                    let harga_umum = row.harga_umum_normal;
+                    let harga_bulanan = row.harga_bulanan_normal;
+                    let harga_harian = row.harga_harian_normal;
 
                     return `
                         <button class="btn btn-warning posting-spp mr-1 edit-table-detail" 

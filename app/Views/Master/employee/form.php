@@ -302,7 +302,7 @@
                     table.find('tbody').empty();
                     var komponenGaji = response.komponenGaji;
 
-                    if (komponenGaji.length == 0 && response.divisi?.divisi != null) {
+                    if (komponenGaji.length == 0 && response.divisi.divisi != null) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Ups, Divisi ' + response.divisi.divisi + ' komponen gajinya belum diatur :)',
@@ -756,7 +756,7 @@
                     table.find('tbody').empty();
                     var komponenGaji = response.komponenGaji;
 
-                    if (komponenGaji.length == 0 && response.divisi?.divisi != null) {
+                    if (komponenGaji.length == 0 && response.divisi.divisi != null) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Ups, Divisi ' + response.divisi.divisi + ' komponen gajinya belum diatur :)',

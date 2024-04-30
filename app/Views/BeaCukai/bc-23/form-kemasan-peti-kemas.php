@@ -283,7 +283,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `<button type="button" class="btn btn-danger" onclick="removeKemasan('${row?.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
+                    return `<button type="button" class="btn btn-danger" onclick="removeKemasan('${row.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                 }
             }
 
@@ -372,7 +372,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `<button type="button" class="btn btn-danger" onclick="removeKontainer('${row?.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
+                    return `<button type="button" class="btn btn-danger" onclick="removeKontainer('${row.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                 }
             }
 

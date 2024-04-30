@@ -188,14 +188,14 @@
             searchable: false,
             sortable: false,
             render: function(data, type, row) {
-                let id = row?.id;
-                let no_kwitansi_hash = row?.no_kwitansi_hash;
-                let tanggal = row?.tanggal;
+                let id = row.id;
+                let no_kwitansi_hash = row.no_kwitansi_hash;
+                let tanggal = row.tanggal;
                 let year = $(".year").val();
                 let month = $(".month").val();
 
 
-                if (row?.is_print == "0") {
+                if (row.is_print == "0") {
                     return '-';
                 } else {
 

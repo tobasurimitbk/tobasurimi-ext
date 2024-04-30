@@ -478,7 +478,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
                     return `
                 <div class="mt-0">
                 <label class="switch">
@@ -813,8 +813,8 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id_kategori").val(id);
-                        $(".kode_akun_kategori").val(res?.data?.no_kategori);
-                        $(".nama_akun_kategori").val(res?.data?.nama_kategori);
+                        $(".kode_akun_kategori").val(res.data.no_kategori);
+                        $(".nama_akun_kategori").val(res.data.nama_kategori);
 
                         validator_kategori.resetForm();
                         validator_kategori.reset();
@@ -833,12 +833,12 @@
                         //             $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
                         //         })
 
-                        //         $(".kelompok_akun_id_kategori").val(res?.data?.kelompok_id).change();
+                        //         $(".kelompok_akun_id_kategori").val(res.data.kelompok_id).change();
                         //         $(".add-modal-kategori").modal("show")
                         //     }
                         // })
                         $('.kelompok_akun_id_kategori').select2(select2kelompok_akun);
-                        const $apOption = $("<option selected='selected'></option>").val(res?.data?.kelompok_id).text(res?.data?.meta_name);
+                        const $apOption = $("<option selected='selected'></option>").val(res.data.kelompok_id).text(res.data.meta_name);
                         $(".kelompok_akun_id_kategori").append($apOption).trigger('change');
                         $(".add-modal-kategori").modal("show")
 
@@ -867,15 +867,15 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id_header").val(id);
-                        $(".kode_akun_header").val(res?.data?.no_header);
-                        $(".nama_akun_header").val(res?.data?.nama_header);
+                        $(".kode_akun_header").val(res.data.no_header);
+                        $(".nama_akun_header").val(res.data.nama_header);
 
                         validator_header.resetForm();
                         validator_header.reset();
 
                         $('.category_id_header').select2(select2categori_id_header);
 
-                        const $apOption = $("<option selected='selected'></option>").val(res.data.kategori_id).text(res?.data?.nama_kategori);
+                        const $apOption = $("<option selected='selected'></option>").val(res.data.kategori_id).text(res.data.nama_kategori);
                         $(".category_id_header").append($apOption).trigger('change');
                         $(".add-modal-header").modal("show")
                     } else {
@@ -903,10 +903,10 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id_sub").val(id);
-                        $(".category_id_sub").val(res?.data?.kategori_id);
-                        $(".kode_akun_sub").val(res?.data?.no_sub);
-                        $(".nama_akun_sub").val(res?.data?.nama_sub);
-                        $(".status_sub").prop("checked", res?.data?.status === "Aktif" ? true : false);
+                        $(".category_id_sub").val(res.data.kategori_id);
+                        $(".kode_akun_sub").val(res.data.no_sub);
+                        $(".nama_akun_sub").val(res.data.nama_sub);
+                        $(".status_sub").prop("checked", res.data.status === "Aktif" ? true : false);
 
                         validator_sub.resetForm();
                         validator_sub.reset();
@@ -922,11 +922,11 @@
                         //             $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
                         //         })
 
-                        //         $(".header_id_sub").val(res?.data?.header_id).change();
+                        //         $(".header_id_sub").val(res.data.header_id).change();
                         //     }
                         // })
                         $('.header_id_sub').select2(select2header_id_sub);
-                        const $apOption = $("<option selected='selected'></option>").val(res?.data?.header_id).text(res?.data?.nama_header);
+                        const $apOption = $("<option selected='selected'></option>").val(res.data.header_id).text(res.data.nama_header);
                         $(".header_id_sub").append($apOption).trigger('change');
 
                         $.ajax({
@@ -943,7 +943,7 @@
                                     $(".coa_id_sub").append(`<option value="${item.id}">${item.value}</option>`)
                                 })
 
-                                $(".coa_id_sub").val(res?.data?.coa_id).change();
+                                $(".coa_id_sub").val(res.data.coa_id).change();
                                 $(".add-modal-sub").modal("show")
                             }
                         })

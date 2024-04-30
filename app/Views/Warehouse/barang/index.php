@@ -789,7 +789,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        // let new_spek = JSON.parse(res?.data?.spek);
+                        // let new_spek = JSON.parse(res.data.spek);
                         // let tag_html = "";
                         // console.log(new_spek);
                         // new_spek.forEach((item) => {
@@ -812,18 +812,18 @@
                         // $(".body-detail-spek").append(tag_html)
 
                         $(".id").val(id);
-                        $('.parent').val(res?.data?.parent_id);
+                        $('.parent').val(res.data.parent_id);
                         $('.kode_barang').rules('remove', 'required');
-                        if (res?.data?.spec_type == 'multi') {
+                        if (res.data.spec_type == 'multi') {
                             $(".inlineRadio1").attr("disabled", true);
                             $(".inlineRadio2").removeAttr('disabled');
                         }
 
-                        if (res?.data?.spec_type == 'single') {
+                        if (res.data.spec_type == 'single') {
                             $(".inlineRadio2").attr("disabled", true);
                             $(".inlineRadio1").removeAttr('disabled');
                         }
-                        if (res?.data?.parent_id !== "0" || res?.data?.spec_type == 'single') {
+                        if (res.data.parent_id !== "0" || res.data.spec_type == 'single') {
                             $(".is_parent").css("display", "");
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('add', {
@@ -847,12 +847,12 @@
                             // $('.pph').rules('remove', 'required');
                         }
 
-                        $(`[name="productSpec"][value="${res?.data?.spec_type}"]`).prop('checked', true);
-                        $(".kode_barang").val(res?.data?.kode_barang);
-                        $(".spek").val(res?.data?.spek);
-                        $(".nama_barang").val(res?.data?.nama_barang);
-                        $(".stok").val(res?.data?.stok);
-                        $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
+                        $(`[name="productSpec"][value="${res.data.spec_type}"]`).prop('checked', true);
+                        $(".kode_barang").val(res.data.kode_barang);
+                        $(".spek").val(res.data.spek);
+                        $(".nama_barang").val(res.data.nama_barang);
+                        $(".stok").val(res.data.stok);
+                        $(".harga_barang").val(res.data.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
                         $('#ppn').val(res.data.ppn);
                         $('#pph').val(res.data.pph);
 
@@ -866,7 +866,7 @@
                         //         $(".parent_id").empty()
                         //         $(".parent_id").append(`<option value=""></option>`)
                         //         result.data.forEach(function(item) {
-                        //             if(item.id == Number(res?.data?.parent_id))
+                        //             if(item.id == Number(res.data.parent_id))
                         //             {
                         //                 $(".parent_id").append(`<option selected value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
                         //             }
@@ -878,10 +878,10 @@
                         //     }
                         // })
 
-                        $('.parent_id').val(res?.data?.parent_id).change();
+                        $('.parent_id').val(res.data.parent_id).change();
 
-                        $(".ap_id").val(res?.data?.ap_id).change();
-                        $(".ar_id").val(res?.data?.ar_id).change();
+                        $(".ap_id").val(res.data.ap_id).change();
+                        $(".ar_id").val(res.data.ar_id).change();
                         /* $.ajax({
                             url: `<?= base_url("ap-ar/dropdown"); ?>`,
                             method: "GET",
@@ -898,20 +898,20 @@
                                     $(".ar_id").append(`<option value="${item.id}">[${item.no_sub}]${item.nama_sub}</option>`)
                                 })
 
-                                $(".ap_id").val(res?.data?.ap_id).change();
-                                $(".ar_id").val(res?.data?.ar_id).change();
+                                $(".ap_id").val(res.data.ap_id).change();
+                                $(".ar_id").val(res.data.ar_id).change();
                             }
                         }) */
 
                         $(".supplier_id").empty()
-                        $(".type").val(res?.data?.type)
+                        $(".type").val(res.data.type)
 
                         let arr_supplier_id = []
-                        res?.dataSupplier.forEach(function(item) {
+                        res.dataSupplier.forEach(function(item) {
                             arr_supplier_id.push(Number(item.supplier_id));
                         })
 
-                        if (res?.data?.type === "BAHAN BAKU LOKAL") {
+                        if (res.data.type === "BAHAN BAKU LOKAL") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
                                 method: "GET",
@@ -927,7 +927,7 @@
                                 }
                             })
                         }
-                        if (res?.data?.type === "BAHAN BAKU IMPORT") {
+                        if (res.data.type === "BAHAN BAKU IMPORT") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
                                 method: "GET",
@@ -943,7 +943,7 @@
                                 }
                             })
                         }
-                        if (res?.data?.type === "BAHAN PENOLONG LOKAL") {
+                        if (res.data.type === "BAHAN PENOLONG LOKAL") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
                                 method: "GET",
@@ -959,7 +959,7 @@
                                 }
                             })
                         }
-                        if (res?.data?.type === "BAHAN PENOLONG IMPORT") {
+                        if (res.data.type === "BAHAN PENOLONG IMPORT") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
                                 method: "GET",
@@ -976,8 +976,8 @@
                             })
                         }
 
-                        $(".satuan_id").val(res?.data?.satuan_id).change();
-                        $(".hs_id").val(res?.data?.hs_id).change();
+                        $(".satuan_id").val(res.data.satuan_id).change();
+                        $(".hs_id").val(res.data.hs_id).change();
                         changeParent = true;
                         $(".add-modal").modal("show")
                         /* $.ajax({
@@ -993,7 +993,7 @@
                                     $(".satuan_id").append(`<option value="${item.id}">${item.nama_satuan}</option>`)
                                 })
 
-                                $(".satuan_id").val(res?.data?.satuan_id).change();
+                                $(".satuan_id").val(res.data.satuan_id).change();
                             }
                         })
 
@@ -1010,7 +1010,7 @@
                                     $(".hs_id").append(`<option value="${item.id}">${item.code}</option>`)
                                 })
 
-                                $(".hs_id").val(res?.data?.hs_id).change();
+                                $(".hs_id").val(res.data.hs_id).change();
                                 changeParent = true;
                                 $(".add-modal").modal("show")
                             }

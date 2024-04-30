@@ -661,10 +661,10 @@
                     dataType: "json",
                     success: function(res) {
                         if (res.status) {
-                            $(".divisi_id").val(res?.data?.divisi_id)
-                            // $(".note").val(res?.data?.note)
-                            $(".divisi").val(res?.data?.divisiName)
-                            $(".company").val(res?.data?.companyName)
+                            $(".divisi_id").val(res.data.divisi_id)
+                            // $(".note").val(res.data.note)
+                            $(".divisi").val(res.data.divisiName)
+                            $(".company").val(res.data.companyName)
 
                             let new_list_items = []
                             let tag_html = "";
@@ -678,7 +678,7 @@
 
                             $(".body-detail-table").empty()
 
-                            res?.detail.map(item => {
+                            res.detail.map(item => {
                                 tag_html += `<tr>`;
                                 tag_html += `<td>`;
                                 tag_html += row + 1;

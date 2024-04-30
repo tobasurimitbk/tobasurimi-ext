@@ -806,7 +806,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_mutasi").val(res?.data);
+                        $(".no_mutasi").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

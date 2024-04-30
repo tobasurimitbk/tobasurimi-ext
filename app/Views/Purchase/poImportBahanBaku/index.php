@@ -199,11 +199,11 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let status = row?.is_posted
-                    let status_penerimaan = row?.status_penerimaan
-                    let purchase_request_id = row?.purchase_request_id
-                    let un_posting = row?.un_posting;
+                    let id = row.id;
+                    let status = row.is_posted
+                    let status_penerimaan = row.status_penerimaan
+                    let purchase_request_id = row.purchase_request_id
+                    let un_posting = row.un_posting;
 
                     // jika belum posting
                     if (status !== "1") {

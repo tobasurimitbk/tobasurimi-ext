@@ -791,8 +791,8 @@
                         $(".barang_id").val('').change()
                         $(".barang_id").empty()
                         $(".barang_id").append(`<option value=""></option>`)
-                        res?.data?.map((item) => {
-                            $(".barang_id").append(`<option value="${item?.id}">${item?.barang_name}</option>`)
+                        res.data.map((item) => {
+                            $(".barang_id").append(`<option value="${item.id}">${item.barang_name}</option>`)
                         })
                     }
                 })

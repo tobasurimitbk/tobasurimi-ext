@@ -164,8 +164,8 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let status = row?.status_posting
+                    let id = row.id;
+                    let status = row.status_posting
 
                     if (status === "0") {
                         return `

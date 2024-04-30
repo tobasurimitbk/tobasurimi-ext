@@ -146,8 +146,8 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let is_used = row?.is_used;
+                    let id = row.id;
+                    let is_used = row.is_used;
                     if (is_used) {
                         return `
                         <div class="mt-0">

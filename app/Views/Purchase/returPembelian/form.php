@@ -210,7 +210,7 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    $(".retur_no").val(res?.data);
+                    $(".retur_no").val(res.data);
                 }
             })
         } else {
