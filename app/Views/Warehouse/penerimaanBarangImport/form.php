@@ -860,7 +860,7 @@
                     dataType: "json",
                     success: function(res) {
                         if (res.status) {
-                            $(".no_penerimaan_barang").val(res?.data);
+                            $(".no_penerimaan_barang").val(res.data);
                         }
                     }
                 })
@@ -1809,7 +1809,7 @@
             $(".foot-detail-table").append(tag_total);
 
             if ($(".tipe_bahan").val() === "BAKU") {
-                arr?.forEach((items) => {
+                arr.forEach((items) => {
                     $.ajax({
                         url: `<?= base_url("po-import-bahan-baku/multi/dropdown"); ?>`,
                         method: "GET",
@@ -1977,7 +1977,7 @@
                 })
             }
             if ($(".tipe_bahan").val() === "PENOLONG") {
-                arr?.forEach((items) => {
+                arr.forEach((items) => {
                     $.ajax({
                         url: `<?= base_url("po-import-bahan-penolong/multi/dropdown"); ?>`,
                         method: "GET",
@@ -2272,7 +2272,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_penerimaan_barang").val(res?.data);
+                        $(".no_penerimaan_barang").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

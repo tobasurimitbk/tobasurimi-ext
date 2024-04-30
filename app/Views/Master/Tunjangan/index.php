@@ -250,22 +250,22 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $("#nama").val(res?.data?.name);
-                        $("select[name='tipe']").val(res?.data?.tipe);
+                        $("#nama").val(res.data.name);
+                        $("select[name='tipe']").val(res.data.tipe);
 
-                        if (res?.data?.is_gaji_harian) {
+                        if (res.data.is_gaji_harian) {
                             $("#isGajiPokokPerHari").prop('checked', true);
                         } else {
                             $("#isGajiPokokPerHari").prop('checked', false);
                         }
 
-                        if (res?.data?.is_cadangan) {
+                        if (res.data.is_cadangan) {
                             $("#isCadangan").prop('checked', true);
                         } else {
                             $("#isCadangan").prop('checked', false);
                         }
 
-                        if (res?.data?.tipe == "PLUS") {
+                        if (res.data.tipe == "PLUS") {
                             $('#isGajiPokokPerHariForm').show();
                             $('#isCadanganForm').show();
                         } else {

@@ -215,8 +215,8 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".kode_satuan").val(res?.data?.kode_satuan);
-                        $(".nama_satuan").val(res?.data?.nama_satuan);
+                        $(".kode_satuan").val(res.data.kode_satuan);
+                        $(".nama_satuan").val(res.data.nama_satuan);
 
                         validator.resetForm();
                         validator.reset();

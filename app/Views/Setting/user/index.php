@@ -954,16 +954,16 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.nip + " - " + res?.data?.name);
-                        $(".username").val(res?.data?.username);
-                        $(".status").val(res?.data?.status);
+                        $(".name").val(res.data.nip + " - " + res.data.name);
+                        $(".username").val(res.data.username);
+                        $(".status").val(res.data.status);
 
                         $(".body-detail-table").empty()
                         row = 0;
                         company_role = []
                         let tag_html = ""
 
-                        res?.company_role.map((item) => {
+                        res.company_role.map((item) => {
                             tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
                             tag_html += "<td>";
                             tag_html += item.company_name;

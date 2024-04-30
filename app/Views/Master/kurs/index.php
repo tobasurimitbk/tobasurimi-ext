@@ -405,10 +405,10 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".nilai_kurs").val(Number(res?.data?.nilai_kurs).toLocaleString());
+                        $(".nilai_kurs").val(Number(res.data.nilai_kurs).toLocaleString());
 
-                        let start_date = res?.data?.start_date;
-                        let end_date = res?.data?.end_date;
+                        let start_date = res.data.start_date;
+                        let end_date = res.data.end_date;
 
                         if (start_date) {
                             let split_start_date = start_date.split("-")
@@ -437,7 +437,7 @@
                                     $(".metadata_id").append(`<option value="${item.id}" data-id="${item.id}">${item.value}</option>`)
                                 })
 
-                                $(".metadata_id").val(res?.data?.metadata_id).change();
+                                $(".metadata_id").val(res.data.metadata_id).change();
                                 $(".add-modal").modal("show")
                             }
                         })

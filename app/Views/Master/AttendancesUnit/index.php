@@ -274,11 +274,11 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $("#nama").val(res?.data?.name);
-                        $("#ip").val(res?.data?.ip);
-                        $("#unit_key").val(res?.data?.unit_key);
+                        $("#nama").val(res.data.name);
+                        $("#ip").val(res.data.ip);
+                        $("#unit_key").val(res.data.unit_key);
                         //document.getElementById("master").checked = true;
-                        if (res?.data?.master == '1')
+                        if (res.data.master == '1')
                             $('#master').attr('checked', true);
                         else
                             $('#master').attr('checked', false);

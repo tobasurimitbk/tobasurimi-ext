@@ -109,7 +109,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
 
                     return `
                     <div class="mt-0">

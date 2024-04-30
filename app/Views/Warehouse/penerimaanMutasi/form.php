@@ -573,7 +573,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".penerimaan_mutasi_no").val(res?.data);
+                        $(".penerimaan_mutasi_no").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

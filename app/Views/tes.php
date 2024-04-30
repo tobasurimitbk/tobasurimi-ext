@@ -125,53 +125,53 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Employee</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end mb-3">
-            <div class="form-group col-md-3">
-                <input class="form-control search" placeholder="Search" value="" />
-            </div>
-            <div class="form-group col-md-3">
-                <select class="form-select tes_id" name="tes_id" id="tes_id" aria-label="Floating label select example">
-                    <option value=""></option>
-                    <?php
-                    if (!empty($dataDivisi)) {
-                        foreach ($dataDivisi as $divisi) {
-                    ?>
-                            <option value="<?= $divisi->id; ?>"><?= $divisi->divisi; ?></option>
-                    <?php
+    <div class="section-header">
+        <h1>Employee</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="form-group col-md-3">
+                    <input class="form-control search" placeholder="Search" value="" />
+                </div>
+                <div class="form-group col-md-3">
+                    <select class="form-select tes_id" name="tes_id" id="tes_id" aria-label="Floating label select example">
+                        <option value=""></option>
+                        <?php
+                        if (!empty($dataDivisi)) {
+                            foreach ($dataDivisi as $divisi) {
+                        ?>
+                                <option value="<?= $divisi->id; ?>"><?= $divisi->divisi; ?></option>
+                        <?php
+                            }
                         }
-                    }
-                    ?>
-                </select>
+                        ?>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>NIP</th>
-                            <th>Nama Lengkap</th>
-                            <th>Divisi</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>NIP</th>
+                                <th>Nama Lengkap</th>
+                                <th>Divisi</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -542,17 +542,17 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".division_id").val(res?.data?.division_id);
-                        $(".address").val(res?.data?.address);
-                        $(".acc_no").val(res?.data?.acc_no);
-                        $(".dob").val(res?.data?.dob);
-                        $(".email").val(res?.data?.email);
-                        $(".gender").val(res?.data?.gender);
-                        $(".name").val(res?.data?.name);
-                        $(".nip").val(res?.data?.nip);
-                        $(".phone_no").val(res?.data?.phone_no);
-                        $(".status").val(res?.data?.status);
-                        document.getElementById("preview_photo").src = res?.data?.employee_img;
+                        $(".division_id").val(res.data.division_id);
+                        $(".address").val(res.data.address);
+                        $(".acc_no").val(res.data.acc_no);
+                        $(".dob").val(res.data.dob);
+                        $(".email").val(res.data.email);
+                        $(".gender").val(res.data.gender);
+                        $(".name").val(res.data.name);
+                        $(".nip").val(res.data.nip);
+                        $(".phone_no").val(res.data.phone_no);
+                        $(".status").val(res.data.status);
+                        document.getElementById("preview_photo").src = res.data.employee_img;
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")
@@ -576,12 +576,15 @@
     }
 
 
-// error di barang/all karena masking total_harga
-// error saat patch purchaseOrder
-// purchaseRequest/approve/15 purchase request not found (username: director password: 123123)
-1. barang/all newData is not defined
-2. purchaseRequest/approve purchase request is not found
-3. patch purchaseOrder hanya mengirim {'is_posted': true} purchaseRequestData is not defined
+    // error di barang/all karena masking total_harga
+    // error saat patch purchaseOrder
+    // purchaseRequest/approve/15 purchase request not found (username: director password: 123123)
+    1. barang / all newData is not defined
+    2. purchaseRequest / approve purchase request is not found
+    3. patch purchaseOrder hanya mengirim {
+        'is_posted': true
+    }
+    purchaseRequestData is not defined
 </script>
 - Divisi jam kerja ditakeout
 - Karyawan form Label anak diganti jadi jumlah anak

@@ -834,10 +834,10 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".name").val(res?.data?.name);
-                        $(".username").val(res?.data?.username);
-                        $(".employee_id").val(res?.data?.employee_id);
-                        $(".status").val(res?.data?.status);
+                        $(".name").val(res.data.name);
+                        $(".username").val(res.data.username);
+                        $(".employee_id").val(res.data.employee_id);
+                        $(".status").val(res.data.status);
 
                         $(".body-detail-table").empty()
                         row = 0;

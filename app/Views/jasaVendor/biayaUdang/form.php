@@ -766,7 +766,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_pembayaran").val(res?.data);
+                        $(".no_pembayaran").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

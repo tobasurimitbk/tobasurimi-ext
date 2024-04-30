@@ -313,8 +313,8 @@
             success: function(res) {
                 if (res.status) {
                     $(".id").val(id);
-                    $("#golonganName").val(res?.data?.golongan_name);
-                    $("#nominalPinjaman").val(formatRupiah(res?.data?.nominal_pinjaman));
+                    $("#golonganName").val(res.data.golongan_name);
+                    $("#nominalPinjaman").val(formatRupiah(res.data.nominal_pinjaman));
 
                     $(".add-modal").modal("show")
                 }

@@ -209,8 +209,8 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".nomor").val(res?.data?.nomor);
-                        $(".rak").val(res?.data?.rak);
+                        $(".nomor").val(res.data.nomor);
+                        $(".rak").val(res.data.rak);
 
                         $(".add-modal").modal("show")
                     } else {

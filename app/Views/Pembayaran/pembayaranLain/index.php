@@ -273,9 +273,9 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
                     let form = '';
-                    let status_posting = row?.status_posting;
+                    let status_posting = row.status_posting;
 
                     form += ` <div class="mt-0">`;
                     if (status_posting == '0') {
@@ -497,19 +497,19 @@
                 success: function(res) {
                     if (res.status) {
                         resetForm();
-                        $('#id').val(res?.data?.id);
-                        $("#no_pembayaran").val(res?.data?.no_pembayaran);
-                        $('#tanggal').val(res?.data?.tanggal);
-                        $('#divisi_id').val(res?.data?.divisi_id).change();
-                        $('#bayar_ke').val(res?.data?.bayar_ke);
-                        $('#valas').val(res?.data?.valas).change();
-                        $('#metode_pembayaran').val(res?.data?.metode_pembayaran).change();
-                        $('#nominal_pembayaran').val(res?.data?.nominal);
-                        $('#pembayaran_oleh').val(res?.data?.pembayaran_oleh);
-                        $('#akun_kas').val(res?.data?.akun_kas).change();
-                        $('#akun_selisih').val(res?.data?.akun_selisih).change();
-                        $('#keterangan').val(res?.data?.keterangan);
-                        if (res?.data?.status_posting === "1") {
+                        $('#id').val(res.data.id);
+                        $("#no_pembayaran").val(res.data.no_pembayaran);
+                        $('#tanggal').val(res.data.tanggal);
+                        $('#divisi_id').val(res.data.divisi_id).change();
+                        $('#bayar_ke').val(res.data.bayar_ke);
+                        $('#valas').val(res.data.valas).change();
+                        $('#metode_pembayaran').val(res.data.metode_pembayaran).change();
+                        $('#nominal_pembayaran').val(res.data.nominal);
+                        $('#pembayaran_oleh').val(res.data.pembayaran_oleh);
+                        $('#akun_kas').val(res.data.akun_kas).change();
+                        $('#akun_selisih').val(res.data.akun_selisih).change();
+                        $('#keterangan').val(res.data.keterangan);
+                        if (res.data.status_posting === "1") {
                             disabledForm();
                         } else {
                             $("#no_pembayaran").attr('disabled', true);

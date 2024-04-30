@@ -199,7 +199,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
+                        $(".name").val(res.data.name);
 
                         $(".add-modal").modal("show")
                     } else {

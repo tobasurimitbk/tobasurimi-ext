@@ -173,7 +173,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `<button type="button" class="btn btn-danger" onclick="removeDokumen('${row?.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
+                    return `<button type="button" class="btn btn-danger" onclick="removeDokumen('${row.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
                 }
             }
 

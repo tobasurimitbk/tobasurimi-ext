@@ -838,19 +838,19 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".kode").val(res?.data?.kode);
-                        $(".name").val(res?.data?.name);
-                        $(".address").val(res?.data?.address);
-                        $(".no_npwp").val(res?.data?.no_npwp);
-                        $(".phone").val(res?.data?.phone);
-                        $(".contact_person").val(res?.data?.contact_person);
-                        $(".email").val(res?.data?.email);
-                        $(".no_rekening").val(res?.data?.no_rekening);
-                        $(".parent_postal_code").val(res?.data?.postal_code);
-                        // $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
-                        $(".province_parent_id").val(res?.data?.province_id).change();
+                        $(".kode").val(res.data.kode);
+                        $(".name").val(res.data.name);
+                        $(".address").val(res.data.address);
+                        $(".no_npwp").val(res.data.no_npwp);
+                        $(".phone").val(res.data.phone);
+                        $(".contact_person").val(res.data.contact_person);
+                        $(".email").val(res.data.email);
+                        $(".no_rekening").val(res.data.no_rekening);
+                        $(".parent_postal_code").val(res.data.postal_code);
+                        // $(".supplier_buyer").val(res.data.supplier_buyer).change();
+                        $(".province_parent_id").val(res.data.province_id).change();
 
-                        row = res?.data?.list_address.length;
+                        row = res.data.list_address.length;
 
                         list_address = [];
 
@@ -858,7 +858,7 @@
 
                         $(".body-detail-table").empty()
 
-                        res?.data?.list_address.map((item, index) => {
+                        res.data.list_address.map((item, index) => {
                             list_address.push({
                                 id: item.id,
                                 vendor_id: item.vendor_id,
@@ -906,7 +906,7 @@
 
                         // AJAX GET CITY
                         $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
                             method: "GET",
                             dataType: "json",
                             success: function(result) {
@@ -917,16 +917,16 @@
                                     $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                                 })
 
-                                $(".city_parent_id").val(res?.data?.city_id).change();
-                                $(".parent_postal_code").val(res?.data?.postal_code);
+                                $(".city_parent_id").val(res.data.city_id).change();
+                                $(".parent_postal_code").val(res.data.postal_code);
                             }
                         })
                         // $('.ap_id').select2(select2Prop);
                         // $('.ar_id').select2(select2Prop);
 
-                        // const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
+                        // const $apOption = $("<option selected='selected'></option>").val(res.data.ap_id).text(res.data.ap_name);
                         // $(".ap_id").append($apOption).trigger('change');
-                        // const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
+                        // const $arOption = $("<option selected='selected'></option>").val(res.data.ar_id).text(res.data.ar_name);
                         // $(".ar_id").append($arOption).trigger('change');
                         $(".add-modal").modal("show")
                     } else {

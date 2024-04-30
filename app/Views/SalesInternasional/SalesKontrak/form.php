@@ -1440,7 +1440,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".sales_contract_no").val(res?.data);
+                        $(".sales_contract_no").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

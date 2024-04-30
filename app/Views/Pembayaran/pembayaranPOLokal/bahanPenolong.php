@@ -149,9 +149,9 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
                     let form = '';
-                    let status_posting = row?.status_posting;
+                    let status_posting = row.status_posting;
                     form += ` <div class="mt-0">`;
                     if (status_posting == '0') {
                         form += `

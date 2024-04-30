@@ -598,12 +598,12 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".code_warehouse").val(res?.data?.code_warehouse);
-                        $(".warehouse_name").val(res?.data?.warehouse_name);
-                        $(".address").val(res?.data?.address);
-                        $(".phone").val(res?.data?.phone);
-                        $(".email").val(res?.data?.email);
-                        $(".province_id").val(res?.data?.province_id).change();
+                        $(".code_warehouse").val(res.data.code_warehouse);
+                        $(".warehouse_name").val(res.data.warehouse_name);
+                        $(".address").val(res.data.address);
+                        $(".phone").val(res.data.phone);
+                        $(".email").val(res.data.email);
+                        $(".province_id").val(res.data.province_id).change();
 
                         // $.ajax({
                         //     url: `<?= base_url("employee-pic/dropdown"); ?>`,
@@ -617,16 +617,16 @@
                         //             $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
                         //         })
 
-                        //         $(".pic_id").val(res?.data?.pic_id).change();
+                        //         $(".pic_id").val(res.data.pic_id).change();
                         //     }
                         // })
-                        $(".pic_id").val(res?.data?.pic_id).change()
-                        $(".divisi_id").val(res?.data?.divisi_id).change();
-                        $(".kawasan_id").val(res?.data?.kawasan_id).change();
+                        $(".pic_id").val(res.data.pic_id).change()
+                        $(".divisi_id").val(res.data.divisi_id).change();
+                        $(".kawasan_id").val(res.data.kawasan_id).change();
 
                         // AJAX GET CITY
                         $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
                             method: "GET",
                             beforeSend: function() {
                                 setLoading();
@@ -643,8 +643,8 @@
                                     $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                                 })
 
-                                $(".city_id").val(res?.data?.city_id).change();
-                                $(".zip_code").val(res?.data?.zip_code);
+                                $(".city_id").val(res.data.city_id).change();
+                                $(".zip_code").val(res.data.zip_code);
                                 $(".add-modal").modal("show")
                             }
                         })

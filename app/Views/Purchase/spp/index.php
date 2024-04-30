@@ -164,8 +164,8 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let is_posted = row?.is_posted;
+                    let id = row.id;
+                    let is_posted = row.is_posted;
                     let spp_type = row.spp_type;
                     let status = row.status;
 

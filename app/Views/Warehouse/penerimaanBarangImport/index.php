@@ -3,74 +3,74 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Penerimaan Barang Import</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-import/create"); ?>">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </a>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end mb-3 row-col-spp">
-            <div class="col">
-            <?= csrf_field() ?>
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+    <div class="section-header">
+        <h1>Penerimaan Barang Import</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-import/create"); ?>">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3 row-col-spp">
+                <div class="col">
+                    <?= csrf_field() ?>
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                <div class="col">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                    <option value="waiting">STATUS LPB:WAITING</option>
-                    <option value="finish">STATUS LPB:FINISH</option>
-                </select>
-            </div>
-            <!-- <div class="col">
+                <div class="col">
+                    <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                        <option value="waiting">STATUS LPB:WAITING</option>
+                        <option value="finish">STATUS LPB:FINISH</option>
+                    </select>
+                </div>
+                <!-- <div class="col">
                 <select class="form-select status_bc" name="status_bc" id="status_bc" aria-label="Floating label select example">
                     <option value="waiting">STATUS BC:WAITING</option>
                     <option value="finish">STATUS BC:FINISH</option>
                 </select>
             </div> -->
-            <div class="col">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
+                <div class="col">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
-                            <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
-                            <th>No. PO</th>
-                            <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
-                            <th>Tanggal</th>
-                            <!-- <th onclick="changeSort('createdAt')" class="sort">Tanggal</th> -->
-                            <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
-                            <!-- <th>Status BC</th> -->
-                            <th>Jumlah Item</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
+                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
+                                <th>No. PO</th>
+                                <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
+                                <th>Tanggal</th>
+                                <!-- <th onclick="changeSort('createdAt')" class="sort">Tanggal</th> -->
+                                <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
+                                <!-- <th>Status BC</th> -->
+                                <th>Jumlah Item</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -83,7 +83,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[4, 'desc']],
+        order: [
+            [4, 'desc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -104,71 +106,71 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            orderable: false
-        },
-        {
-            data: "tipe_bahan",
-            className: "text-center"
-        },
-        {
-            data: "no_penerimaan_barang",
-            className: "text-center"
-        },
-        {
-            data: "multiple_po_no",
-            className: "text-center",
-            searchable: false,
-            sortable: false
-        },
-        {
-            data: "warehouse_name",
-            className: "text-center"
-        },
-        {
-            data: "createdAt",
-            className: "text-center",
-            sortable: false,
-            orderable: false,
-        },
-        {
-            data: "supplier_name",
-            className: "text-center"
-        },
-        // {
-        //     data: "status_bc",
-        //     className: "text-center",
-        //     searchable: false,
-        //     sortable: false
-        // },
-        {
-            data: "itemCount",
-            className: "text-center",
-            searchable: false,
-            sortable: false
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                let status = row?.status_post
-                let tipe_bahan = row?.tipe_bahan
+                data: "no",
+                className: "text-center",
+                orderable: false
+            },
+            {
+                data: "tipe_bahan",
+                className: "text-center"
+            },
+            {
+                data: "no_penerimaan_barang",
+                className: "text-center"
+            },
+            {
+                data: "multiple_po_no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "warehouse_name",
+                className: "text-center"
+            },
+            {
+                data: "createdAt",
+                className: "text-center",
+                sortable: false,
+                orderable: false,
+            },
+            {
+                data: "supplier_name",
+                className: "text-center"
+            },
+            // {
+            //     data: "status_bc",
+            //     className: "text-center",
+            //     searchable: false,
+            //     sortable: false
+            // },
+            {
+                data: "itemCount",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let status = row.status_post
+                    let tipe_bahan = row.tipe_bahan
 
-                if (status == "WAITING") {
-                    return `
+                    if (status == "WAITING") {
+                        return `
                         <div class="mt-0">
                         <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')" style="box-shadow: none !important;">
                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -181,18 +183,19 @@
                         </button>
                         </div>
                     `
-                } else {
-                    return `
+                    } else {
+                        return `
                         <div class="mt-0">
                         <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')" style="box-shadow: none !important;">
                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                         </button>
                         </div>
                     `
-                }
+                    }
 
+                }
             }
-        }],
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -231,12 +234,12 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .status").change(function () {
-        // $(".dateStart, .dateEnd, .status, .status_bc").change(function () {
+        $(".dateStart, .dateEnd, .status").change(function() {
+            // $(".dateStart, .dateEnd, .status, .status_bc").change(function () {
             table.ajax.reload();
         })
 
@@ -357,8 +360,7 @@
         })
     }
 
-    const print = function(url) 
-    {
+    const print = function(url) {
         window.open(url, "_blank");
     }
 

@@ -153,7 +153,7 @@
                 sortable: false,
                 width: "10%",
                 render: function(data, type, row) {
-                    let id = row?.id;
+                    let id = row.id;
                     return `
                         <button onclick="updateForm(${id})"  class="btn btn-warning posting-spp">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>

@@ -109,9 +109,9 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let status = row?.is_posted
-                    let request_status = row?.request_status
+                    let id = row.id;
+                    let status = row.is_posted
+                    let request_status = row.request_status
                     // console.log(status);
                     if (status != 1) {
                         return `

@@ -815,8 +815,8 @@
                     dataType: "json",
                     success: function(res) {
                         if (res.status) {
-                            $(".warehouse_id").val(res?.data?.warehouse_id)
-                            $(".warehouse").val(res?.data?.warehouseName)
+                            $(".warehouse_id").val(res.data.warehouse_id)
+                            $(".warehouse").val(res.data.warehouseName)
 
                             let new_list_items = []
                             let tag_html = "";
@@ -832,7 +832,7 @@
                             $(".body-detail-table").empty()
                             console.log(res.detail)
 
-                            res?.detail.map(item => {
+                            res.detail.map(item => {
                                 tag_html += `<tr>`;
                                 tag_html += `<td class="edit-table-detail" data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${Number(item.qty.replaceAll(",", ""))}" data-keterangan="${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += row + 1;
@@ -984,7 +984,7 @@
                         method: "GET",
                         dataType: "json",
                         success: function(res) {
-                            let spek = res?.data?.spek;
+                            let spek = res.data.spek;
                             $(".spesifikasi").val(spek);
                         }
                     })

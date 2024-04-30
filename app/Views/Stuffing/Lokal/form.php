@@ -1051,7 +1051,7 @@
             dataType: "json",
             success: function(res) {
                 if (res.status) {
-                    $(".no_stuffing").val(res?.data);
+                    $(".no_stuffing").val(res.data);
                 } else {
                     Swal.fire({
                         icon: 'error',

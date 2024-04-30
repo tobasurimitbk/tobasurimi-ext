@@ -432,7 +432,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_penerimaan_barang").val(res?.data);
+                        $(".no_penerimaan_barang").val(res.data);
                     }
                 }
             })
@@ -957,7 +957,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_penerimaan_barang").val(res?.data);
+                        $(".no_penerimaan_barang").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

@@ -142,7 +142,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let state = row?.state;
+                    let state = row.state;
                     if (state == '0') {
                         return '<i class="fa-solid fa-square text-danger"></i>';
 
@@ -158,8 +158,8 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let status = row?.status_posting
+                    let id = row.id;
+                    let status = row.status_posting
 
                     if (status === "0") {
                         return `

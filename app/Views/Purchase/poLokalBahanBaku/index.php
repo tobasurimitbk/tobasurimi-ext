@@ -195,10 +195,10 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let status = row?.is_posted
-                    let status_penerimaan = row?.status_penerimaan
-                    let purchase_request_id = row?.purchase_request_id
+                    let id = row.id;
+                    let status = row.is_posted
+                    let status_penerimaan = row.status_penerimaan
+                    let purchase_request_id = row.purchase_request_id
 
                     // jika belum posting
                     if (status !== "1") {

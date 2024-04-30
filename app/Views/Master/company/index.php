@@ -416,17 +416,17 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        document.getElementById("preview_photo").src = res?.data?.logo;
-                        $(".company").val(res?.data?.company);
-                        $(".holding_company").val(res?.data?.holding_company);
-                        $(".address").val(res?.data?.address);
-                        $(".email").val(res?.data?.email);
-                        $(".phone").val(res?.data?.phone);
-                        $(".province_id").val(res?.data?.province_id).change();
+                        document.getElementById("preview_photo").src = res.data.logo;
+                        $(".company").val(res.data.company);
+                        $(".holding_company").val(res.data.holding_company);
+                        $(".address").val(res.data.address);
+                        $(".email").val(res.data.email);
+                        $(".phone").val(res.data.phone);
+                        $(".province_id").val(res.data.province_id).change();
 
                         // AJAX GET CITY
                         $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
                             method: "GET",
                             dataType: "json",
                             success: function(result) {
@@ -437,8 +437,8 @@
                                     $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                                 })
 
-                                $(".city_id").val(res?.data?.city_id).change();
-                                $(".zip_code").val(res?.data?.zip_code);
+                                $(".city_id").val(res.data.city_id).change();
+                                $(".zip_code").val(res.data.zip_code);
                                 $(".add-modal").modal("show")
                             }
                         })

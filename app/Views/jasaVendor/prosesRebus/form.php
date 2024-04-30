@@ -896,7 +896,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_rebus").val(res?.data);
+                        $(".no_rebus").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

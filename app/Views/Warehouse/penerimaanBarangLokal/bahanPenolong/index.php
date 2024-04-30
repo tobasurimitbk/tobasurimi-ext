@@ -157,9 +157,9 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let status = row?.status_post
-                    let tipe_bahan = row?.tipe_bahan
+                    let id = row.id;
+                    let status = row.status_post
+                    let tipe_bahan = row.tipe_bahan
 
                     if (status == "WAITING") {
                         return `

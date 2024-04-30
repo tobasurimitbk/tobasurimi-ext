@@ -109,9 +109,9 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row?.id;
-                    let id_material_request = row?.id_material_request;
-                    let id_production_result = row?.id_production_result;
+                    let id = row.id;
+                    let id_material_request = row.id_material_request;
+                    let id_production_result = row.id_production_result;
 
                     let buttonsHTML = `
                         <div class="mt-0">

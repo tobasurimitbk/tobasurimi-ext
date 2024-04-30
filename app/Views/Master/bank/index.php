@@ -258,10 +258,10 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $("#kode_bank").val(res?.data?.kode_bank);
-                        $('#name').val(res?.data?.name);
-                        $('#atas_nama').val(res?.data?.atas_nama);
-                        $('#no_rekening').val(res?.data?.no_rekening);
+                        $("#kode_bank").val(res.data.kode_bank);
+                        $('#name').val(res.data.name);
+                        $('#atas_nama').val(res.data.atas_nama);
+                        $('#no_rekening').val(res.data.no_rekening);
                         $(".add-modal").modal("show")
                     } else {
                         Swal.fire({

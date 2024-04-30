@@ -359,8 +359,8 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let employee_id = row?.employee_id;
-                    let id = row?.id;
+                    let employee_id = row.employee_id;
+                    let id = row.id;
                     return `
                         <div class="mt-0">
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("payroll/print/single/"); ?>${id}')" style="box-shadow: none !important;">

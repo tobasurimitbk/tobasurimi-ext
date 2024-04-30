@@ -361,8 +361,8 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if (res?.status) {
-                        $(".kode").val(res?.data)
+                    if (res.status) {
+                        $(".kode").val(res.data)
                         $(".add-modal").modal("show");
                     } else {
                         Swal.fire({
@@ -400,19 +400,19 @@
                         validator.reset();
 
                         $(".id").val(id);
-                        $(".kode").val(res?.data?.kode);
-                        $(".name").val(res?.data?.name);
-                        $(".address").val(res?.data?.address);
-                        $(".no_npwp").val(res?.data?.no_npwp);
-                        $(".phone").val(res?.data?.phone);
-                        $(".contact_person").val(res?.data?.contact_person);
-                        $(".email").val(res?.data?.email);
-                        $(".province_parent_id").val(res?.data?.province_id).change();
-                        $(".country_code").val(res?.data?.country_code).change();
+                        $(".kode").val(res.data.kode);
+                        $(".name").val(res.data.name);
+                        $(".address").val(res.data.address);
+                        $(".no_npwp").val(res.data.no_npwp);
+                        $(".phone").val(res.data.phone);
+                        $(".contact_person").val(res.data.contact_person);
+                        $(".email").val(res.data.email);
+                        $(".province_parent_id").val(res.data.province_id).change();
+                        $(".country_code").val(res.data.country_code).change();
 
                         // AJAX GET CITY
                         $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
                             method: "GET",
                             dataType: "json",
                             success: function(result) {
@@ -423,8 +423,8 @@
                                     $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                                 })
 
-                                $(".city_parent_id").val(res?.data?.city_id).change();
-                                $(".parent_postal_code").val(res?.data?.postal_code);
+                                $(".city_parent_id").val(res.data.city_id).change();
+                                $(".parent_postal_code").val(res.data.postal_code);
                             }
                         })
 

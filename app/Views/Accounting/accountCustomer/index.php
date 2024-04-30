@@ -225,7 +225,7 @@
                             $('.delete-btn').show();
                             $("#customer_id").prop("disabled", false).select2();
 
-                            $("#customer_id").val(res?.data?.customer_id).change();
+                            $("#customer_id").val(res.data.customer_id).change();
                         } else {
                             $('.delete-btn').hide();
                             $("#customer_id").select2({
@@ -233,8 +233,8 @@
                             });
                             $("#customer_id").val("").change()
                         }
-                        $("#akun_ap_id").val(res?.data?.ap_id).change();
-                        $("#akun_ar_id").val(res?.data?.ar_id).change();
+                        $("#akun_ap_id").val(res.data.ap_id).change();
+                        $("#akun_ar_id").val(res.data.ar_id).change();
                         $('.add-modal').modal('show');
                     } else {
                         Swal.fire({

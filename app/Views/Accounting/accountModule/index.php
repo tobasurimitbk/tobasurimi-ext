@@ -524,14 +524,14 @@
                         $('.input-generate').hide()
 
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
-                        $(".akun_ap_id").val(res?.data?.ap_id).change();
-                        $(".akun_ar_id").val(res?.data?.ar_id).change();
-                        $(".tipe").val(res?.data?.type).change();
-                        $(".kategori").val(res?.data?.kategori).change();
-                        $(".module").val(res?.data?.module).change();
+                        $(".name").val(res.data.name);
+                        $(".akun_ap_id").val(res.data.ap_id).change();
+                        $(".akun_ar_id").val(res.data.ar_id).change();
+                        $(".tipe").val(res.data.type).change();
+                        $(".kategori").val(res.data.kategori).change();
+                        $(".module").val(res.data.module).change();
 
-                        row = res?.data?.list_address.length;
+                        row = res.data.list_address.length;
 
                         list_address = [];
 
@@ -539,7 +539,7 @@
 
                         $(".body-detail-table").empty()
 
-                        res?.data?.list_address.map((item, index) => {
+                        res.data.list_address.map((item, index) => {
                             list_address.push({
                                 id: item.id,
                             })

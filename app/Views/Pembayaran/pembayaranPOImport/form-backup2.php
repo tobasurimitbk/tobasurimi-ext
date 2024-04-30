@@ -391,8 +391,8 @@
             theme: "bootstrap-5"
         }).change(function() {
             const attr = $(this).select2('data');
-            const amount = attr[0]?.amount;
-            const currency = attr[0]?.currency;
+            const amount = attr[0].amount;
+            const currency = attr[0].currency;
 
             $('#po_amt').val(formatRupiah(amount || 0));
             $('#currency').val(currency);

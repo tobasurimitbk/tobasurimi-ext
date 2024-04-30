@@ -1822,7 +1822,7 @@
                 if ($(".tipe_bahan").val() === "BAKU") {
                     $(".kode_barang").empty()
                     $(".kode_barang").append(`<option value=""></option>`)
-                    arr?.forEach((items) => {
+                    arr.forEach((items) => {
                         $.ajax({
                             url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
                             method: "GET",
@@ -1845,7 +1845,7 @@
                 if ($(".tipe_bahan").val() === "PENOLONG") {
                     $(".kode_barang").empty()
                     $(".kode_barang").append(`<option value=""></option>`)
-                    arr?.forEach((items) => {
+                    arr.forEach((items) => {
                         $.ajax({
                             url: `<?= base_url("po-lokal-bahan-penolong/multi/dropdown"); ?>`,
                             method: "GET",
@@ -2033,7 +2033,7 @@
             $(".foot-detail-table").append(tag_total);
 
             if ($(".tipe_bahan").val() === "BAKU") {
-                arr?.forEach((items) => {
+                arr.forEach((items) => {
                     $.ajax({
                         url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
                         method: "GET",
@@ -2151,7 +2151,7 @@
                 })
             }
             if ($(".tipe_bahan").val() === "PENOLONG") {
-                arr?.forEach((items) => {
+                arr.forEach((items) => {
                     $.ajax({
                         url: `<?= base_url("po-lokal-bahan-penolong/multi/dropdown"); ?>`,
                         method: "GET",
@@ -2646,7 +2646,7 @@
         if ($(".tipe_bahan").val() === "BAKU") {
             $(".kode_barang").empty()
             $(".kode_barang").append(`<option value=""></option>`)
-            arr?.forEach((items) => {
+            arr.forEach((items) => {
                 $.ajax({
                     url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
                     method: "GET",
@@ -2672,7 +2672,7 @@
         if ($(".tipe_bahan").val() === "PENOLONG") {
             $(".kode_barang").empty()
             $(".kode_barang").append(`<option value=""></option>`)
-            arr?.forEach((items) => {
+            arr.forEach((items) => {
                 $.ajax({
                     url: `<?= base_url("po-lokal-bahan-penolong/multi/dropdown"); ?>`,
                     method: "GET",

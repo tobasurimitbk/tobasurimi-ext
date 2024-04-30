@@ -296,9 +296,9 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".komoditi").val(res?.data?.komoditi);
-                        $(".code").val(res?.data?.code);
-                        $(".uraian_barang").val(res?.data?.uraian_barang);
+                        $(".komoditi").val(res.data.komoditi);
+                        $(".code").val(res.data.code);
+                        $(".uraian_barang").val(res.data.uraian_barang);
 
                         validator.resetForm();
                         validator.reset();
@@ -314,7 +314,7 @@
                                     $(".unit").append(`<option value="${item.id}">${item.kode_satuan + ' - ' + item.nama_satuan}</option>`)
                                 })
 
-                                $(".unit").val(res?.data?.unit).change();
+                                $(".unit").val(res.data.unit).change();
                                 $(".add-modal").modal("show");
                             }
                         })

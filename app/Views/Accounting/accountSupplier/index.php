@@ -220,11 +220,11 @@
                     csrf.val();
                     if (res.status) {
                         $("#id").val(id).change();
-                        if (res?.data?.supplier_id != 0) {
+                        if (res.data.supplier_id != 0) {
                             $('.delete-btn').show();
                             $("#supplier_id").prop("disabled", false).select2();
 
-                            $("#supplier_id").val(res?.data?.supplier_id).change();
+                            $("#supplier_id").val(res.data.supplier_id).change();
                         } else {
                             $('.delete-btn').hide();
                             $("#supplier_id").select2({
@@ -232,8 +232,8 @@
                             });
                             $("#supplier_id").val("").change()
                         }
-                        $("#akun_ap_id").val(res?.data?.ap_id).change();
-                        $("#akun_ar_id").val(res?.data?.ar_id).change();
+                        $("#akun_ap_id").val(res.data.ap_id).change();
+                        $("#akun_ar_id").val(res.data.ar_id).change();
                         $('.add-modal').modal('show');
                     } else {
                         Swal.fire({

@@ -214,8 +214,8 @@
                     if (res.status) {
                         csrf.val(res.token);
                         if (res.data.status) {
-                            $("#harga_ndpbm").val((formatRupiah(res?.data?.data)));
-                            $("#harga_cif").val((formatRupiah(res?.data?.data)));
+                            $("#harga_ndpbm").val((formatRupiah(res.data.data)));
+                            $("#harga_cif").val((formatRupiah(res.data.data)));
 
                             var ndpbm = convertRupiahToNumber($("#harga_ndpbm").val()) || 0;
                             var hargaBarang = convertRupiahToNumber($("#harga_nilai_barang").val()) || 0;

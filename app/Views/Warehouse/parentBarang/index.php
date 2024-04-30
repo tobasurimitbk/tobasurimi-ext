@@ -194,9 +194,9 @@
                 success: function(res) {
                     csrf.val();
                     if (res.status) {
-                        $("#id").val(res?.data?.id);
-                        $("#parentName").val(res?.data?.parent_name);
-                        $("#kategori").val(res?.data?.kategori);
+                        $("#id").val(res.data.id);
+                        $("#parentName").val(res.data.parent_name);
+                        $("#kategori").val(res.data.kategori);
                         validator.resetForm();
                         validator.reset();
                         $('.add-modal').modal('show');

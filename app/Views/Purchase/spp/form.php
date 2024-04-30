@@ -1276,7 +1276,7 @@
                     divisi_name: $(".divisi_id option:selected").text()
                 },
                 success: function(res) {
-                    $(".spp_no").val(res?.data);
+                    $(".spp_no").val(res.data);
                 }
             })
         }
@@ -1296,7 +1296,7 @@
                     divisi_name: $(".divisi_id option:selected").text()
                 },
                 success: function(res) {
-                    $(".spp_no").val(res?.data);
+                    $(".spp_no").val(res.data);
                 }
             })
         } else {
