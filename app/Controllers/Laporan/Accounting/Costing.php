@@ -3,17 +3,11 @@
 namespace App\Controllers\Laporan\Accounting;
 
 use App\Controllers\BaseController;
-use App\Controllers\Master\Kurs;
-use App\Models\SupplierModel;
-use App\Models\TransaksiPembelianModel;
-use App\Models\LocalPOPaymentModel;
-use App\Models\MetadataModel;
-use App\Models\KursModel;
-use App\Models\RMImportPODetailModel;
-use App\Models\RMPurchaseOrderDetailModel;
-use App\Models\AMPurchaseOrderDetailModel;
-use App\Models\PenerimaanBarangModel;
-use App\Models\PenerimaanBarangDetailModel;
+use App\Models\JurnalUmumModel;
+use App\Models\ProductionResultDetailModel;
+use App\Models\ProductionResultModel;
+use App\Models\SettingCostingModel;
+use App\Models\Sub_AkunsModel;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -21,170 +15,57 @@ use Exception;
 
 class Costing extends BaseController
 {
+    protected $token;
     protected $this_company_id;
-    protected $supplierModel;
-    protected $transaksiPembelianModel;
-    protected $metadataModel;
-    protected $kursModel;
-    protected $rMImportPODetailModel;
-    protected $rMPurchaseOrderDetailModel;
-    protected $aMPurchaseOrderDetailModel;
-    protected $penerimaanBarangModel;
-    protected $penerimaanBarangDetailModel;
+    protected $Sub_AkunsModel;
+    protected $settingCosting;
+    protected $productionResultModel;
+    protected $productionResultDetailModel;
+    protected $jurnalUmumModel;
 
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->supplierModel = new SupplierModel();
-        $this->transaksiPembelianModel = new TransaksiPembelianModel();
-        $this->metadataModel = new MetadataModel();
-        $this->kursModel = new KursModel();
-        $this->rMImportPODetailModel = new RMImportPODetailModel();
-        $this->rMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-        $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-        $this->penerimaanBarangModel = new PenerimaanBarangModel();
-        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->Sub_AkunsModel = new Sub_AkunsModel();
+        $this->settingCosting = new SettingCostingModel();
+        $this->productionResultModel = new ProductionResultModel();
+        $this->productionResultDetailModel = new ProductionResultDetailModel();
+        $this->jurnalUmumModel = new JurnalUmumModel();
     }
+
     public function index()
     {
-        $supplierData = $this->supplierModel->asObject()->findAll();
-        $data = [
-            'suppliers' => $supplierData
-        ];
-        return view('Laporan/LaporanCosting/index', $data);
+        return view('Laporan/LaporanCosting/index');
     }
-    public function allTransaksi()
+
+    public function getCostingData()
     {
-        $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-        ];
-
-        $condition = [
-            // "company_id"  => $this->this_company_id,
-            "penerimaan_barang.deletedAt" => NULL
-        ];
-
-        $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-        ];
-
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
-
-        // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
-        $metaValuta = $this->metadataModel->get_by_name('Valuta');
-
-        $rdata = [];
-
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-        foreach ($res['data'] as $data) {
-            $tglTransaksi = $data->tanggal_penerimaan;
-            $dokumenTransaksi = $data->BC23_AJU ? "BC 2.3/" . $data->BC23_AJU : ($data->BC40_AJU ? "BC 4.0/" . $data->BC40_AJU : "-");
-            $buktiTransaksi = $data->no_penerimaan_barang;
-            $invoiceTransaksi = $data->no_invoice;
-            $tglInvoiceTransaksi = $data->tanggal_penerimaan;
-            $taxInvoiceTransaksi = "";
-            $poNumberTransaksi = str_replace(',', ", ", str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no));
-            $supplierTransaksi = $data->supplier_name;
-            $valasTransaksi = "IDR";
-            $exchangeTransaksi = 1.0;
-            $nominalTransaksi = 0.0;
-            $nominalIdrTransaksi = 0.0;
-            $paidIdrTransaksi = 0.0;
-            $totalHargaAll = 0.0;
-            $lokalbb = "";
-            $importbb = "";
-            $bp = "";
-            if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
-                $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
-                foreach ($lokalbb as $value) {
-                    $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-                    $nominalTransaksi += $totalxqty;
-                }
-                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-                $nominalIdrTransaksi += $totalHargaAll;
-            } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
-                $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
-                foreach ($importbb as $value) {
-                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-                    if ($kursData) {
-                        foreach ($metaValuta as $valueValuta) {
-                            if ($value['currency'] == $valueValuta['id']) {
-                                $valasTransaksi = $valueValuta['value'];
-                                $exchangeTransaksi = $kursData->nilai_kurs;
-                            }
-                        }
-                    } else {
-                        $valasTransaksi = $value['currencyValue'];
-                    }
-                    $nominalTransaksi += $value['total_po'];
-                }
-                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-                $nominalIdrTransaksi += $totalHargaAll;
-            } else {
-                $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
-                foreach ($bp as $value) {
-                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-                    if ($kursData) {
-                        foreach ($metaValuta as $valueValuta) {
-                            if ($value['currency'] == $valueValuta['id']) {
-                                $valasTransaksi = $valueValuta['value'];
-                                $exchangeTransaksi = $kursData->nilai_kurs;
-                            }
-                        }
-                    } else {
-                        $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
-                    }
-                    $nominalTransaksi += $value['total_po'];
-                }
-                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-                $nominalIdrTransaksi += $totalHargaAll;
+        if (!empty($this->request->getVar('month'))) {
+            $monthData = $this->request->getVar('month');
+            list($month, $year) = explode('/', $monthData);
+            $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $settingCosting = $this->settingCosting->getSettingCosting();
+            foreach ($settingCosting as $valueSetting) {
+                $condition = [
+                    'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                    // 'id_coa' => $valueSetting['coa'],
+                ];
+                $jurnalData = $this->jurnalUmumModel->getDataJurnal($condition);
+                var_dump($jurnalData);
             }
+            exit;
 
-            array_push($rdata, [
-                "no"                    => $no++,
-                "id"                    => $data->id,
-                "po_date"               => $tglTransaksi,
-                "dokumen_num"           => $dokumenTransaksi,
-                "evidance_num"          => $buktiTransaksi,
-                "invoice_num"           => $invoiceTransaksi,
-                "invoice_date"          => $tglInvoiceTransaksi,
-                "tax_invoice"           => $taxInvoiceTransaksi,
-                "po_num"                => $poNumberTransaksi,
-                "supplier_name"         => $supplierTransaksi,
-                "valas"                 => $valasTransaksi,
-                "exchange"              => number_format(floatval($exchangeTransaksi), 2, ',', '.'),
-                "nominal"               => number_format(floatval($nominalTransaksi), 2, ',', '.'),
-                "nominal_idr"           => number_format(floatval($nominalIdrTransaksi), 2, ',', '.'),
-                "paid_idr"              => $paidIdrTransaksi,
+            $dataResult = [
+                'settingCosting' => $settingCosting
+            ];
+
+            return response()->setJSON([
+                'data' => $dataResult,
+                'token' => csrf_hash(),
+                'status' => true
             ]);
-
-            // var_dump($rdata);
         }
-
-        $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $res['totalData'],
-            "recordsFiltered"   => $res['totalFilteredData'],
-            "data"              => $rdata,
-            "payload"           => $payload,
-        ];
-
-        return response()->setJSON($data);
     }
 
     public function LaporanKopekPrint($tglAwal, $tglAkhir, $filter, $search)

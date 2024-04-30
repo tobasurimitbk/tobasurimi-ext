@@ -64,9 +64,14 @@ class JurnalUmumModel extends Model
     public function getDataJurnal($where)
     {
         $where['deletedAt'] = null;
-
         $builder = $this->db->table('jurnal_umum');
-        $builder->where($where);
+
+        if (isset($where['tanggal_jurnal'])) {
+            $builder->like($where);
+        } else {
+            $builder->where($where);
+        }
+
         $query = $builder->get();
 
         return $query->getResult();
