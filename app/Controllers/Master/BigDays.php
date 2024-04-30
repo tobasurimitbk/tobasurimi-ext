@@ -76,13 +76,38 @@ class BigDays extends BaseController
 
     public function saveBigDay()
     {
+        $name = $this->request->getPost("nama");
+        $company_id = $this->this_company_id;
+
+        $getYear = date("Y", strtotime(str_replace("/", "-", $this->request->getPost("date_create"))));
+
+
+        $getNameNull = $this->BigDaysModel->select('id')
+            ->where('name', $name)
+            ->where('YEAR(date)', $getYear)
+            ->where('company_id', $company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+
+        //cek nama duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getNameNull)) {
+            $rule_is_unique = 'required|is_unique[big_days.name]';
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "date_create" => [
                     "rules" => "required"
                 ],
                 "nama" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'Nama harus diisi',
+                        'is_unique' => 'Nama sudah ada'
+                    ]
                 ]
 
             ];
@@ -112,10 +137,14 @@ class BigDays extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"     => false,
+                    "message"    => $errors,
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
             }
@@ -132,19 +161,59 @@ class BigDays extends BaseController
 
     public function updateBigDay()
     {
+        $id = $this->request->getPost("id");
+        $company_id = $this->this_company_id;
+        $name = $this->request->getPost("nama");
+
+        $getYear = date("Y", strtotime(str_replace("/", "-", $this->request->getPost("date_create"))));
+
+        $getNameNull = $this->BigDaysModel->select('id')
+            ->where('name', $name)
+            ->where('YEAR(date)', $getYear)
+            ->where('company_id', $company_id)
+            ->where('deletedAt', null)
+            ->where('id !=', $id)
+            ->findAll();
+
+        //cek name duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
+        if (!empty($getNameNull)) {
+
+            //cek name yg diedit masih sama dengan yg di ID?
+            $getNameNow = $this->BigDaysModel->select('id')
+                ->where('name', $name)
+                ->where('YEAR(date)', $getYear)
+                ->where('company_id', $company_id)
+                ->where('deletedAt', null)
+                ->where('id', $id)
+                ->first();
+
+            //jika sama
+            if (!empty($getNameNow)) {
+                $rule_is_unique = 'required';
+            } else {
+                $rule_is_unique = 'required|is_unique[big_days.name]';
+            }
+        } else {
+            $rule_is_unique = 'required';
+        }
+
         try {
             $rules = [
                 "date_create" => [
                     "rules" => "required"
                 ],
                 "nama" => [
-                    "rules" => "required"
+                    "rules" => $rule_is_unique,
+                    'errors' => [
+                        'required' => 'Nama harus diisi',
+                        'is_unique' => 'Nama sudah ada'
+                    ]
                 ]
             ];
 
             if ($this->validate($rules)) {
 
-                $id = $this->request->getPost("id");
+
 
                 $values = [
                     "company_id" => $this->this_company_id,
@@ -171,10 +240,14 @@ class BigDays extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errors = '';
+                foreach ($this->validator->getErrors() as $key => $row) {
+                    $errors .= $row . '. ';
+                }
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
+                    "status"     => false,
+                    "message"    => $errors,
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
             }

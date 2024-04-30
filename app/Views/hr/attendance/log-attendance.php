@@ -168,151 +168,157 @@
                         </thead>
                         <tbody>
                             <?php $kehadiran = array(); ?>
-                            <?php for ($i = 0; $i < count($res_user); $i++) : ?>
-                                <?php
-                                $hadir = 0;
-                                $alpha = 0;
-                                $libur = 0;
-                                ?>
+                            <?php if (count($res_user) == 0) : ?>
                                 <tr>
-                                    <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo strtoupper($res_user[$i]["employeeName"]); ?></td>
-                                    <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo strtoupper($res_user[$i]["divisi"]); ?></td>
-                                    <td style="vertical-align:middle;z-index:1" nowrap>
-                                        &nbsp;<?php echo strtoupper($res_user[$i]["namaBagian"]); ?></td>
-                                    </td>
-                                    <?php
-                                    for ($j = 1; $j <= $last_date; $j++) :
-                                        $no = (strlen($j) == 1) ? ("0" . $j) : $j;
-                                        $jam_masuk = ""; // checkOut
-                                        $jam_keluar = ""; // checkIN
-                                        $check = 0; // cek apakah ada di log absen tidak
-
-                                        $dateFormat = ($year . "-" . $month . "-" . $no);
-                                        $formPerizinanModel = new \App\Models\FormPerijinanModel();
-                                        $hariBesarModel = new \App\Models\BigDaysModel();
-
-                                        $perizinanCheck = $formPerizinanModel
-                                            ->where('employee_id', $res_user[$i]['employeeID'])
-                                            ->where('periode', ($year . "-" . $month . "-" . $no))
-                                            ->first();
-
-                                        $hariBesarCheck = $hariBesarModel
-                                            ->where('date', $dateFormat)
-                                            ->first();
-
-                                        foreach ($res_user[$i]["list_attendance"] as $val) :
-                                            if ($val->periode == ($year . "-" . $month . "-" . $no)) :
-                                                $jam_masuk = $val->checkin;
-                                                $jam_keluar = $val->checkout;
-                                                if ($val->checkin != '')
-                                                    $check = 1;
-                                                break;
-                                            endif;
-                                        endforeach;
-                                    ?>
-                                        <?php if ($hariBesarCheck != null) : ?>
-                                            <?php $libur++; ?>
-                                            <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="vertical-align:middle; cursor:pointer;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                            <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="vertical-align:middle;cursor:pointer;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                        <?php elseif ($perizinanCheck != null) : ?>
-                                            <!-- Ada perizinan -->
-                                            <?php $statusKode = explode("_", $perizinanCheck['status'])[1]; ?>
-                                            <?php if ($perizinanCheck['status']  == "CUTI TAHUNAN_CT") : ?>
-                                                <!-- Ada perizinan Cuti Tahunan -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ffc107; color:white; cursor:pointer;'>
-                                                    <b><?= $statusKode ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ffc107; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode  ?></b>
-                                                </td>
-                                            <?php elseif ($perizinanCheck['status'] == "CUTI HAID_CHD") : ?>
-                                                <!-- Ada perizinan Cuti Haid -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#242120; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#242120; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode  ?></b>
-                                                </td>
-                                            <?php elseif ($perizinanCheck['status'] == "CUTI HAMIL_CHL") : ?>
-                                                <!-- Ada perizinan Cuti Hamil -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#C34A36; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#C34A36; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode  ?></b>
-                                                </td>
-                                            <?php elseif ($perizinanCheck['status'] == "CUTI MELAHIRKAN_CM") : ?>
-                                                <!-- Ada perizinan Cuti Melahirkan -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#4B4453; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#4B4453; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode  ?></b>
-                                                </td>
-                                            <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
-                                                <!-- Ada ijin -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode  ?></b>
-                                                </td>
-                                            <?php elseif ($perizinanCheck['status'] == "SAKIT_S") : ?>
-                                                <!-- Ada sakit -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#28a745; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#28a745; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode  ?></b>
-                                                </td>
-                                            <?php elseif ($perizinanCheck['status'] == "RL_RL") : ?>
-                                                <!-- Ada RL -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ff7b00; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ff7b00; color:white;cursor:pointer;'>
-                                                    <b><?= $statusKode  ?></b>
-                                                </td>
-                                            <?php endif ?>
-                                        <?php else : ?>
-                                            <?php if ($check == 1) : ?>
-                                                <?php $hadir++; ?>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;cursor:pointer;'>
-                                                    <font color="white"><b><?= $jam_masuk; ?></b></font>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;cursor:pointer;'>
-                                                    <font color="white"><b><?= $jam_keluar; ?></b></font>
-                                                </td>
-                                            <?php else : ?>
-                                                <?php
-                                                $temp = mktime(0, 0, 0, $month, $j, $year);
-                                                if (date("N", $temp) == 7) {
-                                                    // Hari Minggu
-                                                    $libur++;
-                                                    echo "<td class='detail' data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width='25' align='center' style=\"vertical-align:middle;cursor:pointer;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
-                                                    echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style=\"vertical-align:middle;cursor:pointer;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
-                                                } else {
-                                                    // tidak absen = alpha
-                                                    $alpha++;
-                                                    echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style='background-color:#e7323a;;cursor:pointer;'></td>";
-                                                    echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style='background-color:#e7323a;cursor:pointer;'></td>";
-                                                }
-                                                ?>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
-                                    <?php endfor; ?>
+                                    <td colspan="66">Tidak ada data pegawai</td>
                                 </tr>
-                                <?php
-                                $kehadiran[] = [
-                                    'id' => $res_user[$i]['employeeID'],
-                                    'hadir' => $hadir,
-                                    'libur' => $libur,
-                                    'alpha' => $alpha
-                                ];
-                                ?>
-                            <?php endfor; ?>
+                            <?php else : ?>
+                                <?php for ($i = 0; $i < count($res_user); $i++) : ?>
+                                    <?php
+                                    $hadir = 0;
+                                    $alpha = 0;
+                                    $libur = 0;
+                                    ?>
+                                    <tr>
+                                        <td style="vertical-align:middle;z-index:1" nowrap>
+                                            &nbsp;<?php echo strtoupper($res_user[$i]["employeeName"]); ?></td>
+                                        <td style="vertical-align:middle;z-index:1" nowrap>
+                                            &nbsp;<?php echo strtoupper($res_user[$i]["divisi"]); ?></td>
+                                        <td style="vertical-align:middle;z-index:1" nowrap>
+                                            &nbsp;<?php echo strtoupper($res_user[$i]["namaBagian"]); ?></td>
+                                        </td>
+                                        <?php
+                                        for ($j = 1; $j <= $last_date; $j++) :
+                                            $no = (strlen($j) == 1) ? ("0" . $j) : $j;
+                                            $jam_masuk = ""; // checkOut
+                                            $jam_keluar = ""; // checkIN
+                                            $check = 0; // cek apakah ada di log absen tidak
+
+                                            $dateFormat = ($year . "-" . $month . "-" . $no);
+                                            $formPerizinanModel = new \App\Models\FormPerijinanModel();
+                                            $hariBesarModel = new \App\Models\BigDaysModel();
+
+                                            $perizinanCheck = $formPerizinanModel
+                                                ->where('employee_id', $res_user[$i]['employeeID'])
+                                                ->where('periode', ($year . "-" . $month . "-" . $no))
+                                                ->first();
+
+                                            $hariBesarCheck = $hariBesarModel
+                                                ->where('date', $dateFormat)
+                                                ->first();
+
+                                            foreach ($res_user[$i]["list_attendance"] as $val) :
+                                                if ($val->periode == ($year . "-" . $month . "-" . $no)) :
+                                                    $jam_masuk = $val->checkin;
+                                                    $jam_keluar = $val->checkout;
+                                                    if ($val->checkin != '')
+                                                        $check = 1;
+                                                    break;
+                                                endif;
+                                            endforeach;
+                                        ?>
+                                            <?php if ($hariBesarCheck != null) : ?>
+                                                <?php $libur++; ?>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="vertical-align:middle; cursor:pointer;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="vertical-align:middle;cursor:pointer;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                            <?php elseif ($perizinanCheck != null) : ?>
+                                                <!-- Ada perizinan -->
+                                                <?php $statusKode = explode("_", $perizinanCheck['status'])[1]; ?>
+                                                <?php if ($perizinanCheck['status']  == "CUTI TAHUNAN_CT") : ?>
+                                                    <!-- Ada perizinan Cuti Tahunan -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ffc107; color:white; cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ffc107; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                <?php elseif ($perizinanCheck['status'] == "CUTI HAID_CHD") : ?>
+                                                    <!-- Ada perizinan Cuti Haid -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#242120; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#242120; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                <?php elseif ($perizinanCheck['status'] == "CUTI HAMIL_CHL") : ?>
+                                                    <!-- Ada perizinan Cuti Hamil -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#C34A36; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#C34A36; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                <?php elseif ($perizinanCheck['status'] == "CUTI MELAHIRKAN_CM") : ?>
+                                                    <!-- Ada perizinan Cuti Melahirkan -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#4B4453; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#4B4453; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
+                                                    <!-- Ada ijin -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                <?php elseif ($perizinanCheck['status'] == "SAKIT_S") : ?>
+                                                    <!-- Ada sakit -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#28a745; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#28a745; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                <?php elseif ($perizinanCheck['status'] == "RL_RL") : ?>
+                                                    <!-- Ada RL -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ff7b00; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ff7b00; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                <?php endif ?>
+                                            <?php else : ?>
+                                                <?php if ($check == 1) : ?>
+                                                    <?php $hadir++; ?>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;cursor:pointer;'>
+                                                        <font color="white"><b><?= $jam_masuk; ?></b></font>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;cursor:pointer;'>
+                                                        <font color="white"><b><?= $jam_keluar; ?></b></font>
+                                                    </td>
+                                                <?php else : ?>
+                                                    <?php
+                                                    $temp = mktime(0, 0, 0, $month, $j, $year);
+                                                    if (date("N", $temp) == 7) {
+                                                        // Hari Minggu
+                                                        $libur++;
+                                                        echo "<td class='detail' data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width='25' align='center' style=\"vertical-align:middle;cursor:pointer;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
+                                                        echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style=\"vertical-align:middle;cursor:pointer;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
+                                                    } else {
+                                                        // tidak absen = alpha
+                                                        $alpha++;
+                                                        echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style='background-color:#e7323a;;cursor:pointer;'></td>";
+                                                        echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style='background-color:#e7323a;cursor:pointer;'></td>";
+                                                    }
+                                                    ?>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        <?php endfor; ?>
+                                    </tr>
+                                    <?php
+                                    $kehadiran[] = [
+                                        'id' => $res_user[$i]['employeeID'],
+                                        'hadir' => $hadir,
+                                        'libur' => $libur,
+                                        'alpha' => $alpha
+                                    ];
+                                    ?>
+                                <?php endfor; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -341,37 +347,43 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php for ($i = 0; $i < count($res_user); $i++) : ?>
+                            <?php if (count($res_user) == 0) : ?>
                                 <tr>
-                                    <td width="150">
-                                        &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
-                                    <td width="110">
-                                        &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
-                                    <td width="110">
-                                        &nbsp;<?php echo $res_user[$i]["namaBagian"]; ?></td>
-                                    </td>
-                                    <?php foreach ($statusPerizinan as $s) : ?>
-                                        <td width="90" align="center">
-                                            <?= $res_user[$i]['statusAttendances'][explode("_", $s['value'])[1]] ?>
-                                        </td>
-                                    <?php endforeach; ?>
-                                    <td width="90" align="center">
-                                        <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
-                                            <b><?= $kehadiran[$i]['libur']; ?></b>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td width="90" align="center">
-                                        <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
-                                            <b><?= $kehadiran[$i]['alpha']; ?></b>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td width="90" align="center">
-                                        <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
-                                            <b><?= $kehadiran[$i]['hadir']; ?></b>
-                                        <?php endif; ?>
-                                    </td>
+                                    <td colspan="13">Tidak ada data pegawai</td>
                                 </tr>
-                            <?php endfor; ?>
+                            <?php else : ?>
+                                <?php for ($i = 0; $i < count($res_user); $i++) : ?>
+                                    <tr>
+                                        <td width="150">
+                                            &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
+                                        <td width="110">
+                                            &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
+                                        <td width="110">
+                                            &nbsp;<?php echo $res_user[$i]["namaBagian"]; ?></td>
+                                        </td>
+                                        <?php foreach ($statusPerizinan as $s) : ?>
+                                            <td width="90" align="center">
+                                                <?= $res_user[$i]['statusAttendances'][explode("_", $s['value'])[1]] ?>
+                                            </td>
+                                        <?php endforeach; ?>
+                                        <td width="90" align="center">
+                                            <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
+                                                <b><?= $kehadiran[$i]['libur']; ?></b>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td width="90" align="center">
+                                            <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
+                                                <b><?= $kehadiran[$i]['alpha']; ?></b>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td width="90" align="center">
+                                            <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
+                                                <b><?= $kehadiran[$i]['hadir']; ?></b>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endfor; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
