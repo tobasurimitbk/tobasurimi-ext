@@ -721,7 +721,7 @@
                                             reverseButtons: true,
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
-                                            window.location.replace("<?= base_url('spp/id/') ?>" + response.id);
+                                            window.location.replace("<?= base_url('spp') ?>");
                                         })
                                     }
                                 }
