@@ -99,15 +99,25 @@ class Kawasan extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $name = strtoupper($this->request->getVar('name'));
-        $this->kawasanModel->update($id, [
-            'name' => $name
-        ]);
+        $kawasanFirst = $this->kawasanModel->where('id !=', $id)->where('name', $name)->where('company_id', $this->this_company_id)->first();
 
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Kawasan warehouse berhasil diupdate",
-            'token' => csrf_hash()
-        ]);
+        if ($kawasanFirst != null) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Kawasan " . $kawasanFirst['name'] . " sudah ada",
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $this->kawasanModel->update($id, [
+                'name' => $name
+            ]);
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Kawasan warehouse berhasil diupdate",
+                'token' => csrf_hash()
+            ]);
+        }
     }
 
     public function delete()

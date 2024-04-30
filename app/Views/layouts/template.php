@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="<?= base_url(); ?>assets/img/favicon.png" type="image/png" />
     <link href="<?= base_url() ?>assets/css/bootstrap.min.css?v=<?= time(); ?>" rel="stylesheet">
     <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js?v=<?= time(); ?>"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- General CSS Files -->
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap1.min.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/all.css?v=<?= time(); ?>">
@@ -42,7 +42,6 @@
 </head>
 
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/css3pie/1.0beta5/PIE.js" integrity="sha512-xZo7z6S7GzOh8bg8MT5XNm2E5VAK57t+/koYZBbiSEYhP/kTZGdPCilmDpysFovyd6KCmWD7oxMbUih/EDUfmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.43/polyfill.min.js" integrity="sha512-lvWiOP+aMKHllm4THsjzNleVuGOh0WGniJ3lgu/nvCbex1LlaQSxySUjAu/LTJw9FhnSL/PVYoQcckg1Q03+fQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> <!-- Bootstrap core JavaScript-->
     <script src="<?= base_url(); ?>assets/_vendor/jquery/jquery.min.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url() ?>assets/js/moment.min.js?v=<?= time(); ?>"></script>
