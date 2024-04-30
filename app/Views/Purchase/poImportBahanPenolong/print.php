@@ -118,6 +118,11 @@
                         <td>:</td>
                         <td><?= $dataPO->attn ?></td>
                     </tr>
+                    <tr>
+                        <td>ORIGIN</td>
+                        <td>:</td>
+                        <td><?= $dataPO->port_origin == "-" ? "-" : strtoupper($dataPO->port_origin); ?></td>
+                    </tr>
                 </table>
             </td>
             <td></td>
@@ -128,7 +133,7 @@
             <td>
                 <b><u>CONSIGNEE & NOTIFY PARTY :</u></b> <br>
                 <div style="margin-top: 8px;">
-                    <?= strtoupper($dataPO->shipper) ?>
+                    <?= strtoupper($dataPO->consigne) ?>
                 </div>
             </td>
             <td>
@@ -164,6 +169,11 @@
             <td>ATTN</td>
             <td>:</td>
             <td><?= $attnKantor ?></td>
+        </tr>
+        <tr>
+            <td>DESTINATION</td>
+            <td>:</td>
+            <td><?= $dataPO->port_destination == "-" ? "-" : strtoupper($dataPO->port_destination); ?></td>
         </tr>
     </table>
     <table border="1" style="width: 100%; margin-top:10px;" class="table no-border">
