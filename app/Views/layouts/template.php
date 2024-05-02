@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap-datepicker.standalone.min.css?v=<?= time(); ?>">
 
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css?v=<?= time(); ?>" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="<?= base_url() ?>assets/css/select2.min.css?v=<?= time(); ?>" crossorigin="anonymous" referrerpolicy="no-referrer">
     <!-- <link href="<?= base_url(); ?>assets/_vendor/fontawesome-free/css/all.min.css?v=<?= time(); ?>" rel="stylesheet" type="text/css"> -->
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/all.min.css?v=<?= time(); ?>">
 
@@ -64,9 +64,9 @@
     <script src="<?= base_url(); ?>assets/js/bootstrap-datepicker.min.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url() ?>assets/js/loading.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url() ?>assets/js/JsLocalSearch.js?v=<?= time(); ?>"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
+    <script src="<?= base_url() ?>assets/_vendor/popper/popper.min.js?v=<?= time(); ?>"></script>
+    <script src="<?= base_url() ?>assets/_vendor/bootstrap/js/bootstrap.min.js?v=<?= time(); ?>"></script>
+    <script src="https://kit.fontawesome.com/6297a3e18a.js" crossorigin="anonymous"></script>
 
     <div id="app">
         <!-- {% block content_2 %}{% endblock %} -->

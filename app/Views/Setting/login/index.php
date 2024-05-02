@@ -62,10 +62,6 @@
 
 </div>
 
-<!-- Bootstrap core JavaScript-->
-<script src="<?= base_url(); ?>assets/_vendor/jquery/jquery.min.js?v=<?= time(); ?>"></script>
-<script src="<?= base_url(); ?>assets/_vendor/bootstrap/js/bootstrap.bundle.min.js?v=<?= time(); ?>"></script>
-
 <!-- Core plugin JavaScript-->
 <script src="<?= base_url(); ?>assets/_vendor/jquery-easing/jquery.easing.min.js?v=<?= time(); ?>"></script>
 

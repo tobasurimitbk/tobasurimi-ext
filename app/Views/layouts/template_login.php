@@ -26,9 +26,9 @@
     <script src="<?= base_url(); ?>assets/js/imask.js?v=<?= time(); ?>"></script>
 
     <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js?v=<?= time(); ?>"></script>
+    <script src="<?= base_url(); ?>assets/js/jquery.validate.js?v=<?= time(); ?>"></script>
 
     <!-- <script src="<?= base_url(); ?>assets/_vendor/jquery-validation/dist/jquery.validate.js?v=<?= time(); ?>"></script> -->
-    <script src="<?= base_url(); ?>assets/_vendor/jquery-validation/dist/jquery.validate.min.js?v=<?= time(); ?>"></script>
 </head>
 
 <body class="bg-login-register">
