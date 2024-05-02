@@ -144,8 +144,8 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 29px;
-            padding: 29px;
+            margin: 25px;
+            padding: 25px;
         }
 
         .header {
@@ -564,7 +564,7 @@
                     <?php } ?>
                 </tr>
             </table>
-            <table class="w-100 sign-table border-collapse signed-info footer">
+            <table class="w-100 sign-table border-collapse signed-info footer mt-3">
                 <tr>
                     <th>
                         <div class="sign-row-second">

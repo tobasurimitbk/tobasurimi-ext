@@ -546,7 +546,9 @@ class SuratJalan extends BaseController
         $domPdf->loadHtml(view('SalesLokal/SuratJalan/print', $data));
 
         // (optional) setup the paper size and orientation
-        $domPdf->setPaper([0, 0, 792.96, 528]);
+        $domPdf->setPaper('A4', 'landscape');
+        // $domPdf->setPaper([0, 0, 792.96, 528]);
+
 
         // render html as PDF
         $domPdf->render();

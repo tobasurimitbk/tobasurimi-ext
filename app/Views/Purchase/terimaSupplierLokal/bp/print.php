@@ -4,8 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tanda Terima Faktur Lokal BP</title>
     <style>
+        body {
+            font-size: 12px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        @page {
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
+        }
+
         .align-items-center {
             align-items: center;
         }
@@ -32,13 +43,13 @@
             vertical-align: middle;
         }
 
-        .d-flex {
-            /* display: flex; */
+        /* .d-flex {
+            display: flex;
         }
 
         .flex-1 {
-            /* flex: 1; */
-        }
+            flex: 1;
+        } */
 
         .flex-column {
             flex-direction: column;

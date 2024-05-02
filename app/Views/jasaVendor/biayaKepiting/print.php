@@ -7,15 +7,15 @@
     <title>Biaya Kepiting</title>
     <style>
         body {
-            font-size: 13px;
+            font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        @page {
-            size: 12.00in 10.50in landscape;
+        /* @page {
+            size: 8.27in 5.50in landscape;
             margin: 25px;
             padding: 25px;
-        }
+        } */
 
         .body {
             margin-left: 30px;
@@ -43,12 +43,12 @@
             background-color: transparent;
             border-collapse: collapse;
             border: 1px solid black;
-            font-size: 11px;
+            font-size: 10px;
         }
 
         .table th,
         .table td {
-            padding: 0.75rem;
+            padding: 0.25rem;
             vertical-align: top;
             border-top: 1px solid black;
             border-right: 1px solid black;
@@ -104,7 +104,7 @@
                 </tr>
             </table>
 
-            <table class="table" style="margin-top: 30px;">
+            <table class="table" style="margin-top: 15px;">
                 <thead class="thead-dark">
                     <tr>
                         <th style="text-align: center;" colspan="3"></th>
@@ -168,7 +168,7 @@
                             <td><?= $no++ ?></td>
                             <td><?= $b['tanggal_masuk'] ?></td>
                             <td><?= $b['nama_barang'] ?></td>
-                            <td><?= $b['qty_kopek'] ?></td>
+                            <td><?= number_format($b['qty_kopek'], 2) ?></td>
                             <td><?= number_format($rasio, 2) . " %" ?></td>
                             <td><?= $b['jumbo'] ?></td>
                             <td><?= $b['ex_lump'] ?></td>

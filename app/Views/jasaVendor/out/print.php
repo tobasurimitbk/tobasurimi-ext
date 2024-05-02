@@ -7,12 +7,12 @@
     <title>Jasa Vendor Barang Keluar</title>
     <style>
         body {
-            font-size: 13px;
+            font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         @page {
-            size: 12.00in 7.50in landscape;
+            size: 8.27in 5.50in landscape;
             margin: 25px;
             padding: 25px;
         }
@@ -28,7 +28,7 @@
         }
 
         .head-table {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
             text-align: center;
         }
@@ -47,7 +47,7 @@
 
         .table th,
         .table td {
-            padding: 0.75rem;
+            padding: 0.25rem;
             vertical-align: top;
             border-top: 1px solid black;
             border-right: 1px solid black;
@@ -68,12 +68,12 @@
 <body>
     <?php if (!empty($jasaVendorOut)) : ?>
         <div class="body">
-            <table style="width: 135%;">
+            <table style="width: 100%;">
                 <tr>
-                    <td>
+                    <td style="width: 45%;">
                         <h2>PT. TOBA SURIMI INDUSTRIES</h2> <br>
                     </td>
-                    <td>
+                    <td style="text-align: right;">
                         <h2>
                             <u>
                                 NOTA JALAN / DELIVERY NOTE
@@ -82,15 +82,15 @@
                     </td>
                 </tr>
             </table>
-            <table style="width: 290%; margin-top:-20px;">
+            <table style="width: 100%; margin-top:-20px;">
                 <tr>
-                    <td>
+                    <td style="width: 45%;">
                         <div class="vendor-detail">
                             Kepada Yth. <br>
                             <?= $jasaVendorOut['vendor_name'] ?>, <?= $jasaVendorOut['address'] ?>
                         </div>
                     </td>
-                    <td>
+                    <td style="text-align: right;">
                         <div class="vendor-detail">
                             No Surat Jalan: <?= $jasaVendorOut['no_surat_jalan'] ?>
                         </div>
@@ -163,7 +163,7 @@
 
             </table>
             <br><br><br>
-            <table style="width: 130%;margin-top:20px;">
+            <table style="width: 130%;margin-top:5px;">
                 <tr>
                     <td>
                         <b>Diketahui Oleh</b>
