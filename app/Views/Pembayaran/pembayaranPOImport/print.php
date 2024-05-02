@@ -127,16 +127,32 @@
             </tr>
         </thead>
         <tbody>
-            <?php $no = 0; ?>
+            <?php $no = 1; ?>
+            <?php $payment_amt_total = 0; ?>
             <?php foreach ($poList as $p) : ?>
                 <tr>
                     <td><?= $no++; ?></td>
                     <td><?= date('d/m/Y', strtotime($p['tgl_po'])) ?></td>
                     <td><?= $p['po_no'] ?></td>
-                    <td></td>
+                    <td><?= $p['barang'] ?></td>
+                    <td><?= $p['qty'] ?></td>
+                    <td><?= $p['kode_satuan'] ?></td>
+                    <td><?= number_format($p['total'], 2) ?></td>
                 </tr>
+                <?php $payment_amt_total += $p['total']; ?>
             <?php endforeach; ?>
+
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6" style="text-align: right;">Total Tagihan</td>
+                <td><?= number_format($payment_amt_total, 2) ?></td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">Total Dibayar</td>
+                <td><?= number_format($detail['payment_amt'], 2) ?></td>
+            </tr>
+        </tfoot>
 
     </table>
 

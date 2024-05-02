@@ -243,46 +243,56 @@
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="pembelianLokal" role="tabpanel" aria-labelledby="pembelianLokal">
-                        <div class="row justify-content-end">
-                            <div class="col-md-3">
-                                <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Nomor PO" value="" type="text" class="form-control form-control-lg search-po-lokal">
+                        <?php if (can('Pembelian', 'PO Lokal BP', 'r')) : ?>
+                            <div class="row justify-content-end">
+                                <div class="col-md-3">
+                                    <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Nomor PO" value="" type="text" class="form-control form-control-lg search-po-lokal">
+                                </div>
                             </div>
-                        </div>
-                        <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoLokal" id="tablePoLokal" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">No</th>
-                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')" class="sort">No PO</th>
-                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
-                                    <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
-                                    <th scope="col" onclick="changeShortPoLokal('barang_master.barang_name')" class="sort">Barang</th>
-                                    <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                            <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoLokal" id="tablePoLokal" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')" class="sort">No PO</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
+                                        <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
+                                        <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        <?php else : ?>
+                            <p class="text-bold">Anda Tidak Punya Akses</p>
+                        <?php endif; ?>
                     </div>
+
+
                     <div class="tab-pane fade" id="pembelianImport" role="tabpanel" aria-labelledby="pembelianImport">
-                        <div class="row justify-content-end">
-                            <div class="col-md-3">
-                                <input autocomplete="one-time-code" style="height: 40px;" value="" placeholder="Cari Nomor PO" type="text" class="form-control form-control-lg search-po-import">
+                        <?php if (can('Pembelian', 'PO Import BP', 'r')) : ?>
+                            <div class="row justify-content-end">
+                                <div class="col-md-3">
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" placeholder="Cari Nomor PO" type="text" class="form-control form-control-lg search-po-import">
+                                </div>
                             </div>
-                        </div>
-                        <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoImport" id="tablePoImport" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">No</th>
-                                    <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_no')" class="sort">No PO</th>
-                                    <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_date')" class="sort">Tanggal</th>
-                                    <th scope="col" onclick="changeShortPoImport('suppliers.name')" class="sort">Supplier</th>
-                                    <th scope="col" onclick="changeShortPoImport('barang_master.barang_name')" class="sort">Barang</th>
-                                    <th scope="col" onclick="changeShortPoImport('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                            <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoImport" id="tablePoImport" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_no')" class="sort">No PO</th>
+                                        <th scope="col" onclick="changeShortPoImport('am_purchase_orders.po_date')" class="sort">Tanggal</th>
+                                        <th scope="col" onclick="changeShortPoImport('suppliers.name')" class="sort">Supplier</th>
+                                        <th scope="col" onclick="changeShortPoImport('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
+                                        <th scope="col" onclick="changeShortPoImport('am_purchase_order_details.price')" class="sort">Harga Terakhir</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        <?php else : ?>
+                            <p class="text-bold">Anda Tidak Punya Akses</p>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -730,7 +740,7 @@
                 data: function(data) {
                     data.id = id_barang;
                     data.search = $(".search-po-lokal").val();
-                    data.sort = sortPoImport;
+                    data.sort = sortPoLokal;
                     data.sortType = sortTypePoLokal;
                     data.po_type = "Lokal";
                 }
@@ -1453,8 +1463,16 @@
         }
         drawTable();
     }
-</script>
-<script>
+
+    function displayHistory(id) {
+        id_barang = id;
+        $('.search-po-lokal').val();
+        $('.search-po-import').val();
+        tablePoLokal.ajax.reload();
+        tablePoImport.ajax.reload();
+        $('#historiModal').modal('show');
+    }
+
     $("select[name='parent_type_id']")
         .parent('div')
         .children('span')
@@ -1525,6 +1543,26 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    function changeShortPoImport(val) {
+        if (sortPoImport !== val) {
+            sortTypePoImport = "asc";
+            sortPoImport = val;
+        } else {
+            sortTypePoImport = sortTypePoImport === "asc" ? "desc" : "asc";
+        }
+        tablePoImport.ajax.reload();
+    }
+
+    function changeShortPoLokal(val) {
+        if (sortPoLokal !== val) {
+            sortTypePoLokal = "asc";
+            sortPoLokal = val;
+        } else {
+            sortTypePoLokal = sortTypePoLokal === "asc" ? "desc" : "asc";
+        }
+        tablePoLokal.ajax.reload();
     }
 </script>
 

@@ -373,7 +373,7 @@ class AMPurchaseOrderModel extends Model
             'am_purchase_orders.po_no' => 'am_purchase_orders.po_no',
             'am_purchase_orders.po_date' => 'am_purchase_orders.po_date',
             'suppliers.name'  => 'suppliers.name',
-            'barang_master.barang_name' => 'barang_master.barang_name',
+            'barang_master_spesifikasi.spesifikasi' => 'barang_master_spesifikasi.spesifikasi',
             'am_purchase_order_details.price' => 'am_purchase_order_details.price',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -382,7 +382,7 @@ class AMPurchaseOrderModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "
-            barang_master.barang_name as nama_barang, 
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
             am_purchase_orders.po_no,
             am_purchase_orders.po_date,
             suppliers.name as nama_supplier,
@@ -394,6 +394,7 @@ class AMPurchaseOrderModel extends Model
             ->where($condition)
             ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id')
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
             ->orderBy($sort, $sortType);
 

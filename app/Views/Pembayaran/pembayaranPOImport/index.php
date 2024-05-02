@@ -159,6 +159,14 @@
                         `;
 
                         form += `
+                            <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+
+                        form += `
                             <?php if (can('Pembayaran', 'Internasional', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
@@ -166,7 +174,13 @@
                             <?php endif; ?>
                         `;
                     } else {
-                        form += '-';
+                        form += `
+                            <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
                     }
 
                     form += ` </div>`;
@@ -291,6 +305,10 @@
                 });
             }
         })
+    }
+
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 
     const remove = function(id) {

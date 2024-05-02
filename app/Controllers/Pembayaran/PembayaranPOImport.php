@@ -308,13 +308,11 @@ class PembayaranPOImport extends BaseController
                 'total' => $p->total,
                 'po_no' => $poDetail['po_no'],
                 'tgl_po' => $poDetail['po_date'],
+                'kode_satuan' => $p->kode_satuan
             ]);
         }
 
         $data['poList'] = $result;
-
-        \dd($data);
-        die;
 
         $this->dompdf->loadHtml(view('Pembayaran/pembayaranPOImport/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
