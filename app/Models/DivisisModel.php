@@ -67,8 +67,8 @@ class DivisisModel extends Model
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
         $requete = "SELECT divisis.*, jam_kerja.jenis FROM divisis ";
-        $requete .= "LEFT JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
-        $requete .= "WHERE divisis.deletedAt IS NULL ";
+        $requete .= "INNER JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
+        $requete .= "WHERE divisis.deletedAt IS NULL AND jam_kerja.deletedAt IS NULL ";
 
         if (isset($values["company_id"]) && $values["company_id"] !== "") {
             $requete .= "AND divisis.company_id = '" . $values["company_id"] . "' ";
@@ -97,13 +97,19 @@ class DivisisModel extends Model
     public function total_list($values)
     {
         $requete  = "SELECT count(*) as total FROM divisis ";
-        $requete .= "WHERE divisis.deletedAt is null ";
-        if (isset($values["company_id"]))
-            $requete .= ($values["company_id"] == "") ? "" : ("AND divisis.company_id ='" . $values["company_id"] . "' ");
-        if (isset($values["divisi"]))
-            $requete .= ($values["divisi"] == "") ? "" : ("AND UPPER(divisis.divisi) like '%" . strtoupper($values["divisi"]) . "%' ");
-        if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(divisis.divisi) like '%" . strtoupper($values["search"]) . "%') ");
+        $requete .= "INNER JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
+        $requete .= "WHERE divisis.deletedAt IS NULL AND jam_kerja.deletedAt IS NULL ";
+        if (isset($values["company_id"]) && $values["company_id"] !== "") {
+            $requete .= "AND divisis.company_id = '" . $values["company_id"] . "' ";
+        }
+
+        if (isset($values["divisi"]) && $values["divisi"] !== "") {
+            $requete .= "AND UPPER(divisis.divisi) LIKE '%" . strtoupper($values["divisi"]) . "%' ";
+        }
+
+        if (isset($values["search"]) && $values["search"] !== "") {
+            $requete .= "AND (UPPER(divisis.divisi) LIKE '%" . strtoupper($values["search"]) . "%') ";
+        }
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;

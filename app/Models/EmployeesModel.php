@@ -148,7 +148,8 @@ class EmployeesModel extends Model
     {
         $requete = "SELECT employees.*, divisis.divisi as divisionName FROM employees ";
         $requete .= "INNER JOIN divisis ON (employees.division_id = divisis.id) ";
-        $requete .= "WHERE employees.deletedAt IS NULL AND divisis.deletedAt IS NULL";
+        $requete .= "INNER JOIN bagian ON (employees.bagian_id = bagian.id) ";
+        $requete .= "WHERE employees.deletedAt IS NULL AND divisis.deletedAt IS NULL AND bagian.deletedAt IS NULL";
 
         if (isset($values["name"])) {
             $requete .= ($values["name"] == "") ? "" : " AND UPPER(employees.name) LIKE '%" . strtoupper($values["name"]) . "%'";
@@ -219,8 +220,7 @@ class EmployeesModel extends Model
         ];
 
         $builder = $this->db->table('employees')
-            ->select("employees.*, users.id as users_id, users.name as users_name, bagian.nama_bagian")
-            ->join('users', 'users.employee_id = employees.id')
+            ->select("employees.*, bagian.nama_bagian")
             ->join('divisis', 'divisis.id = employees.division_id')
             ->join('bagian', 'employees.bagian_id = bagian.id');
         $builder->groupStart()->where($arrCondition)->groupEnd();
@@ -332,8 +332,7 @@ class EmployeesModel extends Model
         }
 
         $this->builder()
-            ->select("employees.*, users.id as users_id, users.name as users_name, divisis.divisi, bagian.nama_bagian")
-            ->join('users', 'users.employee_id = employees.id')
+            ->select("employees.*, divisis.divisi, bagian.nama_bagian")
             ->join('divisis', 'divisis.id = employees.division_id')
             ->join('bagian', 'bagian.id = employees.bagian_id')
             ->groupStart()->where($arrCondition)->groupEnd();
