@@ -13,39 +13,39 @@
                     <!-- Nested Row within Card Body -->
                     <div class="row">
                         <div class="col-lg-12">
-                                <div class="d-flex justify-content-center align-items-center mb-5">
-                                    <img src="<?= base_url("assets/img/logo.png"); ?>">
+                            <div class="d-flex justify-content-center align-items-center mb-5">
+                                <img src="<?= base_url("assets/img/logo.png"); ?>">
+                            </div>
+                            <form class="user" role="form" method="POST" enctype="multipart/form-data">
+                                <?= csrf_field() ?>
+                                <div class="input-group input-group-login-register">
+                                    <div class="input-group-prepend group-prepend-login-register align-items-center">
+                                        <span class="input-group-text input-group-text-login-register" id="basic-addon1"><i class="icon-login-register fas fa-user"></i></span>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input autocomplete="one-time-code" type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
+                                        <label for="floatingInput">Username</label>
+                                    </div>
                                 </div>
-                                <form class="user" role="form" method="POST" enctype="multipart/form-data">
-                                    <?= csrf_field() ?>
-                                    <div class="input-group input-group-login-register">
-                                        <div class="input-group-prepend group-prepend-login-register align-items-center">
-                                            <span class="input-group-text input-group-text-login-register" id="basic-addon1"><i class="icon-login-register fas fa-user"></i></span>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input autocomplete="one-time-code" type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
-                                            <label for="floatingInput">Username</label>
-                                        </div>
+                                <div class="input-group input-group-login-register">
+                                    <div class="input-group-prepend group-prepend-login-register align-items-center">
+                                        <span class="input-group-text input-group-text-login-register" id="basic-addon1"><i class="icon-login-register fas fa-lock"></i></span>
                                     </div>
-                                    <div class="input-group input-group-login-register">
-                                        <div class="input-group-prepend group-prepend-login-register align-items-center">
-                                            <span class="input-group-text input-group-text-login-register" id="basic-addon1"><i class="icon-login-register fas fa-lock"></i></span>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input autocomplete="one-time-code" type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
-                                            <label for="floatingInput">Password</label>
-                                        </div>
-                                        <div class="input-group-prepend group-prepend-password-login-register align-items-center">
-                                            <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2" onclick="password_show_hide()">
-                                                <i class="fas fa-eye d-none" id="show_eye"></i>
-                                                <i class="fas fa-eye-slash" id="hide_eye"></i>
-                                            </span>
-                                        </div>
+                                    <div class="form-floating mb-3">
+                                        <input autocomplete="one-time-code" type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
+                                        <label for="floatingInput">Password</label>
                                     </div>
-                                </form>
-                                <button class="btn btn-login-register btn-block" onclick="submitForm()">
-                                    Log In
-                                </button>
+                                    <div class="input-group-prepend group-prepend-password-login-register align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2" onclick="password_show_hide()">
+                                            <i class="fas fa-eye d-none" id="show_eye"></i>
+                                            <i class="fas fa-eye-slash" id="hide_eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                            <button class="btn btn-login-register btn-block" onclick="submitForm()">
+                                Log In
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -63,15 +63,15 @@
 </div>
 
 <!-- Bootstrap core JavaScript-->
-<script src="<?= base_url(); ?>assets/_vendor/jquery/jquery.min.js"></script>
-<script src="<?= base_url(); ?>assets/_vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url(); ?>assets/_vendor/jquery/jquery.min.js?v=<?= time(); ?>"></script>
+<script src="<?= base_url(); ?>assets/_vendor/bootstrap/js/bootstrap.bundle.min.js?v=<?= time(); ?>"></script>
 
 <!-- Core plugin JavaScript-->
-<script src="<?= base_url(); ?>assets/_vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="<?= base_url(); ?>assets/_vendor/jquery-easing/jquery.easing.min.js?v=<?= time(); ?>"></script>
 
 <!-- Custom scripts for all pages-->
-<script src="<?= base_url(); ?>assets/js/style.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="<?= base_url(); ?>assets/js/style.min.js?v=<?= time(); ?>"></script>
+<script src="<?= base_url(); ?>assets/js/sweetalert2@11.js?v=<?= time(); ?>"></script>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -87,7 +87,7 @@
     }
     ?>
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         var validator = $(".user").validate({
             rules: {
                 username: {
@@ -116,21 +116,21 @@
                     error.insertAfter(element);
                 }
             },
-            highlight: function (element) {
+            highlight: function(element) {
                 $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');                      
+                $(element).addClass('select-class');
 
             },
-            unhighlight: function (element) {
+            unhighlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');   
+                $(element).removeClass('select-class');
             },
         });
     })
 
-    $('.username, .password').keypress(function (e) {
+    $('.username, .password').keypress(function(e) {
         var key = e.which;
-        if(key == 13)  // the enter key code
+        if (key == 13) // the enter key code
         {
             if ($(".user").valid()) {
                 const csrf = $(`[name="${csrfToken}"]`);
