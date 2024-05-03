@@ -206,6 +206,16 @@ class User extends BaseController
                 return;
             }
 
+            foreach (json_decode($this->request->getVar('company_role')) as $r) {
+                if (count($r->divisi_access_id) == 0) {
+                    return response()->setJSON([
+                        'message' => "Isikan minimal satu departemen yang akan dihandle user per company",
+                        'token' => csrf_hash(),
+                        'status' => false
+                    ]);
+                }
+            }
+
             if ($this->validate($rules)) {
                 $payload = [
                     "company_id" => $this->this_company_id,
@@ -284,6 +294,16 @@ class User extends BaseController
                 $id = $this->request->getPost("id");
 
                 $password = $this->request->getPost("password");
+
+                foreach (json_decode($this->request->getVar('company_role')) as $r) {
+                    if (count($r->divisi_access_id) == 0) {
+                        return response()->setJSON([
+                            'message' => "Isikan minimal satu departemen yang akan dihandle user per company",
+                            'token' => csrf_hash(),
+                            'status' => false
+                        ]);
+                    }
+                }
 
                 // check username exist except id
                 $check_current_username = $this->UserModel->check_current_username($id, $this->request->getPost("username"));

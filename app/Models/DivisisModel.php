@@ -190,20 +190,28 @@ class DivisisModel extends Model
 
     public function getDivisiAccess()
     {
-        return $this->asArray()->where('deletedAt', null)
-            ->whereIn('id', session()->get('login')->this_access_divisi_id)
-            ->where('company_id', session()->get('login')->this_company_id)
-            ->orderBy('divisi', "ASC")
-            ->findAll();
+        if (empty(session()->get('login')->this_access_divisi_id)) {
+            return [];
+        } else {
+            return $this->asArray()->where('deletedAt', null)
+                ->whereIn('id', session()->get('login')->this_access_divisi_id)
+                ->where('company_id', session()->get('login')->this_company_id)
+                ->orderBy('divisi', "ASC")
+                ->findAll();
+        }
     }
 
     public function getDivisiExcept($divisi_id)
     {
-        return $this->asArray()->where('deletedAt', null)
-            ->whereNotIn('id', [$divisi_id])
-            ->whereIn('id', session()->get('login')->this_access_divisi_id)
-            ->where('company_id', session()->get('login')->this_company_id)
-            ->orderBy('divisi', "ASC")
-            ->findAll();
+        if (empty(session()->get('login')->this_access_divisi_id)) {
+            return [];
+        } else {
+            return $this->asArray()->where('deletedAt', null)
+                ->whereNotIn('id', [$divisi_id])
+                ->whereIn('id', session()->get('login')->this_access_divisi_id)
+                ->where('company_id', session()->get('login')->this_company_id)
+                ->orderBy('divisi', "ASC")
+                ->findAll();
+        }
     }
 }
