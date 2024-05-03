@@ -74,8 +74,11 @@ class Golongan extends BaseController
 
         $golongan_name = $this->request->getVar('golonganName');
 
+        $company_id = $this->this_company_id;
+
         $getGolonganNameNull = $golonganModel->select('id')
             ->where('golongan_name', $golongan_name)
+            ->where('company_id', $company_id)
             ->where('deletedAt', null)
             ->findAll();
 
@@ -136,10 +139,13 @@ class Golongan extends BaseController
 
         $id = $this->request->getVar('id');
 
+        $company_id = $this->this_company_id;
+
         $golonganName = $this->request->getVar('golonganName');
 
         $getGolonganNull = $golonganModel->select('id')
             ->where('golongan_name', $golonganName)
+            ->where('company_id', $company_id)
             ->where('deletedAt', null)
             ->where('id !=', $id)
             ->findAll();
@@ -150,6 +156,7 @@ class Golongan extends BaseController
             //cek name yg diedit masih sama dengan yg di ID?
             $getGolonganNow = $golonganModel->select('id')
                 ->where('golongan_name', $golonganName)
+                ->where('company_id', $company_id)
                 ->where('deletedAt', null)
                 ->where('id', $id)
                 ->first();
