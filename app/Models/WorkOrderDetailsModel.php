@@ -54,18 +54,27 @@ class WorkOrderDetailsModel extends Model
     public function getWorkOrderDetailByWorkOrderID($woID)
     {
         $selectQry = '
-            work_order_details.*,        
-            barang_master.kode_barang,        
-            barang_master.barang_name,        
-            barang_master.type_barang,        
-            satuans.kode_satuan,        
+            work_order_details.id as id,        
+            work_order_details.barang1_id as barang1_id,        
+            barang_master_spesifikasi.id as barang2_id,        
+            barang_master.barang_name as barang_name,        
+            barang_master.kode_barang as kode_barang,        
+            satuans.kode_satuan as kode_satuan,        
+            work_order_details.nama_barang as nama_barang,        
+            work_order_details.note as note,        
+            work_order_details.qty as qty,        
+            barang_master.type_barang as type_barang,        
+            barang_master_spesifikasi.spesifikasi as spesifikasi,        
+            barang_master_spesifikasi.satuan_1 as unit,        
         ';
 
         $dataQry = $this->asArray()
             ->select($selectQry)
-            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id')
-            ->join('satuans', 'satuans.id = work_order_details.unit')
+            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('work_order_details.work_order_id', $woID)
+            ->where('work_order_details.deletedAt', null)
             ->findAll();
 
         return $dataQry;

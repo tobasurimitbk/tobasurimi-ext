@@ -94,4 +94,124 @@ class ProductionResultModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getDataProductionResultWithDetail($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        barang_master.barang_name, 
+        barang_master_spesifikasi.spesifikasi,
+        production_result_details.*
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->like('production_results.receive_date', $where['tanggal_jurnal'])
+            ->where('production_result_details.type', 'JADI')
+            ->where('production_result_details.deletedAt', $where['deletedAt'])
+            ->where('production_results.deletedAt', $where['deletedAt'])
+            ->findAll();
+
+        return $dataQry;
+    }
+
+    public function getDataProductionResultBahanBakuWithDetail($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        barang_master.barang_name, 
+        barang_master_spesifikasi.spesifikasi,
+        production_result_details.*
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->like('production_results.receive_date', $where['tanggal_jurnal'])
+            ->where('production_result_details.type', 'DIGUNAKAN')
+            ->where('production_result_details.barang_type !=', 'bahan_penolong')
+            ->where('production_result_details.deletedAt', $where['deletedAt'])
+            ->where('production_results.deletedAt', $where['deletedAt'])
+            ->findAll();
+
+        return $dataQry;
+    }
+
+    public function getDataProductionResultBahanPenolongWithDetail($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        barang_master.barang_name, 
+        barang_master_spesifikasi.spesifikasi,
+        production_result_details.*,
+        SUM(production_result_details.qty) as qty,
+        parent_barang.parent_name
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->like('production_results.receive_date', $where['tanggal_jurnal'])
+            ->where('production_result_details.type', 'DIGUNAKAN')
+            ->where('production_result_details.barang_type', 'bahan_penolong')
+            ->where('production_result_details.deletedAt', $where['deletedAt'])
+            ->where('production_results.deletedAt', $where['deletedAt'])
+            ->groupBy('barang_master.parent_type_id')
+            ->findAll();
+
+        var_dump($dataQry);
+
+        return $dataQry;
+    }
+    // public function getDataProductionResultWithDetail($where)
+    // {
+    //     $where['deletedAt'] = null;
+    //     $selectQryJadi = '
+    //     barang_master.barang_name, 
+    //     barang_master_spesifikasi.spesifikasi,
+    //     production_result_details.qty as qtyProduksi
+    //     ';
+    //     $selectQryDigunakan = '
+    //     barang_master.barang_name, 
+    //     barang_master_spesifikasi.spesifikasi,
+    //     production_result_details.*
+    //     ';
+
+    //     $dataQry['jadi'] = $this->asArray()
+    //         ->select($selectQryJadi)
+    //         ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
+    //         ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+    //         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+    //         ->like('production_results.receive_date', $where['tanggal_jurnal'])
+    //         ->where('production_result_details.type', 'JADI')
+    //         ->where('production_result_details.deletedAt', $where['deletedAt'])
+    //         ->where('production_results.deletedAt', $where['deletedAt'])
+    //         ->findAll();
+
+    //     $dataQry['digunakan'] = $this->asArray()
+    //         ->select($selectQryDigunakan)
+    //         ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
+    //         ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+    //         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+    //         ->like('production_results.receive_date', $where['tanggal_jurnal'])
+    //         ->where('production_result_details.type', 'DIGUNAKAN')
+    //         ->where('production_result_details.deletedAt', $where['deletedAt'])
+    //         ->where('production_results.deletedAt', $where['deletedAt'])
+    //         ->findAll();
+
+    //     return $dataQry;
+    // }
 }

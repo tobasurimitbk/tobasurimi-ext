@@ -413,7 +413,8 @@
                     'satuan': '<?= $bd->kode_satuan; ?>',
                     'nama_barang': '<?= $bd->nama_barang; ?>',
                     'qty': '<?= $bd->qty; ?>',
-                    'ref_no': '<?= $bd->no_aju; ?>',
+                    'ref_no': '<?= $bd->no_ref; ?>',
+                    'no_aju': '<?= $bd->no_aju; ?>',
                     'type_barang': '<?= $bd->barang_type; ?>',
                     'type_barang_text': '<?= $bd->type_barang_text; ?>',
                 });
@@ -430,7 +431,8 @@
                     'satuan': '<?= $br->kode_satuan; ?>',
                     'nama_barang': '<?= $br->nama_barang; ?>',
                     'qty': '<?= $br->qty; ?>',
-                    'ref_no': '<?= $br->no_aju; ?>',
+                    'ref_no': '<?= $bd->no_ref; ?>',
+                    'no_aju': '<?= $bd->no_aju; ?>',
                     'type_barang': '<?= $br->barang_type; ?>',
                     'type_barang_text': '<?= $br->type_barang_text; ?>',
                 });
@@ -820,7 +822,7 @@
                     },
                     dataType: "json",
                     success: function(res) {
-                        // console.log(res);
+                        console.log(res);
                         list_items_barang_jadi = [];
                         list_items_barang_scrap = [];
                         list_items_barang_digunakan = [];
@@ -832,12 +834,12 @@
                                 'detail_work_order': item.id,
                                 'barang1_id': item.barang1_id,
                                 'barang2_id': item.barang2_id,
-                                'barang_name': item.barang_name,
+                                'barang_name': item.barang_name + " - " + item.spesifikasi,
                                 'kode_barang': item.kode_barang,
                                 'kode_satuan': item.kode_satuan,
                                 'nama_barang': item.nama_barang,
                                 'note': item.note,
-                                'qty': item.qty,
+                                'qty': 0,
                                 'type_barang': item.type_barang,
                                 'type_barang_text': item.type_barang_text,
                                 'unit': item.unit,
@@ -909,7 +911,7 @@
                                 'satuan': item.satuan,
                                 'nama_barang': item.nama_barang,
                                 'note': item.note,
-                                'qty': item.qty,
+                                'qty': item.qty_isi,
                                 'ref_no': new_ref_no,
                                 'no_aju': item.no_aju,
                                 'type_barang': item.type_barang,

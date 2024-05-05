@@ -46,18 +46,44 @@ class Costing extends BaseController
             list($month, $year) = explode('/', $monthData);
             $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
             $settingCosting = $this->settingCosting->getSettingCosting();
-            foreach ($settingCosting as $valueSetting) {
-                $condition = [
-                    'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
-                    // 'id_coa' => $valueSetting['coa'],
-                ];
-                $jurnalData = $this->jurnalUmumModel->getDataJurnal($condition);
-                var_dump($jurnalData);
+            $conditionProduction = [
+                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            ];
+            foreach ($settingCosting as &$valueSetting) {
+                if ($valueSetting['name'] == "RAW MATERIAL I") {
+                    $condition = [
+                        'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                        'id_coa' => $valueSetting['coa'],
+                    ];
+                    $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
+                    $valueSetting['jmlhJurnal'] = $jurnalData;
+                    $productionResultDataDetailBahanBaku = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
+                    $valueSetting['rawMaterial'] = $productionResultDataDetailBahanBaku;
+                } else if ($valueSetting['name'] == "RAW MATERIAL II") {
+                    $condition = [
+                        'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                        'id_coa' => $valueSetting['coa'],
+                    ];
+                    $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
+                    $valueSetting['jmlhJurnal'] = $jurnalData;
+                    $productionResultDataDetailBahanPenolong = $this->productionResultModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
+                    $valueSetting['rawMaterialPenolong'] = $productionResultDataDetailBahanPenolong;
+                } else {
+                    $condition = [
+                        'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                        'id_coa' => $valueSetting['coa'],
+                    ];
+                    $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
+                    $valueSetting['jmlhJurnal'] = $jurnalData;
+                }
             }
+            $productionResultDataTitle = $this->productionResultModel->getDataProductionResultWithDetail($conditionProduction);
+            // var_dump($productionResultDataTitle);
             exit;
 
             $dataResult = [
-                'settingCosting' => $settingCosting
+                'settingCosting' => $settingCosting,
+                'productionResultDataTitle' => $productionResultDataTitle,
             ];
 
             return response()->setJSON([
