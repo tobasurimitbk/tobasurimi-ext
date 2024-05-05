@@ -70,7 +70,7 @@ class Divisi extends BaseController
             "search"        => $search
         ];
 
-        $totalRecords = $this->DivisisModel->total_list(array());
+        $totalRecords = $this->DivisisModel->total_list($values);
         $totalRecordwithFilter = $this->DivisisModel->total_list($values);
 
         $res = $this->DivisisModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);

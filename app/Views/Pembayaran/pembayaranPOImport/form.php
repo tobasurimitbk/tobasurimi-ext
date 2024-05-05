@@ -34,6 +34,12 @@
                             Simpan
                         </button>
                     <?php endif; ?>
+                <?php else : ?>
+                    <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
+                        <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-import/print/' . encrypt($paymentData['id']) ?? '') ?>">
+                            Print
+                        </a>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
         </div>

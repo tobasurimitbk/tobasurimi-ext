@@ -35,7 +35,7 @@ class ParentBarang extends BaseController
         $type = $this->request->getVar('type');
         $parentName = $this->request->getVar('parentName');
 
-        if ($parentBarangModel->where('parent_name', $parentName)->where('parent_type', $type)->where('deletedAt', null)->first() != null) {
+        if ($parentBarangModel->where('company_id', $this->this_company_id)->where('parent_name', $parentName)->where('parent_type', $type)->where('deletedAt', null)->first() != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'status' => false,
@@ -65,6 +65,7 @@ class ParentBarang extends BaseController
         $first = $parentBarangModel->find($id);
 
         $parentBarangSameName = $parentBarangModel
+            ->where('company_id', $this->this_company_id)
             ->where('parent_name', $parentName)
             ->where('parent_type', $first['parent_type'])
             ->where('id !=', $id)

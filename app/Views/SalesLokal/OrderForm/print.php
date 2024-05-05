@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Form <?= $soData->customerName ?></title>
     <style>
+        body {
+            font-size: 12px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        @page {
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
+        }
+
         .company-name {
             font-weight: 700;
             border: 1px solid;
@@ -20,7 +31,7 @@
             border: 1px solid;
             border-radius: 7px;
             height: 65px;
-            margin-top: 20px;
+
             width: 60%;
             position: relative;
             padding-top: 7px;
@@ -39,8 +50,9 @@
         .item-table {
             border: 1px solid;
             width: 100%;
-            height: 230px;
-            margin-top: 10px;
+
+            margin-top: 5px;
+            margin-bottom: 10px;
             border-collapse: collapse;
         }
 
@@ -120,7 +132,7 @@
         </tr>
     </table>
 
-    <table class="item-table">
+    <table class="item-table" border="1">
         <tr>
             <th style="height: 1px;">Item</th>
             <th>Item Description</th>

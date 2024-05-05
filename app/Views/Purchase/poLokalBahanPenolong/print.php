@@ -7,15 +7,15 @@
     <title>PO Lokal Bahan Penolong</title>
     <style>
         body {
+            height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 13px;
+            font-size: 12px;
         }
 
-
         @page {
-            size: 6.8in 13.2in landscape;
-            margin: 29px;
-            padding: 29px;
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
         }
 
         .header {
@@ -51,6 +51,10 @@
 
         .mt-2 {
             margin-top: 2rem;
+        }
+
+        .mt-3 {
+            margin-top: 3rem;
         }
 
         .border-collapse {
@@ -108,7 +112,7 @@
 
         .footer {
             position: absolute;
-            bottom: 25;
+            bottom: 15;
             width: 100%;
             height: 90px;
             margin-top: 10px;
@@ -118,7 +122,7 @@
 
 <body>
     <?php if (!empty($dataPOLokal)) { ?>
-        <table class="w-100" style="margin-top: -15px;">
+        <table class="w-100" style="margin-top: 10px;">
             <tr>
                 <td style="text-align: right; font-weight:bold;">
                     <div style="font-size: 13px;">
@@ -187,7 +191,7 @@
                 <td style="text-align:left"><?= $dataPOLokal->supplierNPWP ?></td>
             </tr>
         </table>
-        <br><br>
+        <br>
         <div class="mt-025 txt-bold" style="margin-bottom: 3px; margin-top:20px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
         <table class="item-table mt-050">
             <tr>
@@ -213,7 +217,7 @@
                     <!-- <td><?= $detail->additional_cost ?></b></td> -->
                     <!-- <td><?= $detail->nilaiPpn ?></b></td> -->
                     <!-- <td><?= $detail->nilaiPph ?></b></td> -->
-                    <td style="padding-left: 5px;"><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
+                    <td style="padding-left: 5px; "><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail->kode_barang ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail->nama_barang . " " . $detail->spesifikasi ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= "" . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
@@ -221,44 +225,33 @@
                     <td class="txt-right" style="padding-right: 5px;"><?= "" . number_format(formatter($detail->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                 </tr>
             <?php } ?>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="2" style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold; ">Total :</td>
+                <td style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;border-top: 1px solid black;"> <?= $dataPOLokal->totalPrice ?></td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="2" style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;">Tambahan :</td>
+                <td style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;"> <?= $dataPOLokal->totalTambahan ?></td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="2" style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;">Diskon :</td>
+                <td style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;"> <?= $dataPOLokal->totalDisc ?></td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="2" style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;">PPN (dikreditkan) :</td>
+                <td style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;"> <?= $dataPOLokal->totalPpn ?></td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="2" style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;">Grand Total :</td>
+                <td style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;"> <?= $dataPOLokal->totalPo ?></td>
+            </tr>
         </table>
-        <div class="header mt-025">
-            <table style="text-align:right; width:100%; margin-top:30px; font-weight:bold;">
-                <tr>
-                    <td colspan="3">____________</td>
-                </tr>
-                <tr>
-                    <td style="width:1100px">Total</td>
-                    <td style="width: 10px;">:</td>
-                    <td> <?= $dataPOLokal->totalPrice ?></td>
-                </tr>
-                <tr>
-                    <td>Tambahan</td>
-                    <td>:</td>
-                    <td> <?= $dataPOLokal->totalTambahan ?></td>
-                </tr>
-                <tr>
-                    <td>Diskon</td>
-                    <td>:</td>
-                    <td> <?= $dataPOLokal->totalDisc ?></td>
-                </tr>
-                <!-- <tr>
-                    <td>Sub Total</td>
-                    <td>:</td>
-                    <td> <?= $dataPOLokal->totalPrice ?></td>
-                </tr> -->
-                <tr>
-                    <td>PPN (dikreditkan)</td>
-                    <td>:</td>
-                    <td> <?= $dataPOLokal->totalPpn ?></td>
-                </tr>
-                <tr>
-                    <td>Grand Total</td>
-                    <td>:</td>
-                    <td> <?= $dataPOLokal->totalPo ?></td>
-                </tr>
-            </table>
-        </div>
+
         <div class="footer">
             <table class="w-100 sign-table border-collapse " style="padding-top: 0px;margin-left:-30px;">
                 <tr>

@@ -76,10 +76,11 @@ class Tunjangan extends BaseController
     {
 
         $name = $this->request->getPost("nama");
-
+        $company_id = $this->this_company_id;
         $getNameNull = $this->TunjanganModel->select('id')
             ->where('name', $name)
             ->where('deletedAt', null)
+            ->where('company_id', $company_id)
             ->findAll();
 
         //cek nama duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
@@ -170,9 +171,11 @@ class Tunjangan extends BaseController
         $id = $this->request->getPost("id");
 
         $name = $this->request->getPost("nama");
+        $company_id = $this->this_company_id;
 
         $getNameNull = $this->TunjanganModel->select('id')
             ->where('name', $name)
+            ->where('company_id', $company_id)
             ->where('deletedAt', null)
             ->where('id !=', $id)
             ->findAll();
@@ -183,6 +186,7 @@ class Tunjangan extends BaseController
             //cek name yg diedit masih sama dengan yg di ID?
             $getNameNow = $this->TunjanganModel->select('id')
                 ->where('name', $name)
+                ->where('company_id', $company_id)
                 ->where('deletedAt', null)
                 ->where('id', $id)
                 ->first();

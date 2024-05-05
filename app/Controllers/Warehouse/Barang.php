@@ -481,7 +481,7 @@ class Barang extends BaseController
 
         $condition = [
             "am_purchase_orders.company_id"  => $this->this_company_id,
-            "am_purchase_order_details.barang_id" => $this->request->getVar('id'),
+            "am_purchase_order_details.barang_id" => decrypt($this->request->getVar('id')),
             "am_purchase_orders.deletedAt" => NULL,
             "am_purchase_order_details.deletedAt" => NULL,
             "am_purchase_orders.po_type" => $this->request->getVar('po_type')

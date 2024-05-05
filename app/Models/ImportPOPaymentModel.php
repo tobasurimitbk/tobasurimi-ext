@@ -129,7 +129,7 @@ class ImportPOPaymentModel extends Model
 
     public function getPuchaseOrderList($condition, $addCondition, $limit = 10, $offset = 0)
     {
-        $selectQry = "barang_master.kode_barang, barang_master.barang_name, barang_master_spesifikasi.spesifikasi";
+        $selectQry = "barang_master.kode_barang, barang_master.barang_name, barang_master_spesifikasi.spesifikasi,satuans.kode_satuan";
         $joinTable = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details' : 'am_purchase_order_details';
         $orderField = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details.createdAt' : 'am_purchase_order_details.createdAt';
         $table = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details' : 'am_purchase_order_details';
@@ -139,6 +139,7 @@ class ImportPOPaymentModel extends Model
             ->where($condition)
             ->join('barang_master', "$joinTable.barang_id = barang_master.id", 'left')
             ->join('barang_master_spesifikasi', "$joinTable.spesifikasi_id = barang_master_spesifikasi.id", 'left')
+            ->join('satuans', "satuans.id = $joinTable.unit", 'left')
             ->orderBy($orderField, "DESC");
 
         $totalData = $poDataQry->countAllResults(false);

@@ -355,7 +355,7 @@ class BiayaKepiting extends BaseController
         $data['gajiBiayaKepiting'] = $this->biayaKepitingGajiModel->where('biaya_kepiting_id', $biayaKepiting['id'])->findAll();
 
         $this->dompdf->loadHtml(view('jasaVendor/biayaKepiting/print', $data));
-        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->setPaper('A4', 'landscape');
         $this->dompdf->render();
         $this->dompdf->stream("Biaya Kepiting", array("Attachment" => false));
     }

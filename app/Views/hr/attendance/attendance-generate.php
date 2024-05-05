@@ -325,12 +325,12 @@
                                             <?php $isGenerateTotal++; ?>
                                             <tr>
                                                 <td width="150">
-                                                    &nbsp;<?= $e['name'] ?></td>
+                                                    &nbsp;<?= strtoupper($e['name']) ?></td>
                                                 <td width="110">
-                                                    &nbsp;<?= $e['divisi'] ?></td>
+                                                    &nbsp;<?= strtoupper($e['divisi']) ?></td>
                                                 </td>
                                                 <td width="110">
-                                                    &nbsp;<?= $e['nama_bagian'] ?></td>
+                                                    &nbsp;<?= strtoupper($e['nama_bagian']) ?></td>
                                                 </td>
                                                 <?php foreach ($statusPerizinan as $s) : ?>
                                                     <td width="20" align="center">

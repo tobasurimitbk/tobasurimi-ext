@@ -7,15 +7,15 @@
     <title>Biaya Udang</title>
     <style>
         body {
-            font-size: 13px;
+            font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        @page {
-            size: 12.00in 10.50in landscape;
+        /* @page {
+            size: 8.27in 5.50in landscape;
             margin: 25px;
             padding: 25px;
-        }
+        } */
 
         .body {
             margin-left: 30px;
@@ -48,7 +48,7 @@
 
         .table th,
         .table td {
-            padding: 0.75rem;
+            padding: 0.25rem;
             vertical-align: top;
             border-top: 1px solid black;
             border-right: 1px solid black;
@@ -104,7 +104,7 @@
                 </tr>
             </table>
 
-            <table class="table" style="margin-top: 30px;">
+            <table class="table" style="margin-top: 15px;">
                 <thead style="text-align: center; font-weight:bold;">
                     <tr>
                         <th style="text-align: center;" colspan="4"></th>

@@ -7,12 +7,12 @@
     <title>Jasa Vendor Barang Masuk</title>
     <style>
         body {
-            font-size: 13px;
+            font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         @page {
-            size: 13.00in 8.50in landscape;
+            size: 8.27in 5.50in landscape;
             margin: 25px;
             padding: 25px;
         }
@@ -28,7 +28,7 @@
         }
 
         .head-table {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
             text-align: center;
         }
@@ -47,7 +47,7 @@
 
         .table th,
         .table td {
-            padding: 0.75rem;
+            padding: 0.25rem;
             vertical-align: top;
             border-top: 1px solid black;
             border-right: 1px solid black;

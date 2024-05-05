@@ -8,7 +8,7 @@
     <title>Surat Permintaan Pembelian</title>
     <style>
         body {
-            font-size: 13px;
+            font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
@@ -18,9 +18,9 @@
         }
 
         @page {
-            size: 9.44in 4.33in landscape;
-            margin: 29px;
-            padding: 29px;
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
         }
 
         .table-border {
@@ -36,6 +36,10 @@
 
         .mt-5 {
             margin-top: 5px;
+        }
+
+        .mt-3 {
+            margin-top: 3rem;
         }
 
         .sign-table td:not(:last-child) {

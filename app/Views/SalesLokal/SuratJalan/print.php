@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        body {
+            font-size: 12px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        @page {
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
+        }
+
         .company-name {
             font-weight: 700;
             border: 1px solid;
@@ -19,7 +31,7 @@
             border: 1px solid;
             border-radius: 7px;
             height: 65px;
-            margin-top: 20px;
+            margin-top: 8px;
             width: 60%;
             position: relative;
             padding-top: 7px;
@@ -38,8 +50,9 @@
         .item-table {
             border: 1px solid;
             width: 100%;
-            height: 230px;
-            margin-top: 10px;
+
+            margin-top: 2px;
+            margin-bottom: 2px;
             border-collapse: collapse;
         }
 
@@ -54,7 +67,7 @@
 
         .signature-table {
             border-spacing: 30px 0;
-            margin-top: 10px;
+            margin-top: 2px;
         }
 
         .txt-bold {
@@ -74,6 +87,7 @@
         }
     </style>
 </head>
+
 <body>
     <table class="w-100">
         <tr>
@@ -115,7 +129,7 @@
             </td>
         </tr>
     </table>
-    
+
     <table class="item-table">
         <tr>
             <th>No</th>
@@ -129,36 +143,36 @@
         </tr>
         <?php
         $rowNumber = 1;
-        $totalInv = 0; 
-        foreach($soData as $detail): 
+        $totalInv = 0;
+        foreach ($soData as $detail) :
             $totalWithoutDisc = $detail->amt / ((100 - $detail->disc_pct) / 100);
             $totalInv += $detail->amt;
         ?>
-        <tr>
-            <td class="txt-center" style="height: 1px;"><?= $rowNumber; ?></td>
-            <td><?= $detail->namaBarang ?></td>
-            <td><?= $detail->no_sales_order ?></td>
-            <td class="txt-center"><?= $detail->qty ?></td>
-            <td class="txt-center"><?= $detail->kodeSatuan ?></td>
-            <td class="txt-center"><?= number_format($totalWithoutDisc / $detail->qty) ?></td>
-            <td class="txt-center"><?= $detail->disc_pct ?></td>
-            <td class="txt-right"><?= number_format($detail->amt) ?></td>
-        </tr>
+            <tr>
+                <td class="txt-center" style="height: 1px;"><?= $rowNumber; ?></td>
+                <td><?= $detail->namaBarang ?></td>
+                <td><?= $detail->no_sales_order ?></td>
+                <td class="txt-center"><?= $detail->qty ?></td>
+                <td class="txt-center"><?= $detail->kodeSatuan ?></td>
+                <td class="txt-center"><?= number_format($totalWithoutDisc / $detail->qty) ?></td>
+                <td class="txt-center"><?= $detail->disc_pct ?></td>
+                <td class="txt-right"><?= number_format($detail->amt) ?></td>
+            </tr>
         <?php
-        $rowNumber++; 
-        endforeach; 
+            $rowNumber++;
+        endforeach;
         ?>
-        <?php for ($i = 0; $i < (9 - count($soData)); $i++): ?>
-        <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-        </tr>
+        <?php for ($i = 0; $i < (9 - count($soData)); $i++) : ?>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
         <?php endfor; ?>
     </table>
 
@@ -178,7 +192,7 @@
                 <div style="border: 1px solid;"><?= terbilang($totalInv) ?></div>
             </td>
             <td>
-                <div class="txt-right" style="border: 1px solid;">Total Faktur: </div> 
+                <div class="txt-right" style="border: 1px solid;">Total Faktur: </div>
             </td>
             <td>
                 <div class="txt-right" style="border: 1px solid;"><?= number_format($totalInv) ?></div>
@@ -219,4 +233,5 @@
     </table>
 
 </body>
+
 </html>

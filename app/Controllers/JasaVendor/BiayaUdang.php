@@ -318,7 +318,7 @@ class BiayaUdang extends BaseController
         $data['biayaUdangTotal'] = $this->biayaUdangModel->getBarangDetail(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
 
         $this->dompdf->loadHtml(view('jasaVendor/biayaUdang/print', $data));
-        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->setPaper('A4', 'landscape');
         $this->dompdf->render();
         $this->dompdf->stream("Biaya Udang", array("Attachment" => false));
     }

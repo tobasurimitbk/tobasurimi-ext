@@ -34,7 +34,7 @@ class Warehouse extends BaseController
     {
         //$dataWarehouses = $this->WarehousesModel->search_list(array("company_id" => $this->this_company_id), 'warehouse_name');
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
-        $dataPic = $this->EmployeesModel->search_list(array(), 'name');
+        $dataPic = $this->EmployeesModel->search_list(array('company_id' => $this->this_company_id), 'name');
         $dataDivisi = $this->DivisisModel->getDivisiAccess();
         $dataKawasan = $this->KawasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
 
