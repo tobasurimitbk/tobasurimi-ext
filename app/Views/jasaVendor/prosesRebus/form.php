@@ -104,7 +104,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($prosesRebus) ? ($prosesRebus['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($prosesRebus) ? $prosesRebus['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Keterangan</label>
+                            <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -402,9 +402,6 @@
             warehouse_id: {
                 required: true
             },
-            keterangan: {
-                required: true
-            }
         },
         messages: {
             no_rebus: {
@@ -419,9 +416,6 @@
             warehouse_id: {
                 required: "Pilih Warehouse"
             },
-            keterangan: {
-                required: "Keterangan wajib diisi"
-            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',

@@ -51,6 +51,7 @@ class AdjusmentDetailModel extends Model
         $satuanModel = new SatuansModel();
         $warehouseModel = new WarehousesModel();
         $stockDetail2Model = new StockDetail2Model();
+        $supplierModel = new SupplierModel();
 
         $result = $this->asArray()->where('adjusment_id', $adjusmentID)->findAll();
         $adjusment = $adjusmentModel->find($adjusmentID);
@@ -79,24 +80,40 @@ class AdjusmentDetailModel extends Model
                 $spesifikasi_id
             );
 
-            $stockDetail2 = $stockDetail2Model->where('stock_id', $stock['id'])->where('bc_id', $r['bc_id'])->where('no_aju', $no_aju)->first();
+            $stockDetail2 = $stockDetail2Model->select('stock_details2.*, stock_details.sumber')
+                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+                ->where('stock_details2.stock_id', $stock['id'])
+                ->where('bc_id', $r['bc_id'])
+                ->where('no_aju', $no_aju)
+                ->first();
+
+            $supplier = $supplierModel->select('suppliers.*')
+                ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
+                ->where('penerimaan_barang.no_penerimaan_barang', $stockDetail2['no_dokumen'])
+                ->first();
+
+            $stockDetail2GroubBy = $stockDetail2Model->getStockListDetail($stock['id'], $r['bc_id'], $r['no_aju']);
 
             $response[] = array(
                 'id' => $stockDetail2['id'],
                 'stock_id' => $stock['id'],
                 'spesifikasi_id' => $spesifikasi_id,
+                'sumber' => $stockDetail2['sumber'],
+                'stock_dokumen' => $r['stock_dokumen'],
+                'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : "-",
                 'bc_id' => $r['bc_id'],
                 'no_aju' => $r['no_aju'],
-                'dokumen_text' => "(" . $bc_name . ") " . $r['no_aju'],
+                'dokumen_text' =>  $bc_name . " / " . $r['no_aju'],
                 'barang' => $barang,
                 'kode_barang' => $kode_barang,
                 'type_barang' => $r['tipe_barang'],
                 'type_barang_text' => strtoupper(str_replace('_', ' ', $r['tipe_barang'])),
-                'satuan_name' => $satuan == null ? "" : $satuan['kode_satuan'],
-                'warehouse' => $warehouse == null ? "" : $warehouse['warehouse_name'],
+                'satuan' => $satuan == null ? "" : $satuan['kode_satuan'],
+                'warehouse_text' => $warehouse == null ? "" : $warehouse['warehouse_name'],
                 'warehouse_id' => $warehouse == null ? 0 : $warehouse['id'],
-                'operasi' => $r['operasi'],
-                'qty' => $r['qty']
+                'stok_total' => $stockDetail2GroubBy == null ? 0 : $stockDetail2GroubBy['stok_total'],
+                'type_adjusment' => $r['operasi'],
+                'qty_adjusment' => $r['qty'],
             );
         }
 
