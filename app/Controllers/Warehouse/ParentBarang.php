@@ -4,6 +4,9 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 use App\Models\ParentBarangModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ParentBarang extends BaseController
 {
@@ -180,5 +183,101 @@ class ParentBarang extends BaseController
             'status' => true,
             'token' => csrf_hash()
         ]);
+    }
+
+    public function exportExcel()
+    {
+
+        $search        = $this->request->getVar("search");
+        $sort        = $this->request->getVar("sort");
+        $sortType      = $this->request->getVar("sortType");
+        $parent_type      = $this->request->getVar("parent_type");
+
+
+        $filename = "EXPORT_KATEGORI_" . strtoupper($parent_type);
+
+        $condition = [
+            "company_id"  => $this->this_company_id,
+            "parent_type" => $this->request->getGet('parent_type'),
+            "deletedAt" => null,
+        ];
+
+        $search        = $this->request->getVar("search");
+        $parent_type      = $this->request->getVar("parent_type");
+        $sort        = $this->request->getVar("sort");
+        $sortType      = $this->request->getVar("sortType");
+
+        $parentBarangModel = new ParentBarangModel();
+
+        $selectQry = "parent_barang.*";
+        $parentBarangData = $parentBarangModel->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        if ($search) {
+            $parentBarangData->groupStart()
+                ->like('parent_name', $search)
+                ->groupEnd();
+        }
+
+
+        $getAllParentBarangData = $parentBarangData->findAll();
+
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->getStyle('A1:B1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+
+        if (empty($getAllParentBarangData)) {
+            $sheet->setCellValue('A1', 'Tidak Ada Data Satuan');
+        } else {
+            $sheet->setCellValue('A1', 'NO');
+            $sheet->setCellValue('B1', 'KATEGORI');
+            $sheet->getStyle('A1:B1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+            ]);
+
+            $no = 1;
+            $numRow = 2;
+
+            foreach ($getAllParentBarangData as $row) :
+                $sheet->setCellValue('A' . $numRow, $no);
+                $sheet->setCellValue('B' . $numRow, $row['parent_name']);
+
+
+                // Auto size columns A-B
+                $sheet->getColumnDimension('A')->setAutoSize(true);
+                $sheet->getColumnDimension('B')->setAutoSize(true);
+
+
+                $no++;
+                $numRow++;
+            endforeach;
+
+
+            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+
+        ob_start();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        $excelOutput = ob_get_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        header('Content-Length: ' . strlen($excelOutput));
+
+        echo $excelOutput;
+        exit();
     }
 }

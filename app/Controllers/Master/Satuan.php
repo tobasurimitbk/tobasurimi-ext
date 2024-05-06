@@ -7,6 +7,9 @@ use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\SatuansModel;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Satuan extends BaseController
 {
@@ -309,5 +312,109 @@ class Satuan extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function exportExcel()
+    {
+
+        $filename = "EXPORT_SATUAN";
+
+        $condition = [
+            "satuans.deletedAt" => null,
+        ];
+
+        $search        = $this->request->getVar("search");
+        $sort        = $this->request->getVar("sort");
+        $sortType      = $this->request->getVar("sortType");
+
+
+
+        $selectQry = "satuans.*";
+        $satuanDataQry = $this->SatuansModel->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+
+
+        if ($search) {
+            $satuanDataQry->groupStart();
+        }
+
+        if ($search) {
+            $satuanDataQry->like('satuans.nama_satuan', $search);
+        }
+
+        if ($search) {
+            $satuanDataQry->Orlike('satuans.kode_satuan', $search);
+        }
+
+        if ($search) {
+            $satuanDataQry->groupEnd();
+        }
+
+        $getAllSatuanData = $satuanDataQry->findAll();
+
+
+
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+
+        $sheet->getStyle('A1:C1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+
+        if (empty($getAllSatuanData)) {
+            $sheet->setCellValue('A1', 'Tidak Ada Data Satuan');
+        } else {
+            $sheet->setCellValue('A1', 'NO');
+            $sheet->setCellValue('B1', 'KODE SATUAN');
+            $sheet->setCellValue('C1', 'NAMA SATUAN');
+            $sheet->getStyle('A1:C1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+            ]);
+
+            $no = 1;
+            $numRow = 2;
+
+            foreach ($getAllSatuanData as $row) :
+                $sheet->setCellValue('A' . $numRow, $no);
+                $sheet->setCellValue('B' . $numRow, $row['kode_satuan']);
+                $sheet->setCellValue('C' . $numRow, $row['nama_satuan']);
+
+
+                // Auto size columns A, B, and C
+                $sheet->getColumnDimension('A')->setAutoSize(true);
+                $sheet->getColumnDimension('B')->setAutoSize(true);
+                $sheet->getColumnDimension('C')->setAutoSize(true);
+
+                $no++;
+                $numRow++;
+            endforeach;
+
+
+            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+
+        ob_start();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        $excelOutput = ob_get_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        header('Content-Length: ' . strlen($excelOutput));
+
+        echo $excelOutput;
+        exit();
     }
 }
