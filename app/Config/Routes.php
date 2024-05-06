@@ -153,6 +153,7 @@ $routes->get('/satuan/id/(:segment)', 'Master\Satuan::getByIdSatuan/$1', ['filte
 $routes->post('/satuan/save', 'Master\Satuan::saveSatuan', ['filter' => 'Auth']);
 $routes->post('/satuan/update', 'Master\Satuan::updateSatuan', ['filter' => 'Auth']);
 $routes->post('/satuan/delete', 'Master\Satuan::deleteSatuan', ['filter' => 'Auth']);
+$routes->get('/satuan/export-excel', 'Master\Satuan::exportExcel', ['filter' => 'Auth']);
 
 // SHIFT
 $routes->get('/shift', 'Master\Shift::shift', ['filter' => 'Auth']);
@@ -690,6 +691,7 @@ $routes->post('parent-barang/update', 'Warehouse\ParentBarang::update', ['filter
 $routes->post('parent-barang/delete', 'Warehouse\ParentBarang::delete', ['filter' => 'Auth']);
 $routes->post('parent-barang/get', 'Warehouse\ParentBarang::get', ['filter' => 'Auth']);
 $routes->get('parent-barang/all', 'Warehouse\ParentBarang::all', ['filter' => 'Auth']);
+$routes->get('parent-barang/export-excel', 'Warehouse\ParentBarang::exportExcel', ['filter' => 'Auth']);
 // Master Barang
 $routes->get('barang-bahan-baku', 'Warehouse\Barang::bahanBakuView', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong', 'Warehouse\Barang::bahanPenolongView', ['filter' => 'Auth']);
@@ -706,6 +708,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->post('generate-new-code', 'Warehouse\Barang::generateNewCode');
     $routes->get('generate-new-code', 'Warehouse\Barang::generateNewCode');
     $routes->post('import', 'Warehouse\Barang::import');
+    $routes->get('export-excel', 'Warehouse\Barang::exportExcel');
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);
@@ -718,6 +721,7 @@ $routes->post('/kemasan/get', 'Warehouse\Kemasan::get', ['filter' => 'Auth']);
 $routes->get('/kemasan/all', 'Warehouse\Kemasan::all', ['filter' => 'Auth']);
 $routes->post('/kemasan/generate-new-code', 'Warehouse\Kemasan::generateNewKode', ['filter' => 'Auth']);
 $routes->post('/kemasan/import', 'Warehouse\Kemasan::import', ['filter' => 'Auth']);
+$routes->get('/kemasan/export-excel', 'Warehouse\Kemasan::exportExcel', ['filter' => 'Auth']);
 
 // JASA VENDOR
 // REBUSAN

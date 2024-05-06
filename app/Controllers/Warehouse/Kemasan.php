@@ -8,6 +8,9 @@ use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Kemasan extends BaseController
 {
@@ -327,5 +330,120 @@ class Kemasan extends BaseController
             ];
             return response()->setJSON($data);
         }
+    }
+
+    public function exportExcel()
+    {
+
+        $filename = "EXPORT_KEMASAN";
+
+        $condition = [
+            "kemasan.company_id"  => $this->this_company_id,
+            "kemasan.deletedAt" => null,
+        ];
+
+        $search        = $this->request->getVar("search");
+        $parent_type_id      = $this->request->getVar("parent_type_id");
+        $sort        = $this->request->getVar("sort");
+        $sortType      = $this->request->getVar("sortType");
+
+
+
+        $selectQry = "kemasan.*,
+        parent_barang.parent_name,
+        satuans.kode_satuan";
+        $kemasanDataQry = $this->kemasanModel->select($selectQry)
+            ->join('satuans', 'kemasan.satuan_id = satuans.id', 'left')
+            ->join('parent_barang', 'parent_barang.id = kemasan.parent_type_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+
+        if ($search || $parent_type_id) {
+            $kemasanDataQry->groupStart();
+        }
+
+        if ($parent_type_id) {
+            $kemasanDataQry->where('kemasan.parent_type_id', $parent_type_id);
+        }
+
+        if ($search) {
+            $kemasanDataQry->like('satuans.kode_satuan', $search)
+                ->orLike('kemasan.name', 'search')
+                ->orLike('kemasan.kode', 'search')
+                ->orLike('parent_name', 'search');
+            $kemasanDataQry->Orlike('satuans.kode_satuan', $search);
+        }
+
+        if ($search || $parent_type_id) {
+            $kemasanDataQry->groupEnd();
+        }
+
+        $getAllKemasanData = $kemasanDataQry->findAll();
+
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->getStyle('A1:E1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+
+        if (empty($getAllKemasanData)) {
+            $sheet->setCellValue('A1', 'Tidak Ada Data Satuan');
+        } else {
+            $sheet->setCellValue('A1', 'NO');
+            $sheet->setCellValue('B1', 'KODE');
+            $sheet->setCellValue('C1', 'KEMASAN');
+            $sheet->setCellValue('D1', 'KATEGORI');
+            $sheet->setCellValue('E1', 'SATUAN');
+            $sheet->getStyle('A1:E1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+            ]);
+
+            $no = 1;
+            $numRow = 2;
+
+            foreach ($getAllKemasanData as $row) :
+                $sheet->setCellValue('A' . $numRow, $no);
+                $sheet->setCellValue('B' . $numRow, $row['kode']);
+                $sheet->setCellValue('C' . $numRow, $row['name']);
+                $sheet->setCellValue('D' . $numRow, $row['parent_name']);
+                $sheet->setCellValue('E' . $numRow, $row['kode_satuan']);
+
+
+                // Auto size columns A-E
+                $sheet->getColumnDimension('A')->setAutoSize(true);
+                $sheet->getColumnDimension('B')->setAutoSize(true);
+                $sheet->getColumnDimension('C')->setAutoSize(true);
+                $sheet->getColumnDimension('D')->setAutoSize(true);
+                $sheet->getColumnDimension('E')->setAutoSize(true);
+
+                $no++;
+                $numRow++;
+            endforeach;
+
+
+            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+
+        ob_start();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        $excelOutput = ob_get_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        header('Content-Length: ' . strlen($excelOutput));
+
+        echo $excelOutput;
+        exit();
     }
 }

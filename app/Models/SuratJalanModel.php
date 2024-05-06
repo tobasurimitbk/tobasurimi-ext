@@ -77,13 +77,18 @@ class SuratJalanModel extends Model
 
         $totalData = $SuratJalan->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_customer']) {
             $SuratJalan->groupStart();
         }
         if ($addCondition['search']) {
             $SuratJalan
                 ->like('no_surat_jalan', $addCondition['search']);
         }
+
+        if ($addCondition['filter_customer']) {
+            $SuratJalan->where('surat_jalan_so.id_customer', $addCondition['filter_customer']);
+        }
+
         if ($addCondition['filter_invoice'] == "belum") {
             $SuratJalan->where('sales_order_invoice_id', NULL);
         }
@@ -97,7 +102,7 @@ class SuratJalanModel extends Model
         if ($addCondition['dateEnd']) {
             $SuratJalan->where('surat_jalan_so.shipping_date <=', $addCondition['dateEnd']);
         }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_customer']) {
             $SuratJalan->groupEnd();
         }
 

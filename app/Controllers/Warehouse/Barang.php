@@ -14,6 +14,9 @@ use App\Models\SatuansModel;
 use App\Models\DivisisModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Barang extends BaseController
 {
@@ -718,5 +721,159 @@ class Barang extends BaseController
             ];
             return response()->setJSON($data);
         }
+    }
+
+    public function exportExcel()
+    {
+
+        $search        = $this->request->getVar("search");
+        $sort        = $this->request->getVar("sort");
+        $sortType      = $this->request->getVar("sortType");
+        $parent_type      = $this->request->getVar("parent_type");
+        $filter_coa      = $this->request->getVar("filter_coa");
+
+
+        $filename = "EXPORT_BARANG_" . strtoupper($parent_type);
+
+        $condition = [
+            "barang_master.company_id"  => $this->this_company_id,
+            "barang_master.type_barang" => $parent_type,
+            "barang_master.deletedAt" => NULL,
+        ];
+
+        $selectQry = "barang_master.*, barang_master_spesifikasi.spesifikasi, barang_master_spesifikasi.satuan_1, barang_master_spesifikasi.satuan_2, barang_master_spesifikasi.konversi_satuan_2, barang_master_spesifikasi.satuan_3, barang_master_spesifikasi.konversi_satuan_3,
+        parent_barang.parent_name AS kelompok_barang";
+
+        $barangMasterModel = new BarangMasterModel();
+
+        $satuanModel = new SatuansModel();
+        $accountBarangModel = new AccountBarangModel();
+
+        $barangDataQry = $barangMasterModel->select($selectQry)
+            ->where($condition)
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->orderBy($sort, $sortType);
+
+        if ($search || $filter_coa) {
+            $barangDataQry->groupStart();
+        }
+
+        if ($search) {
+            $barangDataQry->like('barang_master.barang_name', $search);
+        }
+
+        if ($search) {
+            $barangDataQry->orLike('barang_master.kode_barang', $search);
+        }
+
+        if ($search) {
+            $barangDataQry->orLike('parent_barang.parent_name', $search);
+        }
+
+        if ($filter_coa) {
+            $barangDataQry->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left');
+        }
+
+        if ($filter_coa == "belum") {
+            $barangDataQry->where('account_barang.ap_id', NULL);
+        }
+
+        if ($filter_coa == "sudah") {
+            $barangDataQry->where('account_barang.ap_id !=', NULL);
+        }
+
+        if ($search || $filter_coa) {
+            $barangDataQry->groupEnd();
+        }
+
+        $getAllBarangData = $barangDataQry->findAll();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+
+        $sheet->getStyle('A1:G1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+
+        if (empty($getAllBarangData)) {
+            $sheet->setCellValue('A1', 'Tidak Ada Data Barang');
+        } else {
+            $sheet->setCellValue('A1', 'NO');
+            $sheet->setCellValue('B1', 'KATEGORI');
+            $sheet->setCellValue('C1', 'KODE BARANG');
+            $sheet->setCellValue('D1', 'NAMA BARANG');
+            $sheet->setCellValue('E1', 'SATUAN 1');
+            $sheet->setCellValue('F1', 'SATUAN 2');
+            $sheet->setCellValue('G1', 'SATUAN 3');
+            $sheet->setCellValue('H1', 'AKUN COA');
+            $sheet->getStyle('A1:H1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+            ]);
+
+            $no = 1;
+            $numRow = 2;
+
+            foreach ($getAllBarangData as $row) :
+
+
+                $satuan1 = $satuanModel->asObject()->where('id', $row['satuan_1'])->where('deletedAt', null)->first();
+                $satuan2 = $satuanModel->asObject()->where('id', $row['satuan_2'])->where('deletedAt', null)->first();
+                $satuan3 = $satuanModel->asObject()->where('id', $row['satuan_3'])->where('deletedAt', null)->first();
+
+                $satuan1_kode = isset($satuan1) ? $satuan1->kode_satuan : "-";
+                $satuan2_kode = (isset($satuan2) && $row['satuan_2'] != 0) ? $satuan2->kode_satuan : "-";
+                $satuan3_kode = (isset($satuan3) && $row['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
+                $accountBarang = $accountBarangModel->where('barang_master_id', $row['id'])->where('deleted_at', null)->first();
+
+
+                $sheet->setCellValue('A' . $numRow, $no);
+                $sheet->setCellValue('B' . $numRow, $row['kelompok_barang']);
+                $sheet->setCellValue('C' . $numRow, $row['kode_barang']);
+                $sheet->setCellValue('D' . $numRow, $row['barang_name'] . " - " . $row['spesifikasi']);
+                $sheet->setCellValue('E' . $numRow, $satuan1_kode);
+                $sheet->setCellValue('F' . $numRow, $satuan2_kode == "-" ? "-" : $satuan2_kode . " (" . $row['konversi_satuan_2'] . " " . $satuan1_kode . ")");
+                $sheet->setCellValue('G' . $numRow, $satuan3_kode == "-" ? "-" : $satuan3_kode . " (" . $row['konversi_satuan_3'] . " " . $satuan1_kode . ")");
+                $sheet->setCellValue('H' . $numRow, $accountBarang == NULL ? "No" : "Yes");
+
+
+                // Auto size columns A, B, and C
+                $sheet->getColumnDimension('A')->setAutoSize(true);
+                $sheet->getColumnDimension('B')->setAutoSize(true);
+                $sheet->getColumnDimension('C')->setAutoSize(true);
+                $sheet->getColumnDimension('D')->setAutoSize(true);
+                $sheet->getColumnDimension('E')->setAutoSize(true);
+                $sheet->getColumnDimension('F')->setAutoSize(true);
+                $sheet->getColumnDimension('G')->setAutoSize(true);
+                $sheet->getColumnDimension('H')->setAutoSize(true);
+
+                $no++;
+                $numRow++;
+            endforeach;
+
+
+            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+
+        ob_start();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        $excelOutput = ob_get_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        header('Content-Length: ' . strlen($excelOutput));
+
+        echo $excelOutput;
+        exit();
     }
 }

@@ -5,6 +5,12 @@
     <div class="section-header">
         <h1>Kategori Barang</h1>
         <?php if (can("Master Barang", "Kategori Barang", "c")) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="excel('<?= base_url("parent-barang/export-excel"); ?>')">EXCEL</button></li>
+            </ul>
             <button class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </button>
@@ -86,7 +92,7 @@
 </div>
 
 <script>
-    let sort = "nomor";
+    let sort = "createdAt";
     let sortType = "desc";
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
@@ -456,6 +462,14 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    //export excel
+    const excel = function(url) {
+        let search = $(".search").val();
+        let parent_type = "<?= $type ?>";
+
+        window.open(url + `?search=${search}&parent_type=${parent_type}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

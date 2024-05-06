@@ -40,6 +40,12 @@
 <section class="section">
     <div class="section-header">
         <h1>Data Satuan</h1>
+        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li><button class="dropdown-item" onclick="excel('<?= base_url("satuan/export-excel"); ?>')">EXCEL</button></li>
+        </ul>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -74,7 +80,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode_satuan";
-    let sortType = "desc";
+    let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -416,6 +422,13 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+    //export excel
+    const excel = function(url) {
+        let search = $(".search").val();
+
+
+        window.open(url + `?search=${search}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

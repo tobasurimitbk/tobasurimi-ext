@@ -79,7 +79,10 @@ class OrderForm extends BaseController
 
     public function index()
     {
-        return view('SalesLokal/OrderForm/index');
+        $data = [
+            'getCustomers' => $this->CustomerModel->where('deletedAt', NULL)->where('tipe_customer', 'LOKAL')->findAll(),
+        ];
+        return view('SalesLokal/OrderForm/index', $data);
     }
 
     public function createView()
@@ -145,6 +148,7 @@ class OrderForm extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
+            "filter_customer"        => $this->request->getGet("filter_customer"),
             "filter_invoice"        => $this->request->getGet("filter_invoice"),
             "filter_surat_jalan"        => $this->request->getGet("filter_surat_jalan"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
@@ -169,6 +173,7 @@ class OrderForm extends BaseController
                 "no" => $no++,
                 "id" => encrypt($data->id),
                 "no_sales_order" => $data->no_sales_order,
+                "order_date" => date("d/m/Y", strtotime($data->order_date)),
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
                 "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->findAll()),
@@ -816,7 +821,7 @@ class OrderForm extends BaseController
         $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
 
         // (optional) setup the paper size and orientation
-        $domPdf->setPaper([0, 0, 792.96, 528]);
+        $domPdf->setPaper('A4', 'landscape');
 
         // render html as PDF
         $domPdf->render();
