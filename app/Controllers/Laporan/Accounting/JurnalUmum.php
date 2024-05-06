@@ -66,8 +66,9 @@ class JurnalUmum extends BaseController
             ->asObject()
             ->where('name', 'Kelompok Akun')
             ->groupStart()
-            ->like('value', 'Pendapatan')
-            ->orLike('value', 'Beban')
+            ->like('value', 'Aktiva / Harta')
+            ->orLike('value', 'Kewajiban / Hutang')
+            ->orLike('value', 'Modal')
             ->groupEnd()
             ->findAll();
         $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");

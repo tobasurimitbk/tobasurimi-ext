@@ -125,7 +125,7 @@ class ProductionResult extends BaseController
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->where('production_result_details.barang_type', 'bahan_jadi')
+            ->where('production_result_details.type', 'JADI')
             ->where('production_result_details.production_result_id', $id)
             ->findAll();
         foreach ($productionResDetDataBJ as $key => &$value) {
@@ -150,7 +150,7 @@ class ProductionResult extends BaseController
             ->join('warehouses', 'warehouses.id = stock.warehouse_id', 'left')
             ->join('divisis', 'divisis.id = stock.divisi_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->where('production_result_details.barang_type', 'bahan_scrap')
+            ->where('production_result_details.type', 'SCRAP')
             ->where('production_result_details.production_result_id', $id)
             ->findAll();
         foreach ($productionResDetDataBS as $key => &$value) {
@@ -173,9 +173,7 @@ class ProductionResult extends BaseController
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('production_result_details.production_result_id', $id)
-            ->where('production_result_details.barang_type !=', 'bahan_scrap')
-            ->where('production_result_details.barang_type !=', 'bahan_return')
-            ->where('production_result_details.barang_type !=', 'bahan_jadi')
+            ->where('production_result_details.type', 'DIGUNAKAN')
             ->findAll();
         foreach ($productionResDetDataBD as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
@@ -197,7 +195,7 @@ class ProductionResult extends BaseController
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->where('production_result_details.barang_type', 'bahan_return')
+            ->where('production_result_details.type', 'RETURN')
             ->where('production_result_details.production_result_id', $id)
             ->findAll();
         foreach ($productionResDetDataBR as $key => &$value) {
@@ -333,8 +331,6 @@ class ProductionResult extends BaseController
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangReturn = json_decode($this->request->getVar("return"));
 
-            $productionResID = $this->productionResultModel->insert($datas);
-
             $dataMaterialRequest = $this->materialRequestModel
                 ->where('id', $this->request->getVar("kode_request"))
                 ->where('deletedAt', null)
@@ -357,23 +353,24 @@ class ProductionResult extends BaseController
                 ->where('work_order_details.deletedAt', null)
                 ->find();
 
+            $productionResID = $this->productionResultModel->insert($datas);
+
             $productionResData = $this->productionResultModel->find($productionResID);
 
-            $this->workOrdersModel->update($this->request->getVar("kode_produksi"), [
-                'request_status' => 'finished'
-            ]);
-
+            // $this->workOrdersModel->update($this->request->getVar("kode_produksi"), [
+            //     'request_status' => 'finished'
+            // ]);
             foreach ($barangJadi as $bj) {
                 foreach ($dataWorkOrderDetail as $key => $value) {
-                    if ($value['barang1_id'] == $bj->barang1_id && $value['barang2_id'] == $bj->barang2_id) {
+                    if ($value['barang1_id'] == $bj->barang1_id) {
                         // var_dump($bj);
                         $stok = $this->stockModel->insertStok(
                             $value['company_id'],
                             $value['warehouse_id'],
                             $value['divisi_id'],
                             "bahan_jadi",
-                            $value['barang1_id'],
-                            $value['barang2_id'],
+                            $bj->barang1_id,
+                            $bj->barang2_id,
                             isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty
                         );
                         $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
@@ -381,8 +378,8 @@ class ProductionResult extends BaseController
                             $value['warehouse_id'],
                             $value['divisi_id'],
                             "bahan_jadi",
-                            $value['barang1_id'],
-                            $value['barang2_id'],
+                            $bj->barang2_id,
+                            $bj->barang2_id,
                             0,
                             '-',
                             $stok
@@ -439,6 +436,7 @@ class ProductionResult extends BaseController
                             "stock_id" => 0,
                             "no_aju" => "-",
                             "barang_type" => $bj->type_barang,
+                            "type" => "JADI",
                             "qty" => isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty,
                         ];
                         $this->productionResultDetailModel->insert($datasbj);
@@ -466,8 +464,10 @@ class ProductionResult extends BaseController
                     "barang2_id" => $bd->barang2_id,
                     "bc_id" => $bd->bc_id,
                     "stock_id" => $bd->stock_id,
-                    "no_aju" => "-",
+                    "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
                     "barang_type" => $bd->type_barang,
+                    "type" => "DIGUNAKAN",
+                    "no_ref" => $bd->ref_no,
                     "qty" => (float) $qtyAkhir,
                 ];
                 // var_dump($datasbd);
@@ -546,7 +546,8 @@ class ProductionResult extends BaseController
                     "bc_id" => 0,
                     "stock_id" => $stok,
                     "no_aju" => "-",
-                    "barang_type" => "bahan_scrap",
+                    "barang_type" => $bs->type_barang,
+                    "type" => "SCRAP",
                     "qty" => (float) $bs->qty,
                 ];
                 $this->productionResultDetailModel->insert($datasbs);
@@ -624,7 +625,9 @@ class ProductionResult extends BaseController
                         "bc_id" => $br->bc_id,
                         "stock_id" => $br->stock_id,
                         "no_aju" => $br->no_aju == "-" ? "-" : $br->no_aju,
-                        "barang_type" => "bahan_return",
+                        "barang_type" => $br->type_barang,
+                        "type" => "RETURN",
+                        "no_ref" => $br->ref_no,
                         "qty" => isset($br->qty_dikembalikan) ? (float) $br->qty_dikembalikan : 0,
                     ];
                     $this->productionResultDetailModel->insert($datasbr);

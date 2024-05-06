@@ -67,13 +67,54 @@ class JurnalUmumModel extends Model
         $builder = $this->db->table('jurnal_umum');
 
         if (isset($where['tanggal_jurnal'])) {
-            $builder->like($where);
+            $builder->like('tanggal_jurnal', $where['tanggal_jurnal']);
+            $builder->where('deletedAt', $where['deletedAt']);
+            $builder->where('id_coa', $where['id_coa']);
+            var_dump($where);
         } else {
             $builder->where($where);
         }
 
-        $query = $builder->get();
+        $query = $builder->get()->getResult();
 
-        return $query->getResult();
+        return $query;
+    }
+
+    public function getDataJurnalForCosting($where)
+    {
+        $saldolama = 0;
+        $where['deletedAt'] = null;
+        $selectQry = 'jurnal_umum.*, metadata.value';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('sub_akuns', 'sub_akuns.id = jurnal_umum.id_coa', 'left')
+            ->join('kategori_akuns', 'kategori_akuns.id = sub_akuns.kategori_id', 'left')
+            ->join('metadata', 'metadata.id = kategori_akuns.kelompok_id', 'left')
+            ->like('tanggal_jurnal', $where['tanggal_jurnal'])
+            ->where('jurnal_umum.deletedAt', $where['deletedAt'])
+            ->where('jurnal_umum.id_coa', $where['id_coa'])
+            ->findAll();
+
+        foreach ($dataQry as &$valueJurnal) {
+            $debit = floatval($valueJurnal['debit']);
+            $kredit = floatval($valueJurnal['kredit']);
+            if (stripos($valueJurnal['value'], "Aktiva") !== false) {
+                if ($debit == 0) {
+                    $saldolama = $saldolama + $debit - $kredit;
+                } else {
+                    $saldolama = $saldolama + $debit;
+                }
+            } else {
+                if ($kredit == 0) {
+                    $saldolama = $saldolama + $kredit - $debit;
+                } else {
+                    $saldolama = $saldolama + $kredit;
+                }
+            }
+            $valueJurnal['saldoTotal'] = $saldolama;
+        }
+
+        return $saldolama;
     }
 }
