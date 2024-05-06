@@ -13,6 +13,36 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-2">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
+                            <option value="" data-code=""></option>
+
+                            <?php foreach ($getCustomers as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
+                            <?php endforeach; ?>
+
+
+                        </select>
+                        <label for="floatingInput">Filter Customer</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
                             <option value="" data-code=""></option>
@@ -35,7 +65,7 @@
                                 <th onclick="changeSort('no')" class="sort">No.</th>
                                 <th onclick="changeSort('kode_pelanggan')" class="sort">Kode Pelanggan</th>
                                 <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Pelanggan</th>
-                                <th onclick="changeSort('no_so')" class="sort">No Order</th>
+
                                 <th onclick="changeSort('no_surat_jalan')" class="sort">No Surat Jalan</th>
                                 <th onclick="changeSort('shipping_date')" class="sort">Shipping Date</th>
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
@@ -63,21 +93,21 @@
     let list_delete = [];
     var row = 0;
 
-    $('.filter_invoice').select2({
+    $('.filter_customer, .filter_invoice').select2({
         placeholder: "",
         theme: "bootstrap-5",
         allowClear: true,
     })
 
     //CSS SELECT2 FLOATING LABEL
-    $('.filter_invoice')
+    $('.filter_customer, .filter_invoice')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_invoice')
+    $('.filter_customer, .filter_invoice')
         .parent('div')
         .children('span')
         .children('span')
@@ -85,12 +115,35 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_invoice')
+    $('.filter_customer, .filter_invoice')
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
     $(document).ready(function() {
+
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
+
         $(".search").keyup(function() {
             table.ajax.reload();
         })
@@ -100,7 +153,7 @@
             location.replace(`<?= base_url("surat-jalan/id"); ?>/${data.id}`);
         })
 
-        $(".filter_invoice").change(function() {
+        $(".dateStart, .dateEnd, .filter_customer, .filter_invoice").change(function() {
             table.ajax.reload();
         });
     })
@@ -126,6 +179,9 @@
                 data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.filter_customer = $(".filter_customer").val();
                 data.filter_invoice = $(".filter_invoice").val();
             }
         },
@@ -147,9 +203,6 @@
             className: "text-center"
         }, {
             data: "nama_pelanggan",
-            className: "text-center"
-        }, {
-            data: "no_so",
             className: "text-center"
         }, {
             data: "no_surat_jalan",

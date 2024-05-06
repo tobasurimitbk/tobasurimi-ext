@@ -45,7 +45,10 @@ class SuratJalan extends BaseController
 
     public function index()
     {
-        return view('SalesLokal/SuratJalan/index');
+        $data = [
+            'getCustomers' => $this->CustomerModel->where('deletedAt', NULL)->where('tipe_customer', 'LOKAL')->findAll(),
+        ];
+        return view('SalesLokal/SuratJalan/index', $data);
     }
 
     public function createView()
@@ -85,6 +88,7 @@ class SuratJalan extends BaseController
             "filter_invoice"        => $this->request->getGet("filter_invoice"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
+            "filter_customer"        => $this->request->getGet("filter_customer"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
