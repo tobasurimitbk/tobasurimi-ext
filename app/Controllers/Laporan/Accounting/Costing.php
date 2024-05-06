@@ -79,7 +79,7 @@ class Costing extends BaseController
             }
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultWithDetail($conditionProduction);
             // var_dump($productionResultDataTitle);
-            exit;
+            // exit;
 
             $dataResult = [
                 'settingCosting' => $settingCosting,

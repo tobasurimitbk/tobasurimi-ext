@@ -18,6 +18,7 @@ class SettingCostingModel extends Model
         'id',
         'name',
         'parent_id',
+        'coa',
         'createdAt',
         'updatedAt',
         'deletedAt'

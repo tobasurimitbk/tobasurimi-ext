@@ -34,4 +34,24 @@ class SettingAkunCostingController extends BaseController
         ];
         return view('Accounting/settingAkunCosting/index', $data);
     }
+
+    public function saveCosting()
+    {
+        $id = $this->request->getPost('id');
+        $value = $this->request->getPost('value');
+
+
+        $this->settingCosting->update($id, [
+            'coa' => $value
+        ]);
+        // var_dump($id);
+        // var_dump($value);
+        // exit;
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Setting Costing Berhasil Disimpan"
+        ]);
+    }
 }

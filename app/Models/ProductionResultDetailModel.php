@@ -20,6 +20,7 @@ class ProductionResultDetailModel extends Model
         'barang2_id',
         'bc_id',
         'stock_id',
+        'stock_dokumen',
         'no_ref',
         'no_aju',
         'barang_type',

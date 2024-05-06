@@ -156,59 +156,118 @@
             `;
             $('.tfoot').append(row);
         } else {
+            let costOfProduction = 0;
             list_items_title_name.forEach((valueSetting) => {
                 if (valueSetting.parent_id === null) {
-                    row += `<tr>`;
-                    row += `<td colspan="2" style="font-weight: bold !important;font-size: 14px !important;">${valueSetting.name}</td>
+                    if (valueSetting.name == "COST OF PRODUCTION") {
+                        row += `<tr>`;
+                        row += `<td colspan="2" style="font-weight: bold !important;font-size: 14px !important;">${valueSetting.name}</td>
                         <td></td>
                         <td></td>`;
-                    list_items_title_name_horizontal.forEach((valueHorizontal) => {
-                        if (valueHorizontal.type == "JADI") {
-                            row += `<td class="text-center"></td>`;
-                            row += `<td class="text-center"></td>`;
-                        }
-                    });
-                    row += `</tr>`;
+                        list_items_title_name_horizontal.forEach((valueHorizontal) => {
+                            if (valueHorizontal.type == "JADI") {
+                                row += `<td class="text-center"></td>`;
+                                row += `<td class="text-center"></td>`;
+                            }
+                        });
+                        row += `</tr>`;
+                    } else {
+                        row += `<tr>`;
+                        row += `<td colspan="2" style="font-weight: bold !important;font-size: 14px !important;">${valueSetting.name}</td>
+                        <td></td>
+                        <td></td>`;
+                        list_items_title_name_horizontal.forEach((valueHorizontal) => {
+                            if (valueHorizontal.type == "JADI") {
+                                row += `<td class="text-center"></td>`;
+                                row += `<td class="text-center"></td>`;
+                            }
+                        });
+                        row += `</tr>`;
+                    }
                     list_items_title_name.forEach((childSetting) => {
                         if (childSetting.parent_id === valueSetting.id) {
                             let jmlhJurnal = parseFloat(childSetting.jmlhJurnal);
+                            costOfProduction += jmlhJurnal;
+                            let totalQtyHorizontal = 0;
+                            list_items_title_name_horizontal.forEach((valueHorizontal) => {
+                                let qtyHorizontal = parseFloat(valueHorizontal.qty);
+                                let jmlhTotal = jmlhJurnal / totalQtyHorizontal;
+                                let jmlhTotalDetail = jmlhTotal * qtyHorizontal;
+                                if (childSetting.name == "RAW MATERIAL I") {
+                                    var sumQty = 0.0;
+                                    var totalHarga = 0.0;
+                                    var totalHargaQty = 0.0;
+                                    childSetting.rawMaterial.forEach((valueSettingRawMaterialI) => {
+                                        if (valueHorizontal.type == "JADI" && valueHorizontal.production_result_id == valueSettingRawMaterialI.production_result_id) {
+                                            sumQty += parseFloat(valueSettingRawMaterialI.qty)
+                                            totalHarga = parseFloat(valueSettingRawMaterialI.harga) + parseFloat(valueSettingRawMaterialI.harga_harian) + parseFloat(valueSettingRawMaterialI.harga_bulanan)
+                                        }
+                                    });
+                                    totalHargaQty = totalHarga * qtyHorizontal;
+                                    totalQtyHorizontal += totalHargaQty ? totalHargaQty : 0;
+                                }
+                            });
                             row += `<tr>`;
                             row += `<td width="10%" style="font-size: 13px !important;">${childSetting.name}</td>
                             <td width="10%"></td>
                             <td width="3%"></td>
-                            <td width="10%">${jmlhJurnal ? formatRupiah(jmlhJurnal) : ""}</td>`;
-
+                            <td width="10%">${childSetting.name == "RAW MATERIAL I" ? formatRupiah(totalQtyHorizontal) : ""}</td>`;
                             list_items_title_name_horizontal.forEach((valueHorizontal) => {
                                 let qtyHorizontal = parseFloat(valueHorizontal.qty);
-                                let jmlhTotal = jmlhJurnal * qtyHorizontal;
+                                let jmlhTotal = jmlhJurnal / totalQtyHorizontal;
+                                let jmlhTotalDetail = jmlhTotal * qtyHorizontal;
                                 if (childSetting.name == "RAW MATERIAL I") {
                                     var sumQty = 0.0;
+                                    var totalHarga = 0.0;
+                                    var totalHargaQty = 0.0;
                                     childSetting.rawMaterial.forEach((valueSettingRawMaterialI) => {
                                         if (valueHorizontal.type == "JADI" && valueHorizontal.production_result_id == valueSettingRawMaterialI.production_result_id) {
                                             sumQty += parseFloat(valueSettingRawMaterialI.qty)
+                                            totalHarga = parseFloat(valueSettingRawMaterialI.harga) + parseFloat(valueSettingRawMaterialI.harga_harian) + parseFloat(valueSettingRawMaterialI.harga_bulanan)
                                         }
                                     });
-                                    row += `<td class="text-center">${formatRupiah(jmlhTotal)}</td>`;
-                                    row += `<td class="text-center"></td>`;
+                                    totalHargaQty = totalHarga * qtyHorizontal;
+                                    row += `<td class="text-center">${totalHarga ? formatRupiah(totalHargaQty)  : formatRupiah(0)}</td>`;
+                                    row += `<td class="text-center">${qtyHorizontal}</td>`;
                                 }
                             });
                             row += `</tr>`;
                             if (childSetting.name == "RAW MATERIAL II") {
+                                var totalHarga = 0.0;
                                 childSetting.rawMaterialPenolong.forEach((childParentSetting) => {
                                     let jmlhJurnal = parseFloat(childParentSetting.jmlhJurnal);
+                                    costOfProduction += jmlhJurnal;
+                                    let totalQtyHorizontal = 0;
+                                    list_items_title_name_horizontal.forEach((valueHorizontal) => {
+                                        let qtyHorizontal = parseFloat(valueHorizontal.qty);
+                                        let jmlhTotal = jmlhJurnal / qtyHorizontal;
+                                        totalQtyHorizontal += qtyHorizontal;
+                                        var totalHargaQty = 0.0;
+                                        if (valueHorizontal.type == "JADI" && childParentSetting.production_result_id == valueHorizontal.production_result_id) {
+                                            totalHarga = parseFloat(childParentSetting.harga) + parseFloat(childParentSetting.harga_harian) + parseFloat(childParentSetting.harga_bulanan)
+                                            totalHargaQty = totalHarga * qtyHorizontal;
+                                        }
+                                        totalQtyHorizontal = totalHargaQty ? totalHargaQty : 0;
+                                        // console.log(totalHarga);
+                                        console.log(totalHargaQty);
+                                    });
+                                    // console.log(totalQtyHorizontal);
                                     row += `<tr>`;
                                     row += `<td width="10%"></td>
                                     <td width="10%">${childParentSetting.parent_name}</td>
                                     <td width="3%"></td>
-                                    <td width="10%">${jmlhJurnal ? formatRupiah(jmlhJurnal) : ""}</td>`;
+                                    <td width="10%">${totalQtyHorizontal ? formatRupiah(totalQtyHorizontal) : ""}</td>`;
                                     list_items_title_name_horizontal.forEach((valueHorizontal) => {
+                                        let qtyHorizontal = parseFloat(valueHorizontal.qty);
+                                        let jmlhTotal = jmlhJurnal / totalQtyHorizontal;
+                                        let jmlhTotalDetail = jmlhTotal * qtyHorizontal;
                                         if (valueHorizontal.type == "JADI" && childParentSetting.production_result_id == valueHorizontal.production_result_id) {
-                                            let qtyHorizontal = parseFloat(valueHorizontal.qty);
-                                            let jmlhTotal = jmlhJurnal * qtyHorizontal;
-                                            console.log("Result 1 : " + qtyHorizontal);
-                                            console.log("Result 2 : " + jmlhTotal);
-                                            row += `<td class="text-center">${formatRupiah(jmlhTotal)}</td>`;
-                                            row += `<td class="text-center"></td>`;
+                                            totalHarga = parseFloat(childParentSetting.harga) + parseFloat(childParentSetting.harga_harian) + parseFloat(childParentSetting.harga_bulanan)
+                                            row += `<td class="text-center">${totalHarga ? formatRupiah(totalHarga * qtyHorizontal) : formatRupiah(0)}</td>`;
+                                            row += `<td class="text-center">${qtyHorizontal}</td>`;
+                                        } else {
+                                            row += `<td class="text-center">${formatRupiah(0)}</td>`;
+                                            row += `<td class="text-center">${qtyHorizontal}</td>`;
                                         }
                                     });
                                     row += `</tr>`;
@@ -216,6 +275,8 @@
                             } else {
                                 list_items_title_name.forEach((childParentSetting) => {
                                     let jmlhJurnal = parseFloat(childParentSetting.jmlhJurnal);
+                                    costOfProduction += jmlhJurnal;
+                                    let totalQtyHorizontal = 0;
                                     if (childParentSetting.parent_id === childSetting.id) {
                                         row += `<tr>`;
                                         row += `<td width="10%"></td>
@@ -224,10 +285,16 @@
                                         <td width="10%">${jmlhJurnal ? formatRupiah(jmlhJurnal) : ""}</td>`;
                                         list_items_title_name_horizontal.forEach((valueHorizontal) => {
                                             let qtyHorizontal = parseFloat(valueHorizontal.qty);
-                                            let jmlhTotal = jmlhJurnal * qtyHorizontal;
+                                            let jmlhTotal = jmlhJurnal / qtyHorizontal;
+                                            totalQtyHorizontal += qtyHorizontal;
+                                        });
+                                        list_items_title_name_horizontal.forEach((valueHorizontal) => {
+                                            let qtyHorizontal = parseFloat(valueHorizontal.qty);
+                                            let jmlhTotal = jmlhJurnal / totalQtyHorizontal;
+                                            let jmlhTotalDetail = jmlhTotal * qtyHorizontal;
                                             if (valueHorizontal.type == "JADI") {
-                                                row += `<td class="text-center">${formatRupiah(jmlhTotal)}</td>`;
-                                                row += `<td class="text-center"></td>`;
+                                                row += `<td class="text-center">${formatRupiah(jmlhTotalDetail)}</td>`;
+                                                row += `<td class="text-center">${qtyHorizontal}</td>`;
                                             }
                                         });
                                         row += `</tr>`;
@@ -263,15 +330,13 @@
     }
 
     function formatRupiah(angka) {
-        var number_string = angka.toString(),
-            sisa = number_string.length % 3,
-            rupiah = number_string.substr(0, sisa),
-            ribuan = number_string.substr(sisa).match(/\d{3}/g);
-        if (ribuan) {
-            separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
-        }
-        return 'Rp ' + rupiah;
+        // Menggunakan toFixed(2) untuk membulatkan menjadi 2 angka di belakang koma
+        var number_string = angka.toFixed(2).replace('.', ',');
+        // Memisahkan angka ribuan dengan tanda titik
+        var parts = number_string.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // Menggabungkan kembali angka ribuan dan desimal
+        return 'Rp ' + parts.join(",");
     }
 </script>
 <?= $this->endSection(); ?>
