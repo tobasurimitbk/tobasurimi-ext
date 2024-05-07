@@ -83,7 +83,9 @@
                                 <th>No.</th>
 
                                 <th onclick="changeSort('no_sales_order')" class="sort">No Order</th>
-                                <th onclick="changeSort('order_date')" class="sort">Date</th>
+                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
+                                <th onclick="changeSort('order_date')" class="sort">Tanggal Order</th>
+                                <th onclick="changeSort('shipping_date')" class="sort">Tanggal Dikirim</th>
 
                                 <th onclick="changeSort('nama_customer')" class="sort">Nama Customer</th>
 
@@ -283,7 +285,13 @@
                 data: "no_sales_order",
                 className: "text-center"
             }, {
+                data: "createdAt",
+                className: "text-center"
+            }, {
                 data: "order_date",
+                className: "text-center"
+            }, {
+                data: "shipping_date",
                 className: "text-center"
             }, {
                 data: "nama_customer",

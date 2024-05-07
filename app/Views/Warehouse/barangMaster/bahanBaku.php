@@ -10,19 +10,24 @@
 
         <?php if (can('Master Barang', 'Bahan Baku', 'c')) : ?>
 
-            <button class="btn btn-primary dropdown-toggle ml-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+
+            <button class="btn btn-primary dropdown-toggle ml-3 float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                 <li><button class="dropdown-item" onclick="excel('<?= base_url("barang-master/export-excel"); ?>')">EXCEL</button></li>
             </ul>
 
+
             <button class="btn btn-discard btn-dropdown-export btn-upload-excel float-right" type="button">
                 <i class="fas fa-file-excel"></i> Import
             </button>
+
+
             <button class="btn btn-show-form btn-add btn-add-barang float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </button>
+
         <?php endif; ?>
     </div>
     <div class="card">

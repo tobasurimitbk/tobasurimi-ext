@@ -19,10 +19,12 @@
                             <tr>
                                 <th onclick="changeSort('no')" class="sort">No.</th>
                                 <th onclick="changeSort('kode_pelanggan')" class="sort">Nomor Invoice</th>
-                                <th onclick="changeSort('nama_pelanggan')" class="sort">Tanggal Invoice</th>
-                                <th onclick="changeSort('no_faktur')" class="sort">Nama Customer</th>
-                                <th onclick="changeSort('total_invoice')" class="sort">Jenis Dokumen</th>
-                                <th onclick="changeSort('keterangan')" class="sort">No Dokumen</th>
+                                <th onclick="changeSort('tanggal_faktur')" class="sort">Tanggal Invoice</th>
+                                <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Customer</th>
+                                <th onclick="changeSort('nama_sales')" class="sort">Nama Sales</th>
+                                <th onclick="changeSort('tipe_invoice')" class="sort">Jenis Invoice</th>
+                                <th onclick="changeSort('document_type')" class="sort">Jenis Dokumen</th>
+                                <th onclick="changeSort('document_no')" class="sort">No Dokumen</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -105,6 +107,14 @@
             },
             {
                 data: "nama_pelanggan",
+                className: "text-center"
+            },
+            {
+                data: "nama_sales",
+                className: "text-center"
+            },
+            {
+                data: "tipe_invoice",
                 className: "text-center"
             },
             {

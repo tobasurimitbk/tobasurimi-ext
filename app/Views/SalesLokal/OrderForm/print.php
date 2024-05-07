@@ -119,8 +119,8 @@
                     </tr>
                     <tr>
                         <td style="border: 1px solid;border-style: dashed dashed hidden hidden">
-                            <div>Terms</div>
-                            <div class="txt-center"><?= $soData->termin ?></div>
+                            <div>No. PO</div>
+                            <div class="txt-center"><?= $soData->no_po ?></div>
                         </td>
                         <td style="border-top: 1px solid;border-top-style: dashed">
                             <div>Tgl. Pengiriman</div>

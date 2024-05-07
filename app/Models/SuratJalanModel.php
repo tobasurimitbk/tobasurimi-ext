@@ -55,6 +55,7 @@ class SuratJalanModel extends Model
     {
         $availableSort = [
             'no_surat_jalan'          => 'surat_jalan_so.no_surat_jalan',
+            'tipe_sales_order'          => 'surat_jalan_so.tipe_sales_order',
             'no_so'            => 'surat_jalan_so.multiple_no_so',
             'kode_pelanggan'             => 'customers.kode',
             'nama_pelanggan'             => 'customers.name',
@@ -67,11 +68,16 @@ class SuratJalanModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'surat_jalan_so.updatedAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "surat_jalan_so.*,customers.name as nama_pelanggan,customers.kode as kode_pelanggan";
+        $selectQry = "surat_jalan_so.*,
+        customers.name as nama_pelanggan,customers.kode as kode_pelanggan, sales_order.total_harga, sales_order.estimated_freight, sales_order.tipe_sales_order,
+        CONCAT(employees.nip , ' - ', employees.name) AS customerSales,
+        ";
 
         $SuratJalan = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = surat_jalan_so.id_customer')
+            ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id')
+            ->join('employees', 'employees.id = sales_order.sales_id ')
             ->where($condition)
             ->orderBy($sort, $sortType);
 

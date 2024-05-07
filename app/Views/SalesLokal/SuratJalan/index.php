@@ -65,10 +65,12 @@
                                 <th onclick="changeSort('no')" class="sort">No.</th>
                                 <th onclick="changeSort('kode_pelanggan')" class="sort">Kode Pelanggan</th>
                                 <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Pelanggan</th>
-
+                                <th onclick="changeSort('customerSales')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('no_surat_jalan')" class="sort">No Surat Jalan</th>
+                                <th onclick="changeSort('tipe_sales_order')" class="sort">Tipe</th>
                                 <th onclick="changeSort('shipping_date')" class="sort">Shipping Date</th>
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
+                                <th onclick="changeSort('total_harga')" class="sort">Total Harga</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -205,7 +207,13 @@
             data: "nama_pelanggan",
             className: "text-center"
         }, {
+            data: "customerSales",
+            className: "text-center"
+        }, {
             data: "no_surat_jalan",
+            className: "text-center"
+        }, {
+            data: "tipe_sales_order",
             className: "text-center"
         }, {
             data: "shipping_date",
@@ -220,6 +228,9 @@
                     return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
                 }
             }
+        }, {
+            data: "total_harga",
+            className: "text-center"
         }, {
             data: "id",
             className: "text-center actions",

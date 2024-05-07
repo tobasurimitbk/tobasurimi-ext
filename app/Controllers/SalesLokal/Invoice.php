@@ -119,6 +119,8 @@ class Invoice extends BaseController
                 "kode_pelanggan"    => $data->kode_pelanggan,
                 "keterangan"        => $data->keterangan,
                 "nama_pelanggan"    => $data->nama_pelanggan,
+                "nama_sales"    => $data->salesName,
+                "tipe_invoice"    => $data->tipe_invoice,
             ]);
         }
 
@@ -763,7 +765,7 @@ class Invoice extends BaseController
         if ($docType == 'pesanan') {
             $soId = $docId;
             $soData = $this->SalesOrderModel->asObject()
-                ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
+                ->select("sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.value AS termin")
                 ->join('customers', 'customers.id = sales_order.id_customer', 'left')
                 ->join('employees', 'employees.id = customers.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
@@ -778,7 +780,7 @@ class Invoice extends BaseController
                           customers.name AS customerName, 
                           customers.address AS customerAddress,  
                           IFNULL(metadata.value, '-') AS termin,
-                          CONCAT(employees.nip , " - ", employees.name) AS salesName";
+                          CONCAT(employees.nip , ' - ', employees.name) AS salesName";
             $suratJalanData = $this->SuratJalanModel->asObject()
                 ->select($selectQry)
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
