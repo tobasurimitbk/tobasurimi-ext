@@ -739,7 +739,7 @@ class PenerimaanBarangLokalBB extends BaseController
                         $p['jml_masuk'],
                         "-",
                         $po['po_no'],
-                        $po['no_po']
+                        $po['po_no'],
                     );
                 }
             }

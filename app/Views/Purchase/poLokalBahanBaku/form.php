@@ -9,7 +9,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah PO Lokal Bahan Baku</h1>
+        <h1 class="title-name"><?= !empty($dataPOLokal) ? "Update PO Lokal Bahan Baku" : "Tambah PO Lokal Bahan Baku" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-lokal-bahan-baku"); ?>">
                 Batal

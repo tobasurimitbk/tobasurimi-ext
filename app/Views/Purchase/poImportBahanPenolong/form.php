@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah PO Import Bahan Penolong</h1>
+        <h1 class="title-name"><?= (!empty($dataPOImport)) ? "Update PO Import Bahan Penolong" : "Tambah PO Import Bahan Penolong" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-penolong"); ?>">
                 Batal
