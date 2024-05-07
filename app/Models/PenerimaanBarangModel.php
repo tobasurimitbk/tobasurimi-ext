@@ -633,6 +633,7 @@ class PenerimaanBarangModel extends Model
                     $stokDetail,
                     $p['qty'],
                     "-",
+                    $po['po_no'],
                     $po['po_no']
                 );
             }
@@ -669,6 +670,7 @@ class PenerimaanBarangModel extends Model
                 $stokDetail,
                 $penerimaanBarang['jumlah_kemasan'],
                 "-",
+                $penerimaanBarang['no_penerimaan_barang'],
                 $penerimaanBarang['no_penerimaan_barang'],
             );
         }

@@ -189,6 +189,19 @@ class POImportBahanPenolong extends BaseController
             );
         }
 
+        $first = $this->amPurchaseOrderModel
+            ->where('company_id', $this->this_company_id)
+            ->where('po_no', $noPoNew)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Purchase Order Sudah Ada",
+                'status' => false
+            ]);
+        }
+
         // create new po
         $poID = $this->amPurchaseOrderModel->insert([
             'company_id' => $this->this_company_id,
@@ -258,6 +271,21 @@ class POImportBahanPenolong extends BaseController
                 date('Y'),
                 getLastDay()
             );
+        }
+
+
+        $first = $this->amPurchaseOrderModel
+            ->where('company_id', $this->this_company_id)
+            ->where('po_no', $noPoNew)
+            ->where('id !=', $id)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Purchase Order Sudah Ada",
+                'status' => false
+            ]);
         }
 
         $firstData = $this->amPurchaseOrderModel->find($id);

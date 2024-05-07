@@ -475,7 +475,8 @@
     $('#barang_id').select2({
         placeholder: "Pilih Bahan Penolong",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: true,
+        dropdownParent: $('.detail-modal')
     }).change(function() {
         $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
     });
@@ -803,6 +804,15 @@
                                         }).then((result) => {
                                             location.reload();
                                         })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            cancelButtonColor: '#d33',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
+                                        })
                                     }
 
                                 }
@@ -890,6 +900,15 @@
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
                                             window.location.href = "<?= base_url('po-import-bahan-penolong') ?>"
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            cancelButtonColor: '#d33',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
                                         })
                                     }
                                 }
@@ -1055,7 +1074,7 @@
     function deleteRow(id) {
         var indexToRemove = -1;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].barang_id == id) {
+            if (listBarang[i].spesifikasi_id == id) {
                 indexToRemove = i;
                 break;
             }

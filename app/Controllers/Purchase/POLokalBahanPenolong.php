@@ -106,6 +106,19 @@ class POLokalBahanPenolong extends BaseController
             );
         }
 
+        $first = $this->aMPurchaseOrderModel
+            ->where('company_id', $this->this_company_id)
+            ->where('po_no', $noPoNew)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Purchase Order Sudah Ada",
+                'status' => false
+            ]);
+        }
+
         $dataAmPurchaseOrderData = [
             'po_no' => $noPoNew,
             'purchase_request_id' => $this->request->getVar('spp_id'),
@@ -305,6 +318,20 @@ class POLokalBahanPenolong extends BaseController
                 date('Y'),
                 getLastDay()
             );
+        }
+
+        $first = $this->aMPurchaseOrderModel
+            ->where('company_id', $this->this_company_id)
+            ->where('po_no', $noPoNew)
+            ->where('id !=', $id)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Purchase Order Sudah Ada",
+                'status' => false
+            ]);
         }
 
         $firstData = $this->aMPurchaseOrderModel->find($id);
