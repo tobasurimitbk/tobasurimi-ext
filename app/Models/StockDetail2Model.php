@@ -271,7 +271,9 @@ class StockDetail2Model extends Model
             stock_details2.stock_detail_id,
             stock_details2.no_aju,
             stock_details2.stock_id,
+            stock_details2.stock_dokumen,
             stock_details.stock_date,
+            stock_details.sumber,
             stock_details.no_dokumen AS no_dokumen_1,
             (SUM(CASE WHEN stock_details.status = "In" 
             THEN stock_details2.qty ELSE 0 END) - 

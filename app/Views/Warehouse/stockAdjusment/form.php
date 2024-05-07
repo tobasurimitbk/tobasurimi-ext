@@ -182,8 +182,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </form>
 
@@ -661,7 +659,6 @@
         } else {
             insertListPabean();
         }
-        console.log(listStock);
     });
 
     $('.posting-adjusment').click(function() {

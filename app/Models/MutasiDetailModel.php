@@ -49,6 +49,7 @@ class MutasiDetailModel extends Model
         $satuanModel = new SatuansModel();
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
+        $supplierModel = new SupplierModel();
 
         $result = array();
         $mutasiDetail = $this->asArray()->where('mutasi_id', $mutasiID)->findAll();
@@ -72,6 +73,11 @@ class MutasiDetailModel extends Model
                 $barangName = $kemasan['name'];
             }
 
+            $supplier = $supplierModel->select('suppliers.*')
+                ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
+                ->where('penerimaan_barang.no_penerimaan_barang', $stockList['no_dokumen_1'])
+                ->first();
+
             $stockList['qty'] = $m['qty'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
@@ -82,7 +88,8 @@ class MutasiDetailModel extends Model
             $stockList['stock_id'] = $stockList['stock_id'];
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-            $stockList['stok_total'] = number_format($stockList['stok_total']);
+            $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
+            $stockList['stok_total'] = $stockList['stok_total'];
 
             array_push($result, $stockList);
         }

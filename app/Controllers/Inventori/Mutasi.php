@@ -167,6 +167,16 @@ class Mutasi extends BaseController
 
     public function createAction()
     {
+        $first = $this->mutasiModel->where('company_id', $this->this_company_id)->where('no_mutasi', $this->request->getVar('no_mutasi'))->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'message' => "Nomor Mutasi Sudah Ada",
+                'token' => csrf_hash(),
+                'status' => false,
+            ]);
+        }
+
         $bc_id = $this->warehouseModel->getDokumenMutasiBarang(
             $this->request->getVar('warehouse_asal_id'),
             $this->request->getVar('warehouse_tujuan_id')
@@ -182,6 +192,7 @@ class Mutasi extends BaseController
             'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
             'warehouse_tujuan_id' => $this->request->getVar('warehouse_tujuan_id'),
             'keterangan' => $this->request->getVar('keterangan'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'createdBy' => $this->this_user_id,
             'status_posting' => '0'
         ]);
@@ -192,6 +203,7 @@ class Mutasi extends BaseController
                 'stock_id' => $l->stock_id,
                 'bc_id' => $l->bc_id,
                 'no_aju' => $l->no_aju,
+                'stock_dokumen' => $l->stock_dokumen,
                 'qty' => $l->qty
             ]);
         }
@@ -223,6 +235,7 @@ class Mutasi extends BaseController
             'warehouse_tujuan_id' => $this->request->getVar('warehouse_tujuan_id'),
             'keterangan' => $this->request->getVar('keterangan'),
             'createdBy' => $this->this_user_id,
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'status_posting' => '0'
         ]);
 
@@ -236,6 +249,7 @@ class Mutasi extends BaseController
                 ->where('stock_id', $l->stock_id)
                 ->where('bc_id', $l->bc_id)
                 ->where('no_aju', $l->no_aju)
+                ->where('stock_dokumen', $l->stock_dokumen)
                 ->first();
 
             if ($check != null) {
@@ -244,6 +258,7 @@ class Mutasi extends BaseController
                     'stock_id' => $l->stock_id,
                     'bc_id' => $l->bc_id,
                     'no_aju' => $l->no_aju,
+                    'stock_dokumen' => $l->stock_dokumen,
                     'qty' => $l->qty
                 ]);
 
@@ -256,6 +271,7 @@ class Mutasi extends BaseController
                     ->where('stock_id', $l->stock_id)
                     ->where('bc_id', $l->bc_id)
                     ->where('no_aju', $l->no_aju)
+                    ->where('stock_dokumen', $l->stock_dokumen)
                     ->delete();
 
                 // INSERT
@@ -264,6 +280,7 @@ class Mutasi extends BaseController
                     'stock_id' => $l->stock_id,
                     'bc_id' => $l->bc_id,
                     'no_aju' => $l->no_aju,
+                    'stock_dokumen' => $l->stock_dokumen,
                     'qty' => $l->qty
                 ]);
 

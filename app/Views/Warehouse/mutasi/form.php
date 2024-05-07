@@ -132,11 +132,20 @@
                             <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
                         </div>
                     </div>
-
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                                <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($mutasi) ? $mutasi['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Keterangan</label>
+                            <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -174,7 +183,12 @@
                                 <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi</label>
                             </div>
                         </div>
-
+                        <div class="col-md-4 form-fifo">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
+                                <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
+                            </div>
+                        </div>
                     </div>
                 </form>
 
@@ -187,11 +201,13 @@
                             <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">#</th>
+                                        <th style="text-align: center;">Asal Barang</th>
+                                        <th style="text-align: center;">No Dokumen</th>
+                                        <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju</th>
-                                        <th style="text-align: center;">Tgl Penerimaan</th>
+                                        <th style="text-align: center;">Tanggal Penerimaan</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty</th>
@@ -218,8 +234,10 @@
                                 <tr>
                                     <th style="text-align: center;">No</th>
                                     <th style="text-align: center;">Tipe Barang</th>
+                                    <th style="text-align: center;">Asal Barang</th>
+                                    <th style="text-align: center;">No Dokumen</th>
+                                    <th style="text-align: center;">Supplier</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
                                     <th style="text-align: center;">Tgl Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
@@ -247,6 +265,8 @@
     var listStockAsal = [];
     var listStockSelected = [];
 
+    $('.form-fifo').hide();
+
     <?php if (!empty($mutasiDetail)) : ?>
         <?php foreach ($mutasiDetail as $m) :  ?>
             listStockSelected.push({
@@ -262,7 +282,10 @@
                 type_barang: "<?= $m['type_barang'] ?>",
                 type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
-                qty: "<?= $m['qty'] ?>"
+                qty: "<?= $m['qty'] ?>",
+                supplier_name: "<?= $m['supplier_name'] ?>",
+                stock_dokumen: "<?= $m['stock_dokumen'] ?>",
+                sumber: "<?= $m['sumber'] ?>"
             });
         <?php endforeach; ?>
         <?php if ($mutasi['status_posting']) : ?>
@@ -354,6 +377,22 @@
         });
     <?php endif; ?>
 
+    $('#type_pengambilan_stock').select2({
+        placeholder: "Pilih Tipe Ambil Stok",
+        theme: "bootstrap-5",
+    }).change(function() {
+        // FIFO
+        if ($(this).val() == "FIFO") {
+            $('.form-fifo').show();
+        } else {
+            $('.form-fifo').hide();
+        }
+        listStockAsal = [];
+        listStockSelected = [];
+        drawTableAsalBarang();
+        drawTableSelectedItem();
+    });
+
     $('#warehouse_tujuan_id').select2({
         placeholder: "Pilih Warehouse Tujuan",
         theme: "bootstrap-5",
@@ -425,7 +464,7 @@
     });
 
 
-    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#spesifikasi_id,#bc_id,#no_aju,#operasi")
+    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#spesifikasi_id,#bc_id,#no_aju,#operasi,#type_pengambilan_stock")
         .parent('div')
         .children('span')
         .children('span')
@@ -434,6 +473,16 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
     $('#select-item-btn').click(function() {
+        var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
+        if (typePengambilanStock == "FIFO") {
+            insertListFifo();
+        } else {
+            insertListPabean();
+        }
+
+    });
+
+    function insertListPabean() {
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
@@ -455,9 +504,65 @@
                 }
             }
         });
-
         drawTableSelectedItem(listStockSelected);
-    });
+    }
+
+    function insertListFifo() {
+        var dataIds = getIDListDataSelected();
+        var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
+        var stockID = $(".spesifikasi_id option:selected").data('stock_id');
+
+        if (isNaN(qtyMutasiFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                reverseButtons: true,
+                confirmButtonText: 'Oke',
+            })
+        } else {
+            var totalStokTotal = 0;
+            $.each(listStockAsal, function(i, v) {
+                totalStokTotal += parseFloat(v.stok_total);
+            });
+            deleteByStockID(stockID);
+
+            if (qtyMutasiFifo > totalStokTotal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true,
+                    confirmButtonText: 'Oke',
+                })
+            } else {
+                $.each(listStockAsal, function(i, v) {
+                    var currentID = Number(v.id);
+                    if ($.inArray(currentID, dataIds) == -1) {
+                        var isIDSelected = $.grep(listStockSelected, function(item) {
+                            return item.id == Number(currentID);
+                        }).length > 0;
+                        if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
+                            var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                            listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                            listStockAsal[i].qty = parseFloat(mutasiQty.toFixed(2));
+                            listStockSelected.push(listStockAsal[i]);
+                            qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                        }
+                    }
+                });
+            }
+        }
+        drawTableSelectedItem(listStockSelected);
+    }
+
+    function deleteByStockID(stockID) {
+        listStockSelected = listStockSelected.filter(function(item) {
+            return item.stock_id != stockID;
+        });
+    }
 
     // VALIDATOR
     var validator = $(".create-form").validate({
@@ -477,9 +582,9 @@
             warehouse_tujuan_id: {
                 required: true,
             },
-            keterangan: {
-                required: true,
-            },
+            type_pengambilan_stock: {
+                required: true
+            }
         },
         messages: {
             no_mutasi: {
@@ -497,9 +602,9 @@
             warehouse_tujuan_id: {
                 required: "Warehouse tujuan wajib diisi",
             },
-            keterangan: {
-                required: "Keterangan wajib diisi",
-            },
+            type_pengambilan_stock: {
+                required: "Tipe ambil stok wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -533,22 +638,25 @@
                 confirmButtonText: 'Ok'
             });
         } else {
+            var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
             if ($('.create-form').valid()) {
                 var isValid = true;
                 var dataError = null;
 
-                $.each(listStockSelected, function(i, v) {
-                    var element = $('input[data-id="' + v.id + '"].stok-mutasi');
-                    var input_user = parseFloat(element.val());
-                    var stok_max = parseFloat(element.data('stok_total'));
+                if (typePengambilanStock == "PABEAN") {
+                    $.each(listStockSelected, function(i, v) {
+                        var element = $('input[data-id="' + v.id + '"].stok-mutasi');
+                        var input_user = parseFloat(element.val());
+                        var stok_max = parseFloat(element.data('stok_total'));
 
-                    if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                        dataError = listStockSelected[i];
-                        isValid = false;
-                    } else {
-                        listStockSelected[i].qty = input_user;
-                    }
-                });
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                            dataError = listStockSelected[i];
+                            isValid = false;
+                        } else {
+                            listStockSelected[i].qty = input_user;
+                        }
+                    });
+                }
 
                 if (!isValid) {
                     Swal.fire({
@@ -831,22 +939,34 @@
             dataTable.destroy();
         }
         const table = $('#dataTable');
+        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
+
         $.each(data, function(i, v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
+            var newRow = $('<tr style="color:whitesmoke;">');
+            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                 `
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                     <div class="form-check">
-                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                        <input  data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
-            ));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align: center;">').text(v.barang));
-            newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+                ));
+            }
+
+            newRow.append($('<td style="text-align:center;">').text(v.sumber));
+            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
+            newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
+            newRow.append($('<td style="text-align:center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align:center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align:center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align:center;">').text(v.barang));
+            newRow.append($('<td style="text-align:center;">').text(v.satuan));
+            newRow.append($('<td style="text-align:center;">').text(v.stok_total));
             table.find('tbody').append(newRow);
         });
 
@@ -883,6 +1003,7 @@
             selectedItemTable.destroy();
         }
         const table = $('#selectedItemTable');
+        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         var no = 1;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
@@ -892,17 +1013,26 @@
                 `
             ));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.sumber));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
+            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type + " / " + v.no_aju));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
+
+            if (typePengambilanStok == "FIFO") {
+                newRow.append($('<td>').text(
+                    v.qty
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                     <input <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
-            ));
+                ));
+            }
             newRow.append($('<td style="text-align: center;">').html(
                 `
                     <button <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
