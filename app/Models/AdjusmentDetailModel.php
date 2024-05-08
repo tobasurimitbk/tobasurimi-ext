@@ -92,7 +92,7 @@ class AdjusmentDetailModel extends Model
                 ->where('penerimaan_barang.no_penerimaan_barang', $stockDetail2['no_dokumen'])
                 ->first();
 
-            $stockDetail2GroubBy = $stockDetail2Model->getStockListDetail($stock['id'], $r['bc_id'], $r['no_aju']);
+            $stockDetail2GroubBy = $stockDetail2Model->getStockListDetail($stock['id'], $r['bc_id'], $r['no_aju'], $r['stock_dokumen']);
 
             $response[] = array(
                 'id' => $stockDetail2['id'],

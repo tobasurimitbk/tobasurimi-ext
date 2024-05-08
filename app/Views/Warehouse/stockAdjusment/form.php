@@ -1052,6 +1052,7 @@
             },
             data: {
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
+                isAdjusment: true
             },
             dataType: "json",
             success: function(res) {

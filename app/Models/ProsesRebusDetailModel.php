@@ -49,6 +49,7 @@ class ProsesRebusDetailModel extends Model
         $satuanModel = new SatuansModel();
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
+        $supplierModel = new SupplierModel();
 
         $result = array();
         $prosesRebusDetail = $this->asArray()->where('proses_rebus_id', $prosesRebusID)->findAll();
@@ -57,7 +58,8 @@ class ProsesRebusDetailModel extends Model
             $stockList = $stockDetail2Model->getStockListDetail(
                 $m['stock_rebus_id'],
                 $m['bc_rebus_id'],
-                $m['no_aju_rebus']
+                $m['no_aju_rebus'],
+                $m['stock_dokumen']
             );
             $stock = $stockModel->find($m['stock_rebus_id']);
             $stockOutput = $stockModel->find($m['stock_hasil_rebus_id']);
@@ -86,6 +88,12 @@ class ProsesRebusDetailModel extends Model
                 $satuanOutputName = $satuanOutput == null ? "-" : $satuanOutput['kode_satuan'];
             }
 
+
+            $supplier = $supplierModel->select('suppliers.*')
+                ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
+                ->where('penerimaan_barang.no_penerimaan_barang', $stockList['no_dokumen_1'])
+                ->first();
+
             $stockList['qty'] = $m['qty_rebus'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
@@ -97,6 +105,7 @@ class ProsesRebusDetailModel extends Model
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = ($stockList['stok_total']);
             $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
+            $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
             $stockList['output'] = [
                 'barang' => $barangNameOutput,
                 'kode_satuan' => $satuanOutputName,

@@ -408,8 +408,11 @@ class StokAdjusment extends BaseController
     public function getListStockByStockID()
     {
         if (!empty($this->request->getVar('stock_id'))) {
+            $isAdjusment = !empty($this->request->getVar('isAdjusment')) ? true : false;
+
             $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
-                $this->request->getVar('stock_id')
+                $this->request->getVar('stock_id'),
+                $isAdjusment
             );
             $stock = $this->stockModel->find($this->request->getVar('stock_id'));
             if ($stock['kemasan_id'] == 0) {

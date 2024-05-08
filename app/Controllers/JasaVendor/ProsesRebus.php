@@ -173,6 +173,7 @@ class ProsesRebus extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'no_rebus' => $this->request->getVar('no_rebus'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'keterangan' => $this->request->getVar('keterangan'),
@@ -188,6 +189,7 @@ class ProsesRebus extends BaseController
                 'no_aju_rebus' => $b->no_aju,
                 'qty_rebus' => $b->qty,
                 'stock_hasil_rebus_id' => $b->output->stock_id,
+                'stock_dokumen' => $b->stock_dokumen,
                 'qty_hasil_rebus' => $b->output->qty,
             ]);
         }
@@ -220,6 +222,7 @@ class ProsesRebus extends BaseController
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'keterangan' => $this->request->getVar('keterangan'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'type_barang' => "bahan_baku",
             'status_posting' => '0'
         ]);
@@ -234,6 +237,7 @@ class ProsesRebus extends BaseController
                 ->where('bc_rebus_id', $b->bc_id)
                 ->where('no_aju_rebus', $b->no_aju)
                 ->where('stock_hasil_rebus_id',  $b->output->stock_id)
+                ->where('stock_dokumen', $b->stock_dokumen)
                 ->first();
 
             if ($check != null) {
@@ -244,6 +248,7 @@ class ProsesRebus extends BaseController
                     'no_aju_rebus' => $b->no_aju,
                     'qty_rebus' => $b->qty,
                     'stock_hasil_rebus_id' => $b->output->stock_id,
+                    'stock_dokumen' => $b->stock_dokumen,
                     'qty_hasil_rebus' => $b->output->qty,
                 ]);
                 array_push($id_detail_all, $check['id']);
@@ -256,6 +261,7 @@ class ProsesRebus extends BaseController
                     ->where('bc_rebus_id', $b->bc_id)
                     ->where('no_aju_rebus', $b->no_aju)
                     ->where('stock_hasil_rebus_id',  $b->output->stock_id)
+                    ->where('stock_dokumen', $b->stock_dokumen)
                     ->delete();
 
                 // INSERT
@@ -266,6 +272,7 @@ class ProsesRebus extends BaseController
                     'no_aju_rebus' => $b->no_aju,
                     'qty_rebus' => $b->qty,
                     'stock_hasil_rebus_id' => $b->output->stock_id,
+                    'stock_dokumen' => $b->stock_dokumen,
                     'qty_hasil_rebus' => $b->output->qty,
                 ]);
                 array_push($id_detail_all,  $id_detail_new);
@@ -334,7 +341,8 @@ class ProsesRebus extends BaseController
                 $stokDetail,
                 $p['qty_rebus'],
                 $p['no_aju_rebus'],
-                "-"
+                "-",
+                $p['stock_dokumen']
             );
 
             // -----
@@ -402,7 +410,8 @@ class ProsesRebus extends BaseController
                 $stokDetail,
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
-                "-"
+                "-",
+                $prosesRebus['no_rebus']
             );
         }
 

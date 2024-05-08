@@ -53,6 +53,8 @@ class VendorModel extends Model
         // $requete .= "LEFT JOIN sub_akuns s1 ON (vendors.ap_id=s1.id) ";
         // $requete .= "LEFT JOIN sub_akuns s2 ON (vendors.ar_id=s2.id) ";
         $requete .= "WHERE vendors.deletedAt is null ";
+        if (isset($values['company_id']))
+            $requete .= "AND company_id=" . $values['company_id'] . " ";
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND UPPER(vendors.name) like '%" . strtoupper($values["name"]) . "%' ");
         if (isset($values["search"]))

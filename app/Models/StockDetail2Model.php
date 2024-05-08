@@ -229,8 +229,10 @@ class StockDetail2Model extends Model
         }
     }
 
-    public function getStockListWithBCDoc($stockID)
+    public function getStockListWithBCDoc($stockID, $isAdjusment = false)
     {
+        // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
+        // JIKA $isAdjusment = false MAKA STOK > 0 YANG MUNCUL
         $selectQry = '
             stock_details2.id,
             stock_details2.bc_id,
@@ -259,10 +261,33 @@ class StockDetail2Model extends Model
             ->orderBy('stock_details.stock_date', "ASC")
             ->findAll();
 
+        if ($isAdjusment == true) {
+            $dataQry = $this->asArray()
+                ->select($selectQry)
+                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+                ->where('stock_details2.stock_id', $stockID)
+                ->groupBy('stock_details2.stock_dokumen')
+                ->groupBy('stock_details2.bc_id')
+                ->groupBy('stock_details2.no_aju')
+                ->orderBy('stock_details.stock_date', "ASC")
+                ->findAll();
+        } else {
+            $dataQry = $this->asArray()
+                ->select($selectQry)
+                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+                ->where('stock_details2.stock_id', $stockID)
+                ->groupBy('stock_details2.stock_dokumen')
+                ->groupBy('stock_details2.bc_id')
+                ->groupBy('stock_details2.no_aju')
+                ->having('stok_total >', 0)
+                ->orderBy('stock_details.stock_date', "ASC")
+                ->findAll();
+        }
+
         return $dataQry;
     }
 
-    public function getStockListDetail($stockID, $bcID, $noAju)
+    public function getStockListDetail($stockID, $bcID, $noAju, $stockDokumen = "-")
     {
 
         $selectQry = '
@@ -288,6 +313,7 @@ class StockDetail2Model extends Model
             ->where('stock_details2.stock_id', $stockID)
             ->where('stock_details2.bc_id', $bcID)
             ->where('stock_details2.no_aju', $noAju)
+            ->where('stock_details2.stock_dokumen', $stockDokumen)
             ->groupBy('stock_details2.stock_dokumen')
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')

@@ -57,7 +57,8 @@ class MutasiDetailModel extends Model
             $stockList = $stockDetail2Model->getStockListDetail(
                 $m['stock_id'],
                 $m['bc_id'],
-                $m['no_aju']
+                $m['no_aju'],
+                $m['stock_dokumen']
             );
             $stock = $stockModel->find($m['stock_id']);
 
