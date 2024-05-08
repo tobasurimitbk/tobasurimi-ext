@@ -184,7 +184,7 @@ class TandaTerimaSupBB extends BaseController
         $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
         $check = $this->tandaTerimaFakturModel->where('faktur_no', $fakturNo)->first();
 
-        if ($check == null) {
+        if ($check != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'message' => "Nomor faktur sudah ada",
