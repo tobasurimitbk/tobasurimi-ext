@@ -568,7 +568,6 @@
                 totalStokTotal += parseFloat(v.stok_total);
             });
 
-            deleteByStockID(stokRebusID);
             if (qtyRebusFifo > totalStokTotal) {
                 Swal.fire({
                     icon: 'error',
@@ -588,6 +587,7 @@
                     confirmButtonText: 'Oke',
                 })
             } else {
+                deleteByStockID(stokRebusID);
                 // STOK REBUS OUT
                 $.each(listStockAsal, function(i, v) {
                     var currentID = Number(v.id);

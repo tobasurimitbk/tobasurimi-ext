@@ -174,6 +174,16 @@ class JasaVendorOut extends BaseController
 
     public function createAction()
     {
+        $check = $this->jasaVendorOutModel->where('no_surat_jalan', $this->request->getVar('no_surat_jalan'))->first();
+
+        if ($check != null) {
+            return response()->setJSON([
+                'message' => "Nomor Surat Jalan Sudah Ada",
+                'token' => csrf_hash(),
+                'status' => false,
+            ]);
+        }
+
         $id = $this->jasaVendorOutModel->insert([
             'company_id' => $this->this_company_id,
             'vendor_id' => $this->request->getVar('vendor_id'),
@@ -183,6 +193,7 @@ class JasaVendorOut extends BaseController
             'tanggal' => date('Y-m-d'),
             'tipe_barang' => "bahan_baku",
             'no_kontainer' => $this->request->getVar('no_kontainer'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'keterangan' => $this->request->getVar('keterangan'),
         ]);
 
@@ -194,6 +205,7 @@ class JasaVendorOut extends BaseController
                 'stock_out_id' => $b->stock_id,
                 'bc_out_id' => $b->bc_id,
                 'no_aju_out' => $b->no_aju,
+                'stock_dokumen' => $b->stock_dokumen,
                 'qty' => $b->qty
             ]);
         }
@@ -228,6 +240,7 @@ class JasaVendorOut extends BaseController
                 ->where('stock_out_id', $b->stock_id)
                 ->where('bc_out_id', $b->bc_id)
                 ->where('no_aju_out', $b->no_aju)
+                ->where('stock_dokumen', $b->stock_dokumen)
                 ->first();
 
             if ($check == null) {
@@ -237,6 +250,7 @@ class JasaVendorOut extends BaseController
                     ->where('stock_out_id', $b->stock_id)
                     ->where('bc_out_id', $b->bc_id)
                     ->where('no_aju_out', $b->no_aju)
+                    ->where('stock_dokumen', $b->stock_dokumen)
                     ->delete();
 
                 $id_detail_new = $this->jasaVendorOutDetailModel->insert([
@@ -244,6 +258,7 @@ class JasaVendorOut extends BaseController
                     'stock_out_id' => $b->stock_id,
                     'bc_out_id' => $b->bc_id,
                     'no_aju_out' => $b->no_aju,
+                    'stock_dokumen' => $b->stock_dokumen,
                     'qty' => $b->qty
                 ]);
                 array_push($id_detail_all,  $id_detail_new);
@@ -254,6 +269,7 @@ class JasaVendorOut extends BaseController
                     'stock_out_id' => $b->stock_id,
                     'bc_out_id' => $b->bc_id,
                     'no_aju_out' => $b->no_aju,
+                    'stock_dokumen' => $b->stock_dokumen,
                     'qty' => $b->qty
                 ]);
                 array_push($id_detail_all, $check['id']);
@@ -329,7 +345,8 @@ class JasaVendorOut extends BaseController
                 $stokDetail,
                 $qty,
                 $j['no_aju_out'],
-                $jasaVendorOut['no_surat_jalan']
+                $jasaVendorOut['no_surat_jalan'],
+                $j['stock_dokumen']
             );
         }
 
@@ -416,7 +433,7 @@ class JasaVendorOut extends BaseController
     public function getListStockByStockID()
     {
         if (!empty($this->request->getVar('stock_id'))) {
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
+            $dataResult = $this->jasaVendorOutDetailModel->getStockListWithBCDoc(
                 $this->request->getVar('stock_id')
             );
             $stock = $this->stockModel->find($this->request->getVar('stock_id'));
@@ -439,6 +456,7 @@ class JasaVendorOut extends BaseController
                     ->where('penerimaan_barang.no_penerimaan_barang', $dataResult[$i]['no_dokumen_1'])
                     ->first();
 
+                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                 $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
                 $dataResult[$i]['satuan'] = $satuan['kode_satuan'];

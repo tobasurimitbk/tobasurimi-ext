@@ -391,6 +391,13 @@ class ProsesRebus extends BaseController
                 );
             }
 
+            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_rebus_id'],
+                $p['bc_rebus_id'],
+                $p['no_aju_rebus'],
+                $p['stock_dokumen']
+            );
+
             // DETAIL
             $stokDetail = $this->stockDetailModel->insertStokDetail(
                 $stok,
@@ -399,7 +406,7 @@ class ProsesRebus extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "REBUS",
-                $prosesRebus['no_rebus'],
+                $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
                 $prosesRebus['keterangan']
             );
 
@@ -410,8 +417,8 @@ class ProsesRebus extends BaseController
                 $stokDetail,
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
-                "-",
-                $prosesRebus['no_rebus']
+                $p['stock_dokumen'],
+                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )"
             );
         }
 

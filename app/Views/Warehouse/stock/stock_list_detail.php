@@ -1554,7 +1554,7 @@
                 sortable: false
             },
             {
-                data: "no_dokumen1",
+                data: "stock_dokumen",
                 className: "text-center",
             },
             {
