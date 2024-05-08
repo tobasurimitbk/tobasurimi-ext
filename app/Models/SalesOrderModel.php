@@ -54,6 +54,7 @@ class SalesOrderModel extends Model
         'include_pa',
         'paid_amt',
         'used',
+        'counter_print',
     ];
 
     // Dates

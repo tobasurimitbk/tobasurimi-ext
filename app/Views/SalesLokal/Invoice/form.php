@@ -76,13 +76,24 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="termin" name="termin" value="<?= $documentData->termin ?? '' ?>" disabled>
+
+                            <select class="form-select termin" id="termin" name="termin">
+                                <?php if ($termin != "") : ?>
+                                    <option value=""></option>
+                                    <?php foreach ($termin as $row) : ?>
+                                        <option value="<?= $row['id'] ?>" <?= $documentData->termin == $row['id'] ? 'selected' : '' ?>><?= $row['value'] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+
+                            </select>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= !empty($data) ? 'disabled' : ''; ?>>
@@ -94,6 +105,7 @@
                             <label for="floatingInput">Jenis Penjualan</label>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="salesName" value="<?= $documentData->salesName ?? '' ?>" disabled>
@@ -293,6 +305,12 @@
     // Display the date on the webpage
     $(document).ready(function() {
 
+
+        <?php if ($termin == "") : ?>
+
+            getTerminList(this.value);
+        <?php endif; ?>
+
         <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) : ?>
 
             $('#taxTotal').html(<?= $data->ppn; ?>.toLocaleString());
@@ -305,8 +323,10 @@
 
         // $(".tanggal_faktur").val(formattedDateFront);
 
+
+
         // via
-        $('.ship_via, #doc_id').select2({
+        $('.ship_via, #doc_id, .termin').select2({
             placeholder: "",
             theme: "bootstrap-5"
         });
@@ -320,9 +340,10 @@
             // clear datatable here
 
             getDocumentList(this.value);
+
         });
 
-        $("#doc_id").change(function() {
+        $("#doc_id, .termin").change(function() {
             getDocumentData(this.value);
         });
 
@@ -349,7 +370,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ship_via, #doc_type, #doc_id')
+        $('.ship_via, #doc_type, #doc_id, .termin')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -434,6 +455,8 @@
             .find('label')
             .css('z-index', '1');
 
+
+
         function getDocumentList(docType) {
             table.clear();
 
@@ -450,6 +473,34 @@
                     })
                 }
             });
+        }
+
+        function getTerminList() {
+
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'termin'
+                },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".termin").empty()
+                    $(".termin").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".termin").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
+                    })
+
+                    $(".termin").val("").change();
+                }
+            })
         }
 
         function getDocumentData(docId) {

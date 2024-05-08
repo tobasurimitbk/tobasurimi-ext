@@ -72,7 +72,8 @@ class Invoice extends BaseController
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
-            "via" => $tipeShipping
+            "via" => $tipeShipping,
+            "termin"        => "",
         ];
         //echo json_encode($data);
         return view('SalesLokal/Invoice/form', $data);
@@ -119,8 +120,9 @@ class Invoice extends BaseController
                 "kode_pelanggan"    => $data->kode_pelanggan,
                 "keterangan"        => $data->keterangan,
                 "nama_pelanggan"    => $data->nama_pelanggan,
-                "nama_sales"    => $data->salesName,
-                "tipe_invoice"    => $data->tipe_invoice,
+                "nama_sales"        => $data->salesName,
+                "tipe_invoice"      => $data->tipe_invoice,
+                "counter_print"     => $data->counter_print,
             ]);
         }
 
@@ -393,6 +395,7 @@ class Invoice extends BaseController
             "data"          => $dataSalesInvoiceOrder,
             "documentList"  => $documentList,
             "documentData"  => $documentData,
+            "termin"        => $this->MetadataModel->where('name', 'termin')->findAll(),
             "id_user"       => $dataSalesInvoiceOrder->id_user,
             "seller_name"   => $dataSalesInvoiceOrder->seller_name,
             "via"           => $tipeShipping,
@@ -569,6 +572,9 @@ class Invoice extends BaseController
                 $this->SuratJalanModel->update(...$updateData);
             }
 
+
+            $this->SalesOrderModel->update($documentData->id, ['payment_terms' => $this->request->getPost('termin')]);
+
             $this->SalesOrderInvoiceModel->db->transComplete();
 
             $data = [
@@ -680,6 +686,7 @@ class Invoice extends BaseController
                         customers.name AS customerName, 
                         customers.address AS customerAddress,
                         metadata.value AS termin,
+                        metadata.id AS terms_id,
                         barangs.nama_barang AS namaBarang, 
                         barangs.kode_barang AS kodeBarang, 
                         sales_order_detail.qty AS qty, 
@@ -707,6 +714,8 @@ class Invoice extends BaseController
             'soData'        => $salesOrderData,
             'invTotal'      => $invTotal
         ];
+        //lagi disini
+        $this->SalesOrderInvoiceModel->update($id, ['counter_print' => $invData->counter_print + 1]);
 
         // return view('SalesLokal/Invoice/print', $data);
 
@@ -765,7 +774,7 @@ class Invoice extends BaseController
         if ($docType == 'pesanan') {
             $soId = $docId;
             $soData = $this->SalesOrderModel->asObject()
-                ->select("sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.value AS termin")
+                ->select("sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.id AS termin")
                 ->join('customers', 'customers.id = sales_order.id_customer', 'left')
                 ->join('employees', 'employees.id = customers.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')

@@ -183,6 +183,7 @@ class OrderForm extends BaseController
                 "keterangan" => $data->keterangan,
                 "surat_jalan_so_id" => $data->surat_jalan_so_id,
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
+                "counter_print" => $data->counter_print,
             ]);
         }
 
@@ -789,6 +790,9 @@ class OrderForm extends BaseController
 
         $id = decrypt($id);
 
+
+
+
         $companyData = $this->companyModel->asObject()
             ->find($this->this_company_id);
 
@@ -816,6 +820,14 @@ class OrderForm extends BaseController
             'soData'        => $salesOrderData,
             'soDet'         => $soDet
         ];
+
+
+        $this->SalesOrderModel->update($id, ['counter_print' => $salesOrderData->counter_print + 1]);
+
+
+
+
+
 
         // return view('SalesLokal/OrderForm/print', $data);
 

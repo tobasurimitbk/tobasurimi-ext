@@ -61,6 +61,7 @@ class Barang extends BaseController
             'type_barang_sales' => "LOKAL",
             'type_barang' => "bahan_jadi",
             'satuan_id' => $this->request->getVar('satuan_id'),
+            'status_ppn' => $this->request->getVar('status_ppn') ?? "0",
             'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
             'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
         ]);
@@ -98,7 +99,8 @@ class Barang extends BaseController
             'type_barang_sales' => "LOKAL",
             'satuan_id' => $this->request->getVar('satuan_id'),
             'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
-            'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
+            'harga_jual' => repairDouble($this->request->getVar('harga_jual')),
+            'status_ppn' => $this->request->getVar('status_ppn') ?? "0",
         ]);
 
         return response()->setJSON([
@@ -171,10 +173,11 @@ class Barang extends BaseController
                 "kode_barang"       => $data['kode_barang'],
                 "barang_name"       => $data['barang_name'],
                 "type_barang_sales" => $data['type_barang_sales'],
-                'kode_satuan'       => $data['kode_satuan'],
+                "kode_satuan"       => $data['kode_satuan'],
                 "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'])),
                 "harga_pokok"       => number_format($data['harga_pokok']),
                 "harga_jual"        => number_format($data['harga_jual']),
+                "status_ppn"       => $data['status_ppn'],
             ]);
         }
 
