@@ -20,7 +20,7 @@
         <?php endif; ?>
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -36,7 +36,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                             <option value="" data-code=""></option>
@@ -50,7 +50,10 @@
                         <label for="floatingInput">Filter Customer</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+
+            </div>
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_surat_jalan" name="filter_surat_jalan" id="filter_surat_jalan">
                             <option value="" data-code=""></option>
@@ -60,7 +63,7 @@
                         <label for="floatingInput">Filter Surat Jalan</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
                             <option value="" data-code=""></option>

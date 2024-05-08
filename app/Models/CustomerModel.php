@@ -36,6 +36,7 @@ class CustomerModel extends Model
         'sales_id',
         'country_id',
         'tipe_customer',
+        'jenis_penjualan',
         'createdAt',
         'updatedAt',
         'deletedAt'
