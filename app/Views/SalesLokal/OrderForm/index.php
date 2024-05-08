@@ -101,6 +101,8 @@
 
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
 
+                                <th onclick="changeSort('counter_print')" class="sort">Print</th>
+
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -324,6 +326,16 @@
                 className: "text-center",
                 render: function(data, type, row) {
                     if (data && data !== "") {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
+            }, {
+                data: "counter_print",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data != 0) {
                         return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
                     } else { // Otherwise, display a dash "-"
                         return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";

@@ -40,6 +40,7 @@ class SalesOrderInvoiceModel extends Model
         'termasuk_pa',
         'tipe_invoice',
         'status_pelunasan',
+        'counter_print',
     ];
 
     // Dates
@@ -131,11 +132,13 @@ class SalesOrderInvoiceModel extends Model
                       users.name AS seller_name,
                       customers.name AS customer_name,
                       sales_order_invoice.status_tax AS status_tax,
-                      sales_order_invoice.termasuk_pa AS termasuk_pa";
+                      sales_order_invoice.termasuk_pa AS termasuk_pa,
+                      sales_order.jenis_penjualan";
 
         $dataSalesOrderInvoice = $this->asObject()
             ->join('users', 'users.id = sales_order_invoice.id_user')
             ->join('customers', 'customers.id = sales_order_invoice.id_customer ')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id')
             ->select($selectQry)
             ->find($id);
 
