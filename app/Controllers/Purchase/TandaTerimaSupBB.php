@@ -99,7 +99,7 @@ class TandaTerimaSupBB extends BaseController
                     "is_used"        => $is_used == null ? false : true
                 ]);
             } else {
-                if ($addCondition['status_lunas']) {
+                if ($addCondition['status_lunas'] == "LUNAS") {
                     if ($is_used) {
                         array_push($dataSupplier, [
                             "no"             => $no++,
