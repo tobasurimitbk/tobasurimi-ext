@@ -131,7 +131,7 @@
                     <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->tanggal ? date("d/m/Y", strtotime($dataPenerimaanBarang->tanggal)) : ""; ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
+                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
                 </td>
                 <td class="txt-right">
                     <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>

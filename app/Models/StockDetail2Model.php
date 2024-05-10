@@ -104,7 +104,8 @@ class StockDetail2Model extends Model
         $stok_detail_id,
         $qty,
         $no_aju,
-        $no_dokumen
+        $no_dokumen,
+        $stock_dokumen = "-"
     ) {
         $stokDetail2 = $this->insert([
             'bc_id' => $bc_id,
@@ -112,7 +113,8 @@ class StockDetail2Model extends Model
             'stock_detail_id' => $stok_detail_id,
             'qty' => $qty,
             'no_aju' => $no_aju,
-            'no_dokumen' => $no_dokumen
+            'no_dokumen' => $no_dokumen,
+            'stock_dokumen' => $stock_dokumen
         ]);
 
         return $stokDetail2;
@@ -123,6 +125,7 @@ class StockDetail2Model extends Model
         $availableSort = [
             'stock_details2.no_dokumen' => 'stock_details2.no_dokumen',
             'stock_details.no_dokumen' => 'stock_details.no_dokumen',
+            'stock_details2.stock_dokumen' => 'stock_details2.stock_dokumen',
             'stock_details2.bc_id' => 'stock_details2.bc_id',
             'stock.barang1_id' => 'stock.barang1_id',
             'stock_details2.qty' => 'stock_details2.qty',
@@ -149,6 +152,7 @@ class StockDetail2Model extends Model
             stock.warehouse_id,
             stock_details.status,
             stock_details.sumber,
+            stock_details2.stock_dokumen,
             stock_details2.qty AS stok_total,
             stock_details2.bc_id,
             stock_details2.no_aju,
@@ -227,17 +231,21 @@ class StockDetail2Model extends Model
         }
     }
 
-    public function getStockListWithBCDoc($stockID)
+    public function getStockListWithBCDoc($stockID, $isAdjusment = false)
     {
+        // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
+        // JIKA $isAdjusment = false MAKA STOK > 0 YANG MUNCUL
         $selectQry = '
             stock_details2.id,
             stock_details2.bc_id,
             stock_details2.stock_detail_id,
             stock_details2.no_aju,
             stock_details2.stock_id,
+            stock_details2.stock_dokumen,
             stock_details2.no_dokumen AS no_dokumen_2,
             stock_details.no_dokumen AS no_dokumen_1,
             stock_details.stock_date,
+            stock_details.sumber,
             (SUM(CASE WHEN stock_details.status = "In" 
             THEN stock_details2.qty ELSE 0 END) - 
             SUM(CASE WHEN stock_details.status = "Out" 
@@ -249,14 +257,39 @@ class StockDetail2Model extends Model
             ->select($selectQry)
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->where('stock_details2.stock_id', $stockID)
+            ->groupBy('stock_details2.stock_dokumen')
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')
+            ->orderBy('stock_details.stock_date', "ASC")
             ->findAll();
+
+        if ($isAdjusment == true) {
+            $dataQry = $this->asArray()
+                ->select($selectQry)
+                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+                ->where('stock_details2.stock_id', $stockID)
+                ->groupBy('stock_details2.stock_dokumen')
+                ->groupBy('stock_details2.bc_id')
+                ->groupBy('stock_details2.no_aju')
+                ->orderBy('stock_details.stock_date', "ASC")
+                ->findAll();
+        } else {
+            $dataQry = $this->asArray()
+                ->select($selectQry)
+                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+                ->where('stock_details2.stock_id', $stockID)
+                ->groupBy('stock_details2.stock_dokumen')
+                ->groupBy('stock_details2.bc_id')
+                ->groupBy('stock_details2.no_aju')
+                ->having('stok_total >', 0)
+                ->orderBy('stock_details.stock_date', "ASC")
+                ->findAll();
+        }
 
         return $dataQry;
     }
 
-    public function getStockListDetail($stockID, $bcID, $noAju)
+    public function getStockListDetail($stockID, $bcID, $noAju, $stockDokumen = "-")
     {
 
         $selectQry = '
@@ -265,7 +298,9 @@ class StockDetail2Model extends Model
             stock_details2.stock_detail_id,
             stock_details2.no_aju,
             stock_details2.stock_id,
+            stock_details2.stock_dokumen,
             stock_details.stock_date,
+            stock_details.sumber,
             stock_details.no_dokumen AS no_dokumen_1,
             (SUM(CASE WHEN stock_details.status = "In" 
             THEN stock_details2.qty ELSE 0 END) - 
@@ -280,6 +315,8 @@ class StockDetail2Model extends Model
             ->where('stock_details2.stock_id', $stockID)
             ->where('stock_details2.bc_id', $bcID)
             ->where('stock_details2.no_aju', $noAju)
+            ->where('stock_details2.stock_dokumen', $stockDokumen)
+            ->groupBy('stock_details2.stock_dokumen')
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')
             ->first();

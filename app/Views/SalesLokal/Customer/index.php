@@ -122,7 +122,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_pelanggan" name="tipe_pelanggan" id="tipe_pelanggan">
                                     <option value=""></option>
@@ -130,7 +130,18 @@
                                 <label for="floatingInput">Tipe Pelanggan (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <option value="1" <?= !empty($data) ? ($data->jenis_penjualan == 1 ? "selected" : "") : ""; ?>>By Sales</option>
+                                    <option value="2" <?= !empty($data) ? ($data->jenis_penjualan == 2 ? "selected" : "") : ""; ?>>By Office</option>
+                                    <option value="3" <?= !empty($data) ? ($data->jenis_penjualan == 3 ? "selected" : "") : ""; ?>>By Ecommerce</option>
+                                </select>
+                                <label for="floatingInput">Jenis Penjualan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
                                 <label for="floatingInput">Nama Sales</label>
@@ -475,6 +486,9 @@
                 },
                 piutang: {
                     required: true
+                },
+                jenis_penjualan: {
+                    required: true
                 }
             },
             messages: {
@@ -497,6 +511,9 @@
                 },
                 piutang: {
                     required: "Limit piutang wajib diisi"
+                },
+                jenis_penjualan: {
+                    required: "Jenis Penjualan wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -659,6 +676,8 @@
                         $(".province_parent_id").val(res.data.province_id).change();
                         $(".piutang").val(res.data.piutang).change();
 
+                        $(".jenis_penjualan").val(res.data.jenis_penjualan).change();
+
                         $(".nik").val(res.data.nik);
 
 
@@ -760,6 +779,8 @@
                                 $(".add-modal").modal("show");
                             }
                         })
+
+
                     } else {
                         Swal.fire({
                             icon: 'error',

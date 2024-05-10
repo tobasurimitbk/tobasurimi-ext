@@ -106,11 +106,14 @@ class SuratJalan extends BaseController
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "no_surat_jalan"      => $data->no_surat_jalan,
+                "tipe_sales_order"      => $data->tipe_sales_order,
                 "no_so"      => implode(', ', $dataNo),
                 "kode_pelanggan"        => $data->kode_pelanggan,
                 "nama_pelanggan" => $data->nama_pelanggan,
+                "customerSales" => $data->customerSales,
                 "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date)),
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
+                "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
             ]);
         }
         //dd($dataAllSuratJalan);

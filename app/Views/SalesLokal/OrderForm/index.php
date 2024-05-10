@@ -20,7 +20,7 @@
         <?php endif; ?>
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -36,7 +36,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                             <option value="" data-code=""></option>
@@ -50,7 +50,10 @@
                         <label for="floatingInput">Filter Customer</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+
+            </div>
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_surat_jalan" name="filter_surat_jalan" id="filter_surat_jalan">
                             <option value="" data-code=""></option>
@@ -60,7 +63,7 @@
                         <label for="floatingInput">Filter Surat Jalan</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
                             <option value="" data-code=""></option>
@@ -83,7 +86,9 @@
                                 <th>No.</th>
 
                                 <th onclick="changeSort('no_sales_order')" class="sort">No Order</th>
-                                <th onclick="changeSort('order_date')" class="sort">Date</th>
+                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
+                                <th onclick="changeSort('order_date')" class="sort">Tanggal Order</th>
+                                <th onclick="changeSort('shipping_date')" class="sort">Tanggal Dikirim</th>
 
                                 <th onclick="changeSort('nama_customer')" class="sort">Nama Customer</th>
 
@@ -98,6 +103,8 @@
                                 <th onclick="changeSort('surat_jalan_so_id')" class="sort">Surat Jalan</th>
 
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
+
+                                <th onclick="changeSort('counter_print')" class="sort">Print</th>
 
                                 <th class="sort">Action</th>
                             </tr>
@@ -283,7 +290,13 @@
                 data: "no_sales_order",
                 className: "text-center"
             }, {
+                data: "createdAt",
+                className: "text-center"
+            }, {
                 data: "order_date",
+                className: "text-center"
+            }, {
+                data: "shipping_date",
                 className: "text-center"
             }, {
                 data: "nama_customer",
@@ -316,6 +329,16 @@
                 className: "text-center",
                 render: function(data, type, row) {
                     if (data && data !== "") {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
+            }, {
+                data: "counter_print",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data != 0) {
                         return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
                     } else { // Otherwise, display a dash "-"
                         return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";

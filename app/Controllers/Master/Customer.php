@@ -186,6 +186,7 @@ class Customer extends BaseController
                     "currency" => $this->request->getPost("currency"),
                     "country_id" => $this->request->getPost('country_id'),
                     "tipe_customer" => $this->request->getPost("tipe_customer"),
+                    "jenis_penjualan" => $this->request->getPost("jenis_penjualan"),
                     "sales_id" => session()->get('login')->user_id
                 ];
                 // var_dump($values);
@@ -288,6 +289,7 @@ class Customer extends BaseController
                     "currency" => $this->request->getPost("currency"),
                     "country_id" => $this->request->getPost('country_id'),
                     "tipe_customer" => $this->request->getPost("tipe_customer"),
+                    "jenis_penjualan" => $this->request->getPost("jenis_penjualan"),
                     "sales_id" => session()->get('login')->user_id
                 ];
                 if ($this->CustomerModel->update($id, $values)) {

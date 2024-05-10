@@ -230,7 +230,8 @@ class PenerimaanMutasiModel extends Model
             $stockListDetail = $stockDetail2Model->getStockListDetail(
                 $m['stock_id'],
                 $m['bc_id'],
-                $m['no_aju']
+                $m['no_aju'],
+                $m['stock_dokumen']
             );
 
             if ($m['tipe_barang'] == 'kemasan') {

@@ -869,7 +869,6 @@ $routes->post('/stock-adjusment/posting', 'Inventori\StokAdjusment::posting', ['
 $routes->post('/stock-adjusment/delete', 'Inventori\StokAdjusment::delete', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/id/(:segment)', 'Inventori\StokAdjusment::detail/$1', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/all', 'Inventori\StokAdjusment::all', ['filter' => 'Auth']);
-$routes->get('/stock-adjusment/handle-minus-adjusment', 'Inventori\StokAdjusment::handleStockMinusAdjusment', ['filter' => 'Auth']);
 
 // MUTASI
 $routes->get('/mutasi', 'Inventori\Mutasi::index', ['filter' => 'Auth']);

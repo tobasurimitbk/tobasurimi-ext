@@ -34,8 +34,8 @@
                 <div class="col mb-3">
                     <select name="status_lunas" id="status_lunas" class="form-select status_lunas">
                         <option value="">SEMUA</option>
-                        <option value="1">LUNAS</option>
-                        <option value="0">BELUM LUNAS</option>
+                        <option value="LUNAS">LUNAS</option>
+                        <option value="BELUM LUNAS">BELUM LUNAS</option>
                     </select>
                 </div>
                 <div class="col mb-3">
@@ -151,7 +151,7 @@
                     if (is_used) {
                         return `
                         <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         </div>

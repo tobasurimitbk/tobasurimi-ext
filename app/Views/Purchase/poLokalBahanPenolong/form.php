@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah PO Lokal Bahan Penolong</h1>
+        <h1 class="title-name"><?= !empty($poDetail) ? "Update PO Lokal Bahan Penolong" : "Tambah PO Lokal Bahan Penolong" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-lokal-bahan-penolong"); ?>">
                 Batal
@@ -710,6 +710,15 @@
                                         }).then((result) => {
                                             location.reload();
                                         })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            cancelButtonColor: '#d33',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
+                                        })
                                     }
 
                                 }
@@ -773,6 +782,15 @@
                                         }).then((result) => {
                                             window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
 
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            cancelButtonColor: '#d33',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
                                         })
                                     }
 
@@ -1049,7 +1067,7 @@
                 barang_id: "<?= $l['barang_id'] ?>",
                 spesifikasi_id: "<?= $l['spesifikasi_id'] ?>",
                 kode_barang: "<?= $l['kode_barang'] ?>",
-                nama_barang: "<?= str_replace('"', '\"', $l['nama_barang']) . " - " . $l['spesifikasi_name']  ?>",
+                nama_barang: "<?= str_replace('"', '\"', $l['nama_barang']) . " - " . str_replace('"', '\"', $l['spesifikasi_name'])  ?>",
                 satuan_id: "<?= $l['satuan_id'] ?>",
                 nama_satuan: "<?= $l['nama_satuan'] ?>",
                 harga_satuan: "<?= $l['harga_satuan'] ?>",

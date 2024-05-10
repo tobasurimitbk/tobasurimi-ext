@@ -40,6 +40,7 @@ class SalesOrderInvoiceModel extends Model
         'termasuk_pa',
         'tipe_invoice',
         'status_pelunasan',
+        'counter_print',
     ];
 
     // Dates
@@ -87,11 +88,13 @@ class SalesOrderInvoiceModel extends Model
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
                       customers.name AS nama_pelanggan,
                       customers.kode AS kode_pelanggan,
+                      CONCAT(employees.nip , ' - ', employees.name) AS salesName,
                       IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no";
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->where($condition)
@@ -129,11 +132,13 @@ class SalesOrderInvoiceModel extends Model
                       users.name AS seller_name,
                       customers.name AS customer_name,
                       sales_order_invoice.status_tax AS status_tax,
-                      sales_order_invoice.termasuk_pa AS termasuk_pa";
+                      sales_order_invoice.termasuk_pa AS termasuk_pa,
+                      sales_order.jenis_penjualan";
 
         $dataSalesOrderInvoice = $this->asObject()
             ->join('users', 'users.id = sales_order_invoice.id_user')
             ->join('customers', 'customers.id = sales_order_invoice.id_customer ')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id')
             ->select($selectQry)
             ->find($id);
 

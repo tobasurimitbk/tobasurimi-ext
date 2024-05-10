@@ -130,8 +130,18 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                                <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Keterangan</label>
+                            <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -174,13 +184,19 @@
                             </div>
                         </div>
 
+                        <div class="col-md-4 form-fifo">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" aria-label="Floating label select example" />
+                                <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
+                            </div>
+                        </div>
                     </div>
                 </form>
 
 
                 <div class="row mt-3">
                     <div class="col mb-0">
-                        <label class="form-label font-weight-bold lable-title">List Inventori Barang (Hanya Menampilkan Barang yang mempunyai Stok)</label>
+                        <label class="form-label font-weight-bold lable-title">List Inventori Barang (Hanya Menampilkan Barang yang mempunyai Stok Rebus)</label>
                     </div>
                     <div class="col-md-12 col-table-button-tts">
                         <div class="table-responsive">
@@ -188,11 +204,12 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">#</th>
-                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">Asal Barang</th>
+                                        <th style="text-align: center;">No Dokumen</th>
+                                        <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju</th>
                                         <th style="text-align: center;">Tanggal Penerimaan</th>
-                                        <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty</th>
@@ -217,10 +234,11 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tipe Barang</th>
+                                    <th style="text-align: center;">#</th>
+                                    <th style="text-align: center;">Asal Barang</th>
+                                    <th style="text-align: center;">No Dokumen</th>
+                                    <th style="text-align: center;">Supplier</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
                                     <th style="text-align: center;">Tanggal Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
@@ -296,6 +314,33 @@
     });
 
     <?php if (!empty($jasaVendorOut)) : ?>
+        <?php if ($jasaVendorOut['tipe_pengambilan_stock'] == "FIFO") : ?>
+            $('.form-fifo').show();
+        <?php else : ?>
+            $('.form-fifo').hide();
+        <?php endif; ?>
+    <?php else : ?>
+        $('.form-fifo').hide();
+    <?php endif; ?>
+
+    $('#type_pengambilan_stock').select2({
+        placeholder: "Pilih Tipe Ambil Stok",
+        theme: "bootstrap-5",
+    }).change(function() {
+        // FIFO
+        if ($(this).val() == "FIFO") {
+            $('.form-fifo').show();
+        } else {
+            $('.form-fifo').hide();
+        }
+        // RESET
+        listStockAsal = [];
+        listStockSelected = [];
+        drawTableAsalBarang(listStockAsal);
+        drawTableSelectedItem(listStockSelected);
+    });
+
+    <?php if (!empty($jasaVendorOut)) : ?>
         // GET LIST BARANG 
         $.ajax({
             url: `<?= base_url('jasa-vendor-out/list-barang-stock-init'); ?>`,
@@ -322,6 +367,9 @@
             listStockSelected.push({
                 id: "<?= $m['id'] ?>",
                 bc_id: "<?= $m['bc_id'] ?>",
+                stock_dokumen: "<?= $m['stock_dokumen'] ?>",
+                sumber: "<?= $m['sumber'] ?>",
+                supplier_name: "<?= $m['supplier_name'] ?>",
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
                 no_aju: "<?= $m['no_aju'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
@@ -409,9 +457,6 @@
             no_kontainer: {
                 required: true
             },
-            keterangan: {
-                required: true
-            },
             divisi_id: {
                 required: true
             },
@@ -463,6 +508,15 @@
 
 
     $('#select-item-btn').click(function() {
+        var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
+        if (typePengambilanStock == "FIFO") {
+            insertListFifo();
+        } else {
+            insertListPabean();
+        }
+    });
+
+    function insertListPabean() {
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
@@ -487,8 +541,69 @@
         // reset barang kirim ke vendor dan list bc nya
         $('#spesifikasi_id').val(null).change();
         drawTableAsalBarang([]);
+    }
 
-    });
+    function insertListFifo() {
+        var dataIds = getIDListDataSelected();
+        var qtyKeluarFifo = parseFloat($('#qty_keluar_fifo').val());
+        var stockOutID = $(".spesifikasi_id option:selected").data('stock_id');
+
+        if (isNaN(qtyKeluarFifo) || qtyKeluarFifo == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan : Qty Keluar Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                reverseButtons: true,
+                confirmButtonText: 'Oke',
+            })
+        } else {
+            var totalStokTotal = 0;
+            $.each(listStockAsal, function(i, v) {
+                totalStokTotal += parseFloat(v.stok_total);
+            });
+
+            if (qtyKeluarFifo > totalStokTotal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan : Stok barang yang akan keluar tidak cukup !',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true,
+                    confirmButtonText: 'Oke',
+                })
+            } else {
+                deleteByStockID(stockOutID);
+                // STOK APPEND
+                $.each(listStockAsal, function(i, v) {
+                    var currentID = Number(v.id);
+                    if ($.inArray(currentID, dataIds) == -1) {
+                        var isIDSelected = $.grep(listStockSelected, function(item) {
+                            return item.id == Number(currentID);
+                        }).length > 0;
+                        if (!isIDSelected && qtyKeluarFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
+                            var keluarQty = Math.min(qtyKeluarFifo, parseFloat(listStockAsal[i].stok_total));
+                            listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                            listStockAsal[i].qty = parseFloat(keluarQty.toFixed(2));
+
+                            listStockSelected.push(listStockAsal[i]);
+                            qtyKeluarFifo = qtyKeluarFifo - keluarQty;
+                        }
+                    }
+                });
+                drawTableSelectedItem(listStockSelected);
+            }
+
+        }
+
+    }
+
+    function deleteByStockID(stockID) {
+        listStockSelected = listStockSelected.filter(function(item) {
+            return item.stock_id != stockID;
+        });
+    }
+
 
     $('.btn-submit-parent').click(function() {
         if (listStockSelected.length == 0) {
@@ -499,22 +614,25 @@
                 confirmButtonText: 'Ok'
             });
         } else {
+            var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
             if ($('.create-form').valid()) {
                 var isValid = true;
                 var dataError = null;
 
-                $.each(listStockSelected, function(i, v) {
-                    var element = $('input[data-id="' + v.id + '"].stok-out');
-                    var input_user = parseFloat(element.val());
-                    var stok_max = parseFloat(element.data('stok_total'));
+                if (typePengambilanStock == "PABEAN") {
+                    $.each(listStockSelected, function(i, v) {
+                        var element = $('input[data-id="' + v.id + '"].stok-out');
+                        var input_user = parseFloat(element.val());
+                        var stok_max = parseFloat(element.data('stok_total'));
 
-                    if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                        dataError = listStockSelected[i];
-                        isValid = false;
-                    } else {
-                        listStockSelected[i].qty = input_user;
-                    }
-                });
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                            dataError = listStockSelected[i];
+                            isValid = false;
+                        } else {
+                            listStockSelected[i].qty = input_user;
+                        }
+                    });
+                }
 
                 if (!isValid) {
                     Swal.fire({
@@ -585,16 +703,25 @@
                                     processData: false,
                                     contentType: false,
                                     success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('jasa-vendor-out/id/') ?>" + response.id
-                                            }
-                                        });
+                                        if (response.status == false) {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: res.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = "<?= base_url('jasa-vendor-out/id/') ?>" + response.id
+                                                }
+                                            });
+                                        }
+
                                     },
                                 });
                             }
@@ -607,7 +734,7 @@
     });
 
 
-    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id")
+    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#type_pengambilan_stock")
         .parent('div')
         .children('span')
         .children('span')
@@ -706,23 +833,34 @@
             dataTable.destroy();
         }
         const table = $('#dataTable');
+        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
+
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
+            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                 `
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                     <div class="form-check">
                         <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
-            ));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align: center;">').text(v.barang));
-            newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+                ));
+            }
+
+            newRow.append($('<td style="text-align:center;">').text(v.sumber));
+            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
+            newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
+            newRow.append($('<td style="text-align:center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align:center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align:center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align:center;">').text(v.barang));
+            newRow.append($('<td style="text-align:center;">').text(v.satuan));
+            newRow.append($('<td style="text-align:center;">').text(v.stok_total));
             table.find('tbody').append(newRow);
         });
 
@@ -758,6 +896,7 @@
             $('#selectedItemTable').DataTable().clear().draw();
             selectedItemTable.destroy();
         }
+        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         const table = $('#selectedItemTable');
         var no = 1;
         $.each(data, function(i, v) {
@@ -767,18 +906,24 @@
                    ${no++} 
                 `
             ));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.sumber));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
+            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
+            if (typePengambilanStok == "FIFO") {
+                newRow.append($('<td style="text-align: center;">').text(v.qty));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                     <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
-            ));
+                ));
+            }
+
             newRow.append($('<td style="text-align: center;">').html(
                 `
                     <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>

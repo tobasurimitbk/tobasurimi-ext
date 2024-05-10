@@ -1,5 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -40,6 +46,7 @@
                                 <th onclick="changeSort('satuan_id')" class="sort">Satuan</th>
                                 <th onclick="changeSort('harga_pokok')" class="sort">Harga Pokok</th>
                                 <th onclick="changeSort('harga_jual')" class="sort">Harga Jual</th>
+                                <th onclick="changeSort('status_ppn')" class="sort">Status PPn</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -113,6 +120,8 @@
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div>
+
+
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -120,6 +129,21 @@
                                 <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
                                 <label for="floatingInput">Harga Jual</label>
                             </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <label class="mt-2">
+                                PPN
+                            </label>
+                            <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                <div class="form-check form-switch form-switch-lg">
+                                    <input class="form-check-input" type="checkbox" value="1" name="status_ppn" id="status_ppn">
+                                    <label class="form-check-label" for="status_ppn"></label>
+                                </div>
+                            </div>
+
+
+
                         </div>
                     </div>
 
@@ -203,6 +227,17 @@
             {
                 data: "harga_jual",
                 className: "text-center",
+            },
+            {
+                data: "status_ppn",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data != 0) {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
             },
         ],
         columnDefs: [{
@@ -438,6 +473,11 @@
                 $('.satuan_id').val(res.data.satuan_id).change();
                 $('.harga_pokok').val(res.data.harga_pokok);
                 $('.harga_jual').val(res.data.harga_jual);
+                if (res.data.status_ppn != 0) {
+                    $("#status_ppn").prop('checked', true);
+                } else {
+                    $("#status_ppn").prop('checked', false);
+                }
 
                 $('.input-generate').hide();
                 $('.kode_barang').attr('readonly', true);

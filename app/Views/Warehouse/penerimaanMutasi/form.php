@@ -165,7 +165,7 @@
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="11" style="text-align: center;">
+                                    <td colspan="12" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -519,7 +519,7 @@
 
         if (listBarang.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="11" style="text-align:center">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="12" style="text-align:center">Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
             var no = 1;

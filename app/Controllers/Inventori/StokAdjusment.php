@@ -169,6 +169,17 @@ class StokAdjusment extends BaseController
 
     public function createAction()
     {
+
+        $first = $this->adjusmentModel->where('company_id', $this->this_company_id)->where('no_adjusment', $this->request->getVar('no_adjusment'))->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'message' => "Nomor Adjusment Sudah Ada",
+                'token' => csrf_hash(),
+                'status' => false,
+            ]);
+        }
+
         $id = $this->adjusmentModel->insert([
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
@@ -176,6 +187,7 @@ class StokAdjusment extends BaseController
             'tanggal' => date('Y-m-d'),
             'keterangan' => $this->request->getVar('keterangan'),
             'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'status_posting' => '0',
             'createdBy' => $this->this_user_id
         ]);
@@ -190,9 +202,10 @@ class StokAdjusment extends BaseController
                 'barang2_id' => $stock['barang2_id'],
                 'kemasan_id' => $stock['kemasan_id'],
                 'no_aju' => $l->no_aju,
+                'stock_dokumen' => $l->stock_dokumen,
                 'tipe_barang' => $l->type_barang,
-                'operasi' => $l->operasi,
-                'qty' => $l->qty
+                'operasi' => $l->type_adjusment,
+                'qty' => $l->qty_adjusment
             ]);
         }
 
@@ -208,11 +221,26 @@ class StokAdjusment extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+        $first = $this->adjusmentModel
+            ->where('company_id', $this->this_company_id)
+            ->where('no_adjusment', $this->request->getVar('no_adjusment'))
+            ->where('id !=', $id)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'message' => "Nomor Adjusment Sudah Ada",
+                'token' => csrf_hash(),
+                'status' => false,
+            ]);
+        }
+
         $this->adjusmentModel->update($id, [
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'keterangan' => $this->request->getVar('keterangan'),
             'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'status_posting' => '0',
             'createdBy' => $this->this_user_id
         ]);
@@ -231,6 +259,7 @@ class StokAdjusment extends BaseController
                 ->where('kemasan_id', $stock['kemasan_id'])
                 ->where('bc_id', $l->bc_id)
                 ->where('no_aju', $l->no_aju)
+                ->where('stock_dokumen', $l->stock_dokumen)
                 ->first();
 
             if ($check != null) {
@@ -241,10 +270,11 @@ class StokAdjusment extends BaseController
                     'barang1_id' => $stock['barang1_id'],
                     'barang2_id' => $stock['barang2_id'],
                     'kemasan_id' => $stock['kemasan_id'],
+                    'stock_dokumen' => $l->stock_dokumen,
                     'no_aju' => $l->no_aju,
-                    'operasi' => $l->operasi,
+                    'operasi' => $l->type_adjusment,
                     'tipe_barang' => $l->type_barang,
-                    'qty' => $l->qty
+                    'qty' => $l->qty_adjusment
                 ]);
                 array_push($id_detail_all, $check['id']);
             } else {
@@ -258,6 +288,7 @@ class StokAdjusment extends BaseController
                     ->where('kemasan_id', $stock['kemasan_id'])
                     ->where('bc_id', $l->bc_id)
                     ->where('no_aju', $l->no_aju)
+                    ->where('stock_dokumen', $l->stock_dokumen)
                     ->delete();
 
                 // INSERT NEW
@@ -270,8 +301,9 @@ class StokAdjusment extends BaseController
                     'kemasan_id' => $stock['kemasan_id'],
                     'tipe_barang' => $l->type_barang,
                     'no_aju' => $l->no_aju,
-                    'operasi' => $l->operasi,
-                    'qty' => $l->qty
+                    'operasi' => $l->type_adjusment,
+                    'stock_dokumen' => $l->stock_dokumen,
+                    'qty' => $l->qty_adjusment
                 ]);
 
                 array_push($id_detail_all,  $id_detail_new);
@@ -343,7 +375,8 @@ class StokAdjusment extends BaseController
                 $stokDetail,
                 $qty,
                 $no_aju,
-                "-"
+                "-",
+                $a['stock_dokumen']
             );
         }
 
@@ -375,8 +408,11 @@ class StokAdjusment extends BaseController
     public function getListStockByStockID()
     {
         if (!empty($this->request->getVar('stock_id'))) {
+            $isAdjusment = !empty($this->request->getVar('isAdjusment')) ? true : false;
+
             $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
-                $this->request->getVar('stock_id')
+                $this->request->getVar('stock_id'),
+                $isAdjusment
             );
             $stock = $this->stockModel->find($this->request->getVar('stock_id'));
             if ($stock['kemasan_id'] == 0) {
@@ -395,7 +431,7 @@ class StokAdjusment extends BaseController
                     ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
                     ->where('penerimaan_barang.no_penerimaan_barang', $dataResult[$i]['no_dokumen_1'])
                     ->first();
-
+                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                 $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
                 $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
@@ -410,42 +446,6 @@ class StokAdjusment extends BaseController
             return response()->setJSON([
                 'data' => $dataResult,
                 'token' => csrf_hash(),
-                'status' => true
-            ]);
-        }
-    }
-
-    public function handleStockMinusAdjusment()
-    {
-        $stockID = $this->request->getVar('stock_id');
-        $qty = $this->request->getVar('qty');
-        $bcID = $this->request->getVar('bc_id');
-        $noAju = empty($this->request->getVar('no_aju')) ? "-" : $this->request->getVar('no_aju');
-        $operasi = $this->request->getVar('operasi');
-
-        if ($operasi == "PLUS") {
-            return response()->setJSON([
-                'message' => "Stok valid",
-                'status' => true
-            ]);
-        }
-
-        $stockListDetail = $this->stockDetail2Model->getStockListDetail(
-            $stockID,
-            $bcID,
-            $noAju
-        );
-
-        $result = $stockListDetail['stok_total'] - $qty;
-
-        if ($result < 0) {
-            return response()->setJSON([
-                'message' => "Stok tidak valid: adjusment ini akan menghasilkan nilai stok minus, silahkan coba dengan qty adjusment lain",
-                'status' => false
-            ]);
-        } else {
-            return response()->setJSON([
-                'message' => "Stok valid",
                 'status' => true
             ]);
         }

@@ -173,7 +173,9 @@ class OrderForm extends BaseController
                 "no" => $no++,
                 "id" => encrypt($data->id),
                 "no_sales_order" => $data->no_sales_order,
+                "createdAt" => date("d/m/Y", strtotime($data->createdAt)),
                 "order_date" => date("d/m/Y", strtotime($data->order_date)),
+                "shipping_date" => date("d/m/Y", strtotime($data->shipping_date)),
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
                 "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->findAll()),
@@ -181,6 +183,7 @@ class OrderForm extends BaseController
                 "keterangan" => $data->keterangan,
                 "surat_jalan_so_id" => $data->surat_jalan_so_id,
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
+                "counter_print" => $data->counter_print,
             ]);
         }
 
@@ -787,6 +790,9 @@ class OrderForm extends BaseController
 
         $id = decrypt($id);
 
+
+
+
         $companyData = $this->companyModel->asObject()
             ->find($this->this_company_id);
 
@@ -814,6 +820,14 @@ class OrderForm extends BaseController
             'soData'        => $salesOrderData,
             'soDet'         => $soDet
         ];
+
+
+        $this->SalesOrderModel->update($id, ['counter_print' => $salesOrderData->counter_print + 1]);
+
+
+
+
+
 
         // return view('SalesLokal/OrderForm/print', $data);
 

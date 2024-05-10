@@ -330,6 +330,14 @@ class PenerimaanBarangLokalBP extends BaseController
             ]);
         }
 
+        $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))->first();
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Penerimaan Barang Sudah Ada",
+                'status' => false
+            ]);
+        }
 
         $penerimaanBarangID = $this->penerimaanBarangModel->insert([
             'company_id' => $this->this_company_id,
@@ -722,6 +730,7 @@ class PenerimaanBarangLokalBP extends BaseController
                         $stokDetail,
                         $p['jml_masuk'],
                         "-",
+                        $po['po_no'],
                         $po['po_no']
                     );
                 }
@@ -758,6 +767,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 $stokDetail,
                 $penerimaanBarang['jumlah_kemasan'],
                 "-",
+                $penerimaanBarang['no_penerimaan_barang'],
                 $penerimaanBarang['no_penerimaan_barang'],
             );
         } catch (Exception $e) {

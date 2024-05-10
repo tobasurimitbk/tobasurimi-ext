@@ -186,6 +186,19 @@ class POImportBahanBaku extends BaseController
             );
         }
 
+        $first = $this->rmImportPOModel
+            ->where('company_id', $this->this_company_id)
+            ->where('po_no', $noPoNew)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Purchase Order Sudah Ada",
+                'status' => false
+            ]);
+        }
+
         // create new po
         $poID = $this->rmImportPOModel->insert([
             'company_id' => $this->this_company_id,
@@ -256,6 +269,20 @@ class POImportBahanBaku extends BaseController
                 date('Y'),
                 getLastDay()
             );
+        }
+
+        $first = $this->rmImportPOModel
+            ->where('company_id', $this->this_company_id)
+            ->where('po_no', $noPoNew)
+            ->where('id !=', $id)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Purchase Order Sudah Ada",
+                'status' => false
+            ]);
         }
 
         $firstData = $this->rmImportPOModel->find($id);

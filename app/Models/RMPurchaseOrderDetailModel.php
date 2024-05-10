@@ -202,7 +202,7 @@ class RMPurchaseOrderDetailModel extends Model
                         'rm_purchase_order_details_id' => $b['id'],
                         'rm_purchase_order_id' => $b['rm_purchase_order_id'],
                         'kode_barang' => $b['kode_barang'],
-                        'nama_barang' => $b['nama_barang'] . ' (' . $b['spesifikasi'] . ')',
+                        'nama_barang' => $b['nama_barang'] . ' - ' . $b['spesifikasi'] . '',
                         'spesifikasi_name' => $b['spesifikasi'],
                         'nama_barang_master' => $b['nama_barang'],
                         'po_no' => $b['po_no'],

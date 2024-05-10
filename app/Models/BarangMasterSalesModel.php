@@ -49,7 +49,7 @@ class BarangMasterSalesModel extends Model
             'satuan_id'         => 'satuan_id',
             'harga_jual'        => 'harga_jual',
             'harga_pokok'       => 'harga_pokok',
-            'satuan_id'         => 'satuan_id'
+            'status_ppn'         => 'status_ppn'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

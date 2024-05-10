@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah PO Import Bahan Baku</h1>
+        <h1 class="title-name"><?= !empty($dataPOImport) ? "Tambah PO Import Bahan Baku" : "Tambah PO Import Bahan Baku" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-baku"); ?>">
                 Batal
@@ -486,7 +486,8 @@
     $('#barang_id').select2({
         placeholder: "Pilih Bahan Baku",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: true,
+        dropdownParent: $('.detail-modal')
     }).change(function() {
         $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
     });
@@ -816,6 +817,15 @@
                                         }).then((result) => {
                                             location.reload();
                                         })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            cancelButtonColor: '#d33',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
+                                        })
                                     }
 
                                 }
@@ -904,6 +914,15 @@
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
                                             window.location.href = "<?= base_url('po-import-bahan-baku') ?>"
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            cancelButtonColor: '#d33',
+                                            reverseButtons: true,
+                                            confirmButtonText: 'Oke',
                                         })
                                     }
                                 }

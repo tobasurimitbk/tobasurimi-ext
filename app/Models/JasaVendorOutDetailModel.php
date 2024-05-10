@@ -49,6 +49,7 @@ class JasaVendorOutDetailModel extends Model
         $satuanModel = new SatuansModel();
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
+        $supplierModel = new SupplierModel();
 
         $result = array();
         $jasaVendorOutDetail = $this->asArray()->where('jasa_vendor_out_id', $jasaVendorOutID)->findAll();
@@ -57,7 +58,8 @@ class JasaVendorOutDetailModel extends Model
             $stockList = $stockDetail2Model->getStockListDetail(
                 $m['stock_out_id'],
                 $m['bc_out_id'],
-                $m['no_aju_out']
+                $m['no_aju_out'],
+                $m['stock_dokumen']
             );
             $stock = $stockModel->find($m['stock_out_id']);
 
@@ -72,6 +74,11 @@ class JasaVendorOutDetailModel extends Model
                 $barangName = $kemasan['name'];
             }
 
+            $supplier = $supplierModel->select('suppliers.*')
+                ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
+                ->where('penerimaan_barang.no_penerimaan_barang', $stockList['no_dokumen_1'])
+                ->first();
+
             $stockList['qty'] = $m['qty'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
@@ -83,10 +90,50 @@ class JasaVendorOutDetailModel extends Model
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = ($stockList['stok_total']);
             $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
+            $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
 
             array_push($result, $stockList);
         }
 
         return $result;
+    }
+
+    public function getStockListWithBCDoc($stockID)
+    {
+
+        $stockDetail2Model = new StockDetail2Model();
+
+        $selectQry = '
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            stock_details2.stock_id,
+            stock_details2.stock_dokumen,
+            stock_details2.no_dokumen AS no_dokumen_2,
+            stock_details.no_dokumen AS no_dokumen_1,
+            stock_details.stock_date,
+            stock_details.sumber,
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,        
+        ';
+
+
+        $dataQry = $stockDetail2Model
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->where('stock_details2.stock_id', $stockID)
+            ->groupBy('stock_details2.stock_dokumen')
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.no_aju')
+            ->having('stok_total >', 0)
+            ->having('sumber', "REBUS")
+            ->orderBy('stock_details.stock_date', "ASC")
+            ->findAll();
+
+        return $dataQry;
     }
 }
