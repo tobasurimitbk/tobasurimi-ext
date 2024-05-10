@@ -1381,6 +1381,17 @@ $routes->post('/akun-department/get', 'Accounting\AccountDepartment\AccountDepar
 //Setting Akun Costing
 $routes->get('/setting-akun-costing', 'Accounting\SettingAkunCosting\SettingAkunCostingController::index', ['filter' => 'Auth']);
 $routes->post('/setting-akun-costing/save', 'Accounting\SettingAkunCosting\SettingAkunCostingController::saveCosting', ['filter' => 'Auth']);
+//Rasio
+$routes->get('/rasio', 'Accounting\Rasio\RasioController::index', ['filter' => 'Auth']);
+$routes->get('/rasio/create', 'Accounting\Rasio\RasioController::createRasio', ['filter' => 'Auth']);
+$routes->get('/rasio/get-barang-jadi', 'Accounting\Rasio\RasioController::getRasioBarangJadi', ['filter' => 'Auth']);
+$routes->get('/rasio/get-barang-digunakan', 'Accounting\Rasio\RasioController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/rasio/all', 'Accounting\Rasio\RasioController::allRasio', ['filter' => 'Auth']);
+$routes->get('/rasio/id/(:segment)', 'Accounting\Rasio\RasioController::getByIdAccountModule/$1', ['filter' => 'Auth']);
+$routes->post('/rasio/save', 'Accounting\Rasio\RasioController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/rasio/update', 'Accounting\Rasio\RasioController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/rasio/delete', 'Accounting\Rasio\RasioController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/rasio/get', 'Accounting\Rasio\RasioController::get', ['filter' => 'Auth']);
 
 //Laporan
 //Accounting
