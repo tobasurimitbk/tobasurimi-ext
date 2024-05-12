@@ -159,6 +159,15 @@ class BiayaKepiting extends BaseController
         $listPerolehanGaji = json_decode($_POST['listPerolehanGaji']);
 
         $jasaVendorIn = $this->jasaVendorInModel->find($this->request->getVar('jasa_vendor_in_id'));
+        $biayaKepiting = $this->biayaKepitingModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_pembayaran'))->first();
+
+        if ($biayaKepiting != null) {
+            return response()->setJSON([
+                'message' => "No pembayaran sudah ada !",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
 
         if (count($listBarang) == 0) {
             return response()->setJSON([
@@ -192,7 +201,9 @@ class BiayaKepiting extends BaseController
                 'special' => $b->special,
                 'claw' => $b->claw,
                 'mh' => $b->mh,
-                'cf' => $b->cf
+                'cf' => $b->cf,
+                'kg_bonus' => $b->kg_bonus,
+                'bonus_nominal' => $b->bonus_nominal
             ]);
         }
 
@@ -258,7 +269,9 @@ class BiayaKepiting extends BaseController
                     'special' => $b->special,
                     'claw' => $b->claw,
                     'mh' => $b->mh,
-                    'cf' => $b->cf
+                    'cf' => $b->cf,
+                    'kg_bonus' => $b->kg_bonus,
+                    'bonus_nominal' => $b->bonus_nominal
                 ]);
                 array_push($id_detail_all, $check['id']);
             } else {
@@ -279,7 +292,9 @@ class BiayaKepiting extends BaseController
                     'special' => $b->special,
                     'claw' => $b->claw,
                     'mh' => $b->mh,
-                    'cf' => $b->cf
+                    'cf' => $b->cf,
+                    'kg_bonus' => $b->kg_bonus,
+                    'bonus_nominal' => $b->bonus_nominal
                 ]);
                 array_push($id_detail_all,  $id_detail_new);
             }

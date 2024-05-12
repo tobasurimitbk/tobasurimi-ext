@@ -248,10 +248,10 @@
                                 <th>No</th>
                                 <th onclick="changeSortPemasukkanBarang('stock_details2.no_dokumen')">Purchase Order</th>
                                 <th onclick="changeSortPemasukkanBarang('stock_details.tanggal')">Tanggal</th>
-                                <th onclick="changeSortPemasukkanBarang('stock_details.no_dokumen')">Dokumen</th>
+                                <th onclick="changeSortPemasukkanBarang('stock_details.no_dokumen')">No LPB</th>
+                                <th>Dokumen Pabean</th>
                                 <th>Supplier</th>
                                 <th onclick="changeSortPemasukkanBarang('stock.barang1_id')">Barang - Spesifikasi</th>
-                                <th>Harga</th>
                                 <th onclick="changeSortPemasukkanBarang('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
@@ -929,6 +929,10 @@
                 className: "text-center"
             },
             {
+                data: "dokumen_pabean",
+                className: "text-center"
+            },
+            {
                 data: "supplier",
                 className: "text-center",
                 searchable: false,
@@ -938,12 +942,12 @@
                 data: "barang",
                 className: "text-center",
             },
-            {
-                data: "harga",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
+            // {
+            //     data: "harga",
+            //     className: "text-center",
+            //     searchable: false,
+            //     sortable: false
+            // },
             {
                 data: "stok_1",
                 className: "text-center"

@@ -63,6 +63,10 @@
             vertical-align: bottom;
             border-bottom: 2px solid black;
         }
+
+        .pagebreak {
+            clear: both;
+        }
     </style>
 </head>
 
@@ -222,6 +226,9 @@
                             <td><?= number_format($total, 2) ?></td>
                         </tr>
                     <?php endforeach; ?>
+                    <?php
+                    $totalTotal = ($totalTotal == 0) ? 1 : $totalTotal;
+                    ?>
                     <tr>
                         <td colspan="5">Total Upah Kopek</td>
                         <td><?= number_format(($jumboTotal * $upahKopekJumbo), 2) ?></td>
@@ -271,7 +278,65 @@
                 </tr>
             </table>
         </div>
+        <div class="pagebreak">
+            <br><br><br><br>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="text-align: center;">
+                        <h2>
+                            <u>
+                                Bonus Khusus Biaya Kepiting
+                            </u>
+                            <br>
+                        </h2>
+                        <h4 style="margin-top: -10px;">
+                            NO : <?= $biayaKepiting['no_pembayaran'] ?>
+                        </h4>
+                    </td>
 
+                </tr>
+            </table>
+            <div class="body" style="margin-top: 10px;">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="text-align: center;" colspan="6">Bonus Khusus Untuk Anggota Kupas di KK</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: center;width:10px">No</th>
+                            <th style="text-align: center;">Tanggal Masuk</th>
+                            <th style="text-align: center;">Barang </th>
+                            <th style="text-align: center;">Kg</th>
+                            <th style="text-align: center;">Bonus</th>
+                            <th style="text-align: center;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $no = 1;
+                        $totalResult = 0; ?>
+                        <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
+
+                            <tr>
+                                <?php $total = 0 ?>
+                                <?php $total = $b['kg_bonus'] * $b['bonus_nominal'];  ?>
+                                <?php $totalResult += $total; ?>
+                                <td><?= $no++ ?></td>
+                                <td><?= $b['tanggal_masuk'] ?></td>
+                                <td><?= $b['nama_barang'] ?></td>
+                                <td><?= $b['kg_bonus'] ?></td>
+                                <td><?= number_format($b['bonus_nominal'], 2) ?></td>
+                                <td><?= number_format($total, 2) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <tr>
+                            <td colspan="5">Grand Total</td>
+                            <td><?= number_format(($totalResult), 2) ?></td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
     <?php endif; ?>
 </body>
 

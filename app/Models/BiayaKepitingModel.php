@@ -195,6 +195,8 @@ class BiayaKepitingModel extends Model
                 $jasaVendorInDetail[$i]['claw'] = $biayaKepitingDetail['claw'];
                 $jasaVendorInDetail[$i]['mh'] = $biayaKepitingDetail['mh'];
                 $jasaVendorInDetail[$i]['cf'] = $biayaKepitingDetail['cf'];
+                $jasaVendorInDetail[$i]['kg_bonus'] = $biayaKepitingDetail['kg_bonus'] ?? 0;
+                $jasaVendorInDetail[$i]['bonus_nominal'] = $biayaKepitingDetail['bonus_nominal'] ?? 0;
             } else {
 
                 $jasaVendorInDetail[$i]['jumbo'] = 0;
@@ -204,6 +206,8 @@ class BiayaKepitingModel extends Model
                 $jasaVendorInDetail[$i]['claw'] = 0;
                 $jasaVendorInDetail[$i]['mh'] = 0;
                 $jasaVendorInDetail[$i]['cf'] = 0;
+                $jasaVendorInDetail[$i]['kg_bonus'] = 0;
+                $jasaVendorInDetail[$i]['bonus_nominal'] = 0;
             }
         }
 

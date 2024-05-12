@@ -738,6 +738,7 @@ $routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateAction', [
 $routes->post('/proses-rebus/delete',  'JasaVendor\ProsesRebus::delete', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/posting',  'JasaVendor\ProsesRebus::posting', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/get-no',  'JasaVendor\ProsesRebus::getProsesRebusNo', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/unposting',  'JasaVendor\ProsesRebus::unPosting', ['filter' => 'Auth']);
 
 // JASA VENDOR OUT
 $routes->get('/jasa-vendor-out',  'JasaVendor\JasaVendorOut::index', ['filter' => 'Auth']);

@@ -202,6 +202,41 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Perhitungan Bonus Khusus</label>
+                </div>
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable3" width="100%" border="1" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="text-align: center;" colspan="6">Bonus Khusus Untuk Anggota Kupas di KK</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center;">No</th>
+                                    <th style="text-align: center;">Tanggal Masuk</th>
+                                    <th style="text-align: center;">Barang </th>
+                                    <th style="text-align: center;">Kg</th>
+                                    <th style="text-align: center;">Bonus</th>
+                                    <th style="text-align: center;">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table-3">
+                            </tbody>
+                            <tfoot class="foot-detail-table-3" id="foot-detail-table">
+                                <tr>
+                                    <td colspan="6" style="text-align: center;">
+                                        Tidak Ada Barang
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -309,7 +344,7 @@
             });
         } else {
             if ($('.create-form').valid()) {
-                // VALIDASI FORM 1
+                // VALIDASI FORM 1 & FORM 3
                 var isValidBarangJumbo = true;
                 var dataErrorBarangJumbo = null;
 
@@ -331,6 +366,12 @@
                 var isValidBarangCf = true;
                 var dataErrorBarangCf = null;
 
+                var isValidBonusKg = true;
+                var dataErrorBonusKg = null;
+
+                var isValidBonusNominal = true;
+                var dataErrorBonusNominal = null;
+
                 $.each(listBarang, function(i, v) {
                     var barangJumboElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].jumbo');
                     var barangExLumpElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].ex_lump');
@@ -339,6 +380,8 @@
                     var barangClawElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].claw');
                     var barangMhElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].mh');
                     var barangCfElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].cf');
+                    var barangBonusKgElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_bonus');
+                    var barangBonusNominalElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].bonus_nominal');
 
                     if (barangJumboElement.val() === undefined || barangJumboElement.val() === '') {
                         isValidBarangJumbo = false;
@@ -387,6 +430,20 @@
                         dataErrorBarangCf = listBarang[i];
                     } else {
                         listBarang[i].cf = barangCfElement.val();
+                    }
+
+                    if (barangBonusKgElement.val() === undefined || barangBonusKgElement.val() === '') {
+                        isValidBonusKg = false;
+                        dataErrorBonusKg = listBarang[i];
+                    } else {
+                        listBarang[i].kg_bonus = barangBonusKgElement.val();
+                    }
+
+                    if (barangBonusNominalElement.val() === undefined || barangBonusNominalElement.val() === '') {
+                        isValidBonusNominal = false;
+                        dataErrorBonusNominal = listBarang[i];
+                    } else {
+                        listBarang[i].bonus_nominal = barangBonusNominalElement.val();
                     }
                 });
             }
@@ -488,7 +545,6 @@
                 }
             });
 
-
             // ALERT FORM 1
             if (!isValidBarangJumbo) {
                 Swal.fire({
@@ -536,6 +592,20 @@
                 Swal.fire({
                     icon: 'error',
                     title: dataErrorBarangCf.nama_barang + ' Cf tidak valid !',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (!isValidBonusKg) {
+                Swal.fire({
+                    icon: 'error',
+                    title: dataErrorBonusKg.nama_barang + ' Bonus KG tidak valid !',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (!isValidBonusNominal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: dataErrorBonusNominal.nama_barang + ' Bonus Nominal tidak valid !',
                     confirmButtonColor: '#4e73df',
                     confirmButtonText: 'Ok'
                 });
@@ -741,7 +811,7 @@
                 ));
                 newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
                 newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
-                newRow.append($('<td>').text(v.qty_kopek));
+                newRow.append($('<td>').text(parseFloat(v.qty_kopek).toFixed(2)));
                 newRow.append($('<td>').text(rasio + ' %'));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -925,7 +995,50 @@
                 newRow1.append($('<td>').text(formatRupiah(gajiTotal.toFixed(2))));
                 table2.find('tbody').append(newRow1);
             }
+
+            // DATATABLE 3
+            const table3 = $('#dataTable3');
+            $('.foot-detail-table-3').empty();
+            $('.body-table-3').empty();
+            var no = 1;
+            var totalBonusResult = 0;
+            $.each(listBarang, function(i, v) {
+                var totalBonus = 0;
+                var newRow = $('<tr  style="color:whitesmoke;">');
+                totalBonus = parseFloat(v.kg_bonus) * parseFloat(v.bonus_nominal);
+                totalBonusResult = totalBonusResult + totalBonus;
+                totalBonus = totalBonus.toFixed(2);
+
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                            ${no++} 
+                        `
+                ));
+                newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
+                newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_bonus" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_bonus" type="text" value="${v.kg_bonus}">
+                        `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control bonus_nominal" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control bonus_nominal" type="text" value="${v.bonus_nominal}">
+                        `
+                ));
+                newRow.append($('<td>').text(totalBonus));
+                table3.find('tbody').append(newRow);
+            })
+
+            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+            newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td>').text(totalBonusResult.toFixed(2)));
+            table3.find('tbody').append(newRow);
+
         }
+
+
+
     }
 
     function preventNegativeInput(inputElement) {

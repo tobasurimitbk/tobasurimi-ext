@@ -4,6 +4,7 @@ namespace App\Controllers\JasaVendor;
 
 use App\Controllers\BaseController;
 use App\Models\DivisisModel;
+use App\Models\JasaVendorInDetailModel;
 use App\Models\MetadataModel;
 use App\Models\ProsesRebusDetailModel;
 use App\Models\ProsesRebusModel;
@@ -23,6 +24,7 @@ class ProsesRebus extends BaseController
     protected $metaDataModel;
     protected $prosesRebusModel;
     protected $prosesRebusDetailModel;
+    protected $jasaVedorInDetailModel;
     protected $warehouseModel;
 
     public function __construct()
@@ -36,6 +38,7 @@ class ProsesRebus extends BaseController
         $this->stockDetail2Model = new StockDetail2Model();
         $this->prosesRebusModel = new ProsesRebusModel();
         $this->prosesRebusDetailModel = new ProsesRebusDetailModel();
+        $this->jasaVedorInDetailModel = new JasaVendorInDetailModel();
         $this->warehouseModel = new WarehousesModel();
     }
 
@@ -92,10 +95,13 @@ class ProsesRebus extends BaseController
                 ->where('deletedAt', null)
                 ->findAll();
 
+            $jasaVendorInDetail = $this->jasaVedorInDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
+
             array_push($dataResult, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "no_rebus"              => $data->no_rebus,
+                'status_used'           => $jasaVendorInDetail == null ? 0 : 1,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
                 "warehouse_name"        => $data->warehouse_name,
@@ -425,6 +431,138 @@ class ProsesRebus extends BaseController
         $this->prosesRebusModel->update($id, ['status_posting' => '1']);
         return response()->setJSON([
             'message' => "Proses rebus berhasil diposting",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+
+    public function unPosting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $prosesRebus = $this->prosesRebusModel->find($id);
+        $prosesRebusDetail = $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->findAll();
+
+        foreach ($prosesRebusDetail as $p) {
+            // BARANG OUT DARI INVENTORI
+            $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
+            $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
+
+            $stok = $this->stockModel->insertStok(
+                $prosesRebus['company_id'],
+                $prosesRebus['warehouse_id'],
+                $prosesRebus['divisi_id'],
+                "bahan_baku",
+                $stockRebus['barang1_id'],
+                $stockRebus['barang2_id'],
+                ($p['qty_rebus']),
+            );
+
+            // DETAIL
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $p['qty_rebus'],
+                "In",
+                date('Y-m-d'),
+                $this->this_user_id,
+                "REBUS",
+                $prosesRebus['no_rebus'],
+                $prosesRebus['keterangan']
+            );
+
+            // SUB DETAIL
+            $this->stockDetail2Model->insertStokDetail2(
+                $p['bc_rebus_id'],
+                $p['stock_rebus_id'],
+                $stokDetail,
+                $p['qty_rebus'],
+                $p['no_aju_rebus'],
+                "-",
+                $p['stock_dokumen']
+            );
+
+            // -----
+            // BARANG IN KE INVENTORI
+            $stok = $this->stockModel->insertStok(
+                $prosesRebus['company_id'],
+                $prosesRebus['warehouse_id'],
+                $prosesRebus['divisi_id'],
+                "bahan_baku",
+                $stockHasilRebus['barang1_id'],
+                $stockHasilRebus['barang2_id'],
+                $p['qty_hasil_rebus']
+            );
+
+            $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
+                $this->this_company_id,
+                $prosesRebus['warehouse_id'],
+                $prosesRebus['divisi_id'],
+                "bahan_baku",
+                $stockHasilRebus['barang1_id'],
+                $stockHasilRebus['barang2_id'],
+                $p['bc_rebus_id'],
+                $p['no_aju_rebus'],
+                $stok
+            );
+
+            if ($checkStokDetail == null) {
+                // INSERT STOK INISIASI
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    0,
+                    "In",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "INISIASI",
+                    "-",
+                    "-"
+                );
+                $this->stockDetail2Model->insertStokDetail2(
+                    $p['bc_rebus_id'],
+                    $p['stock_hasil_rebus_id'],
+                    $stokDetail,
+                    0,
+                    $p['no_aju_rebus'],
+                    "-"
+                );
+            }
+
+            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_rebus_id'],
+                $p['bc_rebus_id'],
+                $p['no_aju_rebus'],
+                $p['stock_dokumen']
+            );
+
+            // DETAIL
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $p['qty_hasil_rebus'],
+                "Out",
+                date('Y-m-d'),
+                $this->this_user_id,
+                "REBUS",
+                $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
+                $prosesRebus['keterangan']
+            );
+
+            // SUB DETAIL
+            $this->stockDetail2Model->insertStokDetail2(
+                $p['bc_rebus_id'],
+                $p['stock_hasil_rebus_id'],
+                $stokDetail,
+                $p['qty_hasil_rebus'],
+                $p['no_aju_rebus'],
+                $p['stock_dokumen'],
+                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )"
+            );
+        }
+
+        $this->prosesRebusModel->update($id, ['status_posting' => '0']);
+
+        return response()->setJSON([
+            'message' => "Proses rebus berhasil diunposting",
             'status' => true,
             'token' => csrf_hash()
         ]);
