@@ -92,9 +92,11 @@
                                         </option>
                                     <?php endforeach; ?>
                                 <?php else : ?>
-                                    <option selected value="<?= $jasaVendorInDetail['id'] ?>">
-                                        <?= $jasaVendorInDetail['no_penerimaan_surat_jalan'] ?>
-                                    </option>
+                                    <?php if (!empty($jasaVendorInDetail)) : ?>
+                                        <option selected value="<?= $jasaVendorInDetail['id'] ?>">
+                                            <?= $jasaVendorInDetail['no_penerimaan_surat_jalan'] ?>
+                                        </option>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih No Surat Jalan</label>
