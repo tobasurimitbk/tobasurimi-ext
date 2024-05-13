@@ -224,7 +224,13 @@ class JasaVendorInModel extends Model
                 $stockInId = $k['stock_in_id'];
                 if (!isset($listBarangMasukGrouped[$stockOutId][$stockInId])) {
                     $listBarangMasukGrouped[$stockOutId][$stockInId] = [
-                        ...$k,
+                        'barang_name_in' => $k['barang_name_in'],
+                        'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
+                        'kode_barang_in' => $k['kode_barang_in'],
+                        'kode_satuan_in' => $k['kode_satuan_in'],
+                        'stock_dokumen' => $k['stock_dokumen'],
+                        'stock_in_id' => $k['stock_in_id'],
+                        'stock_out_id' => $k['stock_out_id'],
                         'qty_kotor' => 0,
                         'qty_bersih' => 0
                     ];

@@ -1008,7 +1008,7 @@
                 newRow.append($('<td>').text(v.tipe_barang));
                 newRow.append($('<td>').text(v.kode_barang_out));
                 newRow.append($('<td>').text(v.barang_out));
-                newRow.append($('<td>').text(v.qty_out));
+                newRow.append($('<td>').text(v.qty_out.toFixed(2)));
                 newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.list_barang_masuk.length + " Barang"));
                 newRow.append($('<td style="text-align: center;">').html(

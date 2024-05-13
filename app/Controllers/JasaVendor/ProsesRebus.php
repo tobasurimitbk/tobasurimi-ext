@@ -5,6 +5,7 @@ namespace App\Controllers\JasaVendor;
 use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorInDetailModel;
+use App\Models\JasaVendorOutDetailModel;
 use App\Models\MetadataModel;
 use App\Models\ProsesRebusDetailModel;
 use App\Models\ProsesRebusModel;
@@ -24,7 +25,7 @@ class ProsesRebus extends BaseController
     protected $metaDataModel;
     protected $prosesRebusModel;
     protected $prosesRebusDetailModel;
-    protected $jasaVedorInDetailModel;
+    protected $jasaVendorOutDetailModel;
     protected $warehouseModel;
 
     public function __construct()
@@ -38,7 +39,7 @@ class ProsesRebus extends BaseController
         $this->stockDetail2Model = new StockDetail2Model();
         $this->prosesRebusModel = new ProsesRebusModel();
         $this->prosesRebusDetailModel = new ProsesRebusDetailModel();
-        $this->jasaVedorInDetailModel = new JasaVendorInDetailModel();
+        $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $this->warehouseModel = new WarehousesModel();
     }
 
@@ -95,13 +96,13 @@ class ProsesRebus extends BaseController
                 ->where('deletedAt', null)
                 ->findAll();
 
-            $jasaVendorInDetail = $this->jasaVedorInDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
+            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
 
             array_push($dataResult, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "no_rebus"              => $data->no_rebus,
-                'status_used'           => $jasaVendorInDetail == null ? 0 : 1,
+                'status_used'           => $jasaVendorOutDetail == null ? 0 : 1,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
                 "warehouse_name"        => $data->warehouse_name,
