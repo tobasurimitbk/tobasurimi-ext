@@ -154,11 +154,13 @@
                     $upahKopekClaw = 0;
                     $upahKopekMh = 0;
                     $upahKopekCf = 0;
+                    // Qty Kopek
+                    $qtySebelumKopekTotal = 0;
                     ?>
                     <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
                         <?php
                         $total = $b['jumbo'] + $b['ex_lump'] + $b['lump'] + $b['special'] + $b['claw'] + $b['mh'] + $b['cf'];
-                        $rasio = $total == 0 ? 0 : (($total / $b['qty_kopek']) * 10);
+                        $rasio = $total == 0 ? 0 : (($total / $b['qty_kopek']) * 100);
                         $jumboTotal += $b['jumbo'];
                         $exLumpTotal += $b['ex_lump'];
                         $lumpTotal += $b['lump'];
@@ -166,6 +168,7 @@
                         $clawTotal += $b['claw'];
                         $mhTotal += $b['mh'];
                         $cfTotal += $b['cf'];
+                        $qtySebelumKopekTotal += $b['qty_kopek'];
                         $totalTotal += $total;
                         ?>
                         <tr>
@@ -185,6 +188,27 @@
                         </tr>
 
                     <?php endforeach; ?>
+                    <?php $qtySebelumKopekTotal = ($qtySebelumKopekTotal == 0) ? 1 : $qtySebelumKopekTotal;  ?>
+                    <?php $qtyTotalBahanBaku = $jumboTotal + $exLumpTotal + $lumpTotal + $specialTotal + $clawTotal + $mhTotal + $cfTotal; ?>
+                    <tr>
+                        <td colspan="3">
+                            Rata Rata Rasio
+                        </td>
+                        <td>
+                            <?= number_format($qtySebelumKopekTotal, 2) ?>
+                        </td>
+                        <td>
+                            <?= number_format(($qtyTotalBahanBaku / $qtySebelumKopekTotal) * 100, 2) ?>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                     <tr>
                         <td colspan="5">
                             Total Kg di B. baku
