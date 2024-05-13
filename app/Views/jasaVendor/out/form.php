@@ -196,7 +196,7 @@
 
                 <div class="row mt-3">
                     <div class="col mb-0">
-                        <label class="form-label font-weight-bold lable-title">List Inventori Barang (Hanya Menampilkan Barang yang mempunyai Stok Rebus)</label>
+                        <label class="form-label font-weight-bold lable-title">List Inventori Barang (Hanya Menampilkan Barang yang mempunyai Stok)</label>
                     </div>
                     <div class="col-md-12 col-table-button-tts">
                         <div class="table-responsive">

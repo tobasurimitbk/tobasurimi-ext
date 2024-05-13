@@ -195,10 +195,10 @@
                             Rata Rata Rasio
                         </td>
                         <td>
-                            <?= number_format($qtySebelumKopekTotal, 2) ?>
+                            <?= number_format(($qtySebelumKopekTotal / count($biayaKepitingDetail)), 2) ?>
                         </td>
                         <td>
-                            <?= number_format(($qtyTotalBahanBaku / $qtySebelumKopekTotal) * 100, 2) ?>
+                            <?= number_format(($qtyTotalBahanBaku / $qtySebelumKopekTotal) * 100, 2) ?> %
                         </td>
                         <td></td>
                         <td></td>
