@@ -657,22 +657,36 @@ class POLokalBahanPenolong extends BaseController
 
         foreach ($sppDetail as $s) {
 
-            $result[] = [
-                'barang_id' => $s['barang1_id'],
-                'spesifikasi_id' => $s['barang2_id'],
-                'kode_barang' => $s['kode_barang'],
-                'nama_barang' => $s['nama_barang'],
-                'satuan_id' => $s['unit'],
-                'nama_satuan' => $s['kode_satuan'],
-                'harga_satuan' => '0',
-                'qty' => $s['qty'],
-                'diskon' => '0',
-                'biaya_tambahan' => '0',
-                'total' => '0',
-                'keterangan' => $s['note'],
-                'ppn' => '',
-                'pph' => ''
-            ];
+            $totalQtyPO = $this->aMPurchaseOrderDetailModel->select('SUM(qty) AS qty_po')
+                ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id')
+                ->where('am_purchase_orders.deletedAt', null)
+                ->where('am_purchase_order_details.deletedAt', null)
+                ->where('am_purchase_orders.purchase_request_id', $id)
+                ->where('barang_id', $s['barang1_id'])
+                ->where('spesifikasi_id', $s['barang2_id'])
+                ->first();
+
+            $totalQtyPO = ($totalQtyPO == null) ? 0 : $totalQtyPO['qty_po'];
+            $totalQtySisa = $s['qty'] - $totalQtyPO;
+
+            if ($totalQtySisa > 0) {
+                $result[] = [
+                    'barang_id' => $s['barang1_id'],
+                    'spesifikasi_id' => $s['barang2_id'],
+                    'kode_barang' => $s['kode_barang'],
+                    'nama_barang' => $s['nama_barang'],
+                    'satuan_id' => $s['unit'],
+                    'nama_satuan' => $s['kode_satuan'],
+                    'harga_satuan' => '0',
+                    'qty' => $totalQtyPO,
+                    'diskon' => '0',
+                    'biaya_tambahan' => '0',
+                    'total' => '0',
+                    'keterangan' => $s['note'],
+                    'ppn' => '',
+                    'pph' => ''
+                ];
+            }
         }
 
         return response()->setJSON([

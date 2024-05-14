@@ -187,7 +187,7 @@ class AMPurchaseOrderModel extends Model
         }
 
         if ($addCondition['search']) {
-            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['spp_no']);
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['search']);
         }
 
         if ($addCondition['dateStart']) {
