@@ -874,7 +874,7 @@
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.nama_satuan));
             newRow.append($('<td>').text(formatRupiah(v.harga_satuan)));
-            newRow.append($('<td>').text(v.qty.toFixed(2)));
+            newRow.append($('<td>').text(parseFloat(v.qty).toFixed(2)));
             newRow.append($('<td>').text(v.diskon));
             newRow.append($('<td>').text(formatRupiah(v.biaya_tambahan)));
             newRow.append($('<td>').text(v.total));
@@ -954,7 +954,7 @@
         }
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
         $('#harga_satuan').val(item.harga_satuan);
-        $('#qty').val(item.qty.toFixed(2));
+        $('#qty').val(parseFloat(item.qty).toFixed());
         $('#diskon').val(item.diskon);
         $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? "" : item.biaya_tambahan).val();
         $('#keterangan').val(item.keterangan);
