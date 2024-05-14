@@ -448,7 +448,7 @@
     // HARGA SATUAN DAN QTY CHANE
     $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
         var hargaSatuan = parseFloat($('#harga_satuan').val()) || 0;
-        var qty = parseInt($('#qty').val()) || 1;
+        var qty = parseFloat($('#qty').val()) || 1;
         var biayaTambahan = parseFloat($('#biaya_tambahan').val()) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
