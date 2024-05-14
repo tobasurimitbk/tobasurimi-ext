@@ -1,56 +1,93 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Nomor Izin TPB</h5>
-            </div>
-            <div class="modal-body">
-                <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
-                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
-                    <?= csrf_field() ?>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input id="no_izin_tpb" name="no_izin_tpb" type="text" class="form-control no_izin_tpb" placeholder="">
-                                <label>Nomor Izin TPB</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" name="tanggal_skep_tpb" type="text" placeholder="" class="form-control tanggal_skep_tpb" id="tanggal_skep_tpb">
-                                    <label>Tanggal Skep TPB</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 0px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                <button type="button" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <section class="section">
     <div class="section-header">
-        <h1>Nomor Izin TPB</h1>
-        <button class="btn btn-show-form btn-add float-right">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <h1>Nomor Ijin TPB</h1>
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("setting-akun-bc/pengusaha-tpb"); ?>">
+                Kembali
+            </a>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
+            <?= csrf_field() ?>
+            <table width="100%" class="mb-3">
+                <tbody>
+                    <tr style="color: black;">
+                        <td width="150px">NPWP</td>
+                        <td width="5px">:</td>
+                        <td><?= empty($pengusahaTPB) ? "" : strtoupper($pengusahaTPB['npwp']); ?></td>
+                    </tr>
+                    <tr style="color: black; height: 20px;">
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr style="color: black;">
+                        <td width="150px">Pengusaha TPB</td>
+                        <td width="5px">:</td>
+                        <td><?= empty($pengusahaTPB) ? "" : strtoupper($pengusahaTPB['nama_pengusaha']); ?></td>
+                    </tr>
+                    <tr style="color: black; height: 20px;">
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr style="color: black;">
+                        <td width="150px">Alamat</td>
+                        <td width="25px">:</td>
+                        <td><?= empty($pengusahaTPB) ? "" : $pengusahaTPB['alamat']; ?></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <form class="create-form">
+                <input type="hidden" name="id" id="id" class="id">
+                <input type="hidden" value="<?= !empty($pengusahaTPB) ? $pengusahaTPB['id'] : '' ?>" name="pengusaha_tpb_id" class="pengusaha_tpb_id" id="pengusaha_tpb_id">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input id="no_ijin_tpb" name="no_ijin_tpb" type="text" class="form-control no_ijin_tpb" placeholder="">
+                            <label>Nomor Izin TPB</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" name="tanggal_skep_tpb" type="text" placeholder="" class="form-control tanggal_skep_tpb" id="tanggal_skep_tpb">
+                                <label>Tanggal Skep TPB</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 17px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating" style="height: 50px;">
+                            <select class="form-select status" name="status" id="status">
+                                <option value=""></option>
+                                <option value="1">AKTIF</option>
+                                <option value="0">TIDAK AKTIF</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tutup No Surat Jalan</label>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-add btn-block float-right btn-submit-form">
+                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
+                        </button>
+                        <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="resetForm()">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div class="row justify-content-end mb-3">
                 <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No Izin TPB" value="" />
@@ -62,11 +99,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('no_izin_tpb')" class="sort">Nomor Izin TPB</th>
+                                <th onclick="changeSort('no_ijin_tpb')" class="sort">Nomor Ijin TPB</th>
                                 <th onclick="changeSort('tanggal_skep_tpb')" class="sort">Tanggal Skep TPB</th>
+                                <th onclick="changeSort('status')" class="sort">Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -98,12 +137,13 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("no-izin-tpb/all"); ?>",
+            url: "<?= base_url("setting-akun-bc/no-ijin-tpb-all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
+                data.pengusaha_tpb_id = $('.pengusaha_tpb_id').val()
             }
         },
         "initComplete": function(settings, json) {
@@ -114,17 +154,58 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "no_izin_tpb",
-            className: "text-center"
-        }, {
-            data: "tanggal_skep_tpb",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "no_ijin_tpb",
+                className: "text-center"
+            }, {
+                data: "tanggal_skep_tpb",
+                className: "text-center"
+            },
+            {
+                data: "status",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let htmlRes = '';
+                    if (row.status == "TIDAK AKTIF") {
+                        htmlRes += `
+                            <div class="badge badge-danger">
+                                TIDAK AKTIF
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="badge badge-primary">
+                                AKTIF
+                            </div>`
+                    }
+
+                    return htmlRes;
+                }
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    return `
+                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" 
+                        onclick="updateForm('${id}')" 
+                        >
+                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        </button><button class="btn btn-danger" onclick="deleteForm('${id}')">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    `
+                }
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -159,22 +240,36 @@
         autoclose: true
     });
 
+    $('#status').select2({
+        placeholder: "Pilih Status",
+        theme: "bootstrap-5",
+        allowClear: true,
+    }).change(function() {
+
+    });
+
     var validator = $(".create-form").validate({
         rules: {
-            no_izin_tpb: {
+            no_ijin_tpb: {
                 required: true
             },
             tanggal_skep_tpb: {
                 required: true
             },
+            status: {
+                required: true
+            }
         },
         messages: {
-            no_izin_tpb: {
-                required: "Nomor izin TPB wajib diisi"
+            no_ijin_tpb: {
+                required: "Nomor Ijin TPB wajib diisi"
             },
             tanggal_skep_tpb: {
                 required: "Tanggal skep TPB wajib diisi"
             },
+            status: {
+                required: "Status wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -198,20 +293,14 @@
         },
     });
 
-    $('.btn-add').click(function() {
-        clearForm();
-        validator.reset();
-        $('.add-modal').modal('show');
-        $('.title-name').text('Tambah ');
-        $('.delete-btn').hide();
 
-    });
-
-    $('.btn-hide-form').click(function() {
-        $('.add-modal').modal('hide');
-        $('#id').val('');
-        clearForm();
-    });
+    $("#status")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
     $('.btn-submit-form').click(function() {
         if ($('.create-form').valid()) {
@@ -231,7 +320,7 @@
                     if (id) {
                         // EDIT
                         $.ajax({
-                            url: "<?= base_url("no-izin-tpb/update"); ?>",
+                            url: "<?= base_url("setting-akun-bc/no-ijin-tpb-update"); ?>",
                             data: formData,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -248,7 +337,7 @@
                                 csrf.val(response.token);
                                 $('.add-modal').modal('hide');
                                 if (response.status) {
-                                    clearForm();
+                                    resetForm();
                                     $('#id').val(null);
                                     Swal.fire({
                                         icon: 'success',
@@ -266,7 +355,7 @@
                     } else {
                         // CREATE
                         $.ajax({
-                            url: "<?= base_url("no-izin-tpb/create"); ?>",
+                            url: "<?= base_url("setting-akun-bc/no-ijin-tpb-create"); ?>",
                             data: formData,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -282,7 +371,7 @@
                             success: function(response) {
                                 csrf.val(response.token);
                                 if (response.status) {
-                                    clearForm();
+                                    resetForm();
                                     Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -291,7 +380,6 @@
                                     }).then((result) => {
                                         if (result.isConfirmed) {
                                             table.ajax.reload();
-                                            $('.add-modal').modal('hide');
                                         }
                                     });
                                 } else {
@@ -312,15 +400,9 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        $(".title-name").text("Update ");
-        $('.delete-btn').show();
-        validator.reset();
-        let id = data.id;
-
+    function updateForm(id) {
         $.ajax({
-            url: "<?= base_url("no-izin-tpb/get"); ?>",
+            url: "<?= base_url("setting-akun-bc/no-ijin-tpb-get"); ?>",
             method: "GET",
             data: {
                 id: id,
@@ -336,29 +418,29 @@
                 if (res.status) {
                     csrf.val(res.token);
                     $('#id').val(res.data.id);
-                    $('#no_izin_tpb').val(res.data.no_izin_tpb);
+                    $('#no_ijin_tpb').val(res.data.no_ijin_tpb);
                     $('#tanggal_skep_tpb').val(res.data.tanggal_skep_tpb);
-                    $('.add-modal').modal('show');
+                    $('#status').val(res.data.status).change();
                 }
             }
         })
-    });
 
-    $(".delete-btn").click(function() {
+    }
+
+    function deleteForm(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Data?',
+            title: 'Hapus Data ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Hapus',
+            confirmButtonText: 'Ya',
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                let id = $(".id").val();
                 $.ajax({
-                    url: "<?= base_url("no-izin-tpb/delete"); ?>",
+                    url: "<?= base_url("setting-akun-bc/no-ijin-tpb-delete"); ?>",
                     data: {
                         id: id
                     },
@@ -380,18 +462,20 @@
                         }).then((result) => {
                             table.ajax.reload();
                         });
-                        $('.add-modal').modal('hide');
-
                     },
                 });
             }
         })
-    })
 
-    function clearForm() {
+    }
+
+    function resetForm() {
         $('#id').val();
-        $('#no_izin_tpb').val('');
+        $('#no_ijin_tpb').val('');
         $('#tanggal_skep_tpb').val('');
+        $('#status').val(null).change();
+        validator.resetForm();
+        validator.reset();
     }
 </script>
 

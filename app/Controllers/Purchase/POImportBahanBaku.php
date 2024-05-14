@@ -104,7 +104,7 @@ class POImportBahanBaku extends BaseController
             return redirect()->to('po-import-bahan-baku');
         }
 
-        $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $data['dataPOImport']->division_id)->where('deletedAt', null)->findAll();
+        $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $data['dataPOImport']->division_id)->where('spp_type', "Import BB")->where('deletedAt', null)->findAll();
 
         return view('Purchase/poImportBahanBaku/form', $data);
     }

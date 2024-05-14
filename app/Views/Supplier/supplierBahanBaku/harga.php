@@ -7,7 +7,7 @@
         <h1 class="title-name">Set Harga Barang</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("supplier-bahan-baku"); ?>">
-                Batal
+                Kembali
             </a>
         </div>
     </div>
@@ -113,7 +113,7 @@
                                 <th>Harga Umum</th>
                                 <th>Harga Harian</th>
                                 <th>Harga Bulanan</th>
-                                <th>Action</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">

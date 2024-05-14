@@ -124,18 +124,17 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataListSPP)) : ?>
                                     <?php foreach ($dataListSPP as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['spp_no'] ?></option>
+                                        <option <?= !empty($poDetail) ? ($poDetail['purchase_request_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['spp_no'] ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">SPP (Opsional)</label>
+                            <label for="floatingInput" style="z-index: 1;">SPP</label>
                         </div>
-                        <small class="mb-3 mt-1"><i><?= !empty($poDetail) ? ($poDetail['spp_no'] != null ? "Nomor SPP : " . $poDetail['spp_no'] : '')  : ' -' ?></i></small>
 
                     </div>
                     <div class="col-md-4">
@@ -153,6 +152,17 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select status_closed_spp" name="status_closed_spp" id="status_closed_spp">
+                                <option value=""></option>
+                                <option <?= !empty($poDetail) ? ($poDetail['status_closed_spp'] == "0" ? 'selected' : '') : '' ?> value="0">OPEN SPP</option>
+                                <option <?= !empty($poDetail) ? ($poDetail['status_closed_spp'] == "1" ? 'selected' : '') : '' ?> value="1">CLOSE SPP</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tutup SPP</label>
+                        </div>
+                        <small class="mb-3 mt-1"><i>Status Open Berarti SPP Masih Bisa Digunakan Kembali, Status Close Berarti SPP Tidak Dapat Digunakan Kembali</i></small>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" value="<?= !empty($poDetail) ? $poDetail['note'] : '' ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
@@ -172,7 +182,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
+                            <select disabled class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                 <option data-barang_id="" data-parent_name="" data-spesifikasi_id="" data-spesifikasi_name="" data-satuan_id="" data-nama_barang="" data-kode_barang="" value=""></option>
                                 <?php foreach ($barang as $s) : ?>
                                     <option data-barang_id="<?= $s['id'] ?>" data-parent_name="<?= $s['parent_name'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" data-spesifikasi_name="<?= strtoupper($s['spesifikasi'])  ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['barang_master_spesifikasi_id'] ?>">
@@ -288,7 +298,7 @@
                     </div>
                     <div class="col-md-6">
                         <button class="btn btn-add btn-block float-right btn-submit-detail">
-                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
+                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i> Update
                         </button>
                         <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="resetForm()">
                             <i class="fa-solid fa-rotate-right mr-1"></i> Reset
@@ -351,6 +361,14 @@
 
     $('#division_id').select2({
         placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+
+    });
+
+    $('#status_closed_spp').select2({
+        placeholder: "Pilih Status SPP",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -525,6 +543,12 @@
             },
             payment_date: {
                 required: true,
+            },
+            spp_id: {
+                required: true,
+            },
+            status_closed_spp: {
+                required: true
             }
         },
         messages: {
@@ -545,6 +569,12 @@
             },
             payment_date: {
                 required: "Tanggal pembayaran wajib diisi"
+            },
+            spp_id: {
+                required: "Pilih Nomor SPP",
+            },
+            status_closed_spp: {
+                required: "Status wajib diisi"
             }
         },
         errorElement: 'span',
@@ -672,6 +702,7 @@
                             var paymentDate = $('#payment_date').val();
                             var sppID = $('#spp_id').val();
                             var note = $('#note').val();
+                            var statusClosedSpp = $('#status_closed_spp option:selected').val();
                             // append
                             var formData = new FormData();
                             formData.append("id", id);
@@ -683,6 +714,7 @@
                             formData.append("paymentDate", paymentDate);
                             formData.append("total", totalHarga);
                             formData.append("note", note);
+                            formData.append("status_closed_spp", statusClosedSpp);
                             formData.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({
@@ -745,6 +777,7 @@
                             var paymentDate = $('#payment_date').val();
                             var sppID = $('#spp_id').val();
                             var note = $('#note').val();
+                            var statusClosedSpp = $('#status_closed_spp option:selected').val();
                             // append
                             var formData = new FormData();
                             formData.append("poDate", poDate);
@@ -755,6 +788,7 @@
                             formData.append("paymentDate", paymentDate);
                             formData.append("total", totalHarga);
                             formData.append("note", note);
+                            formData.append("status_closed_spp", statusClosedSpp);
                             formData.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({

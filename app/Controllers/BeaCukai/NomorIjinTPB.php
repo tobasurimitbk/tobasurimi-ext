@@ -1,22 +1,34 @@
 <?php
 
-namespace App\Controllers\Master;
+namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Models\NomorIjinTPBModel;
+use App\Models\PengusahaTPBModel;
 
 class NomorIjinTPB extends BaseController
 {
     protected $nomorIjinTPBModel;
+    protected $pengusahaTPBModel;
+    protected $this_company_id;
 
     public function __construct()
     {
         $this->nomorIjinTPBModel = new NomorIjinTPBModel();
+        $this->pengusahaTPBModel = new PengusahaTPBModel();
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function index()
+    public function index($id)
     {
-        return view('Master/nomorTpb/index');
+        $pengusahaTPBId = decrypt($id);
+        $data = [
+            'pengusahaTPB' => $this->pengusahaTPBModel->find($pengusahaTPBId)
+        ];
+        if ($data['pengusahaTPB'] == null) {
+            return redirect()->to('setting-akun-bc/pengusaha-tpb');
+        }
+        return view('BeaCukai/settingAkun/settingTpb/index', $data);
     }
 
     public function all()
@@ -30,7 +42,9 @@ class NomorIjinTPB extends BaseController
         ];
 
         $condition = [
-            'deletedAt' => null
+            'nomor_ijin_tpb.deletedAt' => null,
+            'nomor_ijin_tpb.company_id' => $this->this_company_id,
+            'pengusaha_tpb_id' => ($this->request->getVar('pengusaha_tpb_id')),
         ];
 
         $addCondition = [
@@ -52,8 +66,9 @@ class NomorIjinTPB extends BaseController
             array_push($res, [
                 "no"                => $no++,
                 "id"                => encrypt($data->id),
-                "no_izin_tpb"       => $data->no_izin_tpb,
+                "no_ijin_tpb"       => $data->no_ijin_tpb,
                 "tanggal_skep_tpb"  => date('d/m/Y', strtotime($data->tanggal_skep_tpb)),
+                "status"            => $data->status == "1" ? "AKTIF" : "TIDAK AKTIF"
             ]);
         }
 
@@ -70,7 +85,12 @@ class NomorIjinTPB extends BaseController
 
     public function create()
     {
-        $noIjinTpb = $this->nomorIjinTPBModel->where('no_izin_tpb', $this->request->getVar('no_izin_tpb'))->first();
+        $noIjinTpb = $this->nomorIjinTPBModel
+            ->where('company_id', $this->this_company_id)
+            ->where(
+                'no_ijin_tpb',
+                $this->request->getVar('no_ijin_tpb')
+            )->first();
 
         if ($noIjinTpb != null) {
             return response()->setJSON([
@@ -81,8 +101,11 @@ class NomorIjinTPB extends BaseController
         }
 
         $this->nomorIjinTPBModel->insert([
-            'no_izin_tpb' => $this->request->getVar('no_izin_tpb'),
+            'company_id' => $this->this_company_id,
+            'pengusaha_tpb_id' => $this->request->getVar('pengusaha_tpb_id'),
+            'no_ijin_tpb' => $this->request->getVar('no_ijin_tpb'),
             'tanggal_skep_tpb' => $this->request->getVar('tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('tanggal_skep_tpb')), "Y-m-d") : "",
+            'status' => $this->request->getVar('status'),
         ]);
 
         return response()->setJSON([
@@ -96,9 +119,29 @@ class NomorIjinTPB extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+        $noIjinTpb = $this->nomorIjinTPBModel
+            ->where('company_id', $this->this_company_id)
+            ->where(
+                'no_ijin_tpb',
+                $this->request->getVar('no_ijin_tpb')
+            )
+            ->where('id != ', $id)
+            ->first();
+
+        if ($noIjinTpb != null) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Nomor izin TPB sudah ada",
+                'token' => csrf_hash()
+            ]);
+        }
+
         $this->nomorIjinTPBModel->update($id, [
-            'no_izin_tpb' => $this->request->getVar('no_izin_tpb'),
+            'company_id' => $this->this_company_id,
+            'pengusaha_tpb_id' => $this->request->getVar('pengusaha_tpb_id'),
+            'no_ijin_tpb' => $this->request->getVar('no_ijin_tpb'),
             'tanggal_skep_tpb' => $this->request->getVar('tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('tanggal_skep_tpb')), "Y-m-d") : "",
+            'status' => $this->request->getVar('status'),
         ]);
 
         return response()->setJSON([
@@ -123,8 +166,8 @@ class NomorIjinTPB extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $data = $this->nomorIjinTPBModel->find($id);
-        $data['tanggal_skep_tpb'] = date('d/m/Y', strtotime($data['tanggal_skep_tpb']));
         $data['id'] = encrypt($data['id']);
+        $data['tanggal_skep_tpb'] = date('d/m/Y', strtotime($data['tanggal_skep_tpb']));
         return response()->setJSON([
             'data' => $data,
             'status' => true,

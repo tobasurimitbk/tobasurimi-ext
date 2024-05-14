@@ -42,6 +42,7 @@
                                 <th>Tanggal Dibuat</th>
                                 <th onclick="changeSort('divisiName')" class="sort">Departemen</th>
                                 <th onclick="changeSort('poNo')" class="sort">No. PO</th>
+                                <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
                                 <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                                 <th onclick="changeSort('total')" class="sort">Total</th>
                                 <th>Order</th>
@@ -167,6 +168,10 @@
             },
             {
                 data: "po_no",
+                className: "text-center"
+            },
+            {
+                data: "spp_no",
                 className: "text-center"
             },
             {

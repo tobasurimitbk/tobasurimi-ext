@@ -173,9 +173,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary">Tambah Barang</h5>
-                <button class="btn btn-show-form btn-add-barang float-right">
+                <!-- <button class="btn btn-show-form btn-add-barang float-right">
                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
-                </button>
+                </button> -->
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -188,12 +188,19 @@
 
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
-                                <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
-                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
-                                </select>
-                                <label for="floatingInput">Kode Barang</label>
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
+                                    <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
+                                        <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Kode Barang</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">

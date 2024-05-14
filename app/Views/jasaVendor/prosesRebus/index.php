@@ -453,10 +453,6 @@
         })
     }
 
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
-
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";
