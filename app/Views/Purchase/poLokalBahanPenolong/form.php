@@ -964,6 +964,9 @@
         $('#total').val(item.total);
         // attr barang_id disabled
         $('#barang_id').attr('disabled', true);
+        setTimeout(function() {
+            $('#harga_satuan').keyup();
+        }, 1000);
     }
 
     function resetForm() {
