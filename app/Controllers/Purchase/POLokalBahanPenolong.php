@@ -678,7 +678,7 @@ class POLokalBahanPenolong extends BaseController
                     'satuan_id' => $s['unit'],
                     'nama_satuan' => $s['kode_satuan'],
                     'harga_satuan' => '0',
-                    'qty' => $totalQtyPO,
+                    'qty' => $totalQtySisa,
                     'diskon' => '0',
                     'biaya_tambahan' => '0',
                     'total' => '0',
