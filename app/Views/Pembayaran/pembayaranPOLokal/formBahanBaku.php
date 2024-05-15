@@ -207,7 +207,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran mb-3" style="height: 50px;">
-                            <input <?= !empty($detail) ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '' ?>" type="text" class="form-control" placeholder="Nominal Pembayaran">
+                            <input <?= !empty($detail) ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '0' ?>" type="text" class="form-control" placeholder="Nominal Pembayaran">
                             <label for="floatingInput">Potongan / Diskon</label>
                         </div>
                     </div>

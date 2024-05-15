@@ -855,6 +855,7 @@ $routes->get('/stock-list/stock-log-jasa-vendor', 'Inventori\StokList::allStokJa
 $routes->get('/stock-list/stock-log-produksi', 'Inventori\StokList::allStokProduksi', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-rebus', 'Inventori\StokList::allStokRebus', ['filter' => 'Auth']);
 $routes->post('/stock-list/import', 'Inventori\StokList::import', ['filter' => 'Auth']);
+$routes->get('/stock-list/export-excel', 'Inventori\StokList::exportExcel', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);

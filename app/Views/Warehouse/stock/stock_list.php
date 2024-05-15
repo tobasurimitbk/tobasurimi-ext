@@ -5,6 +5,12 @@
     <div class="section-header">
         <h1>Stock List</h1>
         <?php if (can("Inventori", "Stok List", "c")) : ?>
+            <button class="btn btn-primary dropdown-toggle ml-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="excel('<?= base_url("stock-list/export-excel"); ?>')">EXCEL</button></li>
+            </ul>
             <button class="btn btn-discard btn-dropdown-export btn-upload-excel float-right" type="button" style="margin-right: 30px;">
                 <i class="fas fa-file-excel"></i> Import
             </button>
@@ -127,6 +133,7 @@
 <script>
     let sort = "createdAt";
     let sortType = "desc";
+
 
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
@@ -451,6 +458,18 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    //export excel
+    const excel = function(url) {
+        let search = $(".search").val();
+        let parent_type = $("#parent_type option:selected").val();
+        let parent_name = $("#parent_name option:selected").val();
+        let divisi_id = $("#divisi_id option:selected").val();
+        let warehouse_id = $("#warehouse_id").val();
+        let status_stok = $("#status_stok option:selected").val();
+
+        window.open(url + `?search=${search}&parent_type=${parent_type}&parent_name=${parent_name}&divisi_id=${divisi_id}&warehouse_id=${warehouse_id}&status_stok=${status_stok}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

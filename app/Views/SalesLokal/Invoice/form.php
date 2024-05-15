@@ -507,7 +507,7 @@
             const docType = $('#doc_type').val();
 
             table.clear();
-            list_items
+            list_items = [];
 
             $.ajax({
                 url: `<?= base_url('/invoice-penjualan-lokal/getDocumentData/'); ?>${docType}/${docId}`,
@@ -515,6 +515,7 @@
                 dataType: "json",
                 success: function(res) {
                     console.log(res.itemList);
+                    console.log(res.dpp);
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
                     $('#customerAddress').val(res.customerAddress);
@@ -545,6 +546,9 @@
         <?php if (!empty($documentData)) : ?>
             const itemList = <?= json_encode($documentData->itemList) ?>;
             table.rows.add(itemList).draw(false);
+            itemList.forEach(function(item) {
+                list_items.push(item);
+            });
             // $('#itemSubTotal').html('<?= $documentData->dpp ?>');
             // $('#taxTotal').html('<?= $documentData->tax ?>');
             // $('#grandTotal').html('<?= $documentData->total ?>');
@@ -634,6 +638,7 @@
     });
 
     $(".btn-submit").click(function() {
+        console.log(list_items);
         if ($(".create-form").valid()) {
             $.each(list_items, function(i, v) {
                 var element = $('input[data-id="' + v.id + '"].input-qty');
@@ -784,9 +789,11 @@
         let taxTotalHtml = 0;
         let dummyTax = 0;
 
+        console.log(list_items);
         list_items.map((obj) => {
-            const itemAmt = parseFloat(obj.amount.replace(',', ''));
+            const itemAmt = parseFloat(obj.amount.replaceAll(',', ''));
             let taxAmt = 0;
+
             discTotal += ((+obj.disc) / 100) * itemAmt;
             if (taxStatus) {
                 dummyTax = (+obj.taxChecked);
@@ -803,10 +810,15 @@
                 itemSubTotal += itemAmt - taxAmt;
                 dummyGrandTotal += itemAmt;
                 taxTotalHtml += taxAmt;
+            } else if (!taxStatus && !includeTax) {
+                itemSubTotal += itemAmt;
+                taxTotalHtml += taxAmt;
             } else {
                 itemSubTotal += itemAmt;
                 taxTotalHtml += taxAmt;
             }
+
+
         });
 
         $('#itemSubTotal').html(itemSubTotal.toLocaleString());
@@ -815,13 +827,13 @@
 
         if (taxStatus && includeTax) {
             $('#includeTaxText').html('(Termasuk Pajak)');
-            grandTotal = dummyGrandTotal - discTotal;
+            grandTotal = itemSubTotal + taxTotalHtml;
         } else if (taxStatus && !includeTax) {
             $('#includeTaxText').html('');
-            grandTotal = itemSubTotal + taxTotalHtml - discTotal;
+            grandTotal = itemSubTotal + taxTotalHtml;
         } else {
             $('#includeTaxText').html('');
-            grandTotal = itemSubTotal - discTotal;
+            grandTotal = itemSubTotal;
         }
 
         $('#grandTotal').html(grandTotal.toLocaleString());

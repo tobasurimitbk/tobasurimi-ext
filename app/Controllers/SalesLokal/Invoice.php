@@ -276,7 +276,7 @@ class Invoice extends BaseController
                     "discount_percentage_invoice"   => $value['disc'],
                     "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
                     "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                    "amount_invoice"                => str_replace(',', '', $value['total_harga_barang']),
+                    "amount_invoice"                => str_replace(',', '', $value['amount']),
                 ];
                 $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
             }
@@ -377,12 +377,13 @@ class Invoice extends BaseController
 
 
         foreach ($documentData->itemList as &$value) {
+            // var_dump($value);
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
                 if ($value->id_barang == $valueDetail['id_barang_invoice']) {
                     $value->id_detail_invoice = $valueDetail['id'];
-                    $value->qty_input = toRupiah(floatval(str_replace('Rp', '', $valueDetail['qty_invoice'])));
-                    $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $valueDetail['harga_barang_invoice'])));
-                    $value->amount = toRupiah(floatval(str_replace('Rp', '', $valueDetail['amount_invoice'])));
+                    $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 0);
+                    $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
+                    $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
                 }
             }
         }
@@ -463,6 +464,7 @@ class Invoice extends BaseController
             $postData = $this->request->getPost();
             $postItemsData = json_decode($this->request->getPost('items'), true);
 
+
             $soInvData = $this->SalesOrderInvoiceModel->asObject()
                 ->find($payload['id']);
             if (empty($soInvData)) {
@@ -488,7 +490,37 @@ class Invoice extends BaseController
                 if (!empty($postItemsData)) {
                     foreach ($postItemsData as $value) {
                         // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
-                        $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
+                        $soInvDataDetail = $this->SalesOrderInvoiceDetailModel->asObject()
+                            ->find($value['id_detail_invoice']);
+
+
+                        if ((float)$value['qty_input'] > (float)$soInvDataDetail->qty_invoice) {
+                            //ambil jumlah selisi penambahannya misal permintaan awal 50 diubah jadi 60 = selisi 10
+                            $getSelisiQtySekarang = (float)$value['qty_input'] - $soInvDataDetail->qty_invoice;
+
+                            //melebihin dari qty sekarang
+                            if ($getSelisiQtySekarang > (float)$value['qty_sekarang']) {
+
+                                $data = [
+                                    "status"    => false,
+                                    "message"   => 'Qty Invoice Melebihi Qty Sekarang',
+                                    'token'     => csrf_hash(),
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                            // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
+                            $newQtySekarang = (float)$value['qty_sekarang'] - $getSelisiQtySekarang;
+
+                            //qty input kutang dari
+                        } elseif ((float)$value['qty_input'] < $soInvDataDetail->qty_invoice) {
+
+                            //ambil jumlah selisi penambahannya misal permintaan awal 50 diubah jadi 40 = selisi 10
+                            $getSelisiQtySekarang = $soInvDataDetail->qty_invoice - (float)$value['qty_input'];
+                            $newQtySekarang = (float)$value['qty_sekarang'] + $getSelisiQtySekarang;
+                        } elseif ((float)$value['qty_input'] == (float)$soInvDataDetail->qty_invoice) {
+                            $newQtySekarang = (float)$value['qty_sekarang'];
+                        }
 
                         $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
                         $this->SalesOrderDetailModel->update($value['id'], $data);
@@ -505,8 +537,41 @@ class Invoice extends BaseController
                 // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
                 if (!empty($postItemsData)) {
                     foreach ($postItemsData as $value) {
-                        // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
-                        $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
+
+                        $soInvDataDetail = $this->SalesOrderInvoiceDetailModel->asObject()
+                            ->find($value['id_detail_invoice']);
+
+
+                        if ((float)$value['qty_input'] > (float)$soInvDataDetail->qty_invoice) {
+                            //ambil jumlah selisi penambahannya misal permintaan awal 50 diubah jadi 60 = selisi 10
+                            $getSelisiQtySekarang = (float)$value['qty_input'] - $soInvDataDetail->qty_invoice;
+
+                            //melebihin dari qty sekarang
+                            if ($getSelisiQtySekarang > (float)$value['qty_sekarang']) {
+
+                                $data = [
+                                    "status"    => false,
+                                    "message"   => 'Qty Invoice Melebihi Qty Sekarang',
+                                    'token'     => csrf_hash(),
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                            // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
+                            $newQtySekarang = (float)$value['qty_sekarang'] - $getSelisiQtySekarang;
+
+                            //qty input kutang dari
+                        } elseif ((float)$value['qty_input'] < (float)$soInvDataDetail->qty_invoice) {
+
+                            //ambil jumlah selisi penambahannya misal permintaan awal 50 diubah jadi 40 = selisi 10
+                            $getSelisiQtySekarang = (float)$soInvDataDetail->qty_invoice - (float)$value['qty_input'];
+                            $newQtySekarang = (float)$value['qty_sekarang'] + $getSelisiQtySekarang;
+                        } elseif ((float)$value['qty_input'] == (float)$soInvDataDetail->qty_invoice) {
+                            $newQtySekarang = (float)$value['qty_sekarang'];
+                        }
+
+                        // var_dump((float)$value['qty_input'] == (float)$soInvDataDetail->qty_invoice);
+                        // die();
 
                         $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
                         $this->SalesOrderDetailModel->update($value['id'], $data);
@@ -548,7 +613,7 @@ class Invoice extends BaseController
                         "discount_percentage_invoice"   => $value['disc'],
                         "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
                         "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                        "amount_invoice"                => str_replace(',', '', $value['total_harga_barang']),
+                        "amount_invoice"                => str_replace(',', '', $value['amount']),
                     ];
                     $this->SalesOrderInvoiceDetailModel->update($value['id_detail_invoice'], $valuesDetail);
                 } else {
@@ -560,7 +625,7 @@ class Invoice extends BaseController
                         "discount_percentage_invoice"   => $value['disc'],
                         "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
                         "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                        "amount_invoice"                => str_replace(',', '', $value['total_harga_barang']),
+                        "amount_invoice"                => str_replace(',', '', $value['amount']),
                     ];
                     $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
                 }
@@ -817,8 +882,16 @@ class Invoice extends BaseController
             }
             $hargaBarang = str_replace(',', '', $item->harga_barang);
             $qty = str_replace(',', '', $item->qty);
+            $getDiscount = str_replace(',', '', $item->disc);
+            $discount = floatval($getDiscount) / 100;
 
-            $itemTotal = $hargaBarang * $qty;
+            if ($getDiscount == 0) {
+                $itemTotal = $hargaBarang * $qty;
+            } else {
+                $itemTotal = ($hargaBarang - ($hargaBarang * $discount)) * $qty;
+            }
+
+
 
             $dpp += $itemTotal;
             $taxAmt += $itemTotal * ($item->tax / 100);
