@@ -52,7 +52,8 @@ class SppDetailModel extends Model
     {
         $selectQry = "purchase_request_details.*,
                     barang_master.kode_barang,
-                    satuans.nama_satuan AS nama_satuan";
+                    satuans.nama_satuan AS nama_satuan,
+                    satuans.kode_satuan AS kode_satuan";
 
         $condition = [
             "purchase_request_id" => $id,

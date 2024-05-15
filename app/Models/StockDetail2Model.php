@@ -253,16 +253,6 @@ class StockDetail2Model extends Model
             AS stok_total,        
         ';
 
-        $dataQry = $this->asArray()
-            ->select($selectQry)
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
-            ->where('stock_details2.stock_id', $stockID)
-            ->groupBy('stock_details2.stock_dokumen')
-            ->groupBy('stock_details2.bc_id')
-            ->groupBy('stock_details2.no_aju')
-            ->orderBy('stock_details.stock_date', "ASC")
-            ->findAll();
-
         if ($isAdjusment == true) {
             $dataQry = $this->asArray()
                 ->select($selectQry)
@@ -271,7 +261,7 @@ class StockDetail2Model extends Model
                 ->groupBy('stock_details2.stock_dokumen')
                 ->groupBy('stock_details2.bc_id')
                 ->groupBy('stock_details2.no_aju')
-                ->orderBy('stock_details.stock_date', "ASC")
+                ->orderBy('stock_details.createdAt', "ASC")
                 ->findAll();
         } else {
             $dataQry = $this->asArray()
@@ -282,7 +272,7 @@ class StockDetail2Model extends Model
                 ->groupBy('stock_details2.bc_id')
                 ->groupBy('stock_details2.no_aju')
                 ->having('stok_total >', 0)
-                ->orderBy('stock_details.stock_date', "ASC")
+                ->orderBy('stock_details.createdAt', "ASC")
                 ->findAll();
         }
 

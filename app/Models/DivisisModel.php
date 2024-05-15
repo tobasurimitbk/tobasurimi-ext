@@ -67,7 +67,7 @@ class DivisisModel extends Model
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
         $requete = "SELECT divisis.*, jam_kerja.jenis FROM divisis ";
-        $requete .= "INNER JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
+        $requete .= "LEFT JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
         $requete .= "WHERE divisis.deletedAt IS NULL AND jam_kerja.deletedAt IS NULL ";
 
         if (isset($values["company_id"]) && $values["company_id"] !== "") {

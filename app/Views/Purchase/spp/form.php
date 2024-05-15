@@ -69,7 +69,7 @@
                                     <label for="floatingInput">No. SPP</label>
                                 </div>
                                 <div style="<?= !empty($dataSPP) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -690,7 +690,7 @@
                                                 reverseButtons: true,
                                                 confirmButtonText: 'Oke',
                                             }).then((result) => {
-                                                location.reload();
+                                                window.location.replace("<?= base_url('spp') ?>");
                                             })
                                         }
 
