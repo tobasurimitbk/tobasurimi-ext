@@ -107,7 +107,7 @@ class POImportBahanPenolong extends BaseController
             return redirect()->to('po-import-bahan-penolong');
         }
 
-        $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('spp_type', 'Import BP')->where('divisi_id', $data['dataPOImport']->division_id)->where('deletedAt', null)->findAll();
+        $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('spp_type', 'Import BP')->where('divisi_id', $data['dataPOImport']->division_id)->where('deletedAt', null)->where('spp_type', "Import BP")->findAll();
 
         return view('Purchase/poImportBahanPenolong/form', $data);
     }

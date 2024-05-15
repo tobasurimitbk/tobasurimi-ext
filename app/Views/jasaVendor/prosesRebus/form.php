@@ -377,6 +377,10 @@
             $('.form-fifo').hide();
         }
         // RESET
+        $('#spesifikasi_rebus_id').val(null).change();
+        $('#spesifikasi_hasil_rebus_id').val(null).change();
+        $('#qty_rebus_fifo').val(null);
+        $('#qty_hasil_rebus_fifo').val(null);
         listStockAsal = [];
         listStockSelected = [];
         drawTableAsalBarang(listStockAsal);
@@ -499,7 +503,17 @@
     $('#select-item-btn').click(function() {
         var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
         if (typePengambilanStock == "FIFO") {
-            insertListFifo();
+            var spesifikasiHasilRebus = $('.spesifikasi_hasil_rebus_id option:selected');
+            if (spesifikasiHasilRebus.val() == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Barang hasil rebus wajib diisi',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else {
+                insertListFifo();
+            }
         } else {
             insertListPabean();
         }
@@ -952,6 +966,10 @@
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
             },
+            lengthMenu: [
+                [100],
+                [100]
+            ],
             display: "stripe",
             searching: true,
             language: {

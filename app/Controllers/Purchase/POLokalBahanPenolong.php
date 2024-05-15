@@ -130,6 +130,7 @@ class POLokalBahanPenolong extends BaseController
             'division_id' => $this->request->getVar('divisionID'),
             'total' => $this->request->getVar('total'),
             'note' => $this->request->getVar('note'),
+            'status_closed_spp' => $this->request->getVar('status_closed_spp'),
             "createdBy" => session()->get("login")->user_id,
         ];
 
@@ -138,9 +139,12 @@ class POLokalBahanPenolong extends BaseController
         $poID = $this->aMPurchaseOrderModel->insert($dataAmPurchaseOrderData);
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
 
-        $this->sppModel->update($this->request->getVar('spp_id'), [
-            'request_status' => 'finished'
-        ]);
+        if ($dataAmPurchaseOrderData['status_closed_spp']) {
+            // CLOSE SPP
+            $this->sppModel->update($dataAmPurchaseOrderData['purchase_request_id'], [
+                'request_status' => 'finished'
+            ]);
+        }
 
         foreach ($aMPurchaseOrderDetailData as $d) {
             $this->aMPurchaseOrderDetailModel->insert([
@@ -210,6 +214,7 @@ class POLokalBahanPenolong extends BaseController
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
+                "spp_no"         => $data->spp_no,
                 "po_no"         => $data->po_no,
                 "companyName"  => $data->companyName,
                 "divisiName"   => $data->divisi,
@@ -302,7 +307,7 @@ class POLokalBahanPenolong extends BaseController
 
         ];
 
-        $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $poDetail['division_id'])->where('deletedAt', null)->findAll();
+        $data["dataListSPP"] = $this->sppModel->where('id', $poDetail['purchase_request_id'])->findAll();
         return view('Purchase/poLokalBahanPenolong/form', $data);
     }
 
@@ -350,14 +355,18 @@ class POLokalBahanPenolong extends BaseController
             'division_id' => $this->request->getVar('divisionID'),
             'total' => $this->request->getVar('total'),
             'note' => $this->request->getVar('note'),
+            'status_closed_spp' => $this->request->getVar('status_closed_spp'),
             "createdBy" => session()->get("login")->user_id,
         ];
 
         $this->aMPurchaseOrderModel->update($id, $dataAmPurchaseOrderData);
 
-        $this->sppModel->update($this->request->getVar('spp_id'), [
-            'request_status' => 'finished'
-        ]);
+        if ($dataAmPurchaseOrderData['status_closed_spp']) {
+            // CLOSE SPP
+            $this->sppModel->update($dataAmPurchaseOrderData['purchase_request_id'], [
+                'request_status' => 'finished'
+            ]);
+        }
 
         // insert again
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
@@ -648,22 +657,36 @@ class POLokalBahanPenolong extends BaseController
 
         foreach ($sppDetail as $s) {
 
-            $result[] = [
-                'barang_id' => $s['barang1_id'],
-                'spesifikasi_id' => $s['barang2_id'],
-                'kode_barang' => $s['kode_barang'],
-                'nama_barang' => $s['nama_barang'],
-                'satuan_id' => $s['unit'],
-                'nama_satuan' => $s['kode_satuan'],
-                'harga_satuan' => '0',
-                'qty' => $s['qty'],
-                'diskon' => '0',
-                'biaya_tambahan' => '0',
-                'total' => '0',
-                'keterangan' => $s['note'],
-                'ppn' => '',
-                'pph' => ''
-            ];
+            $totalQtyPO = $this->aMPurchaseOrderDetailModel->select('SUM(qty) AS qty_po')
+                ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id')
+                ->where('am_purchase_orders.deletedAt', null)
+                ->where('am_purchase_order_details.deletedAt', null)
+                ->where('am_purchase_orders.purchase_request_id', $id)
+                ->where('barang_id', $s['barang1_id'])
+                ->where('spesifikasi_id', $s['barang2_id'])
+                ->first();
+
+            $totalQtyPO = ($totalQtyPO == null) ? 0 : $totalQtyPO['qty_po'];
+            $totalQtySisa = $s['qty'] - $totalQtyPO;
+
+            if ($totalQtySisa > 0) {
+                $result[] = [
+                    'barang_id' => $s['barang1_id'],
+                    'spesifikasi_id' => $s['barang2_id'],
+                    'kode_barang' => $s['kode_barang'],
+                    'nama_barang' => $s['nama_barang'],
+                    'satuan_id' => $s['unit'],
+                    'nama_satuan' => $s['kode_satuan'],
+                    'harga_satuan' => '0',
+                    'qty' => $totalQtySisa,
+                    'diskon' => '0',
+                    'biaya_tambahan' => '0',
+                    'total' => '0',
+                    'keterangan' => $s['note'],
+                    'ppn' => '',
+                    'pph' => ''
+                ];
+            }
         }
 
         return response()->setJSON([

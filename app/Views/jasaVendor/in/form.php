@@ -138,6 +138,17 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
+                            <select <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] ? 'disabled' : '') : '' ?> class="form-select status_closed_jasa_vendor_out" name="status_closed_jasa_vendor_out" id="status_closed_jasa_vendor_out">
+                                <option value=""></option>
+                                <option <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_closed_jasa_vendor_out'] == "0" ? 'selected' : '') : '' ?> value="0">OPEN SURAT JALAN</option>
+                                <option <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_closed_jasa_vendor_out'] == "1" ? 'selected' : '') : '' ?> value="1">CLOSE SURAT JALAN</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tutup No Surat Jalan</label>
+                        </div>
+                        <small class="mb-3 mt-1"><i>Status Open Berarti Surat Jalan Masih Bisa Digunakan Kembali, Status Close Berarti Surat Jalan Tidak Dapat Digunakan Kembali</i></small>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorIn) ? $jasaVendorIn['no_surat_jalan_vendor'] : '' ?>" class="form-control no_surat_jalan_vendor" id="no_surat_jalan_vendor" name="no_surat_jalan_vendor" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">No Surat Jalan Vendor (Opsional)</label>
@@ -152,38 +163,79 @@
                 </div>
 
             </form>
+            <br>
             <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Daftar Detail Barang Keluar Ke Vendor</label>
+                </div>
                 <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;" colspan="6">Detail Dokumen Pabean</th>
-                                    <th style="text-align: center;" colspan="3">Daftar Barang Keluar</th>
-                                    <th style="text-align: center;" colspan="2">Daftar Barang Masuk</th>
+                                    <th style="text-align: center;" colspan="10">Daftar Barang Keluar</th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">No</th>
                                     <th style="text-align: center;">Tipe Barang</th>
+                                    <th style="text-align: center;">Asal Barang</th>
+                                    <th style="text-align: center;">No Dokumen</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
                                     <th style="text-align: center;">Tgl Penerimaan</th>
                                     <th style="text-align: center;">Supplier</th>
 
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan Output</th>
                                     <th style="text-align: center;">Qty Keluar</th>
+                                    <th style="text-align: center;">Satuan Keluar</th>
 
-                                    <th style="text-align: center;">Total Barang Masuk</th>
-                                    <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="11" style="text-align: center;">
+                                    <td colspan="10" style="text-align: center;">
+                                        Tidak Ada Barang
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Form Input Daftar Barang Masuk Dari Vendor</label>
+                </div>
+
+                <div class="col-md-12 col-table-button-tts">
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable3">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center;" colspan="7">Daftar Barang Keluar</th>
+                                    <th style="text-align: center;" colspan="1">Input Barang Masuk</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center; width:10px;" scope="col">No</th>
+                                    <th style="text-align: center;" scope="col">Tipe Barang</th>
+                                    <th style="text-align: center;" scope="col">Kode</th>
+                                    <th style="text-align: center;" scope="col">Barang-Spesifikasi</th>
+                                    <th style="text-align: center;" scope="col">Qty Keluar</th>
+                                    <th style="text-align: center;" scope="col">Satuan Keluar</th>
+                                    <th style="text-align: center;" scope="col">Total Masuk</th>
+                                    <th style="text-align: center; width:10px;" scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                            <tfoot class="foot-detail-table" id="foot-detail-table">
+                                <tr>
+                                    <td colspan="8" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -205,7 +257,7 @@
             <div class="modal-body">
                 <form class="create-form-barang-masuk" role="form" method="POST" enctype="multipart/form-data">
                     <?= csrf_field() ?>
-                    <input type="hidden" name="jasa_vendor_out_detail_id" id="jasa_vendor_out_detail_id" class="jasa_vendor_out_detail_id">
+                    <input type="hidden" name="stock_out_id" id="stock_out_id" class="stock_out_id">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
@@ -242,10 +294,10 @@
                         </div>
                     </div>
 
-                    <table class="table" id="dataTable2">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable2">
                         <thead>
                             <tr style="text-align: center;">
-                                <th scope="col">#</th>
+                                <th scope="col">No</th>
                                 <th scope="col">Kode Barang</th>
                                 <th scope="col">Barang</th>
                                 <th scope="col">Satuan</th>
@@ -255,10 +307,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="text-align: center;">
-                                <td colspan="7">Tidak ada barang masuk</td>
-                            </tr>
+
                         </tbody>
+                        <tfoot class="foot-detail-table" id="foot-detail-table">
+                            <tr>
+                                <td colspan="7" style="text-align: center;">
+                                    Tidak ada barang masuk </td>
+                            </tr>
+                        </tfoot>
                     </table>
 
                 </form>
@@ -284,6 +340,7 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     var listBarang = [];
+    var listBarangGroup = [];
 
     <?php if (!empty($jasaVendorIn)) : ?>
         let arr = $('.multiple_jasa_vendor_out_id').val();
@@ -298,8 +355,11 @@
             dataType: "json",
             success: function(res) {
                 listBarang = [];
-                listBarang = res.data;
+                listBarangGroup = [];
+                listBarang = res.data.dataDetail;
+                listBarangGroup = res.data.dataGroup;
                 drawTable(listBarang);
+                drawTable3(listBarangGroup);
             }
         })
     <?php endif; ?>
@@ -364,8 +424,11 @@
             dataType: "json",
             success: function(res) {
                 listBarang = [];
-                listBarang = res.data;
+                listBarangGroup = [];
+                listBarang = res.data.dataDetail;
+                listBarangGroup = res.data.dataGroup;
                 drawTable(listBarang);
+                drawTable3(listBarangGroup);
             }
         })
     });
@@ -385,6 +448,9 @@
             warehouse_id: {
                 required: true
             },
+            status_closed_jasa_vendor_out: {
+                required: true
+            },
         },
         messages: {
             no_penerimaan_surat_jalan: {
@@ -399,7 +465,9 @@
             warehouse_id: {
                 required: "Warehouse wajib diisi"
             },
-
+            status_closed_jasa_vendor_out: {
+                required: "Pilih Status Surat Jalan"
+            },
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -469,7 +537,7 @@
                 var isValidBarang = true;
                 var barangError = null;
 
-                $.each(listBarang, function(i, v) {
+                $.each(listBarangGroup, function(i, v) {
                     if (v.list_barang_masuk.length == 0) {
                         isValidBarang = false;
                         barangError = v;
@@ -479,11 +547,66 @@
                 if (!isValidBarang) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Barang keluar ' + barangError.barang_out + ' dengan dokumen ' + barangError.bc_name + ' dan no aju ' + barangError.no_aju + ', output barang nya belum ada !',
+                        title: 'Barang keluar ' + barangError.barang_out + ', output barang nya belum ada !',
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
                     });
                 } else {
+
+                    // APPEND LIST BARANG GROUP KE LIST BARANG
+                    // LOOP LIST BARANG GROUP
+                    $.each(listBarangGroup, function(i, v) {
+                        var totalDetailBarangKeluar = 0;
+                        var qtyKotorRes = 0;
+                        var qtyBersihRes = 0;
+
+                        // LOOP LIST BARANG
+                        $.each(listBarang, function(j, k) {
+
+                            if (v.stock_out_id == k.stock_out_id) {
+                                totalDetailBarangKeluar++;
+                            }
+                        });
+
+                        $.each(listBarang, function(j, k) {
+
+                            if (v.stock_out_id == k.stock_out_id) {
+
+                                listBarang[j].list_barang_masuk = [];
+
+                                $.each(v.list_barang_masuk, function(y, z) {
+
+                                    qtyKotorRes = z.qty_kotor / totalDetailBarangKeluar;
+                                    qtyBersihRes = z.qty_bersih / totalDetailBarangKeluar;
+                                    qtyKotorRes = qtyKotorRes.toFixed(2);
+                                    qtyBersihRes = qtyBersihRes.toFixed(2);
+
+                                    listBarang[j].list_barang_masuk = listBarang[j].list_barang_masuk.filter(item => item.stock_in_id !== z.stock_in_id);
+
+                                    listBarang[j].list_barang_masuk.push({
+                                        jasa_vendor_out_detail_id: k.jasa_vendor_out_detail_id,
+                                        stock_out_id: z.stock_out_id,
+                                        stock_in_id: z.stock_in_id,
+                                        kode_barang_in: z.kode_barang_in,
+                                        barang_name_in: z.barang_name_in,
+                                        kode_satuan_in: z.kode_satuan_in,
+                                        qty_kotor: qtyKotorRes,
+                                        qty_bersih: qtyBersihRes
+
+                                    });
+
+                                })
+
+                            }
+
+                        });
+
+                    });
+
+                    console.log(listBarangGroup);
+                    console.log(listBarang);
+
+
                     Swal.fire({
                         icon: 'question',
                         title: 'Simpan Data ?',
@@ -586,6 +709,14 @@
         }
     });
 
+    $('#status_closed_jasa_vendor_out').select2({
+        placeholder: "Pilih Status Surat Jalan",
+        theme: "bootstrap-5",
+        allowClear: true,
+    }).change(function() {
+
+    });
+
     $('#stock_in_id').select2({
         placeholder: "Pilih Barang Masuk",
         theme: "bootstrap-5",
@@ -598,7 +729,7 @@
 
     $('#btn-stock-in-add').click(function() {
         if ($('.create-form-barang-masuk').valid()) {
-            var jasa_vendor_out_detail_id = $('#jasa_vendor_out_detail_id').val();
+            var stock_out_id = $('#stock_out_id').val();
             var stock_in_id = $('#stock_in_id option:selected').data('stock_id');
             var kode_barang_in = $('#stock_in_id option:selected').data('kode_barang');
             var barang_name_in = $('#stock_in_id option:selected').data('barang');
@@ -606,8 +737,8 @@
             var barangFirst = null;
             var index = null;
 
-            $.each(listBarang, function(i, v) {
-                if (v.jasa_vendor_out_detail_id === jasa_vendor_out_detail_id) {
+            $.each(listBarangGroup, function(i, v) {
+                if (v.stock_out_id == stock_out_id) {
                     index = i;
                     barangFirst = v;
                 }
@@ -616,14 +747,13 @@
             // EACH 
             var isAdd = false;
             $.each(barangFirst.list_barang_masuk, function(i, v) {
-                if (v.stock_in_id === stock_in_id) {
+                if (v.stock_in_id == stock_in_id) {
                     isAdd = true;
                 }
             });
 
             if (!isAdd) {
-                listBarang[index].list_barang_masuk.push({
-                    jasa_vendor_out_detail_id: jasa_vendor_out_detail_id,
+                listBarangGroup[index].list_barang_masuk.push({
                     stock_out_id: barangFirst.stock_out_id,
                     stock_in_id: stock_in_id,
                     kode_barang_in: kode_barang_in,
@@ -642,25 +772,25 @@
             }
 
             // DRAW BARANG MASUK
-            drawTable2(jasa_vendor_out_detail_id, listBarang)
+            drawTable2(stock_out_id, listBarangGroup)
 
         }
     });
 
     $('.btn-submit-detail').click(function() {
-        var jasa_vendor_out_detail_id = $('#jasa_vendor_out_detail_id').val();
+        var stock_out_id = $('#stock_out_id').val();
         var index = null;
         var barangError = null;
         var isValidKotor = true;
         var isValidBersih = true;
 
-        $.each(listBarang, function(i, v) {
-            if (v.jasa_vendor_out_detail_id === jasa_vendor_out_detail_id) {
+        $.each(listBarangGroup, function(i, v) {
+            if (v.stock_out_id == stock_out_id) {
                 index = i;
             }
         });
 
-        $.each(listBarang[index].list_barang_masuk, function(i, v) {
+        $.each(listBarangGroup[index].list_barang_masuk, function(i, v) {
             var element_qty_kotor = $('input[data-stock_in_id="' + v.stock_in_id + '"].qty_kotor');
             var element_qty_bersih = $('input[data-stock_in_id="' + v.stock_in_id + '"].qty_bersih');
 
@@ -671,16 +801,16 @@
                 isValidKotor = false;
                 barangError = v;
             } else {
-                listBarang[index].list_barang_masuk[i].qty_kotor = input_qty_kotor;
-                listBarang[index].list_barang_masuk[i].qty_bersih = input_qty_bersih;
+                listBarangGroup[index].list_barang_masuk[i].qty_kotor = input_qty_kotor;
+                listBarangGroup[index].list_barang_masuk[i].qty_bersih = input_qty_bersih;
             }
 
             if (isNaN(input_qty_bersih) || input_qty_bersih == undefined || input_qty_bersih == 0) {
                 isValidBersih = false;
                 barangError = v;
             } else {
-                listBarang[index].list_barang_masuk[i].qty_kotor = input_qty_kotor;
-                listBarang[index].list_barang_masuk[i].qty_bersih = input_qty_bersih;
+                listBarangGroup[index].list_barang_masuk[i].qty_kotor = input_qty_kotor;
+                listBarangGroup[index].list_barang_masuk[i].qty_bersih = input_qty_bersih;
             }
         });
 
@@ -692,13 +822,13 @@
                 confirmButtonColor: '#4e73df',
             });
         } else {
-            drawTable(listBarang);
+            drawTable3(listBarangGroup);
             $('#update_detail_barang').modal('hide');
         }
 
     });
 
-    $("#vendor_id,#divisi_id,#warehouse_id,.multiple_jasa_vendor_out_id,#stock_in_id")
+    $("#vendor_id,#divisi_id,#warehouse_id,.multiple_jasa_vendor_out_id,#stock_in_id,#status_closed_jasa_vendor_out")
         .parent('div')
         .children('span')
         .children('span')
@@ -708,22 +838,22 @@
 
     $('.btn-discard-barang-masuk').click(function() {
         $('#update_detail_barang').modal('hide');
-        drawTable(listBarang);
+        drawTable3(listBarangGroup);
 
     });
 
-    function displayDetailModal(jasa_vendor_out_detail_id) {
+    function displayDetailModal(stock_out_id) {
         // RESET VALIDATOR
         validatorBarangMasuk.resetForm();
         validatorBarangMasuk.reset();
 
         var barangFirst = null;
-        $.each(listBarang, function(i, v) {
-            if (v.jasa_vendor_out_detail_id == jasa_vendor_out_detail_id) {
+        $.each(listBarangGroup, function(i, v) {
+            if (v.stock_out_id == stock_out_id) {
                 barangFirst = v;
             }
         });
-        $('#jasa_vendor_out_detail_id').val(jasa_vendor_out_detail_id);
+        $('#stock_out_id').val(stock_out_id);
         $('#barang_keluar_name').val('(' + barangFirst.kode_barang_out + ') ' + barangFirst.barang_out);
         $('#satuan_barang_keluar').val(barangFirst.satuan_out);
         $('#qty_barang_keluar').val(barangFirst.qty_out);
@@ -754,7 +884,7 @@
                     })
                     $("#stock_in_id").val(null);
 
-                    drawTable2(jasa_vendor_out_detail_id, listBarang);
+                    drawTable2(stock_out_id, listBarangGroup);
                 }
             });
         } else {
@@ -796,7 +926,7 @@
 
         if (listBarang.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="13" style="text-align:center">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="10" style="text-align:center">Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
             var no = 1;
@@ -804,32 +934,27 @@
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
                 newRow.append($('<td>').text(v.tipe_barang));
-                newRow.append($('<td>').text(v.bc_name));
-                newRow.append($('<td>').text(v.no_aju));
+                newRow.append($('<td>').text(v.sumber));
+                newRow.append($('<td>').text(v.stock_dokumen));
+                newRow.append($('<td>').text(v.bc_name + '/' + v.no_aju));
                 newRow.append($('<td>').text(v.stock_date));
                 newRow.append($('<td>').text(v.supplier_name));
                 newRow.append($('<td>').text(v.barang_out));
-                newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.qty_out));
-                newRow.append($('<td>').text(v.list_barang_masuk.length + ' Barang'));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.jasa_vendor_out_detail_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
-                `
-                ));
+                newRow.append($('<td>').text(v.satuan_out));
                 table.find('tbody').append(newRow);
             });
         }
     }
 
-    function drawTable2(jasa_vendor_out_detail_id, listBarang) {
+    function drawTable2(stock_out_id, listBarangGroup) {
         var listBarangFirst = null;
         const table = $('#dataTable2');
         table.find('tbody').empty();
         table.find('tfoot').empty();
 
-        $.each(listBarang, function(i, v) {
-            if (v.jasa_vendor_out_detail_id == jasa_vendor_out_detail_id) {
+        $.each(listBarangGroup, function(i, v) {
+            if (v.stock_out_id == stock_out_id) {
                 listBarangFirst = v;
             }
         });
@@ -837,7 +962,7 @@
         if (listBarangFirst.list_barang_masuk.length == 0) {
             var newRow = $('<tr>');
             newRow.append($('<td colspan="7" style="text-align:center">Tidak Ada Barang</td>'));
-            table.find('tbody').append(newRow);
+            table.find('tfoot').append(newRow);
         } else {
             var no = 1;
             $.each(listBarangFirst.list_barang_masuk, function(i, v) {
@@ -858,7 +983,7 @@
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.jasa_vendor_out_detail_id}, '${v.stock_in_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.stock_out_id}, '${v.stock_in_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);
@@ -866,27 +991,58 @@
         }
     }
 
-    function deleteDetail(jasa_vendor_out_detail_id, stock_in_id) {
+    function drawTable3(listBarangGroup) {
+        const table = $('#dataTable3');
+        table.find('tbody').empty();
+        table.find('tfoot').empty();
+
+        if (listBarangGroup.length == 0) {
+            var newRow = $('<tr>');
+            newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Barang</td>'));
+            table.find('tfoot').append(newRow);
+        } else {
+            var no = 1;
+            $.each(listBarangGroup, function(i, v) {
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td>').text(no++));
+                newRow.append($('<td>').text(v.tipe_barang));
+                newRow.append($('<td>').text(v.kode_barang_out));
+                newRow.append($('<td>').text(v.barang_out));
+                newRow.append($('<td>').text(v.qty_out.toFixed(2)));
+                newRow.append($('<td>').text(v.satuan_out));
+                newRow.append($('<td>').text(v.list_barang_masuk.length + " Barang"));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.stock_out_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                `
+                ));
+
+                table.find('tbody').append(newRow);
+            });
+        }
+    }
+
+    function deleteDetail(stock_out_id, stock_in_id) {
         var index = null;
         var indexToRemove = -1;
 
-        for (let i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].jasa_vendor_out_detail_id == jasa_vendor_out_detail_id) {
+        for (let i = 0; i < listBarangGroup.length; i++) {
+            if (listBarangGroup[i].stock_out_id == stock_out_id) {
                 index = i;
                 break;
             }
         }
 
-        for (let i = 0; i < listBarang[index].list_barang_masuk.length; i++) {
-            if (listBarang[index].list_barang_masuk[i].stock_in_id == stock_in_id) {
+        for (let i = 0; i < listBarangGroup[index].list_barang_masuk.length; i++) {
+            if (listBarangGroup[index].list_barang_masuk[i].stock_in_id == stock_in_id) {
                 indexToRemove = i;
                 break;
             }
         }
 
         if (indexToRemove !== -1) {
-            listBarang[index].list_barang_masuk.splice(indexToRemove, 1);
-            drawTable2(jasa_vendor_out_detail_id, listBarang);
+            listBarangGroup[index].list_barang_masuk.splice(indexToRemove, 1);
+            drawTable2(stock_out_id, listBarangGroup);
         }
     }
 

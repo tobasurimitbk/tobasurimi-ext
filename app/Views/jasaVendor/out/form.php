@@ -196,7 +196,7 @@
 
                 <div class="row mt-3">
                     <div class="col mb-0">
-                        <label class="form-label font-weight-bold lable-title">List Inventori Barang (Hanya Menampilkan Barang yang mempunyai Stok Rebus)</label>
+                        <label class="form-label font-weight-bold lable-title">List Inventori Barang (Hanya Menampilkan Barang yang mempunyai Stok)</label>
                     </div>
                     <div class="col-md-12 col-table-button-tts">
                         <div class="table-responsive">
@@ -269,7 +269,7 @@
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: false,
         serverSide: false,
-        ordering: true,
+        ordering: false,
         order: [],
         fixedHeader: true,
         "initComplete": function(settings, json) {
@@ -278,6 +278,10 @@
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         display: "stripe",
+        lengthMenu: [
+            [100],
+            [100]
+        ],
         searching: true,
         language: {
             emptyTable: "Tidak Ada Data",
@@ -334,6 +338,7 @@
             $('.form-fifo').hide();
         }
         // RESET
+        $('#spesifikasi_id').val(null).change();
         listStockAsal = [];
         listStockSelected = [];
         drawTableAsalBarang(listStockAsal);
@@ -878,6 +883,10 @@
             },
             display: "stripe",
             searching: true,
+            lengthMenu: [
+                [100],
+                [100]
+            ],
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",

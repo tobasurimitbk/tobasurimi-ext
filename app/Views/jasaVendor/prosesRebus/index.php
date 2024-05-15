@@ -174,6 +174,7 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let status = row.status_posting
+                    let status_used = row.status_used;
 
                     if (status === "0") {
                         return `
@@ -191,7 +192,16 @@
                         </div>
                     `
                     } else {
-                        var res = '-';
+                        var res = '';
+                        if (status_used == '0') {
+                            res += `
+                        <?php if (can('Jasa Vendor', 'Proses Rebus', 'ua')) : ?>
+                                <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}')" class="btn btn-danger posting-spp">
+                                    <i class="fa-solid fa-ban"></i>    
+                                </button>
+                            <?php endif; ?>
+                        `;
+                        }
                         return res;
 
                     }
@@ -303,6 +313,52 @@
         location.replace(`<?= base_url("proses-rebus/id"); ?>/${data.id}`);
     });
 
+    const updateStatus = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Batalkan Posting ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("proses-rebus/unposting"); ?>",
+                    data: {
+                        id: id,
+                        status: status
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
 
     const posting = function(id) {
         Swal.fire({
@@ -395,10 +451,6 @@
                 });
             }
         })
-    }
-
-    const print = function(url) {
-        window.open(url, "_blank");
     }
 
     const changeSort = function(val) {

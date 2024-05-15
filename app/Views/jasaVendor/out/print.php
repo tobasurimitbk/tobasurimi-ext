@@ -152,10 +152,10 @@
                                 <?= $j['barang_name'] . "-" . $j['spesifikasi'] ?>
                             </td>
                             <td>
-                                <?= $j['qty'] . " " . $j['kode_satuan'] ?>
+                                <?= number_format($j['qty'], 2) . " " . $j['kode_satuan'] ?>
                             </td>
                             <td>
-                                <?= $j['qty'] ?>
+                                <?= number_format($j['qty'], 2) ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -738,6 +738,7 @@ $routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateAction', [
 $routes->post('/proses-rebus/delete',  'JasaVendor\ProsesRebus::delete', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/posting',  'JasaVendor\ProsesRebus::posting', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/get-no',  'JasaVendor\ProsesRebus::getProsesRebusNo', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/unposting',  'JasaVendor\ProsesRebus::unPosting', ['filter' => 'Auth']);
 
 // JASA VENDOR OUT
 $routes->get('/jasa-vendor-out',  'JasaVendor\JasaVendorOut::index', ['filter' => 'Auth']);
@@ -855,6 +856,7 @@ $routes->get('/stock-list/stock-log-jasa-vendor', 'Inventori\StokList::allStokJa
 $routes->get('/stock-list/stock-log-produksi', 'Inventori\StokList::allStokProduksi', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-rebus', 'Inventori\StokList::allStokRebus', ['filter' => 'Auth']);
 $routes->post('/stock-list/import', 'Inventori\StokList::import', ['filter' => 'Auth']);
+$routes->get('/stock-list/export-excel', 'Inventori\StokList::exportExcel', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);
@@ -996,15 +998,23 @@ $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImp
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
-// BEA CUKAI 2.3 - 4.1
-// PO UTK BEA CUKAI
-// $routes->get('/po-bea-cukai/dropdown', 'BeaCukai\BeaCukaiController::dropdownBeaCukaiPO', ['filter' => 'Auth']);
-$routes->get('no-izin-tpb', 'Master\NomorIjinTPB::index', ['filter' => 'Auth']);
-$routes->get('no-izin-tpb/all', 'Master\NomorIjinTPB::all', ['filter' => 'Auth']);
-$routes->post('no-izin-tpb/create', 'Master\NomorIjinTPB::create', ['filter' => 'Auth']);
-$routes->post('no-izin-tpb/update', 'Master\NomorIjinTPB::update', ['filter' => 'Auth']);
-$routes->post('no-izin-tpb/delete', 'Master\NomorIjinTPB::delete', ['filter' => 'Auth']);
-$routes->get('no-izin-tpb/get', 'Master\NomorIjinTPB::get', ['filter' => 'Auth']);
+// ROUTE BEA CUKAI REVAMP
+// SETTING AKUN BEA CUKAI
+$routes->get('setting-akun-bc', 'BeaCukai\SettingBeaCukai::index', ['filter' => 'Auth']);
+// PENGUSAHA TPB
+$routes->get('/setting-akun-bc/pengusaha-tpb', 'BeaCukai\PengusahaTPB::index', ['filter' => 'Auth']);
+$routes->post('/setting-akun-bc/pengusaha-tpb/create', 'BeaCukai\PengusahaTPB::create', ['filter' => 'Auth']);
+$routes->post('/setting-akun-bc/pengusaha-tpb/update', 'BeaCukai\PengusahaTPB::update', ['filter' => 'Auth']);
+$routes->post('/setting-akun-bc/pengusaha-tpb/delete', 'BeaCukai\PengusahaTPB::delete', ['filter' => 'Auth']);
+$routes->get('/setting-akun-bc/pengusaha-tpb/get', 'BeaCukai\PengusahaTPB::get', ['filter' => 'Auth']);
+$routes->get('/setting-akun-bc/pengusaha-tpb/all', 'BeaCukai\PengusahaTPB::all', ['filter' => 'Auth']);
+// NO IZIN TPB SETTING
+$routes->get('setting-akun-bc/no-ijin-tpb/(:segment)', 'BeaCukai\NomorIjinTPB::index/$1', ['filter' => 'Auth']);
+$routes->get('setting-akun-bc/no-ijin-tpb-all', 'BeaCukai\NomorIjinTPB::all', ['filter' => 'Auth']);
+$routes->post('setting-akun-bc/no-ijin-tpb-create', 'BeaCukai\NomorIjinTPB::create', ['filter' => 'Auth']);
+$routes->post('setting-akun-bc/no-ijin-tpb-update', 'BeaCukai\NomorIjinTPB::update', ['filter' => 'Auth']);
+$routes->post('setting-akun-bc/no-ijin-tpb-delete', 'BeaCukai\NomorIjinTPB::delete', ['filter' => 'Auth']);
+$routes->get('setting-akun-bc/no-ijin-tpb-get', 'BeaCukai\NomorIjinTPB::get', ['filter' => 'Auth']);
 
 
 // BC 2.3
