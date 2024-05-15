@@ -3,9 +3,12 @@
 namespace App\Controllers\Laporan\Accounting;
 
 use App\Controllers\BaseController;
+use App\Models\DivisisModel;
 use App\Models\JurnalUmumModel;
 use App\Models\ProductionResultDetailModel;
 use App\Models\ProductionResultModel;
+use App\Models\RasioBahanPenolongModel;
+use App\Models\RasioBarangJadiModel;
 use App\Models\SettingCostingModel;
 use App\Models\Sub_AkunsModel;
 use Dompdf\Dompdf;
@@ -22,21 +25,30 @@ class Costing extends BaseController
     protected $productionResultModel;
     protected $productionResultDetailModel;
     protected $jurnalUmumModel;
+    protected $rasioBarangJadiModel;
+    protected $rasioBahanPenolongModel;
+    protected $divisisModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
+        $this->divisisModel = new DivisisModel();
         $this->settingCosting = new SettingCostingModel();
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailModel = new ProductionResultDetailModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
+        $this->rasioBarangJadiModel = new RasioBarangJadiModel();
+        $this->rasioBahanPenolongModel = new RasioBahanPenolongModel();
     }
 
     public function index()
     {
-        return view('Laporan/LaporanCosting/index');
+        $data = [
+            'dataDivisi' => $this->divisisModel->getDivisiAccess()
+        ];
+        return view('Laporan/LaporanCosting/index', $data);
     }
 
     public function getCostingData()
@@ -48,26 +60,18 @@ class Costing extends BaseController
             $settingCosting = $this->settingCosting->getSettingCosting();
             $conditionProduction = [
                 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'divisi_id' => $this->request->getVar('divisi_id'),
+                'company_id' => $this->this_company_id,
             ];
             foreach ($settingCosting as &$valueSetting) {
                 if ($valueSetting['name'] == "RAW MATERIAL I") {
-                    $condition = [
-                        'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
-                        'id_coa' => $valueSetting['coa'],
-                    ];
-                    $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
-                    $valueSetting['jmlhJurnal'] = $jurnalData;
-                    $productionResultDataDetailBahanBaku = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
-                    $valueSetting['rawMaterial'] = $productionResultDataDetailBahanBaku;
+                    $rasioMaterialI = $this->rasioBarangJadiModel->getDataRasioMaterialI($conditionProduction);
+                    $valueSetting['rawMaterial'] = $rasioMaterialI;
                 } else if ($valueSetting['name'] == "RAW MATERIAL II") {
-                    $condition = [
-                        'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
-                        'id_coa' => $valueSetting['coa'],
-                    ];
-                    $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
-                    $valueSetting['jmlhJurnal'] = $jurnalData;
-                    $productionResultDataDetailBahanPenolong = $this->productionResultModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
-                    $valueSetting['rawMaterialPenolong'] = $productionResultDataDetailBahanPenolong;
+                    $nameRasioMaterialII = $this->rasioBahanPenolongModel->getDataNameParentRasioMaterialII($conditionProduction);
+                    $rasioMaterialII = $this->rasioBahanPenolongModel->getDataRasioMaterialII($conditionProduction);
+                    $valueSetting['nameRawMaterialPenolong'] = $nameRasioMaterialII;
+                    $valueSetting['rawMaterialPenolong'] = $rasioMaterialII;
                 } else {
                     $condition = [
                         'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
@@ -78,7 +82,7 @@ class Costing extends BaseController
                 }
             }
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultWithDetail($conditionProduction);
-            // var_dump($productionResultDataTitle);
+            // var_dump($settingCosting);
             // exit;
 
             $dataResult = [

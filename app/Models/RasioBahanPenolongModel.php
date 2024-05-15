@@ -39,4 +39,47 @@ class RasioBahanPenolongModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getDataNameParentRasioMaterialII($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        rasio_bahan_penolong.parent_type_id,
+        rasio_bahan_penolong.parent_name,
+        SUM(rasio_bahan_penolong.total_barang) AS total_barang,
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('rasio', 'rasio.id = rasio_bahan_penolong.rasio_id', 'left')
+            ->like('rasio.bulan', $where['tanggal_jurnal'])
+            ->where('rasio.company_id', $where['company_id'])
+            ->where('rasio.department_id', $where['divisi_id'])
+            ->where('rasio.deletedAt', $where['deletedAt'])
+            ->where('rasio_bahan_penolong.deletedAt', $where['deletedAt'])
+            ->groupBy('rasio_bahan_penolong.parent_type_id')
+            ->findAll();
+
+        return $dataQry;
+    }
+
+    public function getDataRasioMaterialII($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        rasio_bahan_penolong.*
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('rasio', 'rasio.id = rasio_bahan_penolong.rasio_id', 'left')
+            ->like('rasio.bulan', $where['tanggal_jurnal'])
+            ->where('rasio.company_id', $where['company_id'])
+            ->where('rasio.department_id', $where['divisi_id'])
+            ->where('rasio.deletedAt', $where['deletedAt'])
+            ->where('rasio_bahan_penolong.deletedAt', $where['deletedAt'])
+            ->findAll();
+
+        return $dataQry;
+    }
 }

@@ -39,4 +39,24 @@ class RasioBarangJadiModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getDataRasioMaterialI($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        rasio_barang_jadi.*
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('rasio', 'rasio.id = rasio_barang_jadi.rasio_id', 'left')
+            ->like('rasio.bulan', $where['tanggal_jurnal'])
+            ->where('rasio.company_id', $where['company_id'])
+            ->where('rasio.department_id', $where['divisi_id'])
+            ->where('rasio.deletedAt', $where['deletedAt'])
+            ->where('rasio_barang_jadi.deletedAt', $where['deletedAt'])
+            ->findAll();
+
+        return $dataQry;
+    }
 }
