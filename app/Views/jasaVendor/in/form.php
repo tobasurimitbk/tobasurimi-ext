@@ -293,30 +293,34 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-12 col-table-button-tts">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable2">
+                                    <thead>
+                                        <tr style="text-align: center;">
+                                            <th scope="col">No</th>
+                                            <th scope="col">Kode Barang</th>
+                                            <th scope="col">Barang</th>
+                                            <th scope="col">Satuan</th>
+                                            <th scope="col">Qty Kotor</th>
+                                            <th scope="col">Qty Bersih</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable2">
-                        <thead>
-                            <tr style="text-align: center;">
-                                <th scope="col">No</th>
-                                <th scope="col">Kode Barang</th>
-                                <th scope="col">Barang</th>
-                                <th scope="col">Satuan</th>
-                                <th scope="col">Qty Kotor</th>
-                                <th scope="col">Qty Bersih</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-                        <tfoot class="foot-detail-table" id="foot-detail-table">
-                            <tr>
-                                <td colspan="7" style="text-align: center;">
-                                    Tidak ada barang masuk </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-
+                                    </tbody>
+                                    <tfoot class="foot-detail-table" id="foot-detail-table">
+                                        <tr>
+                                            <td colspan="7" style="text-align: center;">
+                                                Tidak ada barang masuk </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
