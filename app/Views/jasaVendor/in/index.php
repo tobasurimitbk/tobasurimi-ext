@@ -87,7 +87,6 @@
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
                             <th>No Surat Jalan</th>
                             <th onclick="changeSort('no_surat_jalan_vendor')">No Surat Jalan Vendor</th>
-                            <th>Total Item</th>
                             <th onclick="changeSort('vendor_id')">Vendor</th>
                             <th>Action</th>
                         </tr>
@@ -172,12 +171,6 @@
             {
                 data: "no_surat_jalan_vendor",
                 className: "text-center",
-            },
-            {
-                data: "total_item",
-                className: "text-center",
-                searchable: false,
-                sortable: false
             },
             {
                 data: "vendor_name",

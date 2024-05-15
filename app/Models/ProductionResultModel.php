@@ -100,8 +100,11 @@ class ProductionResultModel extends Model
         $where['deletedAt'] = null;
         $selectQryJadi = '
         barang_master.barang_name, 
+        barang_master.kode_barang, 
         barang_master_spesifikasi.spesifikasi,
-        production_result_details.*
+        production_result_details.*,
+        SUM(production_result_details.qty) as qtyTotal,
+        satuans.kode_satuan,
         ';
 
         $dataQry = $this->asArray()
@@ -110,10 +113,13 @@ class ProductionResultModel extends Model
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
             ->like('production_results.receive_date', $where['tanggal_jurnal'])
             ->where('production_result_details.type', 'JADI')
+            ->where('work_orders.divisi_id', $where['divisi_id'])
             ->where('production_result_details.deletedAt', $where['deletedAt'])
             ->where('production_results.deletedAt', $where['deletedAt'])
+            ->groupBy('production_result_details.barang1_id, production_result_details.barang2_id')
             ->findAll();
 
         return $dataQry;
@@ -129,6 +135,8 @@ class ProductionResultModel extends Model
         stock_details2.*,
         stock_details.*,
         penerimaan_barang_detail.*,
+        SUM(production_result_details.qty) as qtyTotal,
+        satuans.kode_satuan,
         ';
 
         $dataQry = $this->asArray()
@@ -141,7 +149,9 @@ class ProductionResultModel extends Model
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
             ->like('production_results.receive_date', $where['tanggal_jurnal'])
+            ->where('work_orders.divisi_id', $where['divisi_id'])
             ->where('production_result_details.type', 'DIGUNAKAN')
             ->where('production_result_details.barang_type !=', 'bahan_penolong')
             ->where('production_result_details.deletedAt', $where['deletedAt'])
@@ -186,44 +196,4 @@ class ProductionResultModel extends Model
 
         return $dataQry;
     }
-    // public function getDataProductionResultWithDetail($where)
-    // {
-    //     $where['deletedAt'] = null;
-    //     $selectQryJadi = '
-    //     barang_master.barang_name, 
-    //     barang_master_spesifikasi.spesifikasi,
-    //     production_result_details.qty as qtyProduksi
-    //     ';
-    //     $selectQryDigunakan = '
-    //     barang_master.barang_name, 
-    //     barang_master_spesifikasi.spesifikasi,
-    //     production_result_details.*
-    //     ';
-
-    //     $dataQry['jadi'] = $this->asArray()
-    //         ->select($selectQryJadi)
-    //         ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
-    //         ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
-    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
-    //         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-    //         ->like('production_results.receive_date', $where['tanggal_jurnal'])
-    //         ->where('production_result_details.type', 'JADI')
-    //         ->where('production_result_details.deletedAt', $where['deletedAt'])
-    //         ->where('production_results.deletedAt', $where['deletedAt'])
-    //         ->findAll();
-
-    //     $dataQry['digunakan'] = $this->asArray()
-    //         ->select($selectQryDigunakan)
-    //         ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
-    //         ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
-    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
-    //         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-    //         ->like('production_results.receive_date', $where['tanggal_jurnal'])
-    //         ->where('production_result_details.type', 'DIGUNAKAN')
-    //         ->where('production_result_details.deletedAt', $where['deletedAt'])
-    //         ->where('production_results.deletedAt', $where['deletedAt'])
-    //         ->findAll();
-
-    //     return $dataQry;
-    // }
 }

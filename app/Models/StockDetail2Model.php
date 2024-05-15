@@ -125,6 +125,7 @@ class StockDetail2Model extends Model
         $availableSort = [
             'stock_details2.no_dokumen' => 'stock_details2.no_dokumen',
             'stock_details.no_dokumen' => 'stock_details.no_dokumen',
+            'stock_details2.stock_dokumen' => 'stock_details2.stock_dokumen',
             'stock_details2.bc_id' => 'stock_details2.bc_id',
             'stock.barang1_id' => 'stock.barang1_id',
             'stock_details2.qty' => 'stock_details2.qty',
@@ -151,6 +152,7 @@ class StockDetail2Model extends Model
             stock.warehouse_id,
             stock_details.status,
             stock_details.sumber,
+            stock_details2.stock_dokumen,
             stock_details2.qty AS stok_total,
             stock_details2.bc_id,
             stock_details2.no_aju,

@@ -226,11 +226,21 @@ class JasaVendorIn extends BaseController
             'vendor_id' => $this->request->getVar('vendor_id'),
             'tanggal' =>  $this->request->getPost("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
             "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
+            'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
             'no_penerimaan_surat_jalan' => $this->request->getVar('no_penerimaan_surat_jalan'),
             'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
             'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
             'keterangan' => $this->request->getVar('keterangan')
         ]);
+
+        $statusClosedJasaVendorOut = $this->request->getVar('status_closed_jasa_vendor_out');
+        $jasaVendorOutIdArr = $this->request->getVar('multiple_jasa_vendor_out_id');
+
+        foreach ($jasaVendorOutIdArr as $j) {
+            $this->jasaVendorOutModel->update($j, [
+                'status_closed' => $statusClosedJasaVendorOut
+            ]);
+        }
 
         foreach ($barangs as $b) {
             // LIST BARANG MASUK
@@ -243,6 +253,7 @@ class JasaVendorIn extends BaseController
                         'stock_in_id' => $c->stock_in_id,
                         'bc_in_id' => $b->bc_id,
                         'no_aju_in' => $b->no_aju,
+                        'stock_dokumen' => $b->stock_dokumen,
                         'qty_kotor' => $c->qty_kotor,
                         'qty_bersih' => $c->qty_bersih
                     ]);
@@ -278,65 +289,44 @@ class JasaVendorIn extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
+            'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
             "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
             'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
             'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
             'keterangan' => $this->request->getVar('keterangan')
         ]);
 
-        // get all id detail
-        $id_detail_all = [];
+
+        $statusClosedJasaVendorOut = $this->request->getVar('status_closed_jasa_vendor_out');
+        $jasaVendorOutIdArr = $this->request->getVar('multiple_jasa_vendor_out_id');
+
+        foreach ($jasaVendorOutIdArr as $j) {
+            $this->jasaVendorOutModel->update($j, [
+                'status_closed' => $statusClosedJasaVendorOut
+            ]);
+        }
+
+        // Delete first and insert again
+        $this->jasaVendorInDetailModel->where('jasa_vendor_in_id', $id)->delete();
 
         foreach ($barangs as $b) {
             // LIST BARANG MASUK
             foreach ($b->list_barang_masuk as $c) {
-                // CHECK
-                $check = $this->jasaVendorInDetailModel
-                    ->where('jasa_vendor_in_id', $id)
-                    ->where('jasa_vendor_out_id', $b->jasa_vendor_out_id)
-                    ->where('jasa_vendor_out_detail_id', $b->jasa_vendor_out_detail_id)
-                    ->where('stock_in_id', $c->stock_in_id)
-                    ->first();
-
-                if ($check != null) {
-                    $this->jasaVendorInDetailModel->update($check['id'], [
+                if ($c->qty_bersih != 0) {
+                    $this->jasaVendorInDetailModel->insert([
                         'jasa_vendor_in_id' => $id,
                         'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
                         'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
                         'stock_in_id' => $c->stock_in_id,
                         'bc_in_id' => $b->bc_id,
                         'no_aju_in' => $b->no_aju,
+                        'stock_dokumen' => $b->stock_dokumen,
                         'qty_kotor' => $c->qty_kotor,
                         'qty_bersih' => $c->qty_bersih
                     ]);
-                    array_push($id_detail_all, $check['id']);
-                } else {
-                    // NEW
-                    // DELETE
-                    $this->jasaVendorInDetailModel
-                        ->where('jasa_vendor_in_id', $id)
-                        ->where('jasa_vendor_out_id', $b->jasa_vendor_out_id)
-                        ->where('jasa_vendor_out_detail_id', $b->jasa_vendor_out_detail_id)
-                        ->where('stock_in_id', $c->stock_in_id)
-                        ->delete();
-
-                    // INSERT
-                    $id_detail_new = $this->jasaVendorInDetailModel->insert([
-                        'jasa_vendor_in_id' => $id,
-                        'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
-                        'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
-                        'stock_in_id' => $c->stock_in_id,
-                        'bc_in_id' => $b->bc_id,
-                        'no_aju_in' => $b->no_aju,
-                        'qty_kotor' => $c->qty_kotor,
-                        'qty_bersih' => $c->qty_bersih
-                    ]);
-                    array_push($id_detail_all,  $id_detail_new);
                 }
             }
         }
-
-        $this->jasaVendorInDetailModel->where('jasa_vendor_in_id', $id)->whereNotIn('id', $id_detail_all)->delete();
 
         return response()->setJSON([
             'message' => "Jasa Vendor Barang Masuk Berhasil Diupdate",
@@ -348,8 +338,20 @@ class JasaVendorIn extends BaseController
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
+        $jasaVendorIn = $this->jasaVendorInModel->find($id);
+        $jasaVendorOutIdArr = \json_decode($jasaVendorIn['multiple_jasa_vendor_out_id']);
+
+        if ($jasaVendorIn['status_closed_jasa_vendor_out'] == "1") {
+            foreach ($jasaVendorOutIdArr as $j) {
+                $this->jasaVendorOutModel->update($j, [
+                    'status_closed' => "0"
+                ]);
+            }
+        }
+
         $this->jasaVendorInModel->delete($id);
-        $this->jasaVendorInDetailModel->where('id', $id)->delete();
+        $this->jasaVendorInDetailModel->where('jasa_vendor_in_id', $id)->delete();
+
         return response()->setJSON([
             'message' => "Jasa Vendor Barang Masuk Berhasil Dihapus",
             'token' => csrf_hash(),
@@ -416,6 +418,20 @@ class JasaVendorIn extends BaseController
                 );
             }
 
+            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
+
+            if ($jasaVendorOutDetail) {
+                $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                    $jasaVendorOutDetail['stock_out_id'],
+                    $jasaVendorOutDetail['bc_out_id'],
+                    $jasaVendorOutDetail['no_aju_out'],
+                    $jasaVendorOutDetail['stock_dokumen']
+                );
+            } else {
+                $stockRebusDetail = null;
+            }
+
+
             // DETAIL
             $stokDetail = $this->stockDetailModel->insertStokDetail(
                 $stok,
@@ -424,9 +440,12 @@ class JasaVendorIn extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "JASA VENDOR",
-                $jasaVendorIn['no_penerimaan_surat_jalan'],
+                $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
                 $jasaVendorIn['keterangan']
             );
+
+            // TOBA-RBS/WH-2/06/V/2024 ( PO/LBB-052024/000012 )
+            $noPOFromStockDokumen = splitStokDokumen2($j['stock_dokumen']); // PO/LBB-052024/000012
 
             // SUB DETAIL
             $this->stockDetail2Model->insertStokDetail2(
@@ -435,7 +454,8 @@ class JasaVendorIn extends BaseController
                 $stokDetail,
                 $qty,
                 $j['no_aju_in'],
-                $jasaVendorOut == null ? "-" : $jasaVendorOut['no_surat_jalan']
+                $jasaVendorIn['no_penerimaan_surat_jalan'],
+                $jasaVendorIn['no_penerimaan_surat_jalan'] . " ( " . $noPOFromStockDokumen . " ) ",
             );
         }
 
@@ -454,7 +474,10 @@ class JasaVendorIn extends BaseController
         $jasaVendorOutID = json_decode($this->request->getVar('multiple_jasa_vendor_out_id'));
         if (count($jasaVendorOutID) == 0) {
             return response()->setJSON([
-                'data' => [],
+                'data' => [
+                    'dataDetail' => [],
+                    'dataGroup' => []
+                ],
                 'status' => true,
                 'token' => csrf_hash()
             ]);

@@ -371,3 +371,17 @@ function roundNumber($nilai, $kelipatan)
 {
    return round($nilai / $kelipatan) * $kelipatan;
 }
+
+// TOBA-RBS/WH-2/06/V/2024 ( PO/LBB-052024/000012 )
+function splitStokDokumen2($string)
+{
+   $parts = explode("(", $string);
+
+   if (count($parts) == 2) {
+      $result = str_replace(array(' ', ')'), '', $parts[1]);
+   } else {
+      $result = '-';
+   }
+
+   return $result;
+}

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class NomorIjinTPBModel extends Model
+class PengusahaTPBModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'nomor_ijin_tpb';
+    protected $table            = 'pengusaha_tpb';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -43,9 +43,9 @@ class NomorIjinTPBModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_ijin_tpb' => 'no_ijin_tpb',
-            'tanggal_skep_tpb' => 'tanggal_skep_tpb',
-            'status' => 'status'
+            'npwp' => 'npwp',
+            'nama_pengusaha' => 'nama_pengusaha',
+            'alamat' => 'alamat',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -53,7 +53,7 @@ class NomorIjinTPBModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'id';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "nomor_ijin_tpb.*";
+        $selectQry = "pengusaha_tpb.*";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
@@ -67,7 +67,7 @@ class NomorIjinTPBModel extends Model
         }
 
         if ($addCondition['search']) {
-            $dataQry->like('no_ijin_tpb', $addCondition['search'])->orLike('tanggal_skep_tpb', $addCondition['search']);
+            $dataQry->like('npwp', $addCondition['search'])->orLike('nama_pengusaha', $addCondition['search'])->orLike('alamat', $addCondition['search']);
         }
 
         if ($addCondition['search']) {

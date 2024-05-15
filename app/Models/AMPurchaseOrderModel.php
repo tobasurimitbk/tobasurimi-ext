@@ -34,6 +34,7 @@ class AMPurchaseOrderModel extends Model
         'is_posted',
         'createdBy',
         'status_penerimaan',
+        'status_closed_spp',
 
         // import field
         'shipper',
@@ -149,6 +150,7 @@ class AMPurchaseOrderModel extends Model
             'poDate'           => 'am_purchase_orders.po_date',
             'divisiName'      => 'divisis.divisi',
             'poNo'             => 'am_purchase_orders.po_no',
+            'sppNo'             => 'purchase_requests.spp_no',
             'supplierName'      => 'suppliers.name',
             'divisis'             => 'am_purchase_orders.total',
             'createdAt'         => 'am_purchase_orders.createdAt',
@@ -161,6 +163,7 @@ class AMPurchaseOrderModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "am_purchase_orders.*, 
+                      purchase_requests.spp_no,
                       suppliers.name AS supplierName, 
                       companies.company AS companyName,
                       divisis.divisi,
@@ -173,6 +176,7 @@ class AMPurchaseOrderModel extends Model
             ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
             ->groupBy(('am_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 
@@ -183,7 +187,7 @@ class AMPurchaseOrderModel extends Model
         }
 
         if ($addCondition['search']) {
-            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search']);
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['search']);
         }
 
         if ($addCondition['dateStart']) {
