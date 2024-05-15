@@ -7,8 +7,20 @@ use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\Sub_AkunsModel;
 use App\Models\AccountDivisisModel;
+use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\AMPurchaseOrderModel;
+use App\Models\PenerimaanBarangDetailModel;
+use App\Models\PenerimaanBarangModel;
 use App\Models\ProductionResultDetailModel;
 use App\Models\ProductionResultModel;
+use App\Models\RasioBahanPenolongModel;
+use App\Models\RasioBarangDigunakanModel;
+use App\Models\RasioBarangJadiModel;
+use App\Models\RasioModel;
+use App\Models\RMImportPODetailModel;
+use App\Models\RMImportPOModel;
+use App\Models\RMPurchaseOrderDetailModel;
+use App\Models\RMPurchaseOrderModel;
 
 class RasioController extends BaseController
 {
@@ -18,6 +30,18 @@ class RasioController extends BaseController
     protected $subAkunModel;
     protected $productionResultModel;
     protected $productionResultDetailModel;
+    protected $penerimaanBarangModel;
+    protected $penerimaanBarangDetailModel;
+    protected $rmPurchaseOrderModel;
+    protected $rmPurchaseOrderDetailModel;
+    protected $rmImportPOModel;
+    protected $rmImportPODetailModel;
+    protected $amPurchaseOrderModel;
+    protected $amPurchaseOrderDetailModel;
+    protected $rasioModel;
+    protected $rasioBarangDigunakanModel;
+    protected $rasioBarangJadiModel;
+    protected $rasioBarangPenolongModel;
 
     public function __construct()
     {
@@ -27,6 +51,18 @@ class RasioController extends BaseController
         $this->subAkunModel = new Sub_AkunsModel();
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailModel = new ProductionResultDetailModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $this->rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $this->rmImportPOModel = new RMImportPOModel();
+        $this->rmImportPODetailModel = new RMImportPODetailModel();
+        $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $this->rasioModel = new RasioModel();
+        $this->rasioBarangDigunakanModel = new RasioBarangDigunakanModel();
+        $this->rasioBarangJadiModel = new RasioBarangJadiModel();
+        $this->rasioBarangPenolongModel = new RasioBahanPenolongModel();
     }
 
     public function index()
@@ -51,46 +87,129 @@ class RasioController extends BaseController
 
     public function saveRasio()
     {
-        // $divisisId = $this->request->getVar('id');
-        // $getDataAccountDivisis = $this->accountDivisisModel->where('divisis_id', $divisisId)->where('deleted_at', NULL)->first();
+        try {
+            $tanggal_input = $this->request->getVar("tanggal") ? $this->request->getVar("tanggal") : "";
+            $tanggal_parts = explode("/", $tanggal_input); // Memisahkan bulan dan tahun
+            $tanggal_mysql = $tanggal_parts[1] . "-" . str_pad($tanggal_parts[0], 2, "0", STR_PAD_LEFT);
 
-        // if ($getDataAccountDivisis != null) {
-        //     $this->accountDivisisModel->update($getDataAccountDivisis['id'], [
-        //         'divisis_id' => $divisisId,
-        //         'ap_id' => $this->request->getVar('akun_ap_id'),
-        //         'ar_id' => $this->request->getVar('akun_ar_id')
-        //     ]);
-        // } else {
-        //     $this->accountDivisisModel->insert([
-        //         'divisis_id' => $divisisId,
-        //         'ap_id' => $this->request->getVar('akun_ap_id'),
-        //         'ar_id' => $this->request->getVar('akun_ar_id')
-        //     ]);
-        // }
+            $data = [
+                "company_id" => $this->this_company_id,
+                "department_id" => $this->request->getVar("divisi_id"),
+                'bulan' => $tanggal_mysql,
+                'total_qty_po' => $this->request->getVar("qtyTotalPembelian") ? number_format((float) str_replace(",", "", $this->request->getVar("qtyTotalPembelian")), 2, '.', '') : null,
+                'harga_total_po' => $this->request->getVar("hargaTotalPembelian") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaTotalPembelian")), 2, '.', '') : null,
+                "harga_average_po" => $this->request->getVar("hargaSatuanPembelian") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian")), 2, '.', '') : null,
+                'total_qty_lpb' => $this->request->getVar('qtyTotalPenerimaan') ? number_format((float) str_replace(",", "", $this->request->getVar('qtyTotalPenerimaan')), 2, '.', '') : null,
+                'harga_total_lpb' => $this->request->getVar('hargaTotalPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaTotalPenerimaan')), 2, '.', '') : null,
+                'harga_average_lpb' => $this->request->getVar('hargaSatuanPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaSatuanPenerimaan')), 2, '.', '') : null,
+            ];
 
-        // return response()->setJSON([
-        //     'token' => csrf_hash(),
-        //     'status' => true,
-        //     'message' => "Akun Department Berhasil Ditambahkan"
-        // ]);
+            $id = $this->rasioModel->insert($data);
+
+            $barang_digunakan = json_decode($this->request->getVar("items_digunakan"));
+            $barang_jadi = json_decode($this->request->getVar("items_jadi"));
+            $barang_digunakan_material_2 = json_decode($this->request->getVar("items_digunakan_material_2"));
+
+            foreach ($barang_digunakan as $s) {
+                $this->rasioBarangDigunakanModel->insert([
+                    'rasio_id' => $id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'barang_name' => $s->barang_name,
+                    'spesifikasi' => $s->spesifikasi,
+                    'qty_po' => $s->totalQtyPO,
+                    'harga_po_total' => $s->totalHargaPO,
+                    'harga_po_satuan' => $s->hargaSatuanPO,
+                    'satuan_po' => $s->satuanPO,
+                    'qty_lpb' => $s->totalQtyLPB,
+                    'harga_lpb_total' => $s->totalHargaLPB,
+                    'harga_lpb_satuan' => $s->hargaSatuanLPB,
+                    'satuan_lpb' => $s->satuanLPB,
+                    'no_dokumen' => $s->no_dokumen,
+                    'stock_dokumen' => $s->stock_dokumen,
+                ]);
+            }
+
+            foreach ($barang_jadi as $s) {
+                $this->rasioBarangJadiModel->insert([
+                    'rasio_id' => $id,
+                    'barang_name' => $s->barang_name,
+                    'kode_barang' => $s->kode_barang,
+                    'spesifikasi' => $s->spesifikasi,
+                    'production_result_detail_id' => $s->production_result_detail_id,
+                    'production_result_id' => $s->production_result_id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'bc_id' => $s->bc_id,
+                    'stock_id' => $s->stock_id,
+                    'no_aju' => $s->no_aju,
+                    'stock_dokumen' => $s->stock_dokumen,
+                    'qty_barang' => $s->qty,
+                    'rasio_barang' => $s->rasio,
+                    'harga_barang' => $s->harga,
+                    'kode_satuan' => $s->kode_satuan,
+                ]);
+            }
+
+            foreach ($barang_digunakan_material_2 as $bd) {
+                foreach ($bd->inputData as $bdm) {
+                    $data = [
+                        'rasio_id' => $id,
+                        'production_result_id' => $bdm->id_production,
+                        'production_result_detail_id' => $bdm->id_production_detail,
+                        'barang1_id' => $bd->barang1_id,
+                        'barang2_id' => $bd->barang2_id,
+                        'barang1_id_production' => $bdm->barang1_id_production,
+                        'barang2_id_production' => $bdm->barang2_id_production,
+                        'parent_type_id' => $bd->parent_type_id,
+                        'barang_name' => $bd->barang_name,
+                        'kode_barang' => $bd->kode_barang,
+                        'parent_name' => $bd->parent_name,
+                        'spesifikasi' => $bd->spesifikasi,
+                        'qty_barang' => $bdm->qty_input,
+                        'total_barang' => $bdm->totalHarga_input,
+                        'harga_barang' => $bdm->hargaSatuan_input,
+                    ];
+                    $this->rasioBarangPenolongModel->insert($data);
+                }
+            }
+
+            return response()->setJSON([
+                "id"      => encrypt($id),
+                "status"  => true,
+                "message" => "Data Berhasil disimpan",
+                'token'   => csrf_hash(),
+            ]);
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
-    public function get()
-    {
-        $id = $this->request->getVar('id');
-        // $dataAccountDivisis = $this->divisisModel
-        //     ->join('account_divisis', 'divisis.id = account_divisis.divisis_id', 'left')
-        //     ->where('divisis.id', $id)
-        //     ->first();
 
-        // return response()->setJSON([
-        //     'data' => $dataAccountDivisis,
-        //     'token' => csrf_hash(),
-        //     'status' => true,
-        // ]);
+    public function getById($id = null)
+    {
+        $id = decrypt($id);
+        $subAkunsModel = $this->subAkunModel->asObject()->findAll();
+        $data = [
+            'dataDivisi' => $this->divisisModel->getDivisiAccess(),
+            "subAkuns" => $subAkunsModel
+        ];
+        return view('Accounting/rasio/form', $data);
     }
 
     public function allRasio()
     {
+        $tanggal_input = $this->request->getGet("dateStart") ? $this->request->getGet("dateStart") : "";
+        if ($tanggal_input != "") {
+            $tanggal_parts = explode("/", $tanggal_input); // Memisahkan bulan dan tahun
+            $tanggal_mysql = $tanggal_parts[1] . "-" . str_pad($tanggal_parts[0], 2, "0", STR_PAD_LEFT);
+        }
+
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -100,25 +219,22 @@ class RasioController extends BaseController
         ];
 
         $condition = [
-            "company_id"  => $this->this_company_id,
-            "deletedAt" => NULL
+            "rasio.company_id"  => $this->this_company_id,
+            "rasio.deletedAt" => NULL
         ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
+            "month"        => $tanggal_input != "" ? $tanggal_mysql : "",
+            "department"        => $this->request->getGet("divisi_id"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];
 
-        $Sub_AkunsModel = new Sub_AkunsModel();
-        $dataNamaAP = "";
-        $dataNamaAR = "";
-
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $this->divisisModel->getListForAccount($condition, $addCondition, $limit, $offset);
-        $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
+        $res = $this->rasioModel->getList($condition, $addCondition, $limit, $offset);
 
         $rdata = [];
 
@@ -126,26 +242,12 @@ class RasioController extends BaseController
 
 
         foreach ($res['data'] as $data) {
-            // var_dump($res);
-            // exit;
-            foreach ($subAkunsModel as $datas) {
-                if ($data['ap_id'] == $datas->id) {
-                    $dataNamaAP = $datas->no_sub;
-                } elseif ($data['ap_id'] == NULL) {
-                    $dataNamaAP = "-";
-                }
-                if ($data['ar_id'] == $datas->id) {
-                    $dataNamaAR = $datas->no_sub;
-                } elseif ($data['ar_id'] == NULL) {
-                    $dataNamaAR = "-";
-                }
-            }
             array_push($rdata, [
                 "no"                    => $no++,
-                "id"                    => $data['id'],
-                "parent_name"           => $data['divisi'],
-                "ap_id"                 => $dataNamaAP,
-                "ar_id"                 => $dataNamaAR,
+                "id"                    => encrypt($data['id']),
+                "divisi"                => $data['divisi'],
+                "month"                 => $data['bulan'],
+                "harga"                 => "" . number_format(formatter($data['harga_total_lpb'], "STR_TO_FLOAT"), 2, '.', ','),
             ]);
         }
 
@@ -205,12 +307,108 @@ class RasioController extends BaseController
                 'divisi_id' => $this->request->getVar('department'),
             ];
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
-            $totalQtyAll = 0;
-            foreach ($productionResultDataTitle as $value) {
-                $totalQtyAll += $value['qtyTotal'];
-            }
+            // var_dump($productionResultDataTitle);
+            // exit;
+            // $totalQtyAll = 0;
             foreach ($productionResultDataTitle as &$value) {
-                $value['totalQtyAll'] = $totalQtyAll;
+                $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
+                $poBBImport = $this->rmImportPOModel->where('po_no', $value['stock_dokumen'])->first();
+                $poBP = $this->amPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
+                $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
+                if ($poBBLokal) {
+                    $totalQty = 0;
+                    $totalHarga = 0;
+                    $hargaSatuan = 0;
+                    $satuanPO = "";
+                    $poBBLokalDetail = $this->rmPurchaseOrderDetailModel
+                        ->select('rm_purchase_order_details.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+                        ->where('rm_purchase_order_id', $poBBLokal['id'])
+                        ->where('barang1_id', $value['barang1_id'])
+                        ->where('barang2_id', $value['barang2_id'])
+                        ->findAll();
+                    foreach ($poBBLokalDetail as $valuePoBBLokal) {
+                        $hargaSatuan = $valuePoBBLokal['general_price'] + $valuePoBBLokal['daily_price'] + $valuePoBBLokal['monthly_price'];
+                        $totalQty += $valuePoBBLokal['qty'];
+                        $satuanPO = $valuePoBBLokal['kode_satuan'];
+                    }
+                    $totalHarga = $totalQty * $hargaSatuan;
+                    $value['totalQtyPO'] = $totalQty;
+                    $value['totalHargaPO'] = $totalHarga;
+                    $value['hargaSatuanPO'] = $hargaSatuan;
+                    $value['satuanPO'] = $satuanPO;
+                }
+                if ($poBBImport) {
+                    $totalQty = 0;
+                    $totalHarga = 0;
+                    $hargaSatuan = 0;
+                    $satuanPO = "";
+                    $poBBImportDetail = $this->rmImportPODetailModel
+                        ->select('rm_import_po_details.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+                        ->where('rm_import_po_id', $poBBImport['id'])
+                        ->where('barang1_id', $value['barang1_id'])
+                        ->where('spesifikasi_id', $value['barang2_id'])
+                        ->findAll();
+                    foreach ($poBBImportDetail as $valuePoBBImport) {
+                        $hargaSatuan = $valuePoBBImport['price'] * $valuePoBBImport['disc'] . '%';
+                        $totalQty += $valuePoBBImport['qty'];
+                        $satuanPO = $valuePoBBImport['kode_satuan'];
+                    }
+                    $totalHarga = $totalQty * $hargaSatuan;
+                    $value['totalQtyPO'] = $totalQty;
+                    $value['totalHargaPO'] = $totalHarga;
+                    $value['hargaSatuanPO'] = $hargaSatuan;
+                    $value['satuanPO'] = $satuanPO;
+                }
+                if ($poBP) {
+                    $totalQty = 0;
+                    $totalHarga = 0;
+                    $hargaSatuan = 0;
+                    $satuanPO = "";
+                    $poBPDetail = $this->amPurchaseOrderDetailModel
+                        ->select('am_purchase_order_details.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+                        ->where('am_purchase_order_id', $poBP['id'])
+                        ->where('barang_id', $value['barang1_id'])
+                        ->where('spesifikasi_id', $value['barang2_id'])
+                        ->findAll();
+                    foreach ($poBPDetail as $valuePoBPDetail) {
+                        $disc = $valuePoBPDetail['disc'] / 100;
+                        $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
+                        $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
+                        $totalQty += $valuePoBPDetail['qty'];
+                        $satuanPO = $valuePoBPDetail['kode_satuan'];
+                    }
+                    $totalHarga = $totalQty * $hargaSatuan;
+                    $value['totalQtyPO'] = $totalQty;
+                    $value['totalHargaPO'] = $totalHarga;
+                    $value['hargaSatuanPO'] = $hargaSatuan;
+                    $value['satuanPO'] = $satuanPO;
+                }
+                if ($penerimaanBarang) {
+                    $totalQty = 0;
+                    $totalHarga = 0;
+                    $hargaSatuan = 0;
+                    $satuanLPB = "";
+                    $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
+                        ->select('penerimaan_barang_detail.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+                        ->where('penerimaan_barang_id', $penerimaanBarang['id'])
+                        ->where('barang_id', $value['barang1_id'])
+                        ->where('spesifikasi_id', $value['barang2_id'])
+                        ->findAll();
+                    foreach ($penerimaanBarangDetail as $valuePenerimaanBarangDetail) {
+                        $hargaSatuan = $valuePenerimaanBarangDetail['harga'] + $valuePenerimaanBarangDetail['harga_harian'] + $valuePenerimaanBarangDetail['harga_bulanan'];
+                        $totalQty += $valuePenerimaanBarangDetail['qty'];
+                        $satuanLPB = $valuePenerimaanBarangDetail['kode_satuan'];
+                    }
+                    $totalHarga = $totalQty * $hargaSatuan;
+                    $value['totalQtyLPB'] = $totalQty;
+                    $value['totalHargaLPB'] = $totalHarga;
+                    $value['hargaSatuanLPB'] = $hargaSatuan;
+                    $value['satuanLPB'] = $satuanLPB;
+                }
             }
             if ($productionResultDataTitle) {
                 return response()->setJSON([
@@ -225,5 +423,133 @@ class RasioController extends BaseController
                 ]);
             }
         }
+    }
+
+    public function getRasioBarangDigunakanPenolong()
+    {
+        if (!empty($this->request->getVar('bulan'))) {
+            $monthData = $this->request->getVar('bulan');
+            list($month, $year) = explode('/', $monthData);
+            $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $conditionProduction = [
+                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'divisi_id' => $this->request->getVar('department'),
+            ];
+            $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
+            // var_dump($productionResultDataTitle);
+            // exit;
+            // $totalQtyAll = 0;
+            foreach ($productionResultDataTitle as &$value) {
+                $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
+                $poBBImport = $this->rmImportPOModel->where('po_no', $value['stock_dokumen'])->first();
+                $poBP = $this->amPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
+                $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
+                if ($poBBLokal) {
+                    $totalQty = 0;
+                    $totalHarga = 0;
+                    $hargaSatuan = 0;
+                    $satuanPO = "";
+                    $poBBLokalDetail = $this->rmPurchaseOrderDetailModel
+                        ->select('rm_purchase_order_details.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+                        ->where('rm_purchase_order_id', $poBBLokal['id'])
+                        ->where('barang1_id', $value['barang1_id'])
+                        ->where('barang2_id', $value['barang2_id'])
+                        ->findAll();
+                    foreach ($poBBLokalDetail as $valuePoBBLokal) {
+                        $hargaSatuan = $valuePoBBLokal['general_price'] + $valuePoBBLokal['daily_price'] + $valuePoBBLokal['monthly_price'];
+                        $totalQty += $valuePoBBLokal['qty'];
+                        $satuanPO = $valuePoBBLokal['kode_satuan'];
+                    }
+                    $totalHarga = $totalQty * $hargaSatuan;
+                    $value['totalQtyPO'] = $totalQty;
+                    $value['totalHargaPO'] = $totalHarga;
+                    $value['hargaSatuanPO'] = $hargaSatuan;
+                    $value['satuanPO'] = $satuanPO;
+                }
+                if ($poBBImport) {
+                    $totalQty = 0;
+                    $totalHarga = 0;
+                    $hargaSatuan = 0;
+                    $satuanPO = "";
+                    $poBBImportDetail = $this->rmImportPODetailModel
+                        ->select('rm_import_po_details.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+                        ->where('rm_import_po_id', $poBBImport['id'])
+                        ->where('barang1_id', $value['barang1_id'])
+                        ->where('spesifikasi_id', $value['barang2_id'])
+                        ->findAll();
+                    foreach ($poBBImportDetail as $valuePoBBImport) {
+                        $hargaSatuan = $valuePoBBImport['price'] * $valuePoBBImport['disc'] . '%';
+                        $totalQty += $valuePoBBImport['qty'];
+                        $satuanPO = $valuePoBBImport['kode_satuan'];
+                    }
+                    $totalHarga = $totalQty * $hargaSatuan;
+                    $value['totalQtyPO'] = $totalQty;
+                    $value['totalHargaPO'] = $totalHarga;
+                    $value['hargaSatuanPO'] = $hargaSatuan;
+                    $value['satuanPO'] = $satuanPO;
+                }
+                if ($poBP) {
+                    $totalQty = 0;
+                    $totalHarga = 0;
+                    $hargaSatuan = 0;
+                    $satuanPO = "";
+                    $poBPDetail = $this->amPurchaseOrderDetailModel
+                        ->select('am_purchase_order_details.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+                        ->where('am_purchase_order_id', $poBP['id'])
+                        ->where('barang_id', $value['barang1_id'])
+                        ->where('spesifikasi_id', $value['barang2_id'])
+                        ->findAll();
+                    foreach ($poBPDetail as $valuePoBPDetail) {
+                        $disc = $valuePoBPDetail['disc'] / 100;
+                        $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
+                        $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
+                        $totalQty += $valuePoBPDetail['qty'];
+                        $satuanPO = $valuePoBPDetail['kode_satuan'];
+                    }
+                    $totalHarga = $totalQty * $hargaSatuan;
+                    $value['totalQtyPO'] = $totalQty;
+                    $value['totalHargaPO'] = $totalHarga;
+                    $value['hargaSatuanPO'] = $hargaSatuan;
+                    $value['satuanPO'] = $satuanPO;
+                }
+            }
+            if ($productionResultDataTitle) {
+                return response()->setJSON([
+                    'data' => $productionResultDataTitle,
+                    'token' => csrf_hash(),
+                    'status' => true
+                ]);
+            } else {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+        }
+    }
+
+    public function formatHarga($harga)
+    {
+        // Menghapus "Rp" dan karakter "." dari string harga
+        $harga = str_replace(["Rp", "."], "", $harga);
+
+        // Mengonversi string harga menjadi float
+        $harga = (float) $harga;
+
+        // Mengubah format angka menjadi string dengan dua desimal
+        $harga = number_format($harga, 2, '.', '');
+
+        // Memastikan panjang total menjadi 15 digit dengan memotong atau menambahkan nol di depan jika diperlukan
+        $length = strlen($harga);
+        if ($length < 15) {
+            $harga = str_pad($harga, 15, '0', STR_PAD_LEFT);
+        } elseif ($length > 15) {
+            $harga = substr($harga, 0, 15);
+        }
+
+        return $harga;
     }
 }

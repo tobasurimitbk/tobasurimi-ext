@@ -102,7 +102,17 @@ class ProductionResultModel extends Model
         barang_master.barang_name, 
         barang_master.kode_barang, 
         barang_master_spesifikasi.spesifikasi,
-        production_result_details.*,
+        production_result_details.id as production_result_detail_id,
+        production_result_details.production_result_id as production_result_id,
+        production_result_details.barang1_id as barang1_id,
+        production_result_details.barang2_id as barang2_id,
+        production_result_details.bc_id as bc_id,
+        production_result_details.stock_id as stock_id,
+        production_result_details.no_aju as no_aju,
+        production_result_details.stock_dokumen as stock_dokumen,
+        production_result_details.qty as qty,
+        production_result_details.qty2 as qty2,
+        production_result_details.qty_isi as qty_isi,
         SUM(production_result_details.qty) as qtyTotal,
         satuans.kode_satuan,
         ';
@@ -131,12 +141,10 @@ class ProductionResultModel extends Model
         $selectQryJadi = '
         barang_master.barang_name, 
         barang_master_spesifikasi.spesifikasi,
-        production_result_details.*,
-        stock_details2.*,
-        stock_details.*,
-        penerimaan_barang_detail.*,
-        SUM(production_result_details.qty) as qtyTotal,
-        satuans.kode_satuan,
+        production_result_details.barang1_id,
+        production_result_details.barang2_id,
+        stock_details2.stock_dokumen,
+        stock_details.no_dokumen
         ';
 
         $dataQry = $this->asArray()
@@ -166,12 +174,16 @@ class ProductionResultModel extends Model
     {
         $where['deletedAt'] = null;
         $selectQryJadi = '
+        barang_master.kode_barang, 
         barang_master.barang_name, 
+        barang_master.parent_type_id, 
         barang_master_spesifikasi.spesifikasi,
-        production_result_details.*,
-        stock_details2.*,
-        stock_details.*,
-        penerimaan_barang_detail.*,
+        production_result_details.production_result_id,
+        production_result_details.barang1_id,
+        production_result_details.barang2_id,
+        production_result_details.qty as qty_produksi,
+        stock_details2.stock_dokumen,
+        stock_details.no_dokumen,
         parent_barang.parent_name
         ';
 
@@ -186,12 +198,13 @@ class ProductionResultModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
             ->like('production_results.receive_date', $where['tanggal_jurnal'])
+            ->where('work_orders.divisi_id', $where['divisi_id'])
             ->where('production_result_details.type', 'DIGUNAKAN')
             ->where('production_result_details.barang_type', 'bahan_penolong')
             ->where('production_result_details.deletedAt', $where['deletedAt'])
             ->where('production_results.deletedAt', $where['deletedAt'])
-            ->groupBy('barang_master.parent_type_id')
             ->findAll();
 
         return $dataQry;

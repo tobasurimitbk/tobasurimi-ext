@@ -153,10 +153,12 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("akun-department/all"); ?>",
+                url: "<?= base_url("rasio/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
+                    data.dateStart = $(".dateStart").val();
+                    data.divisi_id = $(".divisi_id").val();
                     data.sort = sort;
                     data.sortType = sortType;
                 }
@@ -174,13 +176,13 @@
                 sortable: false,
                 width: "5%"
             }, {
-                data: "parent_name",
+                data: "divisi",
                 className: "text-center",
             }, {
-                data: "ap_id",
+                data: "month",
                 className: "text-center",
             }, {
-                data: "ar_id",
+                data: "harga",
                 className: "text-center",
             }, ],
             columnDefs: [{
@@ -200,68 +202,22 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         });
+
+        $(".dateStart").change(function() {
+            table.ajax.reload();
+        });
+
+        $(".divisi_id").change(function() {
+            table.ajax.reload();
+        });
         // hide modal
         $('.btn-discard').click(function() {
             $('.add-modal').modal('hide');
         });
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            $.ajax({
-                url: "<?= base_url("akun-department/get"); ?>",
-                data: formData,
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                method: "GET",
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(res) {
-                    csrf.val();
-                    if (res.status) {
-                        console.log(res);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        });
-                    }
-                }
-            })
-        });
-        // init validation
-        var validator = $(".create-form").validate({
-            rules: {
-                parentName: {
-                    required: true
-                },
-            },
-            messages: {
-                parentName: {
-                    required: "Nama Department Wajib Diisi"
-                },
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
+            console.log(data);
+            location.replace(`<?= base_url("rasio/id"); ?>/${data.id}`);
         });
     });
     // sort
