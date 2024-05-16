@@ -73,7 +73,9 @@ class StokHistori extends BaseController
             "divisi_id" => $this->request->getVar("divisi_id"),
             "warehouse_id" => $this->request->getVar('warehouse_id'),
             "search" => $this->request->getVar("search"),
-            "bc_id" => ""
+            "bc_id" => "",
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getVar("length");

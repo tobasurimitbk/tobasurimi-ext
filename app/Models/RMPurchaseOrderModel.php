@@ -164,6 +164,7 @@ class RMPurchaseOrderModel extends Model
     public function getPoBBLokalById($id)
     {
         $selectQry = "rm_purchase_orders.*,
+                            companies.holding_company,
                             companies.company AS companyName,
                             companies.address AS companyAddress,
                             suppliers.name AS supplierName,

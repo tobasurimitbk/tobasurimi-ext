@@ -69,12 +69,19 @@ class PenerimaanMutasiModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
         if ($addCondition['divisi_id']) {
             $dataQry->where('penerimaan_mutasi.divisi_id', $addCondition['divisi_id']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $dataQry->where('tanggal >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $dataQry->where('tanggal <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['status'] || $addCondition['status'] == '0') {
@@ -85,7 +92,7 @@ class PenerimaanMutasiModel extends Model
             $dataQry->like('penerimaan_mutasi_no', $addCondition['penerimaan_mutasi_no']);
         }
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 

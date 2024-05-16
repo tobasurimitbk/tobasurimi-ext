@@ -64,9 +64,11 @@ class Customer extends BaseController
             'company_id' => ''
         ];
 
+        $dataCompanyUserLogin = [$this->this_company_id];
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $customerData = $this->CustomerModel->getList($condition, $addCondition, $limit, $offset);
+        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $addCondition, $limit, $offset);
 
         $dataCustomer = [];
 

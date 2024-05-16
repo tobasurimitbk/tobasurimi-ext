@@ -41,6 +41,32 @@
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Penerimaan Mutasi </label>
                     </div>
                 </div>
+                <div class="col-md-4 mt-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
@@ -95,6 +121,9 @@
                 data.divisi_id = $(".divisi_id").val();
                 data.status = $(".status").val();
                 data.penerimaan_mutasi_no = $(".penerimaan_mutasi_no").val();
+                data.dateStart = $('#dateStart').val();
+                data.dateEnd = $('#dateEnd').val();
+
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -216,6 +245,20 @@
         }
     });
 
+    $(".dateStart").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".dateEnd").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
@@ -229,6 +272,11 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
+        table.ajax.reload();
+    });
+
+
+    $('#dateStart,#dateEnd').change(function() {
         table.ajax.reload();
     });
 

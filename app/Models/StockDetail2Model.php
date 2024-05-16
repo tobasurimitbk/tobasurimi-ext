@@ -76,7 +76,7 @@ class StockDetail2Model extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['bc_id'] != "" || $addCondition['no_aju'] != "") {
+        if ($addCondition['bc_id'] != "" || $addCondition['no_aju'] != "" || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
             if ($addCondition['bc_id'] || $addCondition['bc_id'] == 0 && $addCondition['bc_id'] != "") {
                 $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
@@ -85,6 +85,14 @@ class StockDetail2Model extends Model
             if ($addCondition['no_aju']) {
                 $dataQry->where('stock_details2.no_aju', $addCondition['no_aju']);
             }
+
+            if ($addCondition['dateStart']) {
+                $dataQry->where('stock_details.stock_date >=',  $addCondition['dateStart']);
+            }
+            if ($addCondition['dateEnd']) {
+                $dataQry->where('stock_details.stock_date <=', $addCondition['dateEnd']);
+            }
+
             $dataQry->groupEnd();
         }
 
@@ -165,12 +173,15 @@ class StockDetail2Model extends Model
             ->select($selectQry)
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('stock', 'stock.id = stock_details2.stock_id')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+            ->join('kemasan', 'kemasan.id = stock.kemasan_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['bc_id'] != "" || $addCondition['divisi_id'] || $addCondition['warehouse_id']) {
+        if ($addCondition['search'] || $addCondition['bc_id'] != "" || $addCondition['divisi_id'] || $addCondition['warehouse_id'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
@@ -182,18 +193,29 @@ class StockDetail2Model extends Model
             $dataQry->where('stock.divisi_id', $addCondition['divisi_id']);
         }
 
-        if ($addCondition['warehouse_id']) {
-            $dataQry->where('stock.warehouse_id', $addCondition['warehouse_id']);
-        }
 
         if ($addCondition['search']) {
             $dataQry->like('stock_details2.no_dokumen', $addCondition['search'])
                 ->orLike('stock_details.no_dokumen', $addCondition['search'])
                 ->orLike('stock_details2.no_aju', $addCondition['search'])
-                ->orLike('stock_details.sumber', $addCondition['search']);
+                ->orLike('stock_details.sumber', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->orLike('kemasan.name', $addCondition['search']);
         }
 
-        if ($addCondition['search'] || $addCondition['bc_id'] != "" || $addCondition['divisi_id'] || $addCondition['warehouse_id']) {
+        if ($addCondition['warehouse_id']) {
+            $dataQry->where('stock.warehouse_id', $addCondition['warehouse_id']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $dataQry->where('stock_details.stock_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $dataQry->where('stock_details.stock_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['bc_id'] != "" || $addCondition['divisi_id'] || $addCondition['warehouse_id'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 

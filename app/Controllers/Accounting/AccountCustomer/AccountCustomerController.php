@@ -83,12 +83,12 @@ class AccountCustomerController extends BaseController
             foreach ($subAkunsModel as $datas) {
                 if ($data->ap_id == $datas->id) {
                     $dataNamaAP = $datas->no_sub;
-                } elseif ($data->ap_id == NULL) {
+                } else {
                     $dataNamaAP = "-";
                 }
                 if ($data->ar_id == $datas->id) {
                     $dataNamaAR = $datas->no_sub;
-                } elseif ($data->ar_id == NULL) {
+                } else {
                     $dataNamaAR = "-";
                 }
             }

@@ -73,6 +73,8 @@ class PenerimaanMutasi extends BaseController
             "divisi_id" => $this->request->getVar("divisi_id"),
             "status" => $this->request->getVar("status"),
             "penerimaan_mutasi_no" => $this->request->getVar("penerimaan_mutasi_no"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getVar("length");

@@ -67,12 +67,19 @@ class MutasiModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
         if ($addCondition['divisi_id']) {
             $dataQry->where('divisi_asal_id', $addCondition['divisi_id']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $dataQry->where('tanggal >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $dataQry->where('tanggal <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['status'] || $addCondition['status'] == '0') {
@@ -83,7 +90,7 @@ class MutasiModel extends Model
             $dataQry->like('no_mutasi', $addCondition['no_mutasi']);
         }
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 
