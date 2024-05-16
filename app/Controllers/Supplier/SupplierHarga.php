@@ -12,9 +12,11 @@ class SupplierHarga extends BaseController
     protected $SupplierHargaModel;
     protected $BarangMasterSpesifikasiModel;
     protected $BarangMasterModel;
+    protected $this_company_id;
 
     public function __construct()
     {
+        $this->this_company_id = session()->get("login")->this_company_id;
         $this->SupplierHargaModel = new SupplierHargaModel();
         $this->BarangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->BarangMasterModel = new BarangMasterModel();
@@ -32,7 +34,8 @@ class SupplierHarga extends BaseController
         ];
 
         $condition = [
-            "supplier_harga.supplier_id"  => $this->request->getGet("supplier_id")
+            "supplier_harga.supplier_id"  => $this->request->getGet("supplier_id"),
+            "barang_master.company_id"  => $this->this_company_id
         ];
 
         $addCondition = [

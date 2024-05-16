@@ -130,7 +130,7 @@ class JasaVendorOutDetailModel extends Model
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')
             ->having('stok_total >', 0)
-            ->orderBy('stock_details.stock_date', "ASC")
+            ->orderBy('stock_details.createdAt', "ASC")
             ->findAll();
 
         return $dataQry;

@@ -5,16 +5,16 @@
 <section class="section">
     <div class="section-header">
         <h1>Barang Modal</h1>
-        <?php if (can('Master Barang', 'Barang Modal', 'c')) : ?>
-            <button class="btn btn-primary dropdown-toggle ml-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                Export
+        <?php if (can('Master Barang', 'Barang Modal', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Import / Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="excel('<?= base_url("barang-master/export-excel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
+                <li><button class="dropdown-item" onclick="excel('<?= base_url("barang-master/export-excel"); ?>')">Export Excel</button></li>
             </ul>
-            <button class="btn btn-discard btn-dropdown-export btn-upload-excel float-right" type="button">
-                <i class="fas fa-file-excel"></i> Import
-            </button>
+        <?php endif; ?>
+        <?php if (can('Master Barang', 'Barang Modal', 'c')) : ?>
             <button class="btn btn-show-form btn-add btn-add-barang float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </button>
@@ -27,8 +27,8 @@
                     <div class="form-floating mb-3">
                         <select class="form-select filter_coa" name="filter_coa" id="filter_coa">
                             <option value="" data-code=""></option>
-                            <option value="belum" data-code="">Belum Punya COA</option>
-                            <option value="sudah" data-code="">Sudah Punya COA</option>
+                            <option value="belum" data-code="">BELUM PUNYA COA</option>
+                            <option value="sudah" data-code="">SUDAH PUNYA COA</option>
                         </select>
                         <label for="floatingInput">Filter Akun</label>
                     </div>
@@ -41,7 +41,7 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable dataTable-barang" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
@@ -187,7 +187,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="row">
+                <div class="row mt-1">
                     <div class="col-md-12 mt-1" style="font-size: 12px;">
                         Note : <br>
                         <ul>
@@ -202,15 +202,15 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="" width="100%" cellspacing="0">
                                     <thead class="thead-dark">
                                         <tr>
-                                            <th scope="col">No</th>
+                                            <th scope="col" style="width: 10px;">No</th>
                                             <th scope="col">Spesifikasi</th>
                                             <th scope="col">Satuan 1</th>
                                             <th scope="col">Satuan 2</th>
                                             <th scope="col">Satuan 3</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col" style="width:90px">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="body-detail-table" id="body-detail-table" id="tbody2" style="cursor: pointer;">
@@ -261,7 +261,7 @@
 
     let list_items = [];
     $(document).ready(function() {
-        const table = $('.dataTable').DataTable({
+        const table = $('.dataTable-barang').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
             serverSide: true,
@@ -1121,7 +1121,7 @@
                 row += '<td>' + item.satuan_3_text + '(' + item.konversi_satuan_3 + ' ' + item.satuan_1_text + ')</td>';
 
                 row += '<td>' + `
-                    <button class="btn btn-warning edit-table-detail" data-spek_id="${item.spek_id}">
+                    <button class="btn btn-warning edit-table-detail mr-2" data-spek_id="${item.spek_id}">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                     </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.spek_id}', '${item.spesifikasi_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>

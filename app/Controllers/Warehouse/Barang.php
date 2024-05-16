@@ -39,7 +39,7 @@ class Barang extends BaseController
         $satuanModel = new SatuansModel();
         $data = [
             'type' => "bahan_baku",
-            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_baku")->where('deletedAt', null)->findAll(),
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_baku")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
@@ -52,7 +52,7 @@ class Barang extends BaseController
         $satuanModel = new SatuansModel();
         $data = [
             'type' => "bahan_penolong",
-            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_penolong")->where('deletedAt', null)->findAll(),
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_penolong")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
@@ -68,7 +68,7 @@ class Barang extends BaseController
 
         $data = [
             'type' => "bahan_jadi",
-            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_jadi")->where('deletedAt', null)->findAll(),
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_jadi")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'divisi' => $divisisModelData,
             'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
@@ -82,7 +82,7 @@ class Barang extends BaseController
         $satuanModel = new SatuansModel();
         $data = [
             'type' => "bahan_scrap",
-            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_scrap")->where('deletedAt', null)->findAll(),
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_scrap")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
@@ -95,7 +95,7 @@ class Barang extends BaseController
         $satuanModel = new SatuansModel();
         $data = [
             'type' => "bahan_modal",
-            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_modal")->where('deletedAt', null)->findAll(),
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_modal")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 
@@ -431,7 +431,7 @@ class Barang extends BaseController
         }
 
         $lastBarang = $barangModel->asObject()
-            // ->where('company_id', $this->this_company_id)
+            ->where('company_id', $this->this_company_id)
             ->where('type_barang', $type)
             ->where('deletedAt', null)
             ->like('kode_barang', $codeName . '-____')

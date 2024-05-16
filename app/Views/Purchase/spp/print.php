@@ -100,12 +100,15 @@
         </table><br>
         <table class="mt-5 table-border">
             <thead class="table-border">
-                <tr class="table-border">
+                <tr>
                     <td class="table-border" style="width: 5px;"><b class="table-font-size">No</b></td>
-                    <td class="table-border" style="width: 105px;"><b class="table-font-size">Kode Barang</b></td>
+                    <td class="table-border" style="width: 70px;"><b class="table-font-size">Kode Barang</b></td>
                     <td class="table-border" style="width: 220px;"><b class="table-font-size">Nama Barang</b></td>
                     <td class="table-border" style="width: 90px;"><b class="table-font-size">Qty</b></td>
                     <td class="table-border" style="width: 10px;"><b class="table-font-size">Keterangan</b></td>
+                    <td class="table-border" style="width: 80px;"><b class="table-font-size">Supplier</b></td>
+                    <td class="table-border" style="width: 80px;"><b class="table-font-size">Harga</b></td>
+                    <td class="table-border" style="width: 60px;"><b class="table-font-size">PBP</b></td>
                 </tr>
             </thead>
             <tbody>
@@ -116,8 +119,11 @@
                         <td class="table-border"><b class="table-font-size"><?= $detail->no ?></b></td>
                         <td class="table-border"><b class="table-font-size"><?= $detail->kode_barang ?></b></td>
                         <td class="table-border"><b class="table-font-size"><?= $detail->nama_barang ?></b></td>
-                        <td class="table-border"><b class="table-font-size"><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
+                        <td class="table-border"><b class="table-font-size"><?= $detail->qty . " " . $detail->kode_satuan ?></b></td>
                         <td class="table-border"><b class="table-font-size"><?= $detail->note ?></b></td>
+                        <td class="table-border"></td>
+                        <td class="table-border"></td>
+                        <td class="table-border"></td>
                     </tr>
                 <?php } ?>
             </tbody>

@@ -216,18 +216,18 @@ class POLokalBahanBaku extends BaseController
     {
 
         $first = $this->RMPurchaseOrderModel
-            ->where('company_id', $this->this_company_id)
             ->where('po_no', !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
                 date('m'),
                 date('Y'),
                 getLastDay()
             ) : $this->request->getVar("po_no"))
+            ->where('company_id', $this->this_company_id)
             ->first();
 
         if ($first != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
-                'message' => "No Purchase Order Sudah Ada",
+                'message' => "No Purchase Order Sudah Ada" . $first['po_no'] . " COMPANY ID" . $this->this_company_id,
                 'status' => false
             ]);
         }

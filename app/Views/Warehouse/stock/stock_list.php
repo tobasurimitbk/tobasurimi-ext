@@ -4,17 +4,17 @@
 <section class="section">
     <div class="section-header">
         <h1>Stock List</h1>
-        <?php if (can("Inventori", "Stok List", "c")) : ?>
-            <button class="btn btn-primary dropdown-toggle ml-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                Export
+        <?php if (can('Inventori', 'Stok List', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 30px;">
+                Import / Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="excel('<?= base_url("stock-list/export-excel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
+                <li><button class="dropdown-item" onclick="excel('<?= base_url("stock-list/export-excel"); ?>')">Export Excel</button></li>
             </ul>
-            <button class="btn btn-discard btn-dropdown-export btn-upload-excel float-right" type="button" style="margin-right: 30px;">
-                <i class="fas fa-file-excel"></i> Import
-            </button>
-            <a href="<?= base_url('stock-list/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <?php endif; ?>
+        <?php if (can("Inventori", "Stok List", "c")) : ?>
+            <a href="<?= base_url('stock-list/create') ?>" type="button" class="btn btn-show-form btn-add btn-add-barang float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Inisiasi Stok
             </a>
         <?php endif; ?>

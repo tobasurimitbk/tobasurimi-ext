@@ -1015,7 +1015,9 @@ $routes->post('setting-akun-bc/no-ijin-tpb-create', 'BeaCukai\NomorIjinTPB::crea
 $routes->post('setting-akun-bc/no-ijin-tpb-update', 'BeaCukai\NomorIjinTPB::update', ['filter' => 'Auth']);
 $routes->post('setting-akun-bc/no-ijin-tpb-delete', 'BeaCukai\NomorIjinTPB::delete', ['filter' => 'Auth']);
 $routes->get('setting-akun-bc/no-ijin-tpb-get', 'BeaCukai\NomorIjinTPB::get', ['filter' => 'Auth']);
-
+// INTEGRASI CEISA
+$routes->get('/setting-akun-bc/akun', 'BeaCukai\IntegrasiCeisa::index', ['filter' => 'Auth']);
+$routes->post('/setting-akun-bc/akun/create-update', 'BeaCukai\IntegrasiCeisa::createOrUpdate', ['filter' => 'Auth']);
 
 // BC 2.3
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
@@ -1074,9 +1076,14 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
 });
 
 // BC 4.0
-$routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'BeaCukai\BC40::index');
+$routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('', 'BeaCukai\BC40::index');
     $routes->get('all', 'BeaCukai\BC40::all');
+    $routes->get('create', 'BeaCukai\BC40::createPurchaseOrderView');
+    $routes->get('list-supplier', 'BeaCukai\BC40::dropdownSupplier');
+    $routes->get('list-po', 'BeaCukai\BC40::dropdownPO');
+    $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
+    // FORM PURCHASE ORDER
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC40::createHeaderView/$1');
     $routes->post('id/header', 'BeaCukai\BC40::createHeaderAction');
