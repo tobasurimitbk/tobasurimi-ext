@@ -32,8 +32,8 @@
                     <div class="form-floating mb-3">
                         <select class="form-select filter_coa" name="filter_coa" id="filter_coa">
                             <option value="" data-code=""></option>
-                            <option value="belum" data-code="">Belum Punya COA</option>
-                            <option value="sudah" data-code="">Sudah Punya COA</option>
+                            <option value="belum" data-code="">BELUM PUNYA COA</option>
+                            <option value="sudah" data-code="">SUDAH PUNYA COA</option>
                         </select>
                         <label for="floatingInput">Filter Akun</label>
                     </div>
@@ -380,7 +380,7 @@
 
     // Akun AR
     $('.filter_coa').select2({
-        placeholder: "",
+        placeholder: "Filter Akun",
         theme: "bootstrap-5",
         allowClear: true,
     })
@@ -408,7 +408,7 @@
 
     // Akun AR
     $('.akun_ar_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Akun AR",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     })
@@ -436,7 +436,7 @@
 
     // Akun AP
     $('.akun_ap_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Akun AP",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     })
