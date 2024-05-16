@@ -4,6 +4,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Dokumen BC 4.0</h1>
+        <?php if (can("Bea Cukai", "BC 4.0", "c")) : ?>
+            <a href="<?= base_url('bea-cukai-bc-40/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <?= csrf_field() ?>

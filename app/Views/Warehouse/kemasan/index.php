@@ -4,16 +4,16 @@
 <section class="section">
     <div class="section-header">
         <h1>Kemasan</h1>
-        <?php if (can('Master Barang', 'Kemasan', 'c')) : ?>
-            <button class="btn btn-primary dropdown-toggle ml-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                Export
+        <?php if (can('Master Barang', 'Kemasan', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Import / Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="excel('<?= base_url("kemasan/export-excel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
+                <li><button class="dropdown-item" onclick="excel('<?= base_url("kemasan/export-excel"); ?>')">Export Excel</button></li>
             </ul>
-            <button class="btn btn-discard btn-dropdown-export btn-upload-excel float-right" type="button">
-                <i class="fas fa-file-excel"></i> Import
-            </button>
+        <?php endif; ?>
+        <?php if (can('Master Barang', 'Kemasan', 'c')) : ?>
             <button class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </button>
@@ -272,14 +272,16 @@
     $('#parent_type_id').select2({
         placeholder: "Pilih Kategori Kemasan",
         theme: "bootstrap-5",
-        allowClear: false
+        allowClear: false,
+        dropdownParent: $('#add_modal')
     });
 
 
     $('#satuan_id').select2({
         placeholder: "Pilih Satuan",
         theme: "bootstrap-5",
-        allowClear: false
+        allowClear: false,
+        dropdownParent: $('#add_modal')
     });
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {

@@ -728,7 +728,7 @@ class BC23 extends BaseController
 
     public function getBLKontainerPetiKemas()
     {
-        $beacukaiApi = new BeaCukaiApi();
+        $beacukaiApi = new BeaCukaiApi("", "");
         $BCDokumenModel = new BCDokumenModel();
         $bc23Model = new BC23Model();
         $metaDataModel = new MetadataModel();
@@ -1603,7 +1603,7 @@ class BC23 extends BaseController
         $BCPengangkutModel = new BCPengangkutModel();
         $BCDokumenModel = new BCDokumenModel();
         $BCPengangkutModel = new BCPengangkutModel();
-        $beacukaiApi = new BeaCukaiApi();
+        $beacukaiApi = new BeaCukaiApi("", "");
 
         $penerimaanBarangID = decrypt($penerimaanBarangID);
         $bc23Data = $bc23Model->get($penerimaanBarangID);
@@ -1637,7 +1637,7 @@ class BC23 extends BaseController
     // API GET
     public function getValuta()
     {
-        $beacukaiApi = new BeaCukaiApi();
+        $beacukaiApi = new BeaCukaiApi("", "");
         $kodeValuta = decrypt($this->request->getVar('harga_kode_valuta'));
         $res = $beacukaiApi->getNilaiValuta($kodeValuta);
 
@@ -1650,7 +1650,7 @@ class BC23 extends BaseController
 
     public function getPelabuhan()
     {
-        $beacukaiApi = new BeaCukaiApi();
+        $beacukaiApi = new BeaCukaiApi("", "");
         $kodeKantorBongkar = decrypt($this->request->getVar('header_kantor_pabean_bongkar'));
         $res = $beacukaiApi->getListKodePelabuhan($kodeKantorBongkar);
 
@@ -1663,7 +1663,7 @@ class BC23 extends BaseController
 
     public function getManifest()
     {
-        $beacukaiApi = new BeaCukaiApi();
+        $beacukaiApi = new BeaCukaiApi("", "");
         $BCDokumenModel = new BCDokumenModel();
         $bc23Model = new BC23Model();
         $metaDataModel = new MetadataModel();
