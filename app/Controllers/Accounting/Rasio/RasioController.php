@@ -9,6 +9,7 @@ use App\Models\Sub_AkunsModel;
 use App\Models\AccountDivisisModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
+use App\Models\JurnalUmumModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\ProductionResultDetailModel;
@@ -16,11 +17,13 @@ use App\Models\ProductionResultModel;
 use App\Models\RasioBahanPenolongModel;
 use App\Models\RasioBarangDigunakanModel;
 use App\Models\RasioBarangJadiModel;
+use App\Models\RasioCostModel;
 use App\Models\RasioModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\RMPurchaseOrderModel;
+use App\Models\SettingCostingModel;
 
 class RasioController extends BaseController
 {
@@ -42,6 +45,9 @@ class RasioController extends BaseController
     protected $rasioBarangDigunakanModel;
     protected $rasioBarangJadiModel;
     protected $rasioBarangPenolongModel;
+    protected $rasioCostModel;
+    protected $jurnalUmumModel;
+    protected $settingCosting;
 
     public function __construct()
     {
@@ -63,6 +69,9 @@ class RasioController extends BaseController
         $this->rasioBarangDigunakanModel = new RasioBarangDigunakanModel();
         $this->rasioBarangJadiModel = new RasioBarangJadiModel();
         $this->rasioBarangPenolongModel = new RasioBahanPenolongModel();
+        $this->rasioCostModel = new RasioCostModel();
+        $this->jurnalUmumModel = new JurnalUmumModel();
+        $this->settingCosting = new SettingCostingModel();
     }
 
     public function index()
@@ -92,16 +101,38 @@ class RasioController extends BaseController
             $tanggal_parts = explode("/", $tanggal_input); // Memisahkan bulan dan tahun
             $tanggal_mysql = $tanggal_parts[1] . "-" . str_pad($tanggal_parts[0], 2, "0", STR_PAD_LEFT);
 
+            $cekRasio = $this->rasioModel
+                ->where("department_id", $this->request->getVar("divisi_id"))
+                ->where("bulan", $tanggal_mysql)
+                ->findAll();
+
+            if ($cekRasio) {
+                $data = [
+                    "status"     => false,
+                    "message"    => "Rasio untuk department dan bulan ini sudah ada",
+                    'token'      => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+
             $data = [
                 "company_id" => $this->this_company_id,
                 "department_id" => $this->request->getVar("divisi_id"),
                 'bulan' => $tanggal_mysql,
-                'total_qty_po' => $this->request->getVar("qtyTotalPembelian") ? number_format((float) str_replace(",", "", $this->request->getVar("qtyTotalPembelian")), 2, '.', '') : null,
-                'harga_total_po' => $this->request->getVar("hargaTotalPembelian") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaTotalPembelian")), 2, '.', '') : null,
-                "harga_average_po" => $this->request->getVar("hargaSatuanPembelian") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian")), 2, '.', '') : null,
-                'total_qty_lpb' => $this->request->getVar('qtyTotalPenerimaan') ? number_format((float) str_replace(",", "", $this->request->getVar('qtyTotalPenerimaan')), 2, '.', '') : null,
-                'harga_total_lpb' => $this->request->getVar('hargaTotalPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaTotalPenerimaan')), 2, '.', '') : null,
-                'harga_average_lpb' => $this->request->getVar('hargaSatuanPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaSatuanPenerimaan')), 2, '.', '') : null,
+                'subsidi_coa_id' => $this->request->getVar("akun_coa_subsidi") ?? null,
+                'biaya_coa_id' => $this->request->getVar("akun_coa_biaya") ?? null,
+                'kopek_coa_id' => $this->request->getVar("akun_coa_kopek") ?? null,
+                'total_subsidi' => $this->request->getVar("biayaSubsidi") ? number_format((float) str_replace(",", "", $this->request->getVar("biayaSubsidi")), 2, '.', '') : 0,
+                'total_biaya' => $this->request->getVar("biayaLain") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("biayaLain")), 2, '.', '') : 0,
+                "total_kopek" => $this->request->getVar("biayaKopek") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("biayaKopek")), 2, '.', '') : 0,
+                'total_qty_po' => $this->request->getVar("qtyTotalPembelian") ? number_format((float) str_replace(",", "", $this->request->getVar("qtyTotalPembelian")), 2, '.', '') : 0,
+                'harga_total_po' => $this->request->getVar("hargaTotalPembelian") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaTotalPembelian")), 2, '.', '') : 0,
+                "harga_average_po" => $this->request->getVar("hargaSatuanPembelian") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian")), 2, '.', '') : 0,
+                'total_qty_lpb' => $this->request->getVar('qtyTotalPenerimaan') ? number_format((float) str_replace(",", "", $this->request->getVar('qtyTotalPenerimaan')), 2, '.', '') : 0,
+                'harga_total_lpb' => $this->request->getVar('hargaTotalPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaTotalPenerimaan')), 2, '.', '') : 0,
+                'harga_average_lpb' => $this->request->getVar('hargaSatuanPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaSatuanPenerimaan')), 2, '.', '') : 0,
             ];
 
             $id = $this->rasioModel->insert($data);
@@ -109,6 +140,9 @@ class RasioController extends BaseController
             $barang_digunakan = json_decode($this->request->getVar("items_digunakan"));
             $barang_jadi = json_decode($this->request->getVar("items_jadi"));
             $barang_digunakan_material_2 = json_decode($this->request->getVar("items_digunakan_material_2"));
+            $labor_cost = json_decode($this->request->getVar("labor_cost"));
+            $overhead_cost = json_decode($this->request->getVar("overhead_cost"));
+            $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
 
             foreach ($barang_digunakan as $s) {
                 $this->rasioBarangDigunakanModel->insert([
@@ -174,6 +208,72 @@ class RasioController extends BaseController
                 }
             }
 
+            foreach ($labor_cost as $bd) {
+                foreach ($bd->inputData as $bdm) {
+                    $data = [
+                        'rasio_id' => $id,
+                        'production_result_id' => $bdm->id_production,
+                        'production_result_detail_id' => $bdm->id_production_detail,
+                        'setting_costing_id' => $bd->id,
+                        'setting_costing_parent_id' => $bd->parent_id,
+                        'coa_id' => $bd->coa,
+                        'barang1_id_production' => $bdm->barang1_id_production,
+                        'barang2_id_production' => $bdm->barang2_id_production,
+                        'name' => $bd->name,
+                        'type' => "labor",
+                        'jumlah_jurnal' => $bd->jmlhJurnal,
+                        'qty_cost' => $bdm->qty_input,
+                        'total_cost' => $bdm->totalHarga_input,
+                        'harga_cost' => $bdm->hargaSatuan_input,
+                    ];
+                    $this->rasioCostModel->insert($data);
+                }
+            }
+
+            foreach ($overhead_cost as $bd) {
+                foreach ($bd->inputData as $bdm) {
+                    $data = [
+                        'rasio_id' => $id,
+                        'production_result_id' => $bdm->id_production,
+                        'production_result_detail_id' => $bdm->id_production_detail,
+                        'setting_costing_id' => $bd->id,
+                        'setting_costing_parent_id' => $bd->parent_id,
+                        'coa_id' => $bd->coa,
+                        'barang1_id_production' => $bdm->barang1_id_production,
+                        'barang2_id_production' => $bdm->barang2_id_production,
+                        'name' => $bd->name,
+                        'type' => "overhead",
+                        'jumlah_jurnal' => $bd->jmlhJurnal,
+                        'qty_cost' => $bdm->qty_input,
+                        'total_cost' => $bdm->totalHarga_input,
+                        'harga_cost' => $bdm->hargaSatuan_input,
+                    ];
+                    $this->rasioCostModel->insert($data);
+                }
+            }
+
+            foreach ($fixed_cost as $bd) {
+                foreach ($bd->inputData as $bdm) {
+                    $data = [
+                        'rasio_id' => $id,
+                        'production_result_id' => $bdm->id_production,
+                        'production_result_detail_id' => $bdm->id_production_detail,
+                        'setting_costing_id' => $bd->id,
+                        'setting_costing_parent_id' => $bd->parent_id,
+                        'coa_id' => $bd->coa,
+                        'barang1_id_production' => $bdm->barang1_id_production,
+                        'barang2_id_production' => $bdm->barang2_id_production,
+                        'name' => $bd->name,
+                        'type' => "fixed",
+                        'jumlah_jurnal' => $bd->jmlhJurnal,
+                        'qty_cost' => $bdm->qty_input,
+                        'total_cost' => $bdm->totalHarga_input,
+                        'harga_cost' => $bdm->hargaSatuan_input,
+                    ];
+                    $this->rasioCostModel->insert($data);
+                }
+            }
+
             return response()->setJSON([
                 "id"      => encrypt($id),
                 "status"  => true,
@@ -195,10 +295,28 @@ class RasioController extends BaseController
     {
         $id = decrypt($id);
         $subAkunsModel = $this->subAkunModel->asObject()->findAll();
+        $rasioModel = $this->rasioModel->asObject()->find($id);
+        $rasioBarangDigunakanModel = $this->rasioBarangDigunakanModel->asObject()->where('rasio_id', $id)->findAll();
+        $rasioBarangJadiModel = $this->rasioBarangJadiModel->asObject()->where('rasio_id', $id)->findAll();
+        $rasioBarangPenolongModel = $this->rasioBarangPenolongModel->asObject()->where('rasio_id', $id)->findAll();
+        $rasioCostModel = $this->rasioCostModel->asObject()->where('rasio_id', $id)->findAll();
+
+        $totalQtyAll = 0;
+        foreach ($rasioBarangJadiModel as &$value) {
+            $totalQtyAll += $value->qty_barang;
+            $value->totalQtyAll = $totalQtyAll;
+        }
         $data = [
             'dataDivisi' => $this->divisisModel->getDivisiAccess(),
-            "subAkuns" => $subAkunsModel
+            "subAkuns" => $subAkunsModel,
+            "rasio" => $rasioModel,
+            "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
+            "rasioBarangJadi" => $rasioBarangJadiModel,
+            "rasioBarangPenolong" => $rasioBarangPenolongModel,
+            "rasioCost" => $rasioCostModel,
         ];
+        // var_dump($data);
+        // exit;
         return view('Accounting/rasio/form', $data);
     }
 
@@ -528,6 +646,67 @@ class RasioController extends BaseController
                     'status' => false
                 ]);
             }
+        }
+    }
+
+    public function getCost()
+    {
+        $monthData = $this->request->getVar('bulan');
+        $department = $this->request->getVar('department');
+        $id_coa = $this->request->getVar('id_coa');
+
+        list($month, $year) = explode('/', $monthData);
+        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+
+        $settingCosting = $this->settingCosting->getSettingCosting();
+
+        foreach ($settingCosting as &$valueSetting) {
+            $condition = [
+                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'id_coa' => $valueSetting['coa'],
+            ];
+            $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
+            $valueSetting['jmlhJurnal'] = $jurnalData;
+        }
+        if ($settingCosting) {
+            return response()->setJSON([
+                'data' => $settingCosting,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } else {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
+    }
+
+    public function getDataJurnal()
+    {
+        $monthData = $this->request->getVar('bulan');
+        $department = $this->request->getVar('department');
+        $id_coa = $this->request->getVar('id_coa');
+
+        list($month, $year) = explode('/', $monthData);
+        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+
+        $condition = [
+            'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            'id_coa' => $id_coa,
+        ];
+        $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
+        if ($jurnalData) {
+            return response()->setJSON([
+                'data' => $jurnalData,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } else {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
         }
     }
 

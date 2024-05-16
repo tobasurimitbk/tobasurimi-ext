@@ -1396,6 +1396,8 @@ $routes->get('/rasio/create', 'Accounting\Rasio\RasioController::createRasio', [
 $routes->get('/rasio/get-barang-jadi', 'Accounting\Rasio\RasioController::getRasioBarangJadi', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan', 'Accounting\Rasio\RasioController::getRasioBarangDigunakan', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/rasio/get-jurnal', 'Accounting\Rasio\RasioController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/rasio/get-cost', 'Accounting\Rasio\RasioController::getCost', ['filter' => 'Auth']);
 $routes->get('/rasio/all', 'Accounting\Rasio\RasioController::allRasio', ['filter' => 'Auth']);
 $routes->get('/rasio/id/(:segment)', 'Accounting\Rasio\RasioController::getById/$1', ['filter' => 'Auth']);
 $routes->post('/rasio/save', 'Accounting\Rasio\RasioController::saveRasio', ['filter' => 'Auth']);
