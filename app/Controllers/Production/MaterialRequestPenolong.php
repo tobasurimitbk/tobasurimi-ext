@@ -25,7 +25,7 @@ use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
 use Exception;
 
-class MaterialRequestKimia extends BaseController
+class MaterialRequestPenolong extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -80,7 +80,7 @@ class MaterialRequestKimia extends BaseController
 
     public function index()
     {
-        return view('Production/materialRequestKimia/index');
+        return view('Production/materialRequestPenolong/index');
     }
 
     public function createView()
@@ -117,7 +117,7 @@ class MaterialRequestKimia extends BaseController
             "dataWorkOrder" => $dataWorkOrder,
         ];
 
-        return view('Production/materialRequestKimia/form', $data);
+        return view('Production/materialRequestPenolong/form', $data);
     }
 
     public function getById($id = null)
@@ -162,7 +162,7 @@ class MaterialRequestKimia extends BaseController
                 ->join('divisis', 'divisis.id = material_request_penolong_details.divisi_id', 'left')
                 ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
                 ->where('material_request_id', $id)
-                ->where('parent_barang.parent_name', "KIMIA")
+                ->where('parent_barang.parent_name !=', "KIMIA")
                 ->where('material_request_penolong_details.deletedAt', null)
                 ->get()->getResult();
             foreach ($dataMaterialRequestDetails as $key => &$value) {
@@ -187,7 +187,7 @@ class MaterialRequestKimia extends BaseController
         // var_dump($data);
         // exit;
 
-        return view('Production/materialRequestKimia/form', $data);
+        return view('Production/materialRequestPenolong/form', $data);
     }
 
     public function all()
@@ -201,7 +201,7 @@ class MaterialRequestKimia extends BaseController
         ];
 
         $condition = [
-            'parent_barang.parent_name' => "KIMIA"
+            'parent_barang.parent_name !=' => "KIMIA"
         ];
 
         $addCondition = [

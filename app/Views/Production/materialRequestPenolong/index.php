@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1>Material Request</h1>
 
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request-kimia/create"); ?>">
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request-penolong/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
         <?= csrf_field() ?>
@@ -65,7 +65,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("material-request-kimia/all"); ?>",
+            url: "<?= base_url("material-request-penolong/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -116,7 +116,7 @@
                     if (status != 1) {
                         return `
                                 <div class="mt-0">
-                                    <button class="btn btn-primary detail-material-request-kimia">
+                                    <button class="btn btn-primary detail-material-request-penolong">
                                         <i class="fa fa-info fa-sm" aria-hidden="true"></i>
                                     </button>
                                     <button class="btn btn-warning">
@@ -131,7 +131,7 @@
                         if (request_status == "waiting") {
                             return `
                                     <div class="mt-0">
-                                        <button class="btn btn-primary detail-material-request-kimia">
+                                        <button class="btn btn-primary detail-material-request-penolong">
                                             <i class="fa fa-info fa-sm" aria-hidden="true"></i>
                                         </button>
                                         <button class="btn btn-warning">
@@ -145,7 +145,7 @@
                         } else {
                             return `
                                     <div class="mt-0">
-                                        <button class="btn btn-primary detail-material-request-kimia">
+                                        <button class="btn btn-primary detail-material-request-penolong">
                                             <i class="fa fa-info fa-sm" aria-hidden="true"></i>
                                         </button>
                                         <button class="btn btn-warning">
@@ -180,7 +180,7 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', '.detail-material-request-kimia', function() {
+        $('#dataTable tbody').on('click', '.detail-material-request-penolong', function() {
             // Get the data associated with the clicked row
             const data = table.row($(this).closest('tr')).data();
 
@@ -205,7 +205,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "<?= base_url("material-request-kimia/update-status"); ?>",
+                    url: "<?= base_url("material-request-penolong/update-status"); ?>",
                     data: {
                         id: id,
                         status_posting: status_posting

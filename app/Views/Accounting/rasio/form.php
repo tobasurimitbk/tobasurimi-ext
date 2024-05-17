@@ -654,13 +654,6 @@
                             list_items_barang_jadi.push(item);
                         });
                         drawTableRasio();
-                    } else {
-                        stopLoading()
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Produksi Tidak Ada',
-                            confirmButtonColor: '#4e73df',
-                        })
                     }
                 },
             });
@@ -690,13 +683,6 @@
                             list_items_barang_digunakan_material_2.push(item);
                         });
                         drawTableDigunakanMaterialII();
-                    } else {
-                        stopLoading()
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Produksi Tidak Ada',
-                            confirmButtonColor: '#4e73df',
-                        })
                     }
                 },
             });
@@ -721,13 +707,6 @@
                         drawTableLaborCost();
                         drawTableOverheadCost();
                         drawTableFixedOverheadCost();
-                    } else {
-                        stopLoading()
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Produksi Tidak Ada',
-                            confirmButtonColor: '#4e73df',
-                        })
                     }
                 },
             });
@@ -765,13 +744,6 @@
                         drawTableLaborCost();
                         drawTableOverheadCost();
                         drawTableFixedOverheadCost();
-                    } else {
-                        stopLoading()
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Produksi Tidak Ada',
-                            confirmButtonColor: '#4e73df',
-                        })
                     }
                 },
             });
