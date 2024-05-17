@@ -18,11 +18,6 @@
                     Posting
                 </button>
             <?php } ?>
-            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1 && $dataMaterialRequestswithwo[0]->posted_wo == 1 && $dataMaterialRequestswithwo[0]->status_wo == "waiting") { ?>
-                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 0)">
-                    Un Posting
-                </button>
-            <?php } ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>

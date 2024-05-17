@@ -520,7 +520,7 @@ class MaterialRequestKimia extends BaseController
                         date('Y-m-d'),
                         $this->this_user_id,
                         "PRODUKSI",
-                        "-",
+                        $materialRequestData['req_no'],
                         $value['note'] ? $value['note'] : "-"
                     );
 
@@ -537,7 +537,7 @@ class MaterialRequestKimia extends BaseController
 
                     // -----
                     // BARANG IN KE INVENTORI
-                    $stok = $this->stockModel->insertStok(
+                    $stokIn = $this->stockModel->insertStok(
                         $materialRequestData['company_id'],
                         $value['warehouse_tujuan_id'],
                         $value['divisi_tujuan_id'],
@@ -547,7 +547,7 @@ class MaterialRequestKimia extends BaseController
                         $value['qty2']
                     );
 
-                    $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
+                    $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
                         $materialRequestData['company_id'],
                         $value['warehouse_tujuan_id'],
                         $value['divisi_tujuan_id'],
@@ -556,13 +556,13 @@ class MaterialRequestKimia extends BaseController
                         $value['barang2_id'],
                         $value['bc_id'],
                         $value['stock_id'],
-                        $stok
+                        $stokIn
                     );
 
-                    if ($checkStokDetail == null) {
+                    if ($checkStokDetailIn == null) {
                         // INSERT STOK INISIASI
-                        $stokDetail = $this->stockDetailModel->insertStokDetail(
-                            $stok,
+                        $stokDetailIn = $this->stockDetailModel->insertStokDetail(
+                            $stokIn,
                             0,
                             "In",
                             date('Y-m-d'),
@@ -574,14 +574,14 @@ class MaterialRequestKimia extends BaseController
                         $this->stockDetail2Model->insertStokDetail2(
                             $value['bc_id'],
                             $value['stock_id'],
-                            $stokDetail,
+                            $stokDetailIn,
                             0,
                             $value['no_aju'],
                             "-"
                         );
                     }
 
-                    $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                    $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
                         $value['bc_id'],
                         $value['stock_id'],
                         $value['no_aju'],
@@ -589,22 +589,22 @@ class MaterialRequestKimia extends BaseController
                     );
 
                     // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
+                    $stokDetailIn = $this->stockDetailModel->insertStokDetail(
+                        $stokIn,
                         $value['qty2'],
                         "In",
                         date('Y-m-d'),
                         $this->this_user_id,
                         "PRODUKSI",
-                        $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
+                        $stockRebusDetailIn == null ? "-" : $stockRebusDetailIn['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
                         $value['note'] ? $value['note'] : "-"
                     );
 
                     // SUB DETAIL
                     $this->stockDetail2Model->insertStokDetail2(
                         $value['bc_id'],
-                        $value['stock_id'],
-                        $stokDetail,
+                        $stokIn,
+                        $stokDetailIn,
                         $value['qty2'],
                         $value['no_aju'],
                         $materialRequestData['req_no'],
