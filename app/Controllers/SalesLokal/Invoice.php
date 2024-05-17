@@ -253,7 +253,7 @@ class Invoice extends BaseController
                 // "no_surat_jalan"    => $postData['no_surat_jalan'],
                 "no_faktur"         => $noFaktur,
                 "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-', $postData['tanggal_faktur']))),
-                "terms"             => $postData['terms'] ?? '',
+                "terms"             => $postData['termin'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
                 "dpp"               => str_replace(',', '', $postData['dpp']),
@@ -381,7 +381,7 @@ class Invoice extends BaseController
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
                 if ($value->id_barang == $valueDetail['id_barang_invoice']) {
                     $value->id_detail_invoice = $valueDetail['id'];
-                    $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 0);
+                    $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
                     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
                     $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
                 }
@@ -410,6 +410,8 @@ class Invoice extends BaseController
     public function update()
     {
         $payload =  $this->request->getVar();
+
+
         //echo json_encode($payload);
         //return;
 
@@ -426,28 +428,10 @@ class Invoice extends BaseController
                     'required' => 'Tanggal Faktur tidak boleh kosong',
                 ]
             ],
-            "doc_type" => [
-                "rules" => "required|in_list[pesanan,pengiriman]",
-                'errors' => [
-                    'required' => 'Jenis dokumen tidak boleh kosong',
-                ]
-            ],
-            "doc_id" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'Nomor Dokumen tidak boleh kosong',
-                ]
-            ],
             "terms" => [
                 "rules" => "permit_empty",
                 'errors' => [
                     // 'required' => 'Term tidak boleh kosong',
-                ]
-            ],
-            "keterangan" => [
-                "rules" => "permit_empty",
-                'errors' => [
-                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
             ]
         ]);
@@ -477,14 +461,14 @@ class Invoice extends BaseController
                 return;
             }
 
-            if ($postData['doc_type'] === 'pesanan') {
+            if ($soInvData->document_type == 'pesanan') {
                 $documentData = $this->SalesOrderModel->asObject()
                     ->where('surat_jalan_so_id', null)
                     ->groupStart()
                     ->where('sales_order_invoice_id', null)
                     ->orWhere('id', $soInvData->document_id)
                     ->groupEnd()
-                    ->find($postData['doc_id']);
+                    ->find($soInvData->document_id);
 
                 // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
                 if (!empty($postItemsData)) {
@@ -532,7 +516,7 @@ class Invoice extends BaseController
                     ->where('sales_order_invoice_id', null)
                     ->orWhere('id', $soInvData->document_id)
                     ->groupEnd()
-                    ->find($postData['doc_id']);
+                    ->find($soInvData->document_id);
 
                 // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
                 if (!empty($postItemsData)) {
@@ -591,14 +575,16 @@ class Invoice extends BaseController
 
             $this->SalesOrderInvoiceModel->db->transException(true)->transStart();
             $values = [
-                "document_type"     => $postData['doc_type'],
-                "document_id"       => $postData['doc_id'],
-                "id_customer"       => $documentData->id_customer,
-                "no_faktur"         => $postData['no_faktur'],
+
+
+
                 "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-', $postData['tanggal_faktur']))),
-                "terms"             => $postData['terms'] ?? '',
+                "terms"             => $postData['termin'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
+                "dpp"               => str_replace(',', '', $postData['dpp']),
+                "ppn"               => str_replace(',', '', $postData['ppn']),
+                "total_invoice"     => str_replace(',', '', $postData['total_invoice']),
                 "termasuk_pa"       => $this->request->getPost('include_tax') ? 'true' : 'false',
                 "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
             ];
@@ -630,15 +616,16 @@ class Invoice extends BaseController
                     $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
                 }
             }
+
             $updateData = [$documentData->id, ['sales_order_invoice_id' => $payload['id']]];
-            if ($postData['doc_type'] === 'pesanan') {
+            if ($soInvData->document_type == 'pesanan') {
                 $this->SalesOrderModel->update(...$updateData);
             } else {
                 $this->SuratJalanModel->update(...$updateData);
             }
 
 
-            $this->SalesOrderModel->update($documentData->id, ['payment_terms' => $this->request->getPost('termin')]);
+            // $this->SalesOrderModel->update($documentData->id, ['payment_terms' => $this->request->getPost('termin')]);
 
             $this->SalesOrderInvoiceModel->db->transComplete();
 
@@ -666,20 +653,21 @@ class Invoice extends BaseController
     public function delete()
     {
         try {
-            $id = $this->request->getPost("id");
+
+            $id = decrypt($this->request->getPost("id"));
             if (!empty($id)) {
                 $this->SalesOrderInvoiceModel->delete($id);
                 $data = [
-                    "status"            => true,
+                    "status"     => true,
                     "message"    => "Data Success Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             } else {
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Dihapus",
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             }
@@ -839,34 +827,44 @@ class Invoice extends BaseController
         if ($docType == 'pesanan') {
             $soId = $docId;
             $soData = $this->SalesOrderModel->asObject()
-                ->select("sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.id AS termin")
+                ->select("sales_order.*,
+                sales_order.no_po, sales_order.nama_ecommerce, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.id AS termin")
                 ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-                ->join('employees', 'employees.id = customers.sales_id', 'left')
+                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
                 ->find($docId);
 
-            $salesName = $soData->salesName;
-            $termin = $soData->termin;
-            $customerName = $soData->customerName;
-            $customerAddress = $soData->customerAddress;
+            $salesName = $soData->salesName ?? "-";
+            $termin = $soData->termin ?? "-";
+            $jenis_penjualan = $soData->jenis_penjualan ?? "-";
+            $no_po = $soData->no_po ?? "-";
+            $nama_ecommerce = $soData->nama_ecommerce ?? "-";
+            $customerName = $soData->customerName ?? "-";
+            $customerAddress = $soData->customerAddress ?? "-";
         } else {
             $selectQry = "surat_jalan_so.*, 
+                          sales_order.jenis_penjualan,
+                          sales_order.no_po,
+                          sales_order.nama_ecommerce,
                           customers.name AS customerName, 
                           customers.address AS customerAddress,  
-                          IFNULL(metadata.value, '-') AS termin,
-                          CONCAT(employees.nip , ' - ', employees.name) AS salesName";
+                          CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.id AS termin";
             $suratJalanData = $this->SuratJalanModel->asObject()
                 ->select($selectQry)
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
-                ->join('employees', 'employees.id = customers.sales_id', 'left')
-                ->join('metadata', 'metadata.id = customers.termin', 'left')
+                ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id')
+                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+                ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
                 ->find($docId);
 
-            $salesName = $suratJalanData->salesName;
-            $termin = $suratJalanData->termin;
+            $salesName = $suratJalanData->salesName ?? "-";
+            $termin = $suratJalanData->termin ?? "-";
+            $jenis_penjualan = $suratJalanData->jenis_penjualan ?? "-";
+            $no_po = $suratJalanData->no_po ?? "-";
+            $nama_ecommerce = $suratJalanData->nama_ecommerce ?? "-";
             $soId = json_decode($suratJalanData->multiple_id_so);
-            $customerName = $suratJalanData->customerName;
-            $customerAddress = $suratJalanData->customerAddress;
+            $customerName = $suratJalanData->customerName ?? "-";
+            $customerAddress = $suratJalanData->customerAddress ?? "-";
         }
 
         $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
@@ -903,6 +901,9 @@ class Invoice extends BaseController
         $data = (object)[
             'salesName'         => $salesName,
             'termin'            => $termin,
+            'jenis_penjualan'   => $jenis_penjualan,
+            'no_po'             => $no_po,
+            'nama_ecommerce'   => $nama_ecommerce,
             'customerName'      => $customerName,
             'customerAddress'   => $customerAddress,
             'taxStatus'         => $taxStatus,
