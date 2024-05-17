@@ -100,9 +100,16 @@ class MaterialRequest extends BaseController
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description', "bahan_baku")
+            ->orWhere('description', "bahan_jadi")
+            ->orWhere('description', "bahan_scrap")
+            ->findAll();
 
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
+            'tipeBarang' => $dataTipeBarang,
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
@@ -182,46 +189,6 @@ class MaterialRequest extends BaseController
 
         return view('Production/materialRequest/form', $data);
     }
-
-    // public function getByIdDetail($id = null)
-    // {
-    //     $id = decrypt($id);
-    //     //Get Barang
-    //     $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
-
-    //     //Get Satuan
-    //     $dataSatuan = $this->satuanModel->asObject()->find();
-
-    //     $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
-    //     $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
-
-    //     $data = [
-    //         "dataBarang" => $dataBarang,
-    //         "dataSatuan" => $dataSatuan,
-    //         "dataDivisi" => $dataDivisi,
-    //         "dataWarehouse" => $dataWarehouse,
-    //     ];
-
-    //     if (!empty($id)) {
-    //         $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
-    //         $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
-    //         $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.nama_satuan')
-    //             ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
-    //             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
-    //             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-    //             ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
-    //             ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
-    //             ->where('material_request_id', $id)
-    //             ->where('material_request_details.deletedAt', null)
-    //             ->get()->getResult();
-    //         $data["dataMaterialRequests"] = $dataMaterialRequests;
-    //         $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
-    //         $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
-    //         $data["ids"] = $id;
-    //     }
-
-    //     return view('Production/materialRequest/form-detail', $data);
-    // }
 
     public function all()
     {
@@ -363,6 +330,8 @@ class MaterialRequest extends BaseController
                         'material_request_id' => $id,
                         'divisi_id' => $s->departmentID,
                         'warehouse_id' => $s->warehouseID,
+                        'divisi_tujuan_id' => $s->departmentTujuanID,
+                        'warehouse_tujuan_id' => $s->warehouseTujuanID,
                         'barang1_id' => $stockBarang->barang1_id,
                         'barang2_id' => $stockBarang->barang2_id,
                         'nama_barang' => $s->barang,
@@ -372,6 +341,7 @@ class MaterialRequest extends BaseController
                         'no_aju' => $s->no_aju,
                         'ref_no' => $s->bc_type,
                         'stock_date' => $stockDetailBarang->stock_date,
+                        'stock_dokumen' => $s->stock_dokumen,
                         'barang_type' => $s->type_barang,
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
@@ -382,6 +352,8 @@ class MaterialRequest extends BaseController
                         'material_request_id' => $id,
                         'divisi_id' => $s->departmentID,
                         'warehouse_id' => $s->warehouseID,
+                        'divisi_tujuan_id' => $s->departmentTujuanID,
+                        'warehouse_tujuan_id' => $s->warehouseTujuanID,
                         'barang1_id' => $stockBarang->barang1_id,
                         'barang2_id' => $stockBarang->barang2_id,
                         'nama_barang' => $s->barang,
@@ -391,6 +363,7 @@ class MaterialRequest extends BaseController
                         'no_aju' => $s->no_aju,
                         'ref_no' => $s->bc_type,
                         'stock_date' => $stockDetailBarang->stock_date,
+                        'stock_dokumen' => $s->stock_dokumen,
                         'barang_type' => $s->type_barang,
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
@@ -449,6 +422,8 @@ class MaterialRequest extends BaseController
                             'material_request_id' => $id,
                             'divisi_id' => $s->departmentID,
                             'warehouse_id' => $s->warehouseID,
+                            'divisi_tujuan_id' => $s->departmentTujuanID,
+                            'warehouse_tujuan_id' => $s->warehouseTujuanID,
                             'barang1_id' => $stockBarang->barang1_id,
                             'barang2_id' => $stockBarang->barang2_id,
                             'nama_barang' => $s->barang,
@@ -458,6 +433,7 @@ class MaterialRequest extends BaseController
                             'no_aju' => $s->no_aju,
                             'ref_no' => $s->bc_type,
                             'stock_date' => $stockDetailBarang->stock_date,
+                            'stock_dokumen' => $s->stock_dokumen,
                             'barang_type' => $s->type_barang,
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
@@ -468,6 +444,8 @@ class MaterialRequest extends BaseController
                             'material_request_id' => $id,
                             'divisi_id' => $s->departmentID,
                             'warehouse_id' => $s->warehouseID,
+                            'divisi_tujuan_id' => $s->departmentTujuanID,
+                            'warehouse_tujuan_id' => $s->warehouseTujuanID,
                             'barang1_id' => $stockBarang->barang1_id,
                             'barang2_id' => $stockBarang->barang2_id,
                             'nama_barang' => $s->barang,
@@ -477,6 +455,7 @@ class MaterialRequest extends BaseController
                             'no_aju' => $s->no_aju,
                             'ref_no' => $s->bc_type,
                             'stock_date' => $stockDetailBarang->stock_date,
+                            'stock_dokumen' => $s->stock_dokumen,
                             'barang_type' => $s->type_barang,
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
@@ -552,7 +531,84 @@ class MaterialRequest extends BaseController
                         $stokDetail,
                         $value['qty2'],
                         $value['no_aju'],
-                        $materialRequestData['req_no']
+                        $materialRequestData['req_no'],
+                        $value['stock_dokumen'],
+                    );
+
+                    // -----
+                    // BARANG IN KE INVENTORI
+                    $stok = $this->stockModel->insertStok(
+                        $materialRequestData['company_id'],
+                        $value['warehouse_tujuan_id'],
+                        $value['divisi_tujuan_id'],
+                        $value['barang_type'],
+                        $value['barang1_id'],
+                        $value['barang2_id'],
+                        $value['qty2']
+                    );
+
+                    $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
+                        $materialRequestData['company_id'],
+                        $value['warehouse_tujuan_id'],
+                        $value['divisi_tujuan_id'],
+                        $value['barang_type'],
+                        $value['barang1_id'],
+                        $value['barang2_id'],
+                        $value['bc_id'],
+                        $value['stock_id'],
+                        $stok
+                    );
+
+                    if ($checkStokDetail == null) {
+                        // INSERT STOK INISIASI
+                        $stokDetail = $this->stockDetailModel->insertStokDetail(
+                            $stok,
+                            0,
+                            "In",
+                            date('Y-m-d'),
+                            $this->this_user_id,
+                            "INISIASI",
+                            "-",
+                            "-"
+                        );
+                        $this->stockDetail2Model->insertStokDetail2(
+                            $value['bc_id'],
+                            $value['stock_id'],
+                            $stokDetail,
+                            0,
+                            $value['no_aju'],
+                            "-"
+                        );
+                    }
+
+                    $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                        $value['bc_id'],
+                        $value['stock_id'],
+                        $value['no_aju'],
+                        $value['stock_dokumen']
+                    );
+
+                    // DETAIL
+                    $stokDetail = $this->stockDetailModel->insertStokDetail(
+                        $stok,
+                        $value['qty2'],
+                        "In",
+                        date('Y-m-d'),
+                        $this->this_user_id,
+                        "PRODUKSI",
+                        $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
+                        $value['note'] ? $value['note'] : "-"
+                    );
+
+                    // SUB DETAIL
+                    $this->stockDetail2Model->insertStokDetail2(
+                        $value['bc_id'],
+                        $value['stock_id'],
+                        $stokDetail,
+                        $value['qty2'],
+                        $value['no_aju'],
+                        $materialRequestData['req_no'],
+                        $value['stock_dokumen'],
                     );
                 }
 
@@ -597,6 +653,31 @@ class MaterialRequest extends BaseController
 
         return response()->setJSON([
             'message' => "Bahan Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function getListBarangIsInit()
+    {
+        $addCondition = [];
+        if ($this->request->getVar('type_barang') == "bahan_penolong" && $this->request->getVar('kondisi') == "nonkimia") {
+            $addCondition = [
+                "parent_name !=" => "KIMIA"
+            ];
+        } else if ($this->request->getVar('type_barang') == "bahan_penolong" && $this->request->getVar('kondisi') == "kimia") {
+            $addCondition = [
+                "parent_name" => "KIMIA"
+            ];
+        }
+        $data = $this->stockModel->getBarangAndStockCondition(
+            $this->request->getVar('type_barang'),
+            $this->request->getVar('divisi_id'),
+            $this->request->getVar('warehouse_id'),
+            $addCondition
+        );
+        return response()->setJSON([
+            'data' => $data,
             'token' => csrf_hash(),
             'status' => true
         ]);

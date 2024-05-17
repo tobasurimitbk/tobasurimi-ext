@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class MaterialRequestDetailsModel extends Model
+class MaterialRequestPenolongDetailsModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'material_request_details';
+    protected $table            = 'material_request_penolong_details';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -43,7 +43,7 @@ class MaterialRequestDetailsModel extends Model
     public function getMaterialRequestDetailByMaterialRequestID($mrID)
     {
         $selectQry = '
-            material_request_details.*,        
+            material_request_penolong_details.*,        
             barang_master.kode_barang,        
             barang_master.barang_name,        
             barang_master.type_barang      
@@ -51,8 +51,8 @@ class MaterialRequestDetailsModel extends Model
 
         $dataQry = $this->asArray()
             ->select($selectQry)
-            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
-            ->where('material_request_details.material_request_id', $mrID)
+            ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id')
+            ->where('material_request_penolong_details.material_request_id', $mrID)
             ->findAll();
 
         return $dataQry;

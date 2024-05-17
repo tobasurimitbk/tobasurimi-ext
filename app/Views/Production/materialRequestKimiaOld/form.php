@@ -4,25 +4,11 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <?php if (isset($ids)) { ?>
-            <h1 class="title-name">Edit Material Request</h1>
-        <?php } else { ?>
-            <h1 class="title-name">Tambah Material Request</h1>
-        <?php } ?>
+        <h1 class="title-name">Tambah Material Request Kimia</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-kimia"); ?>">
                 Batal
             </a>
-            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted != 1) { ?>
-                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
-                    Posting
-                </button>
-            <?php } ?>
-            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1 && $dataMaterialRequestswithwo[0]->posted_wo == 1 && $dataMaterialRequestswithwo[0]->status_wo == "waiting") { ?>
-                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 0)">
-                    Un Posting
-                </button>
-            <?php } ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
@@ -49,7 +35,7 @@
                                 <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
+                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             <?php } ?>
@@ -114,80 +100,21 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
+                        <select class="form-select department_id" name="department_id" id="department_id" aria-label="Floating label select example">
                             <option value=""></option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
-                                </option>
+                            <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
+                                <option value="<?= $dataDivisi['id'] ?>"><?= $dataDivisi['divisi'] ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
+                        <label for="floatingInput">Department</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
+                        <select class="form-select warehouse_id" name="warehouse_id" id="warehouse_id" disabled>
                             <option value=""></option>
-                            <?php if (!empty($warehouseAsal)) : ?>
-                                <?php foreach ($warehouseAsal as $w) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                        <?= $w['warehouse_name']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif ?>
                         </select>
-                        <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php if (!empty($divisiTujuan)) : ?>
-                                <?php foreach ($divisiTujuan as $d) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                        <?= $d['divisi']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php if (!empty($warehouseTujuan)) : ?>
-                                <?php foreach ($warehouseTujuan as $w) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_tujuan_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                        <?= $w['warehouse_name']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
-                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
-                        <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
+                        <label for="floatingInput">Warehouse</label>
                     </div>
                 </div>
             </div>
@@ -215,27 +142,23 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12 col-table-button-tts">
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center;">#</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
-                                    <th style="text-align: center;">Tanggal Penerimaan</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">#</th>
+                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">Dokumen Pabean</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Tanggal Penerimaan</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table">
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="row">
@@ -280,7 +203,7 @@
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Scrap Request</label>
+                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Scrap dan Penolong Request</label>
                     </div>
                 </div>
             </div>
@@ -330,8 +253,39 @@
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Kaleng</th>
-                                <th style="text-align: center;">Qty Kaleng Direquest</th>
-                                <th style="text-align: center;">Qty Isi Direquest</th>
+                                <th style="text-align: center;">Qty Isi</th>
+                                <th style="text-align: center;">Qty Direquest</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">Data Bahan Kimia</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahanKimia" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Department</th>
+                                <th style="text-align: center;">Warehouse</th>
+                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">Dokumen Pabean</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Tanggal Penerimaan</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Qty Awal</th>
+                                <th style="text-align: center;">Qty Direquest</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -348,9 +302,10 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    var listStockAsal = [];
+    let list_items = [];
     var listStockSelectedBahanBaku = [];
     var listStockSelectedBahan = [];
+    var listStockSelectedBahanKimia = [];
     var listStockSelectedBahanJadi = [];
 
     let sortDataBarang = "createdAt";
@@ -371,10 +326,8 @@
                     no_dokumen_2: "-",
                     qty: "<?= $materialRequestDetails->qty ?>",
                     qty2: "<?= $materialRequestDetails->qty2 ?>",
-                    qty_isi: "<?= $materialRequestDetails->qty_isi ?>",
                     satuan: "<?= $materialRequestDetails->kode_satuan ?>",
                     stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
-                    stock_dokumen: "<?= $materialRequestDetails->stock_dokumen ?>",
                     stock_id: "<?= $materialRequestDetails->stock_id ?>",
                     stok_total: "<?= $materialRequestDetails->qty ?>",
                     supplier_name: "-",
@@ -394,12 +347,10 @@
                     no_aju: "<?= $materialRequestDetails->no_aju ?>",
                     no_dokumen_1: "-",
                     no_dokumen_2: "-",
-                    qty: "<?= $materialRequestDetails->qty ?>",
-                    qty2: "<?= $materialRequestDetails->qty2 ?>",
-                    qty_isi: "<?= $materialRequestDetails->qty_isi ?>",
+                    qty: "<?= $materialRequestDetails->qty2 ?>",
+                    qty2: "<?= $materialRequestDetails->qty_isi ?>",
                     satuan: "<?= $materialRequestDetails->kode_satuan ?>",
                     stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
-                    stock_dokumen: "<?= $materialRequestDetails->stock_dokumen ?>",
                     stock_id: "<?= $materialRequestDetails->stock_id ?>",
                     stok_total: "<?= $materialRequestDetails->qty ?>",
                     supplier_name: "-",
@@ -409,103 +360,81 @@
                     warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
                 });
             <?php } else { ?>
-                listStockSelectedBahan.push({
-                    id_material_request_detail: "<?= $materialRequestDetails->id ?>",
-                    barang: "<?= $materialRequestDetails->nama_barang ?>",
-                    bc_id: "<?= $materialRequestDetails->bc_id ?>",
-                    bc_type: "<?= $materialRequestDetails->ref_no ?>",
-                    departmentID: "<?= $materialRequestDetails->divisi_id ?>",
-                    departmentText: "<?= $materialRequestDetails->divisi_text ?>",
-                    no_aju: "<?= $materialRequestDetails->no_aju ?>",
-                    no_dokumen_1: "-",
-                    no_dokumen_2: "-",
-                    qty: "<?= $materialRequestDetails->qty ?>",
-                    qty2: "<?= $materialRequestDetails->qty2 ?>",
-                    qty_isi: "<?= $materialRequestDetails->qty_isi ?>",
-                    satuan: "<?= $materialRequestDetails->kode_satuan ?>",
-                    stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
-                    stock_dokumen: "<?= $materialRequestDetails->stock_dokumen ?>",
-                    stock_id: "<?= $materialRequestDetails->stock_id ?>",
-                    stok_total: "<?= $materialRequestDetails->qty ?>",
-                    supplier_name: "-",
-                    type_barang: "<?= $materialRequestDetails->barang_type ?>",
-                    type_barang_text: "<?= $materialRequestDetails->barang_type_text ?>",
-                    warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
-                    warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
-                });
+                <?php if ($materialRequestDetails->kimia == "1") { ?>
+                    listStockSelectedBahanKimia.push({
+                        id_material_request_detail: "<?= $materialRequestDetails->id ?>",
+                        barang: "<?= $materialRequestDetails->nama_barang ?>",
+                        bc_id: "<?= $materialRequestDetails->bc_id ?>",
+                        bc_type: "<?= $materialRequestDetails->ref_no ?>",
+                        departmentID: "<?= $materialRequestDetails->divisi_id ?>",
+                        departmentText: "<?= $materialRequestDetails->divisi_text ?>",
+                        no_aju: "<?= $materialRequestDetails->no_aju ?>",
+                        no_dokumen_1: "-",
+                        no_dokumen_2: "-",
+                        qty: "<?= $materialRequestDetails->qty ?>",
+                        qty2: "<?= $materialRequestDetails->qty2 ?>",
+                        satuan: "<?= $materialRequestDetails->kode_satuan ?>",
+                        stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
+                        stock_id: "<?= $materialRequestDetails->stock_id ?>",
+                        stok_total: "<?= $materialRequestDetails->qty ?>",
+                        supplier_name: "-",
+                        type_barang: "<?= $materialRequestDetails->barang_type ?>",
+                        type_barang_text: "<?= $materialRequestDetails->barang_type_text ?>",
+                        warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
+                        warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
+                    });
+                <?php } else { ?>
+                    listStockSelectedBahan.push({
+                        id_material_request_detail: "<?= $materialRequestDetails->id ?>",
+                        barang: "<?= $materialRequestDetails->nama_barang ?>",
+                        bc_id: "<?= $materialRequestDetails->bc_id ?>",
+                        bc_type: "<?= $materialRequestDetails->ref_no ?>",
+                        departmentID: "<?= $materialRequestDetails->divisi_id ?>",
+                        departmentText: "<?= $materialRequestDetails->divisi_text ?>",
+                        no_aju: "<?= $materialRequestDetails->no_aju ?>",
+                        no_dokumen_1: "-",
+                        no_dokumen_2: "-",
+                        qty: "<?= $materialRequestDetails->qty ?>",
+                        qty2: "<?= $materialRequestDetails->qty2 ?>",
+                        satuan: "<?= $materialRequestDetails->kode_satuan ?>",
+                        stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
+                        stock_id: "<?= $materialRequestDetails->stock_id ?>",
+                        stok_total: "<?= $materialRequestDetails->qty ?>",
+                        supplier_name: "-",
+                        type_barang: "<?= $materialRequestDetails->barang_type ?>",
+                        type_barang_text: "<?= $materialRequestDetails->barang_type_text ?>",
+                        warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
+                        warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
+                    });
+                <?php } ?>
             <?php } ?>
         <?php endforeach; ?>
         // console.log(listStockSelectedBahan);
         // console.log(listStockSelectedBahanJadi);
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
+        drawTableSelectedItemBahanKimia(listStockSelectedBahanKimia);
         drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
     <?php endif; ?>
     $(document).ready(function() {
-
-        $('#type_pengambilan_stock').select2({
-            placeholder: "Pilih Tipe Ambil Stok",
-            theme: "bootstrap-5",
+        // Departemen
+        $('.department_id').select2({
+            placeholder: "Pilih Departemen",
+            theme: "bootstrap-5"
         }).change(function() {
-            // FIFO
-            if ($(this).val() == "FIFO") {
-                $('.qty_mutasi_fifo').removeAttr('readonly');
-            } else {
-                $('.qty_mutasi_fifo').attr('readonly', 'readonly');
-            }
-            $('#select_tipe_bahan').val(null).change();
-            $("#select_tipe_bahan").prop('disabled', false);
-            $('#select_nama_barang').val(null).change();
-            $("#select_nama_barang").prop('disabled', false);
-            listStockAsal = [];
-            drawTableAsalBarang();
+            getListWarehouseAsal();
+            $('.select_tipe_bahan').val(null).change();
         });
 
-        $('#divisi_tujuan_id').select2({
-            placeholder: "Pilih Departemen Tujuan",
-            theme: "bootstrap-5",
-            allowClear: true
-        }).change(function() {
-            // CARI WAREHOUSE TUJUAN
-            getListWarehouseTujuan();
-        });
+        //CSS SELECT2 FLOATING LABEL
+        $('.department_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
-        $('#warehouse_tujuan_id').select2({
-            placeholder: "Pilih Warehouse Tujuan",
-            theme: "bootstrap-5",
-            allowClear: true
-        }).change(function() {});
-
-        $('#warehouse_asal_id').select2({
-            placeholder: "Pilih Warehouse Asal",
-            theme: "bootstrap-5",
-            allowClear: true
-        }).change(function() {
-            // RESET TYPE BARANG
-            $('#select_tipe_bahan').val(null).change();
-            $("#select_tipe_bahan").prop('disabled', false);
-            // RESET SEMUA LIST
-            listStockAsal = [];
-            drawTableAsalBarang(listStockAsal);
-        });
-
-        $('#divisi_asal_id').select2({
-            placeholder: "Pilih Departemen Asal",
-            theme: "bootstrap-5",
-            allowClear: true
-        }).change(function() {
-            // CARI DIVISI TUJUAN
-            getListDivisiTujuan();
-            // CARI WAREHOUSE ASAL
-            getListWarehouseAsal()
-            // RESET TYPE BARANG
-            $('#select_tipe_bahan').val(null).change();
-            // RESET SEMUA LIST
-            listStockAsal = [];
-            drawTableAsalBarang(listStockAsal);
-        });
-
-        $("#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#operasi,#type_pengambilan_stock")
+        $('.department_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -513,17 +442,16 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
+        $('.department_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         // select tipe bahan
         $('.select_tipe_bahan').select2({
             placeholder: "Pilih Tipe Bahan",
             theme: "bootstrap-5",
             allowClear: true
-        }).change(function() {
-            $('#select_nama_barang').val(null).change();
-            $("#select_nama_barang").prop('disabled', false);
-            listStockAsal = [];
-            drawTableAsalBarang();
-            getListBarang();
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -553,8 +481,6 @@
             theme: "bootstrap-5",
             allowClear: true
         }).change(function() {
-            listStockAsal = [];
-            drawTableAsalBarang();
             getListDokumenPabean();
         });
 
@@ -603,6 +529,32 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.kode_produksi')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // PILIH TIPE Warehouse
+        $('.warehouse_id').select2({
+            placeholder: "Pilih Warehouse",
+            theme: "bootstrap-5"
+        });
+
+        $('.warehouse_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.warehouse_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.warehouse_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -780,12 +732,11 @@
         });
 
         $('.btn-save').click(function() {
-            var listMaterialCheck = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanJadi);
-
-            if (listMaterialCheck.length == 0) {
+            // console.log(listStockSelectedBahanBaku);
+            if (listStockSelectedBahanKimia.length == 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Barang yang akan direquest tidak boleh kosong !',
+                    title: 'Barang kimia yang akan direquest tidak boleh kosong !',
                     confirmButtonColor: '#4e73df',
                     confirmButtonText: 'Ok'
                 });
@@ -794,54 +745,54 @@
                     var isValid = true;
                     var dataError = null;
 
-                    $.each(listStockSelectedBahanBaku, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].qty-baku-request');
-                        var elementSortir = $('input[data-id="' + v.id + '"].qty-baku-sortir');
-                        var input_user = parseFloat(element.val());
-                        var input_user_sortir = parseFloat(elementSortir.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
+                    // $.each(listStockSelectedBahanBaku, function(i, v) {
+                    //     var element = $('input[data-id="' + v.id + '"].qty-baku-request');
+                    //     var elementSortir = $('input[data-id="' + v.id + '"].qty-baku-sortir');
+                    //     var input_user = parseFloat(element.val());
+                    //     var input_user_sortir = parseFloat(elementSortir.val());
+                    //     var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
-                            dataError = listStockSelectedBahanBaku[i];
-                            isValid = false;
-                        } else {
-                            listStockSelectedBahanBaku[i].qty = stok_max;
-                            listStockSelectedBahanBaku[i].qty2 = input_user;
-                            listStockSelectedBahanBaku[i].qty_isi = input_user_sortir;
-                        }
-                    });
+                    //     if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
+                    //         dataError = listStockSelectedBahanBaku[i];
+                    //         isValid = false;
+                    //     } else {
+                    //         listStockSelectedBahanBaku[i].qty = input_user;
+                    //         listStockSelectedBahanBaku[i].qty2 = input_user_sortir;
+                    //     }
+                    // });
 
-                    $.each(listStockSelectedBahan, function(i, v) {
+                    $.each(listStockSelectedBahanKimia, function(i, v) {
                         var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
                         var input_user = parseFloat(element.val());
                         var stok_max = parseFloat(element.data('stok_total'));
 
                         if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                            dataError = listStockSelectedBahan[i];
+                            dataError = listStockSelectedBahanKimia[i];
                             isValid = false;
                         } else {
-                            listStockSelectedBahan[i].qty = stok_max;
-                            listStockSelectedBahan[i].qty2 = input_user;
+                            listStockSelectedBahanKimia[i].qty = input_user;
                         }
                     });
 
-                    $.each(listStockSelectedBahanJadi, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].qty-jadi-isi');
-                        var elementRequest = $('input[data-id="' + v.id + '"].qty-jadi-request');
-                        var input_user = parseFloat(element.val());
-                        var input_user_request = parseFloat(elementRequest.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
+                    // $.each(listStockSelectedBahanJadi, function(i, v) {
+                    //     var element = $('input[data-id="' + v.id + '"].qty-jadi-isi');
+                    //     var elementRequest = $('input[data-id="' + v.id + '"].qty-jadi-request');
+                    //     var input_user = parseFloat(element.val());
+                    //     var input_user_request = parseFloat(elementRequest.val());
+                    //     var stok_max = parseFloat(element.data('stok_total')) * parseFloat(input_user);
+                    //     var stok_request = parseFloat(input_user_request) / parseFloat(input_user);
 
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || isNaN(input_user_request) || input_user_request == undefined || input_user_request == 0) {
-                            dataError = listStockSelectedBahanJadi[i];
-                            isValid = false;
-                        } else {
-                            listStockSelectedBahanJadi[i].qty = stok_max;
-                            listStockSelectedBahanJadi[i].qty2 = input_user;
-                            listStockSelectedBahanJadi[i].qty_isi = input_user_request;
-                        }
-                    });
-                    console.log(listStockSelectedBahanBaku);
+                    //     if (input_user_request > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || isNaN(input_user_request) || input_user_request == undefined || input_user_request == 0) {
+                    //         dataError = listStockSelectedBahanJadi[i];
+                    //         isValid = false;
+                    //     } else {
+                    //         listStockSelectedBahanJadi[i].qty = input_user_request;
+                    //         listStockSelectedBahanJadi[i].qty2 = input_user;
+                    //         listStockSelectedBahanJadi[i].qty_request = stok_request;
+                    //         listStockSelectedBahanJadi[i].qty_isi = input_user;
+                    //         listStockSelectedBahanJadi[i].qty_request_kaleng = input_user_request;
+                    //     }
+                    // });
 
                     if (!isValid) {
                         Swal.fire({
@@ -864,12 +815,12 @@
                             if (result.isConfirmed) {
                                 let id = $('#id').val();
                                 let data = new FormData(document.querySelector(".create-form"));
-                                var listMaterial = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanJadi);
-                                data.append('listMaterial', JSON.stringify(listMaterial));
+                                // var listMaterial = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanJadi);
+                                data.append('listMaterial', JSON.stringify(listStockSelectedBahanKimia));
                                 if (id) {
                                     // UPDATE
                                     $.ajax({
-                                        url: "<?= base_url("material-request/update"); ?>",
+                                        url: "<?= base_url("material-request-kimia/update"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -933,6 +884,24 @@
             }
         });
 
+        // $('#department_id').on('change', function() {
+        //     var departmentId = $(this).val();
+        //     $.ajax({
+        //         url: `<?= base_url("warehouse/dropdown/divisi/"); ?>/${departmentId}`,
+        //         method: "GET",
+        //         dataType: "json",
+        //         success: function(res) {
+        //             $("#warehouse_id").empty();
+        //             $("#warehouse_id").append(`<option value=""></option>`);
+        //             res.data.forEach(function(item) {
+        //                 $("#warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`);
+        //             })
+        //             $("#warehouse_id").prop('disabled', false);
+        //             // $("#warehouse_id").val().change();
+        //         }
+        //     })
+        // });
+
         $(".kode_produksi").change(function() {
             if ($(".kode_produksi option:selected").val()) {
                 let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
@@ -945,6 +914,16 @@
                 $(".standart_production").val("");
             }
         })
+
+        $(".select_tipe_bahan").change(function() {
+            getListBarang();
+        })
+
+        $(".warehouse_id").change(function() {
+            // $("#select_tipe_bahan").prop('disabled', false);
+            $("#select_tipe_bahan").val('bahan_penolong').change();
+            $("#select_nama_barang").prop('disabled', false);
+        });
     });
 
     $('.btn-hide-detail').click(function() {
@@ -964,30 +943,35 @@
     // }
 
     const deleteRowDetail = function(id) {
-        const indexToRemove = listStockAsal.findIndex(item => item.barang_detail_id === id);
+        const indexToRemove = list_items.findIndex(item => item.barang_detail_id === id);
         if (indexToRemove !== -1) {
-            listStockAsal.splice(indexToRemove, 1);
+            list_items.splice(indexToRemove, 1);
         }
         drawTable();
     }
 
     function getListWarehouseAsal() {
-        setLoading();
         // GET LIST WAREHOUSE ASAL
         $.ajax({
             url: `<?= base_url('mutasi/warehouse'); ?>`,
             method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
             data: {
-                divisi_id: $(".divisi_asal_id option:selected").val(),
+                divisi_id: $(".department_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
-                $(".warehouse_asal_id").empty()
-                $(".warehouse_asal_id").append(`<option value=""></option>`)
+                $(".warehouse_id").empty()
+                $(".warehouse_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".warehouse_asal_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
                 })
-                stopLoading();
+                $(".warehouse_id").prop('disabled', false);
             }
         });
     }
@@ -995,7 +979,7 @@
     function getListBarang() {
         // GET LIST BARANG
         $.ajax({
-            url: `<?= base_url('material-request/list-barang-stock-init'); ?>`,
+            url: `<?= base_url('material-request-kimia/list-barang-stock-init'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1005,12 +989,13 @@
             },
             data: {
                 type_barang: $(".select_tipe_bahan option:selected").val(),
-                divisi_id: $(".divisi_asal_id option:selected").val(),
-                warehouse_id: $(".warehouse_asal_id option:selected").val(),
-                kondisi: "nonkimia",
+                divisi_id: $(".department_id option:selected").val(),
+                warehouse_id: $(".warehouse_id option:selected").val(),
+                kondisi: "kimia",
             },
             dataType: "json",
             success: function(res) {
+                // $(".select_tipe_bahan").val('bahan_penolong').change();
                 $(".select_nama_barang").empty()
                 $(".select_nama_barang").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
@@ -1046,146 +1031,28 @@
         });
     }
 
-    function getListDivisiTujuan() {
-        setLoading();
-        // GET LIST DIVISI TUJUAN
-        $.ajax({
-            url: `<?= base_url('mutasi/list-divisi-except'); ?>`,
-            method: "GET",
-            data: {
-                divisi_id: $(".divisi_asal_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".divisi_tujuan_id").empty()
-                $(".divisi_tujuan_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".divisi_tujuan_id").append(`<option value="${item.id}">${item.divisi}</option>`)
-                })
-                stopLoading();
-            }
-        });
-    }
-
-    function getListWarehouseTujuan() {
-        // GET LIST WAREHOUSE TUJUAN
-        $.ajax({
-            url: `<?= base_url('mutasi/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_tujuan_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_tujuan_id").empty()
-                $(".warehouse_tujuan_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_tujuan_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-            }
-        });
-    }
-
-    const posting = function(id, status_posting) {
-        console.log(id);
-        Swal.fire({
-            icon: 'question',
-            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "<?= base_url("material-request/update-status"); ?>",
-                    data: {
-                        id: id,
-                        status_posting: status_posting
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    window.location.href = "<?= base_url('material-request/details/') ?>" + response.id
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                });
-            }
-        })
-    }
-
     function drawTableAsalBarang(data) {
         if ($.fn.DataTable.isDataTable('#dataTable')) {
             $('#dataTable').DataTable().clear().draw();
             dataTable.destroy();
         }
         const table = $('#dataTable');
-        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
-
         $.each(data, function(i, v) {
-            var newRow = $('<tr style="color:whitesmoke;">');
-            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').html(
                 `
-                ));
-            } else {
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
                     <div class="form-check">
-                        <input  data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
-                ));
-            }
-
-            newRow.append($('<td style="text-align:center;">').text(v.sumber));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
-            newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align:center;">').text(v.no_aju));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align:center;">').text(v.barang));
-            newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(v.stok_total));
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align: center;">').text(v.satuan));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             table.find('tbody').append(newRow);
         });
 
@@ -1201,12 +1068,8 @@
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
             },
-            lengthMenu: [
-                [100],
-                [100]
-            ],
             display: "stripe",
-            searching: true,
+            searching: false,
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1220,25 +1083,13 @@
         dataTable.draw();
     }
 
-    $('#select-item-btn').click(function() {
-        var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
-        if (typePengambilanStock == "FIFO") {
-            insertListFifo();
-        } else {
-            insertListPabean();
-        }
-        console.log(listStockAsal);
-    });
 
-    function insertListPabean() {
-        var departmentID = $("#divisi_asal_id").val();
-        var departmentText = $("#divisi_asal_id option:selected").text();
-        var warehouseID = $("#warehouse_asal_id").val();
-        var warehouseText = $("#warehouse_asal_id option:selected").text();
-        var departmentTujuanID = $("#divisi_tujuan_id").val();
-        var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
-        var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-        var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
+    $('#select-item-btn').click(function() {
+        var checkedCheckboxes = $(".child:checked");
+        var departmentID = $("#department_id").val();
+        var departmentText = $("#department_id option:selected").text();
+        var warehouseID = $("#warehouse_id").val();
+        var warehouseText = $("#warehouse_id option:selected").text();
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
@@ -1248,204 +1099,25 @@
         $.each(listStockAsal, function(i, v) {
             var currentID = Number(v.id);
 
-            if (listStockAsal[i].type_barang == "bahan_baku") {
-                if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
-                        return item.id == Number(currentID);
-                    }).length > 0;
+            if ($.inArray(currentID, dataIds) !== -1) {
+                var isIDSelected = $.grep(listStockSelectedBahanKimia, function(item) {
+                    return item.id == Number(currentID);
+                }).length > 0;
 
-                    if (!isIDSelected) {
-                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                        listStockAsal[i].qty = 0;
-                        listStockAsal[i].qty2 = 0;
-                        listStockAsal[i].qty_isi = 0;
-                        listStockAsal[i].departmentID = departmentID;
-                        listStockAsal[i].departmentText = departmentText;
-                        listStockAsal[i].warehouseID = warehouseID;
-                        listStockAsal[i].warehouseText = warehouseText;
-                        listStockAsal[i].departmentTujuanID = departmentTujuanID;
-                        listStockAsal[i].departmentTujuanText = departmentTujuanText;
-                        listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
-                        listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockSelectedBahanBaku.push(listStockAsal[i]);
-                    }
-                }
-            } else if (listStockAsal[i].type_barang == "bahan_jadi") {
-                if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
-                        return item.id == Number(currentID);
-                    }).length > 0;
-
-                    if (!isIDSelected) {
-                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                        listStockAsal[i].qty = 0;
-                        listStockAsal[i].qty2 = 0;
-                        listStockAsal[i].qty_isi = 0;
-                        listStockAsal[i].departmentID = departmentID;
-                        listStockAsal[i].departmentText = departmentText;
-                        listStockAsal[i].warehouseID = warehouseID;
-                        listStockAsal[i].warehouseText = warehouseText;
-                        listStockAsal[i].departmentTujuanID = departmentTujuanID;
-                        listStockAsal[i].departmentTujuanText = departmentTujuanText;
-                        listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
-                        listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockSelectedBahanJadi.push(listStockAsal[i]);
-                    }
-                }
-            } else {
-                if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
-                        return item.id == Number(currentID);
-                    }).length > 0;
-
-                    if (!isIDSelected) {
-                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                        listStockAsal[i].qty = 0;
-                        listStockAsal[i].qty2 = 0;
-                        listStockAsal[i].qty_isi = 0;
-                        listStockAsal[i].departmentID = departmentID;
-                        listStockAsal[i].departmentText = departmentText;
-                        listStockAsal[i].warehouseID = warehouseID;
-                        listStockAsal[i].warehouseText = warehouseText;
-                        listStockAsal[i].departmentTujuanID = departmentTujuanID;
-                        listStockAsal[i].departmentTujuanText = departmentTujuanText;
-                        listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
-                        listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockSelectedBahan.push(listStockAsal[i]);
-                    }
+                if (!isIDSelected) {
+                    listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                    listStockAsal[i].qty = 0;
+                    listStockAsal[i].qty2 = 0;
+                    listStockAsal[i].departmentID = departmentID;
+                    listStockAsal[i].departmentText = departmentText;
+                    listStockAsal[i].warehouseID = warehouseID;
+                    listStockAsal[i].warehouseText = warehouseText;
+                    listStockSelectedBahanKimia.push(listStockAsal[i]);
                 }
             }
         });
-        drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
-        drawTableSelectedItemBahan(listStockSelectedBahan);
-        drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
-    }
-
-    function insertListFifo() {
-        var departmentID = $("#divisi_asal_id").val();
-        var departmentText = $("#divisi_asal_id option:selected").text();
-        var warehouseID = $("#warehouse_asal_id").val();
-        var warehouseText = $("#warehouse_asal_id option:selected").text();
-
-        var departmentTujuanID = $("#divisi_tujuan_id").val();
-        var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
-        var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-        var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
-
-        var dataIds = getIDListDataSelected();
-        var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
-        var stockID = $(".select_nama_barang option:selected").data('stock_id');
-
-        if (isNaN(qtyMutasiFifo)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                reverseButtons: true,
-                confirmButtonText: 'Oke',
-            })
-        } else {
-            var totalStokTotal = 0;
-            $.each(listStockAsal, function(i, v) {
-                totalStokTotal += parseFloat(v.stok_total);
-            });
-            // deleteByStockID(stockID);
-            if (qtyMutasiFifo > totalStokTotal) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    reverseButtons: true,
-                    confirmButtonText: 'Oke',
-                })
-            } else {
-                $.each(listStockAsal, function(i, v) {
-                    var currentID = Number(v.id);
-                    if (listStockAsal[i].type_barang == "bahan_baku") {
-                        if ($.inArray(currentID, dataIds) == -1) {
-                            var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
-                                return item.id == Number(currentID);
-                            }).length > 0;
-                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
-                                listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                                listStockAsal[i].qty = 0;
-                                listStockAsal[i].qty_isi = 0;
-                                listStockAsal[i].departmentID = departmentID;
-                                listStockAsal[i].departmentText = departmentText;
-                                listStockAsal[i].warehouseID = warehouseID;
-                                listStockAsal[i].warehouseText = warehouseText;
-                                listStockAsal[i].departmentTujuanID = departmentTujuanID;
-                                listStockAsal[i].departmentTujuanText = departmentTujuanText;
-                                listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
-                                listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
-                                listStockSelectedBahanBaku.push(listStockAsal[i]);
-                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
-                            }
-                        }
-                    } else if (listStockAsal[i].type_barang == "bahan_jadi") {
-                        if ($.inArray(currentID, dataIds) == -1) {
-                            var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
-                                return item.id == Number(currentID);
-                            }).length > 0;
-                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
-                                listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                                listStockAsal[i].qty = 0;
-                                listStockAsal[i].qty_isi = 0;
-                                listStockAsal[i].departmentID = departmentID;
-                                listStockAsal[i].departmentText = departmentText;
-                                listStockAsal[i].warehouseID = warehouseID;
-                                listStockAsal[i].warehouseText = warehouseText;
-                                listStockAsal[i].departmentTujuanID = departmentTujuanID;
-                                listStockAsal[i].departmentTujuanText = departmentTujuanText;
-                                listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
-                                listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
-                                listStockSelectedBahanJadi.push(listStockAsal[i]);
-                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
-                            }
-                        }
-                    } else {
-                        if ($.inArray(currentID, dataIds) == -1) {
-                            var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
-                                return item.id == Number(currentID);
-                            }).length > 0;
-                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
-                                listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                                listStockAsal[i].qty = 0;
-                                listStockAsal[i].qty_isi = 0;
-                                listStockAsal[i].departmentID = departmentID;
-                                listStockAsal[i].departmentText = departmentText;
-                                listStockAsal[i].warehouseID = warehouseID;
-                                listStockAsal[i].warehouseText = warehouseText;
-                                listStockAsal[i].departmentTujuanID = departmentTujuanID;
-                                listStockAsal[i].departmentTujuanText = departmentTujuanText;
-                                listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
-                                listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
-                                listStockSelectedBahan.push(listStockAsal[i]);
-                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
-        drawTableSelectedItemBahan(listStockSelectedBahan);
-        drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
-    }
-
-    // function deleteByStockID(stockID) {
-    //     listStockSelected = listStockSelected.filter(function(item) {
-    //         return item.stock_id != stockID;
-    //     });
-    // }
+        drawTableSelectedItemBahanKimia(listStockSelectedBahanKimia);
+    });
 
     function drawTableSelectedItemBahanBaku(data) {
         if ($.fn.DataTable.isDataTable('#selectedItemTableBahanBaku')) {
@@ -1470,21 +1142,39 @@
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+            if (v.id_material_request_detail) {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                <input readonly class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
             `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty_isi}">
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                <input readonly class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty2}">
             `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                <button disabled type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
-            ));
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                <input class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+            `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                <input class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty2}">
+            `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+            `
+                ));
+            }
             table.find('tbody').append(newRow);
         });
 
@@ -1538,16 +1228,29 @@
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
+            if (v.id_material_request_detail) {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input readonly class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <button disabled type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-            `
-            ));
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                ));
+            }
             table.find('tbody').append(newRow);
         });
 
@@ -1578,6 +1281,82 @@
         selectedItemTableBahan.draw();
     }
 
+    function drawTableSelectedItemBahanKimia(data) {
+        if ($.fn.DataTable.isDataTable('#selectedItemTableBahanKimia')) {
+            $('#selectedItemTableBahanKimia').DataTable().clear().draw();
+            selectedItemTableBahanKimia.destroy();
+        }
+        const table = $('#selectedItemTableBahanKimia');
+        var no = 1;
+        $.each(data, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+               ${no++} 
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align: center;">').text(v.satuan));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            if (v.id_material_request_detail) {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input readonly class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <button disabled type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                ));
+            }
+            table.find('tbody').append(newRow);
+        });
+
+        selectedItemTableBahanKimia = $('#selectedItemTableBahanKimia').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: false,
+            serverSide: false,
+            ordering: true,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        selectedItemTableBahanKimia.draw();
+    }
+
     function drawTableSelectedItemBahanJadi(data) {
         if ($.fn.DataTable.isDataTable('#selectedItemTableBahanJadi')) {
             $('#selectedItemTableBahanJadi').DataTable().clear().draw();
@@ -1601,21 +1380,39 @@
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
+            if (v.id_material_request_detail) {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input readonly class="form-control qty-jadi-isi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-isi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input readonly class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty_isi}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <button disabled type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanJadi(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanJadi(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-            `
-            ));
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input class="form-control qty-jadi-isi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+                `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <input class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                `
+                ));
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
+                    <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanJadi(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+                ));
+            }
             table.find('tbody').append(newRow);
         });
 
@@ -1654,183 +1451,45 @@
         return id_selected;
     }
 
-    function deleteDetailBahanBaku(id, iddetail) {
-        if (id) {
-            var indexToRemove = -1;
-            for (var i = 0; i < listStockSelectedBahanBaku.length; i++) {
-                if (listStockSelectedBahanBaku[i].id == id) {
-                    indexToRemove = i;
-                    break;
-                }
-            }
-            if (indexToRemove !== -1) {
-                listStockSelectedBahanBaku.splice(indexToRemove, 1);
-                drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
+    function deleteDetailBahanBaku(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listStockSelectedBahanBaku.length; i++) {
+            if (listStockSelectedBahanBaku[i].id == id) {
+                indexToRemove = i;
+                break;
             }
         }
-        if (iddetail) {
-            console.log(iddetail);
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di hapus?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
-                        data: {
-                            id: iddetail,
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        location.reload();
-                                    })
-                            }
-                        },
-                    });
-                }
-            })
+        if (indexToRemove !== -1) {
+            listStockSelectedBahanBaku.splice(indexToRemove, 1);
+            drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         }
     }
 
-    function deleteDetailBahan(id, iddetail) {
-        if (id) {
-            var indexToRemove = -1;
-            for (var i = 0; i < listStockSelectedBahan.length; i++) {
-                if (listStockSelectedBahan[i].id == id) {
-                    indexToRemove = i;
-                    break;
-                }
-            }
-            if (indexToRemove !== -1) {
-                listStockSelectedBahan.splice(indexToRemove, 1);
-                drawTableSelectedItemBahan(listStockSelectedBahan);
+    function deleteDetailBahan(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listStockSelectedBahan.length; i++) {
+            if (listStockSelectedBahan[i].id == id) {
+                indexToRemove = i;
+                break;
             }
         }
-        if (iddetail) {
-            console.log(iddetail);
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di hapus?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
-                        data: {
-                            id: iddetail,
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        location.reload();
-                                    })
-                            }
-                        },
-                    });
-                }
-            })
+        if (indexToRemove !== -1) {
+            listStockSelectedBahan.splice(indexToRemove, 1);
+            drawTableSelectedItemBahan(listStockSelectedBahan);
         }
     }
 
-    function deleteDetailBahanJadi(id, iddetail) {
-        if (id) {
-            var indexToRemove = -1;
-            for (var i = 0; i < listStockSelectedBahanJadi.length; i++) {
-                if (listStockSelectedBahanJadi[i].id == id) {
-                    indexToRemove = i;
-                    break;
-                }
-            }
-            if (indexToRemove !== -1) {
-                listStockSelectedBahanJadi.splice(indexToRemove, 1);
-                drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
+    function deleteDetailBahanJadi(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listStockSelectedBahanJadi.length; i++) {
+            if (listStockSelectedBahanJadi[i].id == id) {
+                indexToRemove = i;
+                break;
             }
         }
-        if (iddetail) {
-            console.log(iddetail);
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di hapus?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
-                        data: {
-                            id: iddetail,
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        location.reload();
-                                    })
-                            }
-                        },
-                    });
-                }
-            })
+        if (indexToRemove !== -1) {
+            listStockSelectedBahanJadi.splice(indexToRemove, 1);
+            drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
         }
     }
 

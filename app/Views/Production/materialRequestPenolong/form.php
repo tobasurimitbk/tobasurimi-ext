@@ -10,7 +10,7 @@
             <h1 class="title-name">Tambah Material Request</h1>
         <?php } ?>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-kimia"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-penolong"); ?>">
                 Batal
             </a>
             <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted != 1) { ?>
@@ -715,7 +715,7 @@
                                 if (id) {
                                     // UPDATE
                                     $.ajax({
-                                        url: "<?= base_url("material-request-kimia/update"); ?>",
+                                        url: "<?= base_url("material-request-penolong/update"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -744,7 +744,7 @@
                                 } else {
                                     // INSERT
                                     $.ajax({
-                                        url: "<?= base_url("material-request-kimia/save"); ?>",
+                                        url: "<?= base_url("material-request-penolong/save"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -765,7 +765,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url('material-request-kimia/details/') ?>" + response.id
+                                                    window.location.href = "<?= base_url('material-request-penolong/details/') ?>" + response.id
                                                 }
                                             });
                                         },
@@ -841,7 +841,7 @@
     function getListBarang() {
         // GET LIST BARANG
         $.ajax({
-            url: `<?= base_url('material-request-kimia/list-barang-stock-init'); ?>`,
+            url: `<?= base_url('material-request-penolong/list-barang-stock-init'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -853,7 +853,7 @@
                 type_barang: $(".select_tipe_bahan option:selected").val(),
                 divisi_id: $(".divisi_asal_id option:selected").val(),
                 warehouse_id: $(".warehouse_asal_id option:selected").val(),
-                kondisi: "kimia",
+                kondisi: "nonkimia",
             },
             dataType: "json",
             success: function(res) {
@@ -952,7 +952,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "<?= base_url("material-request-kimia/update-status"); ?>",
+                    url: "<?= base_url("material-request-penolong/update-status"); ?>",
                     data: {
                         id: id,
                         status_posting: status_posting
@@ -975,7 +975,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    window.location.href = "<?= base_url('material-request-kimia/details/') ?>" + response.id
+                                    window.location.href = "<?= base_url('material-request-penolong/details/') ?>" + response.id
                                 })
                         } else {
                             Swal.fire({
@@ -1289,7 +1289,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request-kimia/delete"); ?>",
+                        url: "<?= base_url("material-request-penolong/delete"); ?>",
                         data: {
                             id: iddetail,
                         },

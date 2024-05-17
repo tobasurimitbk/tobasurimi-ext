@@ -4,11 +4,11 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Material Request</h1>
+        <h1>Material Request Kimia</h1>
 
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request-kimia/create"); ?>">
+        <!-- <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request-kimia/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        </a> -->
         <?= csrf_field() ?>
     </div>
     <div class="card">
@@ -109,51 +109,23 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row.id;
-                    let status = row.is_posted
-                    let request_status = row.request_status
-                    // console.log(status);
-                    if (status != 1) {
+                    let kimia = row.kimia;
+                    if (kimia != 1) {
                         return `
                                 <div class="mt-0">
-                                    <button class="btn btn-primary detail-material-request-kimia">
-                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <button class="btn btn-warning">
-                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
-                                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                    <button class="btn btn-primary detail-material-request">
+                                        <i class="fa fa-flask fa-sm" aria-hidden="true"></i>
                                     </button>
                                 </div>
                             `
                     } else {
-                        if (request_status == "waiting") {
-                            return `
-                                    <div class="mt-0">
-                                        <button class="btn btn-primary detail-material-request-kimia">
-                                            <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                                        </button>
-                                        <button class="btn btn-warning">
-                                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger" onclick="posting('${id}', 0)">
-                                            <i class="fa fa-ban" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                `
-                        } else {
-                            return `
-                                    <div class="mt-0">
-                                        <button class="btn btn-primary detail-material-request-kimia">
-                                            <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                                        </button>
-                                        <button class="btn btn-warning">
-                                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                `
-                        }
+                        return `
+                                <div class="mt-0">
+                                    <button class="btn btn-warning detail-material-request">
+                                        <i class="fa fa-flask fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            `
                     }
                 }
             }
@@ -180,13 +152,13 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', '.detail-material-request-kimia', function() {
+        $('#dataTable tbody').on('click', '.detail-material-request', function() {
             // Get the data associated with the clicked row
             const data = table.row($(this).closest('tr')).data();
 
             // Redirect to the detail page using the data ID
             if (data) {
-                location.replace(`<?= base_url("material-request/details"); ?>/${data.id}`);
+                location.replace(`<?= base_url("material-request-kimia/details"); ?>/${data.id}`);
             }
         });
     })

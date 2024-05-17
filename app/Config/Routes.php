@@ -574,17 +574,32 @@ $routes->get('/material-request/data-detail-material', 'Production\MaterialReque
 $routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
 $routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
 $routes->post('/material-request/update-status', 'Production\MaterialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/material-request/list-barang-stock-init', 'Production\MaterialRequest::getListBarangIsInit', ['filter' => 'Auth']);
 
+// Material Request Penolong
+$routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/details/(:segment)', 'Production\MaterialRequestPenolong::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/create', 'Production\MaterialRequestPenolong::createView', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/all', 'Production\MaterialRequestPenolong::all', ['filter' => 'Auth']);
+$routes->post('/material-request-penolong/delete', 'Production\MaterialRequestPenolong::deleteMR', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/data-detail-material', 'Production\MaterialRequestPenolong::allDetailMaterialRequest', ['filter' => 'Auth']);
+$routes->post('/material-request-penolong/save', 'Production\MaterialRequestPenolong::create', ['filter' => 'Auth']);
+$routes->post('/material-request-penolong/update', 'Production\MaterialRequestPenolong::update', ['filter' => 'Auth']);
+$routes->post('/material-request-penolong/update-status', 'Production\MaterialRequestPenolong::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/list-barang-stock-init', 'Production\MaterialRequestPenolong::getListBarangIsInit', ['filter' => 'Auth']);
 
-// Rencana Produksi
+// Material Request Kimia
 $routes->get('/material-request-kimia', 'Production\MaterialRequestKimia::index', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/details/(:segment)', 'Production\MaterialRequestKimia::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/create', 'Production\MaterialRequestKimia::createView', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/all', 'Production\MaterialRequestKimia::all', ['filter' => 'Auth']);
-$routes->post('/material-request-kimia/update', 'Production\MaterialRequestKimia::update', ['filter' => 'Auth']);
+$routes->post('/material-request-kimia/delete', 'Production\MaterialRequestKimia::deleteMR', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/data-detail-material', 'Production\MaterialRequestKimia::allDetailMaterialRequest', ['filter' => 'Auth']);
-$routes->post('/material-request-kimia/update-status', 'Production\MaterialRequestKimia::updateStatusApproveMaterialRequest', ['filter' => 'Auth']);
+$routes->post('/material-request-kimia/save', 'Production\MaterialRequestKimia::create', ['filter' => 'Auth']);
+$routes->post('/material-request-kimia/update', 'Production\MaterialRequestKimia::update', ['filter' => 'Auth']);
+$routes->post('/material-request-kimia/update-status', 'Production\MaterialRequestKimia::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/list-barang-stock-init', 'Production\MaterialRequestKimia::getListBarangIsInit', ['filter' => 'Auth']);
+
 // DROPDOWN
 
 // TERIMA FAKTUR

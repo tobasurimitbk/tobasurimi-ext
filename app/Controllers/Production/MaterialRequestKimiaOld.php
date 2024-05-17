@@ -9,9 +9,7 @@ use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MaterialRequestDetailsModel;
-use App\Models\MaterialRequestPenolongDetailsModel;
 use App\Models\MaterialRequestsModel;
-use App\Models\MaterialRequestsPenolongModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
@@ -48,11 +46,9 @@ class MaterialRequestKimia extends BaseController
     protected $supplierModel;
     protected $materialRequestModel;
     protected $materialRequestDetailsModel;
-    protected $this_user_id;
 
     public function __construct()
     {
-        $this->this_user_id = session()->get("login")->user_id;
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
@@ -74,8 +70,8 @@ class MaterialRequestKimia extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->supplierModel = new SupplierModel();
-        $this->materialRequestModel = new MaterialRequestsPenolongModel();
-        $this->materialRequestDetailsModel = new MaterialRequestPenolongDetailsModel();
+        $this->materialRequestModel = new MaterialRequestsModel();
+        $this->materialRequestDetailsModel = new MaterialRequestDetailsModel();
     }
 
     public function index()
@@ -97,19 +93,14 @@ class MaterialRequestKimia extends BaseController
             ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
-            // ->where('work_orders.is_posted', "0")
+            ->where('work_orders.is_posted', "0")
             ->where('work_orders.deletedAt', null)
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
-        $dataTipeBarang = $this->metaDataModel
-            ->where('deletedAt', null)
-            ->where('name', "Kategori Barang")
-            ->where('description', "bahan_penolong")
-            ->findAll();
 
         $data = [
-            'tipeBarang' => $dataTipeBarang,
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
@@ -154,16 +145,13 @@ class MaterialRequestKimia extends BaseController
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
             $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
-            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_penolong_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
-                ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_penolong_details.barang2_id', 'left')
+            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
+                ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                ->join('warehouses', 'warehouses.id = material_request_penolong_details.warehouse_id', 'left')
-                ->join('divisis', 'divisis.id = material_request_penolong_details.divisi_id', 'left')
-                ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+                ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
+                ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
                 ->where('material_request_id', $id)
-                ->where('parent_barang.parent_name', "KIMIA")
-                ->where('material_request_penolong_details.deletedAt', null)
                 ->get()->getResult();
             foreach ($dataMaterialRequestDetails as $key => &$value) {
                 if ($value->barang_type == "bahan_baku") {
@@ -184,9 +172,6 @@ class MaterialRequestKimia extends BaseController
             $data["ids"] = $ids;
         }
 
-        // var_dump($data);
-        // exit;
-
         return view('Production/materialRequestKimia/form', $data);
     }
 
@@ -200,9 +185,7 @@ class MaterialRequestKimia extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            'parent_barang.parent_name' => "KIMIA"
-        ];
+        $condition = [];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -219,6 +202,11 @@ class MaterialRequestKimia extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($materialRequestData['data'] as $data) {
+            $checkKimia = $this->materialRequestDetailsModel->where('material_request_id', $data->id)->where('kimia', 1)->find();
+            $kimia = "0";
+            if ($checkKimia) {
+                $kimia = "1";
+            }
             array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -226,7 +214,7 @@ class MaterialRequestKimia extends BaseController
                 "nama_barang"           => $data->nama_barang,
                 "wo_no"           => $data->wo_no,
                 "is_posted"           => $data->is_posted,
-                "request_status"           => $data->request_status,
+                "kimia"           => $kimia,
             ]);
         }
 
@@ -254,7 +242,8 @@ class MaterialRequestKimia extends BaseController
         ];
 
         $condition = [
-            "material_requests_penolong.id"        => decrypt($this->request->getGet("id"))
+            "material_requests.is_posted"        => 1,
+            "material_request_details.material_request_id"        => decrypt($this->request->getGet("id")),
         ];
 
         $addCondition = [
@@ -266,7 +255,12 @@ class MaterialRequestKimia extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $materialRequestData = $this->materialRequestModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
+        // var_dump($limit);
+        // var_dump($offset);
+        // var_dump($payload);
+        // var_dump($condition);
+        $materialRequestData = $this->materialRequestModel->getMaterialRequestListForMaterialWarehouseDetail($condition, $addCondition, $limit, $offset);
+
 
         $dataMaterialRequest = [];
 
@@ -276,13 +270,11 @@ class MaterialRequestKimia extends BaseController
             array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "req_no"                 => $data->req_no,
-                "tgl_req"                 => $data->request_date,
-                "nama_divisi"           => $data->divisi,
-                "nama_warehouse"           => $data->warehouse_name,
+                "ref_no"                 => $data->ref_no,
                 "nama_barang"           => $data->nama_barang,
                 "satuan"           => $data->satuan,
                 "total"           => $data->total,
+                "note"           => $data->note,
             ]);
         }
 
@@ -299,25 +291,10 @@ class MaterialRequestKimia extends BaseController
         return;
     }
 
-    public function create()
+    public function update()
     {
         try {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-
-            $dataMaterial = [
-                "work_order_id" => $this->request->getPost("kode_produksi"),
-                'company_id' => $this->this_company_id,
-                'divisi_id' => $this->request->getVar("department_id"),
-                'warehouse_id' => $this->request->getVar("warehouse_id"),
-                "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
-                "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
-                "req_no" => $no,
-                'is_posted' => 0,
-                'createdBy' =>  session()->get("login")->user_id,
-            ];
-            $id = $this->materialRequestModel->insert($dataMaterial);
-
+            $id = decrypt($this->request->getPost("id"));
             $mr_detail = json_decode($this->request->getVar("listMaterial"));
             // var_dump($mr_detail);
             // exit;
@@ -330,8 +307,6 @@ class MaterialRequestKimia extends BaseController
                         'material_request_id' => $id,
                         'divisi_id' => $s->departmentID,
                         'warehouse_id' => $s->warehouseID,
-                        'divisi_tujuan_id' => $s->departmentTujuanID,
-                        'warehouse_tujuan_id' => $s->warehouseTujuanID,
                         'barang1_id' => $stockBarang->barang1_id,
                         'barang2_id' => $stockBarang->barang2_id,
                         'nama_barang' => $s->barang,
@@ -341,10 +316,9 @@ class MaterialRequestKimia extends BaseController
                         'no_aju' => $s->no_aju,
                         'ref_no' => $s->bc_type,
                         'stock_date' => $stockDetailBarang->stock_date,
-                        'stock_dokumen' => $s->stock_dokumen,
                         'barang_type' => $s->type_barang,
-                        'qty' => $s->qty,
-                        'qty2' => $s->qty2,
+                        'qty' => $s->qty_request,
+                        'qty2' => $s->qty_request_kaleng,
                         'qty_isi' => $s->qty_isi,
                     ];
                 } else {
@@ -352,8 +326,6 @@ class MaterialRequestKimia extends BaseController
                         'material_request_id' => $id,
                         'divisi_id' => $s->departmentID,
                         'warehouse_id' => $s->warehouseID,
-                        'divisi_tujuan_id' => $s->departmentTujuanID,
-                        'warehouse_tujuan_id' => $s->warehouseTujuanID,
                         'barang1_id' => $stockBarang->barang1_id,
                         'barang2_id' => $stockBarang->barang2_id,
                         'nama_barang' => $s->barang,
@@ -363,11 +335,10 @@ class MaterialRequestKimia extends BaseController
                         'no_aju' => $s->no_aju,
                         'ref_no' => $s->bc_type,
                         'stock_date' => $stockDetailBarang->stock_date,
-                        'stock_dokumen' => $s->stock_dokumen,
                         'barang_type' => $s->type_barang,
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
-                        'qty_isi' => $s->qty_isi,
+                        'kimia' => 1,
                     ];
                 }
                 $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -390,100 +361,7 @@ class MaterialRequestKimia extends BaseController
         return;
     }
 
-    public function update()
-    {
-        try {
-            $id = decrypt($this->request->getPost("id"));
-            $mr_detail = json_decode($this->request->getVar("listMaterial"));
-            // var_dump($mr_detail);
-            // exit;
-
-            foreach ($mr_detail as $s) {
-                if (!empty($s->id_material_request_detail)) {
-                    if ($s->type_barang == "bahan_jadi") {
-                        $dataMaterialDetail = [
-                            'qty' => $s->qty,
-                            'qty2' => $s->qty2,
-                            'qty_isi' => $s->qty_isi,
-                        ];
-                    } else {
-                        $dataMaterialDetail = [
-                            'qty' => $s->qty,
-                            'qty2' => $s->qty2,
-                            'qty_isi' => $s->qty_isi,
-                        ];
-                    }
-                    $this->materialRequestDetailsModel->update($s->id_material_request_detail, $dataMaterialDetail);
-                } else {
-                    $stockBarang =  $this->stockModel->asObject()->find($s->stock_id);
-                    $stockDetailBarang =  $this->stockDetailModel->asObject()->find($s->stock_detail_id);
-                    if ($s->type_barang == "bahan_jadi") {
-                        $dataMaterialDetail = [
-                            'material_request_id' => $id,
-                            'divisi_id' => $s->departmentID,
-                            'warehouse_id' => $s->warehouseID,
-                            'divisi_tujuan_id' => $s->departmentTujuanID,
-                            'warehouse_tujuan_id' => $s->warehouseTujuanID,
-                            'barang1_id' => $stockBarang->barang1_id,
-                            'barang2_id' => $stockBarang->barang2_id,
-                            'nama_barang' => $s->barang,
-                            'satuan' => $s->satuan,
-                            'stock_id' => $s->stock_id,
-                            'bc_id' => $s->bc_id,
-                            'no_aju' => $s->no_aju,
-                            'ref_no' => $s->bc_type,
-                            'stock_date' => $stockDetailBarang->stock_date,
-                            'stock_dokumen' => $s->stock_dokumen,
-                            'barang_type' => $s->type_barang,
-                            'qty' => $s->qty,
-                            'qty2' => $s->qty2,
-                            'qty_isi' => $s->qty_isi,
-                        ];
-                    } else {
-                        $dataMaterialDetail = [
-                            'material_request_id' => $id,
-                            'divisi_id' => $s->departmentID,
-                            'warehouse_id' => $s->warehouseID,
-                            'divisi_tujuan_id' => $s->departmentTujuanID,
-                            'warehouse_tujuan_id' => $s->warehouseTujuanID,
-                            'barang1_id' => $stockBarang->barang1_id,
-                            'barang2_id' => $stockBarang->barang2_id,
-                            'nama_barang' => $s->barang,
-                            'satuan' => $s->satuan,
-                            'stock_id' => $s->stock_id,
-                            'bc_id' => $s->bc_id,
-                            'no_aju' => $s->no_aju,
-                            'ref_no' => $s->bc_type,
-                            'stock_date' => $stockDetailBarang->stock_date,
-                            'stock_dokumen' => $s->stock_dokumen,
-                            'barang_type' => $s->type_barang,
-                            'qty' => $s->qty,
-                            'qty2' => $s->qty2,
-                            'qty_isi' => $s->qty_isi,
-                        ];
-                    }
-                    $this->materialRequestDetailsModel->insert($dataMaterialDetail);
-                }
-            }
-
-            return response()->setJSON([
-                "id"      => encrypt($id),
-                "status"  => true,
-                "message" => "Data Berhasil disimpan",
-                'token'   => csrf_hash(),
-            ]);
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function updateStatusPostedMaterialRequest()
+    public function updateStatusApproveMaterialRequest()
     {
         try {
 
@@ -492,133 +370,24 @@ class MaterialRequestKimia extends BaseController
 
             // po posting
             $payload = [
-                "is_posted" => $this->request->getVar('status_posting') == '1' ? $this->request->getVar('status_posting') : null,
+                "is_approve" => $this->request->getVar('status_posting'),
+                "approveBy" => session()->get("login")->user_id,
                 "note_approve" => $this->request->getVar('keterangan_posting')
             ];
 
+
             if (!empty($id)) {
                 $this->materialRequestModel->update($id, $payload);
-                $materialRequestData = $this->materialRequestModel->find($id);
-                $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->findAll();
 
-                foreach ($materialRequestDetailData as $key => $value) {
-                    $stok = $this->stockModel->insertStok(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_id'],
-                        $value['divisi_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        ($value['qty2'] * -1)
-                    );
-
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $value['qty2'],
-                        "Out",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "PRODUKSI",
-                        "-",
-                        $value['note'] ? $value['note'] : "-"
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $stokDetail,
-                        $value['qty2'],
-                        $value['no_aju'],
-                        $materialRequestData['req_no'],
-                        $value['stock_dokumen'],
-                    );
-
-                    // -----
-                    // BARANG IN KE INVENTORI
-                    $stok = $this->stockModel->insertStok(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_tujuan_id'],
-                        $value['divisi_tujuan_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        $value['qty2']
-                    );
-
-                    $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_tujuan_id'],
-                        $value['divisi_tujuan_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $stok
-                    );
-
-                    if ($checkStokDetail == null) {
-                        // INSERT STOK INISIASI
-                        $stokDetail = $this->stockDetailModel->insertStokDetail(
-                            $stok,
-                            0,
-                            "In",
-                            date('Y-m-d'),
-                            $this->this_user_id,
-                            "INISIASI",
-                            "-",
-                            "-"
-                        );
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $value['bc_id'],
-                            $value['stock_id'],
-                            $stokDetail,
-                            0,
-                            $value['no_aju'],
-                            "-"
-                        );
-                    }
-
-                    $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $value['no_aju'],
-                        $value['stock_dokumen']
-                    );
-
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $value['qty2'],
-                        "In",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "PRODUKSI",
-                        $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
-                        $value['note'] ? $value['note'] : "-"
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $stokDetail,
-                        $value['qty2'],
-                        $value['no_aju'],
-                        $materialRequestData['req_no'],
-                        $value['stock_dokumen'],
-                    );
+                if ($this->request->getVar('status_posting') == "1") {
+                    $status = "approve";
+                } else {
+                    $status = "reject";
                 }
 
-                $this->workOrdersModel->update($materialRequestData['work_order_id'], [
-                    'is_posted' => 1
-                ]);
                 $data = [
                     "status"    => true,
-                    "id"    => $this->request->getVar('id'),
-                    "message"   => "Status Posting Berhasil Diperbaharui",
+                    "message"   => "Material Request Berhasil Di" . $status,
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];
@@ -627,8 +396,7 @@ class MaterialRequestKimia extends BaseController
             } else {
                 $data = [
                     "status"    => false,
-                    "id"    => $this->request->getVar('id'),
-                    "message"   => "Data Gagal Disimpan",
+                    "message"   => "Data Gagal Diapprove",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];
@@ -643,19 +411,6 @@ class MaterialRequestKimia extends BaseController
             echo json_encode($data);
         }
         return;
-    }
-
-    public function deleteMR()
-    {
-        $id = ($this->request->getVar('id'));
-        $this->materialRequestDetailsModel->delete($id);
-        // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
-
-        return response()->setJSON([
-            'message' => "Bahan Berhasil Dihapus",
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
     }
 
     public function getListBarangIsInit()
