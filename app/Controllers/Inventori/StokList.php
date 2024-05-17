@@ -1594,9 +1594,9 @@ class StokList extends BaseController
             $warehouse_id = "";
         }
 
-        if ($status_stok  == "ALL") {
-            $status_stok = "";
-        }
+        // if ($status_stok  == "ALL") {
+        //     $status_stok = "";
+        // }
 
 
 
