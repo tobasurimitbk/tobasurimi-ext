@@ -11,7 +11,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mt-3">
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Supplier" value="" />
                 </div>
             </div>
@@ -186,6 +186,8 @@
         // create modal show
         $('.btn-show-form').click(function() {
             resetVal();
+            $('.title-name').text("Tambah Account Supplier");
+            $('.delete-btn').hide();
             $('.add-modal').modal('show');
         });
         // hide modal
@@ -193,19 +195,15 @@
             $('.add-modal').modal('hide');
         });
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            resetVal();
             const data = table.row(this).data();
             let csrf = $(`[name="${csrfToken}"]`);
             let id = data.id;
             let formData = new FormData();
             formData.append("id", id);
-            if (id != 1) {
-                $('.delete-btn').show();
-            } else {
-                $('.delete-btn').hide();
+            $('.delete-btn').show();
+            $('.title-name').text("Update Account Supplier");
 
-            }
-
-            $('.title-name').text("Update Kategori ");
             $.ajax({
                 url: "<?= base_url("akun-supplier/get"); ?>",
                 data: formData,
@@ -222,14 +220,12 @@
                         $("#id").val(id).change();
                         if (res.data.supplier_id != 0) {
                             $('.delete-btn').show();
-                            $("#supplier_id").prop("disabled", false).select2();
+                            $("#supplier_id").prop("disabled", false);
 
                             $("#supplier_id").val(res.data.supplier_id).change();
                         } else {
                             $('.delete-btn').hide();
-                            $("#supplier_id").select2({
-                                disabled: 'readonly'
-                            });
+                            $("#supplier_id").prop("disabled", true);
                             $("#supplier_id").val("").change()
                         }
                         $("#akun_ap_id").val(res.data.ap_id).change();
@@ -251,7 +247,7 @@
             var parentName = $('#parentName').val();
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Account Customer ?',
+                title: 'Hapus Account Supplier ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -463,12 +459,6 @@
         $("#akun_ar_id").val("").change();
     }
 
-    // Akun AR
-    $('.akun_ar_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    })
 
     //CSS SELECT2 FLOATING LABEL
     $('.akun_ar_id')
@@ -487,64 +477,73 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
     $('.akun_ar_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.akun_ap_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.akun_ap_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.akun_ap_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.supplier_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.supplier_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.supplier_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
     // Akun AP
     $('.akun_ap_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Akun AP",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     })
 
-    //CSS SELECT2 FLOATING LABEL
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.akun_ap_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+    // Akun AR
+    $('.akun_ar_id').select2({
+        placeholder: "Pilih Akun AP",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    })
 
     // Akun AP
     $('.supplier_id').select2({
-        placeholder: "",
+        placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     })
-    //CSS SELECT2 FLOATING LABEL
-    $('.supplier_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.supplier_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.supplier_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 </script>
 
 <?= $this->endSection(); ?>

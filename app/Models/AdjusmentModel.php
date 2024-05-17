@@ -67,7 +67,7 @@ class AdjusmentModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_adjusment']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_adjusment'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
@@ -79,11 +79,18 @@ class AdjusmentModel extends Model
             $dataQry->where('status_posting', $addCondition['status']);
         }
 
+        if ($addCondition['dateStart']) {
+            $dataQry->where('tanggal >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $dataQry->where('tanggal <=', $addCondition['dateEnd']);
+        }
+
         if ($addCondition['no_adjusment']) {
             $dataQry->like('no_adjusment', $addCondition['no_adjusment']);
         }
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_adjusment']) {
+        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_adjusment'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 

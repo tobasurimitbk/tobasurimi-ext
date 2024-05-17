@@ -100,6 +100,7 @@ class TipeBarang extends BaseController
 
         $condition = [
             "type_barang" => $this->request->getGet('parent_type'),
+            'company_id' => $this->this_company_id,
             "deletedAt" => NULL
         ];
 

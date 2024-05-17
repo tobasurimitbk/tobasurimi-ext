@@ -49,12 +49,13 @@ class Customer extends BaseController
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
         $dataCountry = $this->countryModel->findAll();
+        $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
 
         $data = [
             "dataProvinces" => $dataProvinces,
             "dataBanks" => $dataBanks,
             "dataCountry" => $dataCountry,
-            "dataCompany" => $this->CompanyModel->where('deletedAt', null)->orderBy('company', "ASC")->findAll()
+            "dataCompany" => $this->CompanyModel->whereIn('id', $dataCompanyUserLogin)->where('deletedAt', null)->orderBy('company', "ASC")->findAll()
         ];
 
         return view('Master/customer/index', $data);
@@ -84,7 +85,9 @@ class Customer extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $customerData = $this->CustomerModel->getList($condition, $addCondition, $limit, $offset);
+        $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
+
+        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $addCondition, $limit, $offset);
 
         $dataCustomer = [];
 

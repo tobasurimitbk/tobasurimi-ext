@@ -232,6 +232,10 @@
         })
     })
 
+    const print = function(url) {
+        window.open(url, "_blank");
+    }
+
     const updateStatus = function(id, status) {
         if (status == "UNPOST") {
             $(".id_sales_order").val(id);

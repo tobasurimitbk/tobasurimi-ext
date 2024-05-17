@@ -6,7 +6,7 @@
         <h1>Detail Stok</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-list"); ?>">
-                Batal
+                Kembali
             </a>
 
         </div>
@@ -158,7 +158,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_inisasi" id="bc_id_stok_inisasi" name="bc_id_stok_inisasi" aria-label="Floating label select example">
                             <option value=""></option>
@@ -173,10 +173,36 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_inisasi" id="search_no_aju_stok_inisasi" name="search_no_aju_stok_inisasi" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Aju </label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_inisiasi dateStart" id="tgl_awal_stok_inisiasi" name="tgl_awal_stok_inisiasi" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_inisiasi dateEnd" id="tgl_akhir_stok_inisiasi" name="tgl_akhir_stok_inisiasi" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -217,7 +243,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_pemasukkan_barang" name="bc_id_stok_inisasi" aria-label="Floating label select example">
                             <option value=""></option>
@@ -232,10 +258,36 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_pemasukkan_barang" id="search_no_aju_stok_pemasukkan_barang" name="search_no_aju_stok_pemasukkan_barang" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor PO / LPB / No Aju </label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_pemasukkan_barang dateStart" id="tgl_awal_stok_pemasukkan_barang" name="tgl_awal_stok_pemasukkan_barang" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_pemasukkan_barang dateEnd" id="tgl_akhir_stok_pemasukkan_barang" name="tgl_akhir_stok_pemasukkan_barang" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -278,7 +330,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_adjusment" name="bc_id_stok_adjusment" aria-label="Floating label select example">
                             <option value=""></option>
@@ -293,7 +345,7 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select tipe_adjusment" id="tipe_adjusment" name="tipe_adjusment" aria-label="Floating label select example">
                             <option value=""></option>
@@ -307,10 +359,36 @@
                         <label for="floatingInput" style="z-index: 1;">Tipe Adjusment</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_adjusment" id="search_no_aju_stok_adjusment" name="search_no_aju_stok_pemasukkan_barang" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Adjusment </label>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_adjusment dateStart" id="tgl_awal_stok_adjusment" name="tgl_awal_stok_adjusment" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_adjusment dateEnd" id="tgl_akhir_stok_adjusment" name="tgl_akhir_stok_adjusment" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -353,7 +431,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_mutasi" id="bc_id_stok_mutasi" name="bc_id_stok_mutasi" aria-label="Floating label select example">
                             <option value=""></option>
@@ -368,13 +446,38 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_mutasi" id="search_no_aju_stok_mutasi" name="search_no_aju_stok_mutasi" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari No Aju / No Mutasi / No Penerimaan Mutasi </label>
                     </div>
                 </div>
-
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_mutasi dateStart" id="tgl_awal_stok_mutasi" name="tgl_awal_stok_mutasi" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_mutasi dateEnd" id="tgl_akhir_stok_mutasi" name="tgl_akhir_stok_mutasi" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
@@ -414,7 +517,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_jasa_vendor" id="bc_id_stok_jasa_vendor" name="bc_id_stok_jasa_vendor" aria-label="Floating label select example">
                             <option value=""></option>
@@ -429,10 +532,36 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_jasa_vendor" id="search_no_aju_stok_jasa_vendor" name="search_no_aju_stok_jasa_vendor" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari No Aju / No SJ / No Penerimaan SJ </label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_jasa_vendor dateStart" id="tgl_awal_stok_jasa_vendor" name="tgl_awal_stok_jasa_vendor" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_jasa_vendor dateEnd" id="tgl_akhir_stok_jasa_vendor" name="tgl_akhir_stok_jasa_vendor" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -474,7 +603,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_produksi_out" id="bc_id_stok_produksi_out" name="bc_id_stok_produksi_out" aria-label="Floating label select example">
                             <option value=""></option>
@@ -489,10 +618,36 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_produksi_out" id="search_no_aju_stok_produksi_out" name="search_no_aju_stok_produksi_out" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Kode Produksi </label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_produksi_out dateStart" id="tgl_awal_stok_produksi_out" name="tgl_awal_stok_produksi_out" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_produksi_out dateEnd" id="tgl_akhir_stok_produksi_out " name="tgl_akhir_stok_produksi_out " aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -533,7 +688,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_produksi_in" id="bc_id_stok_produksi_in" name="bc_id_stok_produksi_in" aria-label="Floating label select example">
                             <option value=""></option>
@@ -548,10 +703,36 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_stok_produksi_in" id="search_no_aju_stok_produksi_in" name="search_no_aju_stok_produksi_in" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Kode Penerimaan Produksi </label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_produksi_in dateStart" id="tgl_awal_stok_produksi_in" name="tgl_awal_stok_produksi_out" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_produksi_in dateEnd" id="tgl_akhir_stok_produksi_in " name="tgl_akhir_stok_produksi_out " aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -592,7 +773,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select bc_id_stok_rebus" id="bc_id_stok_rebus" name="bc_id_stok_rebus" aria-label="Floating label select example">
                             <option value=""></option>
@@ -607,10 +788,36 @@
                         <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search_no_aju_rebus" id="search_no_aju_rebus" name="search_no_aju_rebus" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Rebus</label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_rebus dateStart" id="tgl_awal_stok_rebus" name="tgl_awal_stok_rebus" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_rebus dateEnd" id="tgl_akhir_stok_rebus " name="tgl_akhir_stok_rebus " aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -787,6 +994,9 @@
                 data.no_aju = $("#search_no_aju_stok_inisasi").val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "INISIASI";
+                data.dateStart = $('#tgl_awal_stok_inisiasi').val();
+                data.dateEnd = $('#tgl_akhir_stok_inisiasi').val();
+
                 data.sort = sortStokInisasi;
                 data.sortType = sortTypeInisasi;
             },
@@ -883,6 +1093,8 @@
                 data.search = $("#search_no_aju_stok_pemasukkan_barang").val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "LPB";
+                data.dateStart = $('#tgl_awal_stok_pemasukkan_barang').val();
+                data.dateEnd = $('#tgl_akhir_stok_pemasukkan_barang').val();
 
                 data.sort = sortStokPemasukkanBarang;
                 data.sortType = sortTypePemasukkanBarang;
@@ -996,6 +1208,8 @@
                 data.tipe_adjusment = $('#tipe_adjusment option:selected').val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "ADJUSMENT";
+                data.dateStart = $('#tgl_awal_stok_adjusment').val();
+                data.dateEnd = $('#tgl_akhir_stok_adjusment').val();
 
                 data.sort = sortStokAdjusment;
                 data.sortType = sortTypeAdjusment;
@@ -1105,6 +1319,8 @@
                 data.search = $("#search_no_aju_stok_mutasi").val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "MUTASI";
+                data.dateStart = $('#tgl_awal_stok_mutasi').val();
+                data.dateEnd = $('#tgl_akhir_stok_mutasi').val();
 
                 data.sort = sortStokMutasi
                 data.sortType = sortTypeMutasi;
@@ -1208,6 +1424,8 @@
                 data.search = $("#search_no_aju_stok_jasa_vendor").val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "JASA VENDOR";
+                data.dateStart = $('#tgl_awal_stok_jasa_vendor').val();
+                data.dateEnd = $('#tgl_akhir_stok_jasa_vendor').val();
 
                 data.sort = sortStokJasaVendor
                 data.sortType = sortTypeJasaVendor;
@@ -1312,6 +1530,8 @@
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "PRODUKSI";
                 data.status = "Out"
+                data.dateStart = $('#tgl_awal_stok_produksi_out').val();
+                data.dateEnd = $('#tgl_akhir_stok_produksi_out').val();
 
                 data.sort = sortStokProduksiOut
                 data.sortType = sortTypeProduksiOut;
@@ -1411,6 +1631,8 @@
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "PRODUKSI";
                 data.status = "In"
+                data.dateStart = $('#tgl_awal_stok_produksi_in').val();
+                data.dateEnd = $('#tgl_akhir_stok_produksi_in').val();
 
                 data.sort = sortStokProduksiIn
                 data.sortType = sortTypeProduksiIn;
@@ -1510,6 +1732,8 @@
                 data.search = $("#search_no_aju_stok_rebus").val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
                 data.sumber = "REBUS";
+                data.dateStart = $('#tgl_awal_stok_rebus').val();
+                data.dateEnd = $('#tgl_akhir_stok_rebus').val();
 
                 data.sort = sortStokRebus
                 data.sortType = sortTypeRebus;
@@ -1702,6 +1926,52 @@
     $('#search_no_aju_rebus').change(function() {
         stokTableRebus.ajax.reload();
     });
+
+    $('#tgl_awal_stok_inisiasi,#tgl_akhir_stok_inisiasi').change(function() {
+        stokTableInisiasi.ajax.reload();
+    });
+
+    $('#tgl_awal_stok_pemasukkan_barang,#tgl_akhir_stok_pemasukkan_barang').change(function() {
+        stokTablePemasukkanBarang.ajax.reload();
+    });
+
+    $('#tgl_awal_stok_adjusment,#tgl_akhir_stok_adjusment').change(function() {
+        stokTableAdjusment.ajax.reload();
+    });
+
+    $('#tgl_awal_stok_mutasi,#tgl_akhir_stok_mutasi').change(function() {
+        stokTableMutasi.ajax.reload();
+    });
+
+    $('#tgl_awal_stok_jasa_vendor,#tgl_akhir_stok_jasa_vendor').change(function() {
+        stokTableJasaVendor.ajax.reload();
+    });
+
+    $('#tgl_awal_stok_produksi_out,#tgl_akhir_stok_produksi_out').change(function() {
+        stokTableProduksiOut.ajax.reload();
+    });
+
+    $('#tgl_awal_stok_produksi_in,#tgl_akhir_stok_produksi_in').change(function() {
+        stokTableProduksiIn.ajax.reload();
+    });
+
+    $('#tgl_awal_stok_rebus,#tgl_akhir_stok_rebus').change(function() {
+        stokTableRebus.ajax.reload();
+    });
+
+    $(".dateStart").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".dateEnd").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
 
 
     $("#bc_id_stok_mutasi,#bc_id_stok_per_dokumen, #bc_id_stok_inisasi, #bc_id_stok_pemasukkan_barang, #bc_id_stok_adjusment,#bc_id_stok_jasa_vendor,#bc_id_stok_produksi_in,#bc_id_stok_produksi_out,#tipe_adjusment,#bc_id_stok_rebus")

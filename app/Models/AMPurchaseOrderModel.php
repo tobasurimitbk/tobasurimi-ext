@@ -457,11 +457,13 @@ class AMPurchaseOrderModel extends Model
 
         if ($res == null) {
             return [
+                'hargaTerakhirNumber' => 0,
                 'hargaTerakhir' => '-',
                 'supplierTerakhir' => '-'
             ];
         } else {
             return [
+                'hargaTerakhirNumber' => $res['price'],
                 'hargaTerakhir' => number_format($res['price'], 2, ',', '.'),
                 'supplierTerakhir' => $res['nama_supplier']
             ];

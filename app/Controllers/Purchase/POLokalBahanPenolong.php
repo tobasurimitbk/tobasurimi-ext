@@ -670,6 +670,13 @@ class POLokalBahanPenolong extends BaseController
             $totalQtySisa = $s['qty'] - $totalQtyPO;
 
             if ($totalQtySisa > 0) {
+                $hargaTerakhir = $this->aMPurchaseOrderModel->historiHargaPOBahanPenolongFirst(
+                    $s['barang1_id'],
+                    $s['barang2_id'],
+                    "Lokal",
+                    $this->this_company_id,
+                );
+
                 $result[] = [
                     'barang_id' => $s['barang1_id'],
                     'spesifikasi_id' => $s['barang2_id'],
@@ -677,11 +684,11 @@ class POLokalBahanPenolong extends BaseController
                     'nama_barang' => $s['nama_barang'],
                     'satuan_id' => $s['unit'],
                     'nama_satuan' => $s['kode_satuan'],
-                    'harga_satuan' => '0',
+                    'harga_satuan' => number_format($hargaTerakhir['hargaTerakhirNumber'], 2),
                     'qty' => $totalQtySisa,
                     'diskon' => '0',
                     'biaya_tambahan' => '0',
-                    'total' => '0',
+                    'total' => number_format($hargaTerakhir['hargaTerakhirNumber'] * $totalQtySisa, 2),
                     'keterangan' => $s['note'],
                     'ppn' => '',
                     'pph' => ''

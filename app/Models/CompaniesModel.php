@@ -88,4 +88,16 @@ class CompaniesModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function getCompaniesUserLogin()
+    {
+        $company = session()->get("login")->arr_company;
+        $result = [];
+
+        foreach ($company as $c) {
+            array_push($result, $c['id']);
+        }
+
+        return $result;
+    }
 }

@@ -85,6 +85,8 @@ class StokAdjusment extends BaseController
             "divisi_id" => $this->request->getVar("divisi_id"),
             "status" => $this->request->getVar("status"),
             "no_adjusment" => $this->request->getVar("no_adjusment"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getVar("length");

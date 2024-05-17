@@ -75,7 +75,7 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $companyAccessArr, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
             'companyName'       => 'companies.company',
@@ -102,6 +102,7 @@ class CustomerModel extends Model
 
         $customerDataQry = $this->asObject()
             ->select($selectQry)
+            ->whereIn('customers.company_id', $companyAccessArr)
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')

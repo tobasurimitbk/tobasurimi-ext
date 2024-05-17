@@ -264,7 +264,7 @@
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    PT TOBASURIMI INDUSTRIES<br>
+                    <?= strtoupper($dataPO->holding_company) ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>
             </div><br>
@@ -379,7 +379,7 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    PT TOBASURIMI INDUSTRIES<br>
+                    <?= strtoupper($dataPO->holding_company) ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>
                 <div style="padding: 0.5rem">
@@ -443,7 +443,7 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    PT TOBASURIMI INDUSTRIES (<?= $dataPO->companyName ?>)<br>
+                    <?= strtoupper($dataPO->holding_company) ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>
                 <div style="padding: 0.5rem; text-align: center;">
@@ -456,7 +456,8 @@
                 <tr>
                     <td style="vertical-align: top; width: 20%;">Sudah Terima Dari <br> (Received From)</td>
                     <td style="vertical-align: top; width: 2%;">: </td>
-                    <td style="vertical-align: top; width: 55%; text-transform: uppercase;">PT TOBASURIMI INDUSTRIES (<?= $dataPO->companyName ?>)</td>
+                    <td style="vertical-align: top; width: 55%; text-transform: uppercase;"> <?= strtoupper($dataPO->holding_company) ?>
+                        (<?= $dataPO->companyName ?>)</td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">Banyaknya Uang <br> (Amount)</td>
@@ -610,7 +611,7 @@
                         <div><span class="txt-bold">Tanggal : <?= $dataPO->lpb->createdAt ? date("d/m/Y", strtotime($dataPO->lpb->createdAt)) : ""; ?></span></div>
                     </td>
                     <td>
-                        <div><span class="txt-bold">Kemasan : <?= $dataPO->lpb->kemasan; ?></span></div>
+                        <div><span class="txt-bold">Jenis Kemasan : <?= $dataPO->lpb->kemasan; ?></span></div>
                     </td>
                     <td class="txt-right">
                         <div><span class="txt-bold">Jumlah Kemasan: <?= $dataPO->lpb->jumlah_kemasan; ?></span></div>
