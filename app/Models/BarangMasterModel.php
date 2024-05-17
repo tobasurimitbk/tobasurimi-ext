@@ -191,7 +191,7 @@ class BarangMasterModel extends Model
         return $this->where('id', $barangID)->first();
     }
 
-    public function getListForAccount($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getListForAccount($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
             'kode_barang'       => 'barang_master.kode_barang',
@@ -210,6 +210,7 @@ class BarangMasterModel extends Model
         $barangDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
+            ->whereIn('divisis.id', $conditionArr)
             ->join('divisis', '1=1', 'CROSS')
             // ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->orderBy($sort, $sortType);

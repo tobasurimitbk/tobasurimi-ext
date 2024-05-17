@@ -124,14 +124,20 @@ class TipeBarang extends BaseController
             "sortType"      => $this->request->getGet("sortType")
         ];
 
-        $Sub_AkunsModel = new Sub_AkunsModel();
+        $divisiAccess = $this->divisiModel->getDivisiAccess();
+        $divisiAccessArr = [];
+
+        foreach ($divisiAccess as $d) {
+            array_push($divisiAccessArr, $d['id']);
+        }
+
         $dataNamaAP = "";
         $dataNamaAR = "";
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $this->barangMasterModel->getListForAccount($condition, $addCondition, $limit, $offset);
+        $res = $this->barangMasterModel->getListForAccount($condition, $divisiAccessArr, $addCondition, $limit, $offset);
 
         $rdata = [];
 
