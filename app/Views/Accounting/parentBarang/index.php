@@ -27,8 +27,19 @@
                     <a class="nav-link <?= $type == "kemasan" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=kemasan') ?>">Kemasan</a>
                 </li>
             </ul>
-            <div class="row justify-content-end mt-3">
-                <div class="col-md-2">
+            <div class="row justify-content-end mt-4">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
+                            <option value="" data-code=""></option>
+                            <?php foreach ($divisi as $d) : ?>
+                                <option value="<?= $d['id'] ?>"><?= strtoupper($d['divisi']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Pilih Departemen</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_coa" name="filter_coa" id="filter_coa">
                             <option value="" data-code=""></option>
@@ -46,11 +57,12 @@
             </div>
             <div class="row mt-3">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable dataTable-barang" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark text-center">
                             <tr>
                                 <th>No.</th>
                                 <th>Barang</th>
+                                <th>Departemen</th>
                                 <th>Akun Pembelian</th>
                                 <th>Akun Penjualan</th>
                             </tr>
@@ -74,56 +86,61 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <input type="hidden" name="divisi_id" class="divisi_id" id="divisi_id">
                     <input type="hidden" name="type" id="type" value="<?= $type ?>">
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Barang" id="parentName" name="parentName">
+                                <input disabled autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Barang" id="parentName" name="parentName">
                                 <label for="floatingInput">Nama Barang</label>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input disabled autocomplete="one-time-code" type="text" class="form-control divisis_name" placeholder="Departemen" id="divisi_name" name="divisi_name">
+                                <label for="floatingInput">Departemen</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select akun_ap_id" name="akun_ap_id" id="akun_ap_id">
-                                            <option value=""></option>
-                                            <?php
-                                            if (!empty($subAkuns)) {
-                                                foreach ($subAkuns as $sub) {
-                                            ?>
-                                                    <option value="<?= $sub->id; ?>"><?= $sub->no_sub; ?> <?= $sub->nama_sub; ?></option>
-                                            <?php
-                                                }
-                                            }
-                                            ?>
-                                        </select>
-                                        <label for="floatingInput">Akun Pembelian</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select akun_ar_id" name="akun_ar_id" id="akun_ar_id">
-                                            <option value="" data-code=""></option>
-                                            <?php
-                                            if (!empty($subAkuns)) {
-                                                foreach ($subAkuns as $sub_ar) {
-                                            ?>
-                                                    <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
-                                            <?php
-                                                }
-                                            }
-                                            ?>
-                                        </select>
-                                        <label for="floatingInput">Akun Penjualan</label>
-                                    </div>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select akun_ap_id" name="akun_ap_id" id="akun_ap_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($subAkuns)) {
+                                        foreach ($subAkuns as $sub) {
+                                    ?>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->no_sub; ?> <?= $sub->nama_sub; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Akun Pembelian</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select akun_ar_id" name="akun_ar_id" id="akun_ar_id">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($subAkuns)) {
+                                        foreach ($subAkuns as $sub_ar) {
+                                    ?>
+                                            <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Akun Penjualan</label>
                             </div>
                         </div>
                     </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -135,11 +152,12 @@
 </div>
 
 <script>
-    let sort = "nomor";
-    let sortType = "desc";
+    let sort = "barang_master.id";
+    let sortType = "ASC";
+
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
-        const table = $('.dataTable').DataTable({
+        const table = $('.dataTable-barang').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
             serverSide: true,
@@ -162,6 +180,7 @@
                     data.sortType = sortType;
                     data.parent_type = "<?= $type ?>";
                     data.filter_coa = $(".filter_coa").val();
+                    data.filter_divisi = $(".filter_divisi").val();
                 }
             },
             "initComplete": function(settings, json) {
@@ -178,6 +197,10 @@
                 width: "5%"
             }, {
                 data: "parent_name",
+                className: "text-left",
+                sortable: false,
+            }, {
+                data: "divisi",
                 className: "text-left",
                 sortable: false,
             }, {
@@ -209,19 +232,26 @@
         $(".filter_coa").change(function() {
             table.ajax.reload();
         });
+        $(".filter_divisi").change(function() {
+            table.ajax.reload();
+        });
         // hide modal
         $('.btn-discard').click(function() {
             $('.add-modal').modal('hide');
         });
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+            console.log(data);
             let csrf = $(`[name="${csrfToken}"]`);
             let id = data.id;
-            let type = $("input[name='type']").val();
+            let divisi_id = data.divisi_id;
+            let divisi = data.divisi;
+            let parentName = data.parent_name;
+
             let formData = new FormData();
             $('#parentName').val(null);
-            console.log(id);
             formData.append("id", id);
+            formData.append("divisi_id", divisi_id);
 
             $('.title-name').text("Update Akun Barang");
             $('.delete-btn').show();
@@ -238,11 +268,18 @@
                 success: function(res) {
                     csrf.val();
                     if (res.status) {
-                        console.log(res);
-                        $("#id").val(id);
-                        $("#parentName").val(res.data.barang_name);
-                        $("#akun_ap_id").val(res.data.ap_id).change();
-                        $("#akun_ar_id").val(res.data.ar_id).change();
+                        if (res.data != null) {
+                            $("#akun_ap_id").val(res.data.ap_id).change();
+                            $("#akun_ar_id").val(res.data.ar_id).change();
+                        } else {
+                            $("#akun_ap_id").val(null).change();
+                            $("#akun_ar_id").val(null).change();
+                        }
+                        $("#parentName").val(parentName);
+                        $('#divisi_id').val(divisi_id)
+                        $('#divisi_name').val(divisi);
+                        $('#id').val(id);
+
                         $('.add-modal').modal('show');
                     } else {
                         Swal.fire({
@@ -315,8 +352,10 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let id = $('input[name="id"]').val();
+                        let divisi_id = $('#divisi_id').val();
                         let csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form"));
+                        data.append("divisi_id", divisi_id);
                         $.ajax({
                             url: "<?= base_url("tipe-barang/save"); ?>",
                             data: data,
@@ -379,6 +418,13 @@
     }
 
     // Akun AR
+    $('.filter_divisi').select2({
+        placeholder: "Filter Departemen",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    // Akun AR
     $('.filter_coa').select2({
         placeholder: "Filter Akun",
         theme: "bootstrap-5",
@@ -386,14 +432,14 @@
     })
 
     //CSS SELECT2 FLOATING LABEL
-    $('.filter_coa')
+    $('.filter_coa, .filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_coa')
+    $('.filter_coa,.filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
@@ -401,66 +447,66 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_coa')
+    $('.filter_coa,.filter_divisi')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.akun_ar_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.akun_ar_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.akun_ar_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.akun_ap_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.akun_ap_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.akun_ap_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
     // Akun AR
     $('.akun_ar_id').select2({
-        placeholder: "Pilih Akun AR",
+        placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     })
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.akun_ar_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.akun_ar_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.akun_ar_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 
     // Akun AP
     $('.akun_ap_id').select2({
-        placeholder: "Pilih Akun AP",
+        placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     })
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.akun_ap_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 </script>
 
 <?= $this->endSection(); ?>

@@ -395,7 +395,7 @@ class POLokalBahanPenolong extends BaseController
                     'additional_cost' => $d->biaya_tambahan,
                     'ppn' => $d->ppn,
                     'pph' => $d->pph,
-                    'total' => repairDouble($d->total),
+                    'total' => ($d->total),
                     'remaining_qty' => $d->qty
                 ]);
                 array_push($id_detail_all, $check['id']);
@@ -421,7 +421,7 @@ class POLokalBahanPenolong extends BaseController
                     'additional_cost' => $d->biaya_tambahan,
                     'ppn' => $d->ppn,
                     'pph' => $d->pph,
-                    'total' => repairDouble($d->total),
+                    'total' => ($d->total),
                     'remaining_qty' => $d->qty
                 ]);
                 array_push($id_detail_all, $id_detail_new);

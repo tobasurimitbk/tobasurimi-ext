@@ -7,6 +7,7 @@ use App\Models\MetadataModel;
 use App\Models\BarangMasterModel;
 use App\Models\Sub_AkunsModel;
 use App\Models\AccountBarangModel;
+use App\Models\DivisisModel;
 
 class TipeBarang extends BaseController
 {
@@ -15,6 +16,8 @@ class TipeBarang extends BaseController
     protected $Sub_AkunsModel;
     protected $barangMasterModel;
     protected $accountBarangModel;
+    protected $divisiModel;
+
 
     public function __construct()
     {
@@ -23,6 +26,7 @@ class TipeBarang extends BaseController
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->accountBarangModel = new AccountBarangModel();
+        $this->divisiModel = new DivisisModel();
     }
 
     public function index()
@@ -32,6 +36,7 @@ class TipeBarang extends BaseController
 
         $type = "bahan_baku";
         $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
+        $divisi = $this->divisiModel->getDivisiAccess();
 
         if (!empty(@$_GET['type'])) {
             $type = $this->request->getGet('type');
@@ -40,7 +45,8 @@ class TipeBarang extends BaseController
         $data = [
             'type' => $type,
             'kategoriBP' => $metaDataModel->where('name', 'Kelompok BP')->findAll(),
-            "subAkuns" => $subAkunsModel
+            "subAkuns" => $subAkunsModel,
+            "divisi" => $divisi
         ];
         // return view('Warehouse/parentBarang/index', $data);
         return view('Accounting/parentBarang/index', $data);
@@ -48,20 +54,21 @@ class TipeBarang extends BaseController
 
     public function saveTipeBarang()
     {
-
-        $type = $this->request->getVar('type');
         $barangMasterId = $this->request->getVar('id');
-        $getDataAccountBarang = $this->accountBarangModel->where('barang_master_id', $barangMasterId)->where('deleted_at', NULL)->first();
+        $divisiId = $this->request->getVar('divisi_id');
+        $getDataAccountBarang = $this->accountBarangModel->where('divisi_id', $divisiId)->where('barang_master_id', $barangMasterId)->where('deleted_at', NULL)->first();
 
         if ($getDataAccountBarang != null) {
             $this->accountBarangModel->update($getDataAccountBarang['id'], [
                 'barang_master_id' => $barangMasterId,
+                'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id')
             ]);
         } else {
             $this->accountBarangModel->insert([
                 'barang_master_id' => $barangMasterId,
+                'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id')
             ]);
@@ -76,9 +83,12 @@ class TipeBarang extends BaseController
     public function get()
     {
         $id = $this->request->getVar('id');
+        $divisiId = $this->request->getVar('divisi_id');
         $dataAccountBarang = $this->barangMasterModel
+            ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id')
             ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->where('barang_master.id', $id)
+            ->where('divisi_id', $divisiId)
             ->first();
 
         return response()->setJSON([
@@ -100,13 +110,16 @@ class TipeBarang extends BaseController
 
         $condition = [
             "type_barang" => $this->request->getGet('parent_type'),
-            'company_id' => $this->this_company_id,
-            "deletedAt" => NULL
+            'barang_master.company_id' => $this->this_company_id,
+            'divisis.company_id' => $this->this_company_id,
+            "barang_master.deletedAt" => NULL,
+            'divisis.deletedAt' => null
         ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "filter_coa"        => $this->request->getGet("filter_coa"),
+            'filter_divisi' => $this->request->getGet('filter_divisi'),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];
@@ -119,35 +132,85 @@ class TipeBarang extends BaseController
         $offset = $this->request->getGet("start");
 
         $res = $this->barangMasterModel->getListForAccount($condition, $addCondition, $limit, $offset);
-        $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
 
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-
         foreach ($res['data'] as $data) {
             // var_dump($res);
             // exit;
-            foreach ($subAkunsModel as $datas) {
-                if ($data['ap_id'] == $datas->id) {
-                    $dataNamaAP = $datas->no_sub;
-                } elseif ($data['ap_id'] == NULL) {
-                    $dataNamaAP = "-";
-                }
-                if ($data['ar_id'] == $datas->id) {
-                    $dataNamaAR = $datas->no_sub;
-                } elseif ($data['ar_id'] == NULL) {
+            $dataNamaAP = "-";
+            $dataNamaAR = "-";
+
+            $dataAccountBarang = $this->barangMasterModel
+                ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id')
+                ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
+                ->where('barang_master.id', $data['id'])
+                ->where('divisi_id', $data['divisi_id'])
+                ->first();
+
+            // dd($dataAccountBarang);
+
+            if ($dataAccountBarang != null) {
+                $dataAR = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ar_id'])->first();
+                $dataAP = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ap_id'])->first();
+
+                if ($dataAR != null) {
+                    $dataNamaAR = $dataAR['no_sub'];
+                } else {
                     $dataNamaAR = "-";
                 }
+
+                if ($dataAP != null) {
+                    $dataNamaAP = $dataAP['no_sub'];
+                } else {
+                    $dataNamaAP = "-";
+                }
             }
-            array_push($rdata, [
-                "no"                    => $no++,
-                "id"                    => $data['id'],
-                "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
-                "ap_id"                 => $dataNamaAP,
-                "ar_id"                 => $dataNamaAR,
-            ]);
+
+            if ($addCondition['filter_coa'] == "belum") {
+                if ($dataNamaAP == "-" || $dataAP == "-") {
+                    array_push($rdata, [
+                        "no"                    => $no++,
+                        "id"                    => $data['id'],
+                        "divisi_id"             => $data['divisi_id'],
+                        "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+                        "divisi"                => strtoupper($data['divisi']),
+                        "ap_id"                 => $dataNamaAP,
+                        "ar_id"                 => $dataNamaAR,
+
+                    ]);
+                }
+            } elseif ($addCondition['filter_coa'] == "sudah") {
+                if ($dataNamaAP != "-" && $dataAP != "-") {
+                    array_push($rdata, [
+                        "no"                    => $no++,
+                        "id"                    => $data['id'],
+                        "divisi_id"             => $data['divisi_id'],
+                        "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+                        "divisi"                => strtoupper($data['divisi']),
+                        "ap_id"                 => $dataNamaAP,
+                        "ar_id"                 => $dataNamaAR,
+
+                    ]);
+                }
+            } else {
+                array_push($rdata, [
+                    "no"                    => $no++,
+                    "id"                    => $data['id'],
+                    "divisi_id"             => $data['divisi_id'],
+                    "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+                    "divisi"                => strtoupper($data['divisi']),
+                    "ap_id"                 => $dataNamaAP,
+                    "ar_id"                 => $dataNamaAR,
+
+                ]);
+            }
+
+            // if ($searchBarangId == false && $searchDivisiId !== true) {
+
+            // }
         }
 
         $data = [

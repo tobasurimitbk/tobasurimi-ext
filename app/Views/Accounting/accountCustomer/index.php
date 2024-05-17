@@ -76,7 +76,7 @@
                                             if (!empty($subAkuns)) {
                                                 foreach ($subAkuns as $sub) {
                                             ?>
-                                                    <option value="<?= $sub->id; ?>"><?= $sub->no_sub; ?> <?= $sub->nama_sub; ?></option>
+                                                    <option data-id="<?= $sub->id ?>" value="<?= $sub->id; ?>"><?= $sub->no_sub; ?> <?= $sub->nama_sub; ?></option>
                                             <?php
                                                 }
                                             }
@@ -93,7 +93,7 @@
                                             if (!empty($subAkuns)) {
                                                 foreach ($subAkuns as $sub_ar) {
                                             ?>
-                                                    <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                                    <option data-id="<?= $sub_ar->id ?>" value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
                                             <?php
                                                 }
                                             }

@@ -154,9 +154,10 @@ class BC40 extends BaseController
 
         $id = $this->bcPurchaseOrder->insert([
             'supplier_id' => $this->request->getVar('supplier_id'),
+            'company_id' => $this->this_company_id,
             'po_type' => $this->request->getVar('po_type'),
-            'multiple_po_id' => str_replace(['\\"', '\\'], '', json_encode($poIdArr)),
-            'multiple_lpb_id' => str_replace(['\\"', '\\'], '', json_encode($lpbIdArr)),
+            'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($poIdArr)),
+            'multiple_lpb_id' => str_replace(['\\"', '\\', '"'], '', json_encode($lpbIdArr)),
             'multiple_po_no' => str_replace(['\\"', '\\'], '', json_encode($poNoArr)),
             'multiple_lpb_no' => str_replace(['\\"', '\\'], '', json_encode($lpbNoArr)),
         ]);
