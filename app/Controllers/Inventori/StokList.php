@@ -1594,6 +1594,8 @@ class StokList extends BaseController
             $warehouse_id = "";
         }
 
+
+
         // if ($status_stok  == "ALL") {
         //     $status_stok = "";
         // }
@@ -1748,7 +1750,7 @@ class StokList extends BaseController
                     $satuan3 = $this->satuanModel->find($row['satuan_3']);
 
 
-                    if ($status_stok == 1) {
+                    if ($status_stok == "1") {
                         if ($row['stok_total'] > 0) {
                             $sheet->setCellValue('A' . $numRow, $no);
                             $sheet->setCellValue('B' . $numRow, $row['parent_type']);
@@ -1782,7 +1784,7 @@ class StokList extends BaseController
                             $no++;
                             $numRow++;
                         }
-                    } elseif ($status_stok == 0) {
+                    } elseif ($status_stok == "0") {
                         if ($row['stok_total'] == 0) {
                             $sheet->setCellValue('A' . $numRow, $no);
                             $sheet->setCellValue('B' . $numRow, $row['parent_type']);
@@ -1978,7 +1980,7 @@ class StokList extends BaseController
                     $satuan1 = $this->satuanModel->find($row['satuan_id']);
                     $row['qty'] = $this->stockModel->detailStock($row['id'])['stok']['stokSekarang'];
 
-                    if ($status_stok == 1) {
+                    if ($status_stok == "1") {
                         if ($row['qty'] > 0) {
                             $sheet->setCellValue('A' . $numRow, $no);
                             $sheet->setCellValue('B' . $numRow, strtoupper(str_replace("_", " ", strtoupper($row['parent_type']))));
@@ -2004,8 +2006,8 @@ class StokList extends BaseController
                             $no++;
                             $numRow++;
                         }
-                    } elseif ($status_stok == 0) {
-                        if ($row['qty'] == 0.00) {
+                    } elseif ($status_stok == "0") {
+                        if ($row['qty'] == 0) {
                             $sheet->setCellValue('A' . $numRow, $no);
                             $sheet->setCellValue('B' . $numRow, strtoupper(str_replace("_", " ", strtoupper($row['parent_type']))));
                             $sheet->setCellValue('C' . $numRow, $row['parent_name']);
