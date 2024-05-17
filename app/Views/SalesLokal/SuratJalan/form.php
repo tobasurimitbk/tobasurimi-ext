@@ -92,13 +92,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="no_telp" name="no_telp" value="<?= $data->customerPhone ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" class=" form-control" id="no_telp" name="no_telp" value="<?= $data->customerPhone ?? ''; ?>" disabled>
                             <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" class=" form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" disabled>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
@@ -107,7 +107,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="salesName" name="salesName" value="<?= $data->customerSales ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" class=" form-control" id="salesName" name="salesName" value="<?= $data->customerSales ?? ''; ?>" disabled>
                             <label for="floatingInput">Nama sales</label>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>">
+                            <input readonly autocomplete="one-time-code" class=" form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>">
                             <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
@@ -135,6 +135,20 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan"><?= $data->note ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control jenis_penjualan" id="jenis_penjualan" name="jenis_penjualan" value="<?= $getJenisPenjualan ?? ''; ?>">
+                            <label for="floatingInput">Jenis Penjualan</label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 nama_ecommerce_div">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control nama_ecommerce" id="nama_ecommerce" name="nama_ecommerce" value="<?= $data->nama_ecommerce ?? ''; ?>">
+                            <label for="floatingInput">Nama Ecommerce</label>
                         </div>
                     </div>
                     <input autocomplete="one-time-code" type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
@@ -314,7 +328,18 @@
 
                         // console.log(res.dataWarehouse)
                         res.soList.forEach(function(item) {
-                            $(".id_so").append(`<option  value="${item.id}" data-termin="${item.termin}" data-sales="${item.salesName}">${item.no_sales_order}</option>`);
+                            let jenis_penjualanan_name = "";
+
+                            if (item.jenis_penjualan == 1) {
+                                jenis_penjualanan_name = "By Sales";
+                            } else if (item.jenis_penjualan == 2) {
+                                jenis_penjualanan_name = "By Office";
+                            } else if (item.jenis_penjualan == 3) {
+                                jenis_penjualanan_name = "By Ecommerce";
+                            } else {
+                                jenis_penjualanan_name = "";
+                            }
+                            $(".id_so").append(`<option  value="${item.id}" data-jenis_penjualan="${jenis_penjualanan_name}"  data-no_po="${item.no_po}" data-nama_ecommerce="${item.nama_ecommerce}" data-termin="${item.customerTermin}" data-sales="${item.salesName}">${item.no_sales_order}</option>`);
                         });
 
                         $('#tagihan_ke').val(res.customerData.address);
@@ -334,9 +359,17 @@
 
             let termin = $this.find("option:selected").data("termin");
             let sales = $this.find("option:selected").data("sales");
+            let no_po = $this.find("option:selected").data("no_po");
+
+            let jenis_penjualan = $this.find("option:selected").data("jenis_penjualan");
+            let nama_ecommerce = $this.find("option:selected").data("nama_ecommerce");
 
             $('#termin').val(termin);
             $('#salesName').val(sales);
+            $('#no_po').val(no_po);
+
+            $('#jenis_penjualan').val(jenis_penjualan);
+            $('#nama_ecommerce').val(nama_ecommerce);
 
             $.ajax({
                 url: `<?= base_url('/order-form-lokal/getItemList'); ?>`,

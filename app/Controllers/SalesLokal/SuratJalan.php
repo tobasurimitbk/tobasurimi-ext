@@ -57,6 +57,7 @@ class SuratJalan extends BaseController
         $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
 
 
+
         $data = [
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
@@ -295,11 +296,22 @@ class SuratJalan extends BaseController
             $value->amount = toRupiah(floatval(str_replace('Rp', '', $value->amount)));
         }
 
+        if ($dataSuratJalan->jenis_penjualan == 1) {
+            $getJenisPenjualan = "By Sales";
+        } elseif ($dataSuratJalan->jenis_penjualan == 2) {
+            $getJenisPenjualan = "By Office";
+        } elseif ($dataSuratJalan->jenis_penjualan == 3) {
+            $getJenisPenjualan = "By Ecommerce";
+        } else {
+            $getJenisPenjualan = "";
+        }
+
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
             "id_user" => $dataSuratJalan->id_user,
-            "dataSo" => $dataSo
+            "dataSo" => $dataSo,
+            "getJenisPenjualan" => $getJenisPenjualan
 
         ];
         // var_dump($dataSo);
@@ -432,7 +444,7 @@ class SuratJalan extends BaseController
         ];
         $soList = $this->SalesOrderModel->asObject()
             ->where($condition)
-            ->select('sales_order.*, metadata.value AS termin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->select('sales_order.*, metadata.value AS customerTermin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
             ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->findAll();

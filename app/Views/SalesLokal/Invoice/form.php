@@ -30,7 +30,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
+                            <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
                             <label for="floatingInput">No Faktur</label>
                         </div>
                     </div>
@@ -40,27 +40,30 @@
                             <label for="floatingInput">Tanggal Faktur</label>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select" name="doc_type" id="doc_type">
+                            <select class="form-select" name="doc_type" id="doc_type" <?= !empty($data) ? 'disabled' : ''; ?>>
                                 <option value=""></option>
-                                <option value="pesanan" <?= ($data->document_type ?? '') == 'pesanan' ? 'selected' : '' ?>>Pesanan</option>
-                                <option value="pengiriman" <?= ($data->document_type ?? '') == 'pengiriman' ? 'selected' : '' ?>>Pengiriman</option>
+                                <option value="pesanan" <?= !empty($data) ? ($data->document_type == 'pesanan' ? 'selected' : "") : ""; ?>>Pesanan</option>
+                                <option value="pengiriman" <?= !empty($data) ? ($data->document_type == 'pengiriman' ? 'selected' : "") : ""; ?>>Pengiriman</option>
                             </select>
                             <label for="floatingInput">Jenis Dokumen</label>
+
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select" name="doc_id" id="doc_id">
+                            <select class="form-select" name="doc_id" id="doc_id" <?= !empty($data) ? 'disabled' : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($documentList ?? [] as $document) : ?>
                                     <option value="<?= $document->id ?>" <?= $data->document_id == $document->id ? 'selected' : '' ?>><?= $document->doc_no ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nomor Dokumen</label>
+
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -85,7 +88,7 @@
                                 <?php if ($termin != "") : ?>
                                     <option value=""></option>
                                     <?php foreach ($termin as $row) : ?>
-                                        <option value="<?= $row['id'] ?>" <?= $documentData->termin == $row['id'] ? 'selected' : '' ?>><?= $row['value'] ?></option>
+                                        <option value="<?= $row['id'] ?>" <?= $data->terms == $row['id'] ? 'selected' : '' ?>><?= $row['value'] ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
 
@@ -96,7 +99,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= !empty($data) ? 'disabled' : ''; ?>>
+                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= !empty($data) ? 'disabled' : ''; ?> disabled>
                                 <option value=""></option>
                                 <option value="1" <?= !empty($data) ? ($data->jenis_penjualan == 1 ? "selected" : "") : ""; ?>>By Sales</option>
                                 <option value="2" <?= !empty($data) ? ($data->jenis_penjualan == 2 ? "selected" : "") : ""; ?>>By Office</option>
@@ -115,6 +118,18 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-md-4 nama_ecommerce_div">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control nama_ecommerce" id="nama_ecommerce" name="nama_ecommerce" value="<?= $data->nama_ecommerce ?? ''; ?>">
+                            <label for="floatingInput">Nama Ecommerce</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" class=" form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>">
+                            <label for="floatingInput">No. PO</label>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via_id === true ? 'disabled=true' : '') : ''; ?>>
@@ -126,6 +141,11 @@
                             <label for="floatingInput">Ship Via (Opsional)</label>
                         </div>
                     </div>
+
+                </div>
+
+                <div class="row">
+
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 70px;">
                             <textarea autocomplete="one-time-code" style="height: 100%;" <?= !empty($data->keterangan) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= $data->keterangan ?? ""; ?></textarea>
@@ -343,7 +363,7 @@
 
         });
 
-        $("#doc_id, .termin").change(function() {
+        $("#doc_id").change(function() {
             getDocumentData(this.value);
         });
 
@@ -514,12 +534,15 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    console.log(res.itemList);
-                    console.log(res.dpp);
+
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
                     $('#customerAddress').val(res.customerAddress);
-                    $('#termin').val(res.termin);
+                    $('#nama_ecommerce').val(res.nama_ecommerce);
+                    $('#no_po').val(res.no_po);
+                    $('#termin').val(res.termin).change();
+
+                    $('#jenis_penjualan').val(res.jenis_penjualan).change();
 
                     // add datatable data here
                     table.rows.add(res.itemList).draw(false);
@@ -585,9 +608,6 @@
             "id_so[]": {
                 required: true
             },
-            no_po: {
-                required: true
-            },
             no_surat_jalan: {
                 required: true
             },
@@ -604,9 +624,6 @@
             },
             "id_so[]": {
                 required: "SO wajib diisi"
-            },
-            no_po: {
-                required: "No PO wajib diisi"
             },
             no_surat_jalan: {
                 required: "No Surat jalan wajib diisi"
@@ -789,7 +806,7 @@
         let taxTotalHtml = 0;
         let dummyTax = 0;
 
-        console.log(list_items);
+
         list_items.map((obj) => {
             const itemAmt = parseFloat(obj.amount.replaceAll(',', ''));
             let taxAmt = 0;
@@ -849,8 +866,8 @@
                 dataError = list_items[i];
                 isValid = false;
             } else {
-                list_items[i].qty_sekarang = stok_max;
-                list_items[i].qty_input = input_user;
+                list_items[i].qty_sekarang = stok_max.toFixed(2);
+                list_items[i].qty_input = input_user.toFixed(2);
 
                 // Calculate the amount and format it using .toLocaleString()
                 var amount = parseFloat(v.disc.replace(',', '')) != 0 ? ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100) * parseFloat(v.qty_input) : parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);

@@ -104,7 +104,7 @@
                                     if (!empty($dataCustomers)) {
                                         foreach ($dataCustomers as $customer) {
                                     ?>
-                                            <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['kode']; ?> - <?= $customer['name']; ?></option>
+                                            <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" data-jenis_penjualan="<?= rawurlencode($customer['jenis_penjualan']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['kode']; ?> - <?= $customer['name']; ?></option>
                                     <?php
                                         }
                                     }
@@ -182,6 +182,13 @@
                         <div class="form-floating ff-ket mb-3" style="height: 80px;">
                             <textarea autocomplete="one-time-code" <?= !empty($data) ? 'disabled=true' : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" class="form-control 
+                            no_po" id="no_po" name="no_po" value="<?= !empty($data) ? $data->no_po : ""; ?>">
+                            <label for="floatingInput">No PO</label>
                         </div>
                     </div>
                 </div>
@@ -810,13 +817,17 @@
         }).change(function() {
             const customerAddress = $(this).find(':selected').data('address') ? $(this).find(':selected').data('address') : "";
             const termin = $(this).find(':selected').data('termin') ? $(this).find(':selected').data('termin') : "";
+
             const salesName = $(this).find(':selected').data('salesname') ? $(this).find(':selected').data('salesname') : "";
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
+            const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
 
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
             $('#termin').val(decodeURIComponent(termin)).change();
+
             $('#sales_name').val(decodeURIComponent(salesName));
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
+            $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
         });
 
         $("#hidden_tipe_pelanggan").on('input change keyup paste', function() {
@@ -2210,7 +2221,7 @@
                 $(".id_customer").empty()
                 $(".id_customer").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".id_customer").append(`<option value="${item.id}" data-tipepelanggan="${item.tipe_pelanggan}" data-address="${item.address}" data-termin="${item.termin}" data-salesname="${item.salesName}">${item.kode} - ${item.name}</option>`)
+                    $(".id_customer").append(`<option value="${item.id}" data-jenis_penjualan="${item.jenis_penjualan}" data-tipepelanggan="${item.tipe_pelanggan}" data-address="${item.address}" data-termin="${item.termin}" data-salesname="${item.salesName}">${item.kode} - ${item.name}</option>`)
                 })
                 $(".id_customer").val();
             }
