@@ -217,8 +217,12 @@ class BarangMasterModel extends Model
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['filter_divisi']) {
             $barangDataQry->groupStart();
+        }
+
+        if ($addCondition['filter_divisi']) {
+            $barangDataQry->where('divisis.id', $addCondition['filter_divisi']);
         }
 
         if ($addCondition['search']) {
@@ -229,11 +233,7 @@ class BarangMasterModel extends Model
             $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
         }
 
-        if ($addCondition['filter_divisi']) {
-            $barangDataQry->where('divisis.id', $addCondition['filter_divisi']);
-        }
-
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['filter_divisi']) {
             $barangDataQry->groupEnd();
         }
 
