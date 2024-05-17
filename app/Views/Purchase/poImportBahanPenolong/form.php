@@ -517,14 +517,14 @@
     });
     // HARGA SATUAN DAN QTY CHANE
     $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
-        var hargaSatuan = parseInt($('#harga_satuan').val()) || 0;
-        var qty = parseInt($('#qty').val()) || 1;
-        var biayaTambahan = parseInt($('#biaya_tambahan').val()) || 0;
-        var diskon = parseInt($('#diskon').val()) || 0;
+        var hargaSatuan = parseFloat($('#harga_satuan').val()) || 0;
+        var qty = parseFloat($('#qty').val()) || 1;
+        var biayaTambahan = parseFloat($('#biaya_tambahan').val()) || 0;
+        var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(formatRupiah(total));
+        $('#total').val(formatRupiah(total.toFixed(2)));
     });
 
     // VALIDATOR DETAIL
@@ -1053,11 +1053,11 @@
                 ));
             <?php endif; ?>
             table.find('tbody').append(newRow);
-            totalHargaSatuan += parseInt(v.harga_satuan);
-            totalQty += parseInt(v.qty);
-            totalDiskon += parseInt(v.diskon);
-            totalTambahan += parseInt(v.biaya_tambahan);
-            totalHarga += parseInt(formatCurrency(v.total));
+            totalHargaSatuan += parseFloat(v.harga_satuan);
+            totalQty += parseFloat(v.qty);
+            totalDiskon += parseFloat(v.diskon);
+            totalTambahan += parseFloat(v.biaya_tambahan);
+            totalHarga += parseFloat(formatCurrency(v.total));
         });
         table.find('tfoot').empty();
         var newRow = $('<tr>');
