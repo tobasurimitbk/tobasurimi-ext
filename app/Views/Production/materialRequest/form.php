@@ -146,13 +146,11 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
                             <option value=""></option>
-                            <?php if (!empty($divisiTujuan)) : ?>
-                                <?php foreach ($divisiTujuan as $d) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                        <?= $d['divisi']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                            <?php foreach ($dataDivisi as $d) : ?>
+                                <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                    <?= $d['divisi']; ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
                     </div>
@@ -495,7 +493,7 @@
             allowClear: true
         }).change(function() {
             // CARI DIVISI TUJUAN
-            getListDivisiTujuan();
+            // getListDivisiTujuan();
             // CARI WAREHOUSE ASAL
             getListWarehouseAsal()
             // RESET TYPE BARANG
