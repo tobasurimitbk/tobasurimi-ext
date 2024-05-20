@@ -555,7 +555,7 @@ class MaterialRequest extends BaseController
                         $value['barang1_id'],
                         $value['barang2_id'],
                         $value['bc_id'],
-                        $value['stock_id'],
+                        $value['no_aju'],
                         $stokIn
                     );
 
