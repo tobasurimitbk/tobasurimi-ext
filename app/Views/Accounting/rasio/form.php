@@ -822,8 +822,8 @@
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
-                row += '<td>' + item.totalQtyPO.toLocaleString() + '</td>';
-                row += '<td>' + formatRupiah(item.totalHargaPO) + '</td>';
+                row += '<td>' + parseFloat(item.totalQtyPO).toLocaleString() + '</td>';
+                row += '<td>' + formatRupiah(parseFloat(item.totalHargaPO)) + '</td>';
                 row += '<td>' + formatRupiah(item.hargaSatuanPO) + '</td>';
                 row += '<td>' + item.satuanPO + '</td>';
                 row += '<td>' + item.totalQtyLPB.toLocaleString() + '</td>';
