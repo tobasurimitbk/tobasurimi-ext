@@ -251,7 +251,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" readonly class="form-control total" name="total" id="total" placeholder="Total">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total">
                             <label for="floatingInput">Total</label>
                         </div>
                     </div>
@@ -454,7 +454,21 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(formatRupiah(total));
+        var total
+        $('#total').val((total.toFixed(2)));
+    });
+
+    // CHANGE TOTAL
+    $('#total').keyup(function() {
+        var total = parseFloat($('#total').val()) || 0;
+        var qty = parseFloat($('#qty').val()) || 1;
+        var biayaTambahan = parseFloat($('#biaya_tambahan').val()) || 0;
+        var diskon = parseFloat($('#diskon').val()) || 0;
+        var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
+        console.log(total);
+
+        var hargaSatuan = (((total / qty)));
+        $('#harga_satuan').val((hargaSatuan.toFixed(2)));
     });
 
     // VALIDATOR DETAIL
@@ -877,7 +891,7 @@
             newRow.append($('<td>').text(parseFloat(v.qty).toFixed(2)));
             newRow.append($('<td>').text(v.diskon));
             newRow.append($('<td>').text(formatRupiah(v.biaya_tambahan)));
-            newRow.append($('<td>').text(v.total));
+            newRow.append($('<td>').text(formatRupiah(v.total)));
             <?php if (!empty($poDetail)) : ?>
                 <?php if (!$poDetail['is_posted']) : ?>
                     newRow.append($('<td>').html(
@@ -905,12 +919,12 @@
             <?php endif; ?>
 
             table.find('tbody').append(newRow);
-            totalHarga += parseFloat(formatCurrency(v.total));
+            totalHarga += parseFloat(v.total);
         });
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="8"><b>Total</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(totalHarga) + '</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
     }
@@ -1111,7 +1125,7 @@
                 qty: "<?= $l['qty'] ?>",
                 diskon: "<?= $l['diskon'] ?>",
                 biaya_tambahan: "<?= $l['biaya_tambahan'] ?>",
-                total: formatRupiah("<?= (($l['harga_satuan'] * $l['qty']) - (($l['diskon'] / 100) * ($l['harga_satuan'] * $l['qty']))) + $l['biaya_tambahan'] ?>"),
+                total: ("<?= (($l['harga_satuan'] * $l['qty']) - (($l['diskon'] / 100) * ($l['harga_satuan'] * $l['qty']))) + $l['biaya_tambahan'] ?>"),
                 keterangan: "<?= $l['keterangan'] ?>",
                 ppn: "<?= $l['ppn'] ?>",
                 pph: "<?= $l['pph'] ?>"

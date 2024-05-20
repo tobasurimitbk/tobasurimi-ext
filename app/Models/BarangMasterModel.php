@@ -191,7 +191,7 @@ class BarangMasterModel extends Model
         return $this->where('id', $barangID)->first();
     }
 
-    public function getListForAccount($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getListForAccount($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
             'kode_barang'       => 'barang_master.kode_barang',
@@ -200,23 +200,29 @@ class BarangMasterModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master.id, divisis.divisi';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "barang_master.*,
-                    account_barang.ap_id,
-                    account_barang.ar_id,";
+                    divisis.id AS divisi_id,
+                    divisis.divisi";
 
         $barangDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
-            ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
+            ->whereIn('divisis.id', $conditionArr)
+            ->join('divisis', '1=1', 'CROSS')
+            // ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['filter_divisi']) {
             $barangDataQry->groupStart();
+        }
+
+        if ($addCondition['filter_divisi']) {
+            $barangDataQry->where('divisis.id', $addCondition['filter_divisi']);
         }
 
         if ($addCondition['search']) {
@@ -227,15 +233,7 @@ class BarangMasterModel extends Model
             $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
         }
 
-        if ($addCondition['filter_coa'] == "belum") {
-            $barangDataQry->where('account_barang.ap_id', NULL);
-        }
-
-        if ($addCondition['filter_coa'] == "sudah") {
-            $barangDataQry->where('account_barang.ap_id !=', NULL);
-        }
-
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['filter_divisi']) {
             $barangDataQry->groupEnd();
         }
 
