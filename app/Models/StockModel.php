@@ -693,6 +693,7 @@ class StockModel extends Model
             // LIST KEMASAN
             $selectQry = "
                 stock.id AS stock_id,
+                kemasan.id AS barang_id,
                 kemasan.id AS spesifikasi_id,
                 UPPER(kemasan.name) AS barang,
                 kemasan.kode AS kode_barang,
@@ -714,6 +715,7 @@ class StockModel extends Model
             // LIST BARANG
             $selectQry = "
                 stock.id AS stock_id,
+                stock.barang1_id AS barang_id,
                 stock.barang2_id AS spesifikasi_id,
                 CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
                 barang_master.kode_barang,

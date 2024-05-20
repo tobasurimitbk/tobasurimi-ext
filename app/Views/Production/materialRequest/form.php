@@ -17,10 +17,15 @@
                 <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
                     Posting
                 </button>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php } else if (!isset($dataMaterialRequests)) { ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php } else { ?>
             <?php } ?>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button>
         </div>
     </div>
     <div class="card">

@@ -553,6 +553,7 @@ $routes->post('/production-result/create', 'Production\ProductionResult::savePro
 $routes->get('/production-result/list-work-order', 'Production\ProductionResult::getListWorkOrderByID', ['filter' => 'Auth']);
 $routes->get('/production-result/list-material-request', 'Production\ProductionResult::getListMaterialRequestByID', ['filter' => 'Auth']);
 $routes->get('/production-result/material-request', 'Production\ProductionResult::getListMaterialRequestByWOID', ['filter' => 'Auth']);
+$routes->post('/production-result/update-status', 'Production\ProductionResult::updateStatusPostedProductionResult', ['filter' => 'Auth']);
 
 // Rencana Produksi
 $routes->get('/work-order', 'Production\WorkOrder::index', ['filter' => 'Auth']);

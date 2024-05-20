@@ -10,6 +10,8 @@ use App\Models\AccountDivisisModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\JurnalUmumModel;
+use App\Models\MaterialRequestPenolongDetailsModel;
+use App\Models\MaterialRequestsPenolongModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\ProductionResultDetailModel;
@@ -48,6 +50,8 @@ class RasioController extends BaseController
     protected $rasioCostModel;
     protected $jurnalUmumModel;
     protected $settingCosting;
+    protected $materialRequestsPenolongModel;
+    protected $materialRequestPenolongDetailsModel;
 
     public function __construct()
     {
@@ -72,6 +76,8 @@ class RasioController extends BaseController
         $this->rasioCostModel = new RasioCostModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
         $this->settingCosting = new SettingCostingModel();
+        $this->materialRequestsPenolongModel = new MaterialRequestsPenolongModel();
+        $this->materialRequestPenolongDetailsModel = new MaterialRequestPenolongDetailsModel();
     }
 
     public function index()
@@ -553,9 +559,9 @@ class RasioController extends BaseController
                 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
                 'divisi_id' => $this->request->getVar('department'),
             ];
-            $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
-            // var_dump($productionResultDataTitle);
-            // exit;
+            $productionResultDataTitle = $this->materialRequestsPenolongModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
+            var_dump($productionResultDataTitle);
+            exit;
             // $totalQtyAll = 0;
             foreach ($productionResultDataTitle as &$value) {
                 $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();

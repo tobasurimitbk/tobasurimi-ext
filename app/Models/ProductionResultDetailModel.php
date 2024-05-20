@@ -13,20 +13,8 @@ class ProductionResultDetailModel extends Model
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'production_result_id',
-        'barang1_id',
-        'barang2_id',
-        'bc_id',
-        'stock_id',
-        'stock_dokumen',
-        'no_ref',
-        'no_aju',
-        'barang_type',
-        'type',
-        'qty',
-    ];
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = false;

@@ -301,4 +301,43 @@ class MaterialRequestsPenolongModel extends Model
 
         return $data;
     }
+
+    public function getDataProductionResultBahanPenolongWithDetail($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        barang_master.kode_barang, 
+        barang_master.barang_name, 
+        barang_master.parent_type_id, 
+        barang_master_spesifikasi.spesifikasi,
+        material_request_penolong_details.material_request_id,
+        material_request_penolong_details.barang1_id,
+        material_request_penolong_details.barang2_id,
+        material_request_penolong_details.qty2 as qty_produksi,
+        stock_details2.stock_dokumen,
+        stock_details.no_dokumen,
+        parent_barang.parent_name
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('material_request_penolong_details', 'material_request_penolong_details.material_request_id = material_requests_penolong.id', 'left')
+            ->join('stock_details2', 'stock_details2.stock_id = material_request_penolong_details.stock_id AND stock_details2.stock_dokumen = material_request_penolong_details.stock_dokumen', 'left')
+            ->join('stock_details', 'stock_details.stock_id = material_request_penolong_details.stock_id AND stock_details.id = stock_details2.stock_detail_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.no_penerimaan_barang = stock_details.no_dokumen', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.barang_id = material_request_penolong_details.barang1_id AND penerimaan_barang_detail.spesifikasi_id = material_request_penolong_details.barang2_id', 'left')
+            ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_penolong_details.barang2_id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->like('material_requests_penolong.receive_date', $where['tanggal_jurnal'])
+            ->where('material_request_penolong_details.divisi_id', $where['divisi_id'])
+            ->where('material_request_penolong_details.type', 'DIGUNAKAN')
+            ->where('material_request_penolong_details.barang_type', 'bahan_penolong')
+            ->where('material_request_penolong_details.deletedAt', $where['deletedAt'])
+            ->where('material_requests_penolong.deletedAt', $where['deletedAt'])
+            ->findAll();
+
+        return $dataQry;
+    }
 }

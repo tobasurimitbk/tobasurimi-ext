@@ -112,13 +112,34 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `
-                        <div class="mt-0">
-                            <button type="button" class="btn btn-primary detail-result">
-                                <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        `
+                    let id = row.id;
+                    let status = row.is_posted
+                    if (status != 1) {
+                        return `
+                                <div class="mt-0">
+                                    <button class="btn btn-primary detail-result">
+                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-warning">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
+                                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            `
+                    } else {
+                        return `
+                                <div class="mt-0">
+                                    <button class="btn btn-primary detail-result">
+                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-warning">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            `
+                    }
                 }
             }
         ],
@@ -163,6 +184,66 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    const posting = function(id, status_posting) {
+        console.log(id);
+        Swal.fire({
+            icon: 'question',
+            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url("material-request-kimia/update-status"); ?>",
+                    data: {
+                        id: id,
+                        status_posting: status_posting
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
     }
 </script>
 <?= $this->endSection(); ?>

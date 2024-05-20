@@ -10,17 +10,22 @@
             <h1 class="title-name">Tambah Material Request</h1>
         <?php } ?>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-kimia"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
                 Batal
             </a>
             <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted != 1) { ?>
                 <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
                     Posting
                 </button>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php } else if (!isset($dataMaterialRequests)) { ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php } else { ?>
             <?php } ?>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button>
         </div>
     </div>
     <div class="card">

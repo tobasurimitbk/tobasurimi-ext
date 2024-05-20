@@ -625,7 +625,8 @@
                         res.data.forEach(function(item) {
                             list_items_barang_digunakan.push(item);
                         });
-                        drawTableDigunakan();
+                        console.log(list_items_barang_digunakan);
+                        // drawTableDigunakan();
                     } else {
                         stopLoading()
                         Swal.fire({

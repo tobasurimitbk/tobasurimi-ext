@@ -16,7 +16,7 @@ class ProductionResultModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'work_order_id',
-        'material_request_id',
+        'is_posted',
         'warehouse_id',
         'pr_no',
         'receive_date'

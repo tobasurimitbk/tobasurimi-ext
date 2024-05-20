@@ -596,7 +596,7 @@ class MaterialRequestPenolong extends BaseController
                         date('Y-m-d'),
                         $this->this_user_id,
                         "PRODUKSI",
-                        $stockRebusDetailIn == null ? "-" : $stockRebusDetailIn['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
+                        $materialRequestData['req_no'],
                         $value['note'] ? $value['note'] : "-"
                     );
 

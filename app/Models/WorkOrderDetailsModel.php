@@ -57,6 +57,8 @@ class WorkOrderDetailsModel extends Model
             work_order_details.id as id,        
             work_order_details.barang1_id as barang1_id,        
             barang_master_spesifikasi.id as barang2_id,        
+            work_orders.warehouse_id as warehouse_id,        
+            work_orders.divisi_id as divisi_id,        
             barang_master.barang_name as barang_name,        
             barang_master.kode_barang as kode_barang,        
             satuans.kode_satuan as kode_satuan,        
@@ -70,6 +72,7 @@ class WorkOrderDetailsModel extends Model
 
         $dataQry = $this->asArray()
             ->select($selectQry)
+            ->join('work_orders', 'work_orders.id = work_order_details.work_order_id', 'left')
             ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
