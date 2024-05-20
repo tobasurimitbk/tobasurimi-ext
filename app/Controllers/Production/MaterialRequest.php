@@ -544,7 +544,7 @@ class MaterialRequest extends BaseController
                         $value['barang_type'],
                         $value['barang1_id'],
                         $value['barang2_id'],
-                        $value['qty_isi']
+                        $value['qty2']
                     );
 
                     $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
@@ -591,7 +591,7 @@ class MaterialRequest extends BaseController
                     // DETAIL
                     $stokDetailIn = $this->stockDetailModel->insertStokDetail(
                         $stokIn,
-                        $value['qty_isi'],
+                        $value['qty2'],
                         "In",
                         date('Y-m-d'),
                         $this->this_user_id,
@@ -605,7 +605,7 @@ class MaterialRequest extends BaseController
                         $value['bc_id'],
                         $stokIn,
                         $stokDetailIn,
-                        $value['qty_isi'],
+                        $value['qty2'],
                         $value['no_aju'],
                         $materialRequestData['req_no'],
                         $value['stock_dokumen'],
