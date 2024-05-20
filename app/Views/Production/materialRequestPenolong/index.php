@@ -24,7 +24,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('wo_no')" class="sort">Kode Work Order</th>
+                                <!-- <th onclick="changeSort('wo_no')" class="sort">Kode Work Order</th> -->
                                 <th onclick="changeSort('req_no')" class="sort">Kode Request</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th>Action</th>
@@ -90,10 +90,6 @@
                 data: "no",
                 className: "text-center",
                 orderable: false
-            },
-            {
-                data: "wo_no",
-                className: "text-center"
             },
             {
                 data: "req_no",
