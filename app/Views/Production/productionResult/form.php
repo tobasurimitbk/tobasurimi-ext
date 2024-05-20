@@ -74,7 +74,7 @@
                                     <option value=""></option>
                                     <?php if (isset($dataWorkOrder)) : ?>
                                         <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                            <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?></option>
+                                            <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
