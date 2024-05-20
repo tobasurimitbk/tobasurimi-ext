@@ -33,7 +33,7 @@
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
-                <div class="col-subtitle-modal">
+                <!-- <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
@@ -68,205 +68,166 @@
                             <label for="floatingInput">Jumlah Standart Produksi</label>
                         </div>
                     </div> -->
+        </div> -->
+        <div class="col-subtitle-modal">
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold modal-sub-title">Header Request</label>
                 </div>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Header Request</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="input-group input-group-password">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
-                                    <label for="floatingInput">Kode Request</label>
-                                </div>
-                                <!-- <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                            <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
+                            <label for="floatingInput">Kode Request</label>
+                        </div>
+                        <!-- <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div> -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->request_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
-                            <label for="floatingInput">Tanggal Request</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->production_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
-                            <label for="floatingInput">Tanggal Produksi</label>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php if (!empty($warehouseAsal)) : ?>
-                                <?php foreach ($warehouseAsal as $w) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                        <?= $w['warehouse_name']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
-                    </div>
+            <div class="col-md-4">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->request_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                    <label for="floatingInput">Tanggal Request</label>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php if (!empty($warehouseTujuan)) : ?>
-                                <?php foreach ($warehouseTujuan as $w) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_tujuan_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                        <?= $w['warehouse_name']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
-                    </div>
+            <div class="col-md-4">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->production_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                    <label for="floatingInput">Tanggal Produksi</label>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
-                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
-                        <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan" disabled>
-                            <option value=""></option>
-                            <?php foreach ($tipeBarang as $t) : ?>
-                                <option value="<?= $t['description'] ?>">
-                                    <?= strtoupper($t['value']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Tipe Bahan</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang" disabled>
-                            <option value=""></option>
-                        </select>
-                        <label for="floatingInput">Nama Barang</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12 col-table-button-tts">
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center;">#</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
-                                    <th style="text-align: center;">Tanggal Penerimaan</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-2">
-                    <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
-                    </button>
-                </div>
-            </div>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Penolong Request</label>
-                    </div>
-                </div>
-            </div>
+        </div>
+        </form>
+        <div class="col-subtitle-modal">
             <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
+                        <option value=""></option>
+                        <?php foreach ($dataDivisi as $d) : ?>
+                            <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                <?= $d['divisi']; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
+                        <option value=""></option>
+                        <?php if (!empty($warehouseAsal)) : ?>
+                            <?php foreach ($warehouseAsal as $w) : ?>
+                                <option <?= !empty($mutasi) ? ($mutasi['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
+                                    <?= $w['warehouse_name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif ?>
+                    </select>
+                    <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
+                        <option value=""></option>
+                        <?php foreach ($dataDivisi as $d) : ?>
+                            <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                <?= $d['divisi']; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
+                        <option value=""></option>
+                        <?php if (!empty($warehouseTujuan)) : ?>
+                            <?php foreach ($warehouseTujuan as $w) : ?>
+                                <option <?= !empty($mutasi) ? ($mutasi['warehouse_tujuan_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
+                                    <?= $w['warehouse_name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif ?>
+                    </select>
+                    <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
+                        <option value=""></option>
+                        <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                        <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
+                    </select>
+                    <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating" style="height: 50px;">
+                    <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
+                    <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan" disabled>
+                        <option value=""></option>
+                        <?php foreach ($tipeBarang as $t) : ?>
+                            <option value="<?= $t['description'] ?>">
+                                <?= strtoupper($t['value']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label for="floatingInput">Tipe Bahan</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang" disabled>
+                        <option value=""></option>
+                    </select>
+                    <label for="floatingInput">Nama Barang</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-table-button-tts">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahan" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Department</th>
-                                <th style="text-align: center;">Warehouse</th>
-                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">#</th>
+                                <th style="text-align: center;">Asal Barang</th>
+                                <th style="text-align: center;">No Dokumen</th>
+                                <th style="text-align: center;">Supplier</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
                                 <th style="text-align: center;">No Aju</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Qty Awal</th>
-                                <th style="text-align: center;">Qty Direquest</th>
-                                <th style="text-align: center;">Action</th>
+                                <th style="text-align: center;">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="body-table">
@@ -275,6 +236,45 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-sm-2">
+                <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn">
+                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
+                </button>
+            </div>
+        </div>
+        <div class="col-subtitle-modal">
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold modal-sub-title">Data Barang Penolong Request</label>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="table-responsive">
+                <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahan" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="text-align: center;">No</th>
+                            <th style="text-align: center;">Department</th>
+                            <th style="text-align: center;">Warehouse</th>
+                            <th style="text-align: center;">Tipe Barang</th>
+                            <th style="text-align: center;">Dokumen Pabean</th>
+                            <th style="text-align: center;">No Aju</th>
+                            <th style="text-align: center;">Tanggal Penerimaan</th>
+                            <th style="text-align: center;">Barang - Spesifikasi</th>
+                            <th style="text-align: center;">Satuan</th>
+                            <th style="text-align: center;">Qty Awal</th>
+                            <th style="text-align: center;">Qty Direquest</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="body-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     </div>
 </section>
 

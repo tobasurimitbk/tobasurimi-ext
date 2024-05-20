@@ -110,14 +110,14 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let id_material_request = row.id_material_request;
+                    // let id_material_request = row.id_material_request;
                     let id_production_result = row.id_production_result;
 
                     let buttonsHTML = `
                         <div class="mt-0">
                     `;
                     buttonsHTML += `
-                        <button class="btn btn-primary to-material-request" onclick="toMaterialRequest('${id_material_request}')" >
+                        <button class="btn btn-primary to-material-request" onclick="toMaterialRequest()" >
                             <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
                         </button>
                     `;

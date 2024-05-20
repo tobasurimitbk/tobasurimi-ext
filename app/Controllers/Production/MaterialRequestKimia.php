@@ -143,7 +143,7 @@ class MaterialRequestKimia extends BaseController
             ->find();
 
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_penolong")->findAll(),
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
@@ -306,7 +306,7 @@ class MaterialRequestKimia extends BaseController
             $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day);
 
             $dataMaterial = [
-                "work_order_id" => $this->request->getPost("kode_produksi"),
+                // "work_order_id" => $this->request->getPost("kode_produksi"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),
