@@ -168,6 +168,9 @@ class ProductionResultModel extends Model
             ->groupBy('production_result_details.stock_dokumen')
             ->findAll();
 
+        // var_dump($dataQry);
+        // exit;
+
         return $dataQry;
     }
 

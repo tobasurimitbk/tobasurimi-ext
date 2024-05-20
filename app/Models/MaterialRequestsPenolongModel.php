@@ -323,7 +323,7 @@ class MaterialRequestsPenolongModel extends Model
             ->select($selectQryJadi)
             ->join('material_request_penolong_details', 'material_request_penolong_details.material_request_id = material_requests_penolong.id', 'left')
             ->join('stock_details2', 'stock_details2.stock_id = material_request_penolong_details.stock_id AND stock_details2.stock_dokumen = material_request_penolong_details.stock_dokumen', 'left')
-            ->join('stock_details', 'stock_details.stock_id = material_request_penolong_details.stock_id AND stock_details.id = stock_details2.stock_detail_id', 'left')
+            ->join('stock_details', 'stock_details.stock_id = material_request_penolong_details.stock_id AND stock_details.id = stock_details2.stock_detail_id  AND stock_details.sumber = "LPB"', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.no_penerimaan_barang = stock_details.no_dokumen', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.barang_id = material_request_penolong_details.barang1_id AND penerimaan_barang_detail.spesifikasi_id = material_request_penolong_details.barang2_id', 'left')
             ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id', 'left')
@@ -337,6 +337,9 @@ class MaterialRequestsPenolongModel extends Model
             ->where('material_requests_penolong.deletedAt', $where['deletedAt'])
             ->groupBy('barang_master.parent_type_id')
             ->findAll();
+
+        // var_dump($dataQry);
+        // exit;
 
         return $dataQry;
     }

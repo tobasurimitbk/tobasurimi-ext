@@ -9,6 +9,21 @@
         </div>
         <div class="card">
             <div class="card-body">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataDivisi as $d) : ?>
+                                    <option value="<?= $d['id'] ?>" <?= !empty($rasio) && $rasio->department_id == $d['id'] ? "selected" : "" ?>>
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                        </div>
+                    </div>
+                </div>
                 <div class="row mt-3">
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
@@ -25,7 +40,7 @@
                                             <tr>
                                                 <td colspan="2" style="font-weight: bold !important;font-size: 14px !important;"><?= $valueSetting['name'] ?></td>
                                                 <td>
-                                                    <select class="coa_id" name="coa_id<?= $valueSetting['id'] ?>" id="coa_id<?= $valueSetting['id'] ?>" onchange="submitData(<?= $valueSetting['id'] ?>)">
+                                                    <select class="coa_id" name="coa_id<?= $valueSetting['id'] ?>" id="coa_id<?= $valueSetting['id'] ?>" onchange="submitData(<?= $valueSetting['id'] ?>, this.value)">
                                                         <option value=""></option>
                                                         <?php foreach ($subAkuns as $s) : ?>
                                                             <option value="<?= $s->id ?>"><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
@@ -39,7 +54,7 @@
                                                         <td width="20%" style="font-weight: bold !important;font-size: 13px !important;"><?= $childSetting['name'] ?></td>
                                                         <td width="20%"></td>
                                                         <td>
-                                                            <select class="coa_id" name="coa_id<?= $childSetting['id'] ?>" id="coa_id<?= $childSetting['id'] ?>" onchange="submitData(<?= $childSetting['id'] ?>)">
+                                                            <select class="coa_id" name="coa_id<?= $childSetting['id'] ?>" id="coa_id<?= $childSetting['id'] ?>" onchange="submitData(<?= $childSetting['id'] ?>, this.value)">
                                                                 <option value=""></option>
                                                                 <?php foreach ($subAkuns as $s) : ?>
                                                                     <option value="<?= $s->id ?>"><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
@@ -53,7 +68,7 @@
                                                                 <td width="20%"></td>
                                                                 <td width="20%"><?= $childParentSetting['name'] ?></td>
                                                                 <td>
-                                                                    <select class="coa_id" name="coa_id<?= $childParentSetting['id'] ?>" id="coa_id<?= $childParentSetting['id'] ?>" onchange="submitData(<?= $childParentSetting['id'] ?>)">
+                                                                    <select class="coa_id" name="coa_id<?= $childParentSetting['id'] ?>" id="coa_id<?= $childParentSetting['id'] ?>" onchange="submitData(<?= $childParentSetting['id'] ?>, this.value)">
                                                                         <option value=""></option>
                                                                         <?php foreach ($subAkuns as $s) : ?>
                                                                             <option value="<?= $s->id ?>"><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
@@ -83,21 +98,38 @@
             theme: "bootstrap-5",
             allowClear: true
         });
+
+        $('#divisi_id').select2({
+            placeholder: "Pilih Departemen",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {});
+
+        $("#divisi_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
     });
 
-    function submitData(ID) {
-        var value = $("#coa_id" + ID).val();
+    function submitData(ID, value) {
+        // var value = $("#coa_id" + ID).val();
+        var divisi = $("#divisi_id").val();
         let csrfToken = '<?= csrf_token() ?>';
         let csrf = $(`[name="${csrfToken}"]`);
         console.log({
             id: ID,
-            value: value
+            value: value,
+            divisi: divisi,
         })
         $.ajax({
             url: "<?= base_url("setting-akun-costing/save"); ?>",
             data: {
                 id: ID,
                 value: value,
+                divisi: divisi,
             },
             method: "POST",
             dataType: "json",

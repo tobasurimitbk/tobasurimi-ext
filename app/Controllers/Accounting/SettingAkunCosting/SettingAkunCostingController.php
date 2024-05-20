@@ -15,6 +15,7 @@ class SettingAkunCostingController extends BaseController
     protected $this_company_id;
     protected $Sub_AkunsModel;
     protected $settingCosting;
+    protected $divisisModel;
 
     public function __construct()
     {
@@ -22,6 +23,7 @@ class SettingAkunCostingController extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->settingCosting = new SettingCostingModel();
+        $this->divisisModel = new DivisisModel();
     }
 
     public function index()
@@ -30,6 +32,7 @@ class SettingAkunCostingController extends BaseController
         $settingCosting = $this->settingCosting->getSettingCosting();
         $data = [
             "subAkuns" => $subAkunsModel,
+            'dataDivisi' => $this->divisisModel->getDivisiAccess(),
             "settingCosting" => $settingCosting,
         ];
         return view('Accounting/settingAkunCosting/index', $data);
@@ -37,16 +40,16 @@ class SettingAkunCostingController extends BaseController
 
     public function saveCosting()
     {
-        $id = $this->request->getPost('id');
-        $value = $this->request->getPost('value');
+        $id = $this->request->getVar('id');
+        $value = $this->request->getVar('value');
 
+        var_dump($id);
+        var_dump($value);
+        exit;
 
         $this->settingCosting->update($id, [
             'coa' => $value
         ]);
-        // var_dump($id);
-        // var_dump($value);
-        // exit;
 
         return response()->setJSON([
             'token' => csrf_hash(),

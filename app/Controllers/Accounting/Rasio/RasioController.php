@@ -122,7 +122,6 @@ class RasioController extends BaseController
                 return;
             }
 
-
             $data = [
                 "company_id" => $this->this_company_id,
                 "department_id" => $this->request->getVar("divisi_id"),
@@ -139,6 +138,9 @@ class RasioController extends BaseController
                 'total_qty_lpb' => $this->request->getVar('qtyTotalPenerimaan') ? number_format((float) str_replace(",", "", $this->request->getVar('qtyTotalPenerimaan')), 2, '.', '') : 0,
                 'harga_total_lpb' => $this->request->getVar('hargaTotalPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaTotalPenerimaan')), 2, '.', '') : 0,
                 'harga_average_lpb' => $this->request->getVar('hargaSatuanPenerimaan') ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar('hargaSatuanPenerimaan')), 2, '.', '') : 0,
+                'total_qty_po_bp' => $this->request->getVar("qtyTotalPembelian_material_2") ? number_format((float) str_replace(",", "", $this->request->getVar("qtyTotalPembelian_material_2")), 2, '.', '') : 0,
+                'harga_total_po_bp' => $this->request->getVar("hargaTotalPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaTotalPembelian_material_2")), 2, '.', '') : 0,
+                "harga_average_po_bp" => $this->request->getVar("hargaSatuanPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian_material_2")), 2, '.', '') : 0,
             ];
 
             $id = $this->rasioModel->insert($data);
@@ -431,8 +433,6 @@ class RasioController extends BaseController
                 'divisi_id' => $this->request->getVar('department'),
             ];
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
-            // var_dump($productionResultDataTitle);
-            // exit;
             // $totalQtyAll = 0;
             foreach ($productionResultDataTitle as &$value) {
                 $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
@@ -534,6 +534,8 @@ class RasioController extends BaseController
                     $value['satuanLPB'] = $satuanLPB;
                 }
             }
+            // var_dump($productionResultDataTitle);
+            // exit;
             if ($productionResultDataTitle) {
                 return response()->setJSON([
                     'data' => $productionResultDataTitle,
