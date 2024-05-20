@@ -133,7 +133,7 @@ class WorkOrder extends BaseController
         foreach ($workOrdersData['data'] as $data) {
             // $materialRequestData = $this->materialRequestModel->asObject()->where('work_order_id', $data->id)->where('deletedAt', null)->where('is_posted', 1)->find();
             // $materialRequestId = isset($materialRequestData[0]->id) ? $materialRequestData[0]->id : null;
-            $productionData = $this->productionResultModel->asObject()->where('work_order_id', $data->id)->where('material_request_id', $materialRequestId)->where('deletedAt', null)->find();
+            $productionData = $this->productionResultModel->asObject()->where('work_order_id', $data->id)->where('deletedAt', null)->find();
             $productionResultId = isset($productionData[0]->id) ? $productionData[0]->id : null;
             array_push($dataWorkOrders, [
                 "no"                    => $no++,
