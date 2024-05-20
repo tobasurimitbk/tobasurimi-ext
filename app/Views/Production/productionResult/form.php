@@ -970,45 +970,45 @@
                 $(".warehouse_id_order").val(warehouse_id).change();
                 $(".department_id_order").val(divisi_id).change();
                 setLoading();
-                $.ajax({
-                    url: `<?= base_url('production-result/material-request'); ?>`,
-                    method: "GET",
-                    data: {
-                        kode_produksi: $(this).val(),
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        stopLoading()
-                        if (res.status) {
-                            // Clear existing options
-                            $('#kode_request').empty();
-                            // Append a default option
-                            $('#kode_request').append($('<option>', {
-                                value: '',
-                                text: ''
-                            }));
-                            // Iterate over each item in the response data
-                            res.data.forEach(function(item) {
-                                // Append an option for each item
-                                $('#kode_request').append($('<option>', {
-                                    value: item.id,
-                                    text: item.req_no,
-                                    'data-tanggal-request': item.request_date,
-                                    'data-user-request': item.user_name,
-                                    'data-warehouse-request': item.warehouse_id,
-                                    'data-divisi-request': item.divisi_id
-                                }));
-                            });
-                        } else {
-                            stopLoading()
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Material Request Belum Di Setujui Warehouse',
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    },
-                });
+                // $.ajax({
+                //     url: `<?= base_url('production-result/material-request'); ?>`,
+                //     method: "GET",
+                //     data: {
+                //         kode_produksi: $(this).val(),
+                //     },
+                //     dataType: "json",
+                //     success: function(res) {
+                //         stopLoading()
+                //         if (res.status) {
+                //             // Clear existing options
+                //             $('#kode_request').empty();
+                //             // Append a default option
+                //             $('#kode_request').append($('<option>', {
+                //                 value: '',
+                //                 text: ''
+                //             }));
+                //             // Iterate over each item in the response data
+                //             res.data.forEach(function(item) {
+                //                 // Append an option for each item
+                //                 $('#kode_request').append($('<option>', {
+                //                     value: item.id,
+                //                     text: item.req_no,
+                //                     'data-tanggal-request': item.request_date,
+                //                     'data-user-request': item.user_name,
+                //                     'data-warehouse-request': item.warehouse_id,
+                //                     'data-divisi-request': item.divisi_id
+                //                 }));
+                //             });
+                //         } else {
+                //             stopLoading()
+                //             Swal.fire({
+                //                 icon: 'error',
+                //                 title: 'Data Material Request Belum Di Setujui Warehouse',
+                //                 confirmButtonColor: '#4e73df',
+                //             })
+                //         }
+                //     },
+                // });
                 $.ajax({
                     url: `<?= base_url('production-result/list-work-order'); ?>`,
                     method: "GET",
