@@ -374,7 +374,7 @@
             allowClear: true
         }).change(function() {
             // CARI DIVISI TUJUAN
-            getListDivisiTujuan();
+            // getListDivisiTujuan();
             // CARI WAREHOUSE ASAL
             getListWarehouseAsal()
             // RESET TYPE BARANG

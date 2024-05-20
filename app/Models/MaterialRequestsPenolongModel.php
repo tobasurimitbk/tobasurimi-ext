@@ -330,12 +330,12 @@ class MaterialRequestsPenolongModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_penolong_details.barang2_id', 'left')
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->like('material_requests_penolong.receive_date', $where['tanggal_jurnal'])
-            ->where('material_request_penolong_details.divisi_id', $where['divisi_id'])
-            ->where('material_request_penolong_details.type', 'DIGUNAKAN')
+            ->like('material_requests_penolong.request_date', $where['tanggal_jurnal'])
+            // ->where('material_request_penolong_details.divisi_id', $where['divisi_id'])
             ->where('material_request_penolong_details.barang_type', 'bahan_penolong')
             ->where('material_request_penolong_details.deletedAt', $where['deletedAt'])
             ->where('material_requests_penolong.deletedAt', $where['deletedAt'])
+            ->groupBy('barang_master.parent_type_id')
             ->findAll();
 
         return $dataQry;

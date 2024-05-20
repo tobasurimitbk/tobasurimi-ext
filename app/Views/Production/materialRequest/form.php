@@ -266,7 +266,7 @@
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Awal</th>
                                 <th style="text-align: center;">Qty Direquest</th>
-                                <th style="text-align: center;">Qty Sortir</th>
+                                <!-- <th style="text-align: center;">Qty Sortir</th> -->
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -794,18 +794,19 @@
 
                     $.each(listStockSelectedBahanBaku, function(i, v) {
                         var element = $('input[data-id="' + v.id + '"].qty-baku-request');
-                        var elementSortir = $('input[data-id="' + v.id + '"].qty-baku-sortir');
+                        // var elementSortir = $('input[data-id="' + v.id + '"].qty-baku-sortir');
                         var input_user = parseFloat(element.val());
-                        var input_user_sortir = parseFloat(elementSortir.val());
+                        // var input_user_sortir = parseFloat(elementSortir.val());
                         var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
+                        // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
                             dataError = listStockSelectedBahanBaku[i];
                             isValid = false;
                         } else {
                             listStockSelectedBahanBaku[i].qty = stok_max;
                             listStockSelectedBahanBaku[i].qty2 = input_user;
-                            listStockSelectedBahanBaku[i].qty_isi = input_user_sortir;
+                            // listStockSelectedBahanBaku[i].qty_isi = input_user_sortir;
                         }
                     });
 
@@ -1473,11 +1474,11 @@
                 <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty_isi}">
-            `
-            ));
+            // newRow.append($('<td style="text-align: center;">').html(
+            //     `
+            //     <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty_isi}">
+            // `
+            // ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
                 <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>

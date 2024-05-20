@@ -560,8 +560,8 @@ class RasioController extends BaseController
                 'divisi_id' => $this->request->getVar('department'),
             ];
             $productionResultDataTitle = $this->materialRequestsPenolongModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
-            var_dump($productionResultDataTitle);
-            exit;
+            // var_dump($productionResultDataTitle);
+            // exit;
             // $totalQtyAll = 0;
             foreach ($productionResultDataTitle as &$value) {
                 $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();

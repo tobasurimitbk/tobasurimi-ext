@@ -625,8 +625,8 @@
                         res.data.forEach(function(item) {
                             list_items_barang_digunakan.push(item);
                         });
-                        console.log(list_items_barang_digunakan);
-                        // drawTableDigunakan();
+                        // console.log(list_items_barang_digunakan);
+                        drawTableDigunakan();
                     } else {
                         stopLoading()
                         Swal.fire({
@@ -648,6 +648,7 @@
                 success: function(res) {
                     stopLoading()
                     if (res.status) {
+                        console.log(res);
                         list_items_barang_jadi = [];
                         let no = 0;
                         // Iterate over each item in the response data
@@ -915,9 +916,13 @@
                 var barang1_id_production = $(this).data('barang1_id_production');
                 var barang2_id_production = $(this).data('barang2_id_production');
                 var qty = parseFloat($(this).val().replace(/Rp|\./g, ""));
-                var hargaSatuan = parseFloat($('input.harga-satuan-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val().replace(/Rp|\./g, ""));
-                var totalHarga = qty * hargaSatuan;
-                $('input.harga-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val(formatRupiah(totalHarga));
+                var hargaTotal = parseFloat($('#hargaTotalPembelian_material_2').val().replace(/Rp|\./g, ""));
+                var hargaSatuan = hargaTotal / qty;
+                // console.log(qty);
+                // console.log(hargaTotal);
+                // console.log(hargaSatuan);
+                $('input.harga-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val(formatRupiah(hargaTotal));
+                $('input.harga-satuan-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val(formatRupiah(hargaSatuan));
 
                 // Update the data in list_items_barang_digunakan_material_2
                 if (!list_items_barang_digunakan_material_2[rowIndex].inputData) {
@@ -929,7 +934,7 @@
                     barang1_id_production: barang1_id_production,
                     barang2_id_production: barang2_id_production,
                     qty_input: qty,
-                    totalHarga_input: totalHarga,
+                    totalHarga_input: hargaTotal,
                     hargaSatuan_input: hargaSatuan
                 };
             });
@@ -1221,7 +1226,7 @@
         var row = '';
         var rowFooter = '';
         var no = 1;
-        var amount = $('#hargaTotalPenerimaan').val();
+        var amount = $('#hargaTotalPenerimaan').val() ? $('#hargaTotalPenerimaan').val() : formatRupiah(0);
         var biayaSubsidi = $('#biayaSubsidi').val() ? $('#biayaSubsidi').val() : formatRupiah(0);
         var biayaLain = $('#biayaLain').val() ? $('#biayaLain').val() : formatRupiah(0);
         var biayaKopek = $('#biayaKopek').val() ? $('#biayaKopek').val() : formatRupiah(0);
