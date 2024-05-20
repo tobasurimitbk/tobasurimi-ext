@@ -43,7 +43,7 @@
                                                     <select class="coa_id" name="coa_id<?= $valueSetting['id'] ?>" id="coa_id<?= $valueSetting['id'] ?>" onchange="submitData(<?= $valueSetting['id'] ?>, this.value)">
                                                         <option value=""></option>
                                                         <?php foreach ($subAkuns as $s) : ?>
-                                                            <option value="<?= $s->id ?>"><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
+                                                            <option value="<?= $s->id ?>" <?= $valueSetting['coa'] ==  $s->id ? "selected" : "" ?>><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </td>
@@ -57,7 +57,7 @@
                                                             <select class="coa_id" name="coa_id<?= $childSetting['id'] ?>" id="coa_id<?= $childSetting['id'] ?>" onchange="submitData(<?= $childSetting['id'] ?>, this.value)">
                                                                 <option value=""></option>
                                                                 <?php foreach ($subAkuns as $s) : ?>
-                                                                    <option value="<?= $s->id ?>"><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
+                                                                    <option value="<?= $s->id ?>" <?= $valueSetting['coa'] ==  $s->id ? "selected" : "" ?>><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
                                                                 <?php endforeach; ?>
                                                             </select>
                                                         </td>
@@ -71,7 +71,7 @@
                                                                     <select class="coa_id" name="coa_id<?= $childParentSetting['id'] ?>" id="coa_id<?= $childParentSetting['id'] ?>" onchange="submitData(<?= $childParentSetting['id'] ?>, this.value)">
                                                                         <option value=""></option>
                                                                         <?php foreach ($subAkuns as $s) : ?>
-                                                                            <option value="<?= $s->id ?>"><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
+                                                                            <option value="<?= $s->id ?>" <?= $valueSetting['coa'] ==  $s->id ? "selected" : "" ?>><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
                                                                         <?php endforeach; ?>
                                                                     </select>
                                                                 </td>
