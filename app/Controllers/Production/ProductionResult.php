@@ -98,6 +98,7 @@ class ProductionResult extends BaseController
                 "wo_no"         => $data->wo_no,
                 "barangCode"    => $data->barangCode,
                 "barangName"    => $data->barangName,
+                "is_posted"    => $data->is_posted,
                 "receive_date"  => $data->receives_date
             ]);
         }
@@ -122,7 +123,7 @@ class ProductionResult extends BaseController
             ->select("*, DATE_FORMAT(receive_date, '%d/%m/%Y') AS receive_date")
             ->find($id);
 
-        $productionResDetSelectBJ = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
+        $productionResDetSelectBJ = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
         $productionResDetDataBJ = $this->productionResultDetailModel->asObject()
             ->select($productionResDetSelectBJ)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
@@ -131,6 +132,7 @@ class ProductionResult extends BaseController
             ->where('production_result_details.type', 'JADI')
             ->where('production_result_details.production_result_id', $id)
             ->findAll();
+
         foreach ($productionResDetDataBJ as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
                 $value->type_barang_text = "Bahan Baku";

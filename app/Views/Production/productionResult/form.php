@@ -233,7 +233,7 @@
                                 <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-jadi" aria-selected="true">Barang Jadi</button>
                                 <!-- <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-setengah-jadi" type="button" role="tab" aria-controls="nav-barang-setengah-jadi" aria-selected="false">Barang Setengah Jadi</button> -->
                                 <button class="nav-link" id="nav-scrap-tab" data-bs-toggle="tab" data-bs-target="#nav-scrap" type="button" role="tab" aria-controls="nav-scrap" aria-selected="false">Scrap</button>
-                                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-material-return" type="button" role="tab" aria-controls="nav-material-return" aria-selected="false">Material Return</button>
+                                <!-- <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-material-return" type="button" role="tab" aria-controls="nav-material-return" aria-selected="false">Material Return</button> -->
                             </div>
                         </nav>
                         <div class="tab-content mt-3" id="nav-tabContent">
@@ -426,10 +426,10 @@
                     'barang_detail_id': getID(),
                     'barang1_id': '<?= $bj->barang1_id; ?>',
                     'barang2_id': '<?= $bj->barang2_id; ?>',
-                    'barang_name': '<?= $bj->barang_name; ?>',
+                    'barang_name': '<?= $bj->nama_barang; ?>',
                     'kode_barang': '<?= $bj->kode_barang; ?>',
                     'kode_satuan': '<?= $bj->kode_satuan; ?>',
-                    'nama_barang': '<?= $bj->nama_barang; ?>',
+                    'nama_barang': '<?= $bj->barang_name; ?>',
                     'qty': '<?= $bj->qty; ?>',
                     'type_barang': '<?= $bj->barang_type; ?>',
                     'type_barang_text': '<?= $bj->type_barang_text; ?>',
