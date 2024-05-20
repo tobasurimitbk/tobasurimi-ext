@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Hasil Produksi</h1>
-
+        <?= csrf_field() ?>
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("production-result/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
@@ -187,6 +187,7 @@
     }
 
     const posting = function(id, status_posting) {
+        const csrf = $(`[name="${csrfToken}"]`);
         console.log(id);
         Swal.fire({
             icon: 'question',
@@ -200,7 +201,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "<?= base_url("material-request-kimia/update-status"); ?>",
+                    url: "<?= base_url("production-result/update-status"); ?>",
                     data: {
                         id: id,
                         status_posting: status_posting
