@@ -314,6 +314,7 @@ class MaterialRequestsPenolongModel extends Model
         material_request_penolong_details.barang1_id,
         material_request_penolong_details.barang2_id,
         material_request_penolong_details.qty2 as qty_produksi,
+        material_request_penolong_details.satuan as satuan_request,
         stock_details2.stock_dokumen,
         stock_details.no_dokumen,
         parent_barang.parent_name
@@ -335,7 +336,7 @@ class MaterialRequestsPenolongModel extends Model
             ->where('material_request_penolong_details.barang_type', 'bahan_penolong')
             ->where('material_request_penolong_details.deletedAt', $where['deletedAt'])
             ->where('material_requests_penolong.deletedAt', $where['deletedAt'])
-            ->groupBy('barang_master.parent_type_id')
+            ->groupBy('barang_master.parent_type_id, material_request_penolong_details.barang1_id, material_request_penolong_details.barang2_id')
             ->findAll();
 
         // var_dump($dataQry);

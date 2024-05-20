@@ -459,6 +459,15 @@
         startView: "months",
         minViewMode: 1
     }).change(function() {
+        list_items_barang_jadi = [];
+        list_items_barang_jadi_material_2 = [];
+        list_items_barang_digunakan = [];
+        list_items_barang_digunakan_material_2 = [];
+        list_items_labor_cost = [];
+        list_items_title_cost = [];
+        list_items_overhead_cost = [];
+        list_items_fixed_cost = [];
+
         getDataRawMaterialI();
         getDataRawMaterialII();
         getDataCost();
@@ -469,6 +478,15 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
+        list_items_barang_jadi = [];
+        list_items_barang_jadi_material_2 = [];
+        list_items_barang_digunakan = [];
+        list_items_barang_digunakan_material_2 = [];
+        list_items_labor_cost = [];
+        list_items_title_cost = [];
+        list_items_overhead_cost = [];
+        list_items_fixed_cost = [];
+
         getDataRawMaterialI();
         getDataRawMaterialII();
         getDataCost();
@@ -881,13 +899,14 @@
             var qtyProduksi = 0;
             var hargaPO = 0;
             var hargaPOSatuan = 0;
+            var strip = "-";
             var banyakBarangJadi = list_items_barang_jadi_material_2.length;
             list_items_barang_digunakan_material_2.map((item, index) => {
                 rowDigunakan += '<tr style="color:whitesmoke;text-align: center;">';
                 rowDigunakan += '<td>' + no + '</td>';
                 rowDigunakan += '<td>' + item.parent_name + '</td>';
                 rowDigunakan += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
-                rowDigunakan += '<td>' + item.satuanPO + '</td>';
+                rowDigunakan += '<td>' + (item.satuanPO !== undefined ? item.satuanPO : item.satuan_request) + '</td>';
                 rowDigunakan += '<td>' + item.qty_produksi + '</td>';
                 list_items_barang_jadi_material_2.map((item2, index2) => {
                     if (item.production_result_id == item2.production_result_id) {

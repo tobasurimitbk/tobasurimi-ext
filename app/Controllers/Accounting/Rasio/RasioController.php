@@ -159,14 +159,14 @@ class RasioController extends BaseController
                     'barang2_id' => $s->barang2_id,
                     'barang_name' => $s->barang_name,
                     'spesifikasi' => $s->spesifikasi,
-                    'qty_po' => $s->totalQtyPO,
-                    'harga_po_total' => $s->totalHargaPO,
-                    'harga_po_satuan' => $s->hargaSatuanPO,
-                    'satuan_po' => $s->satuanPO,
-                    'qty_lpb' => $s->totalQtyLPB,
-                    'harga_lpb_total' => $s->totalHargaLPB,
-                    'harga_lpb_satuan' => $s->hargaSatuanLPB,
-                    'satuan_lpb' => $s->satuanLPB,
+                    'qty_po' => $s->totalQtyPO ?? 0,
+                    'harga_po_total' => $s->totalHargaPO ?? 0,
+                    'harga_po_satuan' => $s->hargaSatuanPO ?? 0,
+                    'satuan_po' => $s->satuanPO  ?? "-",
+                    'qty_lpb' => $s->totalQtyLPB ?? 0,
+                    'harga_lpb_total' => $s->totalHargaLPB ?? 0,
+                    'harga_lpb_satuan' => $s->hargaSatuanLPB ?? 0,
+                    'satuan_lpb' => $s->satuanLPB ?? "-",
                     'no_dokumen' => $s->no_dokumen,
                     'stock_dokumen' => $s->stock_dokumen,
                 ]);
@@ -562,8 +562,6 @@ class RasioController extends BaseController
                 'divisi_id' => $this->request->getVar('department'),
             ];
             $productionResultDataTitle = $this->materialRequestsPenolongModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
-            // var_dump($productionResultDataTitle);
-            // exit;
             // $totalQtyAll = 0;
             foreach ($productionResultDataTitle as &$value) {
                 $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
@@ -642,6 +640,8 @@ class RasioController extends BaseController
                     $value['satuanPO'] = $satuanPO;
                 }
             }
+            // var_dump($productionResultDataTitle);
+            // exit;
             if ($productionResultDataTitle) {
                 return response()->setJSON([
                     'data' => $productionResultDataTitle,
