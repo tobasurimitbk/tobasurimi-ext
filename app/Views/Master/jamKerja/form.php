@@ -259,7 +259,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            location.reload();
+                                            window.location.href = "<?= base_url("jam-kerja"); ?>";
                                         });
                                 } else {
                                     Swal.fire({

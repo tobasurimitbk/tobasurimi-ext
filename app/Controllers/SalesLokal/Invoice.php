@@ -58,7 +58,10 @@ class Invoice extends BaseController
 
     public function index()
     {
-        return view('SalesLokal/Invoice/index');
+        $data = [
+            'getCustomers' => $this->CustomerModel->where('deletedAt', NULL)->where('tipe_customer', 'LOKAL')->findAll(),
+        ];
+        return view('SalesLokal/Invoice/index', $data);
     }
 
     public function createView()
@@ -99,8 +102,10 @@ class Invoice extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            // "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            //"dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "filter_jenis_dokumen"        => $this->request->getGet("filter_jenis_dokumen"),
+            "filter_customer"        => $this->request->getGet("filter_customer"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
         $dataSalesOrderInvoice = $this->SalesOrderInvoiceModel
             ->getAllSalesOrderInvoiceLokal($condition, $addCondition, $pageSize, $offset);

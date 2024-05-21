@@ -802,7 +802,7 @@
                                             reverseButtons: true,
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
-                                            location.reload();
+                                            window.location.href = "<?= base_url('po-import-bahan-penolong') ?>"
                                         })
                                     } else {
                                         Swal.fire({
@@ -1329,7 +1329,7 @@
                                     reverseButtons: true,
                                     confirmButtonText: 'Oke',
                                 }).then((result) => {
-                                    location.reload();
+                                    window.location.href = "<?= base_url('po-import-bahan-penolong') ?>"
                                 })
                             } else {
                                 Swal.fire({
@@ -1386,7 +1386,7 @@
                                     reverseButtons: true,
                                     confirmButtonText: 'Oke',
                                 }).then((result) => {
-                                    location.reload();
+                                    window.location.href = "<?= base_url('po-import-bahan-penolong') ?>"
                                 })
                             }
 

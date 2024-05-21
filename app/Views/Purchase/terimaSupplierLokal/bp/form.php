@@ -662,7 +662,7 @@
                                         confirmButtonText: 'Ok'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            location.reload();
+                                            window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
                                         }
                                     });
                                 },
@@ -688,7 +688,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp/id/') ?>" + response.id
+                                                window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
                                             }
                                         });
                                     } else {
@@ -787,7 +787,7 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            location.reload();
+                            window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
                         },
                     });
                 }

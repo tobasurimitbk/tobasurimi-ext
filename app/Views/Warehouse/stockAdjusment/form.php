@@ -593,7 +593,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    location.reload();
+                                                    window.location.href = "<?= base_url("stock-adjusment"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -630,7 +630,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    location.replace('<?= base_url("stock-adjusment/id") ?>/' + response.id, "_blank")
+                                                    window.location.href = "<?= base_url("stock-adjusment"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -697,7 +697,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                location.reload();
+                                window.location.href = "<?= base_url("stock-adjusment"); ?>";
                             });
                         } else {
                             Swal.fire({

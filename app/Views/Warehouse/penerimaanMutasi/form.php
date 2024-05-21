@@ -371,7 +371,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    location.reload();
+                                                    window.location.href = "<?= base_url("penerimaan-mutasi") ?>";
                                                 }
                                             });
                                         } else {
@@ -410,7 +410,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url('penerimaan-mutasi/id/') ?>" + response.id
+                                                    window.location.href = "<?= base_url("penerimaan-mutasi") ?>";
                                                 }
                                             });
                                         } else {
@@ -648,7 +648,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                location.reload()
+                                window.location.href = "<?= base_url("penerimaan-mutasi") ?>";
                             });
                         } else {
                             Swal.fire({

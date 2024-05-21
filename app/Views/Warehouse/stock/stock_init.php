@@ -444,7 +444,7 @@
                                         reverseButtons: true,
                                         confirmButtonText: 'Oke',
                                     }).then((result) => {
-                                        location.reload();
+                                        window.location.href = "<?= base_url("stock-list"); ?>";
                                     })
                                 } else {
                                     Swal.fire({

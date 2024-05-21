@@ -32,7 +32,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="tipe_sales_order" name="tipe_sales_order" id="tipe_sales_order" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -45,7 +45,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" name="order_date" type="text" value="<?= !empty($data) ? $data->order_date : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" class="form-control order_date" id="order_date">
@@ -53,6 +53,30 @@
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
                                 <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataCustomers)) {
+                                        foreach ($dataCustomers as $customer) {
+                                    ?>
+                                            <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-customerphone="<?= rawurlencode($customer['phone']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" data-jenis_penjualan="<?= rawurlencode($customer['jenis_penjualan']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['kode']; ?> - <?= $customer['name']; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Nama Konsumen</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -96,29 +120,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="input-group">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataCustomers)) {
-                                        foreach ($dataCustomers as $customer) {
-                                    ?>
-                                            <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" data-jenis_penjualan="<?= rawurlencode($customer['jenis_penjualan']); ?>" <?= !empty($data) ? ($data->id_customer == $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['kode']; ?> - <?= $customer['name']; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">Nama Konsumen</label>
-                            </div>
-                            <div class="input-group-append" style="height:50px;">
-                                <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>" disabled>
+                            <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" disabled value="<?= $data->address ?? '' ?>">
@@ -222,6 +229,7 @@
                                 <th>Satuan</th>
                                 <th>Harga Satuan</th>
                                 <th>Discount (%)</th>
+                                <th>PPN</th>
                                 <th>Amount</th>
                                 <th></th>
                             </tr>
@@ -328,12 +336,24 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control keteranganppn" name="keteranganppn" id="keteranganppn" placeholder="keteranganppn">
+                                <label for="floatingInput">Status PPN</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="hidden" readonly="true" class="form-control statusppn" name="statusppn" id="statusppn" placeholder="statusppn">
+                            </div>
+                        </div>
+
                     </div>
                 </form>
             </div>
@@ -613,6 +633,17 @@
                 className: "text-center"
             },
             {
+                data: "statusppn",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data != 0) {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
+            },
+            {
                 data: "amount",
                 className: "text-center"
             },
@@ -657,6 +688,7 @@
                     qty: "<?= $payload['qty'] ?>",
                     amount: "<?= $payload['amount'] ?>",
                     keterangan: "<?= $payload['keterangan'] ?>",
+                    statusppn: "<?= $payload['tax'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
                     isDeleted: false,
@@ -678,6 +710,7 @@
                     qty: "<?= $payload['qty'] ?>",
                     amount: "<?= $payload['amount'] ?>",
                     keterangan: "<?= $payload['keterangan'] ?>",
+                    statusppn: "<?= $payload['tax'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
                     isDeleted: false,
@@ -815,6 +848,7 @@
             allowClear: true,
             theme: "bootstrap-5"
         }).change(function() {
+            const customerPhone = $(this).find(':selected').data('customerphone') ? $(this).find(':selected').data('customerphone') : "";
             const customerAddress = $(this).find(':selected').data('address') ? $(this).find(':selected').data('address') : "";
             const termin = $(this).find(':selected').data('termin') ? $(this).find(':selected').data('termin') : "";
 
@@ -822,6 +856,7 @@
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
             const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
 
+            $('#customerphone').val(decodeURIComponent(customerPhone));
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
             $('#termin').val(decodeURIComponent(termin)).change();
 
@@ -1378,6 +1413,7 @@
             $('#generate_new_code').attr('checked', true);
             generateCodeMasterBarang();
             $('.barang_name').val(null);
+            $('.statusppn').val(null);
             $('.satuan_id').val(null).change();
             $('.harga_pokok').val(null);
             $('.harga_jual').val(null);
@@ -1628,6 +1664,7 @@
                 let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";
                 let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
                 let satuan = $(".id_barang option:selected").data("satuan") ? $(".id_barang option:selected").data("satuan") : "";
+                let statusppn = $(".id_barang option:selected").data("statusppn");
                 let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
                 let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
                 let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : 0;
@@ -1649,7 +1686,14 @@
                         })
                     }
                 })
+                if (statusppn == 1) {
+                    $(".keteranganppn").val("Barang PPN");
 
+                } else {
+                    $(".keteranganppn").val("Barang Tidak PPN");
+                }
+
+                $(".statusppn").val(statusppn);
                 $(".nama_barang").val(nama);
                 $(".warehouse").on('change', function() {
                     let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
@@ -1672,12 +1716,14 @@
                 });
                 $(".satuan").val(satuan);
                 $(".harga").val(harga);
+
             } else {
                 $(".nama_barang").attr("readonly", false)
                 // $(".harga").val("0");
                 $(".qty").val("");
                 $(".amount").val("0");
                 $(".keterangan").val("").change();
+                $(".statusppn").val("");
                 $(".tax").val("");
                 $(".discount_percentage").val("0");
                 $(".dept").val("");
@@ -1701,6 +1747,7 @@
             let keterangan = $(this).data('keterangan')
             let dept = $(this).data('dept')
             let idWarehouse = $(this).data('id_warehouse')
+            let statusppn = $(this).data('statusppn')
             let tax = $(this).data('tax')
             let discount = $(this).data('discount_percentage')
             let row = $(this).data('row')
@@ -1716,6 +1763,7 @@
             $(".tipe_pelanggan").val(tipe_pelanggan)
             $(".amount").val(amount)
             $(".keterangan").val(keterangan)
+            $(".statusppn").val(statusppn)
             $(".tax").val(tax)
             $(".discount_percentage").val(discount)
             $(".dept").val(dept)
@@ -1730,13 +1778,13 @@
 
                     // $(".id_barang").empty();
 
-                    $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
+                    $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-statusppn="" data-warehouse_name="" data-id_item="" value=""></option>`);
 
                     res.dataBarang.forEach(function(item) {
                         if (item.id == id_barang) {
                             valData = item.id_barang
                         }
-                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-satuan="${item.nama_satuan}" data-warehouse_id="${idWarehouse}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id_barang}" value="${item.id_barang}" ${item.id_barang==id_barang?'selected':''}>${item.nama_barang}</option>`);
+                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.harga_jual}" data-satuan="${item.nama_satuan}" data-warehouse_id="${idWarehouse}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id_barang}  value="${item.id_barang}" ${item.id_barang==id_barang?'selected':''}>${item.nama_barang}</option>`);
                     })
 
                     $(".id_barang").val(valData).change();
@@ -1772,7 +1820,7 @@
 
                         let update_list_items = [];
 
-                        update_list_items = tableData;
+                        update_list_items = list_items;
 
                         if (list_delete.length !== 0) {
                             list_delete.map(obj => {
@@ -1784,6 +1832,7 @@
                                     qty: obj.qty ? Number(obj.qty) : 0,
                                     amount: obj.amount ? Number(obj.amount.replaceAll(",", "")) : 0,
                                     keterangan: obj.keterangan,
+                                    statusppn: obj.statusppn,
                                     tax: obj.tax ? Number(obj.tax) : 0,
                                     discount_percentage: obj.discount_percentage ? Number(obj.discount_percentage) : 0,
                                     dept: obj.dept ? Number(obj.dept) : 0,
@@ -1793,6 +1842,7 @@
                                 })
                             })
                         }
+                        console.log(update_list_items)
 
                         const taxStatus = $('#tax_status').is(':checked');
                         const includeTaxStatus = $('#include_tax').is(':checked');
@@ -1840,7 +1890,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("order-form-lokal/id/"); ?>" + response.id;
+                                                window.location.href = "<?= base_url('order-form-lokal') ?>"
                                             })
                                     } else {
                                         Swal.fire({
@@ -1897,7 +1947,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("order-form-lokal/id/"); ?>" + response.id;
+                                                window.location.href = "<?= base_url('order-form-lokal') ?>"
                                             })
                                     } else {
                                         Swal.fire({
@@ -1938,6 +1988,7 @@
             $("#warehouse").empty()
             $(".harga").val('')
             $(".qty").val('')
+            $(".statusppn").val('')
             $(".amount").val('')
             $(".keterangan").val('')
 
@@ -1977,7 +2028,7 @@
             let qty = $(".qty").val()
             let amount = $(".amount").val().replace(/\,/g, '');
             let keterangan = $(".keterangan").val()
-            // const tax = $(".tax").val()
+            let statusppn = $(".statusppn").val()
             const tax = selectedData.tax;
             let discountPercentage = $(".discount_percentage").val() || 0;
             let dept = $(".dept").val()
@@ -2024,6 +2075,7 @@
                                     amount: amount,
                                     discountedAmt: discountedAmt,
                                     keterangan: keterangan,
+                                    statusppn: statusppn,
                                     tax: tax,
                                     taxAmt: amount * (tax / 100),
                                     discount_percentage: discountPercentage,
@@ -2051,6 +2103,7 @@
                                     harga_barang: harga,
                                     barangTotal: amount,
                                     disc: discountPercentage,
+                                    statusppn: statusppn,
                                     tax: tax,
                                     taxAmt: amount * (tax / 100),
                                     keterangan: keterangan,
@@ -2221,7 +2274,7 @@
                 $(".id_customer").empty()
                 $(".id_customer").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".id_customer").append(`<option value="${item.id}" data-jenis_penjualan="${item.jenis_penjualan}" data-tipepelanggan="${item.tipe_pelanggan}" data-address="${item.address}" data-termin="${item.termin}" data-salesname="${item.salesName}">${item.kode} - ${item.name}</option>`)
+                    $(".id_customer").append(`<option value="${item.id}" data-jenis_penjualan="${item.jenis_penjualan}" data-tipepelanggan="${item.tipe_pelanggan}" data-customerphone="${item.customerPhone}" data-address="${item.address}" data-termin="${item.termin}" data-salesname="${item.salesName}">${item.kode} - ${item.name}</option>`)
                 })
                 $(".id_customer").val();
             }
@@ -2236,11 +2289,14 @@
             success: function(res) {
                 $(".id_barang").empty();
 
-                $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
+                $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-statusppn="" data-warehouse_name="" data-id_item="" value=""></option>`);
+
+
 
                 res.dataBarang.forEach(function(item) {
-                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-tax="${+item.tax}" data-satuan="${item.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
                 })
+                console.log(res.dataBarang);
 
                 $(".id_barang").val("").change();
             }

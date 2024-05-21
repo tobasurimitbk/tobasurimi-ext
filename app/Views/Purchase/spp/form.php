@@ -1076,7 +1076,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    location.reload()
+                                    window.location.replace("<?= base_url('spp') ?>");
                                 })
                         }
                     },
