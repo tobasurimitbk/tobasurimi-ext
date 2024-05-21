@@ -1105,6 +1105,7 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->get('list-po', 'BeaCukai\BC40::dropdownPO');
     $routes->get('list-no-ijin-tpb', 'BeaCukai\BC40::dropdownNoIjinTPB');
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
+    $routes->get('print-po', 'BeaCukai\BC40::exportPdf');
     // FORM PURCHASE ORDER
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC40::createHeaderView/$1');

@@ -8,6 +8,12 @@
                 Kembali
             </a>
         </div>
+        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 10px;">
+            Export
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li><button onclick="print()" class="dropdown-item print-pdf">PDF</button></li>
+        </ul>
     </div>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
@@ -325,6 +331,15 @@
 
             }
         });
+    }
+
+    function print() {
+        var supplierId = $(".supplier_id option:selected").val();
+        var poType = $(".po_type option:selected").val();
+
+        if (supplierId && poType) {
+            window.open("<?= base_url('bea-cukai-bc-40/print-po') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+        }
     }
 </script>
 

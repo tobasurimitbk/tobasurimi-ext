@@ -10,13 +10,14 @@ use Exception;
 class BeaCukaiApi
 {
 
-    protected $baseUrl, $username, $password;
+    protected $baseUrl, $baseUrlDev, $username, $password;
     protected $metaDataModel;
 
     public function __construct($username, $password)
     {
         $this->metaDataModel = new MetadataModel();
         $this->baseUrl = $this->metaDataModel->where('name', "Base Url BC")->first()['value'];
+        $this->baseUrlDev = $this->metaDataModel->where('name', "Base Url BC")->first()['description'];
         $this->username = $username;
         $this->password = $password;
     }

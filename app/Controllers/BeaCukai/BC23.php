@@ -1623,7 +1623,7 @@ class BC23 extends BaseController
             $bc23Pengangkut
         );
 
-        // $res = $beacukaiApi->kirimDokumenBC($payload, false);
+        $res = $beacukaiApi->kirimDokumenBC($payload, false);
         // return response()->setJSON($res);
 
         // UPDATE STATUS
@@ -1636,6 +1636,7 @@ class BC23 extends BaseController
             'token' => csrf_hash(),
             'status' => true,
             'message' => "Dokumen BC 2.3 Berhasil Diposting",
+            'res' => $res
         ]);
     }
 
