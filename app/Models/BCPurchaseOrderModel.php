@@ -215,7 +215,7 @@ class BCPurchaseOrderModel extends Model
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $rmPurchaseOrderDetailModel = new RMImportPODetailModel();
 
         $first = $this->find($bcPurchaseOrderID);
 
@@ -357,7 +357,7 @@ class BCPurchaseOrderModel extends Model
                 SUM(additional_cost) AS total_biaya_tambahan'
             )
                 ->where('barang_id', $po['barang_id'])
-                ->where('am_purchase_order_id', $po['purchase_order_id'])
+                ->where('rm_import_po_id', $po['purchase_order_id'])
                 ->groupBy('barang_id')
                 ->first();
 
