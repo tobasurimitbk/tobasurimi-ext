@@ -4,6 +4,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Dokumen BC 2.3</h1>
+        <?php if (can("Bea Cukai", "BC 2.3", "c")) : ?>
+            <a href="<?= base_url('bea-cukai-bc-23/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -27,7 +32,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <select name="statusBC" class="form-select statusBC" id="statusBC">
-                        <option value="Belum Dibuat">STATUS BC : BELUM DIBUAT</option>
+                        <option value="ALL">STATUS BC : ALL</option>
                         <option value="Belum Lengkap">STATUS BC : BELUM LENGKAP</option>
                         <option value="Siap Kirim">STATUS BC : SIAP KIRIM CEISA 4.0</option>
                         <option value="Sudah Kirim">STATUS BC : SUDAH KIRIM CEISA 4.0</option>
@@ -36,17 +41,18 @@
                 <div class="col-md-3 mb-3">
                     <select name="statusLPB" class="form-select statusLPB" id="statusLPB">
                         <option value="SEMUA">JENIS LPB : SEMUA</option>
-                        <!-- <option value="LOKAL BAKU">JENIS LPB : LOKAL BB</option>
-                        <option value="LOKAL PENOLONG">JENIS LPB : LOKAL BP</option> -->
                         <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
                         <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noBC23 search form-out-search" placeholder="Cari Nomor BC 2.3" value="" />
+                    <input autocomplete="one-time-code" class="form-control supplierName search form-out-search" placeholder="Cari Nama Supplier" value="" />
                 </div>
                 <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noPenerimaanBarang search form-out-search" placeholder="Cari Nomor LPB" value="" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control noPo search form-out-search" placeholder="Cari Nomor Purchase Order" value="" />
                 </div>
                 <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.3" value="" />
@@ -57,13 +63,14 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center;">No.</th>
+                                <th style="text-align: center;">No</th>
+                                <th onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Supplier</th>
                                 <th onclick="changeSort('bc_23.bc_no_lokal')" class="sort" style="text-align: center;">No BC 2.3</th>
                                 <th onclick="changeSort('bc_23.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.3</th>
                                 <th onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.3</th>
-                                <th style="text-align: center;">Jenis LPB</th>
-                                <th onclick="changeSort('penerimaan_barang.no_penerimaan_barang')" class="sort" style="text-align: center;">No LPB</th>
-                                <th onclick="changeSort('penerimaan_barang.warehouse_id')" class="sort" style="text-align: center;">Warehouse</th>
+                                <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
+                                <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
+                                <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th>
                                 <th style="text-align: center;">Status BC 2.3</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
@@ -87,7 +94,7 @@
                 <h5 class="modal-title"><label class="title-name"></label> Ubah Nomor Pengajuan</h5>
             </div>
             <form id="form-update">
-                <input type="hidden" name="penerimaan_barang_id" class="penerimaan_barang_id" id="penerimaan_barang_id">
+                <input type="hidden" name="bc_purchase_order_id" class="bc_purchase_order_id" id="bc_purchase_order_id">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-sm-6 mt-1">
@@ -153,7 +160,7 @@
             data: function(data) {
                 data.mulaiTanggalBC23 = $('.mulaiTanggalBC23').val();
                 data.selesaiTanggalBC23 = $('.selesaiTanggalBC23').val();
-                data.noBC23 = $('.noBC23').val();
+                data.supplierName = $('.supplierName').val();
                 data.statusLPB = $('.statusLPB').val();
                 data.statusBC = $('.statusBC').val();
                 data.noPenerimaanBarang = $('.noPenerimaanBarang').val();
@@ -169,13 +176,15 @@
         },
         display: "stripe",
         searching: false,
-        columns: [
-
-            {
+        columns: [{
                 data: "no",
                 className: "text-center",
                 sortable: false,
                 width: "5%"
+            },
+            {
+                data: "supplier_name",
+                className: "text-center"
             },
             {
                 data: "bc_no_lokal",
@@ -190,17 +199,15 @@
                 className: "text-center"
             },
             {
-                data: "jenis_lpb",
+                data: "po_type",
                 className: "text-center",
-                searchable: false,
-                sortable: false,
             },
             {
-                data: "no_penerimaan_barang",
+                data: "lpb_no",
                 className: "text-center"
             },
             {
-                data: "warehouse_name",
+                data: "po_no",
                 className: "text-center"
             },
             {
@@ -253,14 +260,14 @@
                         if (row.status == "BELUM LENGKAP") {
                             if (row.is_update_no_aju) {
                                 htmlRes += `
-                                <button onclick="noAjuShowModal('${row.penerimaan_barang_id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
+                                <button onclick="noAjuShowModal('${row.id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
                                     <i class="fas fa-edit fa-sm"></i>
                                 </button>
                                 `;
                             }
 
                             htmlRes += `
-                                <button onclick="deleteAction('${row.penerimaan_barang_id}')" class="btn btn-danger delete-parent">
+                                <button onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
                             `;
@@ -270,20 +277,20 @@
 
                             if (row.is_update_no_aju) {
                                 htmlRes += `
-                                <button onclick="noAjuShowModal('${row.penerimaan_barang_id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
+                                <button onclick="noAjuShowModal('${row.id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
                                     <i class="fas fa-edit fa-sm"></i>
                                 </button>
                                 `;
                             }
 
                             htmlRes += `
-                                <button onclick="postingAction('${row.penerimaan_barang_id}')" class="btn btn-success posting-spp">
+                                <button onclick="postingAction('${row.id}')" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
                             `;
 
                             htmlRes += `
-                                <button onclick="deleteAction('${row.penerimaan_barang_id}')" class="btn btn-danger delete-parent">
+                                <button onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
                             `;
@@ -318,18 +325,14 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        if (data.status == 'BELUM DIBUAT') {
-            location.replace(`<?= base_url("bea-cukai-bc-23/id/header"); ?>/${data.penerimaan_barang_id}`);
-        } else {
-            location.replace(`<?= base_url("bea-cukai-bc-23/id/header"); ?>/${data.penerimaan_barang_id}`);
-        }
+        location.replace(`<?= base_url("bea-cukai-bc-23/id/header"); ?>/${data.id}`);
     });
 
     $('.mulaiTanggalBC23, .selesaiTanggalBC23').change(function() {
         table.ajax.reload();
     });
 
-    $('.noBC23, .noPenerimaanBarang, .noAju').keyup(function() {
+    $('.supplierName, .noPenerimaanBarang, .noAju').keyup(function() {
         table.ajax.reload();
     });
 
@@ -481,7 +484,7 @@
         $('#no_pengajuan').val(noAju);
         $('#no_urut_dokumen').val(splitValues[3]);
         $('#modalUpdateNoAju').modal('show');
-        $('#penerimaan_barang_id').val(id);
+        $('#bc_purchase_order_id').val(id);
     }
 
     function changeSort(val) {
@@ -506,7 +509,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
-                formData.append("penerimaan_barang_id", id);
+                formData.append("bc_purchase_order_id", id);
                 $.ajax({
                     url: `<?= base_url("bea-cukai-bc-23/id/delete"); ?>`,
                     method: "POST",
@@ -543,7 +546,7 @@
     function postingAction(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Kirim Dokumen BC 2.3 ke Ceisa Bea Cukai ?',
+            title: 'Posting BC 2.0 ke aplikasi Ceisa Bea Cukai ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -552,10 +555,31 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.replace("<?= base_url('bea-cukai-bc-23/api/kirim-dokumen/') ?>" + id)
+                $.ajax({
+                    url: `<?= base_url("bea-cukai-bc-23/api/kirim-dokumen/"); ?>` + id,
+                    method: "GET",
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                table.ajax.reload();
+                            });
+                        }
+                    }
+                })
             }
         })
-
     }
 </script>
 <?= $this->endSection(); ?>

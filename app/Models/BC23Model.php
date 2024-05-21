@@ -46,79 +46,67 @@ class BC23Model extends Model
             'bc_23.bc_no_lokal'                      => 'bc_23.bc_no_lokal',
             'bc_23.createdAt'                        => 'bc_23.createdAt',
             'bc_23.no_aju'                           => 'bc_23.no_aju',
-            'penerimaan_barang.no_penerimaan_barang' => 'penerimaan_barang.no_penerimaan_barang',
-            'penerimaan_barang.warehouse_id'         => 'penerimaan_barang.warehouse_id',
+            'bc_purchase_order.po_type'              => 'bc_purchase_order.po_type',
+            'bc_purchase_order.multiple_lpb_no'      => 'bc_purchase_order.multiple_lpb_no',
+            'bc_purchase_order.multiple_po_no'       => 'bc_purchase_order.multiple_po_no',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'penerimaan_barang.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bc_purchase_order.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "bc_23.*,
-            penerimaan_barang.no_penerimaan_barang,
-            penerimaan_barang.id AS penerimaan_barang_id,
-            penerimaan_barang.status_penerimaan,
-            penerimaan_barang.tipe_bahan,
-            warehouses.warehouse_name";
+            bc_purchase_order.multiple_po_no,
+            bc_purchase_order.id AS bc_purchase_order_id,
+            bc_purchase_order.multiple_lpb_no,
+            bc_purchase_order.po_type,
+            suppliers.name AS supplier_name";
 
         $bcDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('penerimaan_barang', 'penerimaan_barang.id = bc_23.penerimaan_barang_id', 'right')
-            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->whereIn('po_type', ["IMPORT BAKU", "IMPORT PENOLONG"])
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'right')
+            ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $bcDataQry->countAllResults(false);
 
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['noBC23'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
+        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['supplierName'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
             $bcDataQry->groupStart();
         }
 
         if ($addCondition['statusBC']) {
-            if ($addCondition['statusBC'] == "Belum Dibuat") {
-                $bcDataQry->where('bc_23.id IS NULL');
-            } elseif ($addCondition['statusBC'] == "Belum Lengkap") {
+            if ($addCondition['statusBC'] == "Belum Lengkap") {
                 $bcDataQry->where('bc_23.status_dokumen', "Belum Lengkap");
             } elseif ($addCondition['statusBC'] == "Siap Kirim") {
                 $bcDataQry->where('bc_23.status_dokumen', "Siap Kirim");
-            } else {
+            } else if ($addCondition['statusBC'] == "Sudah Kirim") {
                 $bcDataQry->where('bc_23.status_dokumen', "Sudah Kirim");
             }
         }
 
         if ($addCondition['statusLPB']) {
-            if ($addCondition['statusLPB'] == "LOKAL BAKU") {
-                $statusLPB = explode(' ', "LOKAL BAKU");
-                $bcDataQry->where('status_penerimaan', $statusLPB[0]);
-                $bcDataQry->where('tipe_bahan', $statusLPB[1]);
-            } elseif ($addCondition['statusLPB'] == "LOKAL PENOLONG") {
-                $statusLPB = explode(' ', "LOKAL PENOLONG");
-                $bcDataQry->where('status_penerimaan', $statusLPB[0]);
-                $bcDataQry->where('tipe_bahan', $statusLPB[1]);
-            } elseif ($addCondition['statusLPB'] == "IMPORT BAKU") {
-                $statusLPB = explode(' ', "IMPORT BAKU");
-                $bcDataQry->where('status_penerimaan', $statusLPB[0]);
-                $bcDataQry->where('tipe_bahan', $statusLPB[1]);
-            } elseif ($addCondition['statusLPB'] == "IMPORT PENOLONG") {
-                $statusLPB = explode(' ', "IMPORT PENOLONG");
-                $bcDataQry->where('status_penerimaan', $statusLPB[0]);
-                $bcDataQry->where('tipe_bahan', $statusLPB[1]);
+            if ($addCondition['statusLPB'] != "SEMUA") {
+                $bcDataQry->where('bc_purchase_order.po_type', $addCondition['statusLPB']);
+            } else {
+                $bcDataQry->whereIn('bc_purchase_order.po_type', ["IMPORT BAKU", "IMPORT PENOLONG"]);
             }
         }
 
-        if ($addCondition['noBC23']) {
-            $bcDataQry->like('bc_no_lokal', $addCondition['noBC23']);
+        if ($addCondition['supplierName']) {
+            $bcDataQry->like('suppliers.name', $addCondition['supplierName']);
         }
 
         if ($addCondition['noPenerimaanBarang']) {
-            $bcDataQry->like('no_penerimaan_barang', $addCondition['noPenerimaanBarang']);
+            $bcDataQry->like('multiple_lpb_no', $addCondition['noPenerimaanBarang']);
         }
 
         if ($addCondition['noAju']) {
             $bcDataQry->like('no_aju', $addCondition['noAju']);
         }
 
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['noBC23'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
+        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['supplierName'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
             $bcDataQry->groupEnd();
         }
 
@@ -183,15 +171,15 @@ class BC23Model extends Model
     }
 
     // BARU
-    public function get($penerimaanBarangID)
+    public function get($bcPurchaseOrderID)
     {
-        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        return $this->asArray()->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->first();
     }
 
-    public function isCompleteFormHeader($penerimaanBarangID)
+    public function isCompleteFormHeader($bcPurchaseOrderID)
     {
         $isCompleteForm = false;
-        $data = $this->get($penerimaanBarangID);
+        $data = $this->get($bcPurchaseOrderID);
         if ($data == null) {
             $isCompleteForm = false;
         } else {
@@ -204,10 +192,10 @@ class BC23Model extends Model
         return $isCompleteForm;
     }
 
-    public function isCompleteFormPernyataan($penerimaanBarangID)
+    public function isCompleteFormPernyataan($bcPurchaseOrderID)
     {
         $isCompleteForm = false;
-        $data = $this->get($penerimaanBarangID);
+        $data = $this->get($bcPurchaseOrderID);
         if ($data == null) {
             $isCompleteForm = false;
         } else {
@@ -220,38 +208,38 @@ class BC23Model extends Model
         return $isCompleteForm;
     }
 
-    public function isCompleteFormEntitas($penerimaanBarangID)
+    public function isCompleteFormEntitas($bcPurchaseOrderID)
     {
         $bcEntitasModel = new BCEntitasModel();
-        return $bcEntitasModel->get($penerimaanBarangID) == null ? false : true;
+        return $bcEntitasModel->get($bcPurchaseOrderID) == null ? false : true;
     }
 
-    public function isCompleteFormDokumen($penerimaanBarangID)
+    public function isCompleteFormDokumen($bcPurchaseOrderID)
     {
         $bcDokumenModel = new BCDokumenModel();
-        return $bcDokumenModel->get($penerimaanBarangID) == null ? false : true;
+        return $bcDokumenModel->get($bcPurchaseOrderID) == null ? false : true;
     }
 
-    public function isCompleteFormPengangkut($penerimaanBarangID)
+    public function isCompleteFormPengangkut($bcPurchaseOrderID)
     {
         $bc23PengangkutModel = new BCPengangkutModel();
-        return $bc23PengangkutModel->get($penerimaanBarangID) == null ? false : true;
+        return $bc23PengangkutModel->get($bcPurchaseOrderID) == null ? false : true;
     }
 
-    public function isCompleteFormPetiKemas($penerimaanBarangID)
+    public function isCompleteFormPetiKemas($bcPurchaseOrderID)
     {
         $bcKontainerModel = new BCKontainerModel();
         $bcKemasanModel = new BCKemasanModel();
 
-        $kontainer = $bcKontainerModel->getLast($penerimaanBarangID) != null ? true : false;
-        $kemasan = $bcKemasanModel->getLast($penerimaanBarangID) != null ? true : false;
+        $kontainer = $bcKontainerModel->getLast($bcPurchaseOrderID) != null ? true : false;
+        $kemasan = $bcKemasanModel->getLast($bcPurchaseOrderID) != null ? true : false;
 
         return $kontainer && $kemasan;
     }
 
-    public function isCompleteFormTransaksi($penerimaanBarangID)
+    public function isCompleteFormTransaksi($bcPurchaseOrderID)
     {
-        $data = $this->get($penerimaanBarangID);
+        $data = $this->get($bcPurchaseOrderID);
         if ($data == null) {
             return false;
         } else {
@@ -259,19 +247,17 @@ class BC23Model extends Model
         }
     }
 
-    public function isCompleteFormBarang($penerimaanBarangID)
+    public function isCompleteFormBarang($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $bcPurchaseOrderModel = new BCPurchaseOrderModel();
         $bcBarangModel = new BCBarangModel();
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $lpbDetail = $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan);
+        $lpbDetail = $bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID);
 
         $totalPerluDiisi = count($lpbDetail);
         $totalSudahDiisi = 0;
         foreach ($lpbDetail as $l) {
-            $bcDokumenBarang =  $bcBarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first();
+            $bcDokumenBarang =  $bcBarangModel->where('penerimaan_barang_id', $l['penerimaan_barang_id'])->where('barang1_id', $l['barang1_id'])->first();
             if ($bcDokumenBarang != null) {
                 $totalSudahDiisi++;
             }
@@ -280,11 +266,11 @@ class BC23Model extends Model
         return $totalSudahDiisi == $totalPerluDiisi ? true : false;
     }
 
-    public function isCompleteFormPungutan($penerimaanBarangID)
+    public function isCompleteFormPungutan($bcPurchaseOrderID)
     {
         $bcBarangTarifModel = new BCBarangTarifModel();
         $barangTarif = $bcBarangTarifModel
-            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
             ->findAll();
 
         return count($barangTarif) == 0 ? false : true;

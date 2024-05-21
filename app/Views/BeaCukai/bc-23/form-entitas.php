@@ -24,20 +24,27 @@
                                 Importir/Pengusaha TPB
                             </label>
                             <div class="mt-1">
-                                <div class="form-floating mb-3">
-                                    <input id="entitas_npwp_importir" value="<?= $bc23Entitas == null ? $npwpDefault['value'] : $bc23Entitas['nomor_identitas'] ?>" name="entitas_npwp_importir" type="text" class="form-control entitas_npwp_importir" placeholder="">
-                                    <label>NPWP</label>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select entitas_npwp_importir" id="entitas_npwp_importir" name="entitas_npwp_importir" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php foreach ($pengusahaTPB as $p) : ?>
+                                            <option <?= $bc23Entitas != null ? ($p['npwp'] == $bc23Entitas['nomor_identitas'] ? 'selected' : '')  : '' ?> value="<?= $p['npwp'] ?>" data-nama_pengusaha="<?= $p['nama_pengusaha'] ?>" data-alamat="<?= $p['alamat'] ?>" data-id="<?= $p['id'] ?>">
+                                                <?= $p['npwp'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label style="z-index: 1;">NPWP</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nama_importir" value="<?= $bc23Entitas == null ? $namaImportirDefault['value'] : $bc23Entitas['nama_entitas'] ?>" name="entitas_nama_importir" type="text" class="form-control entitas_nama_importir" placeholder="">
+                                    <input readonly id="entitas_nama_importir" value="<?= $bc23Entitas == null ? '' : $bc23Entitas['nama_entitas'] ?>" name="entitas_nama_importir" type="text" class="form-control entitas_nama_importir" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= "\n" . ($bc23Entitas == null) ? $alamatImportirDefault['value'] : $bc23Entitas['alamat_entitas'] ?></textarea>
+                                    <textarea readonly name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= ($bc23Entitas == null) ? '' : $bc23Entitas['alamat_entitas'] ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -45,11 +52,11 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select entitas_nomor_ijin_tpb" id="entitas_nomor_ijin_tpb" name="entitas_nomor_ijin_tpb" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <?php foreach ($nomorIjinTPB as $k) : ?>
-                                            <option data-tanggal_skep_tpb="<?= date('d/m/Y', strtotime($k['tanggal_skep_tpb'])) ?>" <?= !empty($bc23Entitas) ? ($bc23Entitas['nomor_ijin_entitas'] == $k['no_izin_tpb'] ? 'selected' : '') : '' ?> value="<?= $k['no_izin_tpb'] ?>">
-                                                <?= $k['no_izin_tpb'] ?>
+                                        <?php if (!empty($bc23Entitas)) : ?>
+                                            <option value="<?= $bc23Entitas['nomor_ijin_entitas'] ?>" selected>
+                                                <?= $bc23Entitas['nomor_ijin_entitas'] ?>
                                             </option>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                     <label style="z-index: 1;">Nomor Izin TPB</label>
                                 </div>
@@ -64,7 +71,7 @@
                                 </div>
                             </div>
                             <div class="form-floating mb-3">
-                                <input id="entitas_nib" value="<?= $bc23Entitas == null ? $nibDefault['value'] : $bc23Entitas['nib_entitas'] ?>" name="entitas_nib" type="text" class="form-control entitas_nib" placeholder="">
+                                <input id="entitas_nib" value="<?= $bc23Entitas == null ? '' : $bc23Entitas['nib_entitas'] ?>" name="entitas_nib" type="text" class="form-control entitas_nib" placeholder="">
                                 <label>NIB</label>
                             </div>
                         </div>
@@ -108,19 +115,19 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_npwp_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['npwp_pemilik_barang'] : $npwpDefault['value'] ?>" name="entitas_npwp_pemilik_barang" type="text" class="form-control entitas_npwp_pemilik_barang" placeholder="">
+                                    <input id="entitas_npwp_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['npwp_pemilik_barang'] : '' ?>" name="entitas_npwp_pemilik_barang" type="text" class="form-control entitas_npwp_pemilik_barang" placeholder="">
                                     <label>NPWP</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nama_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemilik_barang'] : $namaImportirDefault['value'] ?>" name="entitas_nama_pemilik_barang" type="text" class="form-control entitas_nama_pemilik_barang" placeholder="">
+                                    <input id="entitas_nama_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemilik_barang'] : '' ?>" name="entitas_nama_pemilik_barang" type="text" class="form-control entitas_nama_pemilik_barang" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_pemilik_barang" id="entitas_alamat_pemilik_barang" class="form-control entitas_alamat_pemilik_barang" style="height: 100px;"><?= $bc23Entitas != null ? $bc23Entitas['alamat_pemilik_barang'] : $alamatImportirDefault['value'] ?></textarea>
+                                    <textarea name="entitas_alamat_pemilik_barang" id="entitas_alamat_pemilik_barang" class="form-control entitas_alamat_pemilik_barang" style="height: 100px;"><?= $bc23Entitas != null ? $bc23Entitas['alamat_pemilik_barang'] : '' ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -163,6 +170,27 @@
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
+    });
+
+    $('#entitas_npwp_importir').select2({
+        placeholder: "Pilih No NPWP Perusahaan",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        var selected = $(this).find('option:selected');
+        var npwpPengusaha = $(this).val();
+        var namaPengusaha = selected.data('nama_pengusaha');
+        var alamatPengusaha = selected.data('alamat');
+
+        $('#entitas_nama_importir').val(namaPengusaha);
+        $('#entitas_alamat_importir').val(alamatPengusaha);
+        $('#entitas_npwp_pemilik_barang').val(npwpPengusaha)
+        $('#entitas_nama_pemilik_barang').val(namaPengusaha);
+        $('#entitas_alamat_pemilik_barang').val(alamatPengusaha);
+
+        // DROPDOPWN NOMOR IZIN TPB
+        getListNoIjinTPB();
+
     });
 
     $('.form-select')
@@ -288,7 +316,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-entitas"));
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
                     formData.append("entitas_tanggal_skep_tpb", $('#entitas_tanggal_skep_tpb').val());
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/entitas"); ?>",
@@ -326,6 +354,31 @@
 
         }
     });
+
+    function getListNoIjinTPB() {
+        $.ajax({
+            url: `<?= base_url('bea-cukai-bc-23/list-no-ijin-tpb'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                pengusaha_tpb_id: $(".entitas_npwp_importir option:selected").data('id'),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".entitas_nomor_ijin_tpb").empty()
+                $(".entitas_nomor_ijin_tpb").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".entitas_nomor_ijin_tpb").append(`<option data-tanggal_skep_tpb="${item.tanggal_skep_tpb}"  value="${item.no_ijin_tpb}">${item.no_ijin_tpb}</option>`)
+                })
+                $(".entitas_nomor_ijin_tpb").val();
+            }
+        });
+    }
 </script>
 
 

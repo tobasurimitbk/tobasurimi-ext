@@ -87,6 +87,7 @@ class NomorIjinTPB extends BaseController
     {
         $noIjinTpb = $this->nomorIjinTPBModel
             ->where('company_id', $this->this_company_id)
+            ->where('pengusaha_tpb_id', $this->request->getVar('pengusaha_tpb_id'))
             ->where(
                 'no_ijin_tpb',
                 $this->request->getVar('no_ijin_tpb')
@@ -125,6 +126,7 @@ class NomorIjinTPB extends BaseController
                 'no_ijin_tpb',
                 $this->request->getVar('no_ijin_tpb')
             )
+            ->where('pengusaha_tpb_id', $this->request->getVar('pengusaha_tpb_id'))
             ->where('id != ', $id)
             ->first();
 

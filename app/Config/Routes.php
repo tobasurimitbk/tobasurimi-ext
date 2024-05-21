@@ -1039,6 +1039,11 @@ $routes->post('/setting-akun-bc/akun/create-update', 'BeaCukai\IntegrasiCeisa::c
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC23::index');
     $routes->get('all', 'BeaCukai\BC23::all');
+    $routes->get('create', 'BeaCukai\BC23::createPurchaseOrderView');
+    $routes->get('list-supplier', 'BeaCukai\BC23::dropdownSupplier');
+    $routes->get('list-po', 'BeaCukai\BC40::dropdownPO');
+    $routes->get('list-no-ijin-tpb', 'BeaCukai\BC40::dropdownNoIjinTPB');
+    $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');
     $routes->post('id/header', 'BeaCukai\BC23::createHeaderAction');
@@ -1054,7 +1059,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC23::createPengangkutView/$1');
     $routes->post('id/pengangkut', 'BeaCukai\BC23::createPengangkutAction');
     // KONTAINER(PETI KEMAS)
-    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC23::createKemasanPetiKemas/$1');
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC23::createKemasanPetiKemasView/$1');
     $routes->get('id/kemasan-peti-kemas/kemasan/data/all', 'BeaCukai\BC23::allKemasan');
     $routes->get('id/kemasan-peti-kemas/kontainer/data/all', 'BeaCukai\BC23::allKontainer');
     $routes->post('id/kemasan-peti-kemas/kemasan/create', 'BeaCukai\BC23::createKemasanAction');
@@ -1066,7 +1071,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/transaksi', 'BeaCukai\BC23::createTransaksiAction');
     // BARANG
     $routes->get('id/barang/(:segment)', 'BeaCukai\BC23::createBarangView/$1');
-    $routes->get('id/barang/(:segment)/(:segment)', 'BeaCukai\BC23::createBarangDetailView/$1/$2');
+    $routes->get('id/barang/(:segment)/(:segment)/(:segment)', 'BeaCukai\BC23::createBarangDetailView/$1/$2/$3');
     $routes->get('id/barang-pungutan-all', 'BeaCukai\BC23::allPungutan');
     $routes->post('id/barang-pungutan-create', 'BeaCukai\BC23::createPungutanAction');
     $routes->post('id/barang-pungutan-delete', 'BeaCukai\BC23::deletePungutanAction');
@@ -1098,6 +1103,7 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->get('create', 'BeaCukai\BC40::createPurchaseOrderView');
     $routes->get('list-supplier', 'BeaCukai\BC40::dropdownSupplier');
     $routes->get('list-po', 'BeaCukai\BC40::dropdownPO');
+    $routes->get('list-no-ijin-tpb', 'BeaCukai\BC40::dropdownNoIjinTPB');
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     // FORM PURCHASE ORDER
     // HEADER
@@ -1127,7 +1133,7 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/transaksi', 'BeaCukai\BC40::createTransaksiAction');
     // BARANG
     $routes->get('id/barang/(:segment)', 'BeaCukai\BC40::createBarangView/$1');
-    $routes->get('id/barang/(:segment)/(:segment)', 'BeaCukai\BC40::createBarangDetailView/$1/$2');
+    $routes->get('id/barang/(:segment)/(:segment)/(:segment)', 'BeaCukai\BC40::createBarangDetailView/$1/$2/$3');
     $routes->get('id/barang-pungutan-all', 'BeaCukai\BC40::allPungutan');
     $routes->post('id/barang-pungutan-create', 'BeaCukai\BC40::createPungutanAction');
     $routes->post('id/barang-pungutan-delete', 'BeaCukai\BC40::deletePungutanAction');

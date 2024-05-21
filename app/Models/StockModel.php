@@ -576,6 +576,16 @@ class StockModel extends Model
             ->groupBy('stock_details.stock_id')
             ->findAll();
 
+        if (count($detailStock) == 0) {
+            $detailStock = [
+                'stokSekarang' => 0,
+                'stokMasuk' => 0,
+                'stokKeluar' => 0
+            ];
+        } else {
+            $detailStock = $detailStock[0];
+        }
+
         $selectQry = '
             SUM(stock_details.qty) AS qty
         ';
@@ -590,11 +600,10 @@ class StockModel extends Model
         $stokInisiasi = count($stokInisiasi) == 0 ? 0 : $stokInisiasi[0];
         return [
             'barang' => $detailBarang,
-            'stok' => $detailStock[0],
+            'stok' => $detailStock,
             'stokInisiasi' => $stokInisiasi
         ];
     }
-
     public function getBarangAndStock($type_barang, $divisi_id, $warehouse_id)
     {
         if ($type_barang == "kemasan") {

@@ -29,20 +29,6 @@
                                     <label>Nomor Pengajuan</label>
                                 </div>
                             </div>
-                            <label class="form-label font-weight-bold lable-title mt-4 mb-2">
-                                Tanggal Penerimaan Barang
-                            </label>
-                            <div class="mt-1">
-                                <div class="input-group input-group-password">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input id="tanggal_penerimaan_barang" value="<?= date('d/m/Y', strtotime($lpb->tanggal)) ?>" name="tanggal_penerimaan_barang" type="text" class="tanggal_penerimaan_barang form-control" placeholder="">
-                                        <label>Tanggal Penerimaan Barang</label>
-                                    </div>
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <label class="form-label font-weight-bold lable-title mt-4 mb-2">
@@ -241,7 +227,7 @@
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-header"));
                     formData.append("header_kantor_pabean_pengawas", $('#header_kantor_pabean_pengawas').val());
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
 
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/header"); ?>",

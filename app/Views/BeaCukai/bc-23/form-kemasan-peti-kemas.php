@@ -239,7 +239,7 @@
             url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kemasan/data/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
+                data.bc_purchase_order_id = "<?= encrypt($bcPo['id']) ?>";
                 data.sort = "bc_kemasan.createdAt";
                 data.sortType = "DESC";
             }
@@ -322,7 +322,7 @@
             url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kontainer/data/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
+                data.bc_purchase_order_id = "<?= encrypt($bcPo['id']) ?>";
                 data.sort = "bc_kontainer.createdAt";
                 data.sortType = "DESC";
             }
@@ -515,7 +515,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-kemasan"));
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kemasan/create"); ?>",
                         data: formData,
@@ -560,7 +560,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-kontainer"));
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/kemasan-peti-kemas/kontainer/create"); ?>",
                         data: formData,
@@ -598,7 +598,7 @@
             url: `<?= base_url("bea-cukai-bc-23/api/get-kontainer-peti-kemas"); ?>`,
             method: "GET",
             data: {
-                penerimaan_barang_id: "<?= encrypt($lpb->id) ?>"
+                bc_purchase_order_id: "<?= encrypt($bcPo['id']) ?>"
             },
             beforeSend: function() {
                 setLoading();

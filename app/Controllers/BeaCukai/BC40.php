@@ -5,6 +5,7 @@ namespace App\Controllers\BeaCukai;
 use App\Controllers\BaseController;
 use App\Helpers\BeaCukaiApi;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
 use App\Models\BC40Model;
 use App\Models\BCBarangDokumenModel;
@@ -15,7 +16,7 @@ use App\Models\BCEntitasModel;
 use App\Models\BCKemasanModel;
 use App\Models\BCKontainerModel;
 use App\Models\BCPengangkutModel;
-use App\Models\BCPurchaseOrder;
+use App\Models\BCPurchaseOrderModel;
 use App\Models\CeisaSettingModel;
 use App\Models\HsCodesModel;
 use App\Models\KantorBeaCukaiModel;
@@ -23,10 +24,14 @@ use App\Models\MetadataModel;
 use App\Models\NomorIjinTPBModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
-use App\Models\RMImportPODetailModel;
-use App\Models\RMPurchaseOrderDetailModel;
+use App\Models\PengusahaTPBModel;
+use App\Models\RMPurchaseOrderModel;
+use App\Models\StockDetail2Model;
+use App\Models\StockDetailModel;
+use App\Models\StockModel;
 use App\Models\SupplierHargaModel;
 use App\Models\SupplierModel;
+use Exception;
 
 // META DATA -> jenis_dok_aju
 // BC 2.3 -> 48
@@ -38,18 +43,68 @@ use App\Models\SupplierModel;
 // BC 4.1 -> 54
 class BC40 extends BaseController
 {
+    protected $this_user_id;
     protected $this_company_id;
     protected $ceisaSettingModel;
     protected $penerimaanBarangModel;
-    protected $bcPurchaseOrder;
+    protected $penerimaanBarangDetailModel;
+    protected $bcPurchaseOrderModel;
+    protected $bcBarangModel;
+    protected $bc40Model;
+    protected $metaDataModel;
+    protected $hsCodeModel;
+    protected $amPurchaseOrderDetailModel;
+    protected $supplierHargaModel;
+    protected $barangMasterModel;
+    protected $bcBarangTarifModel;
+    protected $bcDokumenModel;
+    protected $bcBarangDokumenModel;
+    protected $kantorBeaCukaiModel;
+    protected $nomorIjinTPBModel;
+    protected $bcEntitasModel;
+    protected $pengusahaTPBModel;
+    protected $bcPengangkutModel;
+    protected $bcKemasanModel;
+    protected $bcKontainerModel;
+    protected $supplierModel;
+    protected $stockModel;
+    protected $stockDetailModel;
+    protected $stockDetail2Model;
+    protected $amPurchaseOrderModel;
+    protected $rmPurchaseOrderModel;
     protected $akunCeisa;
 
     public function __construct()
     {
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->ceisaSettingModel = new CeisaSettingModel();
-        $this->bcPurchaseOrder = new BCPurchaseOrder();
+        $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
+        $this->bcBarangModel = new BCBarangModel();
+        $this->bc40Model = new BC40Model();
+        $this->metaDataModel = new MetadataModel();
+        $this->hsCodeModel = new HsCodesModel();
+        $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $this->supplierHargaModel = new SupplierHargaModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->bcBarangTarifModel = new BCBarangTarifModel();
+        $this->bcDokumenModel = new BCDokumenModel();
+        $this->bcBarangDokumenModel = new BCBarangDokumenModel();
+        $this->kantorBeaCukaiModel = new KantorBeaCukaiModel();
+        $this->nomorIjinTPBModel = new NomorIjinTPBModel();
+        $this->bcEntitasModel = new BCEntitasModel();
+        $this->pengusahaTPBModel = new PengusahaTPBModel();
+        $this->bcPengangkutModel = new BCPengangkutModel();
+        $this->bcKemasanModel = new BCKemasanModel();
+        $this->bcKontainerModel = new BCKontainerModel();
+        $this->supplierModel = new SupplierModel();
+        $this->stockModel = new StockModel();
+        $this->stockDetailModel = new StockDetailModel();
+        $this->stockDetail2Model = new StockDetail2Model();
+        $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
 
+        $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->akunCeisa = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
     }
@@ -73,19 +128,17 @@ class BC40 extends BaseController
         ];
 
         $condition = [
-            "penerimaan_barang.company_id"  => $this->this_company_id,
-            "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang.bc_type" => 53,
-            "penerimaan_barang.status_post" => "FINISH"
+            "bc_purchase_order.company_id"  => $this->this_company_id,
+            "bc_purchase_order.deletedAt" => null,
+            "bc_40.deletedAt" => null,
         ];
-
 
         $addCondition = [
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
             "statusBC" => $this->request->getGet("statusBC"),
             "statusLPB" => $this->request->getGet("statusLPB"),
-            "noBC40" => $this->request->getGet("noBC40"),
+            "supplierName" => $this->request->getGet("supplierName"),
             "mulaiTanggalBC40" => $this->request->getGet("mulaiTanggalBC40"),
             "selesaiTanggalBC40" => $this->request->getGet('selesaiTanggalBC40'),
             "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
@@ -95,29 +148,25 @@ class BC40 extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $bc40Model = new BC40Model();
-
-        $beaCukaiData = $bc40Model->getList($condition, $addCondition, $limit, $offset);
+        $beaCukaiData = $this->bc40Model->getList($condition, $addCondition, $limit, $offset);
 
         $dataBeaCukai = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($beaCukaiData['data'] as $data) {
-            $status = $data->status_dokumen == null ? "BELUM DIBUAT" : strtoupper($data->status_dokumen);
-            $bc40 = $bc40Model->get($data->penerimaan_barang_id);
-
+            $bc40 = $this->bc40Model->where('bc_purchase_order_id', $data->bc_purchase_order_id)->first();
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "id"                    => encrypt($data->bc_purchase_order_id),
                 "bc_no_lokal"           => $data->bc_no_lokal,
                 "tanggal_bc_40"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
                 "no_aju"                => $data->no_aju,
-                "jenis_lpb"             => $data->status_penerimaan . " " . ($data->tipe_bahan == "PENOLONG" ? "BP" : "BB"),
-                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
-                "warehouse_name"        => strtoupper($data->warehouse_name),
-                "status"                => $status,
+                "po_type"               => $data->po_type,
+                "lpb_no"                => str_replace(['"', ']', '['], " ",  $data->multiple_lpb_no),
+                "po_no"                 => str_replace(['"', ']', '['], " ",  $data->multiple_po_no),
+                "supplier_name"         => strtoupper($data->supplier_name),
+                "status"                => strtoupper($bc40 == null ? "BELUM DIBUAT" : $data->status_dokumen),
                 "is_update_no_aju"      => $bc40 == null ? false : ($bc40['no_aju'] == null ? false : true),
             ]);
         }
@@ -152,7 +201,7 @@ class BC40 extends BaseController
             array_push($lpbNoArr, $l->lpb_no);
         }
 
-        $id = $this->bcPurchaseOrder->insert([
+        $id = $this->bcPurchaseOrderModel->insert([
             'supplier_id' => $this->request->getVar('supplier_id'),
             'company_id' => $this->this_company_id,
             'po_type' => $this->request->getVar('po_type'),
@@ -162,41 +211,35 @@ class BC40 extends BaseController
             'multiple_lpb_no' => str_replace(['\\"', '\\'], '', json_encode($lpbNoArr)),
         ]);
 
-
-
-
         return response()->setJSON([
-            'ALL' => $_POST,
-            'DATA_BARANG' => \json_decode($_POST['listData'])
+            'status' => true,
+            'message' => "Sukses membuat dokumen bc purchase order",
+            'id' => encrypt($id)
         ]);
     }
 
-    public function createHeaderView($penerimaanBarangID)
+    public function createHeaderView($bcPurchaseOrderID)
     {
-        $bc40Model = new BC40Model();
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $metaDataModel = new MetadataModel();
-        $kantorBeaCukaiModel = new KantorBeaCukaiModel();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+        $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
+        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $bc40 = $bc40Model->get($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
         $data = [
             'bc40' => $bc40,
             'noAju' => $bc40 == null ? $this->generateNomorAju() : $bc40['no_aju'],
-            'kodeKantor' => $kantorBeaCukaiModel->findAll(),
-            'kodeTujuanTpb' => $metaDataModel->where('name', "Jenis TPB")->findAll(),
-            'kodeTujuanPengiriman' => $metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->like('value', 40)->where('deletedAt', null)->findAll(),
-            'selectedKantor' => $metaDataModel->where('name', "Kode Kantor Pabean Pengawas Static")->first(),
-            'lpb' => $lpb
+            'kodeKantor' => $this->kantorBeaCukaiModel->findAll(),
+            'kodeTujuanTpb' => $this->metaDataModel->where('name', "Jenis TPB")->findAll(),
+            'kodeTujuanPengiriman' => $this->metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->like('value', 40)->where('deletedAt', null)->findAll(),
+            'selectedKantor' => $ceisaSetting['kode_kantor_pabean'],
+            'bcPo' => $bcPo
         ];
 
         return view('BeaCukai/bc-40/form-header', $data);
@@ -204,17 +247,15 @@ class BC40 extends BaseController
 
     public function createHeaderAction()
     {
-        $bc40Model = new BC40Model();
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
-        $lastData = $bc40Model->get($penerimaanBarangID);
+        $lastData = $this->bc40Model->get($bcPurchaseOrderID);
         if ($lastData == null) {
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
-            $bc40Model->insert([
-                'penerimaan_barang_id' => $penerimaanBarangID,
-                'bc_no_lokal' => $bc40Model->getNo(date('m'), date('Y'), $last_day),
+            $this->bc40Model->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean')),
@@ -223,16 +264,25 @@ class BC40 extends BaseController
             ]);
         } else {
             // update
-            $bc40Model->update($lastData['id'], [
+            $this->bc40Model->update($lastData['id'], [
                 'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean')),
                 'kode_jenis_tpb' => decrypt($this->request->getVar('header_kode_jenis_tpb')),
                 'kode_tujuan_pengiriman' => decrypt($this->request->getVar('header_kode_tujuan_pengiriman'))
             ]);
-        }
 
-        $penerimaanBarangModel->update($penerimaanBarangID, [
-            "tanggal" => $this->request->getVar("tanggal_penerimaan_barang") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_barang")), "Y-m-d") : "",
-        ]);
+            if ($lastData['bc_no_lokal'] == null) {
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $this->bc40Model->update($lastData['id'], [
+                    'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
+                ]);
+            }
+
+            if ($lastData['no_aju'] == null) {
+                $this->bc40Model->update($lastData['id'], [
+                    'no_aju' => $this->generateNomorAju(),
+                ]);
+            }
+        }
 
         return response()->setJSON([
             'status' => true,
@@ -241,34 +291,25 @@ class BC40 extends BaseController
         ]);
     }
 
-    public function createEntitasView($penerimaanBarangID)
+    public function createEntitasView($bcPurchaseOrderID)
     {
-        $bc40Model = new BC40Model();
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $metaDataModel = new MetadataModel();
-        $nomorIjinTPBModel = new NomorIjinTPBModel();
-        $bcEntitasModel = new BCEntitasModel();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $bc40 = $bc40Model->get($penerimaanBarangID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+        $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
+        $pengusahaTPB = $this->pengusahaTPBModel->where('company_id', $this->this_company_id)->findAll();
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
         $data = [
             'bc40' => $bc40,
-            'npwpDefault' => $metaDataModel->where('name', "NPWP Importir Default BC")->first(),
-            'namaImportirDefault' => $metaDataModel->where('name', "Nama Importir Default BC")->first(),
-            'alamatImportirDefault' => $metaDataModel->where('name', "Alamat Importir Default BC")->first(),
-            'nibDefault' => $metaDataModel->where('name', "NIB Default BC")->first(),
-            'nomorIjinTPB' => $nomorIjinTPBModel->findAll(),
-            'bcEntitas' => $bcEntitasModel->get($penerimaanBarangID),
-            'lpb' => $lpb
-
+            'bcEntitas' => $this->bcEntitasModel->get($bcPurchaseOrderID),
+            'pengusahaTPB' => $pengusahaTPB,
+            'bcPo' => $bcPo
         ];
 
         return view('BeaCukai/bc-40/form-entitas', $data);
@@ -276,14 +317,13 @@ class BC40 extends BaseController
 
     public function createEntitasAction()
     {
-        $bcEntitasModel = new BCEntitasModel();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $lastData = $this->bcEntitasModel->get($bcPurchaseOrderID);
 
-        $lastData = $bcEntitasModel->get($penerimaanBarangID);
         if ($lastData == null) {
             // insert
-            $bcEntitasModel->insert([
-                'penerimaan_barang_id' => $penerimaanBarangID,
+            $this->bcEntitasModel->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'bc_type' => 40,
                 'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
                 'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
@@ -300,8 +340,8 @@ class BC40 extends BaseController
             ]);
         } else {
             // update
-            $bcEntitasModel->update($lastData['id'], [
-                'penerimaan_barang_id' => $penerimaanBarangID,
+            $this->bcEntitasModel->update($lastData['id'], [
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'bc_type' => 40,
                 'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
                 'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
@@ -325,24 +365,23 @@ class BC40 extends BaseController
         ]);
     }
 
-    public function createDokumenView($penerimaanBarangID)
+    public function createDokumenView($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $metaDataModel = new MetadataModel();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
-
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
         $data = [
-            'kodeDokumen' => $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->findAll(),
-            'lpb' => $lpb
+            'kodeDokumen' => $this->metaDataModel
+                ->where('name', "Dokumen")
+                ->orderBy('description', "ASC")
+                ->findAll(),
+            'bcPo' => $bcPo
         ];
 
         return view('BeaCukai/bc-40/form-dokumen', $data);
@@ -358,33 +397,32 @@ class BC40 extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
         $condition = [
             "bc_dokumen.deletedAt"  => null,
-            "bc_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_dokumen.bc_purchase_order_id" => $bcPurchaseOrderID,
             "bc_dokumen.bc_type" => 40
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $BCDokumenModel = new BCDokumenModel();
-        $metaDataModel = new MetadataModel();
-
-
-        $beaCukaiDokumen = $BCDokumenModel->getList($condition, $limit, $offset);
+        $beaCukaiDokumen = $this->bcDokumenModel->getList($condition, $limit, $offset);
         $resDokumen = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-
-
         foreach ($beaCukaiDokumen['data'] as $data) {
-            $jenisDokumen = $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->kode_dokumen)->first();
+            $jenisDokumen = $this->metaDataModel
+                ->where('name', "Dokumen")
+                ->where('description', $data->kode_dokumen)
+                ->orderBy('description', "ASC")
+                ->first();
+
             array_push($resDokumen, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "bc_purchase_order_id"  => encrypt($data->bc_purchase_order_id),
                 "kode_dokumen"          => $data->kode_dokumen . ' - ' . $jenisDokumen['value'],
                 "nomor_dokumen"         => $data->nomor_dokumen,
                 "seri_dokumen"          => $data->seri_dokumen,
@@ -405,15 +443,18 @@ class BC40 extends BaseController
 
     public function createDokumenAction()
     {
-        $BCDokumenModel = new BCDokumenModel();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
-        $lastData = $BCDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+        $lastData = $this->bcDokumenModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->orderBy('createdAt', "DESC")
+            ->first();
+
         $seriDokumen = $lastData == null ? 1 : $lastData['seri_dokumen'] + 1;
 
-        $BCDokumenModel->insert([
+        $this->bcDokumenModel->insert([
             'bc_type' => 40,
-            'penerimaan_barang_id' => $penerimaanBarangID,
+            'bc_purchase_order_id' => $bcPurchaseOrderID,
             'id_dokumen' => generateUniqueCode(5),
             'nomor_dokumen' => $this->request->getVar('dokumen_nomor_dokumen'),
             'seri_dokumen' => $seriDokumen,
@@ -430,9 +471,8 @@ class BC40 extends BaseController
 
     public function deleteDokumenAction()
     {
-        $BCDokumenModel = new BCDokumenModel();
         $id = decrypt($this->request->getVar('id'));
-        $BCDokumenModel->delete($id);
+        $this->bcDokumenModel->delete($id);
 
         return response()->setJSON([
             'status' => true,
@@ -441,24 +481,21 @@ class BC40 extends BaseController
         ]);
     }
 
-    public function createPengangkutView($penerimaanBarangID)
+    public function createPengangkutView($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $BCPengangkutModel = new BCPengangkutModel();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
         $data = [
-            'bcPengangkut' => $BCPengangkutModel->get($penerimaanBarangID),
-            'lpb' => $lpb
+            'bcPengangkut' => $this->bcPengangkutModel->get($bcPurchaseOrderID),
+            'bcPo' => $bcPo
         ];
 
         return view('BeaCukai/bc-40/form-pengangkut', $data);
@@ -466,21 +503,20 @@ class BC40 extends BaseController
 
     public function createPengangkutAction()
     {
-        $BCPengangkutModel = new BCPengangkutModel();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-        $lastData = $BCPengangkutModel->get($penerimaanBarangID);
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $lastData = $this->bcPengangkutModel->get($bcPurchaseOrderID);
 
         if ($lastData == null) {
-            $BCPengangkutModel->insert([
-                'penerimaan_barang_id' => $penerimaanBarangID,
+            $this->bcPengangkutModel->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'nama_sarana_pengangkut' => $this->request->getVar('jenis_sarana_pengangkut'),
                 'nomor_pengangkut' => $this->request->getVar('nomor_sarana_pengangkut'),
                 'seri_pengangkut' => 1,
                 'bc_type' => 40
             ]);
         } else {
-            $BCPengangkutModel->update($lastData['id'], [
-                'penerimaan_barang_id' => $penerimaanBarangID,
+            $this->bcPengangkutModel->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'nama_sarana_pengangkut' => $this->request->getVar('jenis_sarana_pengangkut'),
                 'nomor_pengangkut' => $this->request->getVar('nomor_sarana_pengangkut'),
                 'seri_pengangkut' => 1,
@@ -495,34 +531,29 @@ class BC40 extends BaseController
         ]);
     }
 
-    public function createKemasanPetiKemas($penerimaanBarangID)
+    public function createKemasanPetiKemas($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $metaDataModel = new MetadataModel();
-        $BCKemasanModel = new BCKemasanModel();
-        $BCKontainerModel = new BCKontainerModel();
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $kemasanLast = $BCKemasanModel->getLast($penerimaanBarangID);
-        $kontainerLast = $BCKontainerModel->getLast($penerimaanBarangID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+        $kemasanLast = $this->bcKemasanModel->getLast($bcPurchaseOrderID);
+        $kontainerLast = $this->bcKontainerModel->getLast($bcPurchaseOrderID);
 
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
         $data = [
-            'kodeJenisKemasan' => $metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
-            'kodeTipeKontainer' => $metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
-            'kodeUkuranKontainer' => $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
-            'kodeJenisKontainer' => $metaDataModel->where('name', "Jenis Kontainer")->findAll(),
+            'kodeJenisKemasan' => $this->metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
+            'kodeTipeKontainer' => $this->metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
+            'kodeUkuranKontainer' => $this->metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
+            'kodeJenisKontainer' => $this->metaDataModel->where('name', "Jenis Kontainer")->findAll(),
             'seriKemasan' => $kemasanLast == null ? 1 : $kemasanLast['seri_kemasan'] + 1,
             'seriKontainer' => $kontainerLast == null ? 1 : $kontainerLast['seri_kontainer'] + 1,
-            'lpb' => $lpb
+            'bcPo' => $bcPo
         ];
 
         return view('BeaCukai/bc-40/form-kemasan-peti-kemas', $data);
@@ -538,29 +569,30 @@ class BC40 extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
         $condition = [
             "bc_kemasan.deletedAt"  => null,
-            "bc_kemasan.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_kemasan.bc_purchase_order_id" => $bcPurchaseOrderID,
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $BCKemasanModel = new BCKemasanModel();
-        $metaDataModel = new MetadataModel();
-
-        $bc40Kemasan = $BCKemasanModel->getList($condition, $limit, $offset);
+        $bc40Kemasan = $this->bcKemasanModel->getList($condition, $limit, $offset);
         $resKemasan = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($bc40Kemasan['data'] as $data) {
-            $kemasan = $metaDataModel->where('name', 'Jenis Kemasan')->where('description', $data->kode_jenis_kemasan)->first();
+            $kemasan = $this->metaDataModel
+                ->where('name', 'Jenis Kemasan')
+                ->where('description', $data->kode_jenis_kemasan)
+                ->first();
+
             array_push($resKemasan, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "bc_purchase_order_id"  => encrypt($data->bc_purchase_order_id),
                 "jumlah_kemasan"        => $data->jumlah_kemasan,
                 "kode_jenis_kemasan"    => $data->kode_jenis_kemasan . ' - ' . $kemasan['value'],
                 "merk_kemasan"          => $data->merk_kemasan,
@@ -589,32 +621,38 @@ class BC40 extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
         $condition = [
             "bc_kontainer.deletedAt"  => null,
-            "bc_kontainer.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_kontainer.bc_purchase_order_id" => $bcPurchaseOrderID,
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $BCKontainerModel = new BCKontainerModel();
-        $metaDataModel = new MetadataModel();
-
-        $bc40Kontainer = $BCKontainerModel->getList($condition, $limit, $offset);
+        $bc40Kontainer = $this->bcKontainerModel->getList($condition, $limit, $offset);
         $resKontainer = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($bc40Kontainer['data'] as $data) {
-            $ukuranKontainer = $metaDataModel->where('name', "Kode Ukuran Kontainer BC")->where('value', $data->kode_ukuran_kontainer)->first();
-            $jenisKontainer = $metaDataModel->where('name', "Jenis Kontainer")->where('description', $data->kode_jenis_kontainer)->first();
-            $tipeKontainer = $metaDataModel->where('name', "Kode Tipe Kontainer BC")->where('value', $data->kode_tipe_kontainer)->first();
+            $ukuranKontainer = $this->metaDataModel
+                ->where('name', "Kode Ukuran Kontainer BC")
+                ->where('value', $data->kode_ukuran_kontainer)
+                ->first();
+            $jenisKontainer = $this->metaDataModel
+                ->where('name', "Jenis Kontainer")
+                ->where('description', $data->kode_jenis_kontainer)
+                ->first();
+            $tipeKontainer = $this->metaDataModel
+                ->where('name', "Kode Tipe Kontainer BC")
+                ->where('value', $data->kode_tipe_kontainer)
+                ->first();
 
             array_push($resKontainer, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "bc_purchase_order_id"  => encrypt($data->bc_purchase_order_id),
                 "kode_tipe_kontainer"   => $data->kode_tipe_kontainer . ' - ' . $tipeKontainer['description'],
                 "kode_ukuran_kontainer" => $ukuranKontainer['description'],
                 "nomor_kontainer"       => $data->nomor_kontainer,
@@ -636,19 +674,18 @@ class BC40 extends BaseController
 
     public function createKemasanAction()
     {
-        $BCKemasanModel = new BCKemasanModel();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
-        $BCKemasanModel->insert([
+        $this->bcKemasanModel->insert([
             'bc_type' => 40,
-            'penerimaan_barang_id' => $penerimaanBarangID,
+            'bc_purchase_order_id' => $bcPurchaseOrderID,
             'seri_kemasan' => $this->request->getVar('kemasan_seri_kemasan'),
             'jumlah_kemasan' => $this->request->getVar('kemasan_jumlah_kemasan'),
             'kode_jenis_kemasan' => decrypt($this->request->getVar('kemasan_jenis_kemasan')),
             'merk_kemasan' => $this->request->getVar('kemasan_merk_kemasan')
         ]);
 
-        $kemasanLast = $BCKemasanModel->getLast($penerimaanBarangID);
+        $kemasanLast = $this->bcKemasanModel->getLast($bcPurchaseOrderID);
 
         return response()->setJSON([
             'status' => true,
@@ -661,11 +698,10 @@ class BC40 extends BaseController
     public function deleteKemasanAction()
     {
         $id = decrypt($this->request->getVar('id'));
-        $BCKemasanModel = new BCKemasanModel();
-        $penerimaanBarangID = $BCKemasanModel->find($id)['penerimaan_barang_id'];
-        $BCKemasanModel->delete($id);
+        $bcPurchaseOrderID = $this->bcKemasanModel->find($id)['bc_purchase_order_id'];
+        $this->bcKemasanModel->delete($id);
 
-        $kemasanLast = $BCKemasanModel->getLast($penerimaanBarangID);
+        $kemasanLast = $this->bcKemasanModel->getLast($bcPurchaseOrderID);
 
         return response()->setJSON([
             'status' => true,
@@ -677,12 +713,11 @@ class BC40 extends BaseController
 
     public function createKontainerAction()
     {
-        $BCKontainerModel = new BCKontainerModel();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
-        $BCKontainerModel->insert([
+        $this->bcKontainerModel->insert([
             'bc_type' => 40,
-            'penerimaan_barang_id' => $penerimaanBarangID,
+            'bc_purchase_order_id' => $bcPurchaseOrderID,
             'nomor_kontainer' => $this->request->getVar('kontainer_nomor'),
             'kode_ukuran_kontainer' => decrypt($this->request->getVar('kontainer_ukuran')),
             'kode_jenis_kontainer' => decrypt($this->request->getVar('kontainer_jenis')),
@@ -690,7 +725,7 @@ class BC40 extends BaseController
             'seri_kontainer' => $this->request->getVar('kontainer_seri')
         ]);
 
-        $kontainerLast = $BCKontainerModel->getLast($penerimaanBarangID);
+        $kontainerLast = $this->bcKontainerModel->getLast($bcPurchaseOrderID);
 
         return response()->setJSON([
             'status' => true,
@@ -703,11 +738,10 @@ class BC40 extends BaseController
     public function deleteKontainerAction()
     {
         $id = decrypt($this->request->getVar('id'));
-        $BCKontainerModel = new BCKontainerModel();
-        $penerimaanBarangID = $BCKontainerModel->find($id)['penerimaan_barang_id'];
-        $BCKontainerModel->delete($id);
+        $bcPurchaseOrderID = $this->bcKontainerModel->find($id)['bc_purchase_order_id'];
+        $this->bcKontainerModel->delete($id);
 
-        $kontainerLast = $BCKontainerModel->getLast($penerimaanBarangID);
+        $kontainerLast = $this->bcKontainerModel->getLast($bcPurchaseOrderID);
 
         return response()->setJSON([
             'status' => true,
@@ -718,21 +752,18 @@ class BC40 extends BaseController
     }
 
 
-    public function createTransaksiView($penerimaanBarangID)
+    public function createTransaksiView($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $bc40Model = new BC40Model();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+        $lastData = $this->bc40Model->get($bcPurchaseOrderID);
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $lastData = $bc40Model->get($penerimaanBarangID);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
         if ($lastData != null) {
             $lastData['harga_penyerahan'] = ($lastData['harga_penyerahan']);
@@ -745,7 +776,7 @@ class BC40 extends BaseController
         }
 
         $data = [
-            'lpb' => $lpb,
+            'bcPo' => $bcPo,
             'bc40' => $lastData,
         ];
 
@@ -754,20 +785,19 @@ class BC40 extends BaseController
 
     public function createTransaksiAction()
     {
-        $bc40Model = new BC40Model();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
-        $lastData = $bc40Model->get($penerimaanBarangID);
+        $lastData = $this->bc40Model->get($bcPurchaseOrderID);
         if ($lastData == null) {
             // insert
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
-            $bc40Model->insert([
-                'penerimaan_barang_id' => $penerimaanBarangID,
-                'bc_no_lokal' => $bc40Model->getNo(date('m'), date('Y'), $last_day),
+            $this->bc40Model->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
-                'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
+                // 'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
                 'nilai_jasa' => convertRupiahToNumber($this->request->getVar('nilai_jasa')),
                 'uang_muka' => convertRupiahToNumber($this->request->getVar('nilai_uang_muka')),
                 'harga_perolehan' => convertRupiahToNumber($this->request->getVar('harga_perolehan')),
@@ -776,8 +806,8 @@ class BC40 extends BaseController
                 'netto' => convertRupiahToNumber($this->request->getVar('berat_bersih')),
             ]);
         } else {
-            $bc40Model->update($lastData['id'], [
-                'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
+            $this->bc40Model->update($lastData['id'], [
+                // 'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
                 'nilai_jasa' => convertRupiahToNumber($this->request->getVar('nilai_jasa')),
                 'uang_muka' => convertRupiahToNumber($this->request->getVar('nilai_uang_muka')),
                 'harga_perolehan' => convertRupiahToNumber($this->request->getVar('harga_perolehan')),
@@ -794,139 +824,92 @@ class BC40 extends BaseController
         ]);
     }
 
-    public function createBarangView($penerimaanBarangID)
+    public function createBarangView($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $bcPoFirst = $this->bcPurchaseOrderModel->findDetail($bcPurchaseOrderID);
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPoFirst == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
         $data = [
-            'lpb' => $lpb,
-            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan)
+            'bcPo' => $bcPoFirst,
+            'lpbDetail' => $this->bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID)
         ];
 
         return view('BeaCukai/bc-40/form-barang', $data);
     }
 
-    public function createBarangDetailView($penerimaanBarangID, $penerimaanBarangDetailID)
+    public function createBarangDetailView($bcPurchaseOrderID, $penerimaanBarangID, $barang1ID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $metaDataModel = new MetadataModel();
-        $hsCodeModel = new HsCodesModel();
-        $BCBarangModel = new BCBarangModel();
-        $rmImportPoDetailModel = new RMImportPODetailModel(); // import bahan baku
-        $rmLokalPoDetailModel = new RMPurchaseOrderDetailModel(); // lokal bahan baku
-        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel(); // lokal | import penolong
-        $supplierHargaModel = new SupplierHargaModel();
-        $barangMasterModel = new BarangMasterModel();
-
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
         $penerimaanBarangID = decrypt($penerimaanBarangID);
-        $penerimaanBarangDetailID = decrypt($penerimaanBarangDetailID);
+        $barang1ID = decrypt($barang1ID);
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $lpbDetail = $penerimaanBarangDetailModel->find($penerimaanBarangDetailID);
-        $poDetail = null;
-        $barangDetail = null;
+        $lpb = $this->penerimaanBarangModel->getById($penerimaanBarangID);
+        $bcPoFirst = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+        $bc40DokumenBarang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('penerimaan_barang_id', $penerimaanBarangID)->where('barang1_id', $barang1ID)->first();
+        $seriBarang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->orderBy('createdAt', "DESC")->first();
+
         $kodeSatuanBarang = null;
-        $bc40DokumenBarang = null;
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
-        if ($lpb == null || $lpbDetail == null) {
+        if ($lpb == null || $bcPoFirst == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        // get po detail
-        if ($lpb->status_penerimaan == "LOKAL" && $lpb->tipe_bahan == "BAKU") {
-            // PO LOKAL BAKU 
-            $poDetail = $rmLokalPoDetailModel->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id')
-                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id')
-                ->where('penerimaan_barang_detail.id', $penerimaanBarangDetailID)
-                ->first();
+        $barangDetail = $this->bcPurchaseOrderModel->findDetailDokumenBarang(
+            $bcPurchaseOrderID,
+            $penerimaanBarangID,
+            $barang1ID
+        );
 
-            $barangDetail = $supplierHargaModel->select('barang_master.*')->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
-                ->where('supplier_harga.id', $poDetail['supplier_harga_id'])
-                ->first();
-        } else if ($lpb->status_penerimaan == "IMPORT" && $lpb->tipe_bahan == "BAKU") {
-            // PO IMPORT BAKU
-            $poDetail = $rmImportPoDetailModel->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id')
-                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_import_po_details.id')
-                ->where('penerimaan_barang_detail.id', $penerimaanBarangDetailID)
-                ->first();
-
-            $barangDetail = $barangMasterModel->find($poDetail['barang_id']);
-        } else {
-            // PO LOKAL | IMPORT PENOLONG
-            $poDetail = $amPurchaseOrderDetailModel->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id')
-                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id')
-                ->where('penerimaan_barang_detail.id', $penerimaanBarangDetailID)
-                ->first();
-
-            $barangDetail = $barangMasterModel->find($poDetail['barang_id']);
+        if ($barangDetail == null) {
+            return redirect()->to('bea-cukai-bc-40');
         }
 
-        $seriBarang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
-        $bc40DokumenBarang =  $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
-
         if ($bc40DokumenBarang != null) {
-            $kodeSatuanBarang = $metaDataModel->where('name', "Kode Satuan BC")->where('value', $bc40DokumenBarang['kode_satuan_barang'])->first();
+            $kodeSatuanBarang = $this->metaDataModel->where('name', "Kode Satuan BC")->where('value', $bc40DokumenBarang['kode_satuan_barang'])->first();
         }
 
         $data = [
-            'kodeFasilitasTarif' => $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN'])->findAll(),
-            'kodeJenisTarif' => $metaDataModel->where('name', "Kode Jenis Tarif BC")->findAll(),
-            'kodeJenisPungutan' => $metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['PPN'])->findAll(),
-            'kodeHS' => $hsCodeModel->findAll(),
-            'kodeJenisKemasan' => $metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
-            'lpb' => $lpb,
-            'lpbDetail' => $lpbDetail,
-            'poDetail' => $poDetail,
+            'kodeFasilitasTarif' => $this->metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN'])->findAll(),
+            'kodeJenisTarif' => $this->metaDataModel->where('name', "Kode Jenis Tarif BC")->findAll(),
+            'kodeJenisPungutan' => $this->metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['PPN'])->findAll(),
+            'kodeHS' => $this->hsCodeModel->findAll(),
+            'kodeJenisKemasan' => $this->metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
             'barangDetail' => $barangDetail,
             'seriBarang' => $seriBarang == null ? 1 : $seriBarang['seri_barang'] + 1,
             'bc40DokumenBarang' => $bc40DokumenBarang,
             'kodeSatuanBarang' => $kodeSatuanBarang,
+            'bcPo' => $bcPoFirst
         ];
-
-        $diskon = array_key_exists('disc', $data['poDetail']) ? ($data['poDetail']['disc'] == null ? 0 : $data['poDetail']['disc']) : 0;
-
-        if (array_key_exists('price', $data['poDetail'])) {
-            // PO LOKAL BP
-            $data['hargaSebelumDiskon'] = ($data['poDetail']['price'] + $data['poDetail']['additional_cost']) * $data['lpbDetail']['qty'];
-            $data['diskon'] = $data['hargaSebelumDiskon'] * ($diskon / 100);
-        } else {
-            // PO LOKAL BB
-            $data['hargaSebelumDiskon'] = ($data['poDetail']['general_price'] + $data['poDetail']['daily_price'] + $data['poDetail']['monthly_price']) * $data['lpbDetail']['qty'];
-            $data['diskon'] = $data['hargaSebelumDiskon'] * ($diskon / 100);
-        }
-
 
         return view('BeaCukai/bc-40/form-detail-barang', $data);
     }
 
     public function createBarangDetailAction()
     {
-        $BCBarangModel = new BCBarangModel();
-        $BC40Model = new BC40Model();
-
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+        $barang1ID = decrypt($this->request->getVar('barang1_id'));
 
-        $bcBarang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+        $bcBarang = $this->bcBarangModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->where('barang1_id', $barang1ID)
+            ->first();
 
         if ($bcBarang == null) {
-            $BCBarangModel->insert([
+            $this->bcBarangModel->insert([
+                'bc_purchase_order_id' => decrypt($this->request->getVar('bc_purchase_order_id')),
                 'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
-                'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
+                'barang1_id' => decrypt($this->request->getVar('barang1_id')),
                 'bc_type' => 40,
                 'kode_dokumen' => 40,
                 'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),
@@ -948,9 +931,10 @@ class BC40 extends BaseController
 
             ]);
         } else {
-            $BCBarangModel->update($bcBarang['id'], [
+            $this->bcBarangModel->update($bcBarang['id'], [
+                'bc_purchase_order_id' => decrypt($this->request->getVar('bc_purchase_order_id')),
                 'penerimaan_barang_id' => decrypt($this->request->getVar('penerimaan_barang_id')),
-                'penerimaan_barang_detail_id' => decrypt($this->request->getVar('penerimaan_barang_detail_id')),
+                'barang1_id' => decrypt($this->request->getVar('barang1_id')),
                 'bc_type' => 40,
                 'kode_dokumen' => 40,
                 'seri_barang' => $this->request->getVar('barang_detail_seri_barang'),
@@ -973,19 +957,20 @@ class BC40 extends BaseController
         }
 
         // UPDATE DATA DI TRANSAKSI
-        $bc40 = $BC40Model->get($penerimaanBarangID);
+        $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
 
         if ($bc40 == null) {
-            $BC40Model->insert([
-                'penerimaan_barang_id' => $penerimaanBarangID,
-                'netto' => $BCBarangModel->totalBeratBersih($penerimaanBarangID),
-                'harga_penyerahan' => $BCBarangModel->totalHargaPenyerahan($penerimaanBarangID)
+            $this->bc40Model->insert([
+                'no_aju' => $this->generateNomorAju(),
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'netto' => $this->bcBarangModel->totalBeratBersih($bcPurchaseOrderID),
+                'harga_penyerahan' => $this->bcBarangModel->totalHargaPenyerahan($bcPurchaseOrderID)
             ]);
         } else {
-            $BC40Model->update($bc40['id'], [
-                'penerimaan_barang_id' => $penerimaanBarangID,
-                'netto' => $BCBarangModel->totalBeratBersih($penerimaanBarangID),
-                'harga_penyerahan' => $BCBarangModel->totalHargaPenyerahan($penerimaanBarangID)
+            $this->bc40Model->update($bc40['id'], [
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'netto' => $this->bcBarangModel->totalBeratBersih($bcPurchaseOrderID),
+                'harga_penyerahan' => $this->bcBarangModel->totalHargaPenyerahan($bcPurchaseOrderID)
             ]);
         }
 
@@ -1006,29 +991,28 @@ class BC40 extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+        $barang1ID = decrypt($this->request->getVar('barang1_id'));
 
         $condition = [
             "bc_barang_tarif.deletedAt"  => null,
+            "bc_barang_tarif.bc_purchase_order_id" => $bcPurchaseOrderID,
             "bc_barang_tarif.penerimaan_barang_id" => $penerimaanBarangID,
-            "bc_barang_tarif.penerimaan_barang_detail_id" => $penerimaanBarangDetailID
+            "bc_barang_tarif.barang1_id" => $barang1ID
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $BCBarangTarifModel = new BCBarangTarifModel();
-        $metaDataModel = new MetadataModel();
-
-        $bc40BarangTarif = $BCBarangTarifModel->getList($condition, $limit, $offset);
+        $bc40BarangTarif = $this->bcBarangTarifModel->getList($condition, $limit, $offset);
         $res = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($bc40BarangTarif['data'] as $data) {
-            $kodeJenisPungutan = $metaDataModel->where('name', "Kode Jenis Pungutan BC")->where('value', $data->kode_jenis_pungutan)->first();
-            $kodeJenisTarif = $metaDataModel->where('name', "Kode Jenis Tarif BC")->where('value', $data->kode_jenis_tarif)->first();
-            $kodeFasilitasTarif =  $metaDataModel->where('name', "Kode Fasilitas Tarif BC")->where('value', $data->kode_fasilitas_tarif)->first();
+            $kodeJenisPungutan = $this->metaDataModel->where('name', "Kode Jenis Pungutan BC")->where('value', $data->kode_jenis_pungutan)->first();
+            $kodeJenisTarif = $this->metaDataModel->where('name', "Kode Jenis Tarif BC")->where('value', $data->kode_jenis_tarif)->first();
+            $kodeFasilitasTarif =  $this->metaDataModel->where('name', "Kode Fasilitas Tarif BC")->where('value', $data->kode_fasilitas_tarif)->first();
 
             array_push($res, [
                 "no"                    => $no++,
@@ -1054,14 +1038,15 @@ class BC40 extends BaseController
 
     public function createPungutanAction()
     {
-        $BCBarangTarifModel = new BCBarangTarifModel();
-        $BCBarangModel = new BCBarangModel();
-        $metaDataModel = new MetadataModel();
-
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+        $barang1ID = decrypt($this->request->getVar('barang1_id'));
 
-        $bc40Barang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->first();
+        $bc40Barang = $this->bcBarangModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->where('barang1_id', $barang1ID)
+            ->first();
 
         if ($bc40Barang == null) {
             return response()->setJSON([
@@ -1071,13 +1056,19 @@ class BC40 extends BaseController
             ]);
         }
 
-        $pungutan = $BCBarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)
-            ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
+        $pungutan = $this->bcBarangTarifModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->where('penerimaan_barang_id', $penerimaanBarangID)
+            ->where('barang1_id', $barang1ID)
             ->where('kode_jenis_pungutan', decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')))
             ->first();
 
         if ($pungutan != null) {
-            $kodeJenisPungutan = $metaDataModel->where('name', "Kode Jenis Pungutan BC")->where('value', $pungutan['kode_jenis_pungutan'])->first();
+            $kodeJenisPungutan = $this->metaDataModel
+                ->where('name', "Kode Jenis Pungutan BC")
+                ->where('value', $pungutan['kode_jenis_pungutan'])
+                ->first();
+
             return response()->setJSON([
                 'message' => "Jenis pungutan " . $kodeJenisPungutan['description'] . " sudah ada",
                 'status' => false,
@@ -1093,9 +1084,10 @@ class BC40 extends BaseController
         $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
 
 
-        $BCBarangTarifModel->insert([
+        $this->bcBarangTarifModel->insert([
+            'bc_purchase_order_id' => $bcPurchaseOrderID,
             'penerimaan_barang_id' => $penerimaanBarangID,
-            'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
+            'barang1_id' => $barang1ID,
             'bc_type' => 40,
             'kode_jenis_pungutan' => decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')),
             'kode_jenis_tarif' => decrypt($this->request->getVar('barang_detail_kode_jenis_tarif')),
@@ -1116,8 +1108,7 @@ class BC40 extends BaseController
 
     public function deletePungutanAction()
     {
-        $BCBarangTarifModel = new BCBarangTarifModel();
-        $BCBarangTarifModel->delete(decrypt($this->request->getVar('id')));
+        $this->bcBarangTarifModel->delete(decrypt($this->request->getVar('id')));
 
         return response()->setJSON([
             'message' => "Pungutan berhasil dihapus",
@@ -1136,36 +1127,36 @@ class BC40 extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
+        $barang1ID = decrypt($this->request->getVar('barang1_id'));
 
         $condition = [
             "bc_dokumen.deletedAt"  => null,
-            "bc_dokumen.penerimaan_barang_id" => $penerimaanBarangID,
+            "bc_dokumen.bc_purchase_order_id" => $bcPurchaseOrderID,
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $BCDokumenModel = new BCDokumenModel();
-        $metaDataModel = new MetadataModel();
-        $BCBarangDokumenModel = new BCBarangDokumenModel();
-
-        $beaCukaiDokumen = $BCDokumenModel->getList($condition, $limit, $offset);
+        $beaCukaiDokumen = $this->bcDokumenModel->getList($condition, $limit, $offset);
         $resDokumen = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($beaCukaiDokumen['data'] as $data) {
-            $jenisDokumen = $metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->kode_dokumen)->first();
-            $barangDokumen = $BCBarangDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)
-                ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
-                ->where('seri_dokumen', $data->seri_dokumen)->where('deletedAt', null)
+            $jenisDokumen = $this->metaDataModel->where('name', "Dokumen")->orderBy('description', "ASC")->where('description', $data->kode_dokumen)->first();
+            $barangDokumen = $this->bcBarangDokumenModel
+                ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                ->where('penerimaan_barang_id', $penerimaanBarangID)
+                ->where('barang1_id', $barang1ID)
+                ->where('seri_dokumen', $data->seri_dokumen)
+                ->where('deletedAt', null)
                 ->first();
 
             array_push($resDokumen, [
                 "no"                    => $no++,
-                "bc_dokumen_id"      => encrypt($data->id),
-                "penerimaan_barang_id"  => encrypt($data->penerimaan_barang_id),
+                "bc_dokumen_id"         => encrypt($data->id),
+                "bc_purchase_order_id"  => encrypt($data->bc_purchase_order_id),
                 "kode_dokumen"          => $data->kode_dokumen . ' - ' . $jenisDokumen['value'],
                 "nomor_dokumen"         => $data->nomor_dokumen,
                 "seri_dokumen"          => $data->seri_dokumen,
@@ -1188,15 +1179,15 @@ class BC40 extends BaseController
 
     public function createBarangDokumenAction()
     {
-        $BCBarangDokumenModel = new BCBarangDokumenModel();
-
         $barangDokumenID = decrypt($this->request->getVar('bc_dokumen_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $barang1ID = decrypt($this->request->getVar('barang1_id'));
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-        $penerimaanBarangDetailID = decrypt($this->request->getVar('penerimaan_barang_detail_id'));
 
-        $BCBarangDokumenModel->insert([
+        $this->bcBarangDokumenModel->insert([
+            'barang1_id' => $barang1ID,
             'penerimaan_barang_id' => $penerimaanBarangID,
-            'penerimaan_barang_detail_id' => $penerimaanBarangDetailID,
+            'bc_purchase_order_id' => $bcPurchaseOrderID,
             'bc_dokumen_id' => $barangDokumenID,
             'bc_type' => 40,
             'seri_dokumen' => $this->request->getVar('seri_dokumen')
@@ -1211,8 +1202,7 @@ class BC40 extends BaseController
 
     public function deleteBarangDokumenAction()
     {
-        $BCBarangDokumenModel = new BCBarangDokumenModel();
-        $BCBarangDokumenModel->delete(decrypt($this->request->getVar('id')));
+        $this->bcBarangDokumenModel->delete(decrypt($this->request->getVar('id')));
 
         return response()->setJSON([
             'message' => "Dokumen berhasil dihapus",
@@ -1221,27 +1211,26 @@ class BC40 extends BaseController
         ]);
     }
 
-    public function createPungutanView($penerimaanBarangID)
+    public function createPungutanView($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $BCBarangTarifModel = new BCBarangTarifModel();
-        $metaDataModel = new MetadataModel();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
-        $kodeJenisPungutan = $metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['PPN'])->findAll();
+        $kodeJenisPungutan = $this
+            ->metaDataModel
+            ->where('name', "Kode Jenis Pungutan BC")
+            ->whereIn('value', ['PPN'])
+            ->findAll();
 
-        $barangTarif = $BCBarangTarifModel
-            ->where('penerimaan_barang_id', $penerimaanBarangID)
+        $barangTarif = $this->bcBarangTarifModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
             ->findAll();
 
         $pungutanList = [];
@@ -1273,8 +1262,7 @@ class BC40 extends BaseController
         }
 
         $data = [
-            'lpb' => $lpb,
-            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan),
+            'bcPo' => $bcPo,
             'pungutanList' => $pungutanList,
             'barangTarif' => $barangTarif
         ];
@@ -1282,28 +1270,22 @@ class BC40 extends BaseController
         return view('BeaCukai/bc-40/form-pungutan', $data);
     }
 
-    public function createPernyataanView($penerimaanBarangID)
+    public function createPernyataanView($bcPurchaseOrderID)
     {
-        $penerimaanBarangModel = new PenerimaanBarangModel();
-        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $BC40Model = new BC40Model();
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+        $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
 
-        $lpb = $penerimaanBarangModel->getById($penerimaanBarangID);
-        $bc40 = $BC40Model->get($penerimaanBarangID);
-
-        if ($lpb == null || $lpb->bc_type != "BC 4.0") {
+        if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $this->setFlashDataNavigatorSession($penerimaanBarangID);
+        $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
         $data = [
-            'lpb' => $lpb,
-            'lpbDetail' => $penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($penerimaanBarangID, $lpb->tipe_bahan, $lpb->status_penerimaan),
+            'bcPo' => $bcPo,
             'bc40' => $bc40
-
         ];
 
         return view('BeaCukai/bc-40/form-pernyataan', $data);
@@ -1311,17 +1293,16 @@ class BC40 extends BaseController
 
     public function createPernyataanAction()
     {
-        $bc40Model = new bc40Model();
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
-        $lastData = $bc40Model->get($penerimaanBarangID);
+        $lastData = $this->bc40Model->get($bcPurchaseOrderID);
 
         if ($lastData == null) {
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
-            $bc40Model->insert([
-                'penerimaan_barang_id' => $penerimaanBarangID,
-                'bc_no_lokal' => $bc40Model->getNo(date('m'), date('Y'), $last_day),
+            $this->bc40Model->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 'nama_ttd' => $this->request->getVar('pernyatan_nama'),
@@ -1331,8 +1312,8 @@ class BC40 extends BaseController
             ]);
         } else {
             // update
-            $bc40Model->update($lastData['id'], [
-                'penerimaan_barang_id' => $penerimaanBarangID,
+            $this->bc40Model->update($lastData['id'], [
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'nama_ttd' => $this->request->getVar('pernyatan_nama'),
                 'kota_ttd' => $this->request->getVar('pernyatan_tempat'),
                 'tanggal_ttd' => $this->request->getVar('pernyataan_tanggal') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pernyataan_tanggal')), "Y-m-d") : "",
@@ -1349,12 +1330,13 @@ class BC40 extends BaseController
 
     public function updateNoAju()
     {
-        $bc40Model = new BC40Model();
-
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $noAju = $this->request->getVar('no_pengajuan');
 
-        $bc40 = $bc40Model->where('no_aju', $noAju)->whereNotIn('penerimaan_barang_id', [$penerimaanBarangID])->first();
+        $bc40 = $this->bc40Model
+            ->where('no_aju', $noAju)
+            ->whereNotIn('bc_purchase_order_id', [$bcPurchaseOrderID])
+            ->first();
 
         if ($bc40 != null) {
             return response()->setJSON([
@@ -1364,7 +1346,11 @@ class BC40 extends BaseController
             ]);
         }
 
-        $bc40Model->set('no_aju', $noAju)->where('penerimaan_barang_id', $penerimaanBarangID)->update();
+        $this->bc40Model
+            ->set('no_aju', $noAju)
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->update();
+
         return response()->setJSON([
             'message' => "No Aju berhasil diupdate",
             'status' => true,
@@ -1374,28 +1360,18 @@ class BC40 extends BaseController
 
     public function delete()
     {
-        $bc40Model = new BC40Model();
-        $BCBarangModel = new BCBarangModel();
-        $BCBarangDokumenModel = new BCBarangDokumenModel();
-        $BCBarangTarifModel = new BCBarangTarifModel();
-        $BCEntitasModel = new BCEntitasModel();
-        $BCKemasanModel = new BCKemasanModel();
-        $BCKontainerModel = new BCKontainerModel();
-        $BCPengangkutModel = new BCPengangkutModel();
-        $BCDokumenModel = new BCDokumenModel();
-        $BCPengangkutModel = new BCPengangkutModel();
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
 
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-
-        $bc40Model->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCEntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCKemasanModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCKontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCPengangkutModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCBarangDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
-        $BCBarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)->delete();
+        $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcEntitasModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcKemasanModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcKontainerModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcPengangkutModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcBarangDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcBarangTarifModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
+        $this->bcPurchaseOrderModel->delete($bcPurchaseOrderID);
 
         return response()->setJSON([
             'message' => "Dokumen BC 4.0 Berhasil dihapus",
@@ -1405,37 +1381,37 @@ class BC40 extends BaseController
     }
 
     // KIRIM BC.40 KE CEISA
-    public function kirimCeisa($penerimaanBarangID)
+    public function kirimCeisa($bcPurchaseOrderID)
     {
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
+        $status = $this->insertInventori($bcPurchaseOrderID);
+
+        if (!$status) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => "Terjadi kesalahan saat menambah stok inventori"
+            ]);
+        }
+
         $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
         $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
 
-        $bc40Model = new BC40Model();
-        $BCBarangModel = new BCBarangModel();
-        $BCEntitasModel = new BCEntitasModel();
-        $BCKemasanModel = new BCKemasanModel();
-        $BCKontainerModel = new BCKontainerModel();
-        $BCPengangkutModel = new BCPengangkutModel();
-        $BCDokumenModel = new BCDokumenModel();
-        $BCPengangkutModel = new BCPengangkutModel();
-        $BCBarangTarifModel = new BCBarangTarifModel();
-
         $beacukaiApi = new BeaCukaiApi($username, $password);
 
-        $penerimaanBarangID = decrypt($penerimaanBarangID);
-        $bc40Data = $bc40Model->get($penerimaanBarangID);
+        $bc40Data = $this->bc40Model->get($bcPurchaseOrderID);
 
         if ($bc40Data == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
-        $bc23Kontainer = $BCKontainerModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Barang = $BCBarangModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Entitas = $BCEntitasModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Kemasan = $BCKemasanModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Dokumen = $BCDokumenModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bc23Pengangkut = $BCPengangkutModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
-        $bcBarangTarif = $BCBarangTarifModel->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->findAll();
+        $bc23Kontainer = $this->bcKontainerModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Barang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Entitas = $this->bcEntitasModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Kemasan = $this->bcKemasanModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Dokumen = $this->bcDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Pengangkut = $this->bcPengangkutModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bcBarangTarif = $this->bcBarangTarifModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
 
         $payload = $beacukaiApi->payloadTempleateKirimBC40(
             $bc40Data,
@@ -1449,24 +1425,35 @@ class BC40 extends BaseController
         );
 
         // return response()->setJSON($payload);
-        $res = $beacukaiApi->kirimDokumenBC($payload, false);
-        return response()->setJSON($res);
+        // $res = $beacukaiApi->kirimDokumenBC($payload, false);
+        // return response()->setJSON($res);
+
+        // UPDATE STATUS
+        $this->bc40Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
+        $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
+            'status_posting' => '1'
+        ]);
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Dokumen BC 4.O Berhasil Diposting"
+        ]);
     }
 
 
     // Navigator display
-    private function setFlashDataNavigatorSession($penerimaanBarangID)
+    private function setFlashDataNavigatorSession($bcPurchaseOrderID)
     {
-        $bc40Model = new BC40Model();
-        $isCompleteFormHeader = $bc40Model->isCompleteFormHeader($penerimaanBarangID);
-        $isCompleteFormEntitas = $bc40Model->isCompleteFormEntitas($penerimaanBarangID);
-        $isCompleteFormDokumen = $bc40Model->isCompleteFormDokumen($penerimaanBarangID);
-        $isCompleteFormPengangkut = $bc40Model->isCompleteFormPengangkut($penerimaanBarangID);
-        $isCompleteFormPetiKemas = $bc40Model->isCompleteFormPetiKemas($penerimaanBarangID);
-        $isCompleteFormFormTransaksi = $bc40Model->isCompleteFormTransaksi($penerimaanBarangID);
-        $isCompleteFormBarang = $bc40Model->isCompleteFormBarang($penerimaanBarangID);
-        $isCompleteFormPungutan = $bc40Model->isCompleteFormPungutan($penerimaanBarangID);
-        $isCompleteFormPernyataan = $bc40Model->isCompleteFormPernyataan($penerimaanBarangID);
+        $isCompleteFormHeader = $this->bc40Model->isCompleteFormHeader($bcPurchaseOrderID);
+        $isCompleteFormEntitas = $this->bc40Model->isCompleteFormEntitas($bcPurchaseOrderID);
+        $isCompleteFormDokumen = $this->bc40Model->isCompleteFormDokumen($bcPurchaseOrderID);
+        $isCompleteFormPengangkut = $this->bc40Model->isCompleteFormPengangkut($bcPurchaseOrderID);
+        $isCompleteFormPetiKemas = $this->bc40Model->isCompleteFormPetiKemas($bcPurchaseOrderID);
+        $isCompleteFormFormTransaksi = $this->bc40Model->isCompleteFormTransaksi($bcPurchaseOrderID);
+        $isCompleteFormBarang = $this->bc40Model->isCompleteFormBarang($bcPurchaseOrderID);
+        $isCompleteFormPungutan = $this->bc40Model->isCompleteFormPungutan($bcPurchaseOrderID);
+        $isCompleteFormPernyataan = $this->bc40Model->isCompleteFormPernyataan($bcPurchaseOrderID);
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
@@ -1478,51 +1465,56 @@ class BC40 extends BaseController
         session()->setFlashdata('isCompleteFormBarang', $isCompleteFormBarang);
         session()->setFlashdata('isCompleteFormPungutan', $isCompleteFormPungutan);
 
-        if (
-            $isCompleteFormPernyataan && $isCompleteFormHeader && $isCompleteFormEntitas &&
-            $isCompleteFormEntitas && $isCompleteFormDokumen && $isCompleteFormPengangkut &&
-            $isCompleteFormPetiKemas && $isCompleteFormFormTransaksi && $isCompleteFormBarang
-        ) {
-            $bc40Model->set('status_dokumen', "Siap Kirim")->where('penerimaan_barang_id', $penerimaanBarangID)->update();
-        } else {
-            $bc40Model->set('status_dokumen', "Belum Lengkap")->where('penerimaan_barang_id', $penerimaanBarangID)->update();
+        $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+        if ($bcPo['status_posting'] === '0') {
+            if (
+                $isCompleteFormPernyataan && $isCompleteFormHeader && $isCompleteFormEntitas &&
+                $isCompleteFormEntitas && $isCompleteFormDokumen && $isCompleteFormPengangkut &&
+                $isCompleteFormPetiKemas && $isCompleteFormFormTransaksi && $isCompleteFormBarang
+            ) {
+                $this->bc40Model->set('status_dokumen', "Siap Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
+            } else {
+                $this->bc40Model->set('status_dokumen', "Belum Lengkap")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
+            }
         }
     }
 
     public function generateNomorAju()
     {
-        $metaDataModel = new MetadataModel();
-        $bc40Model = new bc40Model();
+        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
+        $kodeDokumenbc40Static = $this->metaDataModel->where('name', "Kode BC40 Static")->first();
 
-        $kodeKantorStatic = $metaDataModel->where('name', "Kode Kantor BC Static")->first();
-        $kodeDokumenbc40Static = $metaDataModel->where('name', "Kode BC40 Static")->first();
+        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'];
         $tanggalAju = date('Ymd');
         $sequenceNoUrutPengajuan = "";
 
-        $bc40Last = $bc40Model->orderBy('createdAt', "DESC")->limit(1)->first();
+        $bc40Last = $this->bc40Model->orderBy('createdAt', "DESC")->limit(1)->first();
 
         if ($bc40Last == null) {
             $sequenceNoUrutPengajuan = "000001";
         } else {
-            // Buatkan auto increment
-            $arrNo = explode('-', $bc40Last['no_aju']);
-            $lastNomor = $arrNo[3];
-            // lakukan increment
-            $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
-            $sequenceNoUrutPengajuan = $nextNomor;
+            if ($bc40Last['no_aju'] == null) {
+                $sequenceNoUrutPengajuan = "000001";
+            } else {
+                // Buatkan auto increment
+                $arrNo = explode('-', $bc40Last['no_aju']);
+                $lastNomor = $arrNo[3];
+                // lakukan increment
+                $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+                $sequenceNoUrutPengajuan = $nextNomor;
+            }
         }
 
-        return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic['value'] . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+        return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
     }
 
     public function dropdownSupplier()
     {
-        $supplierModel = new SupplierModel();
         $poType = $this->request->getVar('po_type');
 
         if (!empty($poType)) {
             $poType = str_replace('LOKAL', 'BAHAN', $poType);
-            $supplier = $supplierModel->where('deletedAt', null)->where('type', $poType)->orderBy('name', "ASC")->findAll();
+            $supplier = $this->supplierModel->where('deletedAt', null)->where('type', $poType)->orderBy('name', "ASC")->findAll();
 
             return response()->setJSON([
                 'data' => $supplier,
@@ -1546,12 +1538,14 @@ class BC40 extends BaseController
         }
 
         // GET PO YANG SUDAH DIGUNAKAN & POSTING
-        $lpbUsed = $this->bcPurchaseOrder->where('supplier_id', $supplierId)->where('po_type', $poType)->where('status_posting', '1')->findAll();
+        $lpbUsed = $this->bcPurchaseOrderModel->where('supplier_id', $supplierId)->where('po_type', $poType)->where('deletedAt', null)->findAll();
         $lpbUsedArr = [];
 
         foreach ($lpbUsed as $p) {
             $lpbArr = json_decode($p['multiple_lpb_id']);
-            $lpbUsedArr[] = $lpbArr;
+            foreach ($lpbArr as $l) {
+                array_push($lpbUsedArr, $l);
+            }
         }
 
         $result = [];
@@ -1585,7 +1579,7 @@ class BC40 extends BaseController
                 ->groupBy('barang_id')
                 ->groupBy('id')
                 ->findAll();
-        } else {
+        } else if ($poType == "LOKAL PENOLONG") {
             // PO LOKAL BAHAN PENOLONG
             $po = $this->penerimaanBarangModel
                 ->select('
@@ -1609,6 +1603,64 @@ class BC40 extends BaseController
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.supplier_id', $supplierId)
                 ->where('penerimaan_barang.bc_type', '53')
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->groupBy('barang_id')
+                ->groupBy('id')
+                ->findAll();
+        } elseif ($poType == "IMPORT BAKU") {
+            // PO IMPORT BAHAN BAKU
+            $po = $this->penerimaanBarangModel
+                ->select('
+                    penerimaan_barang.id,
+                    penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang,
+                    penerimaan_barang_detail.purchase_order_id,
+                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                    SUM(penerimaan_barang_detail.qty) AS qty_po,
+                    SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                    penerimaan_barang_detail.barang_id,
+                    rm_import_pos.po_no,
+                    rm_import_pos.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang
+                ')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
+                ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->where('penerimaan_barang.status_penerimaan', "IMPORT")
+                ->where('penerimaan_barang.tipe_bahan', "BAKU")
+                ->where('penerimaan_barang.supplier_id', $supplierId)
+                ->where('penerimaan_barang.bc_type', '48')
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->groupBy('barang_id')
+                ->groupBy('id')
+                ->findAll();
+        } elseif ($poType == "IMPORT PENOLONG") {
+            // PO IMPORT BAHAN PENOLONG
+            $po = $this->penerimaanBarangModel
+                ->select('
+                penerimaan_barang.id,
+                penerimaan_barang.tanggal AS lpb_date,
+                penerimaan_barang.no_penerimaan_barang,
+                penerimaan_barang_detail.purchase_order_id,
+                SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                SUM(penerimaan_barang_detail.qty) AS qty_po,
+                SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                penerimaan_barang_detail.barang_id,
+                am_purchase_orders.po_no,
+                am_purchase_orders.po_date,
+                barang_master.barang_name,
+                barang_master.kode_barang
+            ')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->where('penerimaan_barang.status_penerimaan', "IMPORT")
+                ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
+                ->where('penerimaan_barang.supplier_id', $supplierId)
+                ->where('penerimaan_barang.bc_type', '48')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->groupBy('barang_id')
@@ -1640,5 +1692,185 @@ class BC40 extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function dropdownNoIjinTPB()
+    {
+        $pengusahaTPBID = $this->request->getVar('pengusaha_tpb_id');
+        $data = $this->nomorIjinTPBModel
+            ->where('company_id', $this->this_company_id)
+            ->where('pengusaha_tpb_id', $pengusahaTPBID)
+            ->where('status', '1')
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $result = array();
+
+        foreach ($data as $d) {
+            array_push($result, [
+                'no_ijin_tpb' => $d['no_ijin_tpb'],
+                'tanggal_skep_tpb' => date('d/m/Y', strtotime($d['tanggal_skep_tpb']))
+            ]);
+        }
+
+        return response()->setJSON([
+            'data' => $result,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    private function insertInventori($bcPurchaseOrderID)
+    {
+        try {
+            $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+            $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+
+            $poIdArr = json_decode($bcPo['multiple_po_id']);
+            $lpbIdArr = json_decode($bcPo['multiple_lpb_id']);
+            $typeBahan = $bcPo['po_type'] == "LOKAL BAKU" ? "bahan_baku" : "bahan_penolong";
+
+            foreach ($lpbIdArr as $lpbId) {
+
+                $penerimaanBarang = $this->penerimaanBarangModel->where('id', $lpbId)->first();
+                $penerimaanBarangList = $this->penerimaanBarangDetailModel
+                    ->where('penerimaan_barang_id', $lpbId)
+                    ->whereIn('purchase_order_id', $poIdArr)
+                    ->where('deletedAt', null)
+                    ->findAll();
+
+                // CHECK STOK APAKAH SUDAH DIINISASI (INISIASI HEADER BARANG)
+                foreach ($penerimaanBarangList as $p) {
+
+                    // CHECK STOK BARANG HEADER
+                    $stok = $this->stockModel->getStokMaster(
+                        $this->this_company_id,
+                        $penerimaanBarang['warehouse_id'],
+                        $penerimaanBarang['divisi_id'],
+                        $typeBahan,
+                        $p['barang_id'],
+                        $p['spesifikasi_id'],
+                    );
+
+                    if ($stok == null) {
+                        $stok = $this->stockModel->insertStok(
+                            $this->this_company_id,
+                            $penerimaanBarang['warehouse_id'],
+                            $penerimaanBarang['divisi_id'],
+                            $typeBahan,
+                            $p['barang_id'],
+                            $p['spesifikasi_id'],
+                            0
+                        );
+                    }
+                }
+
+                // CHECK STOK KEMASAN HEADER (INISIASI HEADER KEMASAN)
+                $stok = $this->stockModel->getStokMaster(
+                    $this->this_company_id,
+                    $penerimaanBarang['warehouse_id'],
+                    $penerimaanBarang['divisi_id'],
+                    "kemasan",
+                    0,
+                    $penerimaanBarang['kemasan_id'],
+                );
+
+                if ($stok == null) {
+                    $stok = $this->stockModel->insertStok(
+                        $this->this_company_id,
+                        $penerimaanBarang['warehouse_id'],
+                        $penerimaanBarang['divisi_id'],
+                        "kemasan",
+                        0,
+                        $penerimaanBarang['kemasan_id'],
+                        0
+                    );
+                }
+
+                // STOK BARANG DIINPUT (INSERT BARANG)
+                foreach ($penerimaanBarangList as $p) {
+                    // HEADER
+                    $stok = $this->stockModel->insertStok(
+                        $this->this_company_id,
+                        $penerimaanBarang['warehouse_id'],
+                        $penerimaanBarang['divisi_id'],
+                        $typeBahan,
+                        $p['barang_id'],
+                        $p['spesifikasi_id'],
+                        $p['jml_masuk']
+                    );
+
+                    // DETAIL
+                    $stokDetail = $this->stockDetailModel->insertStokDetail(
+                        $stok,
+                        $p['jml_masuk'],
+                        'In',
+                        date('Y-m-d'),
+                        $this->this_user_id,
+                        "LPB",
+                        $penerimaanBarang['no_penerimaan_barang'],
+                        "-",
+                    );
+
+                    // GET PURCHASE ORDER
+                    if ($typeBahan == "bahan_penolong") {
+                        // PO BAHAN PENOLONG
+                        $po = $this->amPurchaseOrderModel->find($p['purchase_order_id']);
+                    } else {
+                        // PO BAHAN BAKU
+                        $po = $this->rmPurchaseOrderModel->find($p['purchase_order_id']);
+                    }
+                    // SUB DETAIL
+                    $this->stockDetail2Model->insertStokDetail2(
+                        $penerimaanBarang['bc_type'],
+                        $stok,
+                        $stokDetail,
+                        $p['jml_masuk'],
+                        $bc40['no_aju'],
+                        $po['po_no'],
+                        $po['po_no']
+                    );
+                }
+
+                // INSERT KEMASAN
+                $stok = $this->stockModel->insertStok(
+                    $this->this_company_id,
+                    $penerimaanBarang['warehouse_id'],
+                    $penerimaanBarang['divisi_id'],
+                    "kemasan",
+                    0,
+                    $penerimaanBarang['kemasan_id'],
+                    $penerimaanBarang['jumlah_kemasan']
+                );
+
+                // DETAIL
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    $penerimaanBarang['jumlah_kemasan'],
+                    "In",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "LPB",
+                    $penerimaanBarang['no_penerimaan_barang'],
+                    "-",
+                );
+
+                // SUB DETAIL
+                $this->stockDetail2Model->insertStokDetail2(
+                    $penerimaanBarang['bc_type'],
+                    $stok,
+                    $stokDetail,
+                    $penerimaanBarang['jumlah_kemasan'],
+                    $bc40['no_aju'],
+                    $penerimaanBarang['no_penerimaan_barang'],
+                    $penerimaanBarang['no_penerimaan_barang'],
+                );
+            }
+
+            return true;
+        } catch (Exception $e) {
+            var_dump($e->getMessage());
+            return false;
+        }
     }
 }

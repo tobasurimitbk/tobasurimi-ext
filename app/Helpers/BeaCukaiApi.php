@@ -373,8 +373,9 @@ class BeaCukaiApi
                 'barangDokumen' => []
             ];
 
-            $barangTarifData = $BCBarangTarifModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
-                ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
+            $barangTarifData = $BCBarangTarifModel
+                ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
+                ->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 
@@ -396,8 +397,9 @@ class BeaCukaiApi
             }
             $barang['barangTarif'] = $barangTarifArr;
 
-            $barangDokumenData = $BCBarangDokumenModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
-                ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
+            $barangDokumenData = $BCBarangDokumenModel
+                ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
+                ->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 
@@ -676,7 +678,8 @@ class BeaCukaiApi
             ];
 
             $barangTarifData = $BCBarangTarifModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
-                ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
+                ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
+                ->where('barang1_id', $b['barang1_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 

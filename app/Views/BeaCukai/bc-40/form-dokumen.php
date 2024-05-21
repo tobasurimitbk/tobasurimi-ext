@@ -129,7 +129,7 @@
             url: "<?= base_url("bea-cukai-bc-40/id/dokumen/data/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
+                data.bc_purchase_order_id = "<?= encrypt($bcPo['id']) ?>";
                 data.sort = "bc_dokumen.createdAt";
                 data.sortType = "DESC";
             }
@@ -252,7 +252,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-dokumen"));
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-40/id/dokumen/create"); ?>",
                         data: formData,
