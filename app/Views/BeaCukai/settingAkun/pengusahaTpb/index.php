@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input id="npwp" name="npwp" oninput="preventNegativeInput(this)" type="text" class="form-control npwp" placeholder="">
+                                <input id="npwp" name="npwp" type="number" class="form-control npwp" placeholder="">
                                 <label>NPWP Pengusaha TPB</label>
                             </div>
                         </div>

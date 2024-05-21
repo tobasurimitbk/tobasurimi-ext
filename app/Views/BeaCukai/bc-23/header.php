@@ -55,7 +55,7 @@
                                 confirmButtonColor: '#4e73df',
                                 confirmButtonText: 'Ok'
                             }).then((result) => {
-                                window.location.replace("bea-cukai-bc-23");
+                                location.replace("<?= base_url('bea-cukai-bc-23') ?>")
                             });
                         }
                     }
@@ -77,7 +77,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
-                formData.append("penerimaan_barang_id", "<?= request()->uri->getSegment(4) ?>");
+                formData.append("bc_purchase_order_id", "<?= request()->uri->getSegment(4) ?>");
                 $.ajax({
                     url: `<?= base_url("bea-cukai-bc-23/id/delete"); ?>`,
                     method: "POST",

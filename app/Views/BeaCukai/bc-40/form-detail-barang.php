@@ -143,7 +143,7 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= $barangDetail['qty_lpb'] ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input value="<?= number_format($barangDetail['qty_lpb'], 2) ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Jumlah Satuan</label>
                                     <small><i>Jumlah diterima sesuai dengan LPB</i></small>
                                 </div>

@@ -1401,9 +1401,9 @@ class BC40 extends BaseController
 
         $bc40Data = $this->bc40Model->get($bcPurchaseOrderID);
 
-        if ($bc40Data == null) {
-            return redirect()->to('bea-cukai-bc-40');
-        }
+        // if ($bc40Data == null) {
+        //     return redirect()->to('bea-cukai-bc-40');
+        // }
 
         $bc23Kontainer = $this->bcKontainerModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
         $bc23Barang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
@@ -1437,7 +1437,7 @@ class BC40 extends BaseController
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
-            'message' => "Dokumen BC 4.O Berhasil Diposting"
+            'message' => "Dokumen BC 4.O Berhasil Diposting",
         ]);
     }
 
