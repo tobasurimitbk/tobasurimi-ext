@@ -19,7 +19,6 @@ class Retur extends BaseController
     protected $this_company_id;
     protected $encrypter;
 
-    private $AllNoModel;
     private $customerModel;
     private $soModel;
     private $soReturnModel;
@@ -35,7 +34,6 @@ class Retur extends BaseController
         $this->encrypter = Services::encrypter();
         $this->userId = session()->get("login")->user_id;
 
-        $this->AllNoModel = new AllNoMOdel();
         $this->customerModel = new CustomerModel();
         $this->soModel = new SalesOrderModel();
         $this->soReturnModel = new SalesOrderReturnModel();
