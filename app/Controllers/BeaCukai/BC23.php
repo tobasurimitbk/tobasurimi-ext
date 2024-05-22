@@ -1594,15 +1594,15 @@ class BC23 extends BaseController
         $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
 
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
-        $status = $this->insertInventori($bcPurchaseOrderID);
+        // $status = $this->insertInventori($bcPurchaseOrderID);
 
-        if (!$status) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => true,
-                'message' => "Terjadi kesalahan saat menambah stok inventori"
-            ]);
-        }
+        // if (!$status) {
+        //     return response()->setJSON([
+        //         'token' => csrf_hash(),
+        //         'status' => true,
+        //         'message' => "Terjadi kesalahan saat menambah stok inventori"
+        //     ]);
+        // }
 
         $bc23Data = $this->bc23Model->get($bcPurchaseOrderID);
 
@@ -1624,9 +1624,8 @@ class BC23 extends BaseController
         );
 
         $res = $beacukaiApi->kirimDokumenBC($payload, false);
-        // return response()->setJSON($res);
 
-        // UPDATE STATUS
+        // // UPDATE STATUS
         $this->bc23Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
         $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
             'status_posting' => '1'

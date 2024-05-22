@@ -183,7 +183,7 @@ class BeaCukaiApi
             ];
         }
 
-        $endPoint = $this->baseUrl . "/openapi/document?isFinal" . urlencode($isFinal);
+        $endPoint = $this->baseUrlDev . "/openapi/document?isFinal" . urlencode($isFinal);
 
         $headers = array(
             'Content-Type: application/json',
