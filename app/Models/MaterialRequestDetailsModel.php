@@ -52,7 +52,8 @@ class MaterialRequestDetailsModel extends Model
         $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
-            ->where('material_request_details.material_request_id', $mrID)
+            ->whereIn('material_request_details.material_request_id', $mrID)
+            ->where('material_request_details.qty_now >', 0)
             ->findAll();
 
         return $dataQry;

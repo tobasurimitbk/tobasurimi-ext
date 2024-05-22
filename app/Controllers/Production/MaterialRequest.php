@@ -346,6 +346,7 @@ class MaterialRequest extends BaseController
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
+                        'qty_now' => $s->qty_isi,
                     ];
                 } else {
                     $dataMaterialDetail = [
@@ -368,6 +369,7 @@ class MaterialRequest extends BaseController
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
+                        'qty_now' => $s->qty2,
                     ];
                 }
                 $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -405,12 +407,14 @@ class MaterialRequest extends BaseController
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
+                            'qty_now' => $s->qty_isi,
                         ];
                     } else {
                         $dataMaterialDetail = [
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
+                            'qty_now' => $s->qty2
                         ];
                     }
                     $this->materialRequestDetailsModel->update($s->id_material_request_detail, $dataMaterialDetail);
@@ -438,6 +442,7 @@ class MaterialRequest extends BaseController
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
+                            'qty_now' => $s->qty_isi,
                         ];
                     } else {
                         $dataMaterialDetail = [
@@ -460,6 +465,7 @@ class MaterialRequest extends BaseController
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
+                            'qty_now' => $s->qty2
                         ];
                     }
                     $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -546,6 +552,10 @@ class MaterialRequest extends BaseController
                         $value['barang2_id'],
                         $value['qty2']
                     );
+
+                    $this->materialRequestDetailsModel->update($value['id'], [
+                        'stock_tujuan_id' => $stokIn
+                    ]);
 
                     $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
                         $materialRequestData['company_id'],

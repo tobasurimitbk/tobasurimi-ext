@@ -251,6 +251,17 @@ class ProductionResult extends BaseController
             ->groupBy('work_order_details.work_order_id')
             ->find();
 
+        $dataMaterialRequest = $this->materialRequestModel->asObject()
+            ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
+            ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
+            ->join('users', 'users.id = material_requests.createdBy', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->whereIn('material_requests.id', json_decode($productionResData->material_request_id))
+            ->where('material_requests.deletedAt', null)
+            ->where('material_request_details.deletedAt', null)
+            ->groupBy('material_request_details.material_request_id')
+            ->find();
+
         // var_dump($productionResData);
 
         $data = [
@@ -263,6 +274,7 @@ class ProductionResult extends BaseController
             'dataWarehouse' => $dataWarehouse,
             'dataDivisi' => $dataDivisi,
             'tipeBarang' => $dataTipeBarang,
+            'dataMaterialRequest' => $dataMaterialRequest,
         ];
         return view('Production/productionResult/form', $data);
     }
@@ -323,26 +335,21 @@ class ProductionResult extends BaseController
         try {
             $datas = [
                 "pr_no" => $this->request->getVar("res_no") == "AUTO GENERATE" ? $this->generatePRNo() : $this->request->getVar("res_no"),
+                "material_request_id" => json_encode($this->request->getPost("kode_request")),
                 "work_order_id" => $this->request->getVar("kode_produksi"),
                 "receive_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : date("Y-m-d"),
             ];
+
 
             $barangJadi = json_decode($this->request->getVar("jadi"));
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangReturn = json_decode($this->request->getVar("return"));
 
-            $dataWorkOrder = $this->workOrdersModel
-                ->where('id', $this->request->getVar("kode_produksi"))
-                ->where('deletedAt', null)
-                ->find();
-            $dataWorkOrderDetail = $this->workOrderDetailsModel
-                ->join('work_orders', 'work_orders.id = work_order_details.work_order_id', 'left')
-                ->where('work_order_id', $this->request->getVar("kode_produksi"))
-                ->where('work_orders.deletedAt', null)
-                ->where('work_order_details.deletedAt', null)
-                ->find();
-
+            // var_dump($barangJadi);
+            // var_dump($barangDigunakan);
+            // var_dump($barangScrap);
+            // exit;
             $productionResID = $this->productionResultModel->insert($datas);
 
             $productionResData = $this->productionResultModel->find($productionResID);
@@ -351,7 +358,7 @@ class ProductionResult extends BaseController
             //     'request_status' => 'finished'
             // ]);
             foreach ($barangJadi as $bj) {
-                $qty = isset($bj->qty2) ? (float) $bj->qty2 : (float) $bj->qty;
+                $qty = isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty;
                 if ($qty && $qty != 0) {
                     $datasbj = [
                         "production_result_id" => $productionResID,
@@ -366,20 +373,20 @@ class ProductionResult extends BaseController
                         "barang_type" => $bj->type_barang,
                         "type" => "JADI",
                         "no_ref" => "NON PABEAN",
-                        "qty" => $qty,
+                        "qty" => (float) $qty,
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
                 }
             }
 
             foreach ($barangDigunakan as $bd) {
-                $qty = isset($bd->qty2) ? (float) $bd->qty2 : $bd->qty;
+                $qty = isset($bd->qty2) ? (float) $bd->qty2 : (float) $bd->qty;
                 $datasbd = [
                     "production_result_id" => $productionResID,
                     "barang1_id" => $bd->barang1_id,
                     "barang2_id" => $bd->barang2_id,
-                    "warehouse_id" => $bd->warehouseID,
-                    "divisi_id" => $bd->departmentID,
+                    "warehouse_id" => $bd->warehouse_id,
+                    "divisi_id" => $bd->divisi_id,
                     "bc_id" => $bd->bc_id,
                     "stock_dokumen" => $bd->stock_dokumen,
                     "stock_date" => $bd->stock_date,
@@ -387,7 +394,7 @@ class ProductionResult extends BaseController
                     "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
                     "barang_type" => $bd->type_barang,
                     "type" => "DIGUNAKAN",
-                    "no_ref" => $bd->bc_type,
+                    "no_ref" => $bd->ref_no,
                     "qty" => (float) $qty,
                 ];
                 $this->productionResultDetailModel->insert($datasbd);
@@ -406,6 +413,7 @@ class ProductionResult extends BaseController
                     "no_aju" => "-",
                     "barang_type" => "bahan_scrap",
                     "type" => "SCRAP",
+                    "no_ref" => "NON PABEAN",
                     "qty" => (float) $bs->qty,
                 ];
                 $this->productionResultDetailModel->insert($datasbs);
@@ -414,7 +422,7 @@ class ProductionResult extends BaseController
             $data = [
                 "status"    => true,
                 "id"    => encrypt($productionResID),
-                "message"   => 'Success',
+                "message"   => 'Data produksi berhasil disimpan',
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);
@@ -520,6 +528,7 @@ class ProductionResult extends BaseController
                 ->where('material_requests.is_posted', 1)
                 ->where('material_requests.deletedAt', null)
                 ->where('material_request_details.deletedAt', null)
+                ->where('material_request_details.qty_now >', 0)
                 ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
                 ->groupBy('material_request_details.material_request_id')
                 ->find();
