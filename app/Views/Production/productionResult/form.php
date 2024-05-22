@@ -204,22 +204,24 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangDigunakan" id="tableBarangDigunakan" width="100%" cellspacing="0">
-                                            <thead class="thead-dark">
-                                                <tr>
-                                                    <th style="width: 10px;">No</th>
-                                                    <th>Referensi</th>
-                                                    <th>Kode Barang</th>
-                                                    <th>Jenis Barang</th>
-                                                    <th>Nama Barang</th>
-                                                    <th>Satuan</th>
-                                                    <th>Jumlah Request</th>
-                                                    <th>Jumlah Digunakan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangDigunakan" id="tableBarangDigunakan" width="100%" cellspacing="0">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th style="width: 10px;">No</th>
+                                                        <th>Referensi</th>
+                                                        <th>Kode Barang</th>
+                                                        <th>Jenis Barang</th>
+                                                        <th>Nama Barang</th>
+                                                        <th>Satuan</th>
+                                                        <th>Jumlah Request</th>
+                                                        <th>Jumlah Digunakan</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-subtitle-modal">
@@ -231,21 +233,23 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangJadi" id="tableBarangJadi" width="100%" cellspacing="0">
-                                            <thead class="thead-dark text-center">
-                                                <tr>
-                                                    <th style="width: 10px;">No</th>
-                                                    <th>Kode Barang</th>
-                                                    <th>Jenis Barang</th>
-                                                    <th>Nama Barang</th>
-                                                    <th>Satuan</th>
-                                                    <!-- <th>Qty Target</th> -->
-                                                    <th>Qty Hasil</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangJadi" id="tableBarangJadi" width="100%" cellspacing="0">
+                                                <thead class="thead-dark text-center">
+                                                    <tr>
+                                                        <th style="width: 10px;">No</th>
+                                                        <th>Kode Barang</th>
+                                                        <th>Jenis Barang</th>
+                                                        <th>Nama Barang</th>
+                                                        <th>Satuan</th>
+                                                        <!-- <th>Qty Target</th> -->
+                                                        <th>Qty Hasil</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
