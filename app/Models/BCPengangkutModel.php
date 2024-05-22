@@ -40,8 +40,8 @@ class BCPengangkutModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get($penerimaanBarangID)
+    public function get($bcPurchaseOrderID)
     {
-        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        return $this->asArray()->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->first();
     }
 }

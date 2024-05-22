@@ -14,19 +14,54 @@
                 <button <?= $bc23['status_dokumen'] == 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
                     Hapus
                 </button>
+                <button onclick="alert('Hello')" <?= $bc23['status_dokumen'] != 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-warning btn-print float-right text-white root-form-view">
+                    Print
+                </button>
+                <button <?= $bc23['status_dokumen'] == 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view" <?= ($isFinished == true) ? '' : 'disabled' ?> onclick="submitDokumen()">
+                    Kirim ke Ceisa 4.0
+                </button>
             <?php endif; ?>
-            <button class="btn btn-warning btn-print float-right text-white root-form-view" disabled>
-                Print
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view" <?= ($isFinished == true) ? '' : 'disabled' ?> onclick="submitDokumen()">
-                Kirim ke Ceisa 4.0
-            </button>
+
         </div>
     <?php endif; ?>
 </div>
 <script>
     function submitDokumen() {
-        window.location.replace("<?= base_url('bea-cukai-bc-23/api/kirim-dokumen/' . request()->uri->getSegment(4)) ?>");
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting BC 2.3 ke aplikasi Ceisa Bea Cukai ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `<?= base_url('bea-cukai-bc-23/api/kirim-dokumen/' . request()->uri->getSegment(4)) ?>`,
+                    method: "GET",
+                    beforeSend: function(xhr) {
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                location.replace("<?= base_url('bea-cukai-bc-23') ?>")
+                            });
+                        }
+                    }
+                })
+            }
+        })
     }
 
     function deleteAction() {
@@ -42,7 +77,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
-                formData.append("penerimaan_barang_id", "<?= request()->uri->getSegment(4) ?>");
+                formData.append("bc_purchase_order_id", "<?= request()->uri->getSegment(4) ?>");
                 $.ajax({
                     url: `<?= base_url("bea-cukai-bc-23/id/delete"); ?>`,
                     method: "POST",

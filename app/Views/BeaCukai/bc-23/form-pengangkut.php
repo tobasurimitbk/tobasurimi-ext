@@ -139,7 +139,7 @@
                                 </div>
                             </div>
                             <div class="mt-0">
-                                <a href="#" <?= $bc23DokumenBL == null ? 'disabled' : '' ?> class="btn btn-warning btn-block" id="btn-ambil-manifest" style="float: right;">
+                                <a href="#" <?= $bc23DokumenBL == null ? 'disabled' : '' ?> class="btn btn-warning btn-block mt-2" id="btn-ambil-manifest" style="float: right;">
                                     <?= $bc23DokumenBL == null ? "Dokumen B/L atau AWB belum diisi" : "Ambil Data Manifest Dokumen B/L" ?>
                                 </a>
                                 <button class="btn btn-warning btn-block" type="button" disabled id="btn-loading-manifest" style="float: right;">
@@ -307,7 +307,7 @@
             url: `<?= base_url("bea-cukai-bc-23/api/get-manifest"); ?>`,
             method: "GET",
             data: {
-                penerimaan_barang_id: "<?= encrypt($lpb->id) ?>"
+                bc_purchase_order_id: "<?= encrypt($bcPo['id']) ?>"
             },
             beforeSend: function() {
                 $('#btn-loading-manifest').show();
@@ -374,7 +374,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-pengangkut"));
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/pengangkut"); ?>",
                         data: formData,

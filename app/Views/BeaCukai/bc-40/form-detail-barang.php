@@ -28,7 +28,7 @@
                     <a class="btn btn-primary float-right btn-simpan-detail-barang-form-view" id="btn-simpan-detail-barang-form-view" href="#">
                         Simpan
                     </a>
-                    <a class="btn btn-danger float-right" href="<?= base_url('bea-cukai-bc-40/id/barang/' . encrypt($lpb->id)) ?>" style="margin-right: 8px;">
+                    <a class="btn btn-danger float-right" href="<?= base_url('bea-cukai-bc-40/id/barang/' . encrypt($bcPo['id'])) ?>" style="margin-right: 8px;">
                         Batal
                     </a>
                 </div>
@@ -38,7 +38,7 @@
                         <tr style="color: black;">
                             <td width="150px"><b>Nomor LPB</b></td>
                             <td width="10px">:</td>
-                            <td><?= $lpb->no_penerimaan_barang ?></td>
+                            <td><?= $barangDetail['lpb_no'] ?></td>
                         </tr>
                         <tr style="color: black; height: 20px;">
                             <td colspan="3"></td>
@@ -46,7 +46,7 @@
                         <tr style="color: black;">
                             <td width="150px"><b>Nomor PO</b></td>
                             <td width="30px">:</td>
-                            <td><?= $poDetail != null ? $poDetail['po_no'] : '-' ?></td>
+                            <td><?= $barangDetail != null ? $barangDetail['po_no'] : '-' ?></td>
                         </tr>
                         <tr style="color: black; height: 20px;">
                             <td colspan="3"></td>
@@ -54,7 +54,7 @@
                         <tr style="color: black;">
                             <td width="150px"><b>Nama Barang</b></td>
                             <td width="10px">:</td>
-                            <td><?= $lpbDetail['nama_barang_dok'] ?></td>
+                            <td><?= $barangDetail['barang_name'] ?></td>
                         </tr>
 
 
@@ -143,7 +143,7 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= ($lpbDetail['jml_masuk']) ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input value="<?= number_format($barangDetail['qty_lpb'], 2) ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Jumlah Satuan</label>
                                     <small><i>Jumlah diterima sesuai dengan LPB</i></small>
                                 </div>
@@ -164,9 +164,9 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_jumlah_kemasan" value="<?= $lpb->jumlah_kemasan ?>" readonly name="barang_detail_jumlah_kemasan" type="text" class="form-control barang_detail_jumlah_kemasan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_jumlah_kemasan" value="<?= $barangDetail['jumlah_kemasan'] ?>" readonly name="barang_detail_jumlah_kemasan" type="text" class="form-control barang_detail_jumlah_kemasan" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Jumlah Kemasan</label>
-                                    <small><i>Nama Kemasan(dari LPB) : <?= $lpb->kemasan ?></i></small>
+                                    <small><i>Nama Kemasan(dari LPB) : <?= $barangDetail['kemasan_name'] ?></i></small>
                                 </div>
                             </div>
                             <div class="mt-1">
@@ -196,23 +196,23 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating">
-                                    <input readonly id="barang_detail_harga_penyerahan" value="<?= formatRupiah($lpbDetail['sub_total'])  ?>" maxlength="24" name="barang_detail_harga_penyerahan" type="text" class="form-control barang_detail_harga_penyerahan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input readonly id="barang_detail_harga_penyerahan" value="<?= formatRupiah($barangDetail['harga'], 2) ?>" maxlength="24" name="barang_detail_harga_penyerahan" type="text" class="form-control barang_detail_harga_penyerahan" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Harga Penyerahan</label>
                                     <small><i>Harga penyerahan sesuai dengan total harga LPB diterima <br> (termasuk diskon & biaya tambahan)</i></small><br>
-                                    <small class="mb-3"><i>Harga Sebelum Diskon: <?= formatRupiah($hargaSebelumDiskon) ?></i></small>
+                                    <small class="mb-3"><i>Harga Sebelum Diskon: <?= formatRupiah($barangDetail['harga_sebelum_diskon']) ?></i></small>
                                 </div>
                             </div>
 
                             <div class="mt-1">
                                 <div class="form-floating">
-                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= $bc40DokumenBarang == null ? (formatRupiah(array_key_exists('additional_cost', $poDetail) ? $poDetail['additional_cost'] : 0)) : formatRupiah($bc40DokumenBarang['nilai_tambah']) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= formatRupiah($barangDetail['biaya_tambahan']) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Harga Penggantian/Nilai Jasa</label>
                                     <small class="mb-3"><i>Diambil dari biaya tambahan Purchase Order</i></small>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_diskon" readonly maxlength="24" name="barang_detail_diskon" type="text" value="<?= formatRupiah($diskon) ?>" class="form-control barang_detail_fob" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_diskon" readonly maxlength="24" name="barang_detail_diskon" type="text" value="<?= formatRupiah($barangDetail['diskon']) ?>" class="form-control barang_detail_fob" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                     <label>Diskon</label>
                                 </div>
                             </div>
@@ -434,8 +434,9 @@
             url: "<?= base_url("bea-cukai-bc-40/id/barang-pungutan-all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
-                data.penerimaan_barang_detail_id = "<?= encrypt($lpbDetail['id']) ?>";
+                data.bc_purchase_order_id = "<?= encrypt($bcPo['id']) ?>";
+                data.penerimaan_barang_id = "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>";
+                data.barang1_id = "<?= encrypt($barangDetail['barang1_id']) ?>";
                 data.sort = "bc_barang_tarif.createdAt";
                 data.sortType = "DESC";
             }
@@ -526,8 +527,9 @@
             url: "<?= base_url("bea-cukai-bc-40/id/barang-dokumen-all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.penerimaan_barang_id = "<?= encrypt($lpb->id) ?>";
-                data.penerimaan_barang_detail_id = "<?= encrypt($lpbDetail['id']) ?>";
+                data.bc_purchase_order_id = "<?= encrypt($bcPo['id']) ?>";
+                data.penerimaan_barang_id = "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>";
+                data.barang1_id = "<?= encrypt($barangDetail['barang1_id']) ?>";
                 data.sort = "bc_dokumen.createdAt";
                 data.sortType = "DESC";
             }
@@ -790,8 +792,10 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-pungutan"));
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
-                    formData.append("penerimaan_barang_detail_id", "<?= encrypt($lpbDetail['id']) ?>");
+                    formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+                    formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-40/id/barang-pungutan-create"); ?>",
                         data: formData,
@@ -847,8 +851,10 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-barang-dokumen"));
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
-                    formData.append("penerimaan_barang_detail_id", "<?= encrypt($lpbDetail['id']) ?>");
+                    formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+                    formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-40/id/barang"); ?>",
                         data: formData,
@@ -903,8 +909,9 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();
-                    formData.append("penerimaan_barang_id", "<?= encrypt($lpb->id) ?>");
-                    formData.append("penerimaan_barang_detail_id", "<?= encrypt($lpbDetail['id']) ?>");
+                    formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+                    formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
                     formData.append("bc_dokumen_id", bc23DokumenID);
                     formData.append("seri_dokumen", seriDokumen);
                     $.ajax({

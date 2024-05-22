@@ -11,6 +11,51 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-2">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
+                            <option value="" data-code=""></option>
+
+                            <?php foreach ($getCustomers as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
+                            <?php endforeach; ?>
+
+
+                        </select>
+                        <label for="floatingInput">Filter Customer</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_jenis_dokumen" name="filter_jenis_dokumen" id="filter_jenis_dokumen">
+                            <option value="" data-code=""></option>
+                            <option value="pengiriman" data-code="">Pengiriman</option>
+                            <option value="pesanan" data-code="">Pesanan</option>
+                        </select>
+                        <label for="floatingInput">Filter Jenis Dokumen</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Invoice" value="" />
+                </div>
+            </div>
             <div class="row">
                 <div class="table-responsive">
                     <?= csrf_field() ?>
@@ -24,8 +69,9 @@
                                 <th onclick="changeSort('nama_sales')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('tipe_invoice')" class="sort">Jenis Invoice</th>
                                 <th onclick="changeSort('document_type')" class="sort">Jenis Dokumen</th>
-                                <th onclick="changeSort('counter_print')" class="sort">Print</th>
                                 <th onclick="changeSort('document_no')" class="sort">No Dokumen</th>
+                                <th onclick="changeSort('counter_print')" class="sort">Print</th>
+
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -50,7 +96,56 @@
     let list_delete = [];
     var row = 0;
 
+    $('.filter_customer, .filter_jenis_dokumen').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.filter_customer, .filter_jenis_dokumen')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.filter_customer, .filter_jenis_dokumen')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.filter_customer, .filter_jenis_dokumen')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
     $(document).ready(function() {
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
+
         $(".search").keyup(function() {
             table.ajax.reload();
         })
@@ -59,6 +154,10 @@
             const data = table.row(this).data();
             location.replace(`<?= base_url("invoice-penjualan-lokal/id"); ?>/${data.id}`);
         })
+
+        $(".dateStart, .dateEnd, .filter_customer, .filter_jenis_dokumen").change(function() {
+            table.ajax.reload();
+        });
     })
 
     const table = $('.dataTable').DataTable({
@@ -82,6 +181,10 @@
                 data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.filter_customer = $(".filter_customer").val();
+                data.filter_jenis_dokumen = $(".filter_jenis_dokumen").val();
             }
         },
         // scrollX: true,

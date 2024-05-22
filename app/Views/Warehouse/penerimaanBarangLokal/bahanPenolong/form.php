@@ -729,7 +729,7 @@
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            location.reload();
+                                            window.location.href = "<?= base_url('penerimaan-barang-lokal-bp') ?>"
                                         });
                                     } else {
                                         Swal.fire({
@@ -1051,7 +1051,7 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 }).then((result) => {
-                                    location.reload();
+                                    window.location.href = "<?= base_url('penerimaan-barang-lokal-bp') ?>"
                                 });
                             } else {
                                 Swal.fire({

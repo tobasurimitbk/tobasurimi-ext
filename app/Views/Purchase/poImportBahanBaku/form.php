@@ -815,7 +815,7 @@
                                             reverseButtons: true,
                                             confirmButtonText: 'Oke',
                                         }).then((result) => {
-                                            location.reload();
+                                            window.location.href = "<?= base_url('po-import-bahan-baku') ?>"
                                         })
                                     } else {
                                         Swal.fire({
@@ -1348,7 +1348,7 @@
                                     reverseButtons: true,
                                     confirmButtonText: 'Oke',
                                 }).then((result) => {
-                                    location.reload();
+                                    window.location.href = "<?= base_url('po-import-bahan-baku') ?>"
                                 })
                             } else {
                                 Swal.fire({
@@ -1405,7 +1405,7 @@
                                     reverseButtons: true,
                                     confirmButtonText: 'Oke',
                                 }).then((result) => {
-                                    location.reload();
+                                    window.location.href = "<?= base_url('po-import-bahan-baku') ?>"
                                 })
                             }
 

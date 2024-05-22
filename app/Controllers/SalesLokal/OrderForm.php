@@ -110,7 +110,6 @@ class OrderForm extends BaseController
             ->orderBy('CAST(metadata.value AS DECIMAL)', 'ASC')
             ->findAll();
 
-
         $data = [
             "dataCustomers" => $customers,
             "dataSales" => $sales,
@@ -268,7 +267,7 @@ class OrderForm extends BaseController
                     // 'required' => 'barang tidak boleh kosong',
                 ],
             ],
-            "items.*.harga_barang" => [
+            "items.*.harga" => [
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Harga Barang tidak boleh kosong',
@@ -301,6 +300,26 @@ class OrderForm extends BaseController
             return;
         }
 
+        // Validate PPN status consistency
+        $initialPPNStatus = $items[0]->statusppn;
+
+        if ($initialPPNStatus == "0") {
+            $status_ppn = "0";
+        } else {
+            $status_ppn = "1";
+        }
+        foreach ($items as $row) {
+            if ($row->statusppn != $initialPPNStatus) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Status PPN Barang Tidak Boleh Berbeda",
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+        }
+
         try {
             $this->SalesOrderModel->db->transException(true)->transStart();
             $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
@@ -324,7 +343,8 @@ class OrderForm extends BaseController
                 "estimated_freight"     => $estimatedFreight,
                 "total_harga"           => $postData['total'],
                 "id_company"            => $this->this_company_id,
-                "tipe_sales_order"      => 'LOKAL'
+                "tipe_sales_order"      => 'LOKAL',
+                "ppn"      => $status_ppn
             ];
 
             $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
@@ -357,11 +377,11 @@ class OrderForm extends BaseController
                     "id_sales_order"        => $dataSalesOrder,
                     "id_barang"             => $row->id_barang,
                     "qty"                   => number_format($row->qty, 2, '.', ''),
-                    "qty_sekarang"                   => number_format($row->qty, 2, '.', ''),
-                    "harga_barang"          => str_replace(',', '', $row->harga_barang),
+                    "qty_sekarang"          => number_format($row->qty, 2, '.', ''),
+                    "harga_barang"          => str_replace(',', '', $row->harga),
                     "amount"                => number_format($amountValue, 2, '.', ''),
                     "keterangan"            => $row->keterangan,
-                    // "tax"                   => $row->tax,
+                    "tax"                   => $row->statusppn,
                     "discount_percentage"   => number_format($row->disc, 2, '.', ''),
                     // "dept"                  => $row->dept,
                     // "id_warehouse"          => $row->warehouse_id,
@@ -520,7 +540,7 @@ class OrderForm extends BaseController
                     // 'required' => 'barang tidak boleh kosong',
                 ],
             ],
-            "items.*.harga_barang" => [
+            "items.*.harga" => [
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Harga Barang tidak boleh kosong',
@@ -539,6 +559,28 @@ class OrderForm extends BaseController
             return;
         }
 
+        // Validate PPN status consistency
+        $initialPPNStatus = $items[0]->statusppn;
+
+        if ($initialPPNStatus == "0") {
+            $status_ppn = "0";
+        } else {
+            $status_ppn = "1";
+        }
+
+
+        foreach ($items as $row) {
+            if ($row->statusppn != $initialPPNStatus) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Status PPN Barang Tidak Boleh Berbeda",
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+        }
+
         try {
             $this->SalesOrderModel->db->transException(true)->transStart();
             $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
@@ -546,19 +588,22 @@ class OrderForm extends BaseController
             $estimatedFreight = str_replace(',', '', $postData['estimated_freight']);
 
             $totalQty = 0;
+            $total_harga = 0;
             foreach ($items as $row) {
                 $totalQty = $totalQty + $row->qty;
+
                 $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
+                $total_harga += $amountValue;
                 if ($row->id == 0 || $row->id == null || $row->id == "") {
                     $valueBarang = [
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
                         "qty_sekarang"                   => $row->qty,
-                        "harga_barang"          => str_replace(',', '', $row->harga_barang),
+                        "harga_barang"          => str_replace(',', '', $row->harga),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
-                        // "tax"                   => $row->tax,
+                        "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
@@ -570,10 +615,10 @@ class OrderForm extends BaseController
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
                         "qty_sekarang"                   => $row->qty,
-                        "harga_barang"          => str_replace(',', '', $row->harga_barang),
+                        "harga_barang"          => str_replace(',', '', $row->harga),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
-                        // "tax"                   => $row->tax,
+                        "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
@@ -582,7 +627,7 @@ class OrderForm extends BaseController
                 }
             }
 
-            $this->SalesOrderModel->update($id, ['qty_barang' => $totalQty]);
+            $this->SalesOrderModel->update($id, ['qty_barang' => $totalQty, 'ppn' => $status_ppn, 'total_harga' => $total_harga]);
 
             $this->SalesOrderModel->db->transComplete();
 
@@ -615,7 +660,7 @@ class OrderForm extends BaseController
 
 
             if (!empty($id)) {
-                $checkSJ = $this->SalesOrderModel->where('id', $id)->where('surat_jalan_so_id !=', null)->orWhere('sales_order_invoice_id !=', null)->findAll();
+                $checkSJ = $this->SalesOrderModel->where('id', $id)->where('surat_jalan_so_id !=', null)->orWhere('sales_order_invoice_id !=', null)->first();
 
                 if ($checkSJ) {
                     $data = [
@@ -690,11 +735,14 @@ class OrderForm extends BaseController
             ->select('barang_master_sales.barang_name as nama_barang')
             ->select('barang_master_sales.harga_pokok as harga_pokok')
             ->select('barang_master_sales.harga_jual as harga_jual')
+            ->select('barang_master_sales.status_ppn as statusppn')
             ->select('satuans.nama_satuan as nama_satuan')
             ->where('type_barang_sales', 'LOKAL')
             ->where('barang_master_sales.deletedAt', null)
             ->groupBy('id_barang')
             ->findAll();
+
+
 
         $data = [
             "dataBarang" => $dataBarang,

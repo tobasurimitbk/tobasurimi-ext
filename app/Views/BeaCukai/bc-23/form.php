@@ -2,18 +2,12 @@
 <?= $this->Section('content'); ?>
 <section class="section">
     <div class="section-header">
-        <h1>Tambah Dokumen BC 4.0</h1>
+        <h1>Tambah Dokumen BC 2.3</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-40"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-23"); ?>">
                 Kembali
             </a>
         </div>
-        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 10px;">
-            Export
-        </button>
-        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button onclick="print()" class="dropdown-item print-pdf">PDF</button></li>
-        </ul>
     </div>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
@@ -27,8 +21,8 @@
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
                             <select class="form-select po_type" id="po_type" name="po_type" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <option value="LOKAL BAKU">PO LOKAL BAHAN BAKU</option>
-                                <option value="LOKAL PENOLONG">PO LOKAL BAHAN PENOLONG</option>
+                                <option value="IMPORT BAKU">PO IMPORT BAHAN BAKU</option>
+                                <option value="IMPORT PENOLONG">PO IMPORT BAHAN PENOLONG</option>
 
                             </select>
                             <label style="z-index: 1;">Tipe Purchase Order</label>
@@ -175,7 +169,7 @@
 
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/create"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-23/create"); ?>",
                         data: data,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -190,7 +184,7 @@
                         contentType: false,
                         success: function(response) {
                             if (response.status) {
-                                window.location.replace("<?= base_url('bea-cukai-bc-40/id/barang/') ?>" + response.id)
+                                window.location.replace("<?= base_url('bea-cukai-bc-23/id/barang/') ?>" + response.id)
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -220,7 +214,7 @@
 
     function getListSupplier() {
         $.ajax({
-            url: `<?= base_url('bea-cukai-bc-40/list-supplier'); ?>`,
+            url: `<?= base_url('bea-cukai-bc-23/list-supplier'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -245,7 +239,7 @@
 
     function getListPurchaseOrder() {
         $.ajax({
-            url: `<?= base_url('bea-cukai-bc-40/list-po'); ?>`,
+            url: `<?= base_url('bea-cukai-bc-23/list-po'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -331,15 +325,6 @@
 
             }
         });
-    }
-
-    function print() {
-        var supplierId = $(".supplier_id option:selected").val();
-        var poType = $(".po_type option:selected").val();
-
-        if (supplierId && poType) {
-            window.open("<?= base_url('bea-cukai-bc-40/print-po') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
-        }
     }
 </script>
 

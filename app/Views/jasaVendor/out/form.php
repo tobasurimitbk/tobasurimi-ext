@@ -686,7 +686,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                location.reload();
+                                                window.location.href = "<?= base_url("jasa-vendor-out") ?>";
                                             }
                                         });
                                     },
@@ -722,7 +722,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url('jasa-vendor-out/id/') ?>" + response.id
+                                                    window.location.href = "<?= base_url("jasa-vendor-out") ?>";
                                                 }
                                             });
                                         }
@@ -1066,7 +1066,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                location.reload()
+                                window.location.href = "<?= base_url("jasa-vendor-out") ?>";
                             });
                         } else {
                             Swal.fire({
@@ -1115,7 +1115,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                location.reload();
+                                window.location.href = "<?= base_url("jasa-vendor-out") ?>";
                             });
                         }
                     },

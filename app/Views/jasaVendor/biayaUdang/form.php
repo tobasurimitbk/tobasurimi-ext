@@ -448,7 +448,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    location.reload();
+                                                    window.location.href = "<?= base_url("biaya-udang") ?>";
                                                 }
                                             });
                                         } else {
@@ -487,7 +487,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url('biaya-udang/id/') ?>" + response.id
+                                                    window.location.href = "<?= base_url("biaya-udang") ?>";
                                                 }
                                             });
                                         } else {
@@ -837,7 +837,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                location.reload()
+                                window.location.href = "<?= base_url("biaya-udang") ?>";
                             });
                         } else {
                             Swal.fire({

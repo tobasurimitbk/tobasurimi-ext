@@ -66,8 +66,8 @@ class BCKemasanModel extends Model
         ];
     }
 
-    public function getLast($penerimaanBarangID)
+    public function getLast($bcPurchaseOrderID)
     {
-        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->orderBy('createdAt', "DESC")->first();
+        return $this->asArray()->where('bc_purchase_order_id', $bcPurchaseOrderID)->orderBy('createdAt', "DESC")->first();
     }
 }

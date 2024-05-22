@@ -102,17 +102,37 @@ class SalesOrderInvoiceModel extends Model
 
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_customer']) {
             $salesOrderInvoiceLokal->groupStart();
         }
+
         if ($addCondition['search']) {
             $salesOrderInvoiceLokal
                 ->like('no_faktur', $addCondition['search']);
         }
 
+        if ($addCondition['filter_customer']) {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.id_customer', $addCondition['filter_customer']);
+        }
+
+        if ($addCondition['filter_jenis_dokumen'] == "pengiriman") {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.document_type', 'pengiriman');
+        }
+
+        if ($addCondition['filter_jenis_dokumen'] == "pesanan") {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.document_type', 'pesanan');
+        }
+
+        if ($addCondition['dateStart']) {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.tanggal_faktur >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.tanggal_faktur <=', $addCondition['dateEnd']);
+        }
+
         $salesOrderInvoiceLokal->where('tipe_invoice', 'LOKAL');
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_customer']) {
             $salesOrderInvoiceLokal->groupEnd();
         }
 

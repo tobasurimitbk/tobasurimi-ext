@@ -39,19 +39,19 @@ class BCBarangModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function totalHargaPenyerahan($penerimaanBarangID)
+    public function totalHargaPenyerahan($bcPurchaseOrderID)
     {
         $total = 0;
-        foreach ($this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->findAll() as $t) {
+        foreach ($this->asArray()->where('bc_purchase_order_id', $bcPurchaseOrderID)->findAll() as $t) {
             $total += $t['harga_ekspor'];
         }
         return $total;
     }
 
-    public function totalBeratBersih($penerimaanBarangID)
+    public function totalBeratBersih($bcPurchaseOrderID)
     {
         $total = 0;
-        foreach ($this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->findAll() as $t) {
+        foreach ($this->asArray()->where('bc_purchase_order_id', $bcPurchaseOrderID)->findAll() as $t) {
             $total += $t['netto'];
         }
         return $total;

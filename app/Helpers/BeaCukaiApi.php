@@ -10,13 +10,14 @@ use Exception;
 class BeaCukaiApi
 {
 
-    protected $baseUrl, $username, $password;
+    protected $baseUrl, $baseUrlDev, $username, $password;
     protected $metaDataModel;
 
     public function __construct($username, $password)
     {
         $this->metaDataModel = new MetadataModel();
         $this->baseUrl = $this->metaDataModel->where('name', "Base Url BC")->first()['value'];
+        $this->baseUrlDev = $this->metaDataModel->where('name', "Base Url BC")->first()['description'];
         $this->username = $username;
         $this->password = $password;
     }
@@ -182,7 +183,7 @@ class BeaCukaiApi
             ];
         }
 
-        $endPoint = $this->baseUrl . "/openapi/document?isFinal" . urlencode($isFinal);
+        $endPoint = $this->baseUrlDev . "/openapi/document?isFinal" . urlencode($isFinal);
 
         $headers = array(
             'Content-Type: application/json',
@@ -373,8 +374,9 @@ class BeaCukaiApi
                 'barangDokumen' => []
             ];
 
-            $barangTarifData = $BCBarangTarifModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
-                ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
+            $barangTarifData = $BCBarangTarifModel
+                ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
+                ->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 
@@ -396,8 +398,9 @@ class BeaCukaiApi
             }
             $barang['barangTarif'] = $barangTarifArr;
 
-            $barangDokumenData = $BCBarangDokumenModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
-                ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
+            $barangDokumenData = $BCBarangDokumenModel
+                ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
+                ->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 
@@ -676,7 +679,8 @@ class BeaCukaiApi
             ];
 
             $barangTarifData = $BCBarangTarifModel->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
-                ->where('penerimaan_barang_detail_id', $b['penerimaan_barang_detail_id'])
+                ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
+                ->where('barang1_id', $b['barang1_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 

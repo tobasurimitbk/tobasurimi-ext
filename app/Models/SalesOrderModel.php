@@ -169,7 +169,7 @@ class SalesOrderModel extends Model
         $selectQry = "sales_order.*,
                       users.name as seller_name,
                       customers.name as customer_name ,
-                      customers.address,customers.phone,
+                      customers.address, customers.phone AS customerPhone,
                       customers.tipe_pelanggan as tipe_pelanggan,
                       CONCAT(employees.nip , ' - ', employees.name) AS salesName,
                       termin.value AS termin,

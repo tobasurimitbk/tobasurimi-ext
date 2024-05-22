@@ -13,6 +13,7 @@ use App\Models\SalesOrderDetailModel;
 use App\Models\CustomerModel;
 use App\Models\AllNoModel;
 use App\Models\SuratJalanModel;
+use App\Models\EmployeesModel;
 
 class SuratJalan extends BaseController
 {
@@ -26,6 +27,7 @@ class SuratJalan extends BaseController
     private $SalesOrderDetailModel;
     private $encrypter;
     private $SuratJalanModel;
+    private $EmployeesModel;
     private $AllNoModel;
 
     public function __construct()
@@ -41,6 +43,7 @@ class SuratJalan extends BaseController
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->AllNoModel = new AllNoModel();
         $this->SuratJalanModel = new SuratJalanModel();
+        $this->EmployeesModel = new EmployeesModel();
     }
 
     public function index()
@@ -103,6 +106,14 @@ class SuratJalan extends BaseController
         $dataAllSuratJalan = [];
         foreach ($dataSuratJalan['data'] as $data) {
             $dataNo = json_decode($data->multiple_no_so, true);
+
+            if ($data->sales_id != NULL) {
+
+                $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
+                $customerSales = $getEmployee['customerSales'];
+            } else {
+                $customerSales = "-";
+            }
             array_push($dataAllSuratJalan, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -111,7 +122,7 @@ class SuratJalan extends BaseController
                 "no_so"      => implode(', ', $dataNo),
                 "kode_pelanggan"        => $data->kode_pelanggan,
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "customerSales" => $data->customerSales,
+                "customerSales" => $customerSales,
                 "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date)),
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
@@ -269,8 +280,7 @@ class SuratJalan extends BaseController
     {
         $id = decrypt($id);
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
-        // var_dump($dataSuratJalan);
-        // exit;
+
 
         if (empty($dataSuratJalan)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);

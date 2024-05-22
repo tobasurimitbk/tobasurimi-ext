@@ -946,7 +946,7 @@
                                                         confirmButtonColor: '#4e73df',
                                                     })
                                                     .then(() => {
-                                                        location.reload();
+                                                        window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>"
                                                     })
                                             } else {
                                                 Swal.fire({
@@ -1059,7 +1059,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            location.reload();
+                                            window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>"
                                         })
                                 } else {
                                     Swal.fire({
@@ -1113,7 +1113,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        location.reload();
+                                        window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>"
                                     })
                             }
                         },

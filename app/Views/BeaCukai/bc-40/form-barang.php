@@ -21,65 +21,59 @@
                 <table width="100%" class="mb-3">
                     <tbody>
                         <tr style="color: black;">
-                            <td width="150px"><b>Nomor LPB</b></td>
+                            <td width="150px"><b>Nama Supplier</b></td>
                             <td width="10px">:</td>
-                            <td><?= $lpb->no_penerimaan_barang ?></td>
-                        </tr>
-                        <tr style="color: black; height: 20px;">
-                            <td colspan="3"></td>
-                        </tr>
-                        <tr style="color: black;">
-                            <td width="150px"><b>Tanggal Diterima</b></td>
-                            <td width="30px">:</td>
-                            <td><?= date('d/m/Y', strtotime($lpb->tanggal)) ?></td>
+                            <td><?= $bcPo['supplier_name'] ?></td>
                         </tr>
                     </tbody>
                 </table>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-lpb" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-lpb" id="dataTables" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center;width:10px;">No</th>
-                                <th style="text-align: center;">No PO</th>
+                                <th style="text-align: center; width:5px;">No</th>
                                 <th style="text-align: center;">Kode HS</th>
-                                <th style="text-align: center;">Kode Barang</th>
-                                <th style="text-align: center;">Nama Barang</th>
-                                <th style="text-align: center;">Jmlh Diterima (LPB)</th>
-                                <th style="text-align: center;">Total Harga (LPB)</th>
-                                <th style="text-align: center;">Jmlh Order (PO)</th>
-                                <th style="text-align: center;">Total Harga (PO)</th>
-                                <th style="text-align: center;">Status Dokumen</th>
+                                <th style="text-align: center;">Tgl PO</th>
+                                <th style="text-align: center;">Tgl LPB</th>
+                                <th style="text-align: center;">No LPB</th>
+                                <th style="text-align: center;">No PO</th>
+                                <th style="text-align: center;">Kode</th>
+                                <th style="text-align: center;">Barang</th>
+                                <th style="text-align: center;">Qty PO</th>
+                                <th style="text-align: center;">Qty Diterima</th>
+                                <th style="text-align: center;">Harga</th>
+                                <th style="text-align: center;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $no = 1;
-                            $jmlDiterimaLPB = 0;
-                            $totalHargaLPB = 0;
-                            $jmlOrderPO = 0;
-                            $totalHargaPO = 0;
+                            $qtyPoTotal = 0;
+                            $qtyLpbTotal = 0;
+                            $hargaTotal = 0;
                             $bcBarangModel = new App\Models\BCBarangModel();
                             ?>
                             <?php foreach ($lpbDetail as $l) : ?>
                                 <?php
-                                $jmlDiterimaLPB += $l['jml_masuk'];
-                                $totalHargaLPB += $l['sub_total'];
-                                $jmlOrderPO +=  $l['qty'];
-                                $totalHargaPO += $l['qty'] * ($l['harga'] + $l['harga_harian'] + $l['harga_bulanan']);
+                                $qtyPoTotal += $l['qty_po'];
+                                $qtyLpbTotal += $l['qty_lpb'];
+                                $hargaTotal += $l['harga'];
                                 ?>
-                                <?php $bcDokumenBarang =  $bcBarangModel->where('penerimaan_barang_id', $lpb->id)->where('penerimaan_barang_detail_id', $l['penerimaan_barang_detail_id'])->first(); ?>
-                                <tr style="cursor: pointer;" data-penerimaan_barang_id="<?= encrypt($lpb->id) ?>" data-penerimaan_barang_detail_id="<?= encrypt($l['penerimaan_barang_detail_id']) ?>">
+                                <?php $bcDokumenBarang =  $bcBarangModel->where('penerimaan_barang_id', $l['penerimaan_barang_id'])->where('barang1_id', $l['barang1_id'])->first(); ?>
+                                <tr style="cursor: pointer;" data-bc_purchase_order_id="<?= encrypt($bcPo['id']) ?>" data-penerimaan_barang_id="<?= encrypt($l['penerimaan_barang_id']) ?>" data-barang1_id="<?= encrypt($l['barang1_id']) ?>">
                                     <td style="text-align: center;"><?= $no++; ?></td>
-                                    <td style="text-align: center;"><?= $l['po_no'] ?></td>
                                     <td style="text-align: center;"><?= $bcDokumenBarang == null ? "-" : $bcDokumenBarang['pos_tarif'] ?></td>
+                                    <td style="text-align: center;"><?= $l['po_date'] ?></td>
+                                    <td style="text-align: center;"><?= $l['lpb_date'] ?></td>
+                                    <td style="text-align: center;"><?= $l['lpb_no'] ?></td>
+                                    <td style="text-align: center;"><?= $l['po_no'] ?></td>
                                     <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
-                                    <td style="text-align: center;"><?= $l['nama_barang_dok'] ?></td>
-                                    <td style="text-align: center;"><?= $l['jml_masuk'] ?></td>
-                                    <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['sub_total'])) ?></td>
-                                    <td style="text-align: center;"><?= $l['qty'] ?></td>
-                                    <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['qty'] * ($l['harga'] + $l['harga_harian'] + $l['harga_bulanan']))) ?></td>
-                                    <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['id']) ?>">
+                                    <td style="text-align: center;"><?= $l['barang_name'] ?></td>
+                                    <td style="text-align: center;"><?= number_format($l['qty_po'], 2) ?></td>
+                                    <td style="text-align: center;"><?= number_format($l['qty_lpb'], 2) ?></td>
+                                    <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['harga'])) ?></td>
+                                    <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['penerimaan_barang_id']) ?>">
                                         <?php if ($bcDokumenBarang == null) : ?>
                                             <span class="badge badge-danger">
                                                 BELUM DIISI
@@ -97,12 +91,14 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td style="text-align: center;"><b>Total</b></td>
-                                <td style="text-align: center;"><b><?= $jmlDiterimaLPB ?></b></td>
-                                <td style="text-align: center;"><b><?= str_replace('Rp', '', toRupiah($totalHargaLPB)) ?></b></td>
-                                <td style="text-align: center;"><b><?= $jmlOrderPO ?></b></td>
-                                <td style="text-align: center;"><b><?= str_replace('Rp', '', toRupiah($totalHargaPO)) ?></b></td>
-                                <td style="text-align: center;"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="text-align: right;">Total</td>
+                                <td style="text-align: center;"><?= $qtyPoTotal ?></td>
+                                <td style="text-align: center;"><?= $qtyLpbTotal ?></td>
+                                <td style="text-align: center;"><?= number_format($hargaTotal, 2) ?></td>
+                                <td></td>
                             </tr>
                         </tbody>
 
@@ -144,10 +140,11 @@
         if ($(this).hasClass('action')) {
             return;
         }
+        var bcPoId = $(this).data('bc_purchase_order_id');
         var penerimaanBarangId = $(this).data('penerimaan_barang_id');
-        var penerimaanBarangDetailId = $(this).data('penerimaan_barang_detail_id');
+        var barang1Id = $(this).data('barang1_id');
 
-        window.location.replace("<?= base_url('bea-cukai-bc-40/id/barang/') ?>" + penerimaanBarangId + '/' + penerimaanBarangDetailId);
+        window.location.replace("<?= base_url('bea-cukai-bc-40/id/barang/') ?>" + bcPoId + '/' + penerimaanBarangId + '/' + barang1Id);
     });
 </script>
 

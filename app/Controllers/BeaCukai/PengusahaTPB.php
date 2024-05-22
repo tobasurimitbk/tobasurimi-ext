@@ -28,9 +28,9 @@ class PengusahaTPB extends BaseController
     {
         $rules = [
             "npwp" => [
-                'rules' => 'numeric|min_length[15]',
+                'rules' => 'numeric|min_length[12]',
                 'errors' => [
-                    'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
+                    'min_length' => 'Nomor NPWP harus diisi minimal 12 digit'
                 ]
             ],
         ];
@@ -75,9 +75,9 @@ class PengusahaTPB extends BaseController
     {
         $rules = [
             "npwp" => [
-                'rules' => 'numeric|min_length[15]',
+                'rules' => 'numeric|min_length[12]',
                 'errors' => [
-                    'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
+                    'min_length' => 'Nomor NPWP harus diisi minimal 12 digit'
                 ]
             ],
         ];
