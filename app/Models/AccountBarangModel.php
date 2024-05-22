@@ -18,6 +18,7 @@ class AccountBarangModel extends Model
         'barang_master_id',
         'ap_id',
         'ar_id',
+        'kategori_id',
         'divisi_id',
         'deleted_at',
     ];

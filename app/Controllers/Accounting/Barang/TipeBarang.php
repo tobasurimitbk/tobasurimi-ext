@@ -45,6 +45,7 @@ class TipeBarang extends BaseController
         $data = [
             'type' => $type,
             'kategoriBP' => $metaDataModel->where('name', 'Kelompok BP')->findAll(),
+            'kategoriBarangAkun' => $metaDataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
             "subAkuns" => $subAkunsModel,
             "divisi" => $divisi
         ];
@@ -63,14 +64,16 @@ class TipeBarang extends BaseController
                 'barang_master_id' => $barangMasterId,
                 'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
-                'ar_id' => $this->request->getVar('akun_ar_id')
+                'ar_id' => $this->request->getVar('akun_ar_id'),
+                'kategori_id' => $this->request->getVar('kategori'),
             ]);
         } else {
             $this->accountBarangModel->insert([
                 'barang_master_id' => $barangMasterId,
                 'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
-                'ar_id' => $this->request->getVar('akun_ar_id')
+                'ar_id' => $this->request->getVar('akun_ar_id'),
+                'kategori_id' => $this->request->getVar('kategori'),
             ]);
         }
 
@@ -85,7 +88,7 @@ class TipeBarang extends BaseController
         $id = $this->request->getVar('id');
         $divisiId = $this->request->getVar('divisi_id');
         $dataAccountBarang = $this->barangMasterModel
-            ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id')
+            ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.kategori_id')
             ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->where('barang_master.id', $id)
             ->where('divisi_id', $divisiId)

@@ -105,7 +105,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select akun_ap_id" name="akun_ap_id" id="akun_ap_id">
                                     <option value=""></option>
@@ -122,7 +122,7 @@
                                 <label for="floatingInput">Akun Pembelian</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select akun_ar_id" name="akun_ar_id" id="akun_ar_id">
                                     <option value="" data-code=""></option>
@@ -137,6 +137,23 @@
                                     ?>
                                 </select>
                                 <label for="floatingInput">Akun Penjualan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kategori" name="kategori" id="kategori">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($kategoriBarangAkun)) {
+                                        foreach ($kategoriBarangAkun as $kategoriBarang) {
+                                    ?>
+                                            <option value="<?= $kategoriBarang->id; ?>"><?= $kategoriBarang->description; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Kategori Barang</label>
                             </div>
                         </div>
                     </div>
@@ -241,7 +258,6 @@
         });
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            console.log(data);
             let csrf = $(`[name="${csrfToken}"]`);
             let id = data.id;
             let divisi_id = data.divisi_id;
@@ -271,9 +287,11 @@
                         if (res.data != null) {
                             $("#akun_ap_id").val(res.data.ap_id).change();
                             $("#akun_ar_id").val(res.data.ar_id).change();
+                            $("#kategori").val(res.data.kategori_id).change();
                         } else {
                             $("#akun_ap_id").val(null).change();
                             $("#akun_ar_id").val(null).change();
+                            $("#kategori").val(null).change();
                         }
                         $("#parentName").val(parentName);
                         $('#divisi_id').val(divisi_id)
@@ -303,6 +321,9 @@
                 akun_ar_id: {
                     required: true
                 },
+                kategori: {
+                    required: true
+                },
             },
             messages: {
                 parentName: {
@@ -313,6 +334,9 @@
                 },
                 akun_ar_id: {
                     required: "Akun Penjualan Wajib Diisi"
+                },
+                kategori: {
+                    required: "Kategori Barang Wajib Diisi"
                 },
             },
             errorElement: 'span',
@@ -453,14 +477,14 @@
         .css('z-index', '1');
 
     //CSS SELECT2 FLOATING LABEL
-    $('.akun_ar_id')
+    $('.akun_ar_id, .akun_ap_id, .kategori')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.akun_ar_id')
+    $('.akun_ar_id, .akun_ap_id, .kategori')
         .parent('div')
         .children('span')
         .children('span')
@@ -468,34 +492,20 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.akun_ar_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-    $('.akun_ap_id')
+    $('.akun_ar_id, .akun_ap_id, .kategori')
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
     // Akun AR
     $('.akun_ar_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    })
+
+    // Akun AR
+    $('.kategori').select2({
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
