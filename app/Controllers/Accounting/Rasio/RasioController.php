@@ -52,6 +52,7 @@ class RasioController extends BaseController
     protected $settingCosting;
     protected $materialRequestsPenolongModel;
     protected $materialRequestPenolongDetailsModel;
+    protected $metadataModel;
 
     public function __construct()
     {
@@ -78,6 +79,7 @@ class RasioController extends BaseController
         $this->settingCosting = new SettingCostingModel();
         $this->materialRequestsPenolongModel = new MaterialRequestsPenolongModel();
         $this->materialRequestPenolongDetailsModel = new MaterialRequestPenolongDetailsModel();
+        $this->metadataModel = new MetadataModel();
     }
 
     public function index()
@@ -95,6 +97,7 @@ class RasioController extends BaseController
         $subAkunsModel = $this->subAkunModel->asObject()->findAll();
         $data = [
             'dataDivisi' => $this->divisisModel->getDivisiAccess(),
+            'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
             "subAkuns" => $subAkunsModel
         ];
         return view('Accounting/rasio/form', $data);
@@ -398,6 +401,7 @@ class RasioController extends BaseController
             $conditionProduction = [
                 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
                 'divisi_id' => $this->request->getVar('department'),
+                'kategori_id' => $this->request->getVar('kategori'),
             ];
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultWithDetail($conditionProduction);
             $totalQtyAll = 0;

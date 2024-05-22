@@ -28,7 +28,7 @@
             </ul>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <div class="row mt-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -41,7 +41,7 @@
                             <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -52,6 +52,23 @@
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select kategori" name="kategori" id="kategori">
+                                <option value="" data-code=""></option>
+                                <?php
+                                if (!empty($kategoriBarangAkun)) {
+                                    foreach ($kategoriBarangAkun as $kategoriBarang) {
+                                ?>
+                                        <option value="<?= $kategoriBarang->id; ?>"><?= $kategoriBarang->description; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kategori Barang</label>
                         </div>
                     </div>
                 </div>
@@ -500,6 +517,33 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
+    $('#kategori').select2({
+        placeholder: "Pilih Kategori Barang",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        list_items_barang_jadi = [];
+        list_items_barang_jadi_material_2 = [];
+        list_items_barang_digunakan = [];
+        list_items_barang_digunakan_material_2 = [];
+        list_items_labor_cost = [];
+        list_items_title_cost = [];
+        list_items_overhead_cost = [];
+        list_items_fixed_cost = [];
+
+        getDataRawMaterialI();
+        getDataRawMaterialII();
+        getDataCost();
+    });
+
+    $("#kategori")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
     // Akun AR
     $('#akun_coa_subsidi, #akun_coa_biaya, #akun_coa_kopek').select2({
         placeholder: "Pilih Akun COA",
@@ -624,7 +668,8 @@
     const getDataRawMaterialI = function() {
         var department_id = $('#divisi_id').val();
         var bulan = $('#tanggal').val();
-        if (department_id && bulan) {
+        var kategori = $('#kategori').val();
+        if (department_id && bulan && kategori) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-barang-digunakan'); ?>`,
@@ -632,6 +677,7 @@
                 data: {
                     department: department_id,
                     bulan: bulan,
+                    kategori: kategori,
                 },
                 dataType: "json",
                 success: function(res) {
@@ -647,11 +693,8 @@
                         drawTableDigunakan();
                     } else {
                         stopLoading()
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Produksi Tidak Ada',
-                            confirmButtonColor: '#4e73df',
-                        })
+                        list_items_barang_digunakan = [];
+                        drawTableDigunakan();
                     }
                 },
             });
@@ -661,6 +704,7 @@
                 data: {
                     department: department_id,
                     bulan: bulan,
+                    kategori: kategori,
                 },
                 dataType: "json",
                 success: function(res) {
@@ -673,6 +717,10 @@
                         res.data.forEach(function(item) {
                             list_items_barang_jadi.push(item);
                         });
+                        drawTableRasio();
+                    } else {
+                        stopLoading()
+                        list_items_barang_jadi = [];
                         drawTableRasio();
                     }
                 },
@@ -703,6 +751,10 @@
                             list_items_barang_digunakan_material_2.push(item);
                         });
                         drawTableDigunakanMaterialII();
+                    } else {
+                        stopLoading()
+                        list_items_barang_digunakan_material_2 = [];
+                        drawTableDigunakanMaterialII();
                     }
                 },
             });
@@ -723,6 +775,13 @@
                             list_items_barang_jadi_material_2.push(item);
                             list_items_title_cost.push(item);
                         });
+                        drawTableRasioMaterialII();
+                        drawTableLaborCost();
+                        drawTableOverheadCost();
+                        drawTableFixedOverheadCost();
+                    } else {
+                        stopLoading()
+                        list_items_barang_jadi_material_2 = [];
                         drawTableRasioMaterialII();
                         drawTableLaborCost();
                         drawTableOverheadCost();
@@ -761,6 +820,12 @@
                                 list_items_fixed_cost.push(item);
                             }
                         });
+                        drawTableLaborCost();
+                        drawTableOverheadCost();
+                        drawTableFixedOverheadCost();
+                    } else {
+                        stopLoading();
+                        list_items_labor_cost = [];
                         drawTableLaborCost();
                         drawTableOverheadCost();
                         drawTableFixedOverheadCost();
