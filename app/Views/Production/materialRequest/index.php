@@ -137,9 +137,6 @@
                                         <button class="btn btn-warning">
                                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger" onclick="posting('${id}', 0)">
-                                            <i class="fa fa-ban" aria-hidden="true"></i>
-                                        </button>
                                     </div>
                                 `
                         } else {

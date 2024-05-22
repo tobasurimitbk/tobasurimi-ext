@@ -67,7 +67,7 @@ class ProductionResultModel extends Model
                       DATE_FORMAT(production_results.receive_date, '%d/%m/%Y') AS receives_date,
                       work_orders.wo_no AS wo_no,
                       barang_master.kode_barang AS barangCode,
-                      GROUP_CONCAT(work_order_details.nama_barang SEPARATOR ', ') AS barangName
+                      work_order_details.nama_barang AS barangName
                       ";
         $productionResDataQry = $this->asObject()
             ->select($selectQry)
@@ -75,7 +75,7 @@ class ProductionResultModel extends Model
             ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
             ->join('work_order_details', 'work_order_details.work_order_id = production_results.work_order_id', 'left')
             ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
-            ->groupBy('production_results.work_order_id')
+            // ->groupBy('production_results.work_order_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $productionResDataQry->countAllResults(false);
