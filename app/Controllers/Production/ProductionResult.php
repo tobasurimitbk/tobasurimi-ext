@@ -334,6 +334,7 @@ class ProductionResult extends BaseController
     {
         try {
             $datas = [
+                "company_id" => $this->this_company_id,
                 "pr_no" => $this->request->getVar("res_no") == "AUTO GENERATE" ? $this->generatePRNo() : $this->request->getVar("res_no"),
                 "material_request_id" => json_encode($this->request->getPost("kode_request")),
                 "work_order_id" => $this->request->getVar("kode_produksi"),
@@ -562,7 +563,7 @@ class ProductionResult extends BaseController
             if (!empty($id)) {
                 $this->productionResultModel->update($id, $payload);
                 $resultData = $this->productionResultModel->find($id);
-                $resultDetailData = $this->productionResultDetailModel->where('material_request_id', $id)->findAll();
+                $resultDetailData = $this->productionResultDetailModel->where('production_result_id', $id)->findAll();
 
                 foreach ($resultDetailData as $key => $value) {
                     if ($value['type'] == 'JADI') {
@@ -626,13 +627,13 @@ class ProductionResult extends BaseController
                         // DETAIL
                         $stokDetailIn = $this->stockDetailModel->insertStokDetail(
                             $stokIn,
-                            $value['qty_isi'],
+                            $value['qty'],
                             "In",
                             date('Y-m-d'),
                             $this->this_user_id,
                             "PRODUKSI",
                             $resultData['pr_no'],
-                            $value['note'] ? $value['note'] : "-"
+                            "-"
                         );
 
                         // SUB DETAIL
@@ -640,7 +641,7 @@ class ProductionResult extends BaseController
                             $value['bc_id'],
                             $stokIn,
                             $stokDetailIn,
-                            $value['qty_isi'],
+                            $value['qty'],
                             $value['no_aju'],
                             $resultData['pr_no'],
                             $value['stock_dokumen'],
@@ -666,7 +667,7 @@ class ProductionResult extends BaseController
                             $this->this_user_id,
                             "PRODUKSI",
                             $resultData['pr_no'],
-                            $value['note'] ? $value['note'] : "-"
+                            "-"
                         );
 
                         // SUB DETAIL
