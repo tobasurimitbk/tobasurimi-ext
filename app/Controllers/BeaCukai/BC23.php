@@ -32,6 +32,7 @@ use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\SupplierHargaModel;
 use App\Models\SupplierModel;
+use Dompdf\Dompdf;
 use Exception;
 
 // META DATA -> jenis_dok_aju
@@ -75,6 +76,8 @@ class BC23 extends BaseController
     protected $amPurchaseOrderModel;
     protected $rmImportPoModel;
     protected $akunCeisa;
+    protected $dompdf;
+    protected $bc40Controller;
 
     public function __construct()
     {
@@ -106,6 +109,8 @@ class BC23 extends BaseController
         $this->stockDetail2Model = new StockDetail2Model();
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->rmImportPoModel = new RMImportPOModel();
+        $this->dompdf = new Dompdf();
+        $this->bc40Controller = new BC40();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -1594,15 +1599,15 @@ class BC23 extends BaseController
         $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
 
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
-        // $status = $this->insertInventori($bcPurchaseOrderID);
+        $status = $this->insertInventori($bcPurchaseOrderID);
 
-        // if (!$status) {
-        //     return response()->setJSON([
-        //         'token' => csrf_hash(),
-        //         'status' => true,
-        //         'message' => "Terjadi kesalahan saat menambah stok inventori"
-        //     ]);
-        // }
+        if (!$status) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => "Terjadi kesalahan saat menambah stok inventori"
+            ]);
+        }
 
         $bc23Data = $this->bc23Model->get($bcPurchaseOrderID);
 
@@ -1752,6 +1757,28 @@ class BC23 extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function exportPdf()
+    {
+        $supplierId = $this->request->getVar('supplier_id');
+        $poType = $this->request->getVar('po_type');
+
+        $result = $this->bc40Controller->getListDataPurchaseOrderExport($poType, $supplierId);
+
+        $data = [
+            'result' => $result,
+            'supplier' => $this->supplierModel->find($supplierId)
+        ];
+
+        if ($data['supplier'] == null) {
+            return redirect()->to('bea-cukai-bc-40');
+        }
+
+        $this->dompdf->loadHtml(view('BeaCukai/laporan/export-pdf', $data));
+        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->render();
+        $this->dompdf->stream("BC 2.3 Purchase Order", array("Attachment" => false));
     }
 
     private function insertInventori($bcPurchaseOrderID)

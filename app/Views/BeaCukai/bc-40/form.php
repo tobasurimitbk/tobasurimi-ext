@@ -8,12 +8,15 @@
                 Kembali
             </a>
         </div>
-        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 10px;">
-            Export
-        </button>
-        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button onclick="print()" class="dropdown-item print-pdf">PDF</button></li>
-        </ul>
+        <?php if (can('Bea Cukai', 'BC 4.0', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 10px;">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button onclick="printPdf()" class="dropdown-item print-pdf">PDF</button></li>
+                <li><button onclick="printExcel()" class="dropdown-item print-pdf">EXCEL</button></li>
+            </ul>
+        <?php endif ?>
     </div>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
@@ -70,9 +73,11 @@
             </div>
         </div>
         <div class="card-footer">
-            <a href="#" type="button" class="btn btn-primary btn-lg btn-block btn-submit-parent">
-                PROSES BUAT DOKUMEN BC 4.0
-            </a>
+            <?php if (can('Bea Cukai', 'BC 4.0', 'c')) : ?>
+                <a href="#" type="button" class="btn btn-primary btn-lg btn-block btn-submit-parent">
+                    PROSES BUAT DOKUMEN BC 4.0
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -333,12 +338,35 @@
         });
     }
 
-    function print() {
+    function printPdf() {
         var supplierId = $(".supplier_id option:selected").val();
         var poType = $(".po_type option:selected").val();
 
         if (supplierId && poType) {
-            window.open("<?= base_url('bea-cukai-bc-40/print-po') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+            window.open("<?= base_url('bea-cukai-bc-40/export-pdf') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih Tipe Purchase Order dan Supplier Dahulu",
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+        }
+    }
+
+    function printExcel() {
+        var supplierId = $(".supplier_id option:selected").val();
+        var poType = $(".po_type option:selected").val();
+
+        if (supplierId && poType) {
+            window.open("<?= base_url('bea-cukai-bc-40/export-excel') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih Tipe Purchase Order dan Supplier Dahulu",
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
         }
     }
 </script>

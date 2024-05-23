@@ -1,5 +1,5 @@
 <div class="section-header">
-    <h1 class="title-name">Dokumen BC 4.0</h1>
+    <h1 class="title-name">Dokumen BC 4.0 Untuk Ceisa</h1>
     <?php if (request()->uri->getSegment(5) == null) : ?>
         <?php
         $isFinished = session()->getFlashdata('isCompleteFormHeader') && session()->getFlashdata('isCompleteFormEntitas') && session()->getFlashdata('isCompleteFormDokumen') && session()->getFlashdata('isCompleteFormPengangkut') && session()->getFlashdata('isCompleteFormPetiKemas') && session()->getFlashdata('isCompleteFormTransaksi') && session()->getFlashdata('isCompleteFormBarang') && session()->getFlashdata('isCompleteFormPernyataan');
@@ -7,21 +7,14 @@
         $bc40 = $bc40Model->get(decrypt(request()->uri->getSegment(4)));
         ?>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-40"); ?>">
-                Batal
+            <a class="btn btn-info btn-print float-right text-white" href="<?= base_url('bea-cukai-bc-40/po/' . encrypt($bcPo['id'])) ?>">
+                Data LPB
             </a>
             <?php if ($bc40 != null) : ?>
-                <button <?= $bc40['status_dokumen'] == 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
-                    Hapus
-                </button>
-                <button onclick="alert('Hello')" <?= $bc40['status_dokumen'] != 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-warning btn-print float-right text-white root-form-view">
-                    Print
-                </button>
                 <button <?= $bc40['status_dokumen'] == 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view" <?= ($isFinished == true) ? '' : 'disabled' ?> onclick="submitDokumen()">
                     Kirim ke Ceisa 4.0
                 </button>
             <?php endif; ?>
-
         </div>
     <?php endif; ?>
 </div>
@@ -48,53 +41,6 @@
                         stopLoading();
                     },
                     success: function(res) {
-                        if (res.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: res.message,
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.replace("<?= base_url('bea-cukai-bc-40') ?>")
-                            });
-                        }
-                    }
-                })
-            }
-        })
-    }
-
-    function deleteAction() {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Dokumen BC 4.0 ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var formData = new FormData();
-                formData.append("bc_purchase_order_id", "<?= request()->uri->getSegment(4) ?>");
-                $.ajax({
-                    url: `<?= base_url("bea-cukai-bc-40/id/delete"); ?>`,
-                    method: "POST",
-                    data: formData,
-                    beforeSend: function(xhr) {
-                        setLoading();
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    processData: false,
-                    contentType: false,
-                    success: function(res) {
-                        csrf.val(res.token);
                         if (res.status) {
                             Swal.fire({
                                 icon: 'success',

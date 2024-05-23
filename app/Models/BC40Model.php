@@ -60,6 +60,7 @@ class BC40Model extends Model
             bc_purchase_order.id AS bc_purchase_order_id,
             bc_purchase_order.multiple_lpb_no,
             bc_purchase_order.po_type,
+            bc_purchase_order.status_posting,
             suppliers.name AS supplier_name";
 
         $bcDataQry = $this->asObject()
