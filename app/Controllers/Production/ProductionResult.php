@@ -124,6 +124,8 @@ class ProductionResult extends BaseController
             ->select("*, DATE_FORMAT(receive_date, '%d/%m/%Y') AS receive_date")
             ->find($id);
 
+        $idMaterialRequest = json_decode($productionResData->material_request_id);
+
         $productionResDetSelectBJ = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
         $productionResDetDataBJ = $this->productionResultDetailModel->asObject()
             ->select($productionResDetSelectBJ)

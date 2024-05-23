@@ -248,7 +248,7 @@
                     <div class="col-subtitle-modal">
                         <div class="row mt-3">
                             <div class="col-md-6">
-                                <label class="form-label font-weight-bold modal-sub-title">Rasio Barang Jadi</label>
+                                <label class="form-label font-weight-bold modal-sub-title">Barang Jadi Awal</label>
                             </div>
                         </div>
                     </div>
@@ -263,13 +263,55 @@
                                             <th style="text-align: center;">Nama Barang</th>
                                             <th style="text-align: center;">Satuan</th>
                                             <th style="text-align: center;">Jumlah Barang</th>
-                                            <th style="text-align: center;">Rasio</th>
+                                            <th style="text-align: center;">Harga Satuan</th>
                                             <th style="text-align: center;">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody class="body-table-rasio">
                                     </tbody>
                                     <tfoot style="background: #ffffff !important;" class="tfoot-rasio" id="tfoot-rasio">
+                                        <tr>
+                                            <td colspan="7" style="text-align: center;">
+                                                Tidak Ada Barang
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn" type="button">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-subtitle-modal">
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold modal-sub-title">Rasio Barang Jadi</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableRasioAkhir" width="100%" border="1" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th style="text-align: center;">No</th>
+                                            <th style="text-align: center;">Kode Barang</th>
+                                            <th style="text-align: center;">Nama Barang</th>
+                                            <th style="text-align: center;">Satuan</th>
+                                            <th style="text-align: center;">Jumlah Barang</th>
+                                            <th style="text-align: center;">Rasio</th>
+                                            <th style="text-align: center;">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body-table-rasio-akhir">
+                                    </tbody>
+                                    <tfoot style="background: #ffffff !important;" class="tfoot-rasio-akhir" id="tfoot-rasio-akhir">
                                         <tr>
                                             <td colspan="7" style="text-align: center;">
                                                 Tidak Ada Barang
@@ -710,18 +752,21 @@
                 success: function(res) {
                     stopLoading()
                     if (res.status) {
-                        console.log(res);
                         list_items_barang_jadi = [];
                         let no = 0;
                         // Iterate over each item in the response data
                         res.data.forEach(function(item) {
                             list_items_barang_jadi.push(item);
                         });
+                        console.log(list_items_barang_jadi);
                         drawTableRasio();
                     } else {
                         stopLoading()
                         list_items_barang_jadi = [];
+                        list_items_barang_digunakan = [];
+
                         drawTableRasio();
+                        drawTableDigunakan();
                     }
                 },
             });
@@ -731,7 +776,8 @@
     const getDataRawMaterialII = function() {
         var department_id = $('#divisi_id').val();
         var bulan = $('#tanggal').val();
-        if (department_id && bulan) {
+        var kategori = $('#kategori').val();
+        if (department_id && bulan && kategori) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-barang-digunakan-penolong'); ?>`,
@@ -782,7 +828,13 @@
                     } else {
                         stopLoading()
                         list_items_barang_jadi_material_2 = [];
-                        drawTableRasioMaterialII();
+                        list_items_barang_digunakan_material_2 = [];
+                        list_items_labor_cost = [];
+                        list_items_title_cost = [];
+                        list_items_overhead_cost = [];
+                        list_items_fixed_cost = [];
+
+                        drawTableDigunakanMaterialII();
                         drawTableLaborCost();
                         drawTableOverheadCost();
                         drawTableFixedOverheadCost();
@@ -795,7 +847,8 @@
     const getDataCost = function() {
         var department_id = $('#divisi_id').val();
         var bulan = $('#tanggal').val();
-        if (department_id && bulan) {
+        var kategori = $('#kategori').val();
+        if (department_id && bulan && kategori) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-cost'); ?>`,
@@ -1307,9 +1360,98 @@
         }
     }
 
+    $('#select-item-btn').click(function() {
+        console.log(list_items_barang_jadi);
+    });
+
     const drawTableRasio = function() {
         $('.body-table-rasio').empty();
         $('.tfoot-rasio').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+
+        if (list_items_barang_jadi.length === 0) {
+            row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.tfoot-rasio').append(row);
+        } else {
+            var total_qty = 0;
+            var total_harga_satuan = 0;
+            var total_harga_total = 0;
+            list_items_barang_jadi.map((item, index) => {
+                var qty = parseFloat(item.qtyTotal);
+                var harga_satuan = 0;
+                var harga_total = 0;
+
+                total_qty += qty;
+                total_harga_satuan += harga_satuan;
+                total_harga_total += harga_total;
+
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                row += '<td>' + item.kode_satuan + '</td>';
+                row += '<td>' +
+                    '<input class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '</td>';
+                row += '<td>' +
+                    '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '</td>';
+                row += '<td>' +
+                    '<input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '</td>';
+                row += '</tr>';
+                no++;
+            });
+            rowFooter += '<tr>';
+            rowFooter += '<td colspan="4"></td>';
+            rowFooter += '<td>' +
+                '<input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + total_qty + '">' +
+                '</td>';
+            rowFooter += '<td>' +
+                '<input class="form-control harga-satuan-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(total_harga_satuan) + '">' +
+                '</td>';
+            rowFooter += '<td>' +
+                '<input class="form-control harga-total-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(total_harga_total) + '">' +
+                '</td>';
+            rowFooter += '</tr>';
+            $('.tfoot-rasio').append(rowFooter);
+            $('.body-table-rasio').append(row);
+
+            // Update total harga jika ada perubahan pada input dengan kelas harga
+            $('.harga-satuan').on('input', function() {
+                var totalHarga = 0;
+                var totalHargaQty = 0;
+                var totalTotalHargaQty = 0;
+                $('.harga-satuan').each(function() {
+                    var harga = ($(this).val().replace(/Rp|\./g, ""));
+                    var index = $(this).data('index');
+                    var qty = ($('.jumlah-barang[data-index="' + index + '"]').val());
+
+                    totalHarga += isNaN(harga) ? 0 : harga;
+                    totalHargaQty = harga * (isNaN(qty) ? 0 : qty);
+                    totalTotalHargaQty += totalHargaQty;
+
+                    // Update the array with the new harga_satuan value
+                    if (!isNaN(harga)) {
+                        list_items_barang_jadi[index].harga_satuan = harga;
+                        list_items_barang_jadi[index].harga_total = totalHargaQty;
+                    }
+
+                    $('.harga-total[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
+                    $(this).val(harga);
+                });
+
+                $('.harga-satuan-total').val(formatRupiah(parseFloat(totalHarga)));
+                $('.harga-total-total').val(formatRupiah(parseFloat(totalTotalHargaQty)));
+            });
+        }
+    }
+
+    const drawTableRasioAkhir = function() {
+        $('.body-table-rasio-akhir').empty();
+        $('.tfoot-rasio-akhir').empty();
         var row = '';
         var rowFooter = '';
         var no = 1;
@@ -1320,7 +1462,7 @@
         var hargaTotalPenerimaan = parseFloat(amount.replace(/Rp|\./g, "")) + parseFloat(biayaSubsidi.replace(/Rp|\./g, "")) + parseFloat(biayaLain.replace(/Rp|\./g, "")) + parseFloat(biayaKopek.replace(/Rp|\./g, ""));
         if (list_items_barang_jadi.length === 0) {
             row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
-            $('.tfoot-rasio').append(row);
+            $('.tfoot-rasio-akhir').append(row);
         } else {
             var rasio = 0;
             var rasioTotal = 0;
@@ -1362,8 +1504,8 @@
                 '<input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(totalTotalHargaRasio) + '">' +
                 '</td>';
             rowFooter += '</tr>';
-            $('.tfoot-rasio').append(rowFooter);
-            $('.body-table-rasio').append(row);
+            $('.tfoot-rasio-akhir').append(rowFooter);
+            $('.body-table-rasio-akhir').append(row);
 
             // Update total harga jika ada perubahan pada input dengan kelas harga
             $('.harga').on('input', function() {
