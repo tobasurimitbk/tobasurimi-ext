@@ -4,12 +4,13 @@ namespace App\Helpers;
 
 use App\Models\BCBarangDokumenModel;
 use App\Models\BCBarangTarifModel;
+use App\Models\CeisaSettingModel;
 use App\Models\MetadataModel;
 use Exception;
 
 class BeaCukaiApi
 {
-
+    protected $npwpPerusahaan;
     protected $baseUrl, $baseUrlDev, $username, $password;
     protected $metaDataModel;
 
@@ -18,6 +19,7 @@ class BeaCukaiApi
         $this->metaDataModel = new MetadataModel();
         $this->baseUrl = $this->metaDataModel->where('name', "Base Url BC")->first()['value'];
         $this->baseUrlDev = $this->metaDataModel->where('name', "Base Url BC")->first()['description'];
+        $this->npwpPerusahaan =  $this->metaDataModel->where('name', "NPWP Importir Default BC")->first()['value'];
         $this->username = $username;
         $this->password = $password;
     }
@@ -220,6 +222,48 @@ class BeaCukaiApi
                 'message' => $response,
                 'status' => false
             ];
+        }
+    }
+
+    public function getListStatusResponseAll()
+    {
+        $token = $this->getTokenApi();
+
+        if ($token['status'] === false) {
+            return [
+                'status' => false,
+                'message' => $token['message']
+            ];
+        }
+
+        $endPoint = $this->baseUrl . "/openapi/status?idPerusahaan=" . $this->npwpPerusahaan;
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token['token'],
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endPoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            return [
+                'message' => curl_error($ch) . ". Code " . $httpCode,
+                'status' => false
+            ];
+        } else {
+            $responseData = json_decode($response);
+
+            if ($httpCode == 200) {
+                return $responseData;
+            } else {
+                return [
+                    'message' => "Server Ceisa Error : " . $httpCode,
+                    'status' => false
+                ];
+            }
         }
     }
 
