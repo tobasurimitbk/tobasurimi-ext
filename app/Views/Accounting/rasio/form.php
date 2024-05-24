@@ -1483,7 +1483,7 @@
                 const totalQtyAll = parseFloat(item.totalQtyAll);
                 const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
                 const calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio.toFixed(2) / 100);
-                const itemHargaTotal = item.hargaTotal ? parseFloat(item.hargaTotal) : parseFloat(calculatedHargaTotal);
+                const itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
 
                 console.log(parseFloat(hargaTotalPenerimaan));
                 console.log(parseFloat(totalHargaTotalManual));
