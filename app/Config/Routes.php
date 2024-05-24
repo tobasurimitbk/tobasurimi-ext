@@ -1102,6 +1102,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
 $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->get('', 'BeaCukai\BC40::index');
     $routes->get('online', 'BeaCukai\BC40::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
     $routes->get('all', 'BeaCukai\BC40::all');
     $routes->get('all-online', 'BeaCukai\BC40::allOnline');
     $routes->get('create', 'BeaCukai\BC40::createPurchaseOrderView');
