@@ -1491,18 +1491,18 @@
                 const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
                 const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
 
-                if (item.harga_total == 0) {
-                    calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasioTanpaManual.toFixed(2) / 100);
-                    itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                if (isNaN(totalHargaTotalManual)) {
+                    calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan)) * (rasio / 100);
+                    itemHargaTotal = item.hargaTotal ? parseFloat(item.hargaTotal) : parseFloat(calculatedHargaTotal);
                 } else {
-                    calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio.toFixed(2) / 100);
-                    itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                    if (item.harga_total == 0) {
+                        calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasioTanpaManual / 100);
+                        itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                    } else {
+                        calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio / 100);
+                        itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                    }
                 }
-
-                console.log(rasio);
-                console.log(rasioTanpaManual);
-                console.log(totalQtyTanpaManual);
-                console.log(totalQtyAll);
 
                 rasioTotal += rasio;
                 totalTotalHargaRasio += itemHargaTotal;
@@ -1520,7 +1520,7 @@
                         <input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
                     </td>
                     <td>
-                        <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
+                        <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
                     </td>
                 </tr>`;
                 no++;
@@ -1544,11 +1544,13 @@
             $('.body-table-rasio-akhir').append(row);
 
             // Update total harga if any input with class 'harga' changes
-            $('.harga').on('input', function() {
+            $('.harga').on('change', function() {
                 let totalHarga = 0;
                 $('.harga').each(function() {
-                    const harga = parseFloat($(this).val());
+                    const harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    var index = $(this).data('index');
                     totalHarga += isNaN(harga) ? 0 : harga;
+                    $(this).val(formatRupiah(harga));
                 });
                 $('.harga-total').val(formatRupiah(totalHarga));
             });
