@@ -189,7 +189,7 @@
                         contentType: false,
                         success: function(response) {
                             if (response.status) {
-                                window.location.replace("<?= base_url('bea-cukai-bc-40/id/barang/') ?>" + response.id)
+                                window.location.replace("<?= base_url('bea-cukai-bc-40/po/') ?>" + response.id)
                             } else {
                                 Swal.fire({
                                     icon: 'error',

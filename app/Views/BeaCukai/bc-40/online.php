@@ -184,16 +184,16 @@
                 }
             });
         }
-
-        function pdf(url) {
-            e.preventDefault();
-            var file = $(this).data('file');
-            PDFObject.embed("<?= base_url($baseUrl . '/') ?>" + url, "#mypdfs", {
-                height: "700px"
-            });
-            $('#prevModals').modal('show');
-        }
     })
+
+    function pdf(url) {
+        e.preventDefault();
+        var file = $(this).data('file');
+        PDFObject.embed("<?= base_url($baseUrl . '/') ?>" + url, "#mypdfs", {
+            height: "700px"
+        });
+        $('#prevModals').modal('show');
+    }
 </script>
 
 <?= $this->endSection(); ?>
