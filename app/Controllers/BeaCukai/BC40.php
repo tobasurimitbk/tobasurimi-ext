@@ -124,7 +124,11 @@ class BC40 extends BaseController
 
     public function online()
     {
-        return view('BeaCukai/bc-40/online');
+        $data = [
+            'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
+        ];
+
+        return view('BeaCukai/bc-40/online', $data);
     }
 
     public function allOnline()
