@@ -173,6 +173,24 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
+                                    <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                                        <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
+                                    <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select type_barang" id="type_barang" name="type_barang" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($tipeBarang as $t) : ?>
@@ -359,6 +377,24 @@
         }
     });
 
+    $('#type_pengambilan_stock').select2({
+        placeholder: "Pilih Tipe Ambil Stok",
+        theme: "bootstrap-5",
+    }).change(function() {
+        // FIFO
+        if ($(this).val() == "FIFO") {
+            $('.qty_mutasi_fifo').removeAttr('readonly');
+        } else {
+            $('.qty_mutasi_fifo').attr('readonly', 'readonly');
+        }
+        $('#select_tipe_bahan').val(null).change();
+        $("#select_tipe_bahan").prop('disabled', false);
+        $('#select_nama_barang').val(null).change();
+        $("#select_nama_barang").prop('disabled', false);
+        listStockAsal = [];
+        drawTableAsalBarang();
+    });
+
     <?php if (!empty($stuffingLokal)) : ?>
         // GET LIST BARANG 
         $.ajax({
@@ -541,87 +577,13 @@
     });
 
 
-    $('#select-item-btn').click(function() {
-        var checkedCheckboxes = $(".child:checked");
-        var dataIds = checkedCheckboxes.map(function() {
-            return $(this).data("id");
-        }).get();
-        var id_selected = getIDListDataSelected();
-        var barangIn = $('#spesifikasi_in_id option:selected');
 
-        var checkedCheckboxesorder = $(".childOrder:checked");
-        var dataIdBarangOrder = checkedCheckboxesorder.map(function() {
-            return $(this).data("id_barang");
-        }).get().toString();
-        var dataQtyBarangOrder = checkedCheckboxesorder.map(function() {
-            return $(this).data("qty_barang");
-        }).get().toString();
-        var dataNamaBarangOrder = checkedCheckboxesorder.map(function() {
-            return $(this).data("nama_barang");
-        }).get().toString();
-
-        if (dataIdBarangOrder == "" || dataIdBarangOrder == undefined) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Barang Output Wajib Dipilih !',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Ok'
-            });
-        } else {
-            console.log(listStockSelected);
-            $.each(listStockAsal, function(i, v) {
-                var currentID = Number(v.id);
-
-                if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelected, function(item) {
-                        return item.id == Number(currentID);
-                    }).length > 0;
-                    let divisi_id = $('#divisi_id option:selected').val();
-                    let warehouse_id = $('#warehouse_id option:selected').val();
-                    let tipe_barang = $('#type_barang option:selected').val();
-
-                    var qty = v.qty ? v.qty : 0;
-
-                    if (!isIDSelected) {
-                        var isDuplicateOutput = listStockSelected.some(function(item) {
-                            return item.output.id_barang == dataIdBarangOrder && parseFloat(item.qty) + parseFloat(qty) >= parseFloat(dataQtyBarangOrder);
-                        });
-
-                        console.log(isDuplicateOutput);
-
-                        if (!isDuplicateOutput) {
-                            listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            listStockAsal[i].divisi_id = $('#divisi_id option:selected').val();
-                            listStockAsal[i].warehouse_id = $('#warehouse_id option:selected').val();
-                            listStockAsal[i].tipe_barang = $('#type_barang option:selected').val();
-                            listStockAsal[i].qty = 0;
-                            listStockAsal[i].output = {
-                                id_barang: dataIdBarangOrder,
-                                barang: dataNamaBarangOrder,
-                                qty: parseFloat(dataQtyBarangOrder)
-                            }
-                            listStockSelected.push(listStockAsal[i]);
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Qty barang diorder sudah terpenuhi',
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            });
-                        }
-                    }
-                }
-            });
-
-            drawTableSelectedItem(listStockSelected);
-        }
-    });
 
     $('.btn-submit-parent').click(function() {
         if (listStockSelected.length == 0) {
             Swal.fire({
                 icon: 'error',
-                title: 'Barang yang akan dikirimkan ke vendor tidak boleh kosong !',
+                title: 'Barang yang akan dikirimkan ke vendor tidak boleh kosong!',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });
@@ -651,7 +613,7 @@
                 } else {
                     Swal.fire({
                         icon: 'question',
-                        title: 'Simpan Data ?',
+                        title: 'Simpan Data?',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
@@ -674,7 +636,7 @@
                                         setLoading();
                                     },
                                     complete: function() {
-                                        stopLoading()
+                                        stopLoading();
                                     },
                                     method: "POST",
                                     dataType: "json",
@@ -703,7 +665,7 @@
                                         setLoading();
                                     },
                                     complete: function() {
-                                        stopLoading()
+                                        stopLoading();
                                     },
                                     method: "POST",
                                     dataType: "json",
@@ -717,7 +679,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('pengeluaran-lokal/id/') ?>" + response.id
+                                                window.location.href = "<?= base_url('pengeluaran-lokal/id/') ?>" + response.id;
                                             }
                                         });
                                     },
@@ -726,7 +688,6 @@
                         }
                     });
                 }
-
             }
         }
     });
@@ -877,15 +838,25 @@
             dataTable.destroy();
         }
         const table = $('#dataTable');
+        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
+
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
+            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                 `
+                ));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                     <div class="form-check">
                         <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
-            ));
+                ));
+            }
+
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
@@ -923,11 +894,227 @@
         dataTable.draw();
     }
 
+    $('#select-item-btn').click(function() {
+        var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
+        if (typePengambilanStock == "FIFO") {
+            insertListFifo();
+        } else {
+            insertListPabean();
+        }
+        // console.log(listStockAsal);
+    });
+
+
+    function insertListPabean() {
+        var checkedCheckboxes = $(".child:checked");
+        var dataIds = checkedCheckboxes.map(function() {
+            return $(this).data("id");
+        }).get();
+        var id_selected = getIDListDataSelected();
+        var barangIn = $('#spesifikasi_in_id option:selected');
+
+        var checkedCheckboxesorder = $(".childOrder:checked");
+        var dataIdBarangOrder = checkedCheckboxesorder.map(function() {
+            return $(this).data("id_barang");
+        }).get().toString();
+        var dataQtyBarangOrder = checkedCheckboxesorder.map(function() {
+            return $(this).data("qty_barang");
+        }).get().toString();
+        var dataNamaBarangOrder = checkedCheckboxesorder.map(function() {
+            return $(this).data("nama_barang");
+        }).get().toString();
+
+        if (dataIdBarangOrder == "" || dataIdBarangOrder == undefined) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Barang Output Wajib Dipilih !',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+        } else {
+            // console.log(listStockSelected);
+            $.each(listStockAsal, function(i, v) {
+                var currentID = Number(v.id);
+
+                if ($.inArray(currentID, dataIds) !== -1) {
+                    var isIDSelected = $.grep(listStockSelected, function(item) {
+                        return item.id == Number(currentID);
+                    }).length > 0;
+                    let divisi_id = $('#divisi_id option:selected').val();
+                    let warehouse_id = $('#warehouse_id option:selected').val();
+                    let tipe_barang = $('#type_barang option:selected').val();
+
+                    var qty = v.qty ? v.qty : 0;
+
+                    if (!isIDSelected) {
+                        getItemQty = 0
+                        listStockSelected.some(function(item) {
+                            if (item.output.id_barang == dataIdBarangOrder) {
+                                getItemQty += parseFloat(item.qty);
+                            }
+
+                        });
+                        var isDuplicateOutput = listStockSelected.some(function(item) {
+
+                            // console.log(parseFloat(dataQtyBarangOrder));
+                            // console.log(parseFloat(getItemQty));
+
+                            return item.output.id_barang == dataIdBarangOrder && parseFloat(getItemQty) >= parseFloat(dataQtyBarangOrder);
+                        });
+
+                        // console.log(isDuplicateOutput);
+
+                        if (!isDuplicateOutput) {
+                            listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                            listStockAsal[i].divisi_id = $('#divisi_id option:selected').val();
+                            listStockAsal[i].warehouse_id = $('#warehouse_id option:selected').val();
+                            listStockAsal[i].tipe_barang = $('#type_barang option:selected').val();
+                            listStockAsal[i].qty = 0;
+                            listStockAsal[i].output = {
+                                id_barang: dataIdBarangOrder,
+                                barang: dataNamaBarangOrder,
+                                qty: parseFloat(dataQtyBarangOrder)
+                            }
+                            listStockSelected.push(listStockAsal[i]);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Qty barang diorder sudah terpenuhi',
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            });
+                        }
+                    }
+                }
+            });
+
+            drawTableSelectedItem(listStockSelected);
+        }
+    }
+
+    function insertListFifo() {
+        var divisi_id = $("#divisi_id").val();
+        var warehouse_id = $("#warehouse_id").val();
+        var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
+        var checkedCheckboxesOrder = $(".childOrder:checked");
+
+        if (isNaN(qtyMutasiFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                reverseButtons: true,
+                confirmButtonText: 'Oke',
+            });
+            return;
+        }
+
+        if (checkedCheckboxesOrder.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Barang Output Wajib Dipilih !',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        var totalStokTotal = 0;
+        $.each(listStockAsal, function(i, v) {
+            totalStokTotal += parseFloat(v.stok_total);
+        });
+
+        if (qtyMutasiFifo > totalStokTotal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                reverseButtons: true,
+                confirmButtonText: 'Oke',
+            });
+            return;
+        }
+
+        var dataIdBarangOrder = checkedCheckboxesOrder.map(function() {
+            return $(this).data("id_barang");
+        }).get().toString();
+
+        var dataQtyBarangOrder = checkedCheckboxesOrder.map(function() {
+            return $(this).data("qty_barang");
+        }).get().toString();
+
+        var dataNamaBarangOrder = checkedCheckboxesOrder.map(function() {
+            return $(this).data("nama_barang");
+        }).get().toString();
+
+        var getItemQty = 0;
+        listStockSelected.some(function(item) {
+            if (item.output.id_barang == dataIdBarangOrder) {
+                getItemQty += parseFloat(item.qty);
+            }
+        });
+
+        var isDuplicateOutput = listStockSelected.some(function(item) {
+            return item.output.id_barang == dataIdBarangOrder && parseFloat(getItemQty) >= parseFloat(dataQtyBarangOrder);
+        });
+
+        if (isDuplicateOutput) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Qty barang diorder sudah terpenuhi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        $.each(listStockAsal, function(i, v) {
+            var currentID = Number(v.id);
+            if (qtyMutasiFifo == 0) return false; // Exit loop when qtyMutasiFifo is fully allocated
+
+            var isIDSelected = $.grep(listStockSelected, function(item) {
+                return item.id == currentID;
+            }).length > 0;
+
+            if (!isIDSelected && parseFloat(v.stok_total) > 0) {
+                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(v.stok_total));
+                v.stok_total = parseFloat(v.stok_total);
+                v.qty = 0;
+                v.qty_isi = 0;
+                v.divisi_id = divisi_id;
+                v.warehouse_id = warehouse_id;
+                v.tipe_barang = $('#type_barang option:selected').val();
+
+                v.qty = parseFloat(mutasiQty.toFixed(2));
+
+                var barangOrder = {
+                    id_barang: dataIdBarangOrder,
+                    barang: dataNamaBarangOrder,
+                    qty: parseFloat(dataQtyBarangOrder)
+                };
+
+                v.output = barangOrder;
+
+                listStockSelected.push(v);
+                qtyMutasiFifo -= mutasiQty;
+            }
+        });
+
+        drawTableSelectedItem(listStockSelected);
+    }
+
+
+
+
     function drawTableOrderBarang(data) {
         const tableSales = $('#dataTableSalesOrder').DataTable();
 
         // Clear the existing rows
         tableSales.clear().draw();
+
+
 
         // Add new rows
         data.forEach(function(v) {
@@ -955,11 +1142,7 @@
         var no = 1;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                   ${no++} 
-                `
-            ));
+            newRow.append($('<td style="text-align: center;">').html(`${no++}`));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
@@ -967,18 +1150,14 @@
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                    <input onchange="definisiQtyInput()" <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this);updateOrder($(this));" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
-                `
-            ));
+            newRow.append($('<td style="text-align: center;">').html(`
+            <input onchange="definisiQtyInput()" <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this);updateOrder($(this));" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+        `));
             newRow.append($('<td style="text-align: center;">').text(v.output.barang));
             newRow.append($('<td style="text-align: center;">').text(v.output.qty));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                    <button <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                `
-            ));
+            newRow.append($('<td style="text-align: center;">').html(`
+            <button <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+        `));
             table.find('tbody').append(newRow);
         });
 
@@ -1009,6 +1188,9 @@
         selectedItemTable.draw();
     }
 
+
+
+
     function deleteDetail(id) {
         var indexToRemove = -1;
         for (var i = 0; i < listStockSelected.length; i++) {
@@ -1022,6 +1204,8 @@
             drawTableSelectedItem(listStockSelected);
         }
     }
+
+
 
     function updateOrder(input) {
         var index = input.data('index');

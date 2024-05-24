@@ -769,8 +769,18 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            location.reload();
+                                            // Update the list_items array
+                                            list_items = list_items.filter(item => item.id !== dataId);
+                                            // Redraw the table with the updated list_items
+                                            table.clear().rows.add(list_items).draw();
+                                            reCountTotal();
                                         })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#e74a3b',
+                                    });
                                 }
                             },
                         });
@@ -779,19 +789,22 @@
             } else {
                 // Hapus item dari array JavaScript dan gambar ulang tabel
                 console.log(list_items);
-                console.log(table);
+                // console.log(table);
                 let indexToRemove = list_items.findIndex(item => item.no === dataNo);
                 if (indexToRemove !== -1) {
                     list_items.splice(indexToRemove, 1);
-                    table.clear().rows.add(list_items).draw();
+
                 }
+                table.clear().rows.add(list_items).draw();
+                console.log(list_items);
             }
             reCountTotal();
         });
         generateCodeMasterBarang();
         getBarang();
-        $('#auto_generate').prop('checked', true).change();
-
+        <?php if (empty($data)) : ?>
+            $('#auto_generate').prop('checked', true).change();
+        <?php endif; ?>
 
         $(".order_date").datepicker({
             todayHighlight: true,
@@ -1842,7 +1855,7 @@
                                 })
                             })
                         }
-                        console.log(update_list_items)
+                        // console.log(update_list_items)
 
                         const taxStatus = $('#tax_status').is(':checked');
                         const includeTaxStatus = $('#include_tax').is(':checked');
@@ -2070,7 +2083,7 @@
                                     row: row + 1,
                                     id_barang: id_barang,
                                     nama_barang: nama_barang,
-                                    harga: harga,
+                                    harga_barang: harga,
                                     qty: qty,
                                     amount: amount,
                                     discountedAmt: discountedAmt,
@@ -2296,7 +2309,7 @@
                 res.dataBarang.forEach(function(item) {
                     $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
                 })
-                console.log(res.dataBarang);
+                // console.log(res.dataBarang);
 
                 $(".id_barang").val("").change();
             }

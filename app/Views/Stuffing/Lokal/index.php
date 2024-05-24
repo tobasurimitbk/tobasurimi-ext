@@ -153,7 +153,7 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let status = row.status_posting
-                    let status_closed = row.status_closed;
+                    // let status_closed = row.status_closed;
 
                     if (status === "0") {
                         return `
@@ -192,13 +192,13 @@
                     } else {
                         var res = '';
 
-                        if (status_closed != "CLOSED") {
-                            res += `
-                                <button data-toggle="tooltip" title="Close" onclick="closed('${id}')" class="btn btn-danger posting-spp">
-                                    <i class="fa-solid fa-ban"></i>    
-                                </button>
-                            `;
-                        }
+                        // if (status_closed != "CLOSED") {
+                        //     res += `
+                        //         <button data-toggle="tooltip" title="Close" onclick="closed('${id}')" class="btn btn-danger posting-spp">
+                        //             <i class="fa-solid fa-ban"></i>    
+                        //         </button>
+                        //     `;
+                        // }
 
                         <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
                             // res += `
@@ -415,48 +415,48 @@
     }
 
 
-    const closed = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Close Stuffing Pengeluaran Lokal ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("pengeluaran-lokal/close"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        setLoading();
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                table.ajax.reload()
-                            });
-                        }
-                    },
-                });
-            }
-        })
-    }
+    // const closed = function(id) {
+    //     Swal.fire({
+    //         icon: 'question',
+    //         title: 'Close Stuffing Pengeluaran Lokal ?',
+    //         confirmButtonColor: '#4e73df',
+    //         cancelButtonColor: '#d33',
+    //         showCancelButton: true,
+    //         reverseButtons: true,
+    //         confirmButtonText: 'Simpan',
+    //         cancelButtonText: 'Batal',
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const csrf = $(`[name="${csrfToken}"]`);
+    //             $.ajax({
+    //                 url: "<?= base_url("pengeluaran-lokal/close"); ?>",
+    //                 data: {
+    //                     id: id
+    //                 },
+    //                 beforeSend: function(xhr) {
+    //                     setLoading();
+    //                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //                 },
+    //                 complete: function() {
+    //                     stopLoading();
+    //                 },
+    //                 method: "POST",
+    //                 dataType: "json",
+    //                 success: function(response) {
+    //                     if (response.status) {
+    //                         Swal.fire({
+    //                             icon: 'success',
+    //                             title: response.message,
+    //                             confirmButtonColor: '#4e73df',
+    //                         }).then((result) => {
+    //                             table.ajax.reload()
+    //                         });
+    //                     }
+    //                 },
+    //             });
+    //         }
+    //     })
+    // }
 
     const print = function(url) {
         window.open(url, "_blank");

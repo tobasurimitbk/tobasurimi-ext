@@ -408,7 +408,7 @@ class SuratJalan extends BaseController
     public function delete()
     {
 
-        $id = $this->request->getPost("id");
+        $id = decrypt($this->request->getPost("id"));
         //echo json_encode($id);
 
 

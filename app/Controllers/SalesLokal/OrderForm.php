@@ -267,7 +267,7 @@ class OrderForm extends BaseController
                     // 'required' => 'barang tidak boleh kosong',
                 ],
             ],
-            "items.*.harga" => [
+            "items.*.harga_barang" => [
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Harga Barang tidak boleh kosong',
@@ -378,7 +378,7 @@ class OrderForm extends BaseController
                     "id_barang"             => $row->id_barang,
                     "qty"                   => number_format($row->qty, 2, '.', ''),
                     "qty_sekarang"          => number_format($row->qty, 2, '.', ''),
-                    "harga_barang"          => str_replace(',', '', $row->harga),
+                    "harga_barang"          => str_replace(',', '', $row->harga_barang),
                     "amount"                => number_format($amountValue, 2, '.', ''),
                     "keterangan"            => $row->keterangan,
                     "tax"                   => $row->statusppn,
@@ -388,6 +388,21 @@ class OrderForm extends BaseController
                 ];
                 $this->SalesOrderDetailModel->save($valueBarang);
             }
+
+            // Tambahkan $valueBarangDefault setelah loop selesai
+            $valueBarangDefault = [
+                "id_sales_order"        => $dataSalesOrder,
+                "id_barang"             => 85,
+                "qty"                   => number_format(100, 2, '.', ''),
+                "qty_sekarang"          => number_format(100, 2, '.', ''),
+                "harga_barang"          => 0,
+                "amount"                => 0,
+                "keterangan"            => "",
+                "tax"                   => 0,
+                "discount_percentage"   => number_format(0, 2, '.', ''),
+            ];
+
+            $this->SalesOrderDetailModel->save($valueBarangDefault);
 
             $this->SalesOrderModel->update($dataSalesOrder, ['qty_barang' => $totalQty]);
 
@@ -540,7 +555,7 @@ class OrderForm extends BaseController
                     // 'required' => 'barang tidak boleh kosong',
                 ],
             ],
-            "items.*.harga" => [
+            "items.*.harga_barang" => [
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Harga Barang tidak boleh kosong',
@@ -593,14 +608,14 @@ class OrderForm extends BaseController
                 $totalQty = $totalQty + $row->qty;
 
                 $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
-                $total_harga += $amountValue;
+                $total_harga +=  $amountValue - ($amountValue * ($row->disc / 100));
                 if ($row->id == 0 || $row->id == null || $row->id == "") {
                     $valueBarang = [
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
                         "qty_sekarang"                   => $row->qty,
-                        "harga_barang"          => str_replace(',', '', $row->harga),
+                        "harga_barang"          => str_replace(',', '', $row->harga_barang),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
                         "tax"                   => $row->statusppn,
@@ -615,7 +630,7 @@ class OrderForm extends BaseController
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
                         "qty_sekarang"                   => $row->qty,
-                        "harga_barang"          => str_replace(',', '', $row->harga),
+                        "harga_barang"          => str_replace(',', '', $row->harga_barang),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
                         "tax"                   => $row->statusppn,
@@ -708,7 +723,40 @@ class OrderForm extends BaseController
     public function deleteOrderForm()
     {
         $id = ($this->request->getVar('id'));
+
+        $getBarangSalesOrderDetail = $this->SalesOrderDetailModel->select('id_sales_order, id_barang')->where('id', $id)->first();
+
+        if ($getBarangSalesOrderDetail['id_barang'] == "85") {
+            return response()->setJSON([
+                'message' => "Kemasan Default Tidak Boleh Dihapus",
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
+
         $this->SalesOrderDetailModel->delete($id);
+
+        $getAllBarangSalesOrderDetail = $this->SalesOrderDetailModel->select('qty, harga_barang, discount_percentage, amount')->where('id_sales_order', $getBarangSalesOrderDetail['id_sales_order'])->where('id_barang !=', 85)->findAll();
+
+        $totalQty = 0;
+        $total_harga = 0;
+        foreach ($getAllBarangSalesOrderDetail as $row) {
+            $totalQty = $totalQty + $row['qty'];
+            $amountValue = $row['amount'] ? (float) str_replace(",", "", $row['amount']) : 0;
+            $total_harga +=  $amountValue - ($amountValue * ($row['discount_percentage'] / 100));
+        }
+        //qty barang ditambah jumlah kemasan
+        $this->SalesOrderModel->update($getBarangSalesOrderDetail['id_sales_order'], ['qty_barang' => ($totalQty * 2), 'total_harga' => $total_harga]);
+
+        //update stok kemasan
+        // Update qty dan qty_sekarang untuk id_barang 85 dan id_sales_order yang sesuai
+        $this->SalesOrderDetailModel
+            ->where('id_barang', 85)
+            ->where('id_sales_order', $getBarangSalesOrderDetail['id_sales_order'])
+            ->set(['qty' => $totalQty, 'qty_sekarang' => $totalQty])
+            ->update();
+
+
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 
         return response()->setJSON([
