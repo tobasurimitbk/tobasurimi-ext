@@ -203,7 +203,10 @@ class Lokal extends BaseController
 
         $barang = json_decode($this->request->getVar('listBarang'));
 
+
+
         foreach ($barang as $b) {
+
             $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
             $this->stuffingLokalDetailModel->insert([
                 'divisi_id' => $b->divisi_id,
@@ -215,7 +218,8 @@ class Lokal extends BaseController
                 'barang1_id_warehouse' => $checkStock['barang1_id'],
                 'barang2_id_warehouse' => $checkStock['barang2_id'],
                 'barang_id_order' => $b->output->id_barang,
-                'qty' => $b->qty
+                'qty' => $b->qty,
+                'stok_total' => $b->stok_total
             ]);
         }
 
@@ -233,38 +237,24 @@ class Lokal extends BaseController
 
         $barang = json_decode($this->request->getVar('listBarang'));
 
+        $this->stuffingLokalDetailModel->where('stuffing_lokal_id', $id)->delete();
         // get all id detail
         $id_detail_all = [];
         foreach ($barang as $b) {
-            if (isset($b->id_stuffing_detail)) {
-                $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
-                $this->stuffingLokalDetailModel->update($b->id_stuffing_detail, [
-                    'divisi_id' => $b->divisi_id,
-                    'warehouse_id' => $b->warehouse_id,
-                    'stuffing_lokal_id' => $id,
-                    'stock_id_warehouse' => $b->stock_id,
-                    'bc_id_warehouse' => $b->bc_id,
-                    'no_aju_warehouse' => $b->no_aju,
-                    'barang1_id_warehouse' => $checkStock['barang1_id'],
-                    'barang2_id_warehouse' => $checkStock['barang2_id'],
-                    'barang_id_order' => $b->output->id_barang,
-                    'qty' => $b->qty
-                ]);
-            } else {
-                $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
-                $this->stuffingLokalDetailModel->insert([
-                    'divisi_id' => $b->divisi_id,
-                    'warehouse_id' => $b->warehouse_id,
-                    'stuffing_lokal_id' => $id,
-                    'stock_id_warehouse' => $b->stock_id,
-                    'bc_id_warehouse' => $b->bc_id,
-                    'no_aju_warehouse' => $b->no_aju,
-                    'barang1_id_warehouse' => $checkStock['barang1_id'],
-                    'barang2_id_warehouse' => $checkStock['barang2_id'],
-                    'barang_id_order' => $b->output->id_barang,
-                    'qty' => $b->qty
-                ]);
-            }
+            $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
+            $this->stuffingLokalDetailModel->insert([
+                'divisi_id' => $b->divisi_id,
+                'warehouse_id' => $b->warehouse_id,
+                'stuffing_lokal_id' => $id,
+                'stock_id_warehouse' => $b->stock_id,
+                'bc_id_warehouse' => $b->bc_id,
+                'no_aju_warehouse' => $b->no_aju,
+                'barang1_id_warehouse' => $checkStock['barang1_id'],
+                'barang2_id_warehouse' => $checkStock['barang2_id'],
+                'barang_id_order' => $b->output->id_barang,
+                'qty' => $b->qty,
+                'stok_total' => $b->stok_total
+            ]);
         }
 
         return response()->setJSON([
@@ -273,6 +263,7 @@ class Lokal extends BaseController
             'token' => csrf_hash(),
         ]);
     }
+
 
     public function delete()
     {
