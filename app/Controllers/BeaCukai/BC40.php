@@ -1545,6 +1545,18 @@ class BC40 extends BaseController
     public function posting()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+
+        if ($bc40 == null) {
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            // insert
+            $this->bc40Model->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+            ]);
+        }
+
         $status = $this->insertInventori($bcPurchaseOrderID);
 
         if (!$status) {

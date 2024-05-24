@@ -255,11 +255,14 @@
                     let htmlRes = '';
 
                     if (row.status_posting === "0") {
-                        htmlRes += `
+                        if (row.no_aju != null) {
+                            htmlRes += `
                                 <button data-toggle="tooltip" title="Update No Aju" onclick="noAjuShowModal('${row.id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
                                     <i class="fas fa-edit fa-sm"></i>
                                 </button>
                                 `;
+                        }
+
                         htmlRes += `
                                 <button data-toggle="tooltip" title="Hapus" onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -466,6 +469,7 @@
     });
 
     function noAjuShowModal(id, noAju) {
+        console.log(id, noAju);
         var splitValues = noAju.split("-");
 
         var year = splitValues[2].substring(0, 4);
