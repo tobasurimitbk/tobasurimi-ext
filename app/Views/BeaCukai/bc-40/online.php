@@ -26,10 +26,10 @@
                                 <th style="text-align: center;">Tanggal Respon</th>
                                 <th style="text-align: center;">Waktu Respon</th>
                                 <th style="text-align: center;">Keterangan</th>
-                                <th style="text-align: center;">Action</th>
+                                <th style="text-align: center;">PDF</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -38,7 +38,23 @@
         </div>
     </div>
 </section>
-
+<div class="modal fade" id="prevModals" tabindex="-1" aria-labelledby="prevModals" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prevModals">Preview Response</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <div id="mypdfs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     $(document).ready(function() {
         var dataTable = $('#dataTable').DataTable({
@@ -116,7 +132,20 @@
                                 newRow.append($('<td style="text-align:center;">').text(v.tanggalRespon));
                                 newRow.append($('<td style="text-align:center;">').text(v.waktuRespon));
                                 newRow.append($('<td style="text-align:center;">').text(v.keterangan));
-                                newRow.append($('<td style="text-align:center;">').text('-'));
+                                if (v.pdf != null) {
+                                    newRow.append($('<td style="text-align:center;">').html(
+                                        `
+                                            <button class="btn btn-warning btn-print" onclick="pdf('v.pdf')" style="box-shadow: none !important;">
+                                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                            </button>
+                                        `
+                                    ));
+                                } else {
+                                    newRow.append($('<td style="text-align:center;">').text(
+                                        '-'
+                                    ));
+                                }
+
                                 table.find('tbody').append(newRow);
                             });
 
@@ -154,6 +183,15 @@
 
                 }
             });
+        }
+
+        function pdf(url) {
+            e.preventDefault();
+            var file = $(this).data('file');
+            PDFObject.embed("<?= base_url($baseUrl . '/') ?>" + url, "#mypdfs", {
+                height: "700px"
+            });
+            $('#prevModals').modal('show');
         }
     })
 </script>

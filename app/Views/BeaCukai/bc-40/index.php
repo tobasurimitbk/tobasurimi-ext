@@ -245,6 +245,33 @@
                 className: "text-center",
                 searchable: false,
                 sortable: false,
+                render: function(data, type, row) {
+                    let htmlRes = '';
+
+                    if (row.status == "BELUM DIBUAT") {
+                        htmlRes += `
+                        <div class="text-danger">
+                            BELUM DIBUAT
+                        </div>`
+                    } else if (row.status == "BELUM LENGKAP") {
+                        htmlRes += `
+                        <div class="text-warning">
+                            BELUM LENGKAP
+                        </div>`
+                    } else if (row.status == "SUDAH KIRIM") {
+                        htmlRes += `
+                        <div class="text-success">
+                            SUDAH KIRIM
+                        </div>`
+                    } else if (row.status == "SIAP KIRIM") {
+                        htmlRes += `
+                        <div class="text-primary">
+                            SUDAH KIRIM
+                        </div>`
+                    }
+
+                    return htmlRes;
+                }
             },
             {
                 data: "id",
