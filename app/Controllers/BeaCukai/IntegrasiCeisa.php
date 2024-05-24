@@ -46,6 +46,7 @@ class IntegrasiCeisa extends BaseController
                 'kode_kantor_pabean' => $this->request->getVar('kode_kantor_pabean'),
                 'username' => $this->request->getVar('username'),
                 'password' => $this->request->getVar('password'),
+                'npwp_perusahaan' => $this->request->getVar('npwp_perusahaan'),
                 'status_integrasi' => $loginCeisa
             ]);
         } else {
@@ -55,6 +56,7 @@ class IntegrasiCeisa extends BaseController
                 'kode_kantor_pabean' => $this->request->getVar('kode_kantor_pabean'),
                 'username' => $this->request->getVar('username'),
                 'password' => $this->request->getVar('password'),
+                'npwp_perusahaan' => $this->request->getVar('npwp_perusahaan'),
                 'status_integrasi' => $loginCeisa
             ]);
         }

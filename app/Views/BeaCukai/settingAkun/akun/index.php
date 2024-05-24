@@ -7,6 +7,9 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("setting-akun-bc"); ?>">
                 Kembali
             </a>
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan
+            </button>
         </div>
     </div>
     <div class="row">
@@ -39,7 +42,7 @@
                         <?php endif; ?>
 
                         <div class="row ">
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <div class="form-floating mb-3 mt-1" style="height: 50px;">
                                     <select class="form-select kode_kantor_pabean" id="kode_kantor_pabean" name="kode_kantor_pabean" aria-label="Floating label select example">
                                         <option value=""></option>
@@ -52,7 +55,15 @@
                                     <label style="z-index: 1;">Kantor Pabean</label>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
+                                <div class="mt-1">
+                                    <div class="form-floating mb-3">
+                                        <input id="npwp_perusahaan" value="<?= !empty($akunCeisa) ? $akunCeisa['npwp_perusahaan'] : '' ?>" type="number" class="form-control npwp_perusahaan" name="npwp_perusahaan" placeholder="">
+                                        <label>NPWP Perusahaan</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
                                         <input id="username" value="" type="text" class="form-control username" name="username" placeholder="">
@@ -60,7 +71,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
                                         <input id="password" value="" type="text" class="form-control password" name="password" placeholder="">
@@ -71,11 +82,6 @@
                         </div>
                     </div>
                 </form>
-                <div class="card-footer">
-                    <a href="#" type="button" class="btn btn-primary btn-lg btn-block btn-submit-parent">
-                        CEK & SIMPAN DATA
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -91,6 +97,8 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {});
+
+    $('#npwp_perusahaan').mask('000000000000000');
 
     $('.form-select')
         .parent('div')

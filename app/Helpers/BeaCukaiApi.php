@@ -10,16 +10,15 @@ use Exception;
 
 class BeaCukaiApi
 {
-    protected $npwpPerusahaan;
     protected $baseUrl, $baseUrlDev, $username, $password;
-    protected $metaDataModel;
+    protected $metaDataModel, $ceisaSettingModel;
 
     public function __construct($username, $password)
     {
         $this->metaDataModel = new MetadataModel();
+        $this->ceisaSettingModel = new CeisaSettingModel();
         $this->baseUrl = $this->metaDataModel->where('name', "Base Url BC")->first()['value'];
         $this->baseUrlDev = $this->metaDataModel->where('name', "Base Url BC")->first()['description'];
-        $this->npwpPerusahaan =  $this->metaDataModel->where('name', "NPWP Importir Default BC")->first()['value'];
         $this->username = $username;
         $this->password = $password;
     }
@@ -228,6 +227,12 @@ class BeaCukaiApi
     public function getListStatusResponseAll()
     {
         $token = $this->getTokenApi();
+        $ceisaSetting = $this->ceisaSettingModel
+            ->where('username', $this->username)
+            ->where('password', $this->password)
+            ->first();
+
+        $npwpPerusahaan = $ceisaSetting == null ? "" :  $ceisaSetting['npwp_perusahaan'];
 
         if ($token['status'] === false) {
             return [
@@ -236,7 +241,7 @@ class BeaCukaiApi
             ];
         }
 
-        $endPoint = $this->baseUrl . "/openapi/status?idPerusahaan=" . $this->npwpPerusahaan;
+        $endPoint = $this->baseUrl . "/openapi/status?idPerusahaan=" . $npwpPerusahaan;
         $headers = array(
             'Content-Type: application/json',
             'Authorization: Bearer ' . $token['token'],
