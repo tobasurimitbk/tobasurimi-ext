@@ -1475,22 +1475,34 @@
             let totalTotalHargaRasio = 0;
 
             let totalHargaTotalManual = 0;
+            let totalQtyTanpaManual = 0;
+
             data.forEach(item => {
                 totalHargaTotalManual += parseFloat(item.harga_total);
+                if (item.harga_satuan == 0) {
+                    totalQtyTanpaManual += parseFloat(item.qtyTotal);
+                }
             });
 
             data.forEach((item, index) => {
+                let calculatedHargaTotal = 0;
+                let itemHargaTotal = 0;
                 const totalQtyAll = parseFloat(item.totalQtyAll);
                 const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
-                const calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio.toFixed(2) / 100);
-                const itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
 
-                console.log(parseFloat(hargaTotalPenerimaan));
-                console.log(parseFloat(totalHargaTotalManual));
+                if (item.harga_total == 0) {
+                    calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasioTanpaManual.toFixed(2) / 100);
+                    itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                } else {
+                    calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio.toFixed(2) / 100);
+                    itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                }
+
                 console.log(rasio);
-                console.log(parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual));
-                console.log((parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio / 100));
-                console.log(item.harga_total);
+                console.log(rasioTanpaManual);
+                console.log(totalQtyTanpaManual);
+                console.log(totalQtyAll);
 
                 rasioTotal += rasio;
                 totalTotalHargaRasio += itemHargaTotal;
