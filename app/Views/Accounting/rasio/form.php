@@ -1362,6 +1362,7 @@
 
     $('#select-item-btn').click(function() {
         console.log(list_items_barang_jadi);
+        drawTableRasioAkhir(list_items_barang_jadi);
     });
 
     const drawTableRasio = function() {
@@ -1425,7 +1426,7 @@
                 var totalHargaQty = 0;
                 var totalTotalHargaQty = 0;
                 $('.harga-satuan').each(function() {
-                    var harga = ($(this).val().replace(/Rp|\./g, ""));
+                    var harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
                     var index = $(this).data('index');
                     var qty = ($('.jumlah-barang[data-index="' + index + '"]').val());
 
@@ -1449,76 +1450,99 @@
         }
     }
 
-    const drawTableRasioAkhir = function() {
+    const drawTableRasioAkhir = function(data) {
         $('.body-table-rasio-akhir').empty();
         $('.tfoot-rasio-akhir').empty();
-        var row = '';
-        var rowFooter = '';
-        var no = 1;
-        var amount = $('#hargaTotalPenerimaan').val() ? $('#hargaTotalPenerimaan').val() : formatRupiah(0);
-        var biayaSubsidi = $('#biayaSubsidi').val() ? $('#biayaSubsidi').val() : formatRupiah(0);
-        var biayaLain = $('#biayaLain').val() ? $('#biayaLain').val() : formatRupiah(0);
-        var biayaKopek = $('#biayaKopek').val() ? $('#biayaKopek').val() : formatRupiah(0);
-        var hargaTotalPenerimaan = parseFloat(amount.replace(/Rp|\./g, "")) + parseFloat(biayaSubsidi.replace(/Rp|\./g, "")) + parseFloat(biayaLain.replace(/Rp|\./g, "")) + parseFloat(biayaKopek.replace(/Rp|\./g, ""));
-        if (list_items_barang_jadi.length === 0) {
+
+        let row = '';
+        let rowFooter = '';
+        let no = 1;
+
+        // Retrieve and parse input values
+        const amount = $('#hargaTotalPenerimaan').val() ? parseFloat($('#hargaTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
+        const biayaSubsidi = $('#biayaSubsidi').val() ? parseFloat($('#biayaSubsidi').val().replace(/Rp|\./g, "")) : 0;
+        const biayaLain = $('#biayaLain').val() ? parseFloat($('#biayaLain').val().replace(/Rp|\./g, "")) : 0;
+        const biayaKopek = $('#biayaKopek').val() ? parseFloat($('#biayaKopek').val().replace(/Rp|\./g, "")) : 0;
+
+        const hargaTotalPenerimaan = amount + biayaSubsidi + biayaLain + biayaKopek;
+
+        if (data.length === 0) {
             row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
             $('.tfoot-rasio-akhir').append(row);
         } else {
-            var rasio = 0;
-            var rasioTotal = 0;
-            var total = 0;
-            var totalHargaRasio = 0;
-            var totalTotalHargaRasio = 0;
-            list_items_barang_jadi.map((item, index) => {
-                total = item.totalQtyAll // hitung total barang
-                rasio = item.rasio ? item.rasio : (item.qtyTotal / item.totalQtyAll) * 100; // Perhitungan rasio
-                totalHargaRasio = item.hargaTotal ? item.hargaTotal : (hargaTotalPenerimaan * rasio.toFixed(2)) / 100;
+            let rasioTotal = 0;
+            let totalHargaRasio = 0;
+            let totalTotalHargaRasio = 0;
+
+            let totalHargaTotalManual = 0;
+            data.forEach(item => {
+                totalHargaTotalManual += parseFloat(item.harga_total);
+            });
+
+            data.forEach((item, index) => {
+                const totalQtyAll = parseFloat(item.totalQtyAll);
+                const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
+                const calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio.toFixed(2) / 100);
+                const itemHargaTotal = item.hargaTotal ? parseFloat(item.hargaTotal) : parseFloat(calculatedHargaTotal);
+
+                console.log(parseFloat(hargaTotalPenerimaan));
+                console.log(parseFloat(totalHargaTotalManual));
+                console.log(rasio);
+                console.log(parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual));
+                console.log((parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio / 100));
+                console.log(item.harga_total);
+
                 rasioTotal += rasio;
-                totalTotalHargaRasio += totalHargaRasio;
-                row += '<tr style="color:whitesmoke;text-align: center;">';
-                row += '<td>' + no + '</td>';
-                row += '<td>' + item.kode_barang + '</td>';
-                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
-                row += '<td>' + item.kode_satuan + '</td>';
-                row += '<td>' +
-                    '<input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + item.qtyTotal + '">' +
-                    '</td>';
-                row += '<td>' +
-                    '<input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + rasio.toFixed(2) + '%">' + // Ubah nilai rasio menjadi persentase dengan dua angka di belakang koma
-                    '</td>';
-                row += '<td>' +
-                    '<input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(totalHargaRasio) + '">' +
-                    '</td>';
-                row += '</tr>';
+                totalTotalHargaRasio += itemHargaTotal;
+
+                row += `
+                <tr style="color:whitesmoke;text-align: center;">
+                    <td>${no}</td>
+                    <td>${item.kode_barang}</td>
+                    <td>${item.barang_name} - ${item.spesifikasi}</td>
+                    <td>${item.kode_satuan}</td>
+                    <td>
+                        <input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
+                    </td>
+                    <td>
+                        <input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
+                    </td>
+                    <td>
+                        <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
+                    </td>
+                </tr>`;
                 no++;
             });
-            rowFooter += '<tr>';
-            rowFooter += '<td colspan="4"></td>';
-            rowFooter += '<td>' +
-                '<input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + total + '">' +
-                '</td>';
-            rowFooter += '<td>' +
-                '<input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + rasioTotal.toFixed(2) + '%">' + // Ubah nilai rasio menjadi persentase dengan dua angka di belakang koma
-                '</td>';
-            rowFooter += '<td>' +
-                '<input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(totalTotalHargaRasio) + '">' +
-                '</td>';
-            rowFooter += '</tr>';
+
+            rowFooter += `
+            <tr>
+                <td colspan="4"></td>
+                <td>
+                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal), 0)}">
+                </td>
+                <td>
+                    <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${rasioTotal.toFixed(2)}%">
+                </td>
+                <td>
+                    <input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${formatRupiah(totalTotalHargaRasio)}">
+                </td>
+            </tr>`;
+
             $('.tfoot-rasio-akhir').append(rowFooter);
             $('.body-table-rasio-akhir').append(row);
 
-            // Update total harga jika ada perubahan pada input dengan kelas harga
+            // Update total harga if any input with class 'harga' changes
             $('.harga').on('input', function() {
-                var totalHarga = 0;
+                let totalHarga = 0;
                 $('.harga').each(function() {
-                    var harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    const harga = parseFloat($(this).val());
                     totalHarga += isNaN(harga) ? 0 : harga;
-                    $(this).val(formatRupiah(harga));
                 });
                 $('.harga-total').val(formatRupiah(totalHarga));
             });
         }
-    }
+    };
+
 
     <?php if (!empty($rasio)) : ?>
         $("#qtyTotalPembelian").val(<?= !empty($rasio) ? $rasio->total_qty_po : "" ?>.toLocaleString());
