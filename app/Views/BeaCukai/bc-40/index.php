@@ -4,16 +4,18 @@
 <section class="section">
     <div class="section-header">
         <h1>Dokumen BC 4.0</h1>
-        <?php if ($akunCeisa['status_integrasi']) : ?>
-            <a href="<?= base_url('bea-cukai-bc-40/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
-                <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
-                Data Online
-            </a>
-            <?php if (can("Bea Cukai", "BC 4.0", "c")) : ?>
-
-                <a href="<?= base_url('bea-cukai-bc-40/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
-                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <?php if ($akunCeisa != null) : ?>
+            <?php if ($akunCeisa['status_integrasi']) : ?>
+                <a href="<?= base_url('bea-cukai-bc-40/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
+                    <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
+                    Data Online
                 </a>
+                <?php if (can("Bea Cukai", "BC 4.0", "c")) : ?>
+
+                    <a href="<?= base_url('bea-cukai-bc-40/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                    </a>
+                <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
     </div>
@@ -68,10 +70,16 @@
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 4.0" value="" />
                 </div>
             </div>
-            <?php if ($akunCeisa['status_integrasi'] === "0") : ?>
+            <?php if ($akunCeisa == null) : ?>
                 <div class="alert alert-danger mt-3 mb-3" role="alert">
                     SILAHKAN HUBUNGKAN AKUN CEISA BEA CUKAI TERLEBIH DAHULU SEBELUM MENGGUNAKAN MODUL INI
                 </div>
+            <?php else : ?>
+                <?php if ($akunCeisa['status_integrasi'] === "0") : ?>
+                    <div class="alert alert-danger mt-3 mb-3" role="alert">
+                        SILAHKAN HUBUNGKAN AKUN CEISA BEA CUKAI TERLEBIH DAHULU SEBELUM MENGGUNAKAN MODUL INI
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
             <div class="row">
                 <div class="table-responsive">
