@@ -118,8 +118,11 @@ class BC40 extends BaseController
 
     public function index()
     {
+        $data = [
+            'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first()
+        ];
 
-        return view('BeaCukai/bc-40/index');
+        return view('BeaCukai/bc-40/index', $data);
     }
 
     public function online()
