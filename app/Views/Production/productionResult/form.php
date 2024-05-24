@@ -205,7 +205,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangDigunakan" id="tableBarangDigunakan" width="100%" cellspacing="0">
+                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangDigunakan text-center" id="tableBarangDigunakan" width="100%" cellspacing="0">
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th style="width: 10px;">No</th>
@@ -214,7 +214,7 @@
                                                         <th>Jenis Barang</th>
                                                         <th>Nama Barang</th>
                                                         <th>Satuan</th>
-                                                        <th>Jumlah Request</th>
+                                                        <th>Sisa Qty Request</th>
                                                         <th>Jumlah Digunakan</th>
                                                     </tr>
                                                 </thead>
