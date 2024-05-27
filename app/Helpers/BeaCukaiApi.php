@@ -272,6 +272,46 @@ class BeaCukaiApi
         }
     }
 
+    public function getResponPdf($path)
+    {
+        $token = $this->getTokenApi();
+
+        if ($token['status'] === false) {
+            return [
+                'status' => false,
+                'message' => $token['message']
+            ];
+        }
+
+        $endPoint = $this->baseUrl . "/openapi/download-respon?path=" . $path;
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token['token'],
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endPoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            return [
+                'message' => curl_error($ch) . ". Code " . $httpCode,
+                'status' => false
+            ];
+        } else {
+            if ($httpCode == 200) {
+                return $response;
+            } else {
+                return [
+                    'message' => "Server Ceisa Error : " . $httpCode,
+                    'status' => false
+                ];
+            }
+        }
+    }
+
     public function getTokenApi()
     {
         try {

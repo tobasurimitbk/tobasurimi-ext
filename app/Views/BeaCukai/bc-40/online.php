@@ -135,7 +135,7 @@
                                 if (v.pdf != null) {
                                     newRow.append($('<td style="text-align:center;">').html(
                                         `
-                                            <button class="btn btn-warning btn-print" onclick="pdf('v.pdf')" style="box-shadow: none !important;">
+                                            <button class="btn btn-warning btn-print" onclick="pdf('${v.pdf}')" style="box-shadow: none !important;">
                                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                             </button>
                                         `
@@ -184,16 +184,32 @@
                 }
             });
         }
-
-        function pdf(url) {
-            e.preventDefault();
-            var file = $(this).data('file');
-            PDFObject.embed("<?= base_url($baseUrl . '/') ?>" + url, "#mypdfs", {
-                height: "700px"
-            });
-            $('#prevModals').modal('show');
-        }
     })
+
+    function pdf(url) {
+        $.ajax({
+            url: "<?= base_url('bea-cukai-bc-40/download-response') ?>",
+            type: 'GET',
+            data: {
+                path: url
+            },
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function(blob) {
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'download.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            },
+            error: function(error) {
+                alert('Error downloading PDF');
+            }
+        });
+    }
 </script>
 
 <?= $this->endSection(); ?>

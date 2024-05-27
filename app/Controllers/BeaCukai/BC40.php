@@ -118,8 +118,11 @@ class BC40 extends BaseController
 
     public function index()
     {
+        $data = [
+            'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first()
+        ];
 
-        return view('BeaCukai/bc-40/index');
+        return view('BeaCukai/bc-40/index', $data);
     }
 
     public function online()
@@ -147,6 +150,23 @@ class BC40 extends BaseController
                 'status' => true
             ]);
         }
+    }
+
+    public function downloadResponPdf()
+    {
+        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+
+        $path = $this->request->getVar('path');
+        $beacukaiApi = new BeaCukaiApi($username, $password);
+        $dataOnline = $beacukaiApi->getResponPdf($path);
+
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'pdf');
+        file_put_contents($tempFilePath, $dataOnline);
+
+        return $this->response->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'attachment; filename="download.pdf"')
+            ->setBody($dataOnline);
     }
 
     public function all()
