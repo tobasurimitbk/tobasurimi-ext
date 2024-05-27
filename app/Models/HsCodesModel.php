@@ -20,6 +20,7 @@ class HsCodesModel extends Model
         'code',
         'uraian_barang',
         'unit',
+        'nilai_tarif',
         'createdAt',
         'updatedAt',
         'deletedAt'

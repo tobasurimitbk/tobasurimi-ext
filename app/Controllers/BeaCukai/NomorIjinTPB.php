@@ -68,6 +68,7 @@ class NomorIjinTPB extends BaseController
                 "id"                => encrypt($data->id),
                 "no_ijin_tpb"       => $data->no_ijin_tpb,
                 "tanggal_skep_tpb"  => date('d/m/Y', strtotime($data->tanggal_skep_tpb)),
+                "alamat_pemilik_barang" => strtoupper($data->alamat_pemilik_barang),
                 "status"            => $data->status == "1" ? "AKTIF" : "TIDAK AKTIF"
             ]);
         }
@@ -106,6 +107,7 @@ class NomorIjinTPB extends BaseController
             'pengusaha_tpb_id' => $this->request->getVar('pengusaha_tpb_id'),
             'no_ijin_tpb' => $this->request->getVar('no_ijin_tpb'),
             'tanggal_skep_tpb' => $this->request->getVar('tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('tanggal_skep_tpb')), "Y-m-d") : "",
+            'alamat_pemilik_barang' => strtoupper($this->request->getVar('alamat_pemilik_barang')),
             'status' => $this->request->getVar('status'),
         ]);
 
@@ -143,6 +145,7 @@ class NomorIjinTPB extends BaseController
             'pengusaha_tpb_id' => $this->request->getVar('pengusaha_tpb_id'),
             'no_ijin_tpb' => $this->request->getVar('no_ijin_tpb'),
             'tanggal_skep_tpb' => $this->request->getVar('tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('tanggal_skep_tpb')), "Y-m-d") : "",
+            'alamat_pemilik_barang' => strtoupper($this->request->getVar('alamat_pemilik_barang')),
             'status' => $this->request->getVar('status'),
         ]);
 

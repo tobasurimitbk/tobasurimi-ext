@@ -60,7 +60,8 @@ class PengusahaTPB extends BaseController
                 'company_id' => $this->this_company_id,
                 'npwp' => $this->request->getVar('npwp'),
                 'nama_pengusaha' => strtoupper($this->request->getVar('nama_pengusaha')),
-                'alamat' => strtoupper($this->request->getVar('alamat'))
+                'alamat' => strtoupper($this->request->getVar('alamat')),
+                'nib' => $this->request->getVar('nib'),
             ]);
 
             return response()->setJSON([
@@ -108,7 +109,8 @@ class PengusahaTPB extends BaseController
                 'company_id' => $this->this_company_id,
                 'npwp' => $this->request->getVar('npwp'),
                 'nama_pengusaha' => strtoupper($this->request->getVar('nama_pengusaha')),
-                'alamat' => strtoupper($this->request->getVar('alamat'))
+                'alamat' => strtoupper($this->request->getVar('alamat')),
+                'nib' => $this->request->getVar('nib'),
             ]);
 
             return response()->setJSON([

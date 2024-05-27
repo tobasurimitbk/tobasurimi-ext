@@ -70,7 +70,12 @@
                             <label for="floatingInput" style="z-index: 1;">Tutup No Surat Jalan</label>
                         </div>
                     </div>
-
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <textarea rows="5" name="alamat_pemilik_barang" id="alamat_pemilik_barang" class="form-control alamat_pemilik_barang" placeholder="Alamat Pemilik Barang"></textarea>
+                            <label>Alamat Pemilik Barang</label>
+                        </div>
+                    </div>
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -101,6 +106,7 @@
                                 <th>No</th>
                                 <th onclick="changeSort('no_ijin_tpb')" class="sort">Nomor Ijin TPB</th>
                                 <th onclick="changeSort('tanggal_skep_tpb')" class="sort">Tanggal Skep TPB</th>
+                                <th onclick="changeSort('alamat_pemilik_barang')" class="sort">Alamat Pemilik Barang</th>
                                 <th onclick="changeSort('status')" class="sort">Status</th>
                                 <th>Action</th>
                             </tr>
@@ -163,6 +169,9 @@
                 className: "text-center"
             }, {
                 data: "tanggal_skep_tpb",
+                className: "text-center"
+            }, {
+                data: "alamat_pemilik_barang",
                 className: "text-center"
             },
             {
@@ -256,6 +265,9 @@
             tanggal_skep_tpb: {
                 required: true
             },
+            alamat_pemilik_barang: {
+                required: true
+            },
             status: {
                 required: true
             }
@@ -266,6 +278,9 @@
             },
             tanggal_skep_tpb: {
                 required: "Tanggal skep TPB wajib diisi"
+            },
+            alamat_pemilik_barang: {
+                required: "Alamat pemilik barang wajib diisi"
             },
             status: {
                 required: "Status wajib diisi"
@@ -420,6 +435,7 @@
                     $('#id').val(res.data.id);
                     $('#no_ijin_tpb').val(res.data.no_ijin_tpb);
                     $('#tanggal_skep_tpb').val(res.data.tanggal_skep_tpb);
+                    $('#alamat_pemilik_barang').val(res.data.alamat_pemilik_barang);
                     $('#status').val(res.data.status).change();
                 }
             }
@@ -474,6 +490,7 @@
         $('#no_ijin_tpb').val('');
         $('#tanggal_skep_tpb').val('');
         $('#status').val(null).change();
+        $('#alamat_pemilik_barang').val('');
         validator.resetForm();
         validator.reset();
     }
