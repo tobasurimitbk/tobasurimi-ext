@@ -258,7 +258,7 @@ class ProductionResult extends BaseController
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
             ->join('users', 'users.id = material_requests.createdBy', 'left')
             ->where('company_id', $this->this_company_id)
-            ->whereIn('material_requests.id', json_decode($productionResData->material_request_id))
+            ->whereIn('material_requests.id', $idMaterialRequest)
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
             ->groupBy('material_request_details.material_request_id')

@@ -396,7 +396,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="table-responsive">
-                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableRasioMaterialII" width="100%" border="1" cellspacing="0">
+                                <table class="table table-bordered table-hover-tobasurimi dataTable" id="selectedItemTableRasioMaterialII" width="100%" border="1" cellspacing="0">
                                     <thead class="thead-dark head-table-rasio-material2">
                                         <tr>
                                             <th style="text-align: center;" rowspan="2">No</th>
@@ -731,7 +731,6 @@
                         res.data.forEach(function(item) {
                             list_items_barang_digunakan.push(item);
                         });
-                        // console.log(list_items_barang_digunakan);
                         drawTableDigunakan();
                     } else {
                         stopLoading()
@@ -758,7 +757,6 @@
                         res.data.forEach(function(item) {
                             list_items_barang_jadi.push(item);
                         });
-                        console.log(list_items_barang_jadi);
                         drawTableRasio();
                     } else {
                         stopLoading()
@@ -810,6 +808,7 @@
                 data: {
                     department: department_id,
                     bulan: bulan,
+                    kategori: kategori,
                 },
                 dataType: "json",
                 success: function(res) {
@@ -1058,9 +1057,7 @@
                 var qty = parseFloat($(this).val().replace(/Rp|\./g, ""));
                 var hargaTotal = parseFloat($('#hargaTotalPembelian_material_2').val().replace(/Rp|\./g, ""));
                 var hargaSatuan = hargaTotal / qty;
-                // console.log(qty);
-                // console.log(hargaTotal);
-                // console.log(hargaSatuan);
+
                 $('input.harga-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val(formatRupiah(hargaTotal));
                 $('input.harga-satuan-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val(formatRupiah(hargaSatuan));
 
@@ -1361,7 +1358,6 @@
     }
 
     $('#select-item-btn').click(function() {
-        console.log(list_items_barang_jadi);
         drawTableRasioAkhir(list_items_barang_jadi);
     });
 
@@ -1732,6 +1728,7 @@
                     list_items_barang_jadi[i].rasio = rasioBarangVal;
                     list_items_barang_jadi[i].harga = hargaBarangVal;
                 });
+                console.log(list_items_barang_jadi);
 
                 $.each(list_items_barang_digunakan_material_2, function(i, v) {
                     list_items_barang_jadi_material_2.forEach((item2, index2) => {

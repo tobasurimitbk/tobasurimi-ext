@@ -111,7 +111,7 @@ class RasioController extends BaseController
             $tanggal_mysql = $tanggal_parts[1] . "-" . str_pad($tanggal_parts[0], 2, "0", STR_PAD_LEFT);
 
             $cekRasio = $this->rasioModel
-                ->where("department_id", $this->request->getVar("divisi_id"))
+                ->where("divisi_id", $this->request->getVar("divisi_id"))
                 ->where("bulan", $tanggal_mysql)
                 ->findAll();
 
@@ -127,8 +127,9 @@ class RasioController extends BaseController
 
             $data = [
                 "company_id" => $this->this_company_id,
-                "department_id" => $this->request->getVar("divisi_id"),
+                "divisi_id" => $this->request->getVar("divisi_id"),
                 'bulan' => $tanggal_mysql,
+                'kategori_barang_id' => $this->request->getVar("kategori"),
                 'subsidi_coa_id' => $this->request->getVar("akun_coa_subsidi") ?? null,
                 'biaya_coa_id' => $this->request->getVar("akun_coa_biaya") ?? null,
                 'kopek_coa_id' => $this->request->getVar("akun_coa_kopek") ?? null,
