@@ -1399,8 +1399,9 @@ class BC40 extends BaseController
 
         $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
         $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
+        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
 
-        if ($bcPo == null) {
+        if ($bcPo == null || $ceisaSetting == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
@@ -1408,7 +1409,8 @@ class BC40 extends BaseController
 
         $data = [
             'bcPo' => $bcPo,
-            'bc40' => $bc40
+            'bc40' => $bc40,
+            'ceisaSetting' => $ceisaSetting
         ];
 
         return view('BeaCukai/bc-40/form-pernyataan', $data);
@@ -1517,15 +1519,6 @@ class BC40 extends BaseController
     public function kirimCeisa($bcPurchaseOrderID)
     {
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
-        $status = $this->insertInventori($bcPurchaseOrderID);
-
-        if (!$status) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => true,
-                'message' => "Terjadi kesalahan saat menambah stok inventori"
-            ]);
-        }
 
         $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
         $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);

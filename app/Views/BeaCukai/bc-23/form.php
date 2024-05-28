@@ -3,11 +3,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Tambah Dokumen BC 2.3</h1>
-        <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-23"); ?>">
-                Kembali
-            </a>
-        </div>
+        <?php if (can('Bea Cukai', 'BC 2.3', 'c')) : ?>
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan
+            </button>
+        <?php endif; ?>
         <?php if (can('Bea Cukai', 'BC 2.3', 'p')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 10px;">
                 Export
@@ -71,13 +71,6 @@
 
                 </table>
             </div>
-        </div>
-        <div class="card-footer">
-            <?php if (can('Bea Cukai', 'BC 2.3', 'c')) : ?>
-                <a href="#" type="button" class="btn btn-primary btn-lg btn-block btn-submit-parent">
-                    PROSES BUAT DOKUMEN BC 4.0
-                </a>
-            <?php endif; ?>
         </div>
     </div>
 
@@ -195,7 +188,7 @@
                         contentType: false,
                         success: function(response) {
                             if (response.status) {
-                                window.location.replace("<?= base_url('bea-cukai-bc-23/id/barang/') ?>" + response.id)
+                                window.location.replace("<?= base_url('bea-cukai-bc-23/po/') ?>" + response.id)
                             } else {
                                 Swal.fire({
                                     icon: 'error',

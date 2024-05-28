@@ -594,7 +594,7 @@
         })
     }
 
-    function posting(id) {
+    function postingAction(id) {
         Swal.fire({
             icon: 'question',
             title: 'Posting Dokumen BC 4.0 Lokal ?',

@@ -1043,9 +1043,13 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('list-supplier', 'BeaCukai\BC23::dropdownSupplier');
     $routes->get('list-po', 'BeaCukai\BC40::dropdownPO');
     $routes->get('list-no-ijin-tpb', 'BeaCukai\BC40::dropdownNoIjinTPB');
-    $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->get('export-pdf', 'BeaCukai\BC23::exportPdf');
     $routes->get('export-excel', 'BeaCukai\BC40::exportExcel');
+    $routes->get('po/(:segment)', 'BeaCukai\BC23::updatePurchaseOrderView/$1');
+    $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
+    $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
+    $routes->post('posting', 'BeaCukai\BC23::posting');
+
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');
     $routes->post('id/header', 'BeaCukai\BC23::createHeaderAction');

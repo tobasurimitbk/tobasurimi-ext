@@ -28,7 +28,7 @@
                                     <select class="form-select entitas_npwp_importir" id="entitas_npwp_importir" name="entitas_npwp_importir" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($pengusahaTPB as $p) : ?>
-                                            <option <?= $bc23Entitas != null ? ($p['npwp'] == $bc23Entitas['nomor_identitas'] ? 'selected' : '')  : '' ?> value="<?= $p['npwp'] ?>" data-nama_pengusaha="<?= $p['nama_pengusaha'] ?>" data-alamat="<?= $p['alamat'] ?>" data-id="<?= $p['id'] ?>">
+                                            <option <?= $bc23Entitas != null ? ($p['npwp'] == $bc23Entitas['nomor_identitas'] ? 'selected' : '')  : '' ?> value="<?= $p['npwp'] ?>" data-nama_pengusaha="<?= $p['nama_pengusaha'] ?>" data-alamat="<?= $p['alamat'] ?>" data-nib="<?= $p['nib'] ?>" data-id="<?= $p['id'] ?>">
                                                 <?= $p['npwp'] ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -163,6 +163,7 @@
     }).change(function() {
         var selected = $(this).find('option:selected');
         $('#entitas_tanggal_skep_tpb').val(selected.data('tanggal_skep_tpb'));
+        $('#entitas_alamat_pemilik_barang').val(selected.data('alamat_pemilik_barang'));
     });
 
     $("#entitas_tanggal_skep_tpb").datepicker({
@@ -181,13 +182,14 @@
         var npwpPengusaha = $(this).val();
         var namaPengusaha = selected.data('nama_pengusaha');
         var alamatPengusaha = selected.data('alamat');
+        var nibDefault = selected.data('nib');
 
         $('#entitas_nama_importir').val(namaPengusaha);
         $('#entitas_alamat_importir').val(alamatPengusaha);
         $('#entitas_npwp_pemilik_barang').val(npwpPengusaha)
         $('#entitas_nama_pemilik_barang').val(namaPengusaha);
         $('#entitas_alamat_pemilik_barang').val(alamatPengusaha);
-
+        $('#entitas_nib').val(nibDefault);
         // DROPDOPWN NOMOR IZIN TPB
         getListNoIjinTPB();
 
@@ -373,7 +375,7 @@
                 $(".entitas_nomor_ijin_tpb").empty()
                 $(".entitas_nomor_ijin_tpb").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".entitas_nomor_ijin_tpb").append(`<option data-tanggal_skep_tpb="${item.tanggal_skep_tpb}"  value="${item.no_ijin_tpb}">${item.no_ijin_tpb}</option>`)
+                    $(".entitas_nomor_ijin_tpb").append(`<option data-alamat_pemilik_barang="${item.alamat_pemilik_barang}" data-tanggal_skep_tpb="${item.tanggal_skep_tpb}"  value="${item.no_ijin_tpb}">${item.no_ijin_tpb}</option>`)
                 })
                 $(".entitas_nomor_ijin_tpb").val();
             }

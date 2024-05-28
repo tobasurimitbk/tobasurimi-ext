@@ -174,7 +174,8 @@ class BC23 extends BaseController
                 "po_no"                 => str_replace(['"', ']', '['], " ",  $data->multiple_po_no),
                 "supplier_name"         => strtoupper($data->supplier_name),
                 "status"                => strtoupper($bc23 == null ? "BELUM DIBUAT" : $data->status_dokumen),
-                "is_update_no_aju"      => $bc23 == null ? false : ($bc23['no_aju'] == null ? false : true),
+                "status_posting"        => $data->status_posting,
+                "is_update_no_aju"      => $bc23 == null ? false : ($data->status_posting === "1" ? false : true),
             ]);
         }
 
@@ -192,6 +193,36 @@ class BC23 extends BaseController
     public function createPurchaseOrderView()
     {
         return view('BeaCukai/bc-23/form');
+    }
+
+    public function updatePurchaseOrderView($bcPurchaseOrderID)
+    {
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
+        $bc40 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $bcPo = $this->bcPurchaseOrderModel
+            ->select('bc_purchase_order.*, suppliers.name AS supplier_name')
+            ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
+            ->where('bc_purchase_order.id', $bcPurchaseOrderID)
+            ->first();
+        $noAju = $this->generateNomorAju();
+
+        if ($bcPo == null) {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+
+        if ($bc40 != null) {
+            if ($bc40['no_aju'] != null) {
+                $noAju = $bc40['no_aju'];
+            }
+        }
+
+        $data = [
+            'noAju' => $noAju,
+            'bcPo' => $bcPo,
+            'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID),
+        ];
+
+        return view('BeaCukai/bc-23/form-po-list', $data);
     }
 
     public function createHeaderView($bcPurchaseOrderID)
@@ -578,6 +609,7 @@ class BC23 extends BaseController
             'kodeJenisKontainer' => $this->metaDataModel->where('name', "Jenis Kontainer")->findAll(),
             'seriKemasan' => $kemasanLast == null ? 1 : $kemasanLast['seri_kemasan'] + 1,
             'seriKontainer' => $kontainerLast == null ? 1 : $kontainerLast['seri_kontainer'] + 1,
+            'dropdownKemasan' => $this->bcPurchaseOrderModel->dropdownKemasan($bcPurchaseOrderID),
             'bc23DokumenBL' => $bc23DokumenBL,
             'bcPo' => $bcPo
         ];
@@ -619,8 +651,9 @@ class BC23 extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "bc_purchase_order_id"  => encrypt($data->bc_purchase_order_id),
+                "kemasan_name"          => strtoupper($data->kode_kemasan . " - " . $data->kemasan_name),
                 "jumlah_kemasan"        => $data->jumlah_kemasan,
-                "kode_jenis_kemasan"    => $data->kode_jenis_kemasan . ' - ' . $kemasan['value'],
+                "kode_jenis_kemasan"    => strtoupper($data->kode_jenis_kemasan . ' - ' . $kemasan['value']),
                 "merk_kemasan"          => $data->merk_kemasan,
                 "seri_kemasan"          => $data->seri_kemasan
             ]);
@@ -705,6 +738,7 @@ class BC23 extends BaseController
         $this->bcKemasanModel->insert([
             'bc_type' => 23,
             'bc_purchase_order_id' => $bcPurchaseOrderID,
+            'kemasan_id' => $this->request->getVar('kemasan_kemasan_id'),
             'seri_kemasan' => $this->request->getVar('kemasan_seri_kemasan'),
             'jumlah_kemasan' => $this->request->getVar('kemasan_jumlah_kemasan'),
             'kode_jenis_kemasan' => decrypt($this->request->getVar('kemasan_jenis_kemasan')),
@@ -1351,6 +1385,31 @@ class BC23 extends BaseController
             ]);
         }
 
+        // ADD DATA DI TAB TRANSAKSI
+        $bcBarangList = $this->bcBarangModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->where('deletedAt', null)
+            ->findAll();
+        $hargaTotal = 0;
+        foreach ($bcBarangList as $b) {
+            $hargaTotal += $b['harga_perolehan_barang'];
+        }
+
+        $bc23 = $this->bc23Model->get($bcPurchaseOrderID);
+        if ($bc23 == null) {
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            $this->bc23Model->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+                'nilai_barang' => $hargaTotal
+            ]);
+        } else {
+            $this->bc23Model->update($bc23['id'], [
+                'nilai_barang' => $hargaTotal
+            ]);
+        }
+
         return response()->setJSON([
             'message' => "Detail Barang Dokumen Berhasil Disimpan",
             'token' => csrf_hash(),
@@ -1458,8 +1517,9 @@ class BC23 extends BaseController
 
         $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
         $bc23 = $this->bc23Model->get($bcPurchaseOrderID);
+        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
 
-        if ($bcPo == null) {
+        if ($bcPo == null || $ceisaSetting == null) {
             return redirect()->to('bea-cukai-bc-23');
         }
 
@@ -1467,7 +1527,8 @@ class BC23 extends BaseController
 
         $data = [
             'bcPo' => $bcPo,
-            'bc23' => $bc23
+            'bc23' => $bc23,
+            'ceisaSetting' => $ceisaSetting
         ];
 
         return view('BeaCukai/bc-23/form-pernyataan', $data);
@@ -1551,8 +1612,14 @@ class BC23 extends BaseController
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $noAju = $this->request->getVar('no_pengajuan');
+        $bc23First = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
 
-        $bc23 = $this->bc23Model->where('no_aju', $noAju)->whereNotIn('bc_purchase_order_id', [$bcPurchaseOrderID])->first();
+        $bc23 = $this->bc23Model
+            ->where('no_aju', $noAju)
+            ->whereNotIn(
+                'bc_purchase_order_id',
+                [$bcPurchaseOrderID]
+            )->first();
 
         if ($bc23 != null) {
             return response()->setJSON([
@@ -1562,7 +1629,18 @@ class BC23 extends BaseController
             ]);
         }
 
-        $this->bc23Model->set('no_aju', $noAju)->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
+        if ($bc23First == null) {
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            $this->bc23Model->insert([
+                'no_aju' => $noAju,
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
+            ]);
+        } else {
+            $this->bc23Model->set('no_aju', $noAju)
+                ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                ->update();
+        }
         return response()->setJSON([
             'message' => "No Aju berhasil diupdate",
             'status' => true,
@@ -1596,18 +1674,8 @@ class BC23 extends BaseController
     // KIRIM BC.23 KE CEISA
     public function kirimCeisa($bcPurchaseOrderID)
     {
-        $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
-
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
-        $status = $this->insertInventori($bcPurchaseOrderID);
-
-        if (!$status) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => true,
-                'message' => "Terjadi kesalahan saat menambah stok inventori"
-            ]);
-        }
+        $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
 
         $bc23Data = $this->bc23Model->get($bcPurchaseOrderID);
 
@@ -1643,6 +1711,44 @@ class BC23 extends BaseController
             'res' => $res
         ]);
     }
+
+    // POSTING BEA CUKAI PO
+    public function posting()
+    {
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $bc40 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+
+        if ($bc40 == null) {
+            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            // insert
+            $this->bc23Model->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
+                'no_aju' => $this->generateNomorAju(),
+            ]);
+        }
+
+        $status = $this->insertInventori($bcPurchaseOrderID);
+
+        if (!$status) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => "Terjadi kesalahan saat menambah stok inventori"
+            ]);
+        }
+
+        $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
+            'status_posting' => '1'
+        ]);
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Dokumen BC 2.3 Berhasil Diposting",
+        ]);
+    }
+
 
     // API GET
     public function getValuta()

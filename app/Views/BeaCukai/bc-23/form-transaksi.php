@@ -68,7 +68,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="harga_nilai_barang" value="<?= $bc23 != null ? ($bc23['nilai_barang'] != null ? $bc23['nilai_barang'] : "0,00") : '0,00' ?>" name="harga_nilai_barang" type="text" class="harga_nilai_barang form-control" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input readonly id="harga_nilai_barang" value="<?= $bc23 != null ? ($bc23['nilai_barang'] != null ? $bc23['nilai_barang'] : "0,00") : '0,00' ?>" name="harga_nilai_barang" type="text" class="harga_nilai_barang form-control" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Harga Barang</label>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_nilai_pabean" readonly value="<?= $bc23 != null ? ($bc23['harga_penyerahan'] != null ? $bc23['harga_penyerahan'] : '0,00') : '0,00' ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean" placeholder="">
+                                <input id="harga_nilai_pabean" value="<?= $bc23 != null ? ($bc23['harga_penyerahan'] != null ? $bc23['harga_penyerahan'] : '0,00') : '0,00' ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean" placeholder="">
                                 <label>Harga Barang Pabean</label>
                             </div>
                         </div>
