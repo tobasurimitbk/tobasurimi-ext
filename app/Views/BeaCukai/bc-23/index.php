@@ -4,10 +4,18 @@
 <section class="section">
     <div class="section-header">
         <h1>Dokumen BC 2.3</h1>
-        <?php if (can("Bea Cukai", "BC 2.3", "c")) : ?>
-            <a href="<?= base_url('bea-cukai-bc-23/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </a>
+        <?php if ($akunCeisa != null) : ?>
+            <?php if ($akunCeisa['status_integrasi']) : ?>
+                <a href="<?= base_url('bea-cukai-bc-23/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
+                    <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
+                    Status Respon
+                </a>
+                <?php if (can("Bea Cukai", "BC 2.3", "c")) : ?>
+                    <a href="<?= base_url('bea-cukai-bc-23/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                    </a>
+                <?php endif; ?>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
     <div class="card">

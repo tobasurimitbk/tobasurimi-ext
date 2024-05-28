@@ -8,7 +8,7 @@
             <?php if ($akunCeisa['status_integrasi']) : ?>
                 <a href="<?= base_url('bea-cukai-bc-40/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
                     <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
-                    Data Online
+                    Status Respon
                 </a>
                 <?php if (can("Bea Cukai", "BC 4.0", "c")) : ?>
 

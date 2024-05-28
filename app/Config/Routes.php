@@ -1038,6 +1038,9 @@ $routes->post('/setting-akun-bc/akun/create-update', 'BeaCukai\IntegrasiCeisa::c
 // BC 2.3
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC23::index');
+    $routes->get('online', 'BeaCukai\BC23::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
+    $routes->get('all-online', 'BeaCukai\BC23::allOnline');
     $routes->get('all', 'BeaCukai\BC23::all');
     $routes->get('create', 'BeaCukai\BC23::createPurchaseOrderView');
     $routes->get('list-supplier', 'BeaCukai\BC23::dropdownSupplier');

@@ -119,7 +119,45 @@ class BC23 extends BaseController
 
     public function index()
     {
-        return view('BeaCukai/bc-23/index');
+        $data = [
+            'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first()
+        ];
+
+        return view('BeaCukai/bc-23/index', $data);
+    }
+
+    public function online()
+    {
+        $data = [
+            'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
+        ];
+
+        return view('BeaCukai/bc-23/online', $data);
+    }
+
+    public function allOnline()
+    {
+        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+
+        $beacukaiApi = new BeaCukaiApi($username, $password);
+        $dataOnline = $beacukaiApi->getListStatusResponseAll();
+
+        if ($dataOnline->status == false) {
+            $newDataResult = [];
+            foreach ($dataOnline->dataRespon as $d) {
+                if ($d->kodeDokumen == "23") {
+                    $newDataResult[] = $d;
+                }
+            }
+            $dataOnline->dataRespon = $newDataResult;
+            return response()->setJSON($dataOnline);
+        } else {
+            return response()->setJSON([
+                'data' => $dataOnline,
+                'status' => true
+            ]);
+        }
     }
 
     public function all()
