@@ -41,6 +41,14 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control nilai_tarif" id="nilai_tarif" name="nilai_tarif" placeholder="Nilai Tarif">
+                                <label for="floatingInput">Nilai Tarif (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -299,6 +307,7 @@
                         $(".komoditi").val(res.data.komoditi);
                         $(".code").val(res.data.code);
                         $(".uraian_barang").val(res.data.uraian_barang);
+                        $(".nilai_tarif").val(res.data.nilai_tarif);
 
                         validator.resetForm();
                         validator.reset();

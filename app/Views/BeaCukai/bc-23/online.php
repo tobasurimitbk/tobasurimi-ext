@@ -3,8 +3,8 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Status Respon Dokumen BC 4.0</h1>
-        <a href="<?= base_url('bea-cukai-bc-40') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <h1>Status Respon Dokumen BC 2.3</h1>
+        <a href="<?= base_url('bea-cukai-bc-23') ?>" type="button" class="btn btn-show-form btn-add float-right">
             <i class="fas fa-building mr-2"></i> Data Internal
         </a>
     </div>
@@ -38,23 +38,6 @@
         </div>
     </div>
 </section>
-<div class="modal fade" id="prevModals" tabindex="-1" aria-labelledby="prevModals" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="prevModals">Preview Response</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <div id="mypdfs"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <script>
     $(document).ready(function() {
         var dataTable = $('#dataTable').DataTable({
@@ -85,7 +68,7 @@
 
         function getList() {
             $.ajax({
-                url: `<?= base_url('bea-cukai-bc-40/all-online'); ?>`,
+                url: `<?= base_url('bea-cukai-bc-23/all-online'); ?>`,
                 method: "GET",
                 beforeSend: function() {
                     setLoading();
@@ -188,7 +171,7 @@
 
     function pdf(url) {
         $.ajax({
-            url: "<?= base_url('bea-cukai-bc-40/download-response') ?>",
+            url: "<?= base_url('bea-cukai-bc-23/download-response') ?>",
             type: 'GET',
             data: {
                 path: url

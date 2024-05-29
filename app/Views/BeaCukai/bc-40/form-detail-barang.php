@@ -132,7 +132,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_spesifikasi_lain" name="barang_detail_spesifikasi_lain" type="text" class="form-control barang_detail_spesifikasi_lain" value="<?= $bc40DokumenBarang != null ? $bc40DokumenBarang['spesifikasi_lain'] : '' ?>" placeholder="">
+                                    <input id="barang_detail_spesifikasi_lain" name="barang_detail_spesifikasi_lain" type="text" class="form-control barang_detail_spesifikasi_lain" value="<?= $bc40DokumenBarang != null ? $bc40DokumenBarang['spesifikasi_lain'] : '-' ?>" placeholder="">
                                     <label>Spesifikasi Lain</label>
                                 </div>
                             </div>
@@ -188,7 +188,12 @@
                                     <label>Berat Bersih (Kg)</label>
                                 </div>
                             </div>
-
+                            <div class="mt-1">
+                                <div class="form-floating mb-3">
+                                    <input value="<?= $bc40DokumenBarang != null ? $bc40DokumenBarang['volume'] : '0' ?>" id="barang_detail_volume" name="barang_detail_volume" type="text" class="form-control barang_detail_volume" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <label>Volume (M3)</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-sm-4 mt-1">
                             <label class="form-label font-weight-bold lable-title mb-3">
@@ -251,7 +256,7 @@
                                     <select class="form-select barang_detail_kode_jenis_pungutan" id="barang_detail_kode_jenis_pungutan" name="barang_detail_kode_jenis_pungutan" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeJenisPungutan as $k) : ?>
-                                            <option value="<?= encrypt($k['value']) ?>">
+                                            <option <?= $k['value'] == "PPN" ? "selected" : "" ?> value="<?= encrypt($k['value']) ?>">
                                                 <?= $k['value'] . " - " . strtoupper($k['description']) . " " ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -264,7 +269,7 @@
                                     <select class="form-select barang_detail_kode_jenis_tarif" id="barang_detail_kode_jenis_tarif" name="barang_detail_kode_jenis_tarif" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeJenisTarif as $k) : ?>
-                                            <option value="<?= encrypt($k['value']) ?>">
+                                            <option <?= $k['value'] == "1" ? "selected" : "" ?> value="<?= encrypt($k['value']) ?>">
                                                 <?= $k['value'] . " - " . strtoupper($k['description']) . " " ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -274,7 +279,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="number" min="0" max="100" class="form-control barang_detail_nilai_tarif" placeholder="" oninput="$(this).val(Math.max(0, Math.min(100, $(this).val())))">
+                                    <input value="11" id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="number" min="0" max="100" class="form-control barang_detail_nilai_tarif" placeholder="" oninput="$(this).val(Math.max(0, Math.min(100, $(this).val())))">
                                     <label>Nilai Tarif (%)</label>
                                 </div>
                             </div>
@@ -283,7 +288,7 @@
                                     <select class="form-select barang_detail_kode_fasilitas_tarif" id="barang_detail_kode_fasilitas_tarif" name="barang_detail_kode_fasilitas_tarif" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeFasilitasTarif as $k) : ?>
-                                            <option value="<?= encrypt($k['value']) ?>">
+                                            <option <?= $k['value'] == "3" ? 'selected' : '' ?> value="<?= encrypt($k['value']) ?>">
                                                 (<?= $k['value'] ?>) <?= $k['description'] ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -704,6 +709,9 @@
             barang_detail_diskon: {
                 required: true,
             },
+            barang_detail_volume: {
+                required: true
+            }
         },
         messages: {
             barang_detail_seri_barang: {
@@ -754,6 +762,9 @@
             barang_detail_diskon: {
                 required: "Diskon wajib diisi",
             },
+            barang_detail_volume: {
+                required: "Volume wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -814,11 +825,6 @@
                             csrf.val(response.token);
                             if (response.status) {
                                 tableListInformasiPungutan.ajax.reload();
-                                $('#barang_detail_kode_jenis_pungutan').val(null).change();
-                                $('#barang_detail_kode_jenis_tarif').val(null).change();
-                                $('#barang_detail_nilai_tarif').val('');
-                                $('#barang_detail_kode_fasilitas_tarif').val(null).change();
-                                $('#barang_detail_tarif_fasilitas').val('100');
                             } else {
                                 Swal.fire({
                                     icon: 'error',

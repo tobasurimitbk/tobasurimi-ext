@@ -30,7 +30,7 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input value="<?= !empty($bc40) ?  $bc40['kota_ttd'] : '' ?>" id="pernyatan_tempat" name="pernyatan_tempat" type="text" class="form-control pernyatan_tempat" placeholder="">
+                                <input value="<?= !empty($bc40) ? ($bc40['kota_ttd'] == null ? $ceisaSetting['tempat'] : $bc40['kota_ttd']) : $ceisaSetting['tempat'] ?>" id="pernyatan_tempat" name="pernyatan_tempat" type="text" class="form-control pernyatan_tempat" placeholder="">
                                 <label>Tempat</label>
                             </div>
                         </div>
@@ -47,13 +47,13 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input value="<?= !empty($bc40) ?  $bc40['nama_ttd'] : '' ?>" id="pernyatan_nama" name="pernyatan_nama" type="text" class="form-control pernyatan_nama" placeholder="">
+                                <input value="<?= !empty($bc40) ?  ($bc40['nama_ttd'] == null ? $ceisaSetting['nama'] : $bc40['nama_ttd']) : $ceisaSetting['nama']  ?>" id="pernyatan_nama" name="pernyatan_nama" type="text" class="form-control pernyatan_nama" placeholder="">
                                 <label>Nama</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input value="<?= !empty($bc40) ?  $bc40['jabatan_ttd'] : '' ?>" id="pernyatan_jabatan" name="pernyatan_jabatan" type="text" class="form-control pernyatan_jabatan" placeholder="">
+                                <input value="<?= !empty($bc40) ? ($bc40['jabatan_ttd'] == null ? $ceisaSetting['jabatan'] : $bc40['jabatan_ttd']) : '' ?>" id="pernyatan_jabatan" name="pernyatan_jabatan" type="text" class="form-control pernyatan_jabatan" placeholder="">
                                 <label>Jabatan</label>
                             </div>
                         </div>

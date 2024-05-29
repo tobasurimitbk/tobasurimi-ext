@@ -15,10 +15,10 @@
     <div class="row">
         <div class="col-sm-12 mt-1">
             <div class="card">
-                <div class="card-header" style="font-weight: bold; color:black;">
-                    AKUN CEISA PERUSAHAAN
-                </div>
                 <form class="create-form" method="post">
+                    <div class="card-header" style="font-weight: bold; color:black;">
+                        AKUN CEISA PERUSAHAAN
+                    </div>
                     <?= csrf_field() ?>
                     <div class="card-body">
                         <div class="text-center">
@@ -81,6 +81,31 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card-header" style="font-weight: bold; color:black; margin-bottom:-20px;">
+                        PERNYATAAN PEMBUATAN DOKUMEN
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-4 mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="tempat" value="<?= !empty($akunCeisa) ? $akunCeisa['tempat'] : '' ?>" type="text" class="form-control tempat" name="tempat" placeholder="">
+                                    <label>Tempat</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="nama" value="<?= !empty($akunCeisa) ? $akunCeisa['nama'] : '' ?>" type="text" class="form-control nama" name="nama" placeholder="">
+                                    <label>Nama</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="jabatan" value="<?= !empty($akunCeisa) ? $akunCeisa['jabatan'] : '' ?>" type="text" class="form-control jabatan" name="jabatan" placeholder="">
+                                    <label>Jabatan</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -120,6 +145,15 @@
             password: {
                 required: true
             },
+            tempat: {
+                required: true
+            },
+            nama: {
+                required: true
+            },
+            jabatan: {
+                required: true
+            }
         },
         messages: {
             kode_kantor_pabean: {
@@ -131,6 +165,15 @@
             password: {
                 required: "Password wajib diisi"
             },
+            tempat: {
+                required: "Tempat wajib diisi"
+            },
+            nama: {
+                required: "Nama wajib diisi"
+            },
+            jabatan: {
+                required: "Jabatan wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
