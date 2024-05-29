@@ -64,7 +64,9 @@ class StuffingInternasionalDetailModel extends Model
             $stockList = $stockDetail2Model->getStockListDetail(
                 $m['stock_id_warehouse'],
                 $m['bc_id_warehouse'],
-                $m['no_aju_warehouse']
+                $m['no_aju_warehouse'],
+                $m['stock_dokumen']
+
             );
             $stock = $stockModel->find($m['stock_id_warehouse']);
 
@@ -99,16 +101,19 @@ class StuffingInternasionalDetailModel extends Model
             $stockList['id_stuffing_detail'] = $m['id'];
             $stockList['divisi_id'] = $m['divisi_id'];
             $stockList['warehouse_id'] = $m['warehouse_id'];
+            $stockList['stock_dokumen'] = $m['stock_dokumen'];
+            $stockList['no_dokumen_1'] = $m['no_dokumen_1'];
+            $stockList['no_dokumen_2'] = $m['no_dokumen_2'];
             $stockList['qty'] = $m['qty'];
-            $bcType = $metaDataModel->find($stockList['bc_id']);
-            $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
+            $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
+            $stockList['no_aju'] =  !isset($stockList['no_aju']) ? "-" : $stockList['no_aju'];
             $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
             $stockList['satuan'] = $satuan['kode_satuan'];
             $stockList['barang'] = strtoupper($barangName);
             $stockList['stock_id'] = $stockList['stock_id'];
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-            $stockList['stok_total'] = ($stockList['stok_total']);
+            $stockList['stok_total'] = ($m['stok_total']);
             $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
             $stockList['output'] = [
                 'id_barang' => $barangKodeOutput,

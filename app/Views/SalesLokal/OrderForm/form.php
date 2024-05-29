@@ -74,7 +74,7 @@
                                 <label for="floatingInput">Nama Konsumen</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
-                                <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button">
+                                <button class="btn btn-success btn-customer-add <?= !empty($data) ? (($data->used == "USED") ? 'disabled' : '') : '' ?>" id="btn-customer-add" data-toggle="modal" type="button">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -210,8 +210,8 @@
                     </div>
 
                     <div class="col-md-6">
-                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        <button class="btn btn-show-detail btn-add btn-block float-right <?= !empty($data) ? (($data->used == "USED") ? 'disabled' : '') : '' ?>" data-btn="detail-modal">
+                            <i class="fa fa-plus fa-sm mr-2 " aria-hidden="true"></i>Tambah
                         </button>
                     </div>
                 </div>
@@ -652,11 +652,13 @@
                 className: "text-center actions",
                 render: function(data, type, row) {
                     let id = row.id;
+                    let disableButton = "<?= !empty($data) && $data->used == 'USED' ? 'disabled' : '' ?>";
                     return `
                     <div class="">
-                        <button data-no="${row.no}" data-id="${row.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                        <button data-no="${row.no}" data-id="${row.id}" class="" ${disableButton}><i class="fa fa-trash" aria-hidden="true"></i></button>
                     </div>
-                `
+                `;
+
                 }
             }
         ],
@@ -808,6 +810,7 @@
 
         $(".order_date").datepicker({
             todayHighlight: true,
+            enableOnReadonly: false,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
@@ -815,6 +818,7 @@
 
         $(".shipping_date").datepicker({
             todayHighlight: true,
+            enableOnReadonly: false,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true,

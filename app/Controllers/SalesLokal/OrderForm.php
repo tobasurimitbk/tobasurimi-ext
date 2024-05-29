@@ -177,7 +177,7 @@ class OrderForm extends BaseController
                 "shipping_date" => date("d/m/Y", strtotime($data->shipping_date)),
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
-                "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->findAll()),
+                "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->where('tipe_input', "order_form")->findAll()),
                 "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
                 "keterangan" => $data->keterangan,
                 "surat_jalan_so_id" => $data->surat_jalan_so_id,
@@ -383,26 +383,12 @@ class OrderForm extends BaseController
                     "keterangan"            => $row->keterangan,
                     "tax"                   => $row->statusppn,
                     "discount_percentage"   => number_format($row->disc, 2, '.', ''),
+                    "tipe_input"            => "order_form",
                     // "dept"                  => $row->dept,
                     // "id_warehouse"          => $row->warehouse_id,
                 ];
                 $this->SalesOrderDetailModel->save($valueBarang);
             }
-
-            // Tambahkan $valueBarangDefault setelah loop selesai
-            $valueBarangDefault = [
-                "id_sales_order"        => $dataSalesOrder,
-                "id_barang"             => 85,
-                "qty"                   => number_format(100, 2, '.', ''),
-                "qty_sekarang"          => number_format(100, 2, '.', ''),
-                "harga_barang"          => 0,
-                "amount"                => 0,
-                "keterangan"            => "",
-                "tax"                   => 0,
-                "discount_percentage"   => number_format(0, 2, '.', ''),
-            ];
-
-            $this->SalesOrderDetailModel->save($valueBarangDefault);
 
             $this->SalesOrderModel->update($dataSalesOrder, ['qty_barang' => $totalQty]);
 
@@ -620,6 +606,7 @@ class OrderForm extends BaseController
                         "keterangan"            => $row->keterangan,
                         "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
+                        "tipe_input"            => "order_form",
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
                     ];
@@ -635,6 +622,7 @@ class OrderForm extends BaseController
                         "keterangan"            => $row->keterangan,
                         "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
+                        "tipe_input"            => "order_form",
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
                     ];
@@ -748,13 +736,7 @@ class OrderForm extends BaseController
         //qty barang ditambah jumlah kemasan
         $this->SalesOrderModel->update($getBarangSalesOrderDetail['id_sales_order'], ['qty_barang' => ($totalQty * 2), 'total_harga' => $total_harga]);
 
-        //update stok kemasan
-        // Update qty dan qty_sekarang untuk id_barang 85 dan id_sales_order yang sesuai
-        $this->SalesOrderDetailModel
-            ->where('id_barang', 85)
-            ->where('id_sales_order', $getBarangSalesOrderDetail['id_sales_order'])
-            ->set(['qty' => $totalQty, 'qty_sekarang' => $totalQty])
-            ->update();
+
 
 
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();

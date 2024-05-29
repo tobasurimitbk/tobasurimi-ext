@@ -832,6 +832,10 @@ $routes->post('/pengeluaran-lokal/close',  'Stuffing\Lokal::close', ['filter' =>
 $routes->get('/pengeluaran-lokal/id/(:segment)',  'Stuffing\Lokal::detail/$1', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/get-pengeluaran-lokal-no',  'Stuffing\Lokal::getStuffingLokalNo', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/print/(:segment)', 'Stuffing\Lokal::print/$1', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/kemasanAll', 'Stuffing\Lokal::getAllKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/save-kemasan',  'Stuffing\Lokal::createKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/delete-kemasan',  'Stuffing\Lokal::deleteKemasan', ['filter' => 'Auth']);
+
 
 // Stuffing Internasional
 $routes->get('/pengeluaran-internasional',  'Stuffing\Internasional::index', ['filter' => 'Auth']);
@@ -849,6 +853,10 @@ $routes->post('/pengeluaran-internasional/close',  'Stuffing\Internasional::clos
 $routes->get('/pengeluaran-internasional/id/(:segment)',  'Stuffing\Internasional::detail/$1', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/get-pengeluaran-internasional-no',  'Stuffing\Internasional::getStuffingLokalNo', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/print/(:segment)', 'Stuffing\Internasional::print/$1', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/kemasanAll', 'Stuffing\Internasional::getAllKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/save-kemasan',  'Stuffing\Internasional::createKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/delete-kemasan',  'Stuffing\Internasional::deleteKemasan', ['filter' => 'Auth']);
+
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);

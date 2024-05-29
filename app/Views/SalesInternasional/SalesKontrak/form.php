@@ -1687,5 +1687,10 @@
             }
         })
     })
+
+    //handle print
+    function print(url) {
+        window.open(url, "_blank");
+    }
 </script>
 <?= $this->endSection(); ?>

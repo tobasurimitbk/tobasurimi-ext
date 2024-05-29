@@ -65,8 +65,13 @@ class StuffingLokalDetailModel extends Model
             $stockList = $stockDetail2Model->getStockListDetail(
                 $m['stock_id_warehouse'],
                 $m['bc_id_warehouse'],
-                $m['no_aju_warehouse']
+                $m['no_aju_warehouse'],
+                $m['stock_dokumen']
             );
+
+            // var_dump($m['stock_id_warehouse'], $m['bc_id_warehouse'], $m['no_aju_warehouse'], $m['stock_dokumen'], $stockList);
+            // die();
+
             $stock = $stockModel->find($m['stock_id_warehouse']);
 
             if ($stock['kemasan_id'] == 0) {
@@ -100,9 +105,12 @@ class StuffingLokalDetailModel extends Model
             $stockList['id_stuffing_detail'] = $m['id'];
             $stockList['divisi_id'] = $m['divisi_id'];
             $stockList['warehouse_id'] = $m['warehouse_id'];
+            $stockList['stock_dokumen'] = $m['stock_dokumen'];
+            $stockList['no_dokumen_1'] = $m['no_dokumen_1'];
+            $stockList['no_dokumen_2'] = $m['no_dokumen_2'];
             $stockList['qty'] = $m['qty'];
-            $bcType = $metaDataModel->find($stockList['bc_id']);
-            $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
+            $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
+            $stockList['no_aju'] =  !isset($stockList['no_aju']) ? "-" : $stockList['no_aju'];
             $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
             $stockList['satuan'] = $satuan['kode_satuan'];
             $stockList['barang'] = strtoupper($barangName);

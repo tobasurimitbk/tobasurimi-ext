@@ -16,6 +16,7 @@ use App\Models\StuffingLokalDetailModel;
 use App\Models\StuffingLokalModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
+use App\Models\BarangMasterSalesModel;
 use Dompdf\Dompdf;
 
 class Lokal extends BaseController
@@ -35,6 +36,7 @@ class Lokal extends BaseController
     protected $salesOrderDetailModel;
     protected $stuffingLokalModel;
     protected $stuffingLokalDetailModel;
+    protected $BarangMasterSalesModel;
     protected $dompdf;
 
     public function __construct()
@@ -54,6 +56,7 @@ class Lokal extends BaseController
         $this->salesOrderDetailModel = new SalesOrderDetailModel();
         $this->stuffingLokalModel = new StuffingLokalModel();
         $this->stuffingLokalDetailModel = new StuffingLokalDetailModel();
+        $this->BarangMasterSalesModel = new BarangMasterSalesModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -135,7 +138,7 @@ class Lokal extends BaseController
         $dataAJU = $this->metaDataModel->getBCUsed('so_lokal');
         $data = [
             'tanggal' => date('Y-m-d'),
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description !=', 'kemasan')->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'orderForm' => $this->salesOrderModel
                 ->select('sales_order.*, customers.name as customer_name')
@@ -172,13 +175,17 @@ class Lokal extends BaseController
             return redirect()->to('pengeluaran-lokal');
         }
 
+        // $getStuffingLokalDetail = $this->stuffingLokalDetailModel->getStuffingDetail($id);
+        // var_dump($getStuffingLokalDetail);
+        // die();
+
         $data = [
             'tanggal' => date('Y-m-d'),
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description !=', 'kemasan')->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'orderForm' => $this->salesOrderModel->select('sales_order.*, customers.name as customer_name')->join('customers', 'customers.id = sales_order.id_customer')->where('sales_order.deletedAt', null)->orderBy('sales_order.no_sales_order', "ASC")->findAll(),
             'stuffingLokal' => $stuffingLokalModel,
-            'stuffingLokalDetail' => $this->stuffingLokalDetailModel->getStuffingDetail($id),
+            'stuffingLokalDetail' =>  $this->stuffingLokalDetailModel->getStuffingDetail($id),
             'salesOrder' => $salesOrder,
             'divisi' => $this->divisiModel->getDivisiAccess(),
             "dataAJU" => $dataAJU,
@@ -213,6 +220,9 @@ class Lokal extends BaseController
                 'warehouse_id' => $b->warehouse_id,
                 'stuffing_lokal_id' => $id,
                 'stock_id_warehouse' => $b->stock_id,
+                'stock_dokumen' => $b->stock_dokumen,
+                'no_dokumen_1' => $b->no_dokumen_1,
+                'no_dokumen_2' => $b->no_dokumen_2,
                 'bc_id_warehouse' => $b->bc_id,
                 'no_aju_warehouse' => $b->no_aju,
                 'barang1_id_warehouse' => $checkStock['barang1_id'],
@@ -236,6 +246,8 @@ class Lokal extends BaseController
         $id = decrypt($this->request->getVar('id'));
 
         $barang = json_decode($this->request->getVar('listBarang'));
+        // var_dump($barang);
+        // die();
 
         $this->stuffingLokalDetailModel->where('stuffing_lokal_id', $id)->delete();
         // get all id detail
@@ -247,6 +259,9 @@ class Lokal extends BaseController
                 'warehouse_id' => $b->warehouse_id,
                 'stuffing_lokal_id' => $id,
                 'stock_id_warehouse' => $b->stock_id,
+                'stock_dokumen' => $b->stock_dokumen,
+                'no_dokumen_1' => $b->no_dokumen_1,
+                'no_dokumen_2' => $b->no_dokumen_2,
                 'bc_id_warehouse' => $b->bc_id,
                 'no_aju_warehouse' => $b->no_aju,
                 'barang1_id_warehouse' => $checkStock['barang1_id'],
@@ -292,8 +307,12 @@ class Lokal extends BaseController
         $salesOrder = $this->salesOrderModel->find($stuffingLokal['sales_order_id']);
         $stuffingLokalDetail = $this->stuffingLokalDetailModel->where('stuffing_lokal_id', $id)->where('deletedAt', null)->findAll();
 
+
+
+
         foreach ($stuffingLokalDetail as $j) {
             $stock = $this->stockModel->find($j['stock_id_warehouse']);
+
             $qty = $j['qty'];
 
             if ($stock['tipe_barang'] == "kemasan") {
@@ -302,6 +321,7 @@ class Lokal extends BaseController
                 $barang2_id = $stock['barang2_id'];
             }
 
+            //ngurangin
             $stok = $this->stockModel->insertStok(
                 $stuffingLokal['company_id'],
                 $j['warehouse_id'],
@@ -312,6 +332,7 @@ class Lokal extends BaseController
                 ($qty * -1)
             );
 
+
             // DETAIL
             $stokDetail = $this->stockDetailModel->insertStokDetail(
                 $stok,
@@ -320,7 +341,8 @@ class Lokal extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "PENJUALAN",
-                $salesOrder['no_sales_order'],
+                // $salesOrder['no_sales_order'],
+                $j['no_dokumen_1'],
                 "-"
             );
 
@@ -331,7 +353,8 @@ class Lokal extends BaseController
                 $stokDetail,
                 $qty,
                 $j['no_aju_warehouse'],
-                $stuffingLokal['no_stuffing']
+                $stuffingLokal['no_stuffing'],
+                $j['stock_dokumen']
             );
         }
 
@@ -356,50 +379,50 @@ class Lokal extends BaseController
         ]);
     }
 
-    // public function print($id)
-    // {
-    //     $id = decrypt($id);
-    //     $selectQryJasaVendor = "
-    //         jasa_vendor_out.*,
-    //         vendors.name as vendor_name,
-    //         vendors.address
-    //     ";
+    public function print($id)
+    {
+        $id = decrypt($id);
+        $stuffingLokalModel = $this->stuffingLokalModel
+            ->select('stuffing_lokal.*, sales_order.bc_type, customers.name as customer_name, sales_order.no_sales_order')
+            ->join('customers', 'customers.id = stuffing_lokal.customer_id')
+            ->join('sales_order', 'sales_order.id = stuffing_lokal.sales_order_id')
+            ->find($id);
+        $salesOrder = $this->salesOrderDetailModel
+            ->select('sales_order_detail.*, sales_order.bc_type, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
+            ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order')
+            ->where('sales_order_detail.id_sales_order', $stuffingLokalModel['sales_order_id'])
+            ->where('sales_order_detail.deletedAt', null)
+            ->findAll();
 
-    //     $jasaVendorOut = $this->jasaVendorOutModel->select($selectQryJasaVendor)
-    //         ->join('vendors', 'vendors.id = jasa_vendor_out.vendor_id')
-    //         ->where('jasa_vendor_out.id', $id)
-    //         ->first();
+        if ($stuffingLokalModel['bc_type'] == 0) {
+            $dataAJU = "No Pabean";
+        } else {
+            $getDataAju = $this->metaDataModel->select('value')->where('id', $stuffingLokalModel['bc_type'])->first();
+            $dataAJU = $getDataAju['value'];
+        }
 
-    //     if ($jasaVendorOut == null) {
-    //         return redirect()->to('jasa-vendor-out');
-    //     }
+        if ($stuffingLokalModel == null) {
+            return redirect()->to('pengeluaran-lokal');
+        }
 
-    //     $selectQryJasaVendorDetail = "
-    //         SUM(jasa_vendor_out_detail.qty) as qty,
-    //         satuans.kode_satuan,
-    //         barang_master.barang_name,
-    //         barang_master_spesifikasi.spesifikasi
-    //     ";
+        $data = [
+            'tanggal' => date('Y-m-d'),
+            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description !=', 'kemasan')->findAll(),
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
 
-    //     $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->select($selectQryJasaVendorDetail)
-    //         ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
-    //         ->join('barang_master', 'barang_master.id = stock.barang1_id')
-    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-    //         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
-    //         ->where('jasa_vendor_out_id', $jasaVendorOut['id'])
-    //         ->groupBy('jasa_vendor_out_detail.stock_out_id')
-    //         ->findAll();
+            'stuffingLokal' => $stuffingLokalModel,
+            'stuffingLokalDetail' => $this->stuffingLokalDetailModel->getStuffingDetail($id),
+            'salesOrder' => $salesOrder,
+            'divisi' => $this->divisiModel->getDivisiAccess(),
+            "dataAJU" => $dataAJU,
+        ];
 
-    //     $data = [
-    //         'jasaVendorOut' => $jasaVendorOut,
-    //         'jasaVendorDetail' => $jasaVendorOutDetail
-    //     ];
-
-    //     $this->dompdf->loadHtml(view('Stuffing/Lokal/print', $data));
-    //     $this->dompdf->setPaper('A4', 'portrait');
-    //     $this->dompdf->render();
-    //     $this->dompdf->stream("Jasa Vendor Barang Keluar", array("Attachment" => false));
-    // }
+        $this->dompdf->loadHtml(view('Stuffing/Lokal/print', $data));
+        $this->dompdf->setPaper('A4', 'landscape');
+        $this->dompdf->render();
+        $this->dompdf->stream("Pengeluaran Lokal", array("Attachment" => false));
+    }
 
     public function dropdownListOrder()
     {
@@ -426,5 +449,113 @@ class Lokal extends BaseController
             'data' => $no,
             'token' => csrf_hash()
         ]);
+    }
+
+
+    //handel kemasan
+    public function getAllKemasan()
+    {
+        //Get Barang
+        /*$responseBarang = curl_request("GET", "/barang/all?idCompany=$this->this_company_id", $this->token);
+
+        $dataBarang = [];
+        if ($responseBarang["code"] === 200) {
+            $dataBarang = json_decode($responseBarang["body"])->data;
+        }*/
+        $dataBarang = $this->BarangMasterSalesModel
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->select('barang_master_sales.*')
+            ->select('barang_master_sales.id as id_barang')
+            ->select('barang_master_sales.kode_barang as kode_barang')
+            ->select('barang_master_sales.barang_name as nama_barang')
+            ->select('barang_master_sales.harga_pokok as harga_pokok')
+            ->select('barang_master_sales.harga_jual as harga_jual')
+            ->select('barang_master_sales.status_ppn as statusppn')
+            ->select('satuans.nama_satuan as nama_satuan')
+            ->where('type_barang_sales', 'LOKAL')
+            ->where('type_barang', 'kemasan')
+            ->where('barang_master_sales.deletedAt', null)
+            ->groupBy('id_barang')
+            ->findAll();
+
+
+
+        $data = [
+            "dataBarang" => $dataBarang,
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function createKemasan()
+    {
+
+        $getSalesOrderDetail = $this->salesOrderDetailModel
+            ->select('sales_order_detail.id')
+            ->where('sales_order_detail.id_sales_order', $this->request->getVar('sales_order_id'))
+            ->where('sales_order_detail.id_barang', $this->request->getVar('id_barang'))
+            ->where('sales_order_detail.deletedAt', null)
+            ->first();
+
+        if ($getSalesOrderDetail) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Kemasan sudah ada"
+            ]);
+        }
+
+        $valueKemasan = [
+            "id_sales_order"        => $this->request->getVar('sales_order_id'),
+            "id_barang"             => $this->request->getVar('id_barang'),
+            "qty"                   => number_format($this->request->getVar('qty'), 2, '.', ''),
+            "qty_sekarang"          => number_format($this->request->getVar('qty'), 2, '.', ''),
+            "keterangan"            => $this->request->getVar('keterangan'),
+            "tax"                   => $this->request->getVar('statusppn'),
+            "tipe_input"            => "stuffing",
+
+
+        ];
+        $this->salesOrderDetailModel->save($valueKemasan);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Kemasan berhasil ditambahkan"
+        ]);
+    }
+
+    public function deleteKemasan()
+    {
+        try {
+
+            $id = $this->request->getPost("id");
+            if (!empty($id)) {
+                $this->salesOrderDetailModel->delete($id);
+                $data = [
+                    "status"     => true,
+                    "message"    => "Data Success Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Data Gagal Dihapus",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 }

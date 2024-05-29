@@ -28,6 +28,7 @@ class SalesOrderDetailModel extends Model
         'amount',
         'id_warehouse',
         'dept',
+        'tipe_input',
     ];
 
     // Dates
