@@ -47,7 +47,7 @@ class AccountBarangModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getAccountBarangForJurnal($condition = null)
+    public function getAccountBarangForJurnal($condition = [])
     {
         $select =   "account_barang.*";
         return $this->asObject()
