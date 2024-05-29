@@ -227,4 +227,49 @@ class RMImportPOModel extends Model
             }
         }
     }
+
+    public function getPOByNoPO($noPO, $companyID, $barang1ID, $barang2ID)
+    {
+        $condition = [
+            "rm_import_pos.company_id"  => $companyID,
+            "rm_import_pos.po_no"  => $noPO,
+            "rm_import_pos.deletedAt" => NULL,
+            "rm_import_po_details.deletedAt" => NULL,
+            "rm_import_po_details.barang_id" => $barang1ID,
+            "rm_import_po_details.spesifikasi_id" => $barang2ID,
+        ];
+
+        $selectQry = "
+            barang_master.barang_name as nama_barang, 
+            rm_import_pos.*,
+            suppliers.name as nama_supplier,
+            rm_import_po_details.*,
+            SUM(rm_import_po_details.price) AS price,
+            SUM(rm_import_po_details.total) AS total,
+        ";
+
+        $res = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_purchase_order_id = rm_import_pos.id')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
+            ->first();
+
+        if ($res == null) {
+            return [
+                'hargaTerakhirNumber' => 0,
+                'hargaTerakhir' => '-',
+                'supplierTerakhir' => '-'
+            ];
+        } else {
+            $totalPrice = $res['total'];
+            return [
+                'hargaTerakhirNumber' => $totalPrice,
+                'hargaTerakhir' => number_format($totalPrice, 2, ',', '.'),
+                'supplierTerakhir' => $res['nama_supplier'],
+                'dataPO' => $res
+            ];
+        }
+    }
 }

@@ -47,11 +47,12 @@ class AccountBarangModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getAccountBarangForJurnal()
+    public function getAccountBarangForJurnal($condition = null)
     {
         $select =   "account_barang.*";
         return $this->asObject()
             ->select($select)
+            ->where($condition)
             ->where('account_barang.deleted_at', null)
             ->findAll();
     }

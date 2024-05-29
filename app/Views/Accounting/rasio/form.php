@@ -1396,7 +1396,7 @@
                     '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -1436,7 +1436,7 @@
                         list_items_barang_jadi[index].harga_total = totalHargaQty;
                     }
 
-                    $('.harga-total[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
+                    $('.harga-total-awal[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
                     $(this).val(harga);
                 });
 
@@ -1712,6 +1712,9 @@
                 var formatedHargaTotal = parseFloat(hargaTotal.replace(/Rp|\./g, ""));
                 var formatedHargaTotalPenerimaan = parseFloat(hargaTotalPenerimaan.replace(/Rp|\./g, ""));
 
+
+                console.log(formatedHargaTotal);
+                console.log(formatedHargaTotalPenerimaan);
                 if (formatedHargaTotal != formatedHargaTotalPenerimaan) {
                     isValid = false;
                 }

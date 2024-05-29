@@ -94,12 +94,14 @@ class AccountSupplierModel extends Model
         ];
     }
 
-    public function getAccountSupplierForJurnal()
+    public function getAccountSupplierForJurnal($condition = [])
     {
         $select =   "account_supplier.*";
-        return $this->asObject()
+        $query = $this->asObject()
             ->select($select)
+            ->where($condition)
             ->where('account_supplier.deleted_at', null)
             ->findAll();
+        return $query;
     }
 }

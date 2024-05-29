@@ -413,4 +413,50 @@ class RMPurchaseOrderModel extends Model
 
         return $poBBLokalData;
     }
+
+    public function getPOByNoPO($noPO, $companyID, $barang1ID, $barang2ID)
+    {
+        $condition = [
+            "rm_purchase_orders.company_id"  => $companyID,
+            "rm_purchase_orders.po_no"  => $noPO,
+            "rm_purchase_orders.deletedAt" => NULL,
+            "rm_purchase_order_details.deletedAt" => NULL,
+            "rm_purchase_order_details.barang1_id" => $barang1ID,
+            "rm_purchase_order_details.barang2_id" => $barang2ID,
+        ];
+
+        $selectQry = "
+            barang_master.barang_name as nama_barang, 
+            rm_purchase_orders.*,
+            suppliers.name as nama_supplier,
+            rm_purchase_order_details.*,
+            SUM(rm_purchase_order_details.general_price) AS general_price,
+            SUM(rm_purchase_order_details.daily_price) AS daily_price,
+            SUM(rm_purchase_order_details.monthly_price) AS monthly_price,
+        ";
+
+        $res = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id')
+            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang1_id')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id')
+            ->first();
+
+        if ($res == null) {
+            return [
+                'hargaTerakhirNumber' => 0,
+                'hargaTerakhir' => '-',
+                'supplierTerakhir' => '-'
+            ];
+        } else {
+            $totalPrice = $res['general_price'] + $res['daily_price'] + $res['monthly_price'];
+            return [
+                'hargaTerakhirNumber' => $totalPrice,
+                'hargaTerakhir' => number_format($totalPrice, 2, ',', '.'),
+                'supplierTerakhir' => $res['nama_supplier'],
+                'dataPO' => $res
+            ];
+        }
+    }
 }
