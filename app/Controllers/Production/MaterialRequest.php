@@ -508,7 +508,7 @@ class MaterialRequest extends BaseController
             ];
 
             if (!empty($id)) {
-                // $this->materialRequestModel->update($id, $payload);
+                $this->materialRequestModel->update($id, $payload);
                 $materialRequestData = $this->materialRequestModel->find($id);
                 $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->findAll();
 

@@ -985,6 +985,14 @@ class JurnalUmum extends BaseController
             }
         }
 
+        if (!$barangAPFound) {
+            return response()->setJSON([
+                "status" => false,
+                "message" => "Barang Tidak Memiliki Akun COA",
+                'token' => csrf_hash()
+            ]);
+        }
+
         $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
 
         $resultTransaksiJurnal = array(
