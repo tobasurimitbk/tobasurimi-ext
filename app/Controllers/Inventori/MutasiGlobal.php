@@ -3,44 +3,44 @@
 namespace App\Controllers\Inventori;
 
 use App\Controllers\BaseController;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
-use App\Models\MutasiDetailModel;
-use App\Models\MutasiModel;
-use App\Models\PenerimaanMutasiDetailModel;
+use App\Models\MutasiGlobalDetailModel;
+use App\Models\MutasiGlobalModel;
 use App\Models\WarehousesModel;
 
-class Mutasi extends BaseController
+class MutasiGlobal extends BaseController
 {
     protected $this_user_id;
     protected $this_company_id;
-    protected $divisiModel;
     protected $metaDataModel;
-    protected $mutasiModel;
-    protected $mutasiDetailModel;
+    protected $divisiModel;
+    protected $companyModel;
+    protected $mutasiGlobalModel;
+    protected $mutasiGlobalDetailModel;
     protected $warehouseModel;
-    protected $penerimaanMutasiDetailModel;
 
     public function __construct()
     {
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->divisiModel = new DivisisModel();
         $this->metaDataModel = new MetadataModel();
-        $this->mutasiModel = new MutasiModel();
-        $this->mutasiDetailModel = new MutasiDetailModel();
+        $this->divisiModel = new DivisisModel();
+        $this->companyModel = new CompaniesModel();
+        $this->mutasiGlobalModel = new MutasiGlobalModel();
+        $this->mutasiGlobalDetailModel = new MutasiGlobalDetailModel();
         $this->warehouseModel = new WarehousesModel();
-        $this->penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
     }
-
 
     public function index()
     {
         $data = [
-            'dataDivisi' => $this->divisiModel->getDivisiAccess()
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id)
         ];
 
-        return view('Warehouse/mutasi/index', $data);
+        return view('Warehouse/mutasi/index_global', $data);
     }
 
     public function all()
@@ -54,14 +54,15 @@ class Mutasi extends BaseController
         ];
 
         $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "search" => $this->request->getVar("search"),
-            "divisi_id" => $this->request->getVar("divisi_id"),
-            "status" => $this->request->getVar("status"),
-            "no_mutasi" => $this->request->getVar("no_mutasi"),
-            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "sort"              => $this->request->getVar("sort"),
+            "sortType"          => $this->request->getVar("sortType"),
+            "search"            => $this->request->getVar("search"),
+            "divisi_id"         => $this->request->getVar("divisi_id"),
+            "company_tujuan_id" => $this->request->getVar("company_tujuan_id"),
+            "status"            => $this->request->getVar("status"),
+            "no_mutasi"         => $this->request->getVar("no_mutasi"),
+            "dateStart"         => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"           => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getVar("length");
@@ -70,44 +71,25 @@ class Mutasi extends BaseController
         $dataResult = array();
 
         $condition = [
-            'mutasi.company_id' => $this->this_company_id,
-            'mutasi.deletedAt' => null
+            'mutasi_global.company_asal_id' => $this->this_company_id,
+            'mutasi_global.deletedAt' => null
         ];
 
         foreach ($this->divisiModel->getDivisiAccess() as $d) {
             array_push($divisiArr, $d['id']);
         }
 
-        $dataQry = $this->mutasiModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
+        $dataQry = $this->mutasiGlobalModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
-            $listItem = $this->mutasiDetailModel->where('mutasi_id', $data->id)->findAll();
+            $listItem = $this->mutasiGlobalDetailModel->where('mutasi_global_id', $data->id)->findAll();
             $totalItem = count($listItem);
-            $divisiTujuan = $this->divisiModel->find($data->divisi_tujuan_id);
-            $warehouseTujuan = $this->warehouseModel->find($data->warehouse_tujuan_id);
             $warehouseAsal = $this->warehouseModel->find($data->warehouse_asal_id);
-
-            $divisiTujuanName = $divisiTujuan == null ? '-' : $divisiTujuan['divisi'];
-            $warehouseTujuanName = $warehouseTujuan == null ? '-' : $warehouseTujuan['warehouse_name'];
             $warehouseAsalName = $warehouseAsal == null ? '-' : $warehouseAsal['warehouse_name'];
 
-            $penerimaanTotalDetail =   $this->penerimaanMutasiDetailModel
-                ->select('SUM(qty) AS qty_diterima')
-                ->where('mutasi_id', $data->id)
-                ->where('deletedAt', null)
-                ->groupBy('mutasi_id')
-                ->findAll();
-
-            $totalQtyMutasi = $this->mutasiDetailModel
-                ->select('SUM(qty) AS qty_mutasi')
-                ->where('mutasi_id', $data->id)
-                ->where('deletedAt', null)
-                ->groupBy('mutasi_id')
-                ->findAll();
-
-            $totalDiterima = count($penerimaanTotalDetail) == 0 ? 0 : $penerimaanTotalDetail[0]['qty_diterima'];
-            $totalMutasi = count($totalQtyMutasi) == 0 ? 0 : $totalQtyMutasi[0]['qty_mutasi'];
+            $totalDiterima = 0;
+            $totalMutasi = 1;
 
             array_push($dataResult, [
                 "no"                    => $no++,
@@ -115,8 +97,8 @@ class Mutasi extends BaseController
                 "no_mutasi"             => $data->no_mutasi,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "warehouse_asal"        => strtoupper($data->divisi . ' - ' . $warehouseAsalName),
-                "warehouse_tujuan"      => strtoupper($divisiTujuanName . ' - ' . $warehouseTujuanName),
-                "no_ppbkb"              => "-",
+                "company_tujuan"        => strtoupper($data->company_tujuan_name),
+                "no_bc27"               => "-",
                 "total_item"            => $totalItem,
                 "state"                 => $totalDiterima == $totalMutasi ? '1' : '0',
                 "status_posting"        => $data->status_posting
@@ -140,34 +122,36 @@ class Mutasi extends BaseController
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'tanggal' => date('Y-m-d'),
+            'companyAsalName' => session()->get('login')->this_company,
+            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id)
         ];
 
-        return view('Warehouse/mutasi/form', $data);
+        return view('Warehouse/mutasi/form_global', $data);
     }
 
     public function detail($id)
     {
         $id = decrypt($id);
-        $mutasi = $this->mutasiModel->find($id);
-        if ($mutasi == null) {
-            return redirect()->to('mutasi');
+        $mutasiGlobal = $this->mutasiGlobalModel->find($id);
+        if ($mutasiGlobal == null) {
+            return redirect()->to('mutasi/global');
         }
         $data = [
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
-            'mutasi' => $mutasi,
-            'mutasiDetail' => $this->mutasiDetailModel->getMutasiDetail($id),
-            'warehouseAsal' => $this->warehouseModel->where('divisi_id', $mutasi['divisi_asal_id'])->findAll(),
-            'warehouseTujuan' => $this->warehouseModel->where('divisi_id', $mutasi['divisi_tujuan_id'])->findAll(),
-            'divisiTujuan' => $this->divisiModel->getDivisiExcept($mutasi['divisi_asal_id']),
+            'mutasiGlobal' => $mutasiGlobal,
+            'mutasiGlobalDetail' => $this->mutasiGlobalDetailModel->getMutasiDetail($id),
+            'warehouseAsal' => $this->warehouseModel->where('divisi_id', $mutasiGlobal['divisi_asal_id'])->findAll(),
+            'companyAsalName' => session()->get('login')->this_company,
+            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id)
         ];
 
-        return view('Warehouse/mutasi/form', $data);
+        return view('Warehouse/mutasi/form_global', $data);
     }
 
     public function createAction()
     {
-        $first = $this->mutasiModel->where('company_id', $this->this_company_id)->where('no_mutasi', $this->request->getVar('no_mutasi'))->first();
+        $first = $this->mutasiGlobalModel->where('company_asal_id', $this->this_company_id)->where('no_mutasi', $this->request->getVar('no_mutasi'))->first();
 
         if ($first != null) {
             return response()->setJSON([
@@ -177,14 +161,13 @@ class Mutasi extends BaseController
             ]);
         }
 
-        $id = $this->mutasiModel->insert([
-            'company_id' => $this->this_company_id,
-            'tanggal' => date('Y-m-d'),
+        $id = $this->mutasiGlobalModel->insert([
             'no_mutasi' => $this->request->getVar('no_mutasi'),
+            'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
+            'company_asal_id' => $this->this_company_id,
+            'tanggal' => date('Y-m-d'),
             'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
-            'divisi_tujuan_id' => $this->request->getVar('divisi_tujuan_id'),
             'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
-            'warehouse_tujuan_id' => $this->request->getVar('warehouse_tujuan_id'),
             'keterangan' => $this->request->getVar('keterangan'),
             'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'createdBy' => $this->this_user_id,
@@ -192,8 +175,8 @@ class Mutasi extends BaseController
         ]);
 
         foreach (json_decode($_POST['listMutasi']) as $l) {
-            $this->mutasiDetailModel->insert([
-                'mutasi_id' => $id,
+            $this->mutasiGlobalDetailModel->insert([
+                'mutasi_global_id' => $id,
                 'stock_id' => $l->stock_id,
                 'bc_id' => $l->bc_id,
                 'no_aju' => $l->no_aju,
@@ -214,13 +197,11 @@ class Mutasi extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
-        $this->mutasiModel->update($id, [
-            'company_id' => $this->this_company_id,
-            // 'no_mutasi' => $this->request->getVar('no_mutasi'),
+        $this->mutasiGlobalModel->update($id, [
+            'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
+            'company_asal_id' => $this->this_company_id,
             'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
-            'divisi_tujuan_id' => $this->request->getVar('divisi_tujuan_id'),
             'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
-            'warehouse_tujuan_id' => $this->request->getVar('warehouse_tujuan_id'),
             'keterangan' => $this->request->getVar('keterangan'),
             'createdBy' => $this->this_user_id,
             'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
@@ -232,8 +213,8 @@ class Mutasi extends BaseController
 
         foreach (json_decode($_POST['listMutasi']) as $l) {
             // CHECK
-            $check = $this->mutasiDetailModel
-                ->where('mutasi_id', $id)
+            $check = $this->mutasiGlobalDetailModel
+                ->where('mutasi_global_id', $id)
                 ->where('stock_id', $l->stock_id)
                 ->where('bc_id', $l->bc_id)
                 ->where('no_aju', $l->no_aju)
@@ -241,8 +222,8 @@ class Mutasi extends BaseController
                 ->first();
 
             if ($check != null) {
-                $this->mutasiDetailModel->update($check['id'], [
-                    'mutasi_id' => $id,
+                $this->mutasiGlobalDetailModel->update($check['id'], [
+                    'mutasi_global_id' => $id,
                     'stock_id' => $l->stock_id,
                     'bc_id' => $l->bc_id,
                     'no_aju' => $l->no_aju,
@@ -254,8 +235,8 @@ class Mutasi extends BaseController
             } else {
                 // NEW
                 // DELETE
-                $this->mutasiDetailModel
-                    ->where('mutasi_id', $id)
+                $this->mutasiGlobalDetailModel
+                    ->where('mutasi_global_id', $id)
                     ->where('stock_id', $l->stock_id)
                     ->where('bc_id', $l->bc_id)
                     ->where('no_aju', $l->no_aju)
@@ -263,8 +244,8 @@ class Mutasi extends BaseController
                     ->delete();
 
                 // INSERT
-                $id_detail_new = $this->mutasiDetailModel->insert([
-                    'mutasi_id' => $id,
+                $id_detail_new = $this->mutasiGlobalDetailModel->insert([
+                    'mutasi_global_id' => $id,
                     'stock_id' => $l->stock_id,
                     'bc_id' => $l->bc_id,
                     'no_aju' => $l->no_aju,
@@ -276,7 +257,7 @@ class Mutasi extends BaseController
             }
         }
 
-        $this->mutasiDetailModel->where('mutasi_id', $id)->whereNotIn('id', $id_detail_all)->delete();
+        $this->mutasiGlobalDetailModel->where('mutasi_global_id', $id)->whereNotIn('id', $id_detail_all)->delete();
         return response()->setJSON([
             'message' => "Mutasi berhasil diupdate",
             'status' => true,
@@ -284,11 +265,12 @@ class Mutasi extends BaseController
         ]);
     }
 
+
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->mutasiModel->delete($id);
-        $this->mutasiDetailModel->where('mutasi_id', $id)->delete();
+        $this->mutasiGlobalModel->delete($id);
+        $this->mutasiGlobalDetailModel->where('mutasi_global_id', $id)->delete();
 
         return response()->setJSON([
             'message' => "Mutasi berhasil dihapus",
@@ -300,22 +282,10 @@ class Mutasi extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->mutasiModel->update($id, ['status_posting' => '1']);
+        $this->mutasiGlobalModel->update($id, ['status_posting' => '1']);
         return response()->setJSON([
             'message' => "Mutasi berhasil diposting",
             'status' => true,
-            'token' => csrf_hash()
-        ]);
-    }
-
-    public function listDivisiExcept()
-    {
-        $divisi_id = $this->request->getVar('divisi_id');
-        $result = $this->divisiModel->getDivisiExcept($divisi_id);
-
-        return response()->setJSON([
-            'status' => true,
-            'data' => $result,
             'token' => csrf_hash()
         ]);
     }
@@ -326,10 +296,10 @@ class Mutasi extends BaseController
         $divisi_id = $this->request->getVar('divisi_id');
 
         if (empty($divisi_id)) {
-            $no = $this->mutasiModel->get_no(date('m'), date('Y'), $last_day, "", $divisi_id);
+            $no = $this->mutasiGlobalModel->get_no(date('m'), date('Y'), $last_day, "", $divisi_id);
         } else {
             $divisi = $this->divisiModel->where('id', $divisi_id)->first();
-            $no = $this->mutasiModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisi_id);
+            $no = $this->mutasiGlobalModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisi_id);
         }
         return response()->setJSON([
             'status' => true,

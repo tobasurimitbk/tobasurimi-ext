@@ -5,7 +5,7 @@
     <div class="section-header">
         <h1>Mutasi</h1>
         <?php if (can("Inventori", "Mutasi", "c")) : ?>
-            <a href="<?= base_url('mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+            <a href="<?= base_url('mutasi/create-global') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -14,15 +14,26 @@
         <div class="card-body">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Mutasi PPBKB</a>
+                    <a class="nav-link" href="<?= base_url('mutasi') ?>">Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('mutasi/global') ?>">Mutasi BC 2.7</a>
+                    <a class="nav-link active" href="#">Mutasi BC 2.7</a>
                 </li>
             </ul>
 
             <?= csrf_field() ?>
             <div class="row mb-4 mt-3">
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select company_tujuan_id" id="company_tujuan_id" name="company_tujuan_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($dropdownCompanyExcept as $d) : ?>
+                                <option value="<?= $d["id"]; ?>"><?= strtoupper($d["company"]); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Company Tujuan</label>
+                    </div>
+                </div>
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating">
                         <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
@@ -85,8 +96,8 @@
                             <th onclick="changeSort('no_mutasi')">No Mutasi</th>
                             <th onclick="changeSort('tanggal')">Tanggal</th>
                             <th onclick="changeSort('divisis.divisi')">Warehouse Asal</th>
-                            <th onclick="changeSort('divisis.divisi')">Warehouse Tujuan</th>
-                            <th>No PPBKB</th>
+                            <th onclick="changeSort('company_tujuan_id')">Company Tujuan</th>
+                            <th>No BC 2.7</th>
                             <th>Total Item</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -123,7 +134,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("mutasi/all"); ?>",
+            url: "<?= base_url("mutasi/all-global"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
@@ -161,11 +172,11 @@
                 className: "text-center",
             },
             {
-                data: "warehouse_tujuan",
+                data: "company_tujuan",
                 className: "text-center"
             },
             {
-                data: "no_ppbkb",
+                data: "no_bc27",
                 className: "text-center",
                 searchable: false,
                 sortable: false
@@ -259,6 +270,14 @@
         autoclose: true
     })
 
+    $('#company_tujuan_id').select2({
+        placeholder: "Pilih Company Tujuan",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        table.ajax.reload();
+    });
+
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
@@ -280,7 +299,7 @@
         table.ajax.reload();
     });
 
-    $("#divisi_id,#status")
+    $("#divisi_id,#status,#company_tujuan_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -294,7 +313,7 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("mutasi/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("mutasi/id-global"); ?>/${data.id}`);
     });
 
 
@@ -312,7 +331,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("mutasi/posting"); ?>",
+                    url: "<?= base_url("mutasi/posting-global"); ?>",
                     data: {
                         id: id
                     },
@@ -362,7 +381,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("mutasi/delete"); ?>",
+                    url: "<?= base_url("mutasi/delete-global"); ?>",
                     data: {
                         id: id
                     },

@@ -7,7 +7,6 @@ use App\Models\DivisisModel;
 use App\Models\WarehousesModel;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
-use App\Models\KawasanModel;
 
 class Warehouse extends BaseController
 {
@@ -17,7 +16,6 @@ class Warehouse extends BaseController
     protected $ProvincesModel;
     protected $EmployeesModel;
     protected $DivisisModel;
-    protected $KawasanModel;
 
     public function __construct()
     {
@@ -27,7 +25,6 @@ class Warehouse extends BaseController
         $this->ProvincesModel = new ProvincesModel();
         $this->EmployeesModel = new EmployeesModel();
         $this->DivisisModel = new DivisisModel();
-        $this->KawasanModel = new KawasanModel();
     }
 
     public function warehouse()
@@ -36,13 +33,11 @@ class Warehouse extends BaseController
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $dataPic = $this->EmployeesModel->search_list(array('company_id' => $this->this_company_id), 'name');
         $dataDivisi = $this->DivisisModel->getDivisiAccess();
-        $dataKawasan = $this->KawasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
 
         $data = [
             "dataPic" => $dataPic,
             "dataProvinces" => $dataProvinces,
             "dataDivisi" => $dataDivisi,
-            "dataKawasan" => $dataKawasan
         ];
 
         return view('Master/warehouse/index', $data);
@@ -98,7 +93,6 @@ class Warehouse extends BaseController
                 "province_name" => $res[$i]["province_name"],
                 "city_name" => $res[$i]["city_name"],
                 "pic_name" => $res[$i]["pic_name"],
-                "kawasan_name" => $res[$i]["kawasan_name"]
             );
         }
 
@@ -174,7 +168,6 @@ class Warehouse extends BaseController
                     "email" => $this->request->getPost("email"),
                     "pic_id" => $this->request->getPost("pic_id"),
                     "divisi_id" => $this->request->getPost("divisi_id"),
-                    "kawasan_id" => $this->request->getPost("kawasan_id")
                 ];
 
                 if ($this->WarehousesModel->insert($values)) {
@@ -276,7 +269,6 @@ class Warehouse extends BaseController
                     "email" => $this->request->getPost("email"),
                     "pic_id" => $this->request->getPost("pic_id"),
                     "divisi_id" => $this->request->getPost("divisi_id"),
-                    "kawasan_id" => $this->request->getPost("kawasan_id")
                 ];
 
                 $warehouseSameName = $this->WarehousesModel

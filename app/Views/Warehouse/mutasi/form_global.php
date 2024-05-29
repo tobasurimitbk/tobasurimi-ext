@@ -3,13 +3,13 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($mutasi) ? "Tambah Mutasi" : "Update Mutasi" ?></h1>
+        <h1><?= empty($mutasiGlobal) ? "Tambah Mutasi" : "Update Mutasi" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi"); ?>">
                 Batal
             </a>
-            <?php if (!empty($mutasi)) : ?>
-                <?php if ($mutasi['status_posting'] == "0") : ?>
+            <?php if (!empty($mutasiGlobal)) : ?>
+                <?php if ($mutasiGlobal['status_posting'] == "0") : ?>
                     <?php if (can('Inventori', 'Mutasi', 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right">
                             Hapus
@@ -38,10 +38,10 @@
 
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Mutasi PPBKB</a>
+                    <a class="nav-link" href="<?= base_url('mutasi/create') ?>">Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('mutasi/create-global') ?>">Mutasi BC 2.7</a>
+                    <a class="nav-link active" href="#">Mutasi BC 2.7</a>
                 </li>
             </ul>
 
@@ -51,14 +51,14 @@
                 </div>
             </div>
             <form class="create-form">
-                <input type="hidden" name="id" id="id" value="<?= !empty($mutasi) ? encrypt($mutasi['id']) : '' ?>" class="id">
+                <input type="hidden" name="id" id="id" value="<?= !empty($mutasiGlobal) ? encrypt($mutasiGlobal['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" disabled class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($mutasi) ? $mutasi['tanggal'] : $tanggal)); ?>">
+                                    <input autocomplete="one-time-code" disabled class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($mutasiGlobal) ? $mutasiGlobal['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -71,22 +71,27 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($mutasi) ? 'disabled=true' : ''; ?> value="<?= !empty($mutasi) ? $mutasi['no_mutasi'] : "PPBKB//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_mutasi" id="no_mutasi" name="no_mutasi" placeholder="No. Adjusment">
+                                    <input readonly autocomplete="one-time-code" <?= !empty($mutasiGlobal) ? 'disabled=true' : ''; ?> value="<?= !empty($mutasiGlobal) ? $mutasiGlobal['no_mutasi'] : "BC27//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_mutasi" id="no_mutasi" name="no_mutasi" placeholder="No. Adjusment">
                                     <label for="floatingInput">No. Mutasi</label>
                                 </div>
-                                <div style="<?= !empty($mutasi) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($mutasiGlobal) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 20px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
+                            <input disabled placeholder="Company Asal" value="<?= $companyAsalName ?>" class="form-control" aria-label="Floating label select example" />
+                            <label for="floatingInput" style="z-index: 1;">Company Asal</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($mutasiGlobal) ? ($mutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                    <option <?= !empty($mutasiGlobal) ? ($mutasiGlobal['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
                                         <?= $d['divisi']; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -97,11 +102,11 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
+                            <select <?= !empty($mutasiGlobal) ? ($mutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($warehouseAsal)) : ?>
                                     <?php foreach ($warehouseAsal as $w) : ?>
-                                        <option <?= !empty($mutasi) ? ($mutasi['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
+                                        <option <?= !empty($mutasiGlobal) ? ($mutasiGlobal['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
                                             <?= $w['warehouse_name']; ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -113,48 +118,30 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
+                            <select <?= !empty($mutasiGlobal) ? ($mutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select company_tujuan_id" id="company_tujuan_id" name="company_tujuan_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php if (!empty($divisiTujuan)) : ?>
-                                    <?php foreach ($divisiTujuan as $d) : ?>
-                                        <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                            <?= $d['divisi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                                <?php foreach ($dropdownCompanyExcept as $d) : ?>
+                                    <option <?= !empty($mutasiGlobal) ? ($mutasiGlobal['company_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= strtoupper($d['company']) ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php if (!empty($warehouseTujuan)) : ?>
-                                    <?php foreach ($warehouseTujuan as $w) : ?>
-                                        <option <?= !empty($mutasi) ? ($mutasi['warehouse_tujuan_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                            <?= $w['warehouse_name']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php endif ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
+                            <label for="floatingInput" style="z-index: 1;">Company Tujuan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
+                            <select <?= !empty($mutasiGlobal) ? ($mutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
-                                <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
+                                <option <?= !empty($mutasiGlobal) ? ($mutasiGlobal['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                                <option <?= !empty($mutasiGlobal) ? ($mutasiGlobal['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($mutasi) ? $mutasi['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
+                            <input <?= !empty($mutasiGlobal) ? ($mutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($mutasiGlobal) ? $mutasiGlobal['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
@@ -277,8 +264,8 @@
 
     $('.form-fifo').hide();
 
-    <?php if (!empty($mutasiDetail)) : ?>
-        <?php foreach ($mutasiDetail as $m) :  ?>
+    <?php if (!empty($mutasiGlobalDetail)) : ?>
+        <?php foreach ($mutasiGlobalDetail as $m) :  ?>
             listStockSelected.push({
                 id: "<?= $m['id'] ?>",
                 bc_id: "<?= $m['bc_id'] ?>",
@@ -298,8 +285,11 @@
                 sumber: "<?= $m['sumber'] ?>"
             });
         <?php endforeach; ?>
-        <?php if ($mutasi['status_posting']) : ?>
+        <?php if ($mutasiGlobal['status_posting']) : ?>
             $('.detail-form-layout').hide()
+        <?php endif; ?>
+        <?php if ($mutasiGlobal['tipe_pengambilan_stock'] == "FIFO") : ?>
+            $('.form-fifo').show();
         <?php endif; ?>
     <?php endif; ?>
 
@@ -331,7 +321,7 @@
         }
     });
 
-    <?php if (!empty($mutasi)) : ?>
+    <?php if (!empty($mutasiGlobal)) : ?>
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
             $('#selectedItemTable').DataTable().clear().draw();
             selectedItemTable.destroy();
@@ -404,6 +394,12 @@
         drawTableSelectedItem();
     });
 
+    $('#company_tujuan_id').select2({
+        placeholder: "Pilih Company Tujuan",
+        theme: "bootstrap-5",
+        allowClear: true
+    })
+
     $('#warehouse_tujuan_id').select2({
         placeholder: "Pilih Warehouse Tujuan",
         theme: "bootstrap-5",
@@ -475,7 +471,7 @@
     });
 
 
-    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#spesifikasi_id,#bc_id,#no_aju,#operasi,#type_pengambilan_stock")
+    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#spesifikasi_id,#bc_id,#no_aju,#operasi,#type_pengambilan_stock,#company_tujuan_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -595,6 +591,9 @@
             },
             type_pengambilan_stock: {
                 required: true
+            },
+            company_tujuan_id: {
+                required: true
             }
         },
         messages: {
@@ -694,7 +693,7 @@
                             if (id) {
                                 // UPDATE
                                 $.ajax({
-                                    url: "<?= base_url("mutasi/update"); ?>",
+                                    url: "<?= base_url("mutasi/update-global"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -715,7 +714,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("mutasi"); ?>";
+                                                window.location.href = "<?= base_url("mutasi/global"); ?>";
                                             }
                                         });
                                     },
@@ -723,7 +722,7 @@
                             } else {
                                 // INSERT
                                 $.ajax({
-                                    url: "<?= base_url("mutasi/save"); ?>",
+                                    url: "<?= base_url("mutasi/save-global"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -744,7 +743,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("mutasi"); ?>";
+                                                window.location.href = "<?= base_url("mutasi/global"); ?>";
                                             }
                                         });
                                     },
@@ -917,7 +916,7 @@
         if (value) {
             $(".no_mutasi").attr("readonly", true);
             $.ajax({
-                url: `<?= base_url("mutasi/get-mutasi-no"); ?>`,
+                url: `<?= base_url("mutasi/get-mutasi-no-global"); ?>`,
                 method: "GET",
                 data: {
                     divisi_id: $('#divisi_asal_id option:selected').val()
@@ -1044,13 +1043,13 @@
             } else {
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                    <input <?= !empty($mutasiGlobal) ? (($mutasiGlobal['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
                 ));
             }
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                    <button <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($mutasiGlobal) ? (($mutasiGlobal['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
             ));
             table.find('tbody').append(newRow);
@@ -1105,7 +1104,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("mutasi/posting"); ?>",
+                    url: "<?= base_url("mutasi/posting-global"); ?>",
                     data: {
                         id: $('.id').val()
                     },
@@ -1126,7 +1125,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url("mutasi"); ?>";
+                                window.location.href = "<?= base_url("mutasi/global"); ?>";
                             });
                         } else {
                             Swal.fire({
@@ -1155,7 +1154,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("mutasi/delete"); ?>",
+                    url: "<?= base_url("mutasi/delete-global"); ?>",
                     data: {
                         id: $('.id').val()
                     },
@@ -1175,7 +1174,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url('mutasi') ?>"
+                                window.location.href = "<?= base_url('mutasi/global') ?>"
                             });
                         }
                     },
