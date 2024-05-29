@@ -43,6 +43,7 @@ class NomorIjinTPBModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'alamat_pemilik_barang' => 'alamat_pemilik_barang',
             'no_ijin_tpb' => 'no_ijin_tpb',
             'tanggal_skep_tpb' => 'tanggal_skep_tpb',
             'status' => 'status'

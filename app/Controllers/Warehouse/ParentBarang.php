@@ -180,7 +180,7 @@ class ParentBarang extends BaseController
 
         $parent_type = $this->request->getVar('parent_type');
         return response()->setJSON([
-            'data' => $parentBarangModel->where('parent_type', $parent_type)->findAll(),
+            'data' => $parentBarangModel->where('parent_type', $parent_type)->where('company_id', $this->this_company_id)->findAll(),
             'status' => true,
             'token' => csrf_hash()
         ]);

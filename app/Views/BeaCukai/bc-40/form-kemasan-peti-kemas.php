@@ -35,12 +35,6 @@
                             </div>
                         </div>
                         <div class="mt-1">
-                            <div class="form-floating mb-3">
-                                <input id="kemasan_jumlah_kemasan" name="kemasan_jumlah_kemasan" type="number" class="form-control kemasan_jumlah_kemasan" placeholder="">
-                                <label>Jumlah Kemasan</label>
-                            </div>
-                        </div>
-                        <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select kemasan_jenis_kemasan" id="kemasan_jenis_kemasan" name="kemasan_jenis_kemasan" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -50,9 +44,29 @@
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label style="z-index: 1;">Pilih Jenis Kemasan</label>
+                                <label style="z-index: 1;">Pilih Jenis Kemasan (Bea Cukai)</label>
                             </div>
                         </div>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kemasan_kemasan_id" id="kemasan_kemasan_id" name="kemasan_kemasan_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($dropdownKemasan as $d) : ?>
+                                        <option data-jumlah_kemasan="<?= $d['jumlah_kemasan'] ?>" value="<?= $d['kemasan_id'] ?>">
+                                            <?= $d['kode_kemasan'] . " - " . $d['kemasan_name'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Pilih Jenis Kemasan (Inventori)</label>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3">
+                                <input id="kemasan_jumlah_kemasan" name="kemasan_jumlah_kemasan" type="number" class="form-control kemasan_jumlah_kemasan" placeholder="">
+                                <label>Jumlah Kemasan</label>
+                            </div>
+                        </div>
+
                         <div class="mt-1">
                             <div class="form-floating mb-3">
                                 <input id="kemasan_merk_kemasan" name="kemasan_merk_kemasan" type="text" class="form-control kemasan_merk_kemasan" placeholder="">
@@ -79,7 +93,8 @@
                                     <tr>
                                         <th style="text-align: center;">Seri Kemasan</th>
                                         <th style="text-align: center;">Jumlah Kemasan</th>
-                                        <th style="text-align: center;">Jenis Kemasan</th>
+                                        <th style="text-align: center;">Jenis Kemasan (Bea Cukai)</th>
+                                        <th style="text-align: center;">Jenis Kemasan (Inventori)</th>
                                         <th style="text-align: center;">Merk Kemasan</th>
                                         <th style="text-align: center;">Action</th>
                                     </tr>
@@ -193,7 +208,7 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     $('#kemasan_jenis_kemasan').select2({
-        placeholder: "Pilih Jenis Kemasan",
+        placeholder: "Pilih Kemasan (Bea Cukai)",
         theme: "bootstrap-5",
         allowClear: true
     });
@@ -215,6 +230,16 @@
         theme: "bootstrap-5",
         allowClear: true
     });
+
+    $('#kemasan_kemasan_id').select2({
+        placeholder: "Pilih Kemasan (Inventori)",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        var selected = $('#kemasan_kemasan_id option:selected');
+        $('#kemasan_jumlah_kemasan').val(selected.data('jumlah_kemasan'));
+    });
+
 
     $('.form-select')
         .parent('div')
@@ -264,6 +289,12 @@
             },
             {
                 data: "jumlah_kemasan",
+                searchable: false,
+                sortable: false,
+                className: "text-center",
+            },
+            {
+                data: "kemasan_name",
                 searchable: false,
                 sortable: false,
                 className: "text-center",
@@ -406,6 +437,9 @@
             kemasan_jenis_kemasan: {
                 required: true
             },
+            kemasan_kemasan_id: {
+                required: true
+            },
             kemasan_merk_kemasan: {
                 required: true
             },
@@ -418,7 +452,10 @@
                 required: "Jumlah kemasan wajib diisi"
             },
             kemasan_jenis_kemasan: {
-                required: "Pilih jenis kemasan"
+                required: "Pilih kemasan (Bea Cukai)"
+            },
+            kemasan_kemasan_id: {
+                required: "Pilih kemasan (Inventori)"
             },
             kemasan_merk_kemasan: {
                 required: "Merk kemasan wajib diisi"
@@ -539,6 +576,7 @@
                                 tableListInformasiKemasan.ajax.reload();
                                 $('#kemasan_seri_kemasan').val(response.kemasan_seri_kemasan);
                                 $('#kemasan_jenis_kemasan').val(null).change();
+                                $('#kemasan_kemasan_id').val(null).change();
                                 $('#kemasan_jumlah_kemasan').val('');
                                 $('#kemasan_merk_kemasan').val('');
                             }

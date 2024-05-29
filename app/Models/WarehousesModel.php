@@ -14,7 +14,6 @@ class WarehousesModel extends Model
         'id',
         'company_id',
         'divisi_id',
-        'kawasan_id',
         'code_warehouse',
         'warehouse_name',
         'address',
@@ -59,12 +58,11 @@ class WarehousesModel extends Model
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
-        $requete = "SELECT warehouses.*,kawasan.name AS kawasan_name,provinces.province_name,cities.city_name,employees.name as pic_name, divisis.divisi AS divisi_name FROM warehouses ";
+        $requete = "SELECT warehouses.*,provinces.province_name,cities.city_name,employees.name as pic_name, divisis.divisi AS divisi_name FROM warehouses ";
         $requete .= "LEFT JOIN provinces ON (warehouses.province_id=provinces.id) ";
         $requete .= "LEFT JOIN cities ON (warehouses.city_id=cities.id) ";
         $requete .= "LEFT JOIN employees ON (warehouses.pic_id=employees.id) ";
         $requete .= "LEFT JOIN divisis ON (warehouses.divisi_id=divisis.id) ";
-        $requete .= "LEFT JOIN kawasan ON (warehouses.kawasan_id=kawasan.id) ";
         $requete .= "WHERE warehouses.deletedAt is null ";
         if (isset($values["company_id"]))
             $requete .= ($values["company_id"] == "") ? "" : ("AND warehouses.company_id ='" . $values["company_id"] . "' ");
@@ -95,24 +93,5 @@ class WarehousesModel extends Model
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
-    }
-
-    public function getDokumenMutasiBarang($warehouse_asal_id, $warehouse_tujuan_id)
-    {
-        $metaDataModel = new MetadataModel();
-
-        $warehouseAsal = $this->asArray()->where('deletedAt', null)
-            ->where('id', $warehouse_asal_id)
-            ->first();
-
-        $warehouseTujuan = $this->asArray()->where('deletedAt', null)
-            ->where('id', $warehouse_tujuan_id)
-            ->first();
-
-        if ($warehouseAsal['kawasan_id'] == $warehouseTujuan['kawasan_id']) {
-            return $metaDataModel->where('value', 'PPP-KB')->where('name', 'jenis_dok_aju')->first()['id'];
-        } else {
-            return $metaDataModel->where('value', 'BC 2.7')->where('name', 'jenis_dok_aju')->first()['id'];
-        }
     }
 }

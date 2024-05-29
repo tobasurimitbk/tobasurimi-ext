@@ -56,11 +56,12 @@ class BC23Model extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "bc_23.*,
-            bc_purchase_order.multiple_po_no,
-            bc_purchase_order.id AS bc_purchase_order_id,
-            bc_purchase_order.multiple_lpb_no,
-            bc_purchase_order.po_type,
-            suppliers.name AS supplier_name";
+        bc_purchase_order.multiple_po_no,
+        bc_purchase_order.id AS bc_purchase_order_id,
+        bc_purchase_order.multiple_lpb_no,
+        bc_purchase_order.po_type,
+        bc_purchase_order.status_posting,
+        suppliers.name AS supplier_name";
 
         $bcDataQry = $this->asObject()
             ->select($selectQry)

@@ -118,13 +118,20 @@ class BC40 extends BaseController
 
     public function index()
     {
+        $data = [
+            'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first()
+        ];
 
-        return view('BeaCukai/bc-40/index');
+        return view('BeaCukai/bc-40/index', $data);
     }
 
     public function online()
     {
-        return view('BeaCukai/bc-40/online');
+        $data = [
+            'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
+        ];
+
+        return view('BeaCukai/bc-40/online', $data);
     }
 
     public function allOnline()
@@ -143,6 +150,23 @@ class BC40 extends BaseController
                 'status' => true
             ]);
         }
+    }
+
+    public function downloadResponPdf()
+    {
+        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+
+        $path = $this->request->getVar('path');
+        $beacukaiApi = new BeaCukaiApi($username, $password);
+        $dataOnline = $beacukaiApi->getResponPdf($path);
+
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'pdf');
+        file_put_contents($tempFilePath, $dataOnline);
+
+        return $this->response->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'attachment; filename="download.pdf"')
+            ->setBody($dataOnline);
     }
 
     public function all()
@@ -644,6 +668,7 @@ class BC40 extends BaseController
             'kodeTipeKontainer' => $this->metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
             'kodeUkuranKontainer' => $this->metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
             'kodeJenisKontainer' => $this->metaDataModel->where('name', "Jenis Kontainer")->findAll(),
+            'dropdownKemasan' => $this->bcPurchaseOrderModel->dropdownKemasan($bcPurchaseOrderID),
             'seriKemasan' => $kemasanLast == null ? 1 : $kemasanLast['seri_kemasan'] + 1,
             'seriKontainer' => $kontainerLast == null ? 1 : $kontainerLast['seri_kontainer'] + 1,
             'bcPo' => $bcPo
@@ -686,8 +711,9 @@ class BC40 extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "bc_purchase_order_id"  => encrypt($data->bc_purchase_order_id),
+                "kemasan_name"          => strtoupper($data->kode_kemasan . " - " . $data->kemasan_name),
                 "jumlah_kemasan"        => $data->jumlah_kemasan,
-                "kode_jenis_kemasan"    => $data->kode_jenis_kemasan . ' - ' . $kemasan['value'],
+                "kode_jenis_kemasan"    => strtoupper($data->kode_jenis_kemasan . ' - ' . $kemasan['value']),
                 "merk_kemasan"          => $data->merk_kemasan,
                 "seri_kemasan"          => $data->seri_kemasan
             ]);
@@ -772,6 +798,7 @@ class BC40 extends BaseController
         $this->bcKemasanModel->insert([
             'bc_type' => 40,
             'bc_purchase_order_id' => $bcPurchaseOrderID,
+            'kemasan_id' => $this->request->getVar('kemasan_kemasan_id'),
             'seri_kemasan' => $this->request->getVar('kemasan_seri_kemasan'),
             'jumlah_kemasan' => $this->request->getVar('kemasan_jumlah_kemasan'),
             'kode_jenis_kemasan' => decrypt($this->request->getVar('kemasan_jenis_kemasan')),
@@ -972,7 +999,7 @@ class BC40 extends BaseController
 
         $data = [
             'kodeFasilitasTarif' => $this->metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN'])->findAll(),
-            'kodeJenisTarif' => $this->metaDataModel->where('name', "Kode Jenis Tarif BC")->findAll(),
+            'kodeJenisTarif' => $this->metaDataModel->where('name', "Kode Jenis Tarif BC")->whereIn('description', ['ADVALORUM'])->findAll(),
             'kodeJenisPungutan' => $this->metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['PPN'])->findAll(),
             'kodeHS' => $this->hsCodeModel->findAll(),
             'kodeJenisKemasan' => $this->metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
@@ -1021,7 +1048,7 @@ class BC40 extends BaseController
                 'harga_ekspor' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_harga_penyerahan'))),
                 'nilai_tambah' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_harga_penggantian'))),
                 'diskon' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_diskon'))),
-
+                'volume' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_volume')))
             ]);
         } else {
             $this->bcBarangModel->update($bcBarang['id'], [
@@ -1046,6 +1073,7 @@ class BC40 extends BaseController
                 'harga_ekspor' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_harga_penyerahan'))),
                 'nilai_tambah' => trim(convertRupiahToNumber(trim($this->request->getVar('barang_detail_harga_penggantian')))),
                 'diskon' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_diskon'))),
+                'volume' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_volume')))
             ]);
         }
 
@@ -1057,13 +1085,15 @@ class BC40 extends BaseController
                 'no_aju' => $this->generateNomorAju(),
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'netto' => $this->bcBarangModel->totalBeratBersih($bcPurchaseOrderID),
-                'harga_penyerahan' => $this->bcBarangModel->totalHargaPenyerahan($bcPurchaseOrderID)
+                'harga_penyerahan' => $this->bcBarangModel->totalHargaPenyerahan($bcPurchaseOrderID),
+                'volume' => $this->bcBarangModel->totalVolume($bcPurchaseOrderID)
             ]);
         } else {
             $this->bc40Model->update($bc40['id'], [
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'netto' => $this->bcBarangModel->totalBeratBersih($bcPurchaseOrderID),
-                'harga_penyerahan' => $this->bcBarangModel->totalHargaPenyerahan($bcPurchaseOrderID)
+                'harga_penyerahan' => $this->bcBarangModel->totalHargaPenyerahan($bcPurchaseOrderID),
+                'volume' => $this->bcBarangModel->totalVolume($bcPurchaseOrderID)
             ]);
         }
 
@@ -1369,8 +1399,9 @@ class BC40 extends BaseController
 
         $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
         $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
+        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
 
-        if ($bcPo == null) {
+        if ($bcPo == null || $ceisaSetting == null) {
             return redirect()->to('bea-cukai-bc-40');
         }
 
@@ -1378,7 +1409,8 @@ class BC40 extends BaseController
 
         $data = [
             'bcPo' => $bcPo,
-            'bc40' => $bc40
+            'bc40' => $bc40,
+            'ceisaSetting' => $ceisaSetting
         ];
 
         return view('BeaCukai/bc-40/form-pernyataan', $data);
@@ -1487,15 +1519,6 @@ class BC40 extends BaseController
     public function kirimCeisa($bcPurchaseOrderID)
     {
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
-        $status = $this->insertInventori($bcPurchaseOrderID);
-
-        if (!$status) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => true,
-                'message' => "Terjadi kesalahan saat menambah stok inventori"
-            ]);
-        }
 
         $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
         $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
@@ -1697,7 +1720,8 @@ class BC40 extends BaseController
         foreach ($data as $d) {
             array_push($result, [
                 'no_ijin_tpb' => $d['no_ijin_tpb'],
-                'tanggal_skep_tpb' => date('d/m/Y', strtotime($d['tanggal_skep_tpb']))
+                'tanggal_skep_tpb' => date('d/m/Y', strtotime($d['tanggal_skep_tpb'])),
+                'alamat_pemilik_barang' => $d['alamat_pemilik_barang'],
             ]);
         }
 
@@ -1850,6 +1874,7 @@ class BC40 extends BaseController
                 ->where('penerimaan_barang.bc_type', '53')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
+                ->where('penerimaan_barang.company_id', $this->this_company_id)
                 ->orderBy('penerimaan_barang.createdAt', "DESC")
                 ->groupBy('barang_id')
                 ->groupBy('id')
@@ -1880,6 +1905,7 @@ class BC40 extends BaseController
                 ->where('penerimaan_barang.bc_type', '53')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
+                ->where('penerimaan_barang.company_id', $this->this_company_id)
                 ->orderBy('penerimaan_barang.createdAt', "DESC")
                 ->groupBy('barang_id')
                 ->groupBy('id')
@@ -1910,6 +1936,7 @@ class BC40 extends BaseController
                 ->where('penerimaan_barang.bc_type', '48')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
+                ->where('penerimaan_barang.company_id', $this->this_company_id)
                 ->orderBy('penerimaan_barang.createdAt', "DESC")
                 ->groupBy('barang_id')
                 ->groupBy('id')
@@ -1940,6 +1967,7 @@ class BC40 extends BaseController
                 ->where('penerimaan_barang.bc_type', '48')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
+                ->where('penerimaan_barang.company_id', $this->this_company_id)
                 ->orderBy('penerimaan_barang.createdAt', "DESC")
                 ->groupBy('barang_id')
                 ->groupBy('id')

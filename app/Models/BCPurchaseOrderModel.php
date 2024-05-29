@@ -443,4 +443,36 @@ class BCPurchaseOrderModel extends Model
 
         return $result;
     }
+
+    public function dropdownKemasan($bcPurchaseOrderID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $first = $this->find($bcPurchaseOrderID);
+        $penerimaanBarangIdArr = json_decode($first['multiple_lpb_id']);
+
+        $result = $penerimaanBarangModel->select(
+            '
+            penerimaan_barang.kemasan_id AS kemasan_id, 
+            SUM(penerimaan_barang.jumlah_kemasan) AS jumlah_kemasan, 
+            kemasan.name AS kemasan_name,
+            kemasan.kode AS kode_kemasan'
+        )
+            ->join('kemasan', 'kemasan.id = penerimaan_barang.kemasan_id', 'left')
+            ->whereIn('penerimaan_barang.id', $penerimaanBarangIdArr)
+            ->where('penerimaan_barang.deletedAt', null)
+            ->where('kemasan.deletedAt', null)
+            ->groupBy('penerimaan_barang.kemasan_id')
+            ->findAll();
+
+        $uniqueResults = [];
+        $kemasanIds = [];
+        foreach ($result as $item) {
+            if (!in_array($item['kemasan_id'], $kemasanIds)) {
+                $uniqueResults[] = $item;
+                $kemasanIds[] = $item['kemasan_id'];
+            }
+        }
+
+        return $uniqueResults;
+    }
 }

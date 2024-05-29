@@ -396,7 +396,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="table-responsive">
-                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableRasioMaterialII" width="100%" border="1" cellspacing="0">
+                                <table class="table table-bordered table-hover-tobasurimi dataTable" id="selectedItemTableRasioMaterialII" width="100%" border="1" cellspacing="0">
                                     <thead class="thead-dark head-table-rasio-material2">
                                         <tr>
                                             <th style="text-align: center;" rowspan="2">No</th>
@@ -731,7 +731,6 @@
                         res.data.forEach(function(item) {
                             list_items_barang_digunakan.push(item);
                         });
-                        // console.log(list_items_barang_digunakan);
                         drawTableDigunakan();
                     } else {
                         stopLoading()
@@ -758,7 +757,6 @@
                         res.data.forEach(function(item) {
                             list_items_barang_jadi.push(item);
                         });
-                        console.log(list_items_barang_jadi);
                         drawTableRasio();
                     } else {
                         stopLoading()
@@ -810,6 +808,7 @@
                 data: {
                     department: department_id,
                     bulan: bulan,
+                    kategori: kategori,
                 },
                 dataType: "json",
                 success: function(res) {
@@ -1058,9 +1057,7 @@
                 var qty = parseFloat($(this).val().replace(/Rp|\./g, ""));
                 var hargaTotal = parseFloat($('#hargaTotalPembelian_material_2').val().replace(/Rp|\./g, ""));
                 var hargaSatuan = hargaTotal / qty;
-                // console.log(qty);
-                // console.log(hargaTotal);
-                // console.log(hargaSatuan);
+
                 $('input.harga-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val(formatRupiah(hargaTotal));
                 $('input.harga-satuan-material2[data-index="' + rowIndex + '"][data-index2="' + colIndex + '"]').val(formatRupiah(hargaSatuan));
 
@@ -1361,7 +1358,6 @@
     }
 
     $('#select-item-btn').click(function() {
-        console.log(list_items_barang_jadi);
         drawTableRasioAkhir(list_items_barang_jadi);
     });
 
@@ -1400,7 +1396,7 @@
                     '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -1440,7 +1436,7 @@
                         list_items_barang_jadi[index].harga_total = totalHargaQty;
                     }
 
-                    $('.harga-total[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
+                    $('.harga-total-awal[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
                     $(this).val(harga);
                 });
 
@@ -1475,22 +1471,34 @@
             let totalTotalHargaRasio = 0;
 
             let totalHargaTotalManual = 0;
+            let totalQtyTanpaManual = 0;
+
             data.forEach(item => {
                 totalHargaTotalManual += parseFloat(item.harga_total);
+                if (item.harga_satuan == 0) {
+                    totalQtyTanpaManual += parseFloat(item.qtyTotal);
+                }
             });
 
             data.forEach((item, index) => {
+                let calculatedHargaTotal = 0;
+                let itemHargaTotal = 0;
                 const totalQtyAll = parseFloat(item.totalQtyAll);
                 const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
-                const calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio.toFixed(2) / 100);
-                const itemHargaTotal = item.hargaTotal ? parseFloat(item.hargaTotal) : parseFloat(calculatedHargaTotal);
+                const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
 
-                console.log(parseFloat(hargaTotalPenerimaan));
-                console.log(parseFloat(totalHargaTotalManual));
-                console.log(rasio);
-                console.log(parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual));
-                console.log((parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio / 100));
-                console.log(item.harga_total);
+                if (isNaN(totalHargaTotalManual)) {
+                    calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan)) * (rasio / 100);
+                    itemHargaTotal = item.hargaTotal ? parseFloat(item.hargaTotal) : parseFloat(calculatedHargaTotal);
+                } else {
+                    if (item.harga_total == 0) {
+                        calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasioTanpaManual / 100);
+                        itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                    } else {
+                        calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasio / 100);
+                        itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                    }
+                }
 
                 rasioTotal += rasio;
                 totalTotalHargaRasio += itemHargaTotal;
@@ -1508,7 +1516,7 @@
                         <input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
                     </td>
                     <td>
-                        <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
+                        <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
                     </td>
                 </tr>`;
                 no++;
@@ -1532,11 +1540,13 @@
             $('.body-table-rasio-akhir').append(row);
 
             // Update total harga if any input with class 'harga' changes
-            $('.harga').on('input', function() {
+            $('.harga').on('change', function() {
                 let totalHarga = 0;
                 $('.harga').each(function() {
-                    const harga = parseFloat($(this).val());
+                    const harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    var index = $(this).data('index');
                     totalHarga += isNaN(harga) ? 0 : harga;
+                    $(this).val(formatRupiah(harga));
                 });
                 $('.harga-total').val(formatRupiah(totalHarga));
             });
@@ -1702,6 +1712,9 @@
                 var formatedHargaTotal = parseFloat(hargaTotal.replace(/Rp|\./g, ""));
                 var formatedHargaTotalPenerimaan = parseFloat(hargaTotalPenerimaan.replace(/Rp|\./g, ""));
 
+
+                console.log(formatedHargaTotal);
+                console.log(formatedHargaTotalPenerimaan);
                 if (formatedHargaTotal != formatedHargaTotalPenerimaan) {
                     isValid = false;
                 }
@@ -1718,6 +1731,7 @@
                     list_items_barang_jadi[i].rasio = rasioBarangVal;
                     list_items_barang_jadi[i].harga = hargaBarangVal;
                 });
+                console.log(list_items_barang_jadi);
 
                 $.each(list_items_barang_digunakan_material_2, function(i, v) {
                     list_items_barang_jadi_material_2.forEach((item2, index2) => {

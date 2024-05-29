@@ -17,6 +17,8 @@ class JurnalUmumModel extends Model
     protected $allowedFields    = [
         'id',
         'id_transaksi',
+        'divisi_id',
+        'company_id',
         'id_coa',
         'tanggal_jurnal',
         'debit',

@@ -173,12 +173,12 @@ $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
 // KAWASAN
-$routes->get('/kawasan-warehouse', 'Master\Kawasan::index', ['filter' => 'Auth']);
-$routes->get('/kawasan-warehouse/all', 'Master\Kawasan::all', ['filter' => 'Auth']);
-$routes->post('/kawasan-warehouse/save', 'Master\Kawasan::create', ['filter' => 'Auth']);
-$routes->post('/kawasan-warehouse/update', 'Master\Kawasan::update', ['filter' => 'Auth']);
-$routes->post('/kawasan-warehouse/delete', 'Master\Kawasan::delete', ['filter' => 'Auth']);
-$routes->get('/kawasan-warehouse/get', 'Master\Kawasan::get', ['filter' => 'Auth']);
+// $routes->get('/kawasan-warehouse', 'Master\Kawasan::index', ['filter' => 'Auth']);
+// $routes->get('/kawasan-warehouse/all', 'Master\Kawasan::all', ['filter' => 'Auth']);
+// $routes->post('/kawasan-warehouse/save', 'Master\Kawasan::create', ['filter' => 'Auth']);
+// $routes->post('/kawasan-warehouse/update', 'Master\Kawasan::update', ['filter' => 'Auth']);
+// $routes->post('/kawasan-warehouse/delete', 'Master\Kawasan::delete', ['filter' => 'Auth']);
+// $routes->get('/kawasan-warehouse/get', 'Master\Kawasan::get', ['filter' => 'Auth']);
 
 // SUPPLIER HARGA
 // $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
@@ -924,6 +924,17 @@ $routes->get('/penerimaan-mutasi/id/(:segment)', 'Inventori\PenerimaanMutasi::de
 $routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-no', 'Inventori\PenerimaanMutasi::getPenerimaanMutasiNo', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/all', 'Inventori\PenerimaanMutasi::all', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/print/(:segment)', 'Inventori\PenerimaanMutasi::print/$1', ['filter' => 'Auth']);
+// MUTASI GLOBAL
+$routes->get('/mutasi/global', 'Inventori\MutasiGlobal::index', ['filter' => 'Auth']);
+$routes->get('/mutasi/all-global', 'Inventori\MutasiGlobal::all', ['filter' => 'Auth']);
+$routes->get('/mutasi/create-global', 'Inventori\MutasiGlobal::create', ['filter' => 'Auth']);
+$routes->get('/mutasi/id-global/(:segment)', 'Inventori\MutasiGlobal::detail/$1', ['filter' => 'Auth']);
+$routes->get('/mutasi/get-mutasi-no-global', 'Inventori\MutasiGlobal::getMutasiNo', ['filter' => 'Auth']);
+$routes->post('/mutasi/save-global', 'Inventori\MutasiGlobal::createAction', ['filter' => 'Auth']);
+$routes->post('/mutasi/update-global', 'Inventori\MutasiGlobal::updateAction', ['filter' => 'Auth']);
+$routes->post('/mutasi/delete-global', 'Inventori\MutasiGlobal::delete', ['filter' => 'Auth']);
+$routes->post('/mutasi/posting-global', 'Inventori\MutasiGlobal::posting', ['filter' => 'Auth']);
+
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);
@@ -1046,14 +1057,21 @@ $routes->post('/setting-akun-bc/akun/create-update', 'BeaCukai\IntegrasiCeisa::c
 // BC 2.3
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC23::index');
+    $routes->get('online', 'BeaCukai\BC23::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
+    $routes->get('all-online', 'BeaCukai\BC23::allOnline');
     $routes->get('all', 'BeaCukai\BC23::all');
     $routes->get('create', 'BeaCukai\BC23::createPurchaseOrderView');
     $routes->get('list-supplier', 'BeaCukai\BC23::dropdownSupplier');
     $routes->get('list-po', 'BeaCukai\BC40::dropdownPO');
     $routes->get('list-no-ijin-tpb', 'BeaCukai\BC40::dropdownNoIjinTPB');
-    $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->get('export-pdf', 'BeaCukai\BC23::exportPdf');
     $routes->get('export-excel', 'BeaCukai\BC40::exportExcel');
+    $routes->get('po/(:segment)', 'BeaCukai\BC23::updatePurchaseOrderView/$1');
+    $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
+    $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
+    $routes->post('posting', 'BeaCukai\BC23::posting');
+
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');
     $routes->post('id/header', 'BeaCukai\BC23::createHeaderAction');
@@ -1110,6 +1128,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
 $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->get('', 'BeaCukai\BC40::index');
     $routes->get('online', 'BeaCukai\BC40::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
     $routes->get('all', 'BeaCukai\BC40::all');
     $routes->get('all-online', 'BeaCukai\BC40::allOnline');
     $routes->get('create', 'BeaCukai\BC40::createPurchaseOrderView');

@@ -153,7 +153,8 @@ class HSCode extends BaseController
                     "komoditi" => $this->request->getPost("komoditi"),
                     "code" => $this->request->getPost("code"),
                     "uraian_barang" => $this->request->getPost("uraian_barang"),
-                    "unit" => $this->request->getPost("unit")
+                    "unit" => $this->request->getPost("unit"),
+                    "nilai_tarif" => $this->request->getVar('nilai_tarif')
                 ];
 
                 if ($this->HsCodesModel->insert($values)) {
@@ -220,7 +221,8 @@ class HSCode extends BaseController
                     "komoditi" => $this->request->getPost("komoditi"),
                     "code" => $this->request->getPost("code"),
                     "uraian_barang" => $this->request->getPost("uraian_barang"),
-                    "unit" => $this->request->getPost("unit")
+                    "unit" => $this->request->getPost("unit"),
+                    "nilai_tarif" => $this->request->getVar('nilai_tarif')
                 ];
 
                 $hsCodeSameName = $this->HsCodesModel

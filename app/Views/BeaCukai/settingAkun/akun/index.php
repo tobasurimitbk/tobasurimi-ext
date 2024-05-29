@@ -7,15 +7,18 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("setting-akun-bc"); ?>">
                 Kembali
             </a>
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan
+            </button>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-12 mt-1">
             <div class="card">
-                <div class="card-header" style="font-weight: bold; color:black;">
-                    AKUN CEISA PERUSAHAAN
-                </div>
                 <form class="create-form" method="post">
+                    <div class="card-header" style="font-weight: bold; color:black;">
+                        AKUN CEISA PERUSAHAAN
+                    </div>
                     <?= csrf_field() ?>
                     <div class="card-body">
                         <div class="text-center">
@@ -39,7 +42,7 @@
                         <?php endif; ?>
 
                         <div class="row ">
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <div class="form-floating mb-3 mt-1" style="height: 50px;">
                                     <select class="form-select kode_kantor_pabean" id="kode_kantor_pabean" name="kode_kantor_pabean" aria-label="Floating label select example">
                                         <option value=""></option>
@@ -52,7 +55,15 @@
                                     <label style="z-index: 1;">Kantor Pabean</label>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
+                                <div class="mt-1">
+                                    <div class="form-floating mb-3">
+                                        <input id="npwp_perusahaan" value="<?= !empty($akunCeisa) ? $akunCeisa['npwp_perusahaan'] : '' ?>" type="number" class="form-control npwp_perusahaan" name="npwp_perusahaan" placeholder="">
+                                        <label>NPWP Perusahaan</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
                                         <input id="username" value="" type="text" class="form-control username" name="username" placeholder="">
@@ -60,7 +71,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
                                         <input id="password" value="" type="text" class="form-control password" name="password" placeholder="">
@@ -70,12 +81,32 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card-header" style="font-weight: bold; color:black; margin-bottom:-20px;">
+                        PERNYATAAN PEMBUATAN DOKUMEN
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-4 mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="tempat" value="<?= !empty($akunCeisa) ? $akunCeisa['tempat'] : '' ?>" type="text" class="form-control tempat" name="tempat" placeholder="">
+                                    <label>Tempat</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="nama" value="<?= !empty($akunCeisa) ? $akunCeisa['nama'] : '' ?>" type="text" class="form-control nama" name="nama" placeholder="">
+                                    <label>Nama</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="jabatan" value="<?= !empty($akunCeisa) ? $akunCeisa['jabatan'] : '' ?>" type="text" class="form-control jabatan" name="jabatan" placeholder="">
+                                    <label>Jabatan</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
-                <div class="card-footer">
-                    <a href="#" type="button" class="btn btn-primary btn-lg btn-block btn-submit-parent">
-                        CEK & SIMPAN DATA
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -91,6 +122,8 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {});
+
+    $('#npwp_perusahaan').mask('000000000000000');
 
     $('.form-select')
         .parent('div')
@@ -112,6 +145,15 @@
             password: {
                 required: true
             },
+            tempat: {
+                required: true
+            },
+            nama: {
+                required: true
+            },
+            jabatan: {
+                required: true
+            }
         },
         messages: {
             kode_kantor_pabean: {
@@ -123,6 +165,15 @@
             password: {
                 required: "Password wajib diisi"
             },
+            tempat: {
+                required: "Tempat wajib diisi"
+            },
+            nama: {
+                required: "Nama wajib diisi"
+            },
+            jabatan: {
+                required: "Jabatan wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',

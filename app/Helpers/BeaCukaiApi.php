@@ -10,16 +10,15 @@ use Exception;
 
 class BeaCukaiApi
 {
-    protected $npwpPerusahaan;
     protected $baseUrl, $baseUrlDev, $username, $password;
-    protected $metaDataModel;
+    protected $metaDataModel, $ceisaSettingModel;
 
     public function __construct($username, $password)
     {
         $this->metaDataModel = new MetadataModel();
+        $this->ceisaSettingModel = new CeisaSettingModel();
         $this->baseUrl = $this->metaDataModel->where('name', "Base Url BC")->first()['value'];
         $this->baseUrlDev = $this->metaDataModel->where('name', "Base Url BC")->first()['description'];
-        $this->npwpPerusahaan =  $this->metaDataModel->where('name', "NPWP Importir Default BC")->first()['value'];
         $this->username = $username;
         $this->password = $password;
     }
@@ -228,6 +227,12 @@ class BeaCukaiApi
     public function getListStatusResponseAll()
     {
         $token = $this->getTokenApi();
+        $ceisaSetting = $this->ceisaSettingModel
+            ->where('username', $this->username)
+            ->where('password', $this->password)
+            ->first();
+
+        $npwpPerusahaan = $ceisaSetting == null ? "" :  $ceisaSetting['npwp_perusahaan'];
 
         if ($token['status'] === false) {
             return [
@@ -236,7 +241,7 @@ class BeaCukaiApi
             ];
         }
 
-        $endPoint = $this->baseUrl . "/openapi/status?idPerusahaan=" . $this->npwpPerusahaan;
+        $endPoint = $this->baseUrl . "/openapi/status?idPerusahaan=" . $npwpPerusahaan;
         $headers = array(
             'Content-Type: application/json',
             'Authorization: Bearer ' . $token['token'],
@@ -258,6 +263,46 @@ class BeaCukaiApi
 
             if ($httpCode == 200) {
                 return $responseData;
+            } else {
+                return [
+                    'message' => "Server Ceisa Error : " . $httpCode,
+                    'status' => false
+                ];
+            }
+        }
+    }
+
+    public function getResponPdf($path)
+    {
+        $token = $this->getTokenApi();
+
+        if ($token['status'] === false) {
+            return [
+                'status' => false,
+                'message' => $token['message']
+            ];
+        }
+
+        $endPoint = $this->baseUrl . "/openapi/download-respon?path=" . $path;
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token['token'],
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endPoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            return [
+                'message' => curl_error($ch) . ". Code " . $httpCode,
+                'status' => false
+            ];
+        } else {
+            if ($httpCode == 200) {
+                return $response;
             } else {
                 return [
                     'message' => "Server Ceisa Error : " . $httpCode,

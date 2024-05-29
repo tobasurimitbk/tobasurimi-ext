@@ -45,10 +45,11 @@ class BCKemasanModel extends Model
         $sort = 'bc_kemasan.createdAt';
         $sortType = 'DESC';
 
-        $selectQry = "bc_kemasan.*";
+        $selectQry = "bc_kemasan.*,kemasan.name AS kemasan_name, kemasan.kode AS kode_kemasan";
 
         $pinjamanQry = $this->asObject()
             ->select($selectQry)
+            ->join('kemasan', 'kemasan.id = bc_kemasan.kemasan_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 

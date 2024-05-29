@@ -92,23 +92,6 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kawasan_id" name="kawasan_id" id="kawasan_id">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataKawasan)) {
-                                        foreach ($dataKawasan as $d) {
-                                    ?>
-                                            <option value="<?= $d["id"]; ?>"><?= $d["name"]; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">Pilih Kawasan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
                                 <label for="floatingInput">Email (Opsional)</label>
                             </div>
@@ -179,7 +162,6 @@
                                 <th onclick="changeSort('code_warehouse')" class="sort">Kode Warehouse</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Nama Warehouse</th>
                                 <th onclick="changeSort('divisi_id')" class="sort">Departemen</th>
-                                <th onclick="changeSort('kawasan_name')" class="sort">Kawasan</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
                                 <th onclick="changeSort('phone')" class="sort">Nomor Telepon</th>
                                 <th onclick="changeSort('email')" class="sort">Email</th>
@@ -252,9 +234,6 @@
             data: "divisi_name",
             className: "text-center"
         }, {
-            data: "kawasan_name",
-            className: "text-center"
-        }, {
             data: "address",
             className: "text-center"
         }, {
@@ -302,9 +281,6 @@
                 divisi_id: {
                     required: true
                 },
-                kawasan_id: {
-                    required: true
-                },
                 // province_id: {
                 //     required: true
                 // },
@@ -334,9 +310,6 @@
                 },
                 divisi_id: {
                     required: "Pilih Departemen"
-                },
-                kawasan_id: {
-                    required: "Kawasan wajib diisi"
                 },
                 // province_id: {
                 //     required: "Province wajib diisi"
@@ -384,31 +357,6 @@
 
         $(".zip_code").mask("00000")
 
-        //CSS SELECT2 FLOATING LABEL
-        $(".kawasan_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".kawasan_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".kawasan_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-        $('.kawasan_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        });
 
         $(".province_id")
             .parent('div')
@@ -541,7 +489,6 @@
             $(".city_id").val("").change();
             $(".pic_id").val("").change();
             $(".divisi_id").val(null).change();
-            $(".kawasan_id").val(null).change();
 
             $(".city_id").empty()
             $(".city_id").append(`<option value=""></option>`)
@@ -622,7 +569,6 @@
                         // })
                         $(".pic_id").val(res.data.pic_id).change()
                         $(".divisi_id").val(res.data.divisi_id).change();
-                        $(".kawasan_id").val(res.data.kawasan_id).change();
 
                         // AJAX GET CITY
                         $.ajax({

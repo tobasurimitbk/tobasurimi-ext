@@ -56,4 +56,13 @@ class BCBarangModel extends Model
         }
         return $total;
     }
+
+    public function totalVolume($bcPurchaseOrderID)
+    {
+        $total = 0;
+        foreach ($this->asArray()->where('bc_purchase_order_id', $bcPurchaseOrderID)->findAll() as $t) {
+            $total += $t['volume'];
+        }
+        return $total;
+    }
 }

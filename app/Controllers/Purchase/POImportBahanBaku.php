@@ -71,7 +71,11 @@ class POImportBahanBaku extends BaseController
             "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
             "barang" => $this->barangMasterModel->getBarangByTypeWithSpec([
                 'barang_master.type_barang'  => 'bahan_baku',
-            ]),            "satuan" => $this->satuanModel->getSatuanAll(),
+                'barang_master.company_id' => $this->this_company_id,
+                'barang_master.deletedAt' => null,
+                'barang_master_spesifikasi.deletedAt' => null
+            ]),
+            "satuan" => $this->satuanModel->getSatuanAll(),
             "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
             "dataShipment" => $this->metadataModel->get_by_name('Shipment')
         ];

@@ -55,7 +55,7 @@ class RasioModel extends Model
         $divisisDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
-            ->join('divisis', 'divisis.id = rasio.department_id', 'left')
+            ->join('divisis', 'divisis.id = rasio.divisi_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $divisisDataQry->countAllResults(false);
@@ -73,7 +73,7 @@ class RasioModel extends Model
         }
 
         if ($addCondition['department']) {
-            $divisisDataQry->where('rasio.department_id', $addCondition['department']);
+            $divisisDataQry->where('rasio.divisi_id', $addCondition['department']);
         }
 
         if ($addCondition['search'] || $addCondition['month'] || $addCondition['department']) {

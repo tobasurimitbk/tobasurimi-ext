@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Production;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
@@ -48,6 +49,8 @@ class MaterialRequest extends BaseController
     protected $materialRequestDetailsModel;
     protected $this_user_id;
 
+    protected $jurnalUmumController;
+
     public function __construct()
     {
         $this->this_user_id = session()->get("login")->user_id;
@@ -74,6 +77,8 @@ class MaterialRequest extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->materialRequestModel = new MaterialRequestsModel();
         $this->materialRequestDetailsModel = new MaterialRequestDetailsModel();
+
+        $this->jurnalUmumController = new JurnalUmum();
     }
 
     public function index()
@@ -503,11 +508,14 @@ class MaterialRequest extends BaseController
             ];
 
             if (!empty($id)) {
-                $this->materialRequestModel->update($id, $payload);
+                // $this->materialRequestModel->update($id, $payload);
                 $materialRequestData = $this->materialRequestModel->find($id);
                 $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->findAll();
 
                 foreach ($materialRequestDetailData as $key => $value) {
+                    $this->jurnalUmumController->TransaksiJurnalStockBarang($materialRequestData['company_id'], $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
+                    $this->jurnalUmumController->TransaksiJurnalStockBarang($materialRequestData['company_id'], $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
+
                     $stok = $this->stockModel->insertStok(
                         $materialRequestData['company_id'],
                         $value['warehouse_id'],

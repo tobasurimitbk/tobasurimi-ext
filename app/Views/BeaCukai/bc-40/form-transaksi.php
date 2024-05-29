@@ -55,7 +55,7 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="volume" value="<?= $bc40 == null ? "0" : ($bc40['volume'] == null ? "0" : formatRupiah($bc40['volume'])) ?>" name="volume" type="text" class="form-control volume" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input readonly id="volume" value="<?= $bc40 == null ? "0" : ($bc40['volume'] == null ? "0" : formatRupiah($bc40['volume'])) ?>" name="volume" type="text" class="form-control volume" placeholder="" onchange="this.value = formatRupiah(this.value)">
                                 <label>Volume (M3)</label>
                             </div>
                         </div>

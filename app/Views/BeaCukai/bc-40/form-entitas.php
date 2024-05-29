@@ -28,7 +28,7 @@
                                     <select class="form-select pengusaha_tpb_npwp" id="pengusaha_tpb_npwp" name="pengusaha_tpb_npwp" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($pengusahaTPB as $p) : ?>
-                                            <option <?= $bcEntitas != null ? ($p['npwp'] == $bcEntitas['nomor_identitas'] ? 'selected' : '')  : '' ?> value="<?= $p['npwp'] ?>" data-nama_pengusaha="<?= $p['nama_pengusaha'] ?>" data-alamat="<?= $p['alamat'] ?>" data-id="<?= $p['id'] ?>">
+                                            <option <?= $bcEntitas != null ? ($p['npwp'] == $bcEntitas['nomor_identitas'] ? 'selected' : '')  : '' ?> value="<?= $p['npwp'] ?>" data-nama_pengusaha="<?= $p['nama_pengusaha'] ?>" data-alamat="<?= $p['alamat'] ?>" data-nib="<?= $p['nib'] ?>" data-id="<?= $p['id'] ?>">
                                                 <?= $p['npwp'] ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -152,6 +152,7 @@
     }).change(function() {
         var selected = $(this).find('option:selected');
         $('#pengusaha_tpb_tanggal_skep_tpb').val(selected.data('tanggal_skep_tpb'));
+        $('#pemilik_barang_alamat').val(selected.data('alamat_pemilik_barang'));
     });
 
     $('#pengusaha_tpb_npwp').select2({
@@ -163,9 +164,11 @@
         var npwpPengusaha = $(this).val();
         var namaPengusaha = selected.data('nama_pengusaha');
         var alamatPengusaha = selected.data('alamat');
+        var nibDefault = selected.data('nib');
 
         $('#pengusaha_tpb_nama').val(namaPengusaha);
         $('#pengusaha_tpb_alamat').val(alamatPengusaha);
+        $('#pengusaha_tpb_nib').val(nibDefault)
         $('#pemilik_barang_npwp').val(npwpPengusaha)
         $('#pemilik_barang_nama').val(namaPengusaha);
         $('#pemilik_barang_alamat').val(alamatPengusaha);
@@ -364,7 +367,7 @@
                 $(".pengusaha_tpb_nomor_ijin_tpb").empty()
                 $(".pengusaha_tpb_nomor_ijin_tpb").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".pengusaha_tpb_nomor_ijin_tpb").append(`<option data-tanggal_skep_tpb="${item.tanggal_skep_tpb}"  value="${item.no_ijin_tpb}">${item.no_ijin_tpb}</option>`)
+                    $(".pengusaha_tpb_nomor_ijin_tpb").append(`<option data-alamat_pemilik_barang="${item.alamat_pemilik_barang}" data-tanggal_skep_tpb="${item.tanggal_skep_tpb}"  value="${item.no_ijin_tpb}">${item.no_ijin_tpb}</option>`)
                 })
                 $(".pengusaha_tpb_nomor_ijin_tpb").val();
             }

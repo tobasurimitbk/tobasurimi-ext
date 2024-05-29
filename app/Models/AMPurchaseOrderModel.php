@@ -469,4 +469,46 @@ class AMPurchaseOrderModel extends Model
             ];
         }
     }
+
+    public function getPOByNoPO($noPO, $companyID, $barang1ID, $barang2ID)
+    {
+        $condition = [
+            "am_purchase_orders.company_id"  => $companyID,
+            "am_purchase_orders.po_no"  => $noPO,
+            "am_purchase_orders.deletedAt" => NULL,
+            "am_purchase_order_details.deletedAt" => NULL,
+            "am_purchase_order_details.barang_id" => $barang1ID,
+            "am_purchase_order_details.spesifikasi_id" => $barang2ID,
+        ];
+
+        $selectQry = "
+            barang_master.barang_name as nama_barang, 
+            am_purchase_orders.*,
+            suppliers.name as nama_supplier,
+            am_purchase_order_details.*
+        ";
+
+        $res = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->first();
+
+        if ($res == null) {
+            return [
+                'hargaTerakhirNumber' => 0,
+                'hargaTerakhir' => '-',
+                'supplierTerakhir' => '-'
+            ];
+        } else {
+            return [
+                'hargaTerakhirNumber' => $res['price'],
+                'hargaTerakhir' => number_format($res['price'], 2, ',', '.'),
+                'supplierTerakhir' => $res['nama_supplier'],
+                'dataPO' => $res
+            ];
+        }
+    }
 }

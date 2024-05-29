@@ -26,7 +26,13 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <textarea name="alamat" id="alamat" class="form-control alamat" placeholder="Alamat TPB"></textarea>
+                                <input id="nib" name="nib" type="number" class="form-control nib" placeholder="">
+                                <label>Nomor Induk Berusaha (NIB)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <textarea rows="5" name="alamat" id="alamat" class="form-control alamat" placeholder="Alamat TPB"></textarea>
                                 <label>Alamat Pengusaha TPB</label>
                             </div>
                         </div>
@@ -190,6 +196,9 @@
             nama_pengusaha: {
                 required: true
             },
+            nib: {
+                required: true
+            },
             alamat: {
                 required: true
             },
@@ -200,6 +209,9 @@
             },
             nama_pengusaha: {
                 required: "Masukkan Nama Pengusaha TPB"
+            },
+            nib: {
+                required: "Masukkan Nomor Induk Berusaha (NIB)"
             },
             alamat: {
                 required: "Masukkan Alamat Pengusaha TPB"
@@ -367,6 +379,7 @@
                     $('#id').val(res.data.id);
                     $('#npwp').val(res.data.npwp);
                     $('#nama_pengusaha').val(res.data.nama_pengusaha);
+                    $('#nib').val(res.data.nib);
                     $('#alamat').val(res.data.alamat);
                     $('.add-modal').modal('show');
                 }
@@ -426,6 +439,7 @@
         $('#id').val('');
         $('#npwp').val('');
         $('#nama_pengusaha').val('');
+        $('#nib').val('');
         $('#alamat').val('');
     }
 
