@@ -978,7 +978,7 @@ class JurnalUmum extends BaseController
         }
 
         foreach ($dataAccountBarang as $value) {
-            if ($barang1ID == $value->barang_master_id && $divisiID == $value->divisi_id) {
+            if ($barang1ID == $value->barang_master_id && $divisiID == $value->divisi_id && $companyID == $value->company_id) {
                 $barangAP = $value->ap_id;
                 $barangAR = $value->ar_id;
                 $barangAPFound = true;

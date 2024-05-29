@@ -206,6 +206,7 @@ class MaterialRequest extends BaseController
         ];
 
         $condition = [
+            'material_requests.company_id' => $this->this_company_id,
             'parent_barang.parent_name !=' => "KIMIA"
         ];
 
@@ -508,131 +509,144 @@ class MaterialRequest extends BaseController
             ];
 
             if (!empty($id)) {
-                $this->materialRequestModel->update($id, $payload);
                 $materialRequestData = $this->materialRequestModel->find($id);
                 $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->findAll();
 
                 foreach ($materialRequestDetailData as $key => $value) {
-                    $this->jurnalUmumController->TransaksiJurnalStockBarang($materialRequestData['company_id'], $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
-                    $this->jurnalUmumController->TransaksiJurnalStockBarang($materialRequestData['company_id'], $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
+                    $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
+                    $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
 
-                    $stok = $this->stockModel->insertStok(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_id'],
-                        $value['divisi_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        ($value['qty2'] * -1)
-                    );
+                    if ($statusOUT && $statusIN) {
+                        $responseBody = json_decode($statusOUT->getBody(), true);
+                        $data = [
+                            "status"    => false,
+                            "id"    => $this->request->getVar('id'),
+                            "message"   => $responseBody['message'],
+                            "payload"   => json_encode($payload),
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    } else {
+                        $stok = $this->stockModel->insertStok(
+                            $materialRequestData['company_id'],
+                            $value['warehouse_id'],
+                            $value['divisi_id'],
+                            $value['barang_type'],
+                            $value['barang1_id'],
+                            $value['barang2_id'],
+                            ($value['qty2'] * -1)
+                        );
 
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $value['qty2'],
-                        "Out",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "PRODUKSI",
-                        $materialRequestData['req_no'],
-                        $value['note'] ? $value['note'] : "-"
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $stokDetail,
-                        $value['qty2'],
-                        $value['no_aju'],
-                        $materialRequestData['req_no'],
-                        $value['stock_dokumen'],
-                    );
-
-                    // -----
-                    // BARANG IN KE INVENTORI
-                    $stokIn = $this->stockModel->insertStok(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_tujuan_id'],
-                        $value['divisi_tujuan_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        $value['qty2']
-                    );
-
-                    $this->materialRequestDetailsModel->update($value['id'], [
-                        'stock_tujuan_id' => $stokIn
-                    ]);
-
-                    $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_tujuan_id'],
-                        $value['divisi_tujuan_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        $value['bc_id'],
-                        $value['no_aju'],
-                        $stokIn
-                    );
-
-                    if ($checkStokDetailIn == null) {
-                        // INSERT STOK INISIASI
-                        $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                            $stokIn,
-                            0,
-                            "In",
+                        // DETAIL
+                        $stokDetail = $this->stockDetailModel->insertStokDetail(
+                            $stok,
+                            $value['qty2'],
+                            "Out",
                             date('Y-m-d'),
                             $this->this_user_id,
-                            "INISIASI",
-                            "-",
-                            "-"
+                            "PRODUKSI",
+                            $materialRequestData['req_no'],
+                            $value['note'] ? $value['note'] : "-"
                         );
+
+                        // SUB DETAIL
                         $this->stockDetail2Model->insertStokDetail2(
                             $value['bc_id'],
                             $value['stock_id'],
-                            $stokDetailIn,
-                            0,
+                            $stokDetail,
+                            $value['qty2'],
                             $value['no_aju'],
-                            "-"
+                            $materialRequestData['req_no'],
+                            $value['stock_dokumen'],
                         );
+
+                        // -----
+                        // BARANG IN KE INVENTORI
+                        $stokIn = $this->stockModel->insertStok(
+                            $materialRequestData['company_id'],
+                            $value['warehouse_tujuan_id'],
+                            $value['divisi_tujuan_id'],
+                            $value['barang_type'],
+                            $value['barang1_id'],
+                            $value['barang2_id'],
+                            $value['qty2']
+                        );
+
+                        $this->materialRequestDetailsModel->update($value['id'], [
+                            'stock_tujuan_id' => $stokIn
+                        ]);
+
+                        $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
+                            $materialRequestData['company_id'],
+                            $value['warehouse_tujuan_id'],
+                            $value['divisi_tujuan_id'],
+                            $value['barang_type'],
+                            $value['barang1_id'],
+                            $value['barang2_id'],
+                            $value['bc_id'],
+                            $value['no_aju'],
+                            $stokIn
+                        );
+
+                        if ($checkStokDetailIn == null) {
+                            // INSERT STOK INISIASI
+                            $stokDetailIn = $this->stockDetailModel->insertStokDetail(
+                                $stokIn,
+                                0,
+                                "In",
+                                date('Y-m-d'),
+                                $this->this_user_id,
+                                "INISIASI",
+                                "-",
+                                "-"
+                            );
+                            $this->stockDetail2Model->insertStokDetail2(
+                                $value['bc_id'],
+                                $value['stock_id'],
+                                $stokDetailIn,
+                                0,
+                                $value['no_aju'],
+                                "-"
+                            );
+                        }
+
+                        $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
+                            $value['bc_id'],
+                            $value['stock_id'],
+                            $value['no_aju'],
+                            $value['stock_dokumen']
+                        );
+
+                        // DETAIL
+                        $stokDetailIn = $this->stockDetailModel->insertStokDetail(
+                            $stokIn,
+                            $value['qty2'],
+                            "In",
+                            date('Y-m-d'),
+                            $this->this_user_id,
+                            "PRODUKSI",
+                            $materialRequestData['req_no'],
+                            $value['note'] ? $value['note'] : "-"
+                        );
+
+                        // SUB DETAIL
+                        $this->stockDetail2Model->insertStokDetail2(
+                            $value['bc_id'],
+                            $stokIn,
+                            $stokDetailIn,
+                            $value['qty2'],
+                            $value['no_aju'],
+                            $materialRequestData['req_no'],
+                            $value['stock_dokumen'],
+                        );
+                        $this->materialRequestModel->update($id, $payload);
+
+                        $this->workOrdersModel->update($materialRequestData['work_order_id'], [
+                            'is_posted' => 1
+                        ]);
                     }
-
-                    $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $value['no_aju'],
-                        $value['stock_dokumen']
-                    );
-
-                    // DETAIL
-                    $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                        $stokIn,
-                        $value['qty2'],
-                        "In",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "PRODUKSI",
-                        $materialRequestData['req_no'],
-                        $value['note'] ? $value['note'] : "-"
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $value['bc_id'],
-                        $stokIn,
-                        $stokDetailIn,
-                        $value['qty2'],
-                        $value['no_aju'],
-                        $materialRequestData['req_no'],
-                        $value['stock_dokumen'],
-                    );
                 }
-
-                $this->workOrdersModel->update($materialRequestData['work_order_id'], [
-                    'is_posted' => 1
-                ]);
                 $data = [
                     "status"    => true,
                     "id"    => $this->request->getVar('id'),

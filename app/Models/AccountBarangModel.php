@@ -16,6 +16,7 @@ class AccountBarangModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'barang_master_id',
+        'company_id',
         'ap_id',
         'ar_id',
         'kategori_id',
