@@ -12,8 +12,17 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Mutasi PPBKB</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= base_url('mutasi/global') ?>">Mutasi BC 2.7</a>
+                </li>
+            </ul>
+
             <?= csrf_field() ?>
-            <div class="row mb-4">
+            <div class="row mb-4 mt-3">
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating">
                         <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
@@ -77,7 +86,7 @@
                             <th onclick="changeSort('tanggal')">Tanggal</th>
                             <th onclick="changeSort('divisis.divisi')">Warehouse Asal</th>
                             <th onclick="changeSort('divisis.divisi')">Warehouse Tujuan</th>
-                            <th onclick="changeSort('bc_id')">Dokumen Mutasi</th>
+                            <th>No PPBKB</th>
                             <th>Total Item</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -156,8 +165,10 @@
                 className: "text-center"
             },
             {
-                data: "dokumen_mutasi",
-                className: "text-center"
+                data: "no_ppbkb",
+                className: "text-center",
+                searchable: false,
+                sortable: false
             },
             {
                 data: "total_item",

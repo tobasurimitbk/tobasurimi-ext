@@ -3,59 +3,88 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Pengeluaran Barang Lokal</h1>
-        <?php if (can("Stuffing", "Pengeluaran Lokal", "c")) : ?>
-            <a href="<?= base_url('pengeluaran-lokal/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <h1>Mutasi</h1>
+        <?php if (can("Inventori", "Mutasi", "c")) : ?>
+            <a href="<?= base_url('mutasi/create-global') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= base_url('mutasi') ?>">Mutasi PPBKB</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Mutasi BC 2.7</a>
+                </li>
+            </ul>
+
             <?= csrf_field() ?>
-            <div class="row">
-                <div class="col-sm-6 ">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Dibuat" />
-                                <label for="floatingInput">Tanggal Mulai</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
-                        </div>
+            <div class="row mb-4 mt-3">
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select company_tujuan_id" id="company_tujuan_id" name="company_tujuan_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($dropdownCompanyExcept as $d) : ?>
+                                <option value="<?= $d["id"]; ?>"><?= strtoupper($d["company"]); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Company Tujuan</label>
                     </div>
                 </div>
-                <div class="col-sm-6 ">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Selesai" />
-                                <label for="floatingInput">Tanggal Selesai</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
-                        </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($dataDivisi as $divisi) : ?>
+                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Departemen</label>
                     </div>
                 </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-sm-6 ">
+                <div class="col-sm-4 mt-2">
                     <div class="form-floating">
                         <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
                             <option value="">SEMUA</option>
                             <option value="1">POSTED</option>
                             <option value="0">WAITING</option>
                         </select>
-                        <label style="z-index: 1;">Status Posting</label>
+                        <label style="z-index: 1;">Status Mutasi</label>
                     </div>
                 </div>
-                <div class="col-sm-6 ">
+                <div class="col-sm-4 mt-2">
                     <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control no_stuffing" id="no_stuffing" name="no_stuffing" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Stuffing </label>
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Mutasi </label>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,11 +93,13 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('no_stuffing')">No Stuffing</th>
-                            <th onclick="changeSort('createdAt')">Tanggal</th>
+                            <th onclick="changeSort('no_mutasi')">No Mutasi</th>
+                            <th onclick="changeSort('tanggal')">Tanggal</th>
+                            <th onclick="changeSort('divisis.divisi')">Warehouse Asal</th>
+                            <th onclick="changeSort('company_tujuan_id')">Company Tujuan</th>
+                            <th>No BC 2.7</th>
                             <th>Total Item</th>
-                            <th onclick="changeSort('customer_name')">Customer</th>
-
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -80,6 +111,8 @@
         </div>
     </div>
 </section>
+
+
 
 <script>
     let sort = "createdAt";
@@ -101,13 +134,15 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("pengeluaran-lokal/all"); ?>",
+            url: "<?= base_url("mutasi/all-global"); ?>",
             dataSrc: "data",
             data: function(data) {
+                data.divisi_id = $(".divisi_id").val();
                 data.status = $(".status").val();
-                data.start_date = $(".start_date").val();
-                data.end_date = $(".end_date").val();
-                data.no_stuffing = $(".no_stuffing").val();
+                data.no_mutasi = $(".no_mutasi").val();
+                data.dateStart = $('#dateStart').val();
+                data.dateEnd = $('#dateEnd').val();
+
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -125,13 +160,26 @@
                 orderable: false
             },
             {
-                data: "no_stuffing",
-                className: "text-center",
-
+                data: "no_mutasi",
+                className: "text-center"
             },
             {
                 data: "tanggal",
                 className: "text-center"
+            },
+            {
+                data: "warehouse_asal",
+                className: "text-center",
+            },
+            {
+                data: "company_tujuan",
+                className: "text-center"
+            },
+            {
+                data: "no_bc27",
+                className: "text-center",
+                searchable: false,
+                sortable: false
             },
             {
                 data: "total_item",
@@ -140,10 +188,22 @@
                 sortable: false
             },
             {
-                data: "customer_name",
-                className: "text-center"
-            },
-            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let state = row.state;
+                    if (state == '0') {
+                        return '<i class="fa-solid fa-square text-danger"></i>';
+
+                    } else {
+                        return '<i class="fa-solid fa-square text-success"></i>';
+
+                    }
+
+                }
+            }, {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
@@ -151,65 +211,26 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let status = row.status_posting
-                    // let status_closed = row.status_closed;
 
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Stuffing', 'Pengeluaran Lokal', 'a')) : ?>
+                        <?php if (can('Inventori', 'Mutasi', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        <?php if (can('Stuffing', 'Pengeluaran Lokal', 'd')) : ?>
+                        <?php if (can('Inventori', 'Mutasi', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
                         </div>
                     `
-                        //     return `
-                        //     <div class="mt-0">
-                        //     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'a')) : ?>
-                        //         <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
-                        //             <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                        //         </button>
-                        //     <?php endif; ?>
-                        //     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                        //         <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                        //             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                        //         </button>
-                        //     <?php endif; ?>
-                        //     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'd')) : ?>
-                        //         <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                        //             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        //         </button>
-                        //     <?php endif; ?>
-                        //     </div>
-                        // `
                     } else {
-                        var res = '';
-
-                        // if (status_closed != "CLOSED") {
-                        //     res += `
-                        //         <button data-toggle="tooltip" title="Close" onclick="closed('${id}')" class="btn btn-danger posting-spp">
-                        //             <i class="fa-solid fa-ban"></i>    
-                        //         </button>
-                        //     `;
-                        // }
-
-                        <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                            res += `
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            `;
-
-                        <?php endif; ?>
-
-
-                        return res;
-
+                        return `
+                        -
+                    `
                     }
 
                 }
@@ -235,53 +256,30 @@
         }
     });
 
-    $(".start_date").datepicker({
+    $(".dateStart").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
     })
 
-    $(".end_date").datepicker({
+    $(".dateEnd").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
     })
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
+    $('#company_tujuan_id').select2({
+        placeholder: "Pilih Company Tujuan",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        // GET WAREHOUSES
-        $.ajax({
-            url: `<?= base_url('pengeluaran-lokal/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_id").empty()
-                $(".warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                $(".warehouse_id").val();
-            }
-        });
         table.ajax.reload();
     });
 
-    $('#warehouse_id').select2({
-        placeholder: "Pilih Warehouse",
+    $('#divisi_id').select2({
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -296,7 +294,12 @@
         table.ajax.reload();
     });
 
-    $("#divisi_id,#warehouse_id,#status")
+
+    $('#dateStart,#dateEnd').change(function() {
+        table.ajax.reload();
+    });
+
+    $("#divisi_id,#status,#company_tujuan_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -304,25 +307,20 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-
-    $(".no_stuffing").keyup(function() {
+    $(".no_mutasi").keyup(function() {
         table.ajax.reload();
     })
 
-    $('.start_date,.end_date').change(function() {
-        table.ajax.reload();
-    });
-
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("pengeluaran-lokal/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("mutasi/id-global"); ?>/${data.id}`);
     });
 
 
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Stuffing Pengeluaran Lokal ?',
+            title: 'Posting Mutasi ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -333,7 +331,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("pengeluaran-lokal/posting"); ?>",
+                    url: "<?= base_url("mutasi/posting-global"); ?>",
                     data: {
                         id: id
                     },
@@ -372,18 +370,18 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Stuffing Pengeluaran Lokal ?',
+            title: 'Hapus Mutasi ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Hapus',
+            confirmButtonText: 'Simpan',
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("pengeluaran-lokal/delete"); ?>",
+                    url: "<?= base_url("mutasi/delete-global"); ?>",
                     data: {
                         id: id
                     },
@@ -412,53 +410,6 @@
         })
     }
 
-
-    // const closed = function(id) {
-    //     Swal.fire({
-    //         icon: 'question',
-    //         title: 'Close Stuffing Pengeluaran Lokal ?',
-    //         confirmButtonColor: '#4e73df',
-    //         cancelButtonColor: '#d33',
-    //         showCancelButton: true,
-    //         reverseButtons: true,
-    //         confirmButtonText: 'Simpan',
-    //         cancelButtonText: 'Batal',
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             const csrf = $(`[name="${csrfToken}"]`);
-    //             $.ajax({
-    //                 url: "<?= base_url("pengeluaran-lokal/close"); ?>",
-    //                 data: {
-    //                     id: id
-    //                 },
-    //                 beforeSend: function(xhr) {
-    //                     setLoading();
-    //                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //                 },
-    //                 complete: function() {
-    //                     stopLoading();
-    //                 },
-    //                 method: "POST",
-    //                 dataType: "json",
-    //                 success: function(response) {
-    //                     if (response.status) {
-    //                         Swal.fire({
-    //                             icon: 'success',
-    //                             title: response.message,
-    //                             confirmButtonColor: '#4e73df',
-    //                         }).then((result) => {
-    //                             table.ajax.reload()
-    //                         });
-    //                     }
-    //                 },
-    //             });
-    //         }
-    //     })
-    // }
-
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
 
     const changeSort = function(val) {
         if (sort !== val) {

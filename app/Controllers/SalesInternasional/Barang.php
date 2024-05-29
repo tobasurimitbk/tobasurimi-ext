@@ -57,7 +57,7 @@ class Barang extends BaseController
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => strtoupper($this->request->getVar('barang_name')),
             'type_barang_sales' => "EKSPOR",
-            'type_barang' => "bahan_jadi",
+            'type_barang' => $this->request->getVar('type_barang'),
             'satuan_id' => $this->request->getVar('satuan_id'),
             'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
             'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
@@ -143,7 +143,6 @@ class Barang extends BaseController
         $condition = [
             "barang_master_sales.company_id"  => $this->this_company_id,
             "barang_master_sales.type_barang_sales" => "EKSPOR",
-            "barang_master_sales.type_barang" => "bahan_jadi",
             "barang_master_sales.deletedAt" => NULL,
         ];
 

@@ -26,6 +26,7 @@ class SalesOrderExportDetailModel extends Model
         'remark',
         'kemasan',
         'harga_barang',
+        'tipe_input',
         'total_harga_barang',
         'createdAt',
         'updatedAt',

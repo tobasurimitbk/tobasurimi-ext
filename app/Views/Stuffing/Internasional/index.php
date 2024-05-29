@@ -68,7 +68,6 @@
                             <th onclick="changeSort('createdAt')">Tanggal</th>
                             <th>Total Item</th>
                             <th onclick="changeSort('customer_name')">Customer</th>
-                            <th onclick="changeSort('status_closed')">Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -142,10 +141,8 @@
             {
                 data: "customer_name",
                 className: "text-center"
-            }, {
-                data: "status_closed",
-                className: "text-center"
-            }, {
+            },
+            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
@@ -192,20 +189,20 @@
                     } else {
                         var res = '';
 
-                        if (status_closed != "CLOSED") {
-                            res += `
-                                <button data-toggle="tooltip" title="Close" onclick="closed('${id}')" class="btn btn-danger posting-spp">
-                                    <i class="fa-solid fa-ban"></i>    
-                                </button>
-                            `;
-                        }
+                        // if (status_closed != "CLOSED") {
+                        //     res += `
+                        //         <button data-toggle="tooltip" title="Close" onclick="closed('${id}')" class="btn btn-danger posting-spp">
+                        //             <i class="fa-solid fa-ban"></i>    
+                        //         </button>
+                        //     `;
+                        // }
 
                         <?php if (can('Stuffing', 'Pengeluaran Internasional', 'p')) : ?>
-                            // res += `
-                            //     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
-                            //         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            //     </button>
-                            // `;
+                            res += `
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pengeluaran-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            `;
 
                         <?php endif; ?>
 

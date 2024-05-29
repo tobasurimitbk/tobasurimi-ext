@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class MutasiModel extends Model
+class MutasiGlobalModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'mutasi';
+    protected $table            = 'mutasi_global';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -46,27 +46,29 @@ class MutasiModel extends Model
             'no_mutasi'                           => 'no_mutasi',
             'tanggal'                             => 'tanggal',
             'warehouse_asal_id'                   => 'warehouse_asal_id',
-            'warehouse_tujuan_id'                 => 'warehouse_tujuan_id',
+            'company_tujuan_id'                   => 'company_tujuan_id',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "mutasi.*,
-        divisis.divisi
+        $selectQry = "mutasi_global.*,
+        divisis.divisi,
+        companies.company AS company_tujuan_name
         ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
-            ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
+            ->join('divisis', 'divisis.id = mutasi_global.divisi_asal_id', 'left')
+            ->join('companies', 'companies.id = mutasi_global.company_tujuan_id', 'left')
             ->where($condition)
             ->whereIn('divisi_asal_id', $conditionArr)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['company_tujuan_id'] || $addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
@@ -85,11 +87,15 @@ class MutasiModel extends Model
             $dataQry->where('status_posting', $addCondition['status']);
         }
 
+        if ($addCondition['company_tujuan_id']) {
+            $dataQry->where('company_tujuan_id', $addCondition['company_tujuan_id']);
+        }
+
         if ($addCondition['no_mutasi']) {
             $dataQry->like('no_mutasi', $addCondition['no_mutasi']);
         }
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['company_tujuan_id'] || $addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 
@@ -108,16 +114,16 @@ class MutasiModel extends Model
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
-        $builder = $this->db->table('mutasi');
+        $builder = $this->db->table('mutasi_global');
         $builder->select('no_mutasi');
         $builder->orderBy('no_mutasi', 'desc');
-        $builder->where('mutasi.divisi_asal_id', $divisi_id);
+        $builder->where('mutasi_global.divisi_asal_id', $divisi_id);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_mutasi', $lastStr);
         $query = $builder->get();
 
-        $kode = 'PPBKB/' . $divisiName;
+        $kode = 'BC27/' . $divisiName;
 
         $lastPenerimaan = '1';
 

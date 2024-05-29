@@ -203,6 +203,7 @@ class OrderForm extends BaseController
                     "kemasan"                       => $row->kemasan,
                     "harga_barang"                  => isset($row->hargaOrder) ? number_format($row->hargaOrder, 2, '.', '') : number_format($row->harga, 2, '.', ''),
                     "total_harga_barang"            => isset($row->totalHargaOrder) ? number_format($row->totalHargaOrder, 2, '.', '') : number_format($row->total, 2, '.', ''),
+                    "tipe_input"            => "order_form",
                 ];
                 $this->salesOrderExportDetailModel->save($valueBarang);
             }
@@ -349,6 +350,7 @@ class OrderForm extends BaseController
             ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
             ->join('sales_contract_detail', 'sales_contract_detail.id = sales_order_detail_export.sales_contract_detail_id', 'left')
             ->where('sales_order_export_id', $id)
+            ->where('tipe_input', "order_form")
             ->orderBy('createdAt', "DESC")
             ->findAll();
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');

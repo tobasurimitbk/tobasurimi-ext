@@ -60,7 +60,7 @@ class SalesKontrak extends BaseController
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
         $dataSatuan = $this->satuanModel->findAll();
-        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->where('type_barang_sales', 'EKSPOR')->orderBy('createdAt', "DESC")->findAll();
 
         $data = [
             "dataCustomer" => $dataCustomer,

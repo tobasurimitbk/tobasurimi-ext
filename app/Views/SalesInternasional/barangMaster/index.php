@@ -66,12 +66,24 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select type_barang" name="type_barang" id="type_barang">
+                                    <option value="">Pilih Tipe Barang</option>
+                                    <option value="bahan_jadi">Bahan Jadi</option>
+                                    <option value="kemasan">Kemasan</option>
+
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
@@ -83,14 +95,15 @@
                                 <label for="floatingInput" style="z-index: 1;">Satuan</label>
                             </div>
                         </div>
+
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
@@ -417,6 +430,7 @@
 
                 $('.input-generate').hide();
                 $('.kode_barang').attr('readonly', true);
+                $('.type_barang').attr('disabled', true);
                 $('#add_modal').modal('show');
                 $('.delete-btn').show();
                 $('.title-name').text('Update Barang')
@@ -475,6 +489,7 @@
     $('.btn-add').click(function() {
         resetForm();
         $('.input-generate').show();
+        $('.type_barang').attr('disabled', false); // Enable the select element
         $('#add_modal').modal('show');
         $('.delete-btn').hide();
         $('.title-name').text('Tambah Barang')
@@ -521,8 +536,8 @@
         let csrfToken = '<?= csrf_token() ?>';
         let value = document.getElementById('generate_new_code').checked ? true : false;
         let csrf = $(`[name="${csrfToken}"]`);
-        let type_barang = "bahan_jadi"
-        if (value) {
+        let type_barang = $(".type_barang").val() == "" ? "bahan_jadi" : $(".type_barang").val();
+        if (value && type_barang) {
             $("input[name='kode_barang']").attr("readonly", true);
             $.ajax({
                 url: `<?= base_url("master-barang-internasional/generate-new-code"); ?>`,

@@ -173,12 +173,12 @@ $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
 // KAWASAN
-$routes->get('/kawasan-warehouse', 'Master\Kawasan::index', ['filter' => 'Auth']);
-$routes->get('/kawasan-warehouse/all', 'Master\Kawasan::all', ['filter' => 'Auth']);
-$routes->post('/kawasan-warehouse/save', 'Master\Kawasan::create', ['filter' => 'Auth']);
-$routes->post('/kawasan-warehouse/update', 'Master\Kawasan::update', ['filter' => 'Auth']);
-$routes->post('/kawasan-warehouse/delete', 'Master\Kawasan::delete', ['filter' => 'Auth']);
-$routes->get('/kawasan-warehouse/get', 'Master\Kawasan::get', ['filter' => 'Auth']);
+// $routes->get('/kawasan-warehouse', 'Master\Kawasan::index', ['filter' => 'Auth']);
+// $routes->get('/kawasan-warehouse/all', 'Master\Kawasan::all', ['filter' => 'Auth']);
+// $routes->post('/kawasan-warehouse/save', 'Master\Kawasan::create', ['filter' => 'Auth']);
+// $routes->post('/kawasan-warehouse/update', 'Master\Kawasan::update', ['filter' => 'Auth']);
+// $routes->post('/kawasan-warehouse/delete', 'Master\Kawasan::delete', ['filter' => 'Auth']);
+// $routes->get('/kawasan-warehouse/get', 'Master\Kawasan::get', ['filter' => 'Auth']);
 
 // SUPPLIER HARGA
 // $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
@@ -832,6 +832,10 @@ $routes->post('/pengeluaran-lokal/close',  'Stuffing\Lokal::close', ['filter' =>
 $routes->get('/pengeluaran-lokal/id/(:segment)',  'Stuffing\Lokal::detail/$1', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/get-pengeluaran-lokal-no',  'Stuffing\Lokal::getStuffingLokalNo', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/print/(:segment)', 'Stuffing\Lokal::print/$1', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/kemasanAll', 'Stuffing\Lokal::getAllKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/save-kemasan',  'Stuffing\Lokal::createKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-lokal/delete-kemasan',  'Stuffing\Lokal::deleteKemasan', ['filter' => 'Auth']);
+
 
 // Stuffing Internasional
 $routes->get('/pengeluaran-internasional',  'Stuffing\Internasional::index', ['filter' => 'Auth']);
@@ -849,6 +853,10 @@ $routes->post('/pengeluaran-internasional/close',  'Stuffing\Internasional::clos
 $routes->get('/pengeluaran-internasional/id/(:segment)',  'Stuffing\Internasional::detail/$1', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/get-pengeluaran-internasional-no',  'Stuffing\Internasional::getStuffingLokalNo', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/print/(:segment)', 'Stuffing\Internasional::print/$1', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/kemasanAll', 'Stuffing\Internasional::getAllKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/save-kemasan',  'Stuffing\Internasional::createKemasan', ['filter' => 'Auth']);
+$routes->post('/pengeluaran-internasional/delete-kemasan',  'Stuffing\Internasional::deleteKemasan', ['filter' => 'Auth']);
+
 
 // STOCK HISTORI
 $routes->get('/stock-histori', 'Inventori\StokHistori::index', ['filter' => 'Auth']);
@@ -916,6 +924,17 @@ $routes->get('/penerimaan-mutasi/id/(:segment)', 'Inventori\PenerimaanMutasi::de
 $routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-no', 'Inventori\PenerimaanMutasi::getPenerimaanMutasiNo', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/all', 'Inventori\PenerimaanMutasi::all', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/print/(:segment)', 'Inventori\PenerimaanMutasi::print/$1', ['filter' => 'Auth']);
+// MUTASI GLOBAL
+$routes->get('/mutasi/global', 'Inventori\MutasiGlobal::index', ['filter' => 'Auth']);
+$routes->get('/mutasi/all-global', 'Inventori\MutasiGlobal::all', ['filter' => 'Auth']);
+$routes->get('/mutasi/create-global', 'Inventori\MutasiGlobal::create', ['filter' => 'Auth']);
+$routes->get('/mutasi/id-global/(:segment)', 'Inventori\MutasiGlobal::detail/$1', ['filter' => 'Auth']);
+$routes->get('/mutasi/get-mutasi-no-global', 'Inventori\MutasiGlobal::getMutasiNo', ['filter' => 'Auth']);
+$routes->post('/mutasi/save-global', 'Inventori\MutasiGlobal::createAction', ['filter' => 'Auth']);
+$routes->post('/mutasi/update-global', 'Inventori\MutasiGlobal::updateAction', ['filter' => 'Auth']);
+$routes->post('/mutasi/delete-global', 'Inventori\MutasiGlobal::delete', ['filter' => 'Auth']);
+$routes->post('/mutasi/posting-global', 'Inventori\MutasiGlobal::posting', ['filter' => 'Auth']);
+
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);

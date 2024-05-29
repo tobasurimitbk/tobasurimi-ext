@@ -193,6 +193,7 @@ class SalesOrderModel extends Model
                               barang_master_sales.satuan_id,
                               satuans.kode_satuan AS satuan";
         $detail = $this->SalesOrderDetailModel
+            ->where('tipe_input', "order_form")
             ->where('id_sales_order', $id)
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')

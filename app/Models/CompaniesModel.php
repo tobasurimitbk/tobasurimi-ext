@@ -100,4 +100,9 @@ class CompaniesModel extends Model
 
         return $result;
     }
+
+    public function getCompaniesExcepct($companyExceptId)
+    {
+        return $this->where('deletedAt', null)->whereNotIn('id', [$companyExceptId])->findAll();
+    }
 }

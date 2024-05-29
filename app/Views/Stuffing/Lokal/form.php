@@ -21,9 +21,9 @@
                         </button>
                     <?php endif; ?>
                     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
                             Print
-                        </button> -->
+                        </button>
                     <?php endif; ?>
                     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -32,9 +32,9 @@
                     <?php endif; ?>
                 <?php else : ?>
                     <?php if (can('Stuffing', 'Pengeluaran Lokal', 'p')) : ?>
-                        <!-- <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("pengeluaran-lokal/print/"); ?><?= encrypt($stuffingLokal['id']); ?>')">
                             Print
-                        </button> -->
+                        </button>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
@@ -72,7 +72,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($stuffingLokal) ? 'disabled=true' : ''; ?> value="<?= !empty($stuffingLokal) ? $stuffingLokal['no_stuffing'] : ""; ?>" type="text" class="form-control no_stuffing" id="no_stuffing" name="no_stuffing" placeholder="No. Stuffing Lokal">
+                                    <input readonly autocomplete="one-time-code" <?= !empty($stuffingLokal) ? 'disabled=true' : ''; ?> value="<?= !empty($stuffingLokal) ? $stuffingLokal['no_stuffing'] : ""; ?>" type="text" class="form-control <?= !empty($stuffingLokal) ? '' : 'no_stuffing'; ?> " id="no_stuffing" name="no_stuffing" placeholder="No. Stuffing Lokal">
                                     <label for="floatingInput">No. Stuffing Lokal</label>
                                 </div>
                             </div>
@@ -115,10 +115,21 @@
             </form>
 
             <div class="detail-form-layout">
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Barang</label>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <button class="btn btn-show-detail btn-add btn-block float-right  <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?>" data-btn="kemasan-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Kemasan
+                            </button>
+                        </div>
                     </div>
+                </div>
+                <div class="row">
+
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTableSalesOrder" id="dataTableSalesOrder" width="100%" cellspacing="0">
                             <thead class="thead-dark">
@@ -127,6 +138,7 @@
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Qty</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -279,6 +291,78 @@
 
     </div>
 </section>
+<!-- modal kemasan -->
+<div class="modal kemasan-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Kemasan</h5>
+            </div>
+            <div class="modal-body">
+                <?= csrf_field() ?>
+                <form class="kemasan-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <!-- <input autocomplete="one-time-code" type="hidden" class="id_barang" name="id_barang" id="id_barang" /> -->
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Nama Kemasan</label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control satuan" name="satuan" id="satuan" placeholder="Satuan">
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">Qty</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
+                                <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control keteranganppn" name="keteranganppn" id="keteranganppn" placeholder="keteranganppn">
+                                <label for="floatingInput">Status PPN</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="hidden" readonly="true" class="form-control statusppn" name="statusppn" id="statusppn" placeholder="statusppn">
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-kemasan btn-discard mr-3">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-kemasan">Simpan</button>
+                <!-- <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button> -->
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
@@ -313,7 +397,18 @@
             {
                 data: "qty",
                 className: "text-center"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    return id; // Return only the id value without any HTML tags
+                }
             }
+
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -418,15 +513,21 @@
             }
         });
         // APPEND 
+
         <?php foreach ($stuffingLokalDetail as $m) : ?>
+
             listStockSelected.push({
                 id_stuffing_detail: "<?= $m['id_stuffing_detail'] ?>",
                 id: "<?= $m['id'] ?>",
                 bc_id: "<?= $m['bc_id'] ?>",
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
                 no_aju: "<?= $m['no_aju'] ?>",
+                no_aju: "<?= $m['no_aju'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
                 stok_total: "<?= $m['stok_total'] ?>",
+                stock_dokumen: "<?= $m['stock_dokumen'] ?>",
+                no_dokumen_1: "<?= $m['no_dokumen_1'] ?>",
+                no_dokumen_2: "<?= $m['no_dokumen_2'] ?>",
                 bc_type: "<?= $m['bc_type'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 barang: "<?= $m['barang'] ?>",
@@ -536,6 +637,7 @@
 
     });
 
+
     // VALIDATOR
     var validator = $(".create-form").validate({
         rules: {
@@ -580,6 +682,8 @@
 
 
     $('.btn-submit-parent').click(function() {
+
+        console.log(listStockSelected)
         if (listStockSelected.length == 0) {
             Swal.fire({
                 icon: 'error',
@@ -832,6 +936,10 @@
         });
     }
 
+    function reloadTableData() {
+        getListBarangOutput();
+    }
+
     function drawTableAsalBarang(data) {
         if ($.fn.DataTable.isDataTable('#dataTable')) {
             $('#dataTable').DataTable().clear().draw();
@@ -860,6 +968,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -896,11 +1005,19 @@
 
     $('#select-item-btn').click(function() {
         var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
+        console.log(listStockAsal);
         if (typePengambilanStock == "FIFO") {
             insertListFifo();
         } else {
             insertListPabean();
         }
+
+        // Disable the delete buttons after item selection
+        var checkedCheckboxesOrder = $(".childOrder:checked");
+        checkedCheckboxesOrder.each(function() {
+            var salesOrderDetailId = $(this).data("id");
+            $('button[data-sales_order_detail_id="' + salesOrderDetailId + '"]').prop('disabled', true);
+        });
         // console.log(listStockAsal);
     });
 
@@ -976,6 +1093,10 @@
                                 qty: parseFloat(dataQtyBarangOrder)
                             }
                             listStockSelected.push(listStockAsal[i]);
+
+                            // Disable the corresponding delete button
+                            var salesOrderDetailId = checkedCheckboxesorder.data("id");
+                            $(`[data-sales_ordert_detail_id="${salesOrderDetailId}"]`).prop('disabled', true);
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -989,6 +1110,8 @@
             });
 
             drawTableSelectedItem(listStockSelected);
+
+
         }
     }
 
@@ -1103,33 +1226,44 @@
         });
 
         drawTableSelectedItem(listStockSelected);
+
+
     }
 
 
 
 
     function drawTableOrderBarang(data) {
-        const tableSales = $('#dataTableSalesOrder').DataTable();
-
+        const table = $('#dataTableSalesOrder').DataTable();
         // Clear the existing rows
-        tableSales.clear().draw();
+        table.clear().draw();
 
 
 
         // Add new rows
         data.forEach(function(v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-            <div class="form-check">
-                <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="radio" name="selectedItem">
-            </div>
-        `
-            ));
+            newRow.append($('<td style="text-align: center;">').html(`
+                <div class="form-check">
+                    <input data-id="${v.id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.id_barang}" autocomplete="one-time-code" class="form-check-input childOrder" type="radio" name="selectedItem">
+                </div>
+            `));
             newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
             newRow.append($('<td style="text-align: center;">').text(v.qty));
-            tableSales.row.add(newRow).draw(false);
+
+            if (v.tipe_input === 'stuffing') {
+                newRow.append($('<td style="text-align: center;">').html(`
+            <button type="button" data-sales_order_detail_id = "${v.id}" onclick="handleDelete('${v.id}')" class="btn btn-discard delete-btn btn-trash <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?>">
+                <i class="fa fa-trash"></i>
+            </button>
+        `));
+            } else {
+                newRow.append($('<td style="text-align: center;">').html(''));
+            }
+
+
+            table.row.add(newRow).draw(false);
         });
     }
 
@@ -1146,6 +1280,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1186,6 +1321,7 @@
         });
 
         selectedItemTable.draw();
+
     }
 
 
@@ -1341,6 +1477,277 @@
                             });
                         }
                     },
+                });
+            }
+        })
+    }
+
+    //start handel kemasan
+    $(".btn-show-detail").click(function() {
+        let salesOrderId = $('#sales_order_id').val();
+        if (!salesOrderId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sales Order tidak boleh kosong',
+                text: 'Silakan pilih Sales Order terlebih dahulu.',
+                confirmButtonText: 'OK'
+            });
+        } else {
+
+            $(".title-detail-name").text("Tambah");
+
+            $(".id_detail").val('')
+            $(".id_barang").empty('')
+            $(".id_barang").val('').change()
+            $("#warehouse").val('').change()
+            $("#warehouse").empty()
+            $(".harga").val('')
+            $(".qty").val('')
+            $(".statusppn").val('')
+            $(".amount").val('')
+            $(".keterangan").val('')
+
+            $(".id_barang").val('')
+
+            getBarang();
+            $(".kemasan-modal").modal("show");
+        }
+
+    });
+
+    $(".btn-hide-kemasan").click(function() {
+        $(".kemasan-modal").modal("hide")
+    });
+
+    var validator_kemasan = $(".kemasan-form").validate({
+        rules: {
+            id_barang: {
+                required: true
+            },
+            qty: {
+                required: true
+            }
+        },
+        messages: {
+            id_barang: {
+                required: "Nama kemasan wajib diisi"
+            },
+            qty: {
+                required: "Qty wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    // BARANG
+    $('.id_barang').select2({
+        placeholder: "Pilih Barang",
+        theme: "bootstrap-5",
+        dropdownParent: $(".kemasan-modal .modal-content"),
+        allowClear: true
+    })
+
+    function getBarang() {
+        $.ajax({
+            url: `<?= base_url("/pengeluaran-lokal/kemasanAll"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".id_barang").empty();
+
+                $(".id_barang").append(`<option data-satuan="" data-harga="" data-statusppn="" data-id_item="" value=""></option>`);
+
+
+
+                res.dataBarang.forEach(function(item) {
+                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}"  data-harga="${item.harga_barang}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                })
+                // console.log(res.dataBarang);
+
+                $(".id_barang").val("").change();
+            }
+        })
+    }
+
+    $(".id_barang").change(function() {
+        if ($(".id_barang").val()) {
+            let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";
+            let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
+            let satuan = $(".id_barang option:selected").data("satuan") ? $(".id_barang option:selected").data("satuan") : "";
+            let statusppn = $(".id_barang option:selected").data("statusppn");
+
+            let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : 0;
+
+            // let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
+
+            $(".nama_barang").attr("readonly", nama ? true : false);
+
+            if (statusppn == 1) {
+                $(".keteranganppn").val("Barang PPN");
+
+            } else {
+                $(".keteranganppn").val("Barang Tidak PPN");
+            }
+
+            $(".statusppn").val(statusppn);
+            $(".nama_barang").val(nama);
+
+            $(".satuan").val(satuan);
+            $(".harga").val(harga);
+
+        } else {
+            $(".nama_barang").attr("readonly", false)
+            // $(".harga").val("0");
+            $(".qty").val("");
+            $(".amount").val("0");
+            $(".keterangan").val("").change();
+            $(".statusppn").val("");
+            $(".tax").val("");
+            $(".discount_percentage").val("0");
+            $(".dept").val("");
+
+        }
+    });
+
+    $(".btn-submit-kemasan").click(function() {
+        if ($('.kemasan-form').valid()) {
+
+            let data = new FormData(document.querySelector('.kemasan-form'));
+            // Append sales_order_id to FormData
+            data.append('sales_order_id', $(".sales_order_id option:selected").val());
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url("/pengeluaran-lokal/save-kemasan"); ?>",
+                        data: data,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                }).then((result) => {
+                                    reloadTableData();
+                                    $('.kemasan-modal').modal('hide');
+
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    cancelButtonColor: '#d33',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                })
+                            }
+                        }
+                    });
+                }
+            })
+
+        }
+    });
+
+
+    // delete
+    function handleDelete(id) {
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("pengeluaran-lokal/delete-kemasan"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    reloadTableData();
+
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
                 });
             }
         })
