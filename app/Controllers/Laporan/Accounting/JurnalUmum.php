@@ -44,6 +44,7 @@ class JurnalUmum extends BaseController
 
         if ($dateEnd) {
             $condition = [
+                'jurnal_umum.company_id' => $this->this_company_id,
                 'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
                 'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
             ];
@@ -53,6 +54,7 @@ class JurnalUmum extends BaseController
             ];
         } else {
             $condition = [
+                'jurnal_umum.company_id' => $this->this_company_id,
                 'tanggal_jurnal >=' => date('Y-m-01'),
                 'tanggal_jurnal <=' => date('Y-m-d')
             ];
