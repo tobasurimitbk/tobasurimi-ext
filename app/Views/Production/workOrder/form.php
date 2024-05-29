@@ -51,8 +51,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select department_id" name="department_id" id="department_id" <?= !empty($dataWorkOrders) ? 'disabled' : '' ?>>
                                 <option value=""></option>
-                                <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                    <option value="<?= $dataDivisi->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->divisi_id == $dataDivisi->id ? "selected" : "" : ""; ?>><?= $dataDivisi->divisi ?></option>
+                                <?php foreach ($dataDivisi as $dataDivisis) : ?>
+                                    <option value="<?= $dataDivisis->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->divisi_id == $dataDivisis->id ? "selected" : "" : ""; ?>><?= $dataDivisis->divisi ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Department</label>

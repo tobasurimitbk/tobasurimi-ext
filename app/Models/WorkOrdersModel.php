@@ -68,7 +68,7 @@ class WorkOrdersModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "work_orders.*,
-            GROUP_CONCAT(work_order_details.nama_barang SEPARATOR ', ') AS nama_barang,
+            work_order_details.nama_barang,
             divisis.divisi
         ";
 
