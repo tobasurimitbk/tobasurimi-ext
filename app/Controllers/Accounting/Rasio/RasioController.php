@@ -443,6 +443,7 @@ class RasioController extends BaseController
                 $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
                 $poBBImport = $this->rmImportPOModel->where('po_no', $value['stock_dokumen'])->first();
                 $poBP = $this->amPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
+
                 $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
                 if ($poBBLokal) {
                     $totalQty = 0;

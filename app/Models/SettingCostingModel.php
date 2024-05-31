@@ -68,7 +68,16 @@ class SettingCostingModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'setting_costing.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "setting_costing.id AS id_setting_costing, setting_costing.*, setting_costing_details.*";
+        // Ensure all selected columns have unique aliases
+        $selectQry = "
+        setting_costing.id AS id_setting_costing, 
+        setting_costing.*, 
+        setting_costing_details.id AS id_setting_costing_detail,
+        setting_costing_details.setting_costing_id,
+        setting_costing_details.company_id,
+        setting_costing_details.divisi_id,
+        setting_costing_details.coa_id,
+        ";
 
         // Base query
         $settingCosting = $this->asArray()
@@ -76,6 +85,7 @@ class SettingCostingModel extends Model
             ->where($condition)
             ->where('setting_costing.id >', 10)
             ->join('setting_costing_details', 'setting_costing.id = setting_costing_details.setting_costing_id', 'left')
+            ->groupBy('id_setting_costing')
             ->orderBy($sort, $sortType);
 
         // Total data count before any additional conditions
@@ -83,7 +93,6 @@ class SettingCostingModel extends Model
 
         // Apply conditional join and additional filters if divisi_id or company_id is present
         if (!empty($addCondition['divisi_id']) && !empty($addCondition['company_id'])) {
-
             if (!empty($addCondition['divisi_id'])) {
                 $settingCosting->orWhere('setting_costing_details.divisi_id', $addCondition['divisi_id']);
             }
