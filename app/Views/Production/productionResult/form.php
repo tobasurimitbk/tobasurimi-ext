@@ -901,7 +901,7 @@
                                 'satuan': item.satuan,
                                 'nama_barang': item.nama_barang,
                                 'note': item.note,
-                                'qty': item.type_barang == 'bahan_jadi' ? item.qty_isi : item.qty_now,
+                                'qty': item.qty_now,
                                 'ref_no': new_ref_no,
                                 'no_aju': item.no_aju,
                                 'type_barang': item.type_barang,
