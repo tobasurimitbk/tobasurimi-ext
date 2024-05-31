@@ -82,17 +82,27 @@ class SettingAkunCostingController extends BaseController
 
         $res = $this->settingCosting->getList($condition, $addCondition, $limit, $offset);
 
+        $subAkunsModel = $this->Sub_AkunsModel->asObject()->findAll();
+
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
 
         foreach ($res['data'] as $data) {
+            $dataNamaAkun = "";
+            foreach ($subAkunsModel as $datas) {
+                if ($data['coa_id'] == $datas->id) {
+                    $dataNamaAkun = $datas->no_sub;
+                } elseif ($data['coa_id'] == NULL) {
+                    $dataNamaAkun = "-";
+                }
+            }
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id_setting_costing']),
                 "keterangan"                => $data['name'],
-                "coa_id"                 => $data['coa_id'],
+                "coa_id"                 => $data['coa_id'] ? $dataNamaAkun : "-",
                 "divisi_id"                 => $this->request->getGet("divisi_id"),
             ]);
         }
