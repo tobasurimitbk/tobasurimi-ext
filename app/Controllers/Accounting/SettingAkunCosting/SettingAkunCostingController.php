@@ -90,11 +90,15 @@ class SettingAkunCostingController extends BaseController
 
 
         foreach ($res['data'] as $data) {
-            $dataNamaAkun = "";
+            $dataNamaAkun = "-";
             foreach ($subAkunsModel as $datas) {
-                if ($data['coa_id'] == $datas->id) {
-                    $dataNamaAkun = $datas->no_sub;
-                } elseif ($data['coa_id'] == NULL) {
+                if (isset($data['coa_id'])) {
+                    if ($data['coa_id'] == $datas->id) {
+                        $dataNamaAkun = $datas->no_sub;
+                    } elseif ($data['coa_id'] == NULL) {
+                        $dataNamaAkun = "-";
+                    }
+                } else {
                     $dataNamaAkun = "-";
                 }
             }
@@ -102,7 +106,7 @@ class SettingAkunCostingController extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id_setting_costing']),
                 "keterangan"                => $data['name'],
-                "coa_id"                 => $data['coa_id'] ? $dataNamaAkun : "-",
+                "coa_id"                 => $dataNamaAkun,
                 "divisi_id"                 => $this->request->getGet("divisi_id"),
             ]);
         }
