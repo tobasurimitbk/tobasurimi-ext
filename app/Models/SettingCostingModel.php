@@ -47,10 +47,62 @@ class SettingCostingModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
 
-    public function getSettingCosting()
+    public function getSettingCosting($where = [])
     {
-        $requete = "SELECT * FROM setting_costing WHERE setting_costing.deletedAt is null";
-        $query = $this->db->query($requete);
-        return $query->getResultArray();
+        $select =   "setting_costing.*, setting_costing_details.*";
+        return $this->asArray()
+            ->select($select)
+            ->where($where)
+            ->where('setting_costing.deletedAt', null)
+            ->join('setting_costing_details', 'setting_costing.id = setting_costing_details.setting_costing_id', 'left')
+            ->findAll();
+    }
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'divisi_name' => 'divisis.divisi',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'setting_costing.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "setting_costing.id AS id_setting_costing, setting_costing.*, setting_costing_details.*";
+
+        // Base query
+        $settingCosting = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->where('setting_costing.id >', 10)
+            ->join('setting_costing_details', 'setting_costing.id = setting_costing_details.setting_costing_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        // Total data count before any additional conditions
+        $totalData = $settingCosting->countAllResults(false);
+
+        // Apply conditional join and additional filters if divisi_id or company_id is present
+        if (!empty($addCondition['divisi_id']) && !empty($addCondition['company_id'])) {
+
+            if (!empty($addCondition['divisi_id'])) {
+                $settingCosting->orWhere('setting_costing_details.divisi_id', $addCondition['divisi_id']);
+            }
+
+            if (!empty($addCondition['company_id'])) {
+                $settingCosting->orWhere('setting_costing_details.company_id', $addCondition['company_id']);
+            }
+        }
+
+        // Total filtered data count after additional conditions
+        $totalFilteredData = $settingCosting->countAllResults(false);
+        $data = $settingCosting->findAll($limit, $offset);
+
+        return [
+            'data' => $data,
+            'totalData' => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort' => $sort,
+            'sortType' => $sortType
+        ];
     }
 }

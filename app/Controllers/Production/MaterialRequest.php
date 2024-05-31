@@ -513,8 +513,11 @@ class MaterialRequest extends BaseController
                 $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->findAll();
 
                 foreach ($materialRequestDetailData as $key => $value) {
+
                     $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
                     $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
+                    // var_dump($statusOUT, $statusIN);
+                    // exit;
 
                     if ($statusOUT && $statusIN) {
                         $responseBody = json_decode($statusOUT->getBody(), true);

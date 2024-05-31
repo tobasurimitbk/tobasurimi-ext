@@ -1455,6 +1455,8 @@ $routes->post('/akun-department/delete', 'Accounting\AccountDepartment\AccountDe
 $routes->post('/akun-department/get', 'Accounting\AccountDepartment\AccountDepartmentController::get', ['filter' => 'Auth']);
 //Setting Akun Costing
 $routes->get('/setting-akun-costing', 'Accounting\SettingAkunCosting\SettingAkunCostingController::index', ['filter' => 'Auth']);
+$routes->get('/setting-akun-costing/all', 'Accounting\SettingAkunCosting\SettingAkunCostingController::all', ['filter' => 'Auth']);
+$routes->post('/setting-akun-costing/get', 'Accounting\SettingAkunCosting\SettingAkunCostingController::get', ['filter' => 'Auth']);
 $routes->post('/setting-akun-costing/save', 'Accounting\SettingAkunCosting\SettingAkunCostingController::saveCosting', ['filter' => 'Auth']);
 //Rasio
 $routes->get('/rasio', 'Accounting\Rasio\RasioController::index', ['filter' => 'Auth']);

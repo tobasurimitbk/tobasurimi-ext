@@ -676,7 +676,7 @@ class RasioController extends BaseController
         foreach ($settingCosting as &$valueSetting) {
             $condition = [
                 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
-                'id_coa' => $valueSetting['coa'],
+                'id_coa' => $valueSetting['coa_id'],
             ];
             $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
             $valueSetting['jmlhJurnal'] = $jurnalData;

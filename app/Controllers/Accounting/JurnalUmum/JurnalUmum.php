@@ -913,6 +913,7 @@ class JurnalUmum extends BaseController
         $barangAPFound = false;
 
         $conditionAccountBarang = [
+            'company_id' => $companyID,
             'divisi_id' => $divisiID,
             'barang_master_id' => $barang1ID,
         ];
