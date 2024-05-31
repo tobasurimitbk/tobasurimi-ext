@@ -563,13 +563,13 @@ class ProductionResult extends BaseController
             ];
 
             if (!empty($id)) {
-                $this->productionResultModel->update($id, $payload);
                 $resultData = $this->productionResultModel->find($id);
                 $resultDetailData = $this->productionResultDetailModel->where('production_result_id', $id)->findAll();
 
                 $materialRequestData = [];
                 foreach ($resultDetailData as $key => $value) {
-                    foreach ($resultData['material_request_id'] as $materialRequestId) {
+                    // var_dump(json_decode($resultData['material_request_id']));
+                    foreach (json_decode($resultData['material_request_id']) as $materialRequestId) {
                         $materialRequest = $this->materialRequestDetailModel
                             ->where('material_request_id', $materialRequestId)
                             ->where('barang1_id', $value['barang1_id'])
@@ -703,6 +703,8 @@ class ProductionResult extends BaseController
                         );
                     }
                 }
+                // exit;
+                $this->productionResultModel->update($id, $payload);
 
                 // $this->workOrdersModel->update($resultData['work_order_id'], [
                 //     'is_posted' => 1
