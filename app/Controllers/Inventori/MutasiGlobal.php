@@ -3,6 +3,7 @@
 namespace App\Controllers\Inventori;
 
 use App\Controllers\BaseController;
+use App\Models\BC27Model;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
@@ -20,6 +21,7 @@ class MutasiGlobal extends BaseController
     protected $mutasiGlobalModel;
     protected $mutasiGlobalDetailModel;
     protected $warehouseModel;
+    protected $bc27Model;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class MutasiGlobal extends BaseController
         $this->mutasiGlobalModel = new MutasiGlobalModel();
         $this->mutasiGlobalDetailModel = new MutasiGlobalDetailModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->bc27Model = new BC27Model();
     }
 
     public function index()
@@ -87,6 +90,7 @@ class MutasiGlobal extends BaseController
             $totalItem = count($listItem);
             $warehouseAsal = $this->warehouseModel->find($data->warehouse_asal_id);
             $warehouseAsalName = $warehouseAsal == null ? '-' : $warehouseAsal['warehouse_name'];
+            $bc27 = $this->bc27Model->where('mutasi_global_id', $data->id)->first();
 
             $totalDiterima = 0;
             $totalMutasi = 1;
@@ -98,10 +102,11 @@ class MutasiGlobal extends BaseController
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "warehouse_asal"        => strtoupper($data->divisi . ' - ' . $warehouseAsalName),
                 "company_tujuan"        => strtoupper($data->company_tujuan_name),
-                "no_bc27"               => "-",
+                "no_aju"                => $bc27 == null ? "BELUM DIBUAT" : $bc27['no_aju'],
                 "total_item"            => $totalItem,
                 "state"                 => $totalDiterima == $totalMutasi ? '1' : '0',
-                "status_posting"        => $data->status_posting
+                "status_posting"        => $data->status_posting,
+                "is_used"               => $bc27 == null ? '1' : '0'
             ]);
         }
 
@@ -285,6 +290,17 @@ class MutasiGlobal extends BaseController
         $this->mutasiGlobalModel->update($id, ['status_posting' => '1']);
         return response()->setJSON([
             'message' => "Mutasi berhasil diposting",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function unPosting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->mutasiGlobalModel->update($id, ['status_posting' => '0']);
+        return response()->setJSON([
+            'message' => "Mutasi berhasil diunposting",
             'status' => true,
             'token' => csrf_hash()
         ]);

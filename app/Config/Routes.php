@@ -934,6 +934,7 @@ $routes->post('/mutasi/save-global', 'Inventori\MutasiGlobal::createAction', ['f
 $routes->post('/mutasi/update-global', 'Inventori\MutasiGlobal::updateAction', ['filter' => 'Auth']);
 $routes->post('/mutasi/delete-global', 'Inventori\MutasiGlobal::delete', ['filter' => 'Auth']);
 $routes->post('/mutasi/posting-global', 'Inventori\MutasiGlobal::posting', ['filter' => 'Auth']);
+$routes->post('/mutasi/un-posting-global', 'Inventori\MutasiGlobal::unposting', ['filter' => 'Auth']);
 
 
 // PENERIMAAN BARANG LOKAL BP
@@ -1192,40 +1193,20 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
 
 // BC 2.7
 
+$routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BC27::index');
+    $routes->get('all', 'BeaCukai\BC27::all');
+    $routes->get('create', 'BeaCukai\BC27::create');
+    $routes->get('id/(:segment)', 'BeaCukai\BC27::detail/$1');
+    $routes->post('save', 'BeaCukai\BC27::createAction');
+    $routes->post('update', 'BeaCukai\BC27::updateAction');
+    $routes->post('delete', 'BeaCukai\BC27::delete');
+    $routes->post('posting', 'BeaCukai\BC27::posting');
+    $routes->get('check-no-aju', 'BeaCukai\BC27::checkNoAju');
 
-// BC 2.5
-$routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'BeaCukai\BeaCukaiController::bc25View');
-    $routes->get('all', 'BeaCukai\BeaCukaiController::bc25All');
-    $routes->get('create', 'BeaCukai\BeaCukaiController::bc25CreateFormView');
-    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc25GetByIdFormView/$1');
-    $routes->post('save', 'BeaCukai\BeaCukaiController::bc25SaveForm');
-    $routes->post('update', 'BeaCukai\BeaCukaiController::bc25UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
+    $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
+    $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
 });
-
-// BC 2.6.1
-$routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
-    $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
-    $routes->get('create', 'BeaCukai\BeaCukaiController::bc261CreateFormView');
-    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc261GetByIdFormView/$1');
-    $routes->post('save', 'BeaCukai\BeaCukaiController::bc261SaveForm');
-    $routes->post('update', 'BeaCukai\BeaCukaiController::bc261UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
-});
-
-// BC 2.6.2
-$routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
-    $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
-    $routes->get('create', 'BeaCukai\BeaCukaiController::bc261CreateFormView');
-    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc261GetByIdFormView/$1');
-    $routes->post('save', 'BeaCukai\BeaCukaiController::bc261SaveForm');
-    $routes->post('update', 'BeaCukai\BeaCukaiController::bc261UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
-});
-
 $routes->get('/bea-cukai-bc-27', 'BeaCukai\BeaCukaiController::bc27View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-40', 'BeaCukai\BeaCukaiController::bc40View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-41', 'BeaCukai\beaCukaiController::bc41View', ['filter' => 'Auth']);

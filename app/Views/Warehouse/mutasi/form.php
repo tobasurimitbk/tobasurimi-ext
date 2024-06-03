@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($mutasi) ? "Tambah Mutasi" : "Update Mutasi" ?></h1>
+        <h1><?= empty($mutasi) ? "Tambah Mutasi PPBKB" : "Update Mutasi PPBKB" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi"); ?>">
                 Batal

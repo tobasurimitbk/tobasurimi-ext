@@ -40,10 +40,136 @@ class BC27Model extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-
-
-    public function get($penerimaanBarangID)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
-        return $this->asArray()->where('penerimaan_barang_id', $penerimaanBarangID)->where('deletedAt', null)->first();
+        $availableSort = [
+            'mutasi_global.divisi_asal_id'           => 'mutasi_global.divisi_asal_id',
+            'mutasi_global.warehouse_asal_id'        => 'mutasi_global.warehouse_asal_id',
+            'bc_27.company_tujuan_id'                => 'bc_27.company_tujuan_id',
+            'mutasi_global.no_mutasi'                => 'mutasi_global.no_mutasi',
+            'bc_27.bc_no_lokal'                      => 'bc_27.bc_no_lokal',
+            'bc_27.createdAt'                        => 'bc_27.createdAt',
+            'bc_27.no_aju'                           => 'bc_27.no_aju',
+            'bc_27.status_posting'                   => 'bc_27.status_posting',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bc_27.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "bc_27.*,
+            mutasi_global.no_mutasi,
+            companies.company,
+            divisis.divisi,
+            warehouses.warehouse_name";
+
+        $bcDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('mutasi_global', 'mutasi_global.id = bc_27.mutasi_global_id', 'left')
+            ->join('companies', 'companies.id = bc_27.company_tujuan_id', 'left')
+            ->join('divisis', 'divisis.id = mutasi_global.divisi_asal_id', 'left')
+            ->join('warehouses', 'warehouses.id = mutasi_global.warehouse_asal_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $bcDataQry->countAllResults(false);
+
+        if ($addCondition['statusPosting'] || $addCondition['noAju'] || $addCondition['noBC27'] && (empty($addCondition['mulaiTanggalBC27']) && empty($addCondition['selesaiTanggalBC27']))) {
+            $bcDataQry->groupStart();
+        }
+
+        if ($addCondition['statusPosting']) {
+            if ($addCondition['statusPosting'] == "ALL") {
+                $bcDataQry->whereIn('bc_27.status_posting', ['1', '0']);
+            } elseif ($addCondition['statusPosting'] == "SUDAH POSTING") {
+                $bcDataQry->where('bc_27.status_posting', "1");
+            } else if ($addCondition['statusPosting'] == "BELUM POSTING") {
+                $bcDataQry->where('bc_27.status_POSTING', "0");
+            }
+        }
+
+        if ($addCondition['noAju']) {
+            $bcDataQry->like('no_aju', $addCondition['noAju']);
+        }
+
+        if ($addCondition['noBC27']) {
+            $bcDataQry->like('bc_no_lokal', $addCondition['noBC27']);
+        }
+
+
+        if ($addCondition['statusPosting'] || $addCondition['noAju'] || $addCondition['noBC27'] && (empty($addCondition['mulaiTanggalBC27']) && empty($addCondition['selesaiTanggalBC27']))) {
+            $bcDataQry->groupEnd();
+        }
+
+        if ($addCondition['mulaiTanggalBC27'] && $addCondition['selesaiTanggalBC27']) {
+            $bcDataQry->groupStart();
+            $mulaiTanggalBC27Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC27']), "Y-m-d");
+            $selesaiTanggalBC27Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['selesaiTanggalBC27']), "Y-m-d");
+
+            if ($addCondition['mulaiTanggalBC27']) {
+                $bcDataQry->where('bc_27.createdAt >=', $mulaiTanggalBC27Timestamp);
+            }
+
+            if ($addCondition['selesaiTanggalBC27']) {
+                $bcDataQry->where('bc_27.createdAt <=', $selesaiTanggalBC27Timestamp);
+            }
+
+            $bcDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $bcDataQry->countAllResults(false);
+        $data = $bcDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getBC27($id)
+    {
+        $result = $this->asArray()
+            ->select('bc_27.*, mutasi_global.no_mutasi, divisis.divisi, warehouses.warehouse_name')
+            ->join('mutasi_global', 'mutasi_global.id = bc_27.mutasi_global_id', 'left')
+            ->join('divisis', 'mutasi_global.divisi_asal_id = divisis.id', 'left')
+            ->join('warehouses', 'mutasi_global.warehouse_asal_id = warehouses.id', 'left')
+            ->where('bc_27.id', $id)
+            ->first();
+        return $result;
+    }
+
+    public function getNo($bln, $thn, $last_day)
+    {
+        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
+
+        $builder = $this->db->table('bc_27');
+        $builder->select('bc_no_lokal');
+        $builder->orderBy('bc_no_lokal', 'DESC');
+        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")->where('createdAt <=', $last_day . " 23:59:59");
+        $builder->where('deletedAt', null);
+        $builder->like('bc_no_lokal', $lastStr);
+        $query = $builder->get();
+
+        $kode = 'TOBA/BC27';
+
+        $lastNumber = '1';
+
+        if (!empty($query->getResultArray())) {
+            foreach ($query->getResultArray() as $string) {
+                $explode = explode('/', $string['bc_no_lokal']);
+                $number = intval($explode[2]);
+
+                if ($number > $lastNumber) {
+                    $lastNumber = $number;
+                }
+            }
+            $lastNumber++;
+        }
+
+        $formattedlastNumber = sprintf("%02d", $lastNumber);
+        $generatedNo = $kode . '/' . $formattedlastNumber . '/' . $lastStr;
+
+        return $generatedNo;
     }
 }
