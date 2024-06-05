@@ -17,7 +17,7 @@
                     <?php endif; ?>
                 <?php endif; ?>
                 <?php if ($bc27['status_posting'] == "0") : ?>
-                    <?php if (can('Bea Cukai', 'BC 2.7', 'p')) : ?>
+                    <?php if (can('Bea Cukai', 'BC 2.7', 'a')) : ?>
                         <button class="btn btn-success posting-spp float-right posting-mutasi" onclick="postingAction()">
                             Posting
                         </button>

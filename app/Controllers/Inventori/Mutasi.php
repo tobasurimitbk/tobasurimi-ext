@@ -8,6 +8,7 @@ use App\Models\MetadataModel;
 use App\Models\MutasiDetailModel;
 use App\Models\MutasiModel;
 use App\Models\PenerimaanMutasiDetailModel;
+use App\Models\PPBKBModel;
 use App\Models\WarehousesModel;
 
 class Mutasi extends BaseController
@@ -20,6 +21,7 @@ class Mutasi extends BaseController
     protected $mutasiDetailModel;
     protected $warehouseModel;
     protected $penerimaanMutasiDetailModel;
+    protected $ppbkbModel;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class Mutasi extends BaseController
         $this->mutasiDetailModel = new MutasiDetailModel();
         $this->warehouseModel = new WarehousesModel();
         $this->penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
+        $this->ppbkbModel = new PPBKBModel();
     }
 
 
@@ -106,6 +109,8 @@ class Mutasi extends BaseController
                 ->groupBy('mutasi_id')
                 ->findAll();
 
+            $ppbkb = $this->ppbkbModel->where('mutasi_id', $data->id)->first();
+
             $totalDiterima = count($penerimaanTotalDetail) == 0 ? 0 : $penerimaanTotalDetail[0]['qty_diterima'];
             $totalMutasi = count($totalQtyMutasi) == 0 ? 0 : $totalQtyMutasi[0]['qty_mutasi'];
 
@@ -116,7 +121,7 @@ class Mutasi extends BaseController
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "warehouse_asal"        => strtoupper($data->divisi . ' - ' . $warehouseAsalName),
                 "warehouse_tujuan"      => strtoupper($divisiTujuanName . ' - ' . $warehouseTujuanName),
-                "no_ppbkb"              => "-",
+                "no_ppbkb"              => $ppbkb == null ? "-" : $ppbkb['no_ppbkb'],
                 "total_item"            => $totalItem,
                 "state"                 => $totalDiterima == $totalMutasi ? '1' : '0',
                 "status_posting"        => $data->status_posting
@@ -303,6 +308,17 @@ class Mutasi extends BaseController
         $this->mutasiModel->update($id, ['status_posting' => '1']);
         return response()->setJSON([
             'message' => "Mutasi berhasil diposting",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function unPosting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->mutasiModel->update($id, ['status_posting' => '0']);
+        return response()->setJSON([
+            'message' => "Mutasi berhasil diunposting",
             'status' => true,
             'token' => csrf_hash()
         ]);

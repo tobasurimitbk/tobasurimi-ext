@@ -910,6 +910,7 @@ $routes->post('/mutasi/delete', 'Inventori\Mutasi::delete', ['filter' => 'Auth']
 $routes->post('/mutasi/posting', 'Inventori\Mutasi::posting', ['filter' => 'Auth']);
 $routes->get('/mutasi/id/(:segment)', 'Inventori\Mutasi::detail/$1', ['filter' => 'Auth']);
 $routes->get('/mutasi/all', 'Inventori\Mutasi::all', ['filter' => 'Auth']);
+$routes->post('/mutasi/un-posting', 'Inventori\Mutasi::unPosting', ['filter' => 'Auth']);
 // PENERIMAAN MUTASI
 $routes->get('/penerimaan-mutasi', 'Inventori\PenerimaanMutasi::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/create', 'Inventori\PenerimaanMutasi::create', ['filter' => 'Auth']);
@@ -1192,7 +1193,6 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
 });
 
 // BC 2.7
-
 $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC27::index');
     $routes->get('all', 'BeaCukai\BC27::all');
@@ -1207,9 +1207,24 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
     $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
 });
-$routes->get('/bea-cukai-bc-27', 'BeaCukai\BeaCukaiController::bc27View', ['filter' => 'Auth']);
-$routes->get('/bea-cukai-bc-40', 'BeaCukai\BeaCukaiController::bc40View', ['filter' => 'Auth']);
-$routes->get('/bea-cukai-bc-41', 'BeaCukai\beaCukaiController::bc41View', ['filter' => 'Auth']);
+
+// PPBKB
+$routes->group('bea-cukai-ppbkb', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\PPBKB::index');
+    $routes->get('all', 'BeaCukai\PPBKB::all');
+    $routes->get('create', 'BeaCukai\PPBKB::create');
+    $routes->post('save', 'BeaCukai\PPBKB::createAction');
+    $routes->post('update', 'BeaCukai\PPBKB::updateAction');
+    $routes->get('id/(:segment)', 'BeaCukai\PPBKB::detail/$1');
+    $routes->post('posting', 'BeaCukai\PPBKB::posting');
+    $routes->post('delete', 'BeaCukai\PPBKB::delete');
+    $routes->get('print/(:segment)', 'BeaCukai\PPBKB::print/$1');
+
+    $routes->get('list-mutasi', 'BeaCukai\PPBKB::dropdownMutasi');
+    $routes->get('list-no-ijin-tpb', 'BeaCukai\PPBKB::dropdownNoIjinTPB');
+    $routes->get('list-barang-mutasi', 'BeaCukai\PPBKB::getListMutasiDetail');
+    $routes->get('get-no', 'BeaCukai\PPBKB::getNo');
+});
 
 // HUMAN RESOURCE
 // Attendance

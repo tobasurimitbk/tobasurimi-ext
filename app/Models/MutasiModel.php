@@ -103,6 +103,35 @@ class MutasiModel extends Model
         ];
     }
 
+    public function getMutasiList($divisiAsalId)
+    {
+        $ppbkbModel = new PPBKBModel();
+        $warehousesModel = new WarehousesModel();
+
+        $result = array();
+        $resultMutasiPosted = $this->asArray()
+            ->select('mutasi.*,divisis.divisi AS divisi_tujuan_name, 
+            warehouses.warehouse_name AS warehouse_tujuan_name')
+            ->join('divisis', 'divisis.id = mutasi.divisi_tujuan_id', 'left')
+            ->join('warehouses', 'warehouses.id = mutasi.warehouse_tujuan_id', 'left')
+            ->where('mutasi.divisi_asal_id', $divisiAsalId)
+            ->where('status_posting', '1')
+            ->where('mutasi.deletedAt', null)
+            ->findAll();
+
+        $result = array();
+        for ($i = 0; $i < count($resultMutasiPosted); $i++) {
+            $first = $ppbkbModel->where('mutasi_id', $resultMutasiPosted[$i]['id'])->first();
+            if ($first == null) {
+                $warehouse = $warehousesModel->find($resultMutasiPosted[$i]['warehouse_asal_id']);
+                $resultMutasiPosted[$i]['warehouse_asal_name'] = $warehouse == null ? "" : $warehouse['warehouse_name'];
+                array_push($result, $resultMutasiPosted[$i]);
+            }
+        }
+        return $result;
+    }
+
+
 
     public function get_no($bln, $thn, $last_day, $divisiName, $divisi_id)
     {
