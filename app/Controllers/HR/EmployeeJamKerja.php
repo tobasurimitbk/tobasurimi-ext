@@ -35,7 +35,7 @@ class EmployeeJamKerja extends BaseController
         }
 
         $data = [
-            'detail' => null,
+            'detail' => [],
             'employee' => $employee,
             'jamKerja' => $this->jamKerjaModel->where('company_id', $this->this_company_id)->findAll(),
         ];
