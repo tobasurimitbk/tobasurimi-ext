@@ -913,6 +913,7 @@ class JurnalUmum extends BaseController
         $barangAPFound = false;
 
         $conditionAccountBarang = [
+            'company_id' => $companyID,
             'divisi_id' => $divisiID,
             'barang_master_id' => $barang1ID,
         ];
@@ -978,11 +979,19 @@ class JurnalUmum extends BaseController
         }
 
         foreach ($dataAccountBarang as $value) {
-            if ($barang1ID == $value->barang_master_id && $divisiID == $value->divisi_id) {
+            if ($barang1ID == $value->barang_master_id && $divisiID == $value->divisi_id && $companyID == $value->company_id) {
                 $barangAP = $value->ap_id;
                 $barangAR = $value->ar_id;
                 $barangAPFound = true;
             }
+        }
+
+        if (!$barangAPFound) {
+            return response()->setJSON([
+                "status" => false,
+                "message" => "Barang Tidak Memiliki Akun COA",
+                'token' => csrf_hash()
+            ]);
         }
 
         $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);

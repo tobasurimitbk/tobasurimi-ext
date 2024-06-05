@@ -443,6 +443,7 @@ class RasioController extends BaseController
                 $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
                 $poBBImport = $this->rmImportPOModel->where('po_no', $value['stock_dokumen'])->first();
                 $poBP = $this->amPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
+
                 $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
                 if ($poBBLokal) {
                     $totalQty = 0;
@@ -676,7 +677,7 @@ class RasioController extends BaseController
         foreach ($settingCosting as &$valueSetting) {
             $condition = [
                 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
-                'id_coa' => $valueSetting['coa'],
+                'id_coa' => $valueSetting['coa_id'],
             ];
             $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
             $valueSetting['jmlhJurnal'] = $jurnalData;

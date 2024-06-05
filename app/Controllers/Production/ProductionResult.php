@@ -76,7 +76,7 @@ class ProductionResult extends BaseController
         ];
 
         $condition = [
-            // "suppliers.company_id"  => $this->this_company_id,
+            "production_results.company_id"  => $this->this_company_id,
         ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
@@ -563,11 +563,30 @@ class ProductionResult extends BaseController
             ];
 
             if (!empty($id)) {
-                $this->productionResultModel->update($id, $payload);
                 $resultData = $this->productionResultModel->find($id);
                 $resultDetailData = $this->productionResultDetailModel->where('production_result_id', $id)->findAll();
 
+                $materialRequestData = [];
                 foreach ($resultDetailData as $key => $value) {
+                    // var_dump(json_decode($resultData['material_request_id']));
+                    foreach (json_decode($resultData['material_request_id']) as $materialRequestId) {
+                        $materialRequest = $this->materialRequestDetailModel
+                            ->where('material_request_id', $materialRequestId)
+                            ->where('barang1_id', $value['barang1_id'])
+                            ->where('barang2_id', $value['barang2_id'])
+                            ->where('divisi_tujuan_id', $value['divisi_id'])
+                            ->where('warehouse_tujuan_id', $value['warehouse_id'])
+                            ->where('stock_tujuan_id', $value['stock_id'])
+                            ->findAll();
+                        foreach ($materialRequest as $materialRequestData) {
+                            $qtySaatIni = (float) $materialRequestData['qty_now'];
+                            $qtyProduction = (float) $value['qty'];
+                            $datas = [
+                                'qty_now' => $qtySaatIni - $qtyProduction
+                            ];
+                            $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                        }
+                    }
                     if ($value['type'] == 'JADI') {
                         // -----
                         // BARANG IN KE INVENTORI
@@ -684,6 +703,8 @@ class ProductionResult extends BaseController
                         );
                     }
                 }
+                // exit;
+                $this->productionResultModel->update($id, $payload);
 
                 // $this->workOrdersModel->update($resultData['work_order_id'], [
                 //     'is_posted' => 1

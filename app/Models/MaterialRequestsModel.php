@@ -70,7 +70,7 @@ class MaterialRequestsModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "material_requests.*,
-            GROUP_CONCAT(material_request_details.nama_barang SEPARATOR ',') AS nama_barang,
+            barang_master.barang_name AS nama_barang,
             material_request_details.satuan,
             material_request_details.kimia,
             SUM(material_request_details.qty) as total,

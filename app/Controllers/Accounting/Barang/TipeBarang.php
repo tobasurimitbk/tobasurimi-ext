@@ -62,6 +62,7 @@ class TipeBarang extends BaseController
         if ($getDataAccountBarang != null) {
             $this->accountBarangModel->update($getDataAccountBarang['id'], [
                 'barang_master_id' => $barangMasterId,
+                'company_id' => $this->this_company_id,
                 'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id'),
@@ -70,6 +71,7 @@ class TipeBarang extends BaseController
         } else {
             $this->accountBarangModel->insert([
                 'barang_master_id' => $barangMasterId,
+                'company_id' => $this->this_company_id,
                 'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id'),

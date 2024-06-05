@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Production;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
@@ -50,6 +51,8 @@ class MaterialRequestPenolong extends BaseController
     protected $materialRequestDetailsModel;
     protected $this_user_id;
 
+    protected $jurnalUmumController;
+
     public function __construct()
     {
         $this->this_user_id = session()->get("login")->user_id;
@@ -76,6 +79,8 @@ class MaterialRequestPenolong extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->materialRequestModel = new MaterialRequestsPenolongModel();
         $this->materialRequestDetailsModel = new MaterialRequestPenolongDetailsModel();
+
+        $this->jurnalUmumController = new JurnalUmum();
     }
 
     public function index()
@@ -502,6 +507,19 @@ class MaterialRequestPenolong extends BaseController
                 $materialRequestDetailData = $this->materialRequestDetailsModel->where('material_request_id', $id)->findAll();
 
                 foreach ($materialRequestDetailData as $key => $value) {
+                    // $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
+                    // if ($statusOUT) {
+                    //     $responseBody = json_decode($statusOUT->getBody(), true);
+                    //     $data = [
+                    //         "status"    => false,
+                    //         "id"    => $this->request->getVar('id'),
+                    //         "message"   => $responseBody['message'],
+                    //         "payload"   => json_encode($payload),
+                    //         'token'     => csrf_hash()
+                    //     ];
+                    //     echo json_encode($data);
+                    //     return;
+                    // } else {
                     $stok = $this->stockModel->insertStok(
                         $materialRequestData['company_id'],
                         $value['warehouse_id'],
@@ -534,6 +552,7 @@ class MaterialRequestPenolong extends BaseController
                         $materialRequestData['req_no'],
                         $value['stock_dokumen'],
                     );
+                    // }
 
                     // -----
                     // BARANG IN KE INVENTORI

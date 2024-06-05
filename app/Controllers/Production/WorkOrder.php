@@ -114,7 +114,9 @@ class WorkOrder extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [];
+        $condition = [
+            "work_orders.company_id"        => $this->this_company_id
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

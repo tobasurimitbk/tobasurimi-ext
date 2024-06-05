@@ -4,32 +4,24 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AccountBarangModel extends Model
+class PPBKBDetailModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'account_barang';
+    protected $table            = 'ppbkb_detail';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'barang_master_id',
-        'company_id',
-        'ap_id',
-        'ar_id',
-        'kategori_id',
-        'divisi_id',
-        'deleted_at',
-    ];
+    protected $useSoftDeletes   = true;
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
 
     // Validation
     protected $validationRules      = [];
@@ -47,14 +39,4 @@ class AccountBarangModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function getAccountBarangForJurnal($condition = [])
-    {
-        $select =   "account_barang.*";
-        return $this->asObject()
-            ->select($select)
-            ->where($condition)
-            ->where('account_barang.deleted_at', null)
-            ->findAll();
-    }
 }

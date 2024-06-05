@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($mutasiGlobal) ? "Tambah Mutasi" : "Update Mutasi" ?></h1>
+        <h1><?= empty($mutasiGlobal) ? "Tambah Mutasi BC 2.7" : "Update Mutasi BC 2.7" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi/global"); ?>">
                 Batal
             </a>
             <?php if (!empty($mutasiGlobal)) : ?>

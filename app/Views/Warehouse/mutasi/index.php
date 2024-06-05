@@ -217,9 +217,17 @@
                         </div>
                     `
                     } else {
-                        return `
-                        -
-                    `
+                        if (row.no_ppbkb === "-") {
+                            return `
+                                <?php if (can('Inventori', 'Mutasi', 'ua')) : ?>
+                                    <button data-toggle="tooltip" title="Un-Posting" onclick="unPostingAction('${id}')" class="btn btn-danger posting-spp">
+                                        <i class="fa-solid fa-ban"></i>    
+                                    </button>
+                                <?php endif; ?>
+                            `;
+                        } else {
+                            return ``;
+                        }
                     }
 
                 }
@@ -363,6 +371,49 @@
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("mutasi/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                table.ajax.reload()
+                            });
+                        }
+                    },
+                });
+            }
+        })
+    }
+
+    const unPostingAction = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Un Posting Mutasi ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("mutasi/un-posting"); ?>",
                     data: {
                         id: id
                     },

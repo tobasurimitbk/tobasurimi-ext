@@ -50,7 +50,7 @@
                                             }
                                             ?>
                                         </select>
-                                        <label for="floatingInput">Provinsi</label>
+                                        <label for="floatingInput">Provinsi (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -58,13 +58,13 @@
                                         <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
                                             <option value="" data-code=""></option>
                                         </select>
-                                        <label for="floatingInput">Kota</label>
+                                        <label for="floatingInput">Kota (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Postal Code">
-                                        <label for="floatingInput">Kode Pos</label>
+                                        <label for="floatingInput">Kode Pos (Opsional)</label>
                                     </div>
                                 </div>
                             </div>
@@ -74,13 +74,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
-                                <label for="floatingInput">Nomor NPWP</label>
+                                <label for="floatingInput">Nomor NPWP (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
-                                <label for="floatingInput">No. Telepon</label>
+                                <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -88,13 +88,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
-                                <label for="floatingInput">Contact Person</label>
+                                <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email</label>
+                                <label for="floatingInput">Email (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
-                                <label for="floatingInput">No. Rekening</label>
+                                <label for="floatingInput">No. Rekening (Opsional)</label>
                             </div>
                         </div>
                         <!-- <div class="col-md-6">
@@ -627,35 +627,35 @@
                 address: {
                     required: true
                 },
-                no_npwp: {
-                    required: true,
-                    minlength: 15,
-                    maxlength: 15,
-                },
-                phone: {
-                    required: true
-                },
-                contact_person: {
-                    required: true
-                },
-                email: {
-                    required: true
-                },
-                no_rekening: {
-                    required: true
-                },
-                // supplier_buyer: {
+                // no_npwp: {
+                //     required: true,
+                //     minlength: 15,
+                //     maxlength: 15,
+                // },
+                // phone: {
                 //     required: true
                 // },
-                province_parent_id: {
-                    required: true
-                },
-                city_parent_id: {
-                    required: true
-                },
-                postal_code: {
-                    required: true
-                }
+                // contact_person: {
+                //     required: true
+                // },
+                // email: {
+                //     required: true
+                // },
+                // no_rekening: {
+                //     required: true
+                // },
+                // // supplier_buyer: {
+                // //     required: true
+                // // },
+                // province_parent_id: {
+                //     required: true
+                // },
+                // city_parent_id: {
+                //     required: true
+                // },
+                // postal_code: {
+                //     required: true
+                // }
                 // ap_id: {
                 //     required: true
                 // },
@@ -673,35 +673,35 @@
                 address: {
                     required: "Alamat wajib diisi"
                 },
-                no_npwp: {
-                    required: "Nomor NPWP wajib diisi",
-                    minlength: "Nomor NPWP minimal 15 angka",
-                    maxlength: "Nomor NPWP maksimal 15 angka",
-                },
-                phone: {
-                    required: "No. Telepon wajib diisi"
-                },
-                contact_person: {
-                    required: "Contact Person wajib diisi"
-                },
-                email: {
-                    required: "Email wajib diisi"
-                },
-                no_rekening: {
-                    required: "No. Rekening wajib diisi"
-                },
-                // supplier_buyer: {
-                //     required: "Supplier / Buyer wajib diisi"
+                // no_npwp: {
+                //     required: "Nomor NPWP wajib diisi",
+                //     minlength: "Nomor NPWP minimal 15 angka",
+                //     maxlength: "Nomor NPWP maksimal 15 angka",
                 // },
-                province_parent_id: {
-                    required: "Provinsi wajib diisi"
-                },
-                city_parent_id: {
-                    required: "Kota wajib diisi"
-                },
-                postal_code: {
-                    required: "Kode pos wajib diisi"
-                }
+                // phone: {
+                //     required: "No. Telepon wajib diisi"
+                // },
+                // contact_person: {
+                //     required: "Contact Person wajib diisi"
+                // },
+                // email: {
+                //     required: "Email wajib diisi"
+                // },
+                // no_rekening: {
+                //     required: "No. Rekening wajib diisi"
+                // },
+                // // supplier_buyer: {
+                // //     required: "Supplier / Buyer wajib diisi"
+                // // },
+                // province_parent_id: {
+                //     required: "Provinsi wajib diisi"
+                // },
+                // city_parent_id: {
+                //     required: "Kota wajib diisi"
+                // },
+                // postal_code: {
+                //     required: "Kode pos wajib diisi"
+                // }
                 // ap_id: {
                 //     required: "Akun AP wajib diisi"
                 // },

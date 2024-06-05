@@ -97,7 +97,7 @@
                             <th onclick="changeSort('tanggal')">Tanggal</th>
                             <th onclick="changeSort('divisis.divisi')">Warehouse Asal</th>
                             <th onclick="changeSort('company_tujuan_id')">Company Tujuan</th>
-                            <th>No BC 2.7</th>
+                            <th>No Aju BC 2.7</th>
                             <th>Total Item</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -137,6 +137,7 @@
             url: "<?= base_url("mutasi/all-global"); ?>",
             dataSrc: "data",
             data: function(data) {
+                data.company_tujuan_id = $('.company_tujuan_id').val();
                 data.divisi_id = $(".divisi_id").val();
                 data.status = $(".status").val();
                 data.no_mutasi = $(".no_mutasi").val();
@@ -176,10 +177,20 @@
                 className: "text-center"
             },
             {
-                data: "no_bc27",
+                data: "no_aju",
                 className: "text-center",
                 searchable: false,
-                sortable: false
+                sortable: false,
+                render: function(data, type, row) {
+                    if (row.no_aju == 'BELUM DIBUAT') {
+                        return '<div class="text-danger">BELUM DIBUAT</div>';
+
+                    } else {
+                        return row.no_aju
+
+                    }
+
+                }
             },
             {
                 data: "total_item",
@@ -228,9 +239,18 @@
                         </div>
                     `
                     } else {
-                        return `
-                        -
-                    `
+                        if (row.is_used === "1") {
+                            return `
+                                <?php if (can('Inventori', 'Mutasi', 'ua')) : ?>
+                                    <button data-toggle="tooltip" title="Un-Posting" onclick="unPostingAction('${id}')" class="btn btn-danger posting-spp">
+                                        <i class="fa-solid fa-ban"></i>    
+                                    </button>
+                                <?php endif; ?>
+                            `;
+                        } else {
+                            return ``;
+                        }
+
                     }
 
                 }
@@ -382,6 +402,49 @@
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("mutasi/delete-global"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                table.ajax.reload()
+                            });
+                        }
+                    },
+                });
+            }
+        })
+    }
+
+    const unPostingAction = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Un Posting Mutasi ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("mutasi/un-posting-global"); ?>",
                     data: {
                         id: id
                     },

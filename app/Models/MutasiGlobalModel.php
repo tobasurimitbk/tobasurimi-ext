@@ -109,6 +109,29 @@ class MutasiGlobalModel extends Model
         ];
     }
 
+    public function getMutasiGlobalList($companyTujuanId, $companyAsalId)
+    {
+        $bc27Model = new BC27Model();
+        $result = array();
+        $resultMutasiPosted = $this->asArray()
+            ->select('mutasi_global.*,divisis.divisi AS divisiName, warehouses.warehouse_name AS warehouseName')
+            ->join('divisis', 'divisis.id = mutasi_global.divisi_asal_id', 'left')
+            ->join('warehouses', 'warehouses.id = mutasi_global.warehouse_asal_id', 'left')
+            ->where('company_tujuan_id', $companyTujuanId)
+            ->where('company_asal_id', $companyAsalId)
+            ->where('status_posting', '1')
+            ->where('mutasi_global.deletedAt', null)
+            ->findAll();
+
+        foreach ($resultMutasiPosted as $r) {
+            $first = $bc27Model->where('mutasi_global_id', $r['id'])->first();
+            if ($first == null) {
+                array_push($result, $r);
+            }
+        }
+
+        return $result;
+    }
 
     public function get_no($bln, $thn, $last_day, $divisiName, $divisi_id)
     {

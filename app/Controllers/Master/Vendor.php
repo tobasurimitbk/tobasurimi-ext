@@ -123,30 +123,30 @@ class Vendor extends BaseController
                 "address" => [
                     "rules" => "required"
                 ],
-                "no_npwp" => [
-                    "rules" => "required"
-                ],
-                "phone" => [
-                    "rules" => "required"
-                ],
-                "contact_person" => [
-                    "rules" => "required"
-                ],
-                "email" => [
-                    "rules" => "required|valid_email",
-                    'errors' => [
-                        'valid_email' => 'Email harus valid'
-                    ]
-                ],
-                "no_rekening" => [
-                    "rules" => "required"
-                ],
-                'postal_code' => [
-                    'rules' => 'permit_empty|regex_match[/^\d{5}$/]',
-                    'errors' => [
-                        'regex_match' => 'Kode pos harus terdiri dari 5 digit angka'
-                    ]
-                ]
+                // "no_npwp" => [
+                //     "rules" => "required"
+                // ],
+                // "phone" => [
+                //     "rules" => "required"
+                // ],
+                // "contact_person" => [
+                //     "rules" => "required"
+                // ],
+                // "email" => [
+                //     "rules" => "required|valid_email",
+                //     'errors' => [
+                //         'valid_email' => 'Email harus valid'
+                //     ]
+                // ],
+                // "no_rekening" => [
+                //     "rules" => "required"
+                // ],
+                // 'postal_code' => [
+                //     'rules' => 'permit_empty|regex_match[/^\d{5}$/]',
+                //     'errors' => [
+                //         'regex_match' => 'Kode pos harus terdiri dari 5 digit angka'
+                //     ]
+                // ]
                 // "supplier_buyer" => [
                 //     "rules" => "required"
                 // ],
@@ -254,30 +254,30 @@ class Vendor extends BaseController
                 "address" => [
                     "rules" => "required"
                 ],
-                "no_npwp" => [
-                    "rules" => "required"
-                ],
-                "phone" => [
-                    "rules" => "required"
-                ],
-                "contact_person" => [
-                    "rules" => "required"
-                ],
-                "email" => [
-                    "rules" => "required|valid_email",
-                    'errors' => [
-                        'valid_email' => 'Email harus valid'
-                    ]
-                ],
-                "no_rekening" => [
-                    "rules" => "required"
-                ],
-                'postal_code' => [
-                    'rules' => 'permit_empty|regex_match[/^\d{5}$/]',
-                    'errors' => [
-                        'regex_match' => 'Kode pos harus terdiri dari 5 digit angka'
-                    ]
-                ]
+                // "no_npwp" => [
+                //     "rules" => "required"
+                // ],
+                // "phone" => [
+                //     "rules" => "required"
+                // ],
+                // "contact_person" => [
+                //     "rules" => "required"
+                // ],
+                // "email" => [
+                //     "rules" => "required|valid_email",
+                //     'errors' => [
+                //         'valid_email' => 'Email harus valid'
+                //     ]
+                // ],
+                // "no_rekening" => [
+                //     "rules" => "required"
+                // ],
+                // 'postal_code' => [
+                //     'rules' => 'permit_empty|regex_match[/^\d{5}$/]',
+                //     'errors' => [
+                //         'regex_match' => 'Kode pos harus terdiri dari 5 digit angka'
+                //     ]
+                // ]
                 // "supplier_buyer" => [
                 //     "rules" => "required"
                 // ],

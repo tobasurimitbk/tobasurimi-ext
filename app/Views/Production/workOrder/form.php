@@ -51,8 +51,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select department_id" name="department_id" id="department_id" <?= !empty($dataWorkOrders) ? 'disabled' : '' ?>>
                                 <option value=""></option>
-                                <?php foreach ($dataDivisi ?? [] as $dataDivisi) : ?>
-                                    <option value="<?= $dataDivisi->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->divisi_id == $dataDivisi->id ? "selected" : "" : ""; ?>><?= $dataDivisi->divisi ?></option>
+                                <?php foreach ($dataDivisi as $dataDivisis) : ?>
+                                    <option value="<?= $dataDivisis->id ?>" <?= !empty($dataWorkOrders) ? $dataWorkOrders->divisi_id == $dataDivisis->id ? "selected" : "" : ""; ?>><?= $dataDivisis->divisi ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Department</label>
@@ -481,6 +481,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $('#warehouse_id').prop('disabled', false);
+                            $('#department_id').prop('disabled', false);
                             let id = $(".id").val();
                             let formData = new FormData(document.querySelector('.create-form'));
                             formData.append("items", JSON.stringify(list_items));

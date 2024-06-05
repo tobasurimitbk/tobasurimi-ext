@@ -39,11 +39,13 @@ class NeracaSaldo extends BaseController
 
         if ($this->request->getPost('cariTanggal') != "" && $dateStart != "" && $dateEnd != "") {
             $condition = [
+                'jurnal_umum.company_id' => $this->this_company_id,
                 'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
                 'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
             ];
         } else {
             $condition = [
+                'jurnal_umum.company_id' => $this->this_company_id,
                 'tanggal_jurnal >=' => date('Y-m-01'),
                 'tanggal_jurnal <=' => date('Y-m-d')
             ];
