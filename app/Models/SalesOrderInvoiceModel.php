@@ -41,6 +41,9 @@ class SalesOrderInvoiceModel extends Model
         'tipe_invoice',
         'status_pelunasan',
         'counter_print',
+        'id_company',
+        'document_no',
+        'status_posting',
     ];
 
     // Dates
@@ -158,9 +161,9 @@ class SalesOrderInvoiceModel extends Model
                       sales_order.nama_ecommerce";
 
         $dataSalesOrderInvoice = $this->asObject()
-            ->join('users', 'users.id = sales_order_invoice.id_user')
-            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
-            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id')
+            ->join('users', 'users.id = sales_order_invoice.id_user', 'left')
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'left')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->select($selectQry)
             ->find($id);

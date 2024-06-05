@@ -176,10 +176,8 @@
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($data) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                                <option value="">Pilih Dokumen Pabean</option>
-                                <?php foreach ($dataAJU as $aju) : ?>
-                                    <option <?= !empty($data) ? ($data->bc_type === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
-                                <?php endforeach; ?>
+
+                                <option value="1445" selected>BC 3.0</option>
                             </select>
                             <label for="floatingInput">Dokumen Pabean (Opsional)</label>
                         </div>

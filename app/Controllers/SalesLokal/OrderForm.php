@@ -141,7 +141,10 @@ class OrderForm extends BaseController
         ];
 
 
-        $condition = [];
+        $condition = [
+            "sales_order.id_company" => $this->this_company_id,
+            "sales_order.deletedAt" => null,
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

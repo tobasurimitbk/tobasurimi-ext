@@ -22,6 +22,7 @@ class SalesOrderReturnModel extends Model
         'no_return',
         'tanggal_return',
         'note',
+        'id_company',
     ];
 
     // Dates

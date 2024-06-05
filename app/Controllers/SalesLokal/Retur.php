@@ -85,7 +85,10 @@ class Retur extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $condition = ['sales_order_return.deletedAt' => null];
+        $condition = [
+            "sales_order_return.deletedAt" => null,
+            "sales_order_return.id_company" => $this->this_company_id
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -184,6 +187,7 @@ class Retur extends BaseController
                 "id_invoice"             => $idInvoice,
                 "no_return"             => $postData['no_surat_retur'],
                 "note"             => $postData['note'],
+                "id_company"        => $this->this_company_id,
                 "tanggal_return"           => date("Y-m-d", strtotime(str_replace("/", "-", $returnDate))),
             ];
             $id =  $this->soReturnModel->insert($values);

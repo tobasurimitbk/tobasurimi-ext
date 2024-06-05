@@ -24,7 +24,8 @@ class SuratJalanModel extends Model
         'no_po',
         'shipping_date',
         'no_surat_jalan',
-        'note'
+        'note',
+        'id_company',
     ];
 
     // Dates

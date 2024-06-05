@@ -85,7 +85,10 @@ class SuratJalan extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = ['surat_jalan_so.deletedAt' => null];
+        $condition = [
+            "surat_jalan_so.deletedAt" => null,
+            "surat_jalan_so.id_company" => $this->this_company_id
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -233,6 +236,7 @@ class SuratJalan extends BaseController
                 "note"          => $this->request->getPost('note'),
                 'multiple_id_so' => json_encode($idArray),
                 'multiple_no_so' => json_encode($noArray),
+                "id_company"     => $this->this_company_id,
             ];
             $checkSJ = $this->SuratJalanModel->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
