@@ -67,7 +67,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Lengkap</th>
                                 <th onclick="changeSort('employees.division_id')" class="sort">Departemen</th>
@@ -76,6 +76,7 @@
                                 <th onclick="changeSort('employees.dob')" class="sort">Tanggal Lahir</th>
                                 <th onclick="changeSort('employees.gender')" class="sort">Jenis Kelamin</th>
                                 <th onclick="changeSort('employees.status')" class="sort">Status</th>
+                                <th style="width: 10px;">Jam Kerja</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -135,7 +136,7 @@
             data: "no",
             className: "text-center",
             sortable: false,
-            width: "5%"
+            width: "3%"
         }, {
             data: "nip",
             className: "text-center"
@@ -160,11 +161,31 @@
         }, {
             data: "status",
             className: "text-center"
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            width: "10%",
+            render: function(data, type, row) {
+                let id = row.id;
+                return `
+                    <button data-toggle="tooltip" title="Atur Jam Kerja" onclick="jamKerjaAction('${row.id}')" class="btn btn-success">
+                    <i class="fas fa-user-clock"></i>
+                    </button>
+                    `
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data Karyawan",
             lengthMenu: "Show _MENU_ entries",
@@ -251,6 +272,11 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    function jamKerjaAction(id) {
+        window.location.href = "<?= base_url('employee/jam-kerja/') ?>" + id;
+
     }
 </script>
 

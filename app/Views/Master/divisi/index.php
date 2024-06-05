@@ -2,12 +2,13 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px;">
+    <div class="modal-dialog modal-lg" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Departemen</h5>
             </div>
             <div class="modal-body">
+
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
@@ -33,8 +34,13 @@
                             </div>
                         </div>
                     </div>
+                    <?php if ($isGajiPokok == null || $isCadangan == null) : ?>
+                        <div class="alert alert-danger mt-2 mb-2" role="alert">
+                            KOMPONEN GAJI POKOK DAN KOMPONEN CADANGAN BELUM ADA
+                        </div>
+                    <?php endif; ?>
                     <div class="table-responsive mb-4">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="tabelGaji" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr style="text-align: center;">
                                     <th scope="col" style="width: 10px;"><input type="checkbox" id="parent"></th>
@@ -95,12 +101,13 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable dataTableDivisi" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th style="width: 10%;">No</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('jam_kerja.jenis')" class="sort">Jam Kerja</th>
+                                <th class="sort">Komponen Gaji</th>
                                 <th class="sort">Total Bagian</th>
                                 <th class="sort" style="width: 100px;">Action</th>
                             </tr>
@@ -120,7 +127,7 @@
     let sort = "divisi";
     let sortType = "desc";
 
-    const table = $('.dataTable').DataTable({
+    const table = $('.dataTableDivisi').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
@@ -156,7 +163,7 @@
                 data: "no",
                 className: "text-center",
                 sortable: false,
-                width: "5%"
+                width: "2%"
             }, {
                 data: "divisi",
                 className: "text-center"
@@ -165,11 +172,35 @@
                 className: "text-center"
             },
             {
+                data: "komponenGaji",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let htmlRes = '';
+
+                    if (row.komponenGaji == "SUDAH DIATUR") {
+                        htmlRes += `
+                            <div class="text-success">
+                               <b>SUDAH DIATUR</b>
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                               <b>BELUM DIATUR</b>
+                            </div>`
+                    }
+
+                    return htmlRes;
+                }
+            },
+            {
                 data: "totalBagian",
                 className: "text-center",
                 searchable: false,
                 sortable: false,
-            }, {
+            },
+            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,

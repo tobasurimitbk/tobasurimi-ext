@@ -368,9 +368,10 @@ class EmployeesModel extends Model
 
     public function getSingleEmployee($employeesID)
     {
-        return $this->asArray()->select("employees.*, divisis.divisi, bagian.nama_bagian")
-            ->join('divisis', 'divisis.id = employees.division_id')
-            ->join('bagian', 'bagian.division_id = divisis.id')
+        return $this->asArray()->select("employees.*, divisis.divisi, divisis.jam_kerja_id, bagian.nama_bagian, jabatans.jabatan_name")
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
+            ->join('jabatans', 'jabatans.id = employees.jabatan_id', 'left')
             ->where('employees.id', $employeesID)
             ->first();
     }

@@ -1228,6 +1228,11 @@ $routes->group('bea-cukai-ppbkb', ['filter' => 'Auth'], function ($routes) {
 });
 
 // HUMAN RESOURCE
+// JAM KERJA KARYAWAN
+$routes->get('/employee/jam-kerja/(:segment)', 'HR\EmployeeJamKerja::index/$1', ['filter' => 'Auth']);
+$routes->get('/employee/get-jam-kerja-detail', 'HR\EmployeeJamKerja::getDetailJamKerja', ['filter' => 'Auth']);
+$routes->post('/employee/update-jam-kerja', 'HR\EmployeeJamKerja::createOrUpdate', ['filter' => 'Auth']);
+
 // Attendance
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
@@ -1285,13 +1290,6 @@ $routes->get('/payroll/print/division/(:segment)/(:segment)', 'HR\Payroll::expor
 $routes->get('/payroll/print/detail/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivisionDetail/$1/$2', ['filter' => 'Auth']);
 $routes->get('/payroll/print/summary/(:segment)/(:segment)', 'HR\Payroll::exportPdfSummary/$1/$2', ['filter' => 'Auth']);
 $routes->get('/payroll/print/potongan/(:segment)/(:segment)', 'HR\Payroll::exportPdfPotongan/$1/$2', ['filter' => 'Auth']);
-
-
-// formula payroll
-$routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);
-$routes->get('/formula-payroll/create', 'HR\FormulaPayroll::createView', ['filter' => 'Auth']);
-$routes->post('/formula-payroll/save', 'HR\FormulaPayroll::create', ['filter' => 'Auth']);
-$routes->post('/formula-payroll/update', 'HR\FormulaPayroll::update', ['filter' => 'Auth']);
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::pinjamanKaryawan', ['filter' => 'Auth']);

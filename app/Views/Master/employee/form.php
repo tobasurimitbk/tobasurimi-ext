@@ -9,13 +9,21 @@
                 Batal
             </a>
             <?php if (!empty($data)) : ?>
-                <button class="btn btn-hapus delete-parent float-right root-form-view">
-                    Hapus
+                <?php if (can('Personalia', 'Karyawan', 'd')) : ?>
+                    <button class="btn btn-hapus delete-parent float-right root-form-view">
+                        Hapus
+                    </button>
+                <?php endif; ?>
+                <?php if (can('Personalia', 'Karyawan', 'u')) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
+                        Simpan
+                    </button>
+                <?php endif; ?>
+            <?php else : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
+                    Simpan
                 </button>
             <?php endif; ?>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view">
-                Simpan
-            </button>
         </div>
     </div>
     <div class="card">
@@ -346,21 +354,21 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    $(".nik").mask("AAAAAAAAAAAAAAAA", {
-        translation: {
-            "A": {
-                pattern: /[0-9]/,
-            }
-        }
-    });
+    // $(".nik").mask("AAAAAAAAAAAAAAAA", {
+    //     translation: {
+    //         // "A": {
+    //         //     pattern: /[0-9]/,
+    //         // }
+    //     }
+    // });
 
-    $(".nip").mask("AAAAAAAAAAAAAAAAAA", {
-        translation: {
-            "A": {
-                pattern: /[0-9]/,
-            }
-        }
-    });
+    // $(".nip").mask("AAAAAAAAAAAAAAAAAA", {
+    //     translation: {
+    //         // "A": {
+    //         //     pattern: /[0-9]/,
+    //         // }
+    //     }
+    // });
 
     $('#gender').select2({
         placeholder: "Pilih Jenis Kelamin",
