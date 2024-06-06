@@ -481,6 +481,7 @@ class SuratJalan extends BaseController
         $condition = [
             'id_customer'               => $idCustomer,
             'tipe_sales_order'          => 'LOKAL',
+            "sales_order.id_company"    => $this->this_company_id,
             'surat_jalan_so_id'         => null,
             'sales_order_invoice_id'    => null
         ];
