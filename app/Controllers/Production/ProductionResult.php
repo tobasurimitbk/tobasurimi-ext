@@ -261,10 +261,22 @@ class ProductionResult extends BaseController
             ->whereIn('material_requests.id', $idMaterialRequest)
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
-            ->groupBy('material_request_details.material_request_id')
+            ->groupBy('material_requests.id')
             ->find();
 
-        // var_dump($productionResData);
+        // Inisialisasi variabel untuk menyimpan req_no dan request_date
+        $reqNos = [];
+        $requestDates = [];
+
+        // Iterasi hasil query untuk menggabungkan req_no dan request_date
+        foreach ($dataMaterialRequest as $request) {
+            $reqNos[] = $request->req_no;
+            $requestDates[] = date('d/m/Y', strtotime($request->request_date));
+        }
+
+        // Gabungkan semua req_no dan request_date menjadi satu string dipisahkan oleh koma
+        $combinedReqNos = implode(', ', $reqNos);
+        $combinedRequestDates = implode(', ', $requestDates);
 
         $data = [
             'data'                  => $productionResData,
@@ -277,6 +289,8 @@ class ProductionResult extends BaseController
             'dataDivisi' => $dataDivisi,
             'tipeBarang' => $dataTipeBarang,
             'dataMaterialRequest' => $dataMaterialRequest,
+            'dataMaterialRequestNo' => $combinedReqNos,
+            'dataMaterialRequestDate' => $combinedRequestDates,
         ];
         return view('Production/productionResult/form', $data);
     }
@@ -347,11 +361,12 @@ class ProductionResult extends BaseController
             $barangJadi = json_decode($this->request->getVar("jadi"));
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
-            $barangReturn = json_decode($this->request->getVar("return"));
+            $barangFilling = json_decode($this->request->getVar("filling"));
 
             // var_dump($barangJadi);
             // var_dump($barangDigunakan);
             // var_dump($barangScrap);
+            // var_dump($barangFilling);
             // exit;
             $productionResID = $this->productionResultModel->insert($datas);
 
@@ -377,6 +392,8 @@ class ProductionResult extends BaseController
                         "type" => "JADI",
                         "no_ref" => "NON PABEAN",
                         "qty" => (float) $qty,
+                        "qty2" => (float) $bj->berat_isi_jadi,
+                        "qty_isi" => (float) $bj->qty_isi_jadi,
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
                 }
@@ -386,6 +403,8 @@ class ProductionResult extends BaseController
                 $qty = isset($bd->qty2) ? (float) $bd->qty2 : (float) $bd->qty;
                 $datasbd = [
                     "production_result_id" => $productionResID,
+                    "material_request_detail_id" => $bd->material_request_detail_id,
+                    "material_request_id" => $bd->material_request_id,
                     "barang1_id" => $bd->barang1_id,
                     "barang2_id" => $bd->barang2_id,
                     "warehouse_id" => $bd->warehouse_id,
@@ -393,7 +412,7 @@ class ProductionResult extends BaseController
                     "bc_id" => $bd->bc_id,
                     "stock_dokumen" => $bd->stock_dokumen,
                     "stock_date" => $bd->stock_date,
-                    "stock_id" => $bd->stock_id,
+                    "stock_id" => $bd->stock_id ?? 0,
                     "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
                     "barang_type" => $bd->type_barang,
                     "type" => "DIGUNAKAN",
@@ -420,6 +439,29 @@ class ProductionResult extends BaseController
                     "qty" => (float) $bs->qty,
                 ];
                 $this->productionResultDetailModel->insert($datasbs);
+            }
+
+            foreach ($barangFilling as $bf) {
+                $datasbf = [
+                    "production_result_id" => $productionResID,
+                    "material_request_detail_id" => $bf->material_request_detail_id,
+                    "material_request_id" => $bf->material_request_id,
+                    "barang1_id" => $bf->barang1_id,
+                    "barang2_id" => $bf->barang2_id,
+                    "warehouse_id" => $bf->warehouse_id,
+                    "divisi_id" => $bf->divisi_id,
+                    "bc_id" => $bf->bc_id,
+                    "stock_id" => $bf->stock_id,
+                    "stock_date" => $bf->stock_date,
+                    "stock_dokumen" => $bf->stock_dokumen,
+                    "no_aju" => $bf->no_aju,
+                    "barang_type" => $bf->type_barang,
+                    "type" => "RETURN",
+                    "no_ref" => $bf->ref_no,
+                    "qty" => (float) $bf->qty,
+                    "kondisi_barang" => $bf->kondisi_barang,
+                ];
+                $this->productionResultDetailModel->insert($datasbf);
             }
 
             $data = [
@@ -568,25 +610,48 @@ class ProductionResult extends BaseController
 
                 $materialRequestData = [];
                 foreach ($resultDetailData as $key => $value) {
-                    // var_dump(json_decode($resultData['material_request_id']));
-                    foreach (json_decode($resultData['material_request_id']) as $materialRequestId) {
+                    if ($value['type'] == 'RETURN') {
                         $materialRequest = $this->materialRequestDetailModel
-                            ->where('material_request_id', $materialRequestId)
-                            ->where('barang1_id', $value['barang1_id'])
-                            ->where('barang2_id', $value['barang2_id'])
-                            ->where('divisi_tujuan_id', $value['divisi_id'])
-                            ->where('warehouse_tujuan_id', $value['warehouse_id'])
-                            ->where('stock_tujuan_id', $value['stock_id'])
+                            ->where('material_request_id', $value['material_request_id'])
+                            ->where('id', $value['material_request_detail_id'])
                             ->findAll();
                         foreach ($materialRequest as $materialRequestData) {
-                            $qtySaatIni = (float) $materialRequestData['qty_now'];
-                            $qtyProduction = (float) $value['qty'];
-                            $datas = [
-                                'qty_now' => $qtySaatIni - $qtyProduction
-                            ];
-                            $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                            if ($value['kondisi_barang'] == "ditapak") {
+                                $datas = [
+                                    'qty_now' => $value['qty'],
+                                    'kondisi_barang' => $value['kondisi_barang'],
+                                ];
+                                $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                            } else {
+                                $dataMaterialDetail = [
+                                    'material_request_id' => $materialRequestData['material_request_id'],
+                                    'divisi_id' => $materialRequestData['divisi_id'],
+                                    'warehouse_id' => $materialRequestData['warehouse_id'],
+                                    'divisi_tujuan_id' => $materialRequestData['divisi_tujuan_id'],
+                                    'warehouse_tujuan_id' => $materialRequestData['warehouse_tujuan_id'],
+                                    'stock_tujuan_id' => $materialRequestData['stock_tujuan_id'],
+                                    'barang1_id' => $materialRequestData['barang1_id'],
+                                    'barang2_id' => $materialRequestData['barang2_id'],
+                                    'nama_barang' => $materialRequestData['nama_barang'],
+                                    'satuan' => $materialRequestData['satuan'],
+                                    'stock_id' => $materialRequestData['stock_id'],
+                                    'bc_id' => $materialRequestData['bc_id'],
+                                    'no_aju' => $materialRequestData['no_aju'],
+                                    'ref_no' => $materialRequestData['ref_no'],
+                                    'stock_date' => $materialRequestData['stock_date'],
+                                    'stock_dokumen' => $materialRequestData['stock_dokumen'],
+                                    'barang_type' => $materialRequestData['barang_type'],
+                                    'qty' => $materialRequestData['qty'],
+                                    'qty2' => $materialRequestData['qty2'],
+                                    'qty_isi' => $materialRequestData['qty_isi'],
+                                    'qty_now' => $value['qty'],
+                                    'kondisi_barang' => $value['kondisi_barang'],
+                                ];
+                                $this->materialRequestDetailModel->insert($dataMaterialDetail);
+                            }
                         }
                     }
+
                     if ($value['type'] == 'JADI') {
                         // -----
                         // BARANG IN KE INVENTORI

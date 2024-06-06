@@ -46,14 +46,17 @@ class MaterialRequestDetailsModel extends Model
             material_request_details.*,        
             barang_master.kode_barang,        
             barang_master.barang_name,        
-            barang_master.type_barang      
+            barang_master.type_barang,    
+            satuans.id AS satuan_id,
         ';
 
         $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
+            ->join('satuans', 'satuans.kode_satuan = material_request_details.satuan', 'left')
             ->whereIn('material_request_details.material_request_id', $mrID)
             ->where('material_request_details.qty_now >', 0)
+            ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id')
             ->findAll();
 
         return $dataQry;

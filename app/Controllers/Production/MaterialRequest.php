@@ -169,6 +169,7 @@ class MaterialRequest extends BaseController
                 ->where('material_request_id', $id)
                 ->where('parent_barang.parent_name !=', "KIMIA")
                 ->where('material_request_details.deletedAt', null)
+                ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id, material_request_details.stock_tujuan_id')
                 ->get()->getResult();
             foreach ($dataMaterialRequestDetails as $key => &$value) {
                 if ($value->barang_type == "bahan_baku") {
@@ -353,6 +354,7 @@ class MaterialRequest extends BaseController
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
                         'qty_now' => $s->qty_isi,
+                        'kondisi_barang' => 'request',
                     ];
                 } else {
                     $dataMaterialDetail = [
@@ -376,6 +378,7 @@ class MaterialRequest extends BaseController
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
                         'qty_now' => $s->qty2,
+                        'kondisi_barang' => 'request',
                     ];
                 }
                 $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -449,6 +452,7 @@ class MaterialRequest extends BaseController
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
                             'qty_now' => $s->qty_isi,
+                            'kondisi_barang' => 'request',
                         ];
                     } else {
                         $dataMaterialDetail = [
@@ -471,7 +475,8 @@ class MaterialRequest extends BaseController
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
-                            'qty_now' => $s->qty2
+                            'qty_now' => $s->qty2,
+                            'kondisi_barang' => 'request',
                         ];
                     }
                     $this->materialRequestDetailsModel->insert($dataMaterialDetail);
