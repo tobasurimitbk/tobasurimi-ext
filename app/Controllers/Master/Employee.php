@@ -256,7 +256,7 @@ class Employee extends BaseController
             $values = [
                 "company_id" => $this->this_company_id,
                 "nip" => $this->request->getPost("nip"), // required
-                "name" => $this->request->getPost("name"), // required
+                "name" => strtoupper($this->request->getVar("name")), // required
                 "gender" => $this->request->getPost("gender"), // required
                 "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
                 "dob" => $this->request->getPost("dob") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
@@ -362,7 +362,7 @@ class Employee extends BaseController
             $values = [
                 "company_id" => $this->this_company_id,
                 "nip" => $this->request->getPost("nip"), // required
-                "name" => $this->request->getPost("name"), // required
+                "name" => strtoupper($this->request->getVar("name")), // required
                 "gender" => $this->request->getPost("gender"), // required
                 "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
                 "dob" => $this->request->getPost("dob") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
@@ -564,7 +564,7 @@ class Employee extends BaseController
         }
 
         $data = [
-            'title' => "Edit Karyawan",
+            'title' => "Update Karyawan",
             'dataProvinces' => $this->ProvincesModel->search_list(array(), 'province_name'),
             'tipeEmployee' => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'jabatan' => $this->JabatanModel->where('deletedAt', null)->findAll(),

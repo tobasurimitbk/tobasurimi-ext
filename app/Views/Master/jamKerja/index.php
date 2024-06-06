@@ -5,17 +5,19 @@
 <section class="section">
     <div class="section-header">
         <h1>Jam Kerja</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("jam-kerja/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Master Data', 'Jam Kerja', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("jam-kerja/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <?= csrf_field() ?>
 
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search fos-jk mb-3" placeholder="Search" value="" />
+                <div class="col-md-2">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search mb-3" placeholder="Cari Jam Kerja" value="" />
                 </div>
             </div>
             <div class="row">
@@ -25,7 +27,7 @@
                             <tr>
                                 <th style="width: 10px;" class="sort">No</th>
                                 <th onclick="changeSort('jenis')" class="sort">Jenis Jam Kerja</th>
-                                <th style="width: 100px;">Actions</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -106,8 +108,10 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row.id;
-                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                <?php if (can('Master Data', 'Jam Kerja', 'd')) : ?>
+                    return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
                 `
+                <?php endif; ?>
             }
         }],
         columnDefs: [{

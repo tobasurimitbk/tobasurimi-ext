@@ -57,7 +57,7 @@ class JamKerja extends BaseController
         foreach ($jamKerjaData['data'] as $j) {
             array_push($dataJamKerja, [
                 "no" => $no++,
-                "id" => $j->id,
+                "id" => encrypt($j->id),
                 "jenis" => $j->jenis,
             ]);
         }
@@ -83,7 +83,7 @@ class JamKerja extends BaseController
             'hari' => $modelMetaData->where('name', "hari")->findAll()
         ];
 
-        return \view('Master/jamKerja/form', $data);
+        return view('Master/jamKerja/form', $data);
     }
 
     public function create()
@@ -92,11 +92,11 @@ class JamKerja extends BaseController
         $modelJamKerjaDetail = new JamKerjaDetailModel();
         $modelMetaData = new MetadataModel();
 
-        $jenisJamKerja = $this->request->getVar('jenisJamKerja');
+        $jenisJamKerja = strtoupper($this->request->getVar('jenisJamKerja'));
 
         // check duplikat
         if ($modelJamKerja->where('company_id', $this->this_company_id)->where('jenis', $jenisJamKerja)->first() != null) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Jam Kerja $jenisJamKerja sudah ada, silahkan coba dengan nama lain",
                 'status' => false
             ]);
@@ -130,7 +130,7 @@ class JamKerja extends BaseController
         $modelJamKerja = new JamKerjaModel();
         $modelJamKerjaDetail = new JamKerjaDetailModel();
 
-        $jamKerjaID = $this->request->getVar('jamKerjaID');
+        $jamKerjaID = decrypt($this->request->getVar('jamKerjaID'));
 
         $modelJamKerja->delete($jamKerjaID);
         $modelJamKerjaDetail->where('jam_kerja_id', $jamKerjaID)->delete();
@@ -146,12 +146,18 @@ class JamKerja extends BaseController
         $modelJamKerja = new JamKerjaModel();
         $modelMetaData = new MetadataModel();
 
+        $id = decrypt($id);
+
         $data = [
             'jamKerja' => $modelJamKerja->where('id', $id)->first(),
             'hari' => $modelMetaData->where('name', "hari")->findAll()
         ];
 
-        return \view('Master/jamKerja/form', $data);
+        if ($data['jamKerja'] == null) {
+            return redirect()->to('jam-kerja');
+        }
+
+        return view('Master/jamKerja/form', $data);
     }
 
     public function update()
@@ -163,7 +169,7 @@ class JamKerja extends BaseController
         $jamKerjaSameName = $modelJamKerja
             ->where('company_id', $this->this_company_id)
             ->where('jenis', strtoupper($this->request->getVar('jenisJamKerja')))
-            ->where('id !=', $this->request->getVar('jamKerjaID'))
+            ->where('id !=', decrypt($this->request->getVar('jamKerjaID')))
             ->first();
 
         if ($jamKerjaSameName) {
@@ -174,19 +180,18 @@ class JamKerja extends BaseController
             ]);
         }
 
-
         $modelJamKerja->set('jenis', strtoupper($this->request->getVar('jenisJamKerja')))
             ->set('company_id', $this->this_company_id)
             ->set('jam_terlambat', $this->request->getVar('jamTerlambat'))
-            ->where('id', $this->request->getVar('jamKerjaID'))
+            ->where('id', decrypt($this->request->getVar('jamKerjaID')))
             ->update();
 
         // delete first
-        $modelJamKerjaDetail->where('jam_kerja_id', $this->request->getVar('jamKerjaID'))->delete();
+        $modelJamKerjaDetail->where('jam_kerja_id', decrypt($this->request->getVar('jamKerjaID')))->delete();
 
         foreach ($modelMetaData->where('name', "hari")->findAll() as $h) {
             $modelJamKerjaDetail->insert([
-                'jam_kerja_id' => $this->request->getVar('jamKerjaID'),
+                'jam_kerja_id' => decrypt($this->request->getVar('jamKerjaID')),
                 'hari' => $h['value'],
                 'jam_masuk' => $this->request->getVar($h['value'] . "_mulaiMasuk"),
                 'jam_istirahat_mulai' => $this->request->getVar($h['value'] . "_mulaiIstirahat"),

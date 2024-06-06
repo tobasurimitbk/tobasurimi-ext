@@ -46,6 +46,17 @@
                     <input autocomplete="one-time-code" class="form-control noPPBKB search form-out-search" placeholder="Cari Nomor PPBKB / Mutasi" value="" />
                 </div>
             </div>
+            <?php if ($akunCeisa == null) : ?>
+                <div class="alert alert-danger mt-3 mb-3" role="alert">
+                    SILAHKAN HUBUNGKAN AKUN CEISA BEA CUKAI TERLEBIH DAHULU SEBELUM MENGGUNAKAN MODUL INI
+                </div>
+            <?php else : ?>
+                <?php if ($akunCeisa['status_integrasi'] === "0") : ?>
+                    <div class="alert alert-danger mt-3 mb-3" role="alert">
+                        SILAHKAN HUBUNGKAN AKUN CEISA BEA CUKAI TERLEBIH DAHULU SEBELUM MENGGUNAKAN MODUL INI
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">

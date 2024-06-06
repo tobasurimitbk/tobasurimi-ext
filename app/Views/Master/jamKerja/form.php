@@ -8,9 +8,25 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jam-kerja"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit">
-                <?= !empty($jamKerja) ? "Update" : "Tambah"; ?>
-            </button>
+            <?php if (empty($jamKerja)) : ?>
+                <?php if (can('Master Data', 'Jam Kerja', 'c')) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit">
+                        Simpan
+                    </button>
+                <?php endif; ?>
+            <?php else : ?>
+                <?php if (can('Master Data', 'Jam Kerja', 'd')) : ?>
+                    <button class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
+                        Hapus
+                    </button>
+                <?php endif; ?>
+                <?php if (can('Master Data', 'Jam Kerja', 'u')) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit">
+                        Simpan
+                    </button>
+                <?php endif; ?>
+            <?php endif; ?>
+
         </div>
     </div>
     <div class="card">
@@ -20,7 +36,7 @@
             </label>
             <form action="#" method="post" id="formPost" class="mt-4">
                 <?= csrf_field() ?>
-                <input type="hidden" value="<?= ($jamKerja != null) ? $jamKerja['id'] : null ?>" name="jamKerjaID">
+                <input type="hidden" value="<?= ($jamKerja != null) ? encrypt($jamKerja['id']) : null ?>" id="jamKerjaID" class="jamKerjaID" name="jamKerjaID">
                 <div class="row mb-3">
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -52,7 +68,7 @@
                                 <?php
                                 $jamKerjaDetailModel = new \App\Models\JamKerjaDetailModel();
                                 $jamKerjaDetail = $jamKerjaDetailModel->where('hari', $v['value'])
-                                    ->where('jam_kerja_id', ($jamKerja != null) ? $jamKerja['id'] : null)
+                                    ->where('jam_kerja_id', ($jamKerja != null) ? ($jamKerja['id']) : null)
                                     ->first();
                                 ?>
                                 <tr>
@@ -270,13 +286,7 @@
                                 }
 
                             },
-                            onError: function(response) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                });
-                            }
+
                         });
                     } else {
                         // INSERT
@@ -313,13 +323,7 @@
                                 }
 
                             },
-                            onError: function(response) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                });
-                            }
+
                         });
                     }
 
@@ -343,6 +347,54 @@
         });
 
     });
+
+    function deleteAction() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Jam Kerja ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                var id = $('#jamKerjaID').val();
+                var formData = new FormData();
+                formData.append("jamKerjaID", id);
+                $.ajax({
+                    url: `<?= base_url("jam-kerja/delete"); ?>`,
+                    method: "POST",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: res.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = "<?= base_url("jam-kerja"); ?>";
+                                });
+                        }
+                    }
+                })
+            }
+        })
+    }
 </script>
 
 <?= $this->endSection(); ?>

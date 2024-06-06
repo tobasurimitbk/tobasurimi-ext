@@ -21,6 +21,8 @@ class Bagian extends BaseController
     public function index($id)
     {
         $divisiModel = new DivisisModel();
+        $id = decrypt($id);
+
         $res = $divisiModel->select('divisis.*,jam_kerja.jenis')->join('jam_kerja', 'jam_kerja.id = divisis.jam_kerja_id')->where('divisis.id', $id)->first();
         if ($res == null) {
             return redirect()->to('divisi');
@@ -68,7 +70,7 @@ class Bagian extends BaseController
                 "no"                    => $no++,
                 "id"                    => $data['id'],
                 "kode_bagian"           => $data['kode_bagian'],
-                "nama_bagian"           => $data['nama_bagian'],
+                "nama_bagian"           => strtoupper($data['nama_bagian']),
             ]);
         }
 
@@ -100,7 +102,7 @@ class Bagian extends BaseController
             'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),
             'kode_bagian' => $this->request->getVar('kodeBagian'),
-            'nama_bagian' => $this->request->getVar('namaBagian'),
+            'nama_bagian' => strtoupper($this->request->getVar('namaBagian')),
         ]);
 
         return response()->setJSON([
@@ -141,7 +143,7 @@ class Bagian extends BaseController
         }
 
         $bagianModel->update($id, [
-            'nama_bagian' => $this->request->getVar('namaBagian'),
+            'nama_bagian' => strtoupper($this->request->getVar('namaBagian')),
         ]);
 
         return response()->setJSON([
