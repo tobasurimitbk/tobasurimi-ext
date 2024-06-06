@@ -239,7 +239,10 @@
             render: function(data, type, row) {
                 let id = row.id;
                 return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
-                `
+
+                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("surat-jalan/print/"); ?>${id}')" style="box-shadow: none !important;">
+                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                </button>`
             }
         }],
         columnDefs: [{
@@ -325,6 +328,10 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 </script>
 <?= $this->endSection(); ?>

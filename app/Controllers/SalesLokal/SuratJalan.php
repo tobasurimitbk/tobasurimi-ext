@@ -291,9 +291,7 @@ class SuratJalan extends BaseController
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
 
-        $customers = $this->CustomerModel->asObject()
-            ->where('company_id', $this->this_company_id)
-            ->findAll();
+        $customers = $this->CustomerModel->getCustomerLokal();
 
         $dataSuratJalan->shipping_date = date("m/d/Y", strtotime($dataSuratJalan->shipping_date));
         $dataSo = $this->SalesOrderModel
