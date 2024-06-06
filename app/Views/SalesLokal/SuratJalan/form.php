@@ -381,7 +381,14 @@
                 success: function(res) {
                     let so = $this.val();
                     if (so.length != 0) {
+                        console.log(res);
+                        res.map((row) => {
+                            const amount = parseFloat(row.amount)
+                            const disc = parseFloat(row.disc)
+                            row.amount = (amount * (100 - disc)) / 100
+                        })
                         table.clear();
+
                         table.rows.add(res).draw(false);
                     } else {
                         table.clear().draw(false);
