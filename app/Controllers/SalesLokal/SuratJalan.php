@@ -57,7 +57,8 @@ class SuratJalan extends BaseController
     public function createView()
     {
         //Get Customers
-        $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
+        $customers = $this->CustomerModel->getCustomerLokal();
+
 
 
 
@@ -418,6 +419,33 @@ class SuratJalan extends BaseController
 
         try {
             if (!empty($id)) {
+
+                $checkSJ = $this->SuratJalanModel
+                    ->where('id', $id)
+                    ->where('sales_order_invoice_id !=', null)
+                    ->first();
+
+
+
+                if ($checkSJ) {
+                    $data = [
+                        "status"     => false,
+                        "message"    => "Data Surat Jalan sudah digunakan tidak dapat dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+
+
+                $sJData = $this->SuratJalanModel->asObject()
+                    ->find($id);
+                foreach (json_decode($sJData->multiple_id_so) as $id_doc) {
+
+                    $this->SalesOrderModel->where('id', $id_doc)->set(['surat_jalan_so_id' => NULL])->update();
+                }
+
+
                 $this->SuratJalanModel->delete($id);
                 $data = [
                     "status"            => true,
@@ -597,7 +625,7 @@ class SuratJalan extends BaseController
         $code = "SJ";
         $currentYear = date('Y');
         $currentMonth = date('m');
-        $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/");
+        $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/", $this->this_company_id);
         $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
 
         return response()->setJSON([

@@ -156,12 +156,12 @@ class SuratJalanModel extends Model
         return $dataSuratJalan;
     }
 
-    public function getNumber($periode)
+    public function getNumber($periode, $id_company)
     {
 
         $no = 0;
         $dummyNum = 0;
-        $data = $this->asObject()->where("no_surat_jalan LIKE '%$periode%'")->orderBy('id', 'DESC')->first();
+        $data = $this->asObject()->where('id_company', $id_company)->where("no_surat_jalan LIKE '%$periode%'")->orderBy('id', 'DESC')->first();
         if ($data) {
             $pecah = explode("/", $data->no_surat_jalan);
             foreach ($pecah as $key => $item) {

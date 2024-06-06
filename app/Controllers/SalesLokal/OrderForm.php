@@ -949,6 +949,7 @@ class OrderForm extends BaseController
         $currentMonth = date('m');
         $numberTemplate = $code . "/" . $currentMonth . "/" . $currentYear . "/";
         $lastData = $this->SalesOrderModel->asObject()
+            ->where('id_company', $this->this_company_id)
             ->like('no_sales_order', $numberTemplate)
             ->orderBy('createdAt', 'DESC')
             ->first();
