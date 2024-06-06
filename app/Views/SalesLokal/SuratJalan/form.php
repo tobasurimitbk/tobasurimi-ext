@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? '' : ''; ?> multiple>
+                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? 'disabled' : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {
@@ -381,7 +381,7 @@
                 success: function(res) {
                     let so = $this.val();
                     if (so.length != 0) {
-                        console.log(res);
+
                         res.map((row) => {
                             const amount = parseFloat(row.amount)
                             const disc = parseFloat(row.disc)

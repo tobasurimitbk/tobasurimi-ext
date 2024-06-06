@@ -297,6 +297,7 @@ class SuratJalan extends BaseController
         $dataSo = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
+            ->where('id_company', $this->this_company_id)
             ->select(['id', 'no_sales_order'])
             ->findAll();
 
