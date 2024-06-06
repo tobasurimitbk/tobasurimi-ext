@@ -362,12 +362,6 @@ class ProductionResult extends BaseController
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
-
-            // var_dump($barangJadi);
-            // var_dump($barangDigunakan);
-            // var_dump($barangScrap);
-            // var_dump($barangFilling);
-            // exit;
             $productionResID = $this->productionResultModel->insert($datas);
 
             $productionResData = $this->productionResultModel->find($productionResID);
@@ -420,9 +414,11 @@ class ProductionResult extends BaseController
                     "type" => "DIGUNAKAN",
                     "no_ref" => $bd->ref_no,
                     "qty" => isset($bd->qty2) ? $qty2 : $qty,
+                    "kondisi_barang" => $bd->kondisi_barang,
                 ];
                 $this->productionResultDetailModel->insert($datasbd);
-                if (!$barangFilling && $qtySisa != 0) {
+
+                if (!$barangFilling && $qty2 != 0) {
                     $datasbr = [
                         "production_result_id" => $productionResID,
                         "material_request_detail_id" => $bd->material_request_detail_id,
@@ -492,6 +488,70 @@ class ProductionResult extends BaseController
                 "status"    => true,
                 "id"    => encrypt($productionResID),
                 "message"   => 'Data produksi berhasil disimpan',
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            $data = [
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateProductionResult()
+    {
+        try {
+            $productionResID = $this->request->getVar("id");
+            $barangJadi = json_decode($this->request->getVar("jadi"));
+            $barangDigunakan = json_decode($this->request->getVar("digunakan"));
+            $barangScrap = json_decode($this->request->getVar("scrap"));
+            $barangFilling = json_decode($this->request->getVar("filling"));
+
+            foreach ($barangJadi as $bj) {
+                $qty = isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty;
+                if ($qty && $qty != 0) {
+                    $datasbj = [
+                        "qty" => (float) $qty,
+                        "qty2" => (float) $bj->berat_isi_jadi,
+                        "qty_isi" => (float) $bj->qty_isi_jadi,
+                    ];
+                    $this->productionResultDetailModel->update($bj->production_result_detail_id, $datasbj);
+                }
+            }
+
+            foreach ($barangDigunakan as $bd) {
+                $qty = (float) $bd->qty;
+                $qty2 = isset($bd->qty2) ? (float) $bd->qty2 : 0;
+                $qtySisa = $qty - $qty2;
+                $datasbd = [
+                    "qty" => isset($bd->qty2) ? $qty2 : $qty,
+                ];
+                $this->productionResultDetailModel->update($bd->production_result_detail_id, $datasbd);
+            }
+
+            foreach ($barangScrap as $bs) {
+                $datasbs = [
+                    "qty" => (float) $bs->qty,
+                ];
+                $this->productionResultDetailModel->update($bs->production_result_detail_id, $datasbs);
+            }
+
+            foreach ($barangFilling as $bf) {
+                $datasbf = [
+                    "qty" => (float) $bf->qty,
+                ];
+                $this->productionResultDetailModel->update($bf->production_result_detail_id, $datasbf);
+            }
+
+            $data = [
+                "status"    => true,
+                "id"    => encrypt($productionResID),
+                "message"   => 'Data produksi berhasil diupdate',
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);

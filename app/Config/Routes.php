@@ -552,6 +552,7 @@ $routes->get('/production-result/details/(:segment)', 'Production\ProductionResu
 $routes->get('/production-result/all', 'Production\ProductionResult::getAll', ['filter' => 'Auth']);
 $routes->get('/production-result/create', 'Production\ProductionResult::createProductionResult', ['filter' => 'Auth']);
 $routes->post('/production-result/create', 'Production\ProductionResult::saveProductionResult', ['filter' => 'Auth']);
+$routes->post('/production-result/update', 'Production\ProductionResult::updateProductionResult', ['filter' => 'Auth']);
 $routes->get('/production-result/list-work-order', 'Production\ProductionResult::getListWorkOrderByID', ['filter' => 'Auth']);
 $routes->get('/production-result/list-material-request', 'Production\ProductionResult::getListMaterialRequestByID', ['filter' => 'Auth']);
 $routes->get('/production-result/material-request', 'Production\ProductionResult::getListMaterialRequestByWOID', ['filter' => 'Auth']);
