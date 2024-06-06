@@ -297,6 +297,7 @@ class SuratJalan extends BaseController
         $dataSo = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
+            ->where('id_company', $this->this_company_id)
             ->select(['id', 'no_sales_order'])
             ->findAll();
 
@@ -306,7 +307,7 @@ class SuratJalan extends BaseController
         // var_dump($dataSuratJalan);
         foreach ($dataSuratJalan->itemList as $value) {
             $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $value->harga_barang)));
-            $value->amount = toRupiah(floatval(str_replace('Rp', '', $value->amount)));
+            $value->amount = toRupiah(floatval(str_replace('Rp', '', $value->total_harga_barang)));
         }
 
         if ($dataSuratJalan->jenis_penjualan == 1) {
