@@ -41,6 +41,32 @@ class EmployeeJamKerjaModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function getJamKerjaUsedByEmployeeId($date, $employeeId)
+    {
+        $jamKerjaModel = new JamKerjaModel();
+        $employeeModel = new EmployeesModel();
+        $jamKerja = null;
+
+        // DAPATKAN JAM KERJA YANG DIGUNAKAN OLEH KARYAWAN
+        $jamKerjaEmployee = $this->where('employee_id', $employeeId)
+            ->where('tanggal', $date)
+            ->first();
+        if ($jamKerjaEmployee != null) {
+            // JAM KERJA DI SET PERHARI
+            $jamKerja = $jamKerjaModel->find($jamKerjaEmployee['jam_kerja_id']);
+        } else {
+            // JAM KERJA DEFAULT (AMBIL DARI DIVISI)
+            $result = $employeeModel->select('divisis.jam_kerja_id')
+                ->join('divisis', 'divisis.id = employees.division_id', 'left')
+                ->where('employees.id', $employeeId)
+                ->first();
+
+            $jamKerja = $jamKerjaModel->find($result['jam_kerja_id']);
+        }
+
+        return $jamKerja;
+    }
+
     public function getDetailJamKerjaByEmployee($employeeId, $yearMonth)
     {
         $employeesModel = new EmployeesModel();

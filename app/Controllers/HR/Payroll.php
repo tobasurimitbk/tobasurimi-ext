@@ -104,7 +104,7 @@ class Payroll extends BaseController
             $bagian = $bagianModel->where('id', $p->bagianID)->first();
             array_push($dataPayRolls, [
                 "no" => $no++,
-                "id" => $p->id,
+                "id" => encrypt($p->id),
                 "employee_id" => $p->employee_id,
                 "nip" => $p->employeesNIP,
                 "namaBagian" => ($bagian == null) ? "-" : $bagian['nama_bagian'],
@@ -405,6 +405,8 @@ class Payroll extends BaseController
 
     public function detailPayrollView($id)
     {
+        $id = decrypt($id);
+
         $payrollModel = new PayrollsModel();
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
@@ -480,7 +482,7 @@ class Payroll extends BaseController
         return \response()->setJSON([
             'message' => "Nominal pengurangan keterlambatan presensi berhasil diperbaruhi",
             'location' => "rekapKeterlambatanPresensi",
-            'id' => $payrollID
+            'id' => encrypt($payrollID)
         ]);
     }
 

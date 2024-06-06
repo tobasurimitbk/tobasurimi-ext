@@ -741,6 +741,10 @@ class PayrollsModel extends Model
         }
     }
 
+    static function getRekapGajiKaryawanPerHari($employeeID,)
+    {
+    }
+
     static function convertionIDRMoneyTotal($nilai)
     {
         $pecahan = array(

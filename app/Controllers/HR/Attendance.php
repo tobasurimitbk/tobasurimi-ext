@@ -8,6 +8,7 @@ use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
+use App\Models\EmployeeJamKerjaModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
 use App\Models\GolonganModel;
@@ -304,6 +305,7 @@ class Attendance extends BaseController
         $AttendanceModel = new AttendancesModel();
         $EmployeesModel = new EmployeesModel();
         $bigDaysModel = new BigDaysModel();
+        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
 
         Locale::setDefault('id_ID');
         $attendanceDetail = $AttendanceModel->where('periode', $tanggal)
@@ -318,9 +320,10 @@ class Attendance extends BaseController
             'jamTerlambat' => "-"
         ];
 
-        $keterangan = static::ketelambatanCheck(
-            $this->this_company_id,
-            $attendanceDetail['checkin']
+        $keterangan = static::keterlambatanCheck(
+            $tanggal,
+            $attendanceDetail['checkin'],
+            $employeeID
         );
 
         $resultData['keterangan'] = $keterangan[0];
@@ -337,6 +340,11 @@ class Attendance extends BaseController
                 }
             }
         }
+
+        // GET JAM KERJA USED
+        $jamKerja = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
+        // APPEND TO RESULT
+        $resultData['jamKerja'] = $jamKerja;
 
         return $this->response->setJSON([
             'data' => $resultData,
@@ -404,6 +412,7 @@ class Attendance extends BaseController
         $FormPerijinanModel = new FormPerijinanModel();
         $hariLiburModel = new BigDaysModel();
         $EmployeesModel = new EmployeesModel();
+        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
 
         Locale::setDefault('id_ID');
 
@@ -453,13 +462,16 @@ class Attendance extends BaseController
                 // ada absen di log
                 $result['status'] = "Hadir";
                 if ($logAttandance[0]->checkout != $logAttandance[0]->checkin) {
-                    // ada attandance (in dan out)
-                    $keterangan = static::ketelambatanCheck(
-                        $this->this_company_id,
-                        $result['checkIn']
-                    );
+
                     $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->checkin));
                     $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->checkout));
+
+                    // ada attandance (in dan out)
+                    $keterangan = static::keterlambatanCheck(
+                        $tanggal,
+                        $result['checkIn'],
+                        $employeeID
+                    );
 
                     $result['keterangan'] = $keterangan[0];
                     $result['jamTerlambat'] = $keterangan[1];
@@ -467,15 +479,21 @@ class Attendance extends BaseController
                     // ada attandance only(in)
                     $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->checkin));
                     // $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->checkout));
-                    $keterangan = static::ketelambatanCheck(
-                        $this->this_company_id,
-                        $result['checkIn']
+                    $keterangan = static::keterlambatanCheck(
+                        $tanggal,
+                        $result['checkIn'],
+                        $employeeID
                     );
                     $result['keterangan'] = $keterangan[0];
                     $result['jamTerlambat'] = $keterangan[1];
                 }
             }
         }
+
+        // GET JAM KERJA USED
+        $jamKerja = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
+        // APPEND TO RESULT
+        $result['jamKerja'] = $jamKerja;
 
         return \response()->setJSON([
             'status' => true,
@@ -811,12 +829,12 @@ class Attendance extends BaseController
     }
 
     // helper
-    static function ketelambatanCheck($companyID, $checkIN)
+    static function keterlambatanCheck($date, $checkIN, $employeeID)
     {
-        $jamKerjaModel = new JamKerjaModel();
+        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
         $result = "-";
 
-        $jamKerjaDetail = $jamKerjaModel->where('company_id', $companyID)->first();
+        $jamKerjaDetail = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($date, $employeeID);
 
         if ($jamKerjaDetail !== null && $checkIN != null) {
             $checkInTimestamp = strtotime($checkIN);

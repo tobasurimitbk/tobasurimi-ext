@@ -71,7 +71,8 @@ class AttendanceKeterlambatanModel extends Model
 
             if ($p['status'] == "HADIR_H") {
                 $keterlambatanCheck = static::ketelambatanCheck(
-                    $companyID,
+                    $p['periode'],
+                    $employeeID,
                     $p['checkin']
                 );
 
@@ -90,13 +91,13 @@ class AttendanceKeterlambatanModel extends Model
         }
     }
 
-    static function ketelambatanCheck($companyID, $checkIN)
+    static function ketelambatanCheck($tanggal, $employeeID, $checkIN)
     {
-        $jamKerjaModel = new JamKerjaModel();
+        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
         $result = "-";
         $totalJamTerlambat = "-";
 
-        $jamKerjaDetail = $jamKerjaModel->where('company_id', $companyID)->first();
+        $jamKerjaDetail = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
 
         if ($jamKerjaDetail !== null && $checkIN != null) {
             $checkInTimestamp = strtotime($checkIN);

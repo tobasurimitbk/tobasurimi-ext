@@ -3,19 +3,23 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= (!empty($lemburDetail)) ? "Detail" : "Tambah" ?> Lembur</h1>
+        <h1 class="title-name"><?= (!empty($lemburDetail)) ? "Detail" : "Simpan" ?> Lembur</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("lembur"); ?>">
                 Batal
             </a>
             <?php if (!empty($lemburDetail)) : ?>
-                <a href="#" class="btn btn-hapus delete-parent float-right delete-lembur" data-id="<?= $lemburDetail['id'] ?>">
-                    Hapus
-                </a>
+                <?php if (can('Personalia', 'Form Lembur', 'd')) : ?>
+                    <a href="#" class="btn btn-hapus delete-parent float-right delete-lembur" data-id="<?= encrypt($lemburDetail['id']) ?>">
+                        Hapus
+                    </a>
+                <?php endif; ?>
             <?php else : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit">
-                    Tambah
-                </button>
+                <?php if (can('Personalia', 'Form Lembur', 'c')) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit">
+                        Simpan
+                    </button>
+                <?php endif; ?>
             <?php endif ?>
         </div>
     </div>
@@ -38,7 +42,7 @@
                                 <option value=""> Pilih Nama Karyawan</option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= (!empty($lemburDetail)) ?  ($lemburDetail['division_id'] == $d['id'] ? "selected" : "") : ""  ?> value="<?= $d['id'] ?>">
-                                        <?= $d['divisi'] ?>
+                                        <?= strtoupper($d['divisi']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -138,7 +142,7 @@
                 <!-- Komponen Gaji -->
                 <div id="rincanLembur">
                     <div class="table-responsive mb-4">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="tabelGaji" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="tabelGaji" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="width: 10px;" class="sort">No</th>
@@ -264,7 +268,11 @@
             method: "POST",
             dataType: "json",
             beforeSend: function(xhr) {
+                // setLoading();
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                // stopLoading();
             },
             processData: false,
             contentType: false,
@@ -278,7 +286,7 @@
                     var lemburJamBerikutnya = response.lembur.lemburJamBerikutnya;
 
                     $.each(response.komponenGaji, function(index, data) {
-                        var newRow = $('<tr class="text-dark font-weight-bold">');
+                        var newRow = $('<tr style="color:whitesmoke; font-weight:bold;">');
                         var indexNumber = index + 1;
                         var nominal = "<?= !empty($lemburDetail) ? $lemburDetail['gaji_pokok_per_hari'] : "-" ?>"
                         newRow.append($('<td>').text(indexNumber));
@@ -325,7 +333,7 @@
                     $('input[name="gajiPokokPerHari"]').val(response.upah);
 
                     $.each(dataToAdd, function(index, data) {
-                        var newRow = $("<tr class='text-dark font-weight-bold'>");
+                        var newRow = $("<tr class='text-dark font-weight-bold' style='color:whitesmoke;'>");
                         newRow.append($("<td style='width: 10px;'>").text(data.column1));
                         newRow.append($("<td>").text(data.column2));
                         newRow.append($("<td>").text(data.column3));
@@ -487,6 +495,10 @@
                             data: formData,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
                             },
                             method: "POST",
                             dataType: "json",
@@ -546,6 +558,10 @@
             data: formData,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
             },
             method: "POST",
             dataType: "json",
