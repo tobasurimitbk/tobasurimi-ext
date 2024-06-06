@@ -350,7 +350,7 @@ class OrderForm extends BaseController
                 "ppn"      => $status_ppn
             ];
 
-            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
+            $checkSO = $this->SalesOrderModel->where('id_company', $this->this_company_id)->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
             if ($checkSO) {
                 $data = [
                     "status"    => false,

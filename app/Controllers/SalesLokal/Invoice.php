@@ -218,6 +218,17 @@ class Invoice extends BaseController
             $postItemsData = json_decode($this->request->getPost('items'), true);
             $documentData = null;
 
+            $checkINV = $this->SalesOrderInvoiceModel->where('id_company', $this->this_company_id)->where('UPPER(no_faktur)', strtoupper($postData['no_faktur']))->findAll();
+            if ($checkINV) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "No Faktur Sudah Digunakan",
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             // var_dump($postItemsData);
             // die;
 

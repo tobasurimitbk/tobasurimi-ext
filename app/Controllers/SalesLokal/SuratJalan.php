@@ -239,7 +239,7 @@ class SuratJalan extends BaseController
                 'multiple_no_so' => json_encode($noArray),
                 "id_company"     => $this->this_company_id,
             ];
-            $checkSJ = $this->SuratJalanModel->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
+            $checkSJ = $this->SuratJalanModel->where('id_company', $this->this_company_id)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
                 $data = [
                     "status"    => false,
