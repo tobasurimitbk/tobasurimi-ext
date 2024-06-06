@@ -141,7 +141,10 @@ class OrderForm extends BaseController
         ];
 
 
-        $condition = [];
+        $condition = [
+            "sales_order.id_company" => $this->this_company_id,
+            "sales_order.deletedAt" => null,
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -347,7 +350,7 @@ class OrderForm extends BaseController
                 "ppn"      => $status_ppn
             ];
 
-            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
+            $checkSO = $this->SalesOrderModel->where('id_company', $this->this_company_id)->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
             if ($checkSO) {
                 $data = [
                     "status"    => false,
@@ -381,9 +384,9 @@ class OrderForm extends BaseController
                     "harga_barang"          => str_replace(',', '', $row->harga_barang),
                     "amount"                => number_format($amountValue, 2, '.', ''),
                     "keterangan"            => $row->keterangan,
-                    "tax"                   => $row->statusppn,
                     "discount_percentage"   => number_format($row->disc, 2, '.', ''),
                     "tipe_input"            => "order_form",
+                    "status_ppn"            => $row->statusppn,
                     // "dept"                  => $row->dept,
                     // "id_warehouse"          => $row->warehouse_id,
                 ];
@@ -660,14 +663,27 @@ class OrderForm extends BaseController
         try {
             // $id = $this->request->getPost("id");
             $id = decrypt($this->request->getPost("id"));
-
+            // var_dump($id);
+            // die();
 
             if (!empty($id)) {
-                $checkSJ = $this->SalesOrderModel->where('id', $id)->where('surat_jalan_so_id !=', null)->orWhere('sales_order_invoice_id !=', null)->first();
+
+
+
+                $checkSJ = $this->SalesOrderModel
+                    ->where('id', $id)
+                    ->where('surat_jalan_so_id !=', null)
+                    ->orWhere('sales_order_invoice_id !=', null)
+                    ->where('id', $id)
+                    ->orWhere('used !=', "NOT USED")
+                    ->where('id', $id)
+                    ->first();
+
+
 
                 if ($checkSJ) {
                     $data = [
-                        "status"            => false,
+                        "status"     => false,
                         "message"    => "Data Order sudah digunakan tidak dapat dihapus",
                         'token' => csrf_hash()
                     ];
@@ -769,6 +785,7 @@ class OrderForm extends BaseController
             ->select('satuans.nama_satuan as nama_satuan')
             ->where('type_barang_sales', 'LOKAL')
             ->where('barang_master_sales.deletedAt', null)
+            ->where('barang_master_sales.company_id', $this->this_company_id)
             ->groupBy('id_barang')
             ->findAll();
 
@@ -932,6 +949,7 @@ class OrderForm extends BaseController
         $currentMonth = date('m');
         $numberTemplate = $code . "/" . $currentMonth . "/" . $currentYear . "/";
         $lastData = $this->SalesOrderModel->asObject()
+            ->where('id_company', $this->this_company_id)
             ->like('no_sales_order', $numberTemplate)
             ->orderBy('createdAt', 'DESC')
             ->first();

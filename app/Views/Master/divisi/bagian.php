@@ -6,9 +6,8 @@
         <h1 class="title-name">Set Bagian Departemen</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("divisi"); ?>">
-                Batal
+                Kembali
             </a>
-
         </div>
     </div>
     <div class="card">
@@ -81,7 +80,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th width="10">No</th>
+                                <th width="10px">No</th>
                                 <th>Kode Bagian</th>
                                 <th>Nama Bagian</th>
                                 <th>Action</th>
@@ -138,7 +137,7 @@
                 data: "no",
                 className: "text-center",
                 sortable: false,
-                width: "5%"
+                width: "3%"
             }, {
                 data: "kode_bagian",
                 className: "text-center"

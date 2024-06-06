@@ -41,6 +41,9 @@ class SalesOrderInvoiceModel extends Model
         'tipe_invoice',
         'status_pelunasan',
         'counter_print',
+        'id_company',
+        'document_no',
+        'status_posting',
     ];
 
     // Dates
@@ -85,6 +88,8 @@ class SalesOrderInvoiceModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "sales_order_invoice.*,
+        sales_order_invoice.document_no AS doc_no,
+        sales_order_invoice.document_type AS doc_type,
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
                       customers.name AS nama_pelanggan,
                       customers.kode AS kode_pelanggan,
@@ -158,9 +163,9 @@ class SalesOrderInvoiceModel extends Model
                       sales_order.nama_ecommerce";
 
         $dataSalesOrderInvoice = $this->asObject()
-            ->join('users', 'users.id = sales_order_invoice.id_user')
-            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
-            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id')
+            ->join('users', 'users.id = sales_order_invoice.id_user', 'left')
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'left')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->select($selectQry)
             ->find($id);
@@ -168,7 +173,7 @@ class SalesOrderInvoiceModel extends Model
         return $dataSalesOrderInvoice;
     }
 
-    public function generateNoFaktur(): string
+    public function generateNoFaktur($id_company): string
     {
         $format = "LKL/INV";
         $month = idate('m');
@@ -182,6 +187,7 @@ class SalesOrderInvoiceModel extends Model
         //     ->first();
 
         $lastData = $this->asObject()
+            ->where('id_company', $id_company)
             ->where("no_faktur LIKE '%$numberTemplate%'")
             ->orderBy('createdAt', 'DESC')
             ->first();

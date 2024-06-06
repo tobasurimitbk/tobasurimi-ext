@@ -70,6 +70,7 @@
                                 <th onclick="changeSort('tipe_invoice')" class="sort">Jenis Invoice</th>
                                 <th onclick="changeSort('document_type')" class="sort">Jenis Dokumen</th>
                                 <th onclick="changeSort('document_no')" class="sort">No Dokumen</th>
+                                <th onclick="changeSort('status')" class="sort">Status</th>
                                 <th onclick="changeSort('counter_print')" class="sort">Print</th>
 
                                 <th class="sort">Action</th>
@@ -241,14 +242,31 @@
                 }
             },
             {
+                data: "status",
+                className: "text-center"
+            },
+            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                    let status = row.status
+                    if (status == "Waiting") {
+                        return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+
+                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                </button>
                     `
+                    } else {
+                        return `
+                        <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                    `
+                    }
+
                 }
             }
         ],
@@ -335,6 +353,10 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 </script>
 <?= $this->endSection(); ?>

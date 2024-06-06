@@ -444,10 +444,12 @@ $routes->get('/invoice-penjualan-lokal/all', 'SalesLokal\Invoice::all', ['filter
 $routes->post('/invoice-penjualan-lokal/save', 'SalesLokal\Invoice::save', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/update', 'SalesLokal\Invoice::update', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', ['filter' => 'Auth']);
-$routes->get('/invoice-penjualan-lokal/getDocNumber/(:alpha)', 'SalesLokal\Invoice::getDocNumber/$1', ['filter' => 'Auth']);
+$routes->post('/invoice-penjualan-lokal/posting',  'SalesLokal\Invoice::posting', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/getDocNumber/(:segment)/(:segment)', 'SalesLokal\Invoice::getDocNumber/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getDocumentData/(:alpha)/(:num)', 'SalesLokal\Invoice::getDocData/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getItemList/(:num)', 'SalesLokal\Invoice::getItemList/$1', ['filter' => 'Auth']);
-$routes->get('/invoice-penjualan-lokal/print/(:num)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/print/(:segment)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
+// $routes->post('/invoice-penjualan-lokal/print',  'SalesLokal\Invoice::printInvoice', ['filter' => 'Auth']);
 
 // Surat Jalan
 $routes->get('/surat-jalan', 'SalesLokal\SuratJalan::index', ['filter' => 'Auth']);
@@ -910,6 +912,7 @@ $routes->post('/mutasi/delete', 'Inventori\Mutasi::delete', ['filter' => 'Auth']
 $routes->post('/mutasi/posting', 'Inventori\Mutasi::posting', ['filter' => 'Auth']);
 $routes->get('/mutasi/id/(:segment)', 'Inventori\Mutasi::detail/$1', ['filter' => 'Auth']);
 $routes->get('/mutasi/all', 'Inventori\Mutasi::all', ['filter' => 'Auth']);
+$routes->post('/mutasi/un-posting', 'Inventori\Mutasi::unPosting', ['filter' => 'Auth']);
 // PENERIMAAN MUTASI
 $routes->get('/penerimaan-mutasi', 'Inventori\PenerimaanMutasi::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/create', 'Inventori\PenerimaanMutasi::create', ['filter' => 'Auth']);
@@ -934,6 +937,7 @@ $routes->post('/mutasi/save-global', 'Inventori\MutasiGlobal::createAction', ['f
 $routes->post('/mutasi/update-global', 'Inventori\MutasiGlobal::updateAction', ['filter' => 'Auth']);
 $routes->post('/mutasi/delete-global', 'Inventori\MutasiGlobal::delete', ['filter' => 'Auth']);
 $routes->post('/mutasi/posting-global', 'Inventori\MutasiGlobal::posting', ['filter' => 'Auth']);
+$routes->post('/mutasi/un-posting-global', 'Inventori\MutasiGlobal::unposting', ['filter' => 'Auth']);
 
 
 // PENERIMAAN BARANG LOKAL BP
@@ -1191,46 +1195,45 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
 });
 
 // BC 2.7
+$routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BC27::index');
+    $routes->get('all', 'BeaCukai\BC27::all');
+    $routes->get('create', 'BeaCukai\BC27::create');
+    $routes->get('id/(:segment)', 'BeaCukai\BC27::detail/$1');
+    $routes->post('save', 'BeaCukai\BC27::createAction');
+    $routes->post('update', 'BeaCukai\BC27::updateAction');
+    $routes->post('delete', 'BeaCukai\BC27::delete');
+    $routes->post('posting', 'BeaCukai\BC27::posting');
+    $routes->get('check-no-aju', 'BeaCukai\BC27::checkNoAju');
 
-
-// BC 2.5
-$routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'BeaCukai\BeaCukaiController::bc25View');
-    $routes->get('all', 'BeaCukai\BeaCukaiController::bc25All');
-    $routes->get('create', 'BeaCukai\BeaCukaiController::bc25CreateFormView');
-    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc25GetByIdFormView/$1');
-    $routes->post('save', 'BeaCukai\BeaCukaiController::bc25SaveForm');
-    $routes->post('update', 'BeaCukai\BeaCukaiController::bc25UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
+    $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
+    $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
 });
 
-// BC 2.6.1
-$routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
-    $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
-    $routes->get('create', 'BeaCukai\BeaCukaiController::bc261CreateFormView');
-    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc261GetByIdFormView/$1');
-    $routes->post('save', 'BeaCukai\BeaCukaiController::bc261SaveForm');
-    $routes->post('update', 'BeaCukai\BeaCukaiController::bc261UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
-});
+// PPBKB
+$routes->group('bea-cukai-ppbkb', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\PPBKB::index');
+    $routes->get('all', 'BeaCukai\PPBKB::all');
+    $routes->get('create', 'BeaCukai\PPBKB::create');
+    $routes->post('save', 'BeaCukai\PPBKB::createAction');
+    $routes->post('update', 'BeaCukai\PPBKB::updateAction');
+    $routes->get('id/(:segment)', 'BeaCukai\PPBKB::detail/$1');
+    $routes->post('posting', 'BeaCukai\PPBKB::posting');
+    $routes->post('delete', 'BeaCukai\PPBKB::delete');
+    $routes->get('print/(:segment)', 'BeaCukai\PPBKB::print/$1');
 
-// BC 2.6.2
-$routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
-    $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
-    $routes->get('create', 'BeaCukai\BeaCukaiController::bc261CreateFormView');
-    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc261GetByIdFormView/$1');
-    $routes->post('save', 'BeaCukai\BeaCukaiController::bc261SaveForm');
-    $routes->post('update', 'BeaCukai\BeaCukaiController::bc261UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
+    $routes->get('list-mutasi', 'BeaCukai\PPBKB::dropdownMutasi');
+    $routes->get('list-no-ijin-tpb', 'BeaCukai\PPBKB::dropdownNoIjinTPB');
+    $routes->get('list-barang-mutasi', 'BeaCukai\PPBKB::getListMutasiDetail');
+    $routes->get('get-no', 'BeaCukai\PPBKB::getNo');
 });
-
-$routes->get('/bea-cukai-bc-27', 'BeaCukai\BeaCukaiController::bc27View', ['filter' => 'Auth']);
-$routes->get('/bea-cukai-bc-40', 'BeaCukai\BeaCukaiController::bc40View', ['filter' => 'Auth']);
-$routes->get('/bea-cukai-bc-41', 'BeaCukai\beaCukaiController::bc41View', ['filter' => 'Auth']);
 
 // HUMAN RESOURCE
+// JAM KERJA KARYAWAN
+$routes->get('/employee/jam-kerja/(:segment)', 'HR\EmployeeJamKerja::index/$1', ['filter' => 'Auth']);
+$routes->get('/employee/get-jam-kerja-detail', 'HR\EmployeeJamKerja::getDetailJamKerja', ['filter' => 'Auth']);
+$routes->post('/employee/update-jam-kerja', 'HR\EmployeeJamKerja::createOrUpdate', ['filter' => 'Auth']);
+
 // Attendance
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
@@ -1288,13 +1291,6 @@ $routes->get('/payroll/print/division/(:segment)/(:segment)', 'HR\Payroll::expor
 $routes->get('/payroll/print/detail/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivisionDetail/$1/$2', ['filter' => 'Auth']);
 $routes->get('/payroll/print/summary/(:segment)/(:segment)', 'HR\Payroll::exportPdfSummary/$1/$2', ['filter' => 'Auth']);
 $routes->get('/payroll/print/potongan/(:segment)/(:segment)', 'HR\Payroll::exportPdfPotongan/$1/$2', ['filter' => 'Auth']);
-
-
-// formula payroll
-$routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);
-$routes->get('/formula-payroll/create', 'HR\FormulaPayroll::createView', ['filter' => 'Auth']);
-$routes->post('/formula-payroll/save', 'HR\FormulaPayroll::create', ['filter' => 'Auth']);
-$routes->post('/formula-payroll/update', 'HR\FormulaPayroll::update', ['filter' => 'Auth']);
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::pinjamanKaryawan', ['filter' => 'Auth']);

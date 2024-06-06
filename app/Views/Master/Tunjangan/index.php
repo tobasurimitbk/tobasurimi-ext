@@ -27,13 +27,13 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select" required name="tipe" aria-label="Floating label select example">
                                     <option value="">
-                                        - PILIH STATUS
+                                        PILIH STATUS
                                     </option>
                                     <option value="PLUS">
-                                        - PENAMBAHAN GAJI -
+                                        PENAMBAHAN GAJI (+)
                                     </option>
                                     <option value="MINUS">
-                                        - PENGURANGAN GAJI -
+                                        PENGURANGAN GAJI (-)
                                     </option>
                                 </select>
                                 <label for="floatingInput">Pilih Status</label>
@@ -89,6 +89,11 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <?php if ($isGajiPokok == null || $isCadangan == null) : ?>
+                <div class="alert alert-danger mt-3 mb-3" role="alert">
+                    KOMPONEN GAJI POKOK DAN KOMPONEN CADANGAN BELUM ADA
+                </div>
+            <?php endif; ?>
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
@@ -99,8 +104,8 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th onclick="changeSort('name')" class="sort">Nama</th>
+                                <th style="width: 10px;">No</th>
+                                <th onclick="changeSort('name')" class="sort">Komponen Gaji</th>
                                 <th onclick="changeSort('tipe')" class="sort">Status</th>
                             </tr>
                         </thead>
@@ -154,7 +159,7 @@
                 data: "no",
                 className: "text-center",
                 sortable: false,
-                width: "5%"
+                width: "3%"
             },
             {
                 data: "name",
@@ -162,7 +167,24 @@
             },
             {
                 data: "tipe",
-                className: "text-center"
+                className: "text-center",
+                width: "3%",
+                render: function(data, type, row) {
+                    let htmlRes = '';
+                    if (row.tipe == "+") {
+                        htmlRes += `
+                            <div class="text-success">
+                               <b>(+)</b>
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                               <b>(-)</b>
+                            </div>`
+                    }
+
+                    return htmlRes;
+                }
             }
         ],
         columnDefs: [{

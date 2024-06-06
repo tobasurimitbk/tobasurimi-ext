@@ -20,7 +20,16 @@ class Tunjangan extends BaseController
 
     public function ListTunjangan()
     {
-        return view('Master/Tunjangan/index');
+        // KASIH ALERT BAHWA KOMPONEN IS CADANGAN DAN IS GAJI POKOK WAJIB ADA
+        $isGajiPokok = $this->TunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', '1')->first();
+        $isCadangan = $this->TunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', '1')->first();
+
+        $data = [
+            'isGajiPokok' => $isGajiPokok,
+            'isCadangan' => $isCadangan
+        ];
+
+        return view('Master/Tunjangan/index', $data);
     }
 
     public function allTunjangan()
@@ -56,7 +65,7 @@ class Tunjangan extends BaseController
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "name"                  => $data->name,
-                "tipe"                  => ($data->tipe == "PLUS") ? "Penambahan Gaji" : "Pengurangan Gaji"
+                "tipe"                  => ($data->tipe == "PLUS") ? "+" : "-"
             ]);
         }
 
@@ -120,7 +129,7 @@ class Tunjangan extends BaseController
 
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "name" => $this->request->getPost("nama"),
+                    "name" => strtoupper($this->request->getVar("nama")),
                     "tipe" => $this->request->getPost("tipe"),
                     "is_gaji_harian" => $isGajiPokokPerHari,
                     "is_cadangan" => $isCadangan
@@ -231,7 +240,7 @@ class Tunjangan extends BaseController
 
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "name" => $this->request->getPost("nama"),
+                    "name" => strtoupper($this->request->getVar("nama")),
                     "tipe" => $this->request->getPost("tipe"),
                     "is_gaji_harian" => $isGajiPokokPerHari,
                     "is_cadangan" => $isCadangan

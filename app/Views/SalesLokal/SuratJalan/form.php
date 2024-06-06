@@ -51,7 +51,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php
                                     }
                                 }
@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? 'disabled' : ''; ?> multiple>
+                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? '' : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {

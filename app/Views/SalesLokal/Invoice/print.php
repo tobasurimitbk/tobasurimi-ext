@@ -129,8 +129,8 @@
                         <tr>
                             <td style="width: 1px;vertical-align: top">Penagihan: </td>
                             <td class="rounded-border" style="padding: 5px">
-                                <div><?= $soData[0]->customerName ?></div>
-                                <div><?= $soData[0]->customerAddress ?></div>
+                                <div><?= $invData->customer_name ?></div>
+                                <div><?= $invData->customer_address ?></div>
                             </td>
                         </tr>
                     </table>
@@ -152,13 +152,20 @@
                     <tr>
                         <td style="border: 1px solid;border-style: dashed dashed hidden hidden">
                             <div>No. PO</div>
-                            <div class="txt-center"><?= $soData[0]->no_po ?>&nbsp;</div>
+                            <div class="txt-center"><?= $invData->no_po ?>&nbsp;</div>
                         </td>
 
 
                         <td style="border-top: 1px solid;border-top-style: dashed">
                             <div>SJ/OF No.</div>
-                            <div class="txt-center"><?= $invData->docNo ?>&nbsp;</div>
+                            <?php
+                            // Karakter yang akan dihapus
+                            $unwanted_characters = array('[', '"', ']');
+
+                            // Gantikan karakter tidak diinginkan dengan string kosong
+                            $cleaned_string_document_no = str_replace($unwanted_characters, '', $invData->document_no);
+                            ?>
+                            <div class="txt-center" style="font-size: 10px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
                         </td>
                     </tr>
                 </table>
@@ -166,7 +173,7 @@
         </tr>
     </table>
 
-    <table class="item-table" border="1" style="border-collapse: collapse">
+    <table class=" item-table" border="1" style="border-collapse: collapse">
         <tr>
             <th>No</th>
             <th style="height: 1px;">Item Description</th>
@@ -179,16 +186,16 @@
         <?php
         $rowNumber = 1;
         foreach ($soData as $detail) :
-            $totalWithoutDisc = $detail->amt / ((100 - $detail->disc_pct) / 100);
+
         ?>
             <tr>
                 <td class="txt-center" style="height: 1px;"><?= $rowNumber ?></td>
-                <td><?= $detail->namaBarang ?></td>
-                <td class="txt-center"><?= $detail->qty ?></td>
-                <td class="txt-center"><?= $detail->kodeSatuan ?></td>
-                <td class="txt-center">Rp. <?= number_format($totalWithoutDisc / $detail->qty) ?></td>
-                <td class="txt-center"><?= $detail->disc_pct ?></td>
-                <td class="txt-right">Rp. <?= number_format($detail->amt) ?></td>
+                <td><?= $detail->nama_barang ?></td>
+                <td class="txt-center"><?= $detail->qty_invoice ?></td>
+                <td class="txt-center"><?= $detail->satuan ?></td>
+                <td class="txt-center">Rp. <?= number_format($detail->harga_barang) ?></td>
+                <td class="txt-center"><?= $detail->disc ?></td>
+                <td class="txt-right">Rp. <?= number_format($detail->amount) ?></td>
             </tr>
         <?php
             $rowNumber++;
@@ -211,7 +218,7 @@
         <tr>
             <td style="width: 40px;" valign="top">Say : </td>
             <td class="rounded-border" style="width: 65%;" valign="top">
-                <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? terbilang($invData->total_invoice) : terbilang($invTotal) ?>
+                <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? terbilang($invData->total_invoice) : terbilang($invData->total_invoice) ?>
             </td>
             <td class="rounded-border">
                 <table class="w-100" style="border-collapse: collapse">
@@ -260,7 +267,7 @@
                 <table class="w-100 rounded-border" style="margin-bottom: 3px;">
                     <tr>
                         <td>Tot Sub Stlh Pjk</td>
-                        <td class="txt-right">Rp. <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? number_format($invData->total_invoice) : number_format($invData->total_invoice) ?></td>
+                        <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
                     </tr>
                 </table>
                 <div class="rounded-border" style="margin-bottom: 3px;">&nbsp;</div>
@@ -268,7 +275,7 @@
                     <table class="w-100 txt-bold" style="border-collapse: collapse;">
                         <tr>
                             <td style="border-right: 1px solid;width: 100px">Total Invoice : </td>
-                            <td class="txt-right">Rp. <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? number_format($invData->total_invoice) : number_format($invTotal) ?></td>
+                            <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
                         </tr>
                     </table>
                 </div>

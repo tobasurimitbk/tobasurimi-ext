@@ -50,6 +50,7 @@ class MutasiDetailModel extends Model
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
         $supplierModel = new SupplierModel();
+        $ppbkbDetailModel = new PPBKBDetailModel();
 
         $result = array();
         $mutasiDetail = $this->asArray()->where('mutasi_id', $mutasiID)->findAll();
@@ -68,15 +69,23 @@ class MutasiDetailModel extends Model
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
                 $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
                 $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+                $kodeBarang = $barangMaster['kode_barang'];
             } else {
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
                 $satuan = $satuanModel->find($kemasan['satuan_id']);
                 $barangName = $kemasan['name'];
+                $kodeBarang = $kemasan['kode'];
             }
 
             $supplier = $supplierModel->select('suppliers.*')
                 ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
                 ->where('penerimaan_barang.no_penerimaan_barang', $stockList['no_dokumen_1'])
+                ->first();
+
+            $ppbkbDetail = $ppbkbDetailModel->select('ppbkb_detail.*,hs_codes.code, hs_codes.uraian_barang')
+                ->join('hs_codes', 'hs_codes.id = ppbkb_detail.hs_code_id', 'left')
+                ->where('mutasi_id', $m['mutasi_id'])
+                ->where('mutasi_detail_id', $m['id'])
                 ->first();
 
             $stockList['qty'] = $m['qty'];
@@ -91,6 +100,11 @@ class MutasiDetailModel extends Model
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
             $stockList['stok_total'] = $stockList['stok_total'];
+            $stockList['kode_barang'] = $kodeBarang;
+            $stockList['mutasi_id'] = $m['mutasi_id'];
+            $stockList['mutasi_detail_id'] = $m['id'];
+            $stockList['hs_code_id'] = $ppbkbDetail == null ? null : $ppbkbDetail['hs_code_id'];
+            $stockList['hs_code'] = $ppbkbDetail == null ? null : $ppbkbDetail['code'] . " - " . $ppbkbDetail['uraian_barang'];
 
             array_push($result, $stockList);
         }

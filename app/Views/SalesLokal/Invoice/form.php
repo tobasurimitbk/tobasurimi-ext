@@ -11,14 +11,27 @@
             </a>
 
             <?php if (!empty($data)) : ?>
-                <a class="btn btn-warning btn-print float-right" href="<?= base_url("invoice-penjualan-lokal/print/{$data->id}"); ?>" target="_blank">
+                <a class="btn btn-warning btn-print float-right" href="<?= base_url("invoice-penjualan-lokal/print/{$invoice_id}"); ?>" target="_blank">
                     Print
                 </a>
             <?php endif; ?>
 
-            <button class="btn btn-show-form btn-save float-right btn-submit">
-                Simpan
-            </button>
+            <?php if (!empty($documentData)) : ?>
+                <?php if ($data->status_posting == "0") : ?>
+
+                    <button class="btn btn-success posting-spp float-right posting-invoice">
+                        Posting
+                    </button>
+                    <button class="btn btn-show-form btn-save float-right btn-submit">
+                        Simpan
+                    </button>
+                <?php endif; ?>
+            <?php else : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit">
+                    Simpan
+                </button>
+            <?php endif; ?>
+
         </div>
     </div>
     <div class="card">
@@ -36,7 +49,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" value="<?= $data->tanggal_faktur ?? ""; ?>" placeholder="Tanggal Faktur"></input>
+                            <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" value="<?= $data->tanggal_faktur ?? ""; ?>" placeholder="Tanggal Faktur" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?>></input>
                             <label for="floatingInput">Tanggal Faktur</label>
                         </div>
                     </div>
@@ -49,29 +62,63 @@
                                 <option value="pengiriman" <?= !empty($data) ? ($data->document_type == 'pengiriman' ? 'selected' : "") : ""; ?>>Pengiriman</option>
                             </select>
                             <label for="floatingInput">Jenis Dokumen</label>
-
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select" name="doc_id" id="doc_id" <?= !empty($data) ? 'disabled' : ''; ?>>
-                                <option value=""></option>
-                                <?php foreach ($documentList ?? [] as $document) : ?>
-                                    <option value="<?= $document->id ?>" <?= $data->document_id == $document->id ? 'selected' : '' ?>><?= $document->doc_no ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Nomor Dokumen</label>
 
+
+                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataCustomers)) {
+                                    foreach ($dataCustomers as $customer) {
+                                ?>
+                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput">Pilih Customer</label>
                         </div>
                     </div>
+
+
+
+                    <?php
+                    $selectedDocIds = !empty($data) ? json_decode($data->document_id) : [];
+                    $selectedDocNos = !empty($data) ? json_decode($data->document_no) : [];
+                    ?>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="customerName" value="<?= $documentData->customerName ?? '' ?>" disabled>
-                            <label for="floatingInput">Nama Konsumen</label>
+                            <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?>>
+                                <option value=""></option>
+                                <?php if (!empty($data)) : ?>
+                                    <?php if (!empty($selectedDocIds)) : ?>
+                                        <?php foreach ($selectedDocIds as $i => $id) : ?>
+                                            <option selected value="<?= $id ?>"><?= $selectedDocNos[$i] ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+
+                                    <?php foreach ($documentList as $row) : ?>
+                                        <?php if (!in_array($row->id, $selectedDocIds)) : ?>
+                                            <option value="<?= $row->id ?>"><?= $row->doc_no ?></option>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+
+
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput">Nomor Dokumen</label>
                         </div>
                     </div>
+
+
+
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>" disabled>
@@ -84,7 +131,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
 
-                            <select class="form-select termin" id="termin" name="termin">
+                            <select class="form-select termin" id="termin" name="termin" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?>>
                                 <?php if ($termin != "") : ?>
                                     <option value=""></option>
                                     <?php foreach ($termin as $row) : ?>
@@ -132,7 +179,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via_id === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($via as $payload) : ?>
                                     <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via_id) ? ($payload->id === $data->ship_via_id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
@@ -148,7 +195,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 70px;">
-                            <textarea autocomplete="one-time-code" style="height: 100%;" <?= !empty($data->keterangan) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= $data->keterangan ?? ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" style="height: 100%;" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?> class="form-control Keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= $data->keterangan ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -159,7 +206,7 @@
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= !empty($data->status_tax) ? ($data->status_tax == 'true') ? 'checked' : '' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?> <?= !empty($data->status_tax) ? ($data->status_tax == 'true') ? 'checked' : '' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -170,7 +217,7 @@
                                     <label for="floatingInput">Include Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= !empty($data->termasuk_pa) ? ($data->termasuk_pa == 'true') ? 'checked' : '' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= !empty($data->termasuk_pa) ? ($data->termasuk_pa == 'true') ? 'checked' : '' : ''; ?> <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -194,7 +241,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>No.</th>
+
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Qty Awal</th>
@@ -261,10 +308,6 @@
         searching: false,
         ordering: false,
         columns: [{
-                data: "no",
-                className: "text-center",
-            },
-            {
                 data: "kode_barang",
                 className: "text-center"
             },
@@ -284,12 +327,24 @@
                 data: null,
                 className: "text-center",
                 render: function(data, type, row, meta) {
+
                     var qtyValue = row.qty_input !== undefined ? row.qty_input : row.qty_sekarang;
-                    if (type === 'display') {
-                        return '<input onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" value="' + qtyValue + '">';
-                    } else {
-                        return qtyValue;
-                    }
+                    <?php if (!empty($documentData) && ($data->status_posting != "0")) : ?>
+                        if (type === 'display') {
+                            return '<input onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" readonly value="' + qtyValue + '">';
+                        } else {
+                            return qtyValue;
+                        }
+                    <?php else : ?>
+                        if (type === 'display') {
+                            return '<input onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" value="' + qtyValue + '">';
+                        } else {
+                            return qtyValue;
+                        }
+
+                    <?php endif; ?>
+
+
                 }
             },
             {
@@ -325,6 +380,9 @@
     // Display the date on the webpage
     $(document).ready(function() {
 
+        // let customerId = $('.id_customer option:selected').val();
+        // let docType = $('#doc_type option:selected').val();
+
 
         <?php if ($termin == "") : ?>
 
@@ -346,7 +404,7 @@
 
 
         // via
-        $('.ship_via, #doc_id, .termin').select2({
+        $('.ship_via, .termin').select2({
             placeholder: "",
             theme: "bootstrap-5"
         });
@@ -357,15 +415,25 @@
             theme: "bootstrap-5"
         }).change(function() {
 
-            // clear datatable here
+            let customerId = $('.id_customer option:selected').val();
+            let docType = $('#doc_type option:selected').val();
 
-            getDocumentList(this.value);
-
+            getDocumentList(docType, customerId);
         });
 
-        $("#doc_id").change(function() {
-            getDocumentData(this.value);
+        $(".id_customer").select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: false
+        }).change(function() {
+
+            let customerId = $('.id_customer option:selected').val();
+            let docType = $('#doc_type option:selected').val();
+
+            getDocumentList(docType, customerId);
         });
+
+
 
         $("#tanggal_faktur").datepicker({
             todayHighlight: true,
@@ -375,14 +443,14 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.ship_via')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ship_via')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -390,7 +458,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ship_via, #doc_type, #doc_id, .termin')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, #doc_type, .termin')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -400,53 +468,9 @@
             theme: "bootstrap-5"
         })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.id_customer')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.id_customer')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_customer')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // SO
-        $('.id_so').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_so')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_so')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_so')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
         // Surat jalan
         $('.id_surat_jalan').select2({
@@ -454,46 +478,26 @@
             theme: "bootstrap-5"
         })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.id_surat_jalan')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.id_surat_jalan')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_surat_jalan')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
 
 
-        function getDocumentList(docType) {
-            table.clear();
+        function getDocumentList(docType, idCustomer) {
 
             $.ajax({
-                url: `<?= base_url('/invoice-penjualan-lokal/getDocNumber/'); ?>${docType}`,
+                url: `<?= base_url('/invoice-penjualan-lokal/getDocNumber/'); ?>${docType}/${idCustomer}`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     $("#doc_id").empty();
-                    $("#doc_id").append(`<option value=""></option>`);
-
                     res.data.forEach(function(item) {
-                        $("#doc_id").append(`<option  value="${item.id}">${item.doc_no}</option>`);
-                    })
+                        $("#doc_id").append(`<option value="${item.id}">${item.doc_no}</option>`);
+                    });
+                    $("#doc_id").trigger('change');
                 }
             });
         }
+
+
 
         function getTerminList() {
 
@@ -523,76 +527,122 @@
             })
         }
 
+        // doc
+        $('.doc_id').select2({
+            placeholder: "",
+            // theme: "bootstrap-5",
+            allowClear: false,
+        }).change(function() {
+
+            var selectedDocs = $(this).val();
+
+            <?php if (!empty($data)) : ?>
+
+                var array1 = (<?= ($data->document_id) ?>);
+                var difference = selectedDocs.filter(item => !array1.includes(Number(item)));
+
+                // console.log(array1);
+                // console.log(difference);
+                // Fetch data for newly selected documents
+                if (difference && difference.length > 0) {
+                    difference.forEach(docId => getDocumentData(docId));
+                }
+            <?php else : ?>
+
+                if (selectedDocs && selectedDocs.length > 0) {
+                    selectedDocs.forEach(docId => getDocumentData(docId));
+                }
+
+            <?php endif; ?>
+
+
+            // Remove items for documents that are no longer selected
+            updateItemList(selectedDocs);
+
+        });
+
+
         function getDocumentData(docId) {
+
+            <?php if (empty($data)) : ?>
+
+                table.clear();
+                list_items = [];
+
+            <?php endif; ?>
+
+
             const docType = $('#doc_type').val();
-
-            table.clear();
-            list_items = [];
-
             $.ajax({
                 url: `<?= base_url('/invoice-penjualan-lokal/getDocumentData/'); ?>${docType}/${docId}`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-
+                    console.log(res);
+                    // Populate the form fields with document data
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
                     $('#customerAddress').val(res.customerAddress);
                     $('#nama_ecommerce').val(res.nama_ecommerce);
                     $('#no_po').val(res.no_po);
                     $('#termin').val(res.termin).change();
-
                     $('#jenis_penjualan').val(res.jenis_penjualan).change();
 
-                    // add datatable data here
-                    table.rows.add(res.itemList).draw(false);
+                    // console.log('sebelum foreach', list_items);
+                    // Add items to list_items array
                     res.itemList.forEach(function(item) {
+
                         list_items.push(item);
+
+
                     });
 
-                    // add total here
-                    $('#itemSubTotal').html(res.dpp);
-                    $('#taxTotal').html(res.tax);
-                    $('#grandTotal').html(res.total);
+
+                    // Update DataTable
+                    table.rows.add(res.itemList).draw(false);
+                    // drawTableItem(list_items);
+
+
+                    // Update totals
+                    // Recount totals
+                    reCountTotal();
                 },
-                onError: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    stopLoading()
+                error: function(xhr, status, error) {
+                    console.error(`Error fetching data for document ID ${docId}:`, error);
                 }
             });
         }
 
-        <?php if (!empty($documentData)) : ?>
-            const itemList = <?= json_encode($documentData->itemList) ?>;
+        <?php if (!empty($documentData)) : ?> <?php if ($data->status_posting == "0") : ?>
+                const itemList = <?= json_encode($documentData->itemList) ?>;
+            <?php else : ?>
+                const itemList = <?= json_encode($documentData->itemListPosting) ?>;
+            <?php endif; ?>
+            console.log(itemList);
             table.rows.add(itemList).draw(false);
             itemList.forEach(function(item) {
                 list_items.push(item);
             });
-            // $('#itemSubTotal').html('<?= $documentData->dpp ?>');
-            // $('#taxTotal').html('<?= $documentData->tax ?>');
-            // $('#grandTotal').html('<?= $documentData->total ?>');
+            // drawTableItem(itemList);
+
         <?php endif; ?>
 
-        $('#tax_status').on('input change paste', function() {
 
+
+
+
+        $('#tax_status').on('input change paste', function() {
             if (!this.checked) {
                 $('#include_tax').prop('checked', false);
             }
-
             reCountTotal();
         });
+
         $('#include_tax').on('input change paste', function() {
-
             const taxStatus = $('#tax_status').is(':checked');
-
             if (this.checked && !taxStatus) {
                 $(this).prop('checked', false);
             }
-
             reCountTotal();
         });
     })
@@ -605,7 +655,7 @@
             id_po: {
                 required: true
             },
-            "id_so[]": {
+            "doc_id[]": {
                 required: true
             },
             no_surat_jalan: {
@@ -622,7 +672,7 @@
             id_po: {
                 required: "PO wajib diisi"
             },
-            "id_so[]": {
+            "doc_id[]": {
                 required: "SO wajib diisi"
             },
             no_surat_jalan: {
@@ -655,7 +705,9 @@
     });
 
     $(".btn-submit").click(function() {
-        console.log(list_items);
+        // console.log(list_items);
+        var noDocument = $('#doc_id option:selected').text()
+
         if ($(".create-form").valid()) {
             $.each(list_items, function(i, v) {
                 var element = $('input[data-id="' + v.id + '"].input-qty');
@@ -683,13 +735,18 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     setLoading()
+                    var noDocument = $('#doc_id').select2('data').map(function(elem) {
+                        return elem.text;
+                    });
                     let data = new FormData(document.querySelector(".create-form"));
+                    data.append("noDocument", JSON.stringify(noDocument))
                     data.append("items", JSON.stringify(list_items));
 
                     const ppn = $('#taxTotal').html();
                     const dpp = $('#itemSubTotal').html()
                     const totalInvoice = $('#grandTotal').html();
                     const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
+                    const idCustomer = $('.id_customer').find(":selected").val()
                     let id = $(".id").val();
 
 
@@ -697,6 +754,7 @@
                     data.append("ppn", ppn)
                     data.append("dpp", dpp)
                     data.append("no_surat_jalan", noSuratJalan)
+                    data.append("id_customer", idCustomer)
                     if (!id) {
                         // data.append("tanggal_faktur", tanggalFaktur)
                     }
@@ -794,6 +852,19 @@
         }
     });
 
+    function updateItemList(selectedDocs) {
+        // Remove items for documents that are no longer selected
+
+        list_items = list_items.filter(item => selectedDocs.includes(item.id_sales_order));
+
+
+        // Clear and redraw DataTable with the updated item list
+        table.clear().rows.add(list_items).draw(false);
+
+        // Recalculate totals
+        reCountTotal();
+    }
+
     const reCountTotal = () => {
         const taxStatus = $('#tax_status').is(':checked');
         const includeTax = $('#include_tax').is(':checked');
@@ -805,6 +876,7 @@
         let dummyGrandTotal = 0;
         let taxTotalHtml = 0;
         let dummyTax = 0;
+
 
 
         list_items.map((obj) => {
@@ -857,10 +929,12 @@
     };
 
     function definisiQtyInput() {
+
         $.each(list_items, function(i, v) {
             var element = $('input[data-id="' + v.id + '"].input-qty');
             var input_user = parseFloat(element.val());
             var stok_max = parseFloat(v.qty_sekarang);
+
 
             if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
                 dataError = list_items[i];
@@ -869,8 +943,11 @@
                 list_items[i].qty_sekarang = stok_max.toFixed(2);
                 list_items[i].qty_input = input_user.toFixed(2);
 
+
                 // Calculate the amount and format it using .toLocaleString()
-                var amount = parseFloat(v.disc.replace(',', '')) != 0 ? ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100) * parseFloat(v.qty_input) : parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
+                var amount = parseFloat(v.disc.replace(',', '')) != 0 ? (parseFloat(v.harga_barang.replace(',', '')) -
+                        ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100)) *
+                    parseFloat(v.qty_input) : parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
                 list_items[i].amount = amount.toLocaleString();
             }
         });
@@ -878,6 +955,217 @@
         table.rows.add(list_items).draw(false);
         reCountTotal();
     }
+
+    //posting
+    const posting = function(id) {
+        // console.log(list_items);
+        var noDocument = $('#doc_id option:selected').text()
+
+        if ($(".create-form").valid()) {
+            $.each(list_items, function(i, v) {
+                var element = $('input[data-id="' + v.id + '"].input-qty');
+                var input_user = parseFloat(element.val());
+                var stok_max = parseFloat(v.qty_sekarang);
+
+                if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                    dataError = list_items[i];
+                    isValid = false;
+                } else {
+                    list_items[i].qty_sekarang = stok_max;
+                    list_items[i].qty_input = input_user;
+                }
+            });
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    setLoading()
+                    var noDocument = $('#doc_id').select2('data').map(function(elem) {
+                        return elem.text;
+                    });
+                    let data = new FormData(document.querySelector(".create-form"));
+                    data.append("noDocument", JSON.stringify(noDocument))
+                    data.append("items", JSON.stringify(list_items));
+
+                    const ppn = $('#taxTotal').html();
+                    const dpp = $('#itemSubTotal').html()
+                    const totalInvoice = $('#grandTotal').html();
+                    const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
+                    const idCustomer = $('.id_customer').find(":selected").val()
+                    let id = $(".id").val();
+
+
+                    data.append("total_invoice", totalInvoice)
+                    data.append("ppn", ppn)
+                    data.append("dpp", dpp)
+                    data.append("no_surat_jalan", noSuratJalan)
+                    data.append("id_customer", idCustomer)
+                    if (!id) {
+                        // data.append("tanggal_faktur", tanggalFaktur)
+                    }
+
+                    // UPDATE
+                    if (id) {
+                        $.ajax({
+                            url: "<?= base_url("invoice-penjualan-lokal/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+
+
+                }
+            })
+        }
+    }
+
+    $(".posting-invoice").click(function() {
+        // console.log(list_items);
+        var noDocument = $('#doc_id option:selected').text()
+
+        if ($(".create-form").valid()) {
+            $.each(list_items, function(i, v) {
+                var element = $('input[data-id="' + v.id + '"].input-qty');
+                var input_user = parseFloat(element.val());
+                var stok_max = parseFloat(v.qty_sekarang);
+
+                if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                    dataError = list_items[i];
+                    isValid = false;
+                } else {
+                    list_items[i].qty_sekarang = stok_max;
+                    list_items[i].qty_input = input_user;
+                }
+            });
+            Swal.fire({
+                icon: 'question',
+                title: 'Posting Invoice?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    setLoading()
+                    var noDocument = $('#doc_id').select2('data').map(function(elem) {
+                        return elem.text;
+                    });
+                    let data = new FormData(document.querySelector(".create-form"));
+                    data.append("noDocument", JSON.stringify(noDocument))
+                    data.append("items", JSON.stringify(list_items));
+
+                    const ppn = $('#taxTotal').html();
+                    const dpp = $('#itemSubTotal').html()
+                    const totalInvoice = $('#grandTotal').html();
+                    const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
+                    const idCustomer = $('.id_customer').find(":selected").val()
+                    let id = $(".id").val();
+
+
+                    data.append("total_invoice", totalInvoice)
+                    data.append("ppn", ppn)
+                    data.append("dpp", dpp)
+                    data.append("no_surat_jalan", noSuratJalan)
+                    data.append("id_customer", idCustomer)
+                    if (!id) {
+                        // data.append("tanggal_faktur", tanggalFaktur)
+                    }
+
+                    // UPDATE
+                    if (id) {
+                        $.ajax({
+                            url: "<?= base_url("invoice-penjualan-lokal/posting"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+                }
+            })
+        }
+    });
 </script>
 
 <?= $this->endSection(); ?>
