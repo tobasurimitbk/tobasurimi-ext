@@ -400,7 +400,9 @@ class ProductionResult extends BaseController
             }
 
             foreach ($barangDigunakan as $bd) {
-                $qty = isset($bd->qty2) ? (float) $bd->qty2 : (float) $bd->qty;
+                $qty = (float) $bd->qty;
+                $qty2 = isset($bd->qty2) ? (float) $bd->qty2 : 0;
+                $qtySisa = $qty - $qty2;
                 $datasbd = [
                     "production_result_id" => $productionResID,
                     "material_request_detail_id" => $bd->material_request_detail_id,
@@ -417,9 +419,31 @@ class ProductionResult extends BaseController
                     "barang_type" => $bd->type_barang,
                     "type" => "DIGUNAKAN",
                     "no_ref" => $bd->ref_no,
-                    "qty" => (float) $qty,
+                    "qty" => isset($bd->qty2) ? $qty2 : $qty,
                 ];
                 $this->productionResultDetailModel->insert($datasbd);
+                if (!$barangFilling && $qtySisa != 0) {
+                    $datasbr = [
+                        "production_result_id" => $productionResID,
+                        "material_request_detail_id" => $bd->material_request_detail_id,
+                        "material_request_id" => $bd->material_request_id,
+                        "barang1_id" => $bd->barang1_id,
+                        "barang2_id" => $bd->barang2_id,
+                        "warehouse_id" => $bd->warehouse_id,
+                        "divisi_id" => $bd->divisi_id,
+                        "bc_id" => $bd->bc_id,
+                        "stock_dokumen" => $bd->stock_dokumen,
+                        "stock_date" => $bd->stock_date,
+                        "stock_id" => $bd->stock_id ?? 0,
+                        "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
+                        "barang_type" => $bd->type_barang,
+                        "type" => "RETURN",
+                        "no_ref" => $bd->ref_no,
+                        "qty" => $qtySisa,
+                        "kondisi_barang" => "ditapak",
+                    ];
+                    $this->productionResultDetailModel->insert($datasbr);
+                }
             }
 
             foreach ($barangScrap as $bs) {

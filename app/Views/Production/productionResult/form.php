@@ -730,118 +730,130 @@
             console.log(list_items_barang_jadi);
             console.log(list_items_barang_scrap);
             console.log(list_items_barang_filling);
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
-                        $("#department_id_order").prop('disabled', false);
-                        $("#department_id_request").prop('disabled', false);
-                        $("#warehouse_id_order").prop('disabled', false);
-                        $("#warehouse_id_request").prop('disabled', false);
-                        const data = new FormData(document.querySelector(".create-form"));
-                        const id = $(".id").val();
-                        data.append("jadi", JSON.stringify(list_items_barang_jadi));
-                        data.append("digunakan", JSON.stringify(list_items_barang_digunakan));
-                        data.append("scrap", JSON.stringify(list_items_barang_scrap));
-                        data.append("filling", JSON.stringify(list_items_barang_filling));
+            var listMaterialCheck = [].concat(list_items_barang_digunakan, list_items_barang_jadi, list_items_barang_filling);
 
-                        // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("production-result/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
+            console.log(listMaterialCheck);
+            if (listMaterialCheck.length == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Barang yang akan direquest tidak boleh kosong !',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading()
+                            $("#department_id_order").prop('disabled', false);
+                            $("#department_id_request").prop('disabled', false);
+                            $("#warehouse_id_order").prop('disabled', false);
+                            $("#warehouse_id_request").prop('disabled', false);
+                            const data = new FormData(document.querySelector(".create-form"));
+                            const id = $(".id").val();
+                            data.append("jadi", JSON.stringify(list_items_barang_jadi));
+                            data.append("digunakan", JSON.stringify(list_items_barang_digunakan));
+                            data.append("scrap", JSON.stringify(list_items_barang_scrap));
+                            data.append("filling", JSON.stringify(list_items_barang_filling));
+
+                            // UPDATE
+                            if (id) {
+                                $.ajax({
+                                    url: "<?= base_url("production-result/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
                                             })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
-                                            })
-                                    } else {
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
                                         })
                                         stopLoading()
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        } else {
-                            $.ajax({
-                                url: "<?= base_url("production-result/create"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
+                                });
+                            } else {
+                                $.ajax({
+                                    url: "<?= base_url("production-result/create"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
+                                                })
+                                        } else {
+                                            stopLoading()
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
                                             })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
-                                            })
-                                    } else {
-                                        stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
                                         })
+                                        stopLoading()
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
+                                });
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }
         });
 

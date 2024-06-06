@@ -44,6 +44,7 @@ class MaterialRequestDetailsModel extends Model
     {
         $selectQry = '
             material_request_details.*,        
+            material_request_details.qty_now,        
             barang_master.kode_barang,        
             barang_master.barang_name,        
             barang_master.type_barang,    
@@ -52,11 +53,14 @@ class MaterialRequestDetailsModel extends Model
 
         $dataQry = $this->asArray()
             ->select($selectQry)
-            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
+            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
             ->join('satuans', 'satuans.kode_satuan = material_request_details.satuan', 'left')
             ->whereIn('material_request_details.material_request_id', $mrID)
             ->where('material_request_details.qty_now >', 0)
-            ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id')
+            ->where('material_request_details.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            ->where('satuans.deletedAt', null)
+            // ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id')
             ->findAll();
 
         return $dataQry;
