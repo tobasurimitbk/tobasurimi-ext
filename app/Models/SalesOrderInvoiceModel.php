@@ -88,6 +88,8 @@ class SalesOrderInvoiceModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "sales_order_invoice.*,
+        sales_order_invoice.document_no AS doc_no,
+        sales_order_invoice.document_type AS doc_type,
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
                       customers.name AS nama_pelanggan,
                       customers.kode AS kode_pelanggan,

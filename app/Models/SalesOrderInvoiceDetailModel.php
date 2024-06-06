@@ -25,6 +25,7 @@ class SalesOrderInvoiceDetailModel extends Model
         'harga_barang_invoice',
         'tax_invoice',
         'amount_invoice',
+        'id_sales_order',
     ];
 
     // Dates

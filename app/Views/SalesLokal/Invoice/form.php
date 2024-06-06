@@ -11,7 +11,7 @@
             </a>
 
             <?php if (!empty($data)) : ?>
-                <a class="btn btn-warning btn-print float-right" href="<?= base_url("invoice-penjualan-lokal/print/{$data->id}"); ?>" target="_blank">
+                <a class="btn btn-warning btn-print float-right" href="<?= base_url("invoice-penjualan-lokal/print/{$invoice_id}"); ?>" target="_blank">
                     Print
                 </a>
             <?php endif; ?>
@@ -95,6 +95,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?>>
+                                <option value=""></option>
                                 <?php if (!empty($data)) : ?>
                                     <?php if (!empty($selectedDocIds)) : ?>
                                         <?php foreach ($selectedDocIds as $i => $id) : ?>
@@ -383,9 +384,6 @@
         // let docType = $('#doc_type option:selected').val();
 
 
-
-
-
         <?php if ($termin == "") : ?>
 
             getTerminList(this.value);
@@ -532,6 +530,7 @@
         // doc
         $('.doc_id').select2({
             placeholder: "",
+            // theme: "bootstrap-5",
             allowClear: false,
         }).change(function() {
 
@@ -619,6 +618,7 @@
             <?php else : ?>
                 const itemList = <?= json_encode($documentData->itemListPosting) ?>;
             <?php endif; ?>
+            console.log(itemList);
             table.rows.add(itemList).draw(false);
             itemList.forEach(function(item) {
                 list_items.push(item);

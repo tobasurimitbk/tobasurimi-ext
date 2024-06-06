@@ -29,6 +29,7 @@ class SalesOrderDetailModel extends Model
         'id_warehouse',
         'dept',
         'tipe_input',
+        'status_ppn',
     ];
 
     // Dates
@@ -133,6 +134,7 @@ class SalesOrderDetailModel extends Model
                       sales_order_detail.discount_percentage AS disc,
                       sales_order_detail.tax AS tax,
                       sales_order_detail.amount AS amount,
+                      sales_order_detail.id_sales_order,
                       sales_order_detail.harga_barang AS harga_barang";
 
         $datas = $this->asObject()

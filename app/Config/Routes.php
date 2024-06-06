@@ -448,7 +448,8 @@ $routes->post('/invoice-penjualan-lokal/posting',  'SalesLokal\Invoice::posting'
 $routes->get('/invoice-penjualan-lokal/getDocNumber/(:segment)/(:segment)', 'SalesLokal\Invoice::getDocNumber/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getDocumentData/(:alpha)/(:num)', 'SalesLokal\Invoice::getDocData/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getItemList/(:num)', 'SalesLokal\Invoice::getItemList/$1', ['filter' => 'Auth']);
-$routes->get('/invoice-penjualan-lokal/print/(:num)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/print/(:segment)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
+// $routes->post('/invoice-penjualan-lokal/print',  'SalesLokal\Invoice::printInvoice', ['filter' => 'Auth']);
 
 // Surat Jalan
 $routes->get('/surat-jalan', 'SalesLokal\SuratJalan::index', ['filter' => 'Auth']);

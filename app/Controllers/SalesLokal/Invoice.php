@@ -119,19 +119,27 @@ class Invoice extends BaseController
         $dataAllSalesOrderInvoice = [];
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
+
+            // Karakter yang akan dihapus
+            $unwanted_characters = array('[', '"', ']');
+
+            // Gantikan karakter tidak diinginkan dengan string kosong
+            $cleaned_string_document_no = str_replace($unwanted_characters, ' ', $data->doc_no);
+
             array_push($dataAllSalesOrderInvoice, [
                 "no"                => $no++,
                 "id"                => encrypt($data->id),
                 "no_faktur"         => $data->no_faktur,
                 "tanggal_faktur"    => $data->tanggal_faktur,
-                "document_type"     => $data->document_type,
-                "document_no"       => $data->document_no,
+                "document_type"     => $data->doc_type,
+                "document_no"       => $cleaned_string_document_no,
                 "total_invoice"     => number_format(floatval($data->total_invoice)),
                 "kode_pelanggan"    => $data->kode_pelanggan,
                 "keterangan"        => $data->keterangan,
                 "nama_pelanggan"    => $data->nama_pelanggan,
                 "nama_sales"        => $data->salesName,
                 "tipe_invoice"      => $data->tipe_invoice,
+                "status"            => ($data->status_posting == 0) ? 'Waiting' : 'Posting',
                 "counter_print"     => $data->counter_print,
             ]);
         }
@@ -210,6 +218,10 @@ class Invoice extends BaseController
             $postItemsData = json_decode($this->request->getPost('items'), true);
             $documentData = null;
 
+            // var_dump($postItemsData);
+            // die;
+
+
 
 
             // if ($postData['doc_type'] === 'pesanan') {
@@ -284,6 +296,7 @@ class Invoice extends BaseController
             foreach ($postItemsData as $value) {
                 $valuesDetail = [
                     "id_sales_order_invoice"        => $dataSalesOrderInvoice,
+                    "id_sales_order"                => $value['id_sales_order'],
                     "id_barang_invoice"             => $value['id_barang'],
                     "qty_invoice"                   => $value['qty_input'],
                     "keterangan_invoice"            => "-",
@@ -390,6 +403,7 @@ class Invoice extends BaseController
 
     public function getById($id = null)
     {
+        $invoice_id = $id;
         $id = decrypt($id);
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
@@ -414,9 +428,10 @@ class Invoice extends BaseController
         foreach ($documentData->itemList as &$value) {
             // var_dump($value);
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
-                if ($value->id_barang == $valueDetail['id_barang_invoice']) {
-                    // var_dump($valueDetail['qty_invoice']);
-                    // die();
+                // var_dump($valueDetail);
+
+                if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
+
                     $value->id_detail_invoice = $valueDetail['id'];
                     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
                     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
@@ -425,13 +440,14 @@ class Invoice extends BaseController
             }
         }
 
+        // exit();
         //untuk yang sudah di posting
 
         foreach ($documentData->itemListPosting as &$value) {
             // var_dump($value);
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
 
-                if ($value->id_barang == $valueDetail['id_barang_invoice']) {
+                if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
                     $value->id_detail_invoice = $valueDetail['id'];
                     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
                     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
@@ -461,7 +477,7 @@ class Invoice extends BaseController
             "id_user"       => $dataSalesInvoiceOrder->id_user,
             "seller_name"   => $dataSalesInvoiceOrder->seller_name,
             "via"           => $tipeShipping,
-            // 'dataSuratJalan'=> $dataSuratJalan,
+            'invoice_id' => $invoice_id,
             // 'dataSo'        => $dataSo
 
         ]; //dd($data);
@@ -573,6 +589,7 @@ class Invoice extends BaseController
                         $valuesDetail = [
                             "id_barang_invoice"             => $value['id_barang'],
                             "qty_invoice"                   => $value['qty_input'],
+                            "id_sales_order"                => $value['id_sales_order'],
                             "keterangan_invoice"            => "-",
                             "discount_percentage_invoice"   => $value['disc'],
                             "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
@@ -603,6 +620,7 @@ class Invoice extends BaseController
                         "id_sales_order_invoice"        => $payload['id'],
                         "id_barang_invoice"             => $value['id_barang'],
                         "qty_invoice"                   => $value['qty_input'],
+                        "id_sales_order"                => $value['id_sales_order'],
                         "keterangan_invoice"            => "-",
                         "discount_percentage_invoice"   => $value['disc'],
                         "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
@@ -779,7 +797,29 @@ class Invoice extends BaseController
         try {
 
             $id = decrypt($this->request->getPost("id"));
+
+
+
             if (!empty($id)) {
+                $soInvData = $this->SalesOrderInvoiceModel->asObject()
+                    ->find($id);
+
+
+                //setelah hapus kembalikan kondisi sales_order_invoice_id pada sales order detail semula mejadi null
+                foreach (json_decode($soInvData->document_id) as $id_doc) {
+
+
+                    if ($soInvData->document_type === 'pesanan') {
+
+                        $this->SalesOrderModel->where('id', $id_doc)->set(['sales_order_invoice_id' => NULL])->update();
+                    } else {
+
+                        $this->SuratJalanModel->where('id', $id_doc)->set(['sales_order_invoice_id' => NULL])->update();
+                    }
+                }
+
+                $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $id)->delete();
+
                 $this->SalesOrderInvoiceModel->delete($id);
                 $data = [
                     "status"     => true,
@@ -834,6 +874,8 @@ class Invoice extends BaseController
 
     public function printInvoice($id)
     {
+
+        $id = decrypt($id);
         $domPdf = new Dompdf();
 
         $fileName = 'Invoice';
@@ -843,12 +885,21 @@ class Invoice extends BaseController
             ->find($this->this_company_id);
 
         $invSelectQry = "sales_order_invoice.*,
-                         DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d %b %Y') AS tanggal_faktur, 
-                         customers.name AS customerName, 
-                         customers.address AS customerAddress";
+        DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+        users.name AS seller_name,
+        customers.name AS customer_name,
+        customers.address AS customer_address,
+        sales_order_invoice.status_tax AS status_tax,
+        sales_order_invoice.termasuk_pa AS termasuk_pa,
+        sales_order.jenis_penjualan,
+        sales_order.no_po, 
+        sales_order.nama_ecommerce";
         $invData = $this->SalesOrderInvoiceModel->asObject()
             ->select($invSelectQry)
-            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->join('users', 'users.id = sales_order_invoice.id_user', 'left')
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'left')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id', 'left')
+            ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->find($id);
 
         if ($invData->document_type == 'pengiriman') {
@@ -857,44 +908,41 @@ class Invoice extends BaseController
 
             $soIds = json_decode($sjData->multiple_id_so);
         } else {
-            $soIds = [$invData->document_id];
+            $soIds = json_decode($invData->document_id);
         }
 
-        $soSelectQry = "sales_order.*,
-                        DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
-                        DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
-                        customers.name AS customerName, 
-                        customers.address AS customerAddress,
-                        metadata.value AS termin,
-                        metadata.id AS terms_id,
-                        barangs.nama_barang AS namaBarang, 
-                        barangs.kode_barang AS kodeBarang, 
-                        sales_order_detail.qty AS qty, 
-                        satuans.kode_satuan AS kodeSatuan,
-                        sales_order_detail.discount_percentage AS disc_pct,
-                        sales_order_detail.amount AS amt";
-        $salesOrderData = $this->SalesOrderModel->asObject()
+        $soSelectQry = "sales_order_invoice_detail.id AS id,
+        sales_order_invoice_detail.id_barang_invoice AS id_barang,
+        barang_master_sales.kode_barang AS kode_barang,
+          barang_master_sales.barang_name AS nama_barang,
+          sales_order_invoice_detail.qty_invoice AS qty_invoice,
+          satuans.kode_satuan AS satuan,
+          sales_order_invoice_detail.discount_percentage_invoice AS disc,
+          sales_order_invoice_detail.tax_invoice AS tax,
+          sales_order_invoice_detail.amount_invoice AS amount,
+          sales_order_invoice_detail.id_sales_order,
+          sales_order_invoice_detail.harga_barang_invoice AS harga_barang";
+        $salesOrderDetailData = $this->SalesOrderInvoiceDetailModel->asObject()
             ->select($soSelectQry)
-            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-            ->join('metadata', 'metadata.id = customers.termin', 'left')
-            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'left')
-            ->join('barangs', 'barangs.id = sales_order_detail.id_barang', 'left')
-            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
-            ->whereIn('sales_order.id', $soIds)
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice AND barang_master_sales.deletedAt IS NULL')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'LEFT')
+            // ->where('qty_sekarang !=', 0)
+            ->where('id_sales_order_invoice', $id)
+            ->orderBy('barang_master_sales.barang_name', 'ASC')
             ->findAll();
 
-        $invTotal = $salesOrderData[0]->total_harga + $salesOrderData[0]->estimated_freight;
+        // $invTotal = $salesOrderDetailData[0]->total_harga + $salesOrderDetailData[0]->estimated_freight;
 
-        $invData->docNo = ($invData->document_type == 'pengiriman') ? $sjData->no_surat_jalan : $salesOrderData[0]->no_sales_order;
+        // $invData->docNo = ($invData->document_type == 'pengiriman') ? $sjData->no_surat_jalan : $salesOrderData[0]->no_sales_order;
 
         $data = [
             'companyName'   => $companyData->company,
             'companyAccount' => $companyData->invoice_account,
             'invData'       => $invData,
-            'soData'        => $salesOrderData,
-            'invTotal'      => $invTotal
+            'soData'        => $salesOrderDetailData,
+            // 'invTotal'      => $invTotal
         ];
-        //lagi disini
+
         $this->SalesOrderInvoiceModel->update($id, ['counter_print' => $invData->counter_print + 1]);
 
         // return view('SalesLokal/Invoice/print', $data);
@@ -923,18 +971,20 @@ class Invoice extends BaseController
             $documentList = $this->SalesOrderModel->asObject()
                 ->select('sales_order.id, sales_order.no_sales_order AS doc_no')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
-                ->where('id_customer', $customer_id)
-                ->where('qty_sekarang !=', 0)
-                ->where('id_company', $this->this_company_id)
-                ->groupBy('sales_order.no_sales_order');;
+                ->where('sales_order.id_customer', $customer_id)
+                ->where('sales_order.surat_jalan_so_id', NULL)
+                ->where('sales_order_detail.qty_sekarang !=', 0)
+                ->where('sales_order.id_company', $this->this_company_id)
+                ->groupBy('sales_order.no_sales_order');
         } else { // pengiriman
             $documentList = $this->SuratJalanModel->asObject()
-                ->select('id, no_surat_jalan AS doc_no')
+                ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan AS doc_no')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
-                ->where('id_customer', $customer_id)
-                ->where('qty_sekarang !=', 0)
-                ->where('id_company', $this->this_company_id);
+                ->where('sales_order.id_customer', $customer_id)
+                ->where('sales_order_detail.qty_sekarang !=', 0)
+                ->where('sales_order.id_company', $this->this_company_id)
+                ->groupBy('surat_jalan_so.no_surat_jalan');
         }
 
         // $documentList->where('sales_order_invoice_id', null);
@@ -944,6 +994,11 @@ class Invoice extends BaseController
             $documentList->whereIn('id', $documentId);
             $documentList->groupEnd();
         }
+
+        // var_dump($documentList->findAll());
+        // die();
+
+
         return $documentList->findAll();
     }
 
