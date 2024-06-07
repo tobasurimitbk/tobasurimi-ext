@@ -308,7 +308,7 @@ class MaterialRequestKimia extends BaseController
     {
         try {
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
 
             $dataMaterial = [
                 // "work_order_id" => $this->request->getPost("kode_produksi"),

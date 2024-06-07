@@ -576,6 +576,7 @@ class ProductionResult extends BaseController
 
         $lastData = $this->productionResultModel->asObject()
             ->like('pr_no', $numberTemplate)
+            ->where('company_id', $this->this_company_id)
             ->orderBy('createdAt', 'DESC')
             ->first();
 
