@@ -310,7 +310,7 @@ class MaterialRequest extends BaseController
     {
         try {
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
 
             $dataMaterial = [
                 "work_order_id" => $this->request->getPost("kode_produksi"),
@@ -521,8 +521,8 @@ class MaterialRequest extends BaseController
 
                     $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
                     $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
-                    // var_dump($statusOUT, $statusIN);
-                    // exit;
+                    var_dump($statusOUT, $statusIN);
+                    exit;
 
                     if ($statusOUT && $statusIN) {
                         $responseBody = json_decode($statusOUT->getBody(), true);
