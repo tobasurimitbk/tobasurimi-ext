@@ -900,7 +900,7 @@
                             stopLoading()
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Data Material Request Belum Di Setujui Warehouse',
+                                title: 'Data Material Request Tidak Ada',
                                 confirmButtonColor: '#4e73df',
                             })
                             // Clear existing options
