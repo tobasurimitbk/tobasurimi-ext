@@ -741,7 +741,7 @@ class PayrollsModel extends Model
         }
     }
 
-    static function getRekapGajiKaryawanPerHari($employeeID,)
+    static function getRekapGajiKaryawanPerHari($employeeID)
     {
     }
 
