@@ -6,7 +6,7 @@
         <h1 class="title-name">Detail Payroll</h1>
         <div class="col-button-tambah-spp">
             <?php $splitMonthYear = explode("-", $payrollDetail['year_month']); ?>
-            <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url("payroll/print/single/" . $payrollDetail['id']); ?>">
+            <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url("payroll/print/single/" . encrypt($payrollDetail['id'])); ?>">
                 <i class="fa-solid fa-print"></i> Print
             </a>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("payroll?year=" . $splitMonthYear[0] . "&month=" . $splitMonthYear[1]); ?>">
@@ -196,6 +196,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link <?= (@$_GET['location'] == "pinjamanKaryawan") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#pinjamanKaryawan" type="button" role="tab" aria-selected="false">Pinjaman Karyawan</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link <?= (@$_GET['location'] == "rekapGajiHarian") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#rekapGajiHarian" type="button" role="tab" aria-selected="false">Rekap Gaji Harian</button>
+                    </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade <?= (@$_GET['location'] == "nilaiKomponenGaji" || empty(@$_GET['location'])) ? 'show active' : '' ?> " id="perhitunganGaji" role="tabpanel">
@@ -350,6 +353,24 @@
                                         <td><b class="text-danger">(-) <?= "Rp " . number_format($totalPinjaman,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade <?= (@$_GET['location'] == "rekapGajiHarian") ? 'show active' : '' ?>" id="rekapGajiHarian" role="tabpanel">
+                        <table class="table nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 10px; text-align:center;" class="sort">No</th>
+                                    <th style="text-align: center;" class="sort">Tanggal</th>
+                                    <th class="sort">Jam Kerja</th>
+                                    <th class="sort">CheckIn</th>
+                                    <th class="sort">Mulai Istirahat</th>
+                                    <th class="sort">Selesai Istirahat</th>
+                                    <th class="sort">CheckOut</th>
+                                    <th class="sort">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table">
                             </tbody>
                         </table>
                     </div>
