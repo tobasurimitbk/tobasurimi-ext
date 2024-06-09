@@ -477,11 +477,11 @@ class RasioController extends BaseController
                         ->select('rm_import_po_details.*, satuans.kode_satuan')
                         ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
                         ->where('rm_import_po_id', $poBBImport['id'])
-                        ->where('barang1_id', $value['barang1_id'])
+                        ->where('barang_id', $value['barang1_id'])
                         ->where('spesifikasi_id', $value['barang2_id'])
                         ->findAll();
                     foreach ($poBBImportDetail as $valuePoBBImport) {
-                        $hargaSatuan = $valuePoBBImport['price'] * $valuePoBBImport['disc'] . '%';
+                        $hargaSatuan = $valuePoBBImport['price'] * $valuePoBBImport['disc'];
                         $totalQty += $valuePoBBImport['qty'];
                         $satuanPO = $valuePoBBImport['kode_satuan'];
                     }

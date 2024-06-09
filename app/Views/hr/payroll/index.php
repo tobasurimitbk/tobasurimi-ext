@@ -487,6 +487,10 @@
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                             // show loading
                             $('#loadingSpinner').show();
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,
@@ -594,6 +598,10 @@
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                             // show loading
                             $('#loadingSpinner').show();
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,

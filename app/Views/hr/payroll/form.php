@@ -362,16 +362,38 @@
                                 <tr>
                                     <th style="width: 10px; text-align:center;" class="sort">No</th>
                                     <th style="text-align: center;" class="sort">Tanggal</th>
-                                    <th class="sort">Jam Kerja</th>
-                                    <th class="sort">CheckIn</th>
-                                    <th class="sort">Mulai Istirahat</th>
-                                    <th class="sort">Selesai Istirahat</th>
-                                    <th class="sort">CheckOut</th>
-                                    <th class="sort">Nominal</th>
+                                    <th style="text-align: center;" class="sort">Jam Kerja</th>
+                                    <th style="text-align: center;" class="sort">CheckIn</th>
+                                    <th style="text-align: center;" class="sort">Mulai Istirahat</th>
+                                    <th style="text-align: center;" class="sort">Selesai Istirahat</th>
+                                    <th style="text-align: center;" class="sort">CheckOut</th>
+                                    <th style="text-align: center;" class="sort">Total Jam</th>
+                                    <th style="text-align: center;" class="sort">Nominal ((GP + CADANGAN) / 7 * Total Jam)</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table" id="body-table">
+                                <?php $i = 1; ?>
+                                <?php foreach ($rekapGajiHarian as $r) : ?>
+                                    <tr style="color: whitesmoke; text-align:center;">
+                                        <td><?= $i++ ?></td>
+                                        <td><?= $r['tanggal'] ?></td>
+                                        <td><?= $r['jenis'] ?></td>
+                                        <td><?= $r['jam_masuk'] ?></td>
+                                        <td><?= $r['jam_istirahat_mulai'] ?></td>
+                                        <td><?= $r['jam_istirahat_selesai'] ?></td>
+                                        <td><?= $r['jam_pulang'] ?></td>
+                                        <td><?= number_format($r['total_jam'], 2) ?></td>
+                                        <td style="font-weight: bold;">Rp. <?= number_format($r['nominal_diterima'], 2) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr>
+                                    <td colspan="8" style="text-align:right;"><b>Total Gaji Berdasarkan Jam Kerja</b></td>
+                                    <td style=" text-align:center;">
+                                        <b>Rp. <?= number_format($payrollDetail['nominal_uang_gaji'], 2) ?></b>
+                                    </td>
+                                </tr>
                             </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -660,7 +682,11 @@
                         url: "<?= base_url("payroll/update/nominal-keterlambatan-presensi"); ?>",
                         data: data,
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
