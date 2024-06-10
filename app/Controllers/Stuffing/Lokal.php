@@ -144,6 +144,8 @@ class Lokal extends BaseController
                 ->select('sales_order.*, customers.name as customer_name')
                 ->join('customers', 'customers.id = sales_order.id_customer')
                 ->where('sales_order.deletedAt', null)
+                ->where('sales_order.id_company', $this->this_company_id)
+                ->where('sales_order.tipe_sales_order', 'LOKAL')
                 ->where('sales_order.used', 'NOT USED')
                 ->orderBy('sales_order.no_sales_order', "ASC")
                 ->findAll(),

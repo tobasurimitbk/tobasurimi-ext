@@ -203,7 +203,7 @@ $routes->get('/supplier-bahan-baku/harga/(:segment)', 'Supplier\Supplier::getSup
 $routes->get('/supplier-bahan-baku/all', 'Supplier\Supplier::allSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/save', 'Supplier\Supplier::saveSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/update', 'Supplier\Supplier::updateSupplierBahanBaku', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-baku/print/(:segment)', 'Supplier\Supplier::printSupplierBahanBaku/$1', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku/print/(:segment)', 'Supplier\Supplier::printSupplierBahanBaku/$1', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku/spesifikasi-barang', 'Supplier\SupplierHarga::getListSpesifikasiBarang', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku/all-harga', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
@@ -1529,6 +1529,33 @@ $routes->get('/laporan-supplier-lokal-bb', 'Laporan\Supplier\LaporanSupplierLoka
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\KwitansiTb::index', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/all', 'Laporan\Supplier\KwitansiTb::all', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/print/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Supplier\KwitansiTb::exportPDFKwitansiTB/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanPendapatanSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanPendapatanSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFPendapatanSupplier', ['filter' => 'Auth']);
+
+$routes->get('/laporan-supplier-lokal-bb/rincian-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRincianPerbarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rincian-perbarang/all-rincian-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRincianPerbarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rincian-perbarang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRincianPerbarang', ['filter' => 'Auth']);
+
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/all-rekap-all-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllSupplier', ['filter' => 'Auth']);
+
+$routes->get('/laporan-supplier-lokal-bb/rekap-persupplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapPerSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-persupplier/all-rekap-persupplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapPersupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-persupplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapPersupplier', ['filter' => 'Auth']);
+
+
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/all-rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllBarang', ['filter' => 'Auth']);
+
+$routes->get('/laporan-supplier-lokal-bb/rekap-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapPerbarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-perbarang/all-rekap-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapPerbarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-perbarang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapPerbarang', ['filter' => 'Auth']);
+
+
 
 /*
  * --------------------------------------------------------------------

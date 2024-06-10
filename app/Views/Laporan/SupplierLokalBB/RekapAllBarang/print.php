@@ -88,19 +88,14 @@
             <tr>
                 <td style="width:100px">Tanggal</td>
                 <td style="width:10px">:</td>
-                <td style="width:80px"><?= $tanggalAwal; ?></td>
-                <td style="width:10px"> S/D </td>
-                <td><?= $tanggalAkhir; ?></td>
-            </tr>
-            <tr>
-                <td>Bahan Baku</td>
-                <td>:</td>
-                <td colspan="3" style="text-transform: uppercase;"><?= $bahanBaku; ?></td>
-            </tr>
-            <tr>
-                <td>Lokasi Gudang</td>
-                <td>:</td>
-                <td colspan="3" style="text-transform: uppercase;"><?= $warehouse; ?></td>
+                <?php if (!empty($tanggalAwal) && !empty($tanggalAkhir)) : ?>
+                    <td style="width:80px"><?= $tanggalAwal; ?></td>
+                    <td style="width:10px"> S/D </td>
+                    <td><?= $tanggalAkhir; ?></td>
+                <?php else : ?>
+                    <td colspan="3" style="width:80px">ALL</td>
+
+                <?php endif; ?>
             </tr>
         </tbody>
     </table>
@@ -108,19 +103,16 @@
     <table class="w-100 item-table">
         <tr>
             <th rowspan="2">No.</th>
-            <th rowspan="2">Supplier</th>
+            <th rowspan="2">Jenis</th>
+            <th rowspan="2">Spesifikasi</th>
+            <th rowspan="2">Divisi</th>
             <th rowspan="2">Qty</th>
             <th rowspan="2">Satuan</th>
             <th colspan="3">Harian</th>
             <th colspan="3">Tambahan Harian</th>
             <th colspan="3">Tambahan Bulanan</th>
-            <th colspan="3">Subsidi</th>
-            <th rowspan="2">Total</th>
         </tr>
         <tr>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
             <th>DPP</th>
             <th>PPh</th>
             <th>Dibayarkan</th>
@@ -135,7 +127,9 @@
             <?php foreach ($dataOrder as $do) : ?>
                 <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= $do->supplierName; ?></td>
+                    <td><?= $do->barangName; ?></td>
+                    <td><?= $do->spekName; ?></td>
+                    <td><?= $do->bagianName; ?></td>
                     <td><?= $do->qtyPO; ?></td>
                     <td><?= $do->satuanName; ?></td>
                     <td><?= number_format($do->dppUmum, 0, '.', ''); ?></td>
@@ -147,14 +141,10 @@
                     <td><?= number_format($do->dppBulanan, 0, '.', ''); ?></td>
                     <td><?= number_format($do->pphBulanan, 0, '.', ''); ?></td>
                     <td><?= number_format($do->totalBulanan, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->subsidi, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->pphSubsidi, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalSubsidi, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalRow, 0, '.', ''); ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td colspan="4">Total</td>
+                <td colspan="6">Total</td>
                 <td id="totalDppUmum"><?= $totalDppUmum; ?></td>
                 <td id="totalPphUmum"><?= $totalPphUmum; ?></td>
                 <td id="totalTotalUmum"><?= $totalTotalUmum; ?></td>
@@ -164,10 +154,6 @@
                 <td id="totalDppBulanan"><?= $totalDppBulanan; ?></td>
                 <td id="totalPphBulanan"><?= $totalPphBulanan; ?></td>
                 <td id="totalTotalBulanan"><?= $totalTotalBulanan; ?></td>
-                <td id="totalDppSubsidi"><?= $totalDppSubsidi; ?></td>
-                <td id="totalPphSubsidi"><?= $totalPphSubsidi; ?></td>
-                <td id="totalTotalSubsidi"><?= $totalTotalSubsidi; ?></td>
-                <td id="totalTotalRow"><?= $totalTotalRow; ?></td>
             </tr>
         <?php else : ?>
             <tr>

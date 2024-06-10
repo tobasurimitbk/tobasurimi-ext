@@ -4,12 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pendapatan Supplier</h1>
+        <h1>Rekap Persupplier</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-persupplier/print"); ?>')">PDF</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
@@ -48,7 +48,7 @@
 
 
                         </select>
-                        <label for="floatingInput">Filter Suplier</label>
+                        <label for="floatingInput">Filter Supplier</label>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -86,14 +86,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2">No</th>
-                                <th onclick="changeSort('supplierName')" class="sort" rowspan="2">Supplier</th>
-                                <th onclick="changeSort('poNum')" class="sort" rowspan="2">No PO</th>
-                                <th onclick="changeSort('poDate')" class="sort" rowspan="2">Tgl PO</th>
+
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
                                 <th onclick="changeSort('warehouseName')" class="sort" rowspan="2">Gudang</th>
+                                <th onclick="changeSort('poNum')" class="sort" rowspan="2">No PO</th>
+                                <th onclick="changeSort('poDate')" class="sort" rowspan="2">Tgl PO</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
-                                <th rowspan="2">Unit</th>
                                 <th colspan="3">Harian</th>
                                 <th colspan="3">Tambahan Harian</th>
                                 <th colspan="3">Tambahan Bulanan</th>
@@ -145,7 +144,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier"); ?>",
+            url: "<?= base_url("/laporan-supplier-lokal-bb/rekap-persupplier/all-rekap-persupplier"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.dateStart = $(".dateStart").val();
@@ -172,9 +171,12 @@
                 sortable: false
             },
             {
-                data: "supplierName",
+                data: "barangName",
                 className: "text-center",
-
+            },
+            {
+                data: "warehouseName",
+                className: "text-center",
             },
             {
                 data: "poNum",
@@ -184,24 +186,13 @@
                 data: "poDate",
                 className: "text-center",
             },
-            {
-                data: "barangName",
-                className: "text-center",
-            },
-            {
-                data: "warehouseName",
-                className: "text-center",
-            },
+
             {
                 data: "qtyPO",
                 className: "text-center",
             },
             {
                 data: "satuanName",
-                className: "text-center",
-            },
-            {
-                data: "companyName",
                 className: "text-center",
             },
             {

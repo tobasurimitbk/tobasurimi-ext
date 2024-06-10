@@ -266,7 +266,6 @@ class RMPurchaseOrderModel extends Model
         }
     }
 
-
     public function getPoBBLokalForSupplierReport($startDate, $finishDate, $supplier, $bahanBaku, $warehouse)
     {
         $selectQry = "
@@ -288,8 +287,8 @@ class RMPurchaseOrderModel extends Model
         ";
         $condition = [
             'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.po_date >=' => $startDate,
-            'rm_purchase_orders.po_date <=' => $finishDate,
+            // 'rm_purchase_orders.po_date >=' => $startDate,
+            // 'rm_purchase_orders.po_date <=' => $finishDate,
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
             'penerimaan_barang.tipe_bahan' => 'BAKU',
@@ -322,6 +321,153 @@ class RMPurchaseOrderModel extends Model
         return $poBBLokalData;
     }
 
+    // pendapatan supplier
+    //PDF
+    public function getPoBBLokalForSupplierReportPdf($dateStart, $dateEnd, $supplier, $bahanBaku, $warehouse, $companyId)
+    {
+        $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
+        suppliers.name AS supplierName, 
+        rm_purchase_orders.po_no AS poNum, 
+        rm_purchase_orders.po_date AS poDate, 
+        barang_master.barang_name AS barangName, 
+        warehouses.warehouse_name AS warehouseName, 
+        rm_purchase_order_details.qty AS qtyPO, 
+        satuans.nama_satuan AS satuanName, 
+        companies.company AS companyName, 
+        rm_purchase_orders.subsidi_langsung AS subsidi, 
+        rm_purchase_order_details.daily_price AS dppHarian,
+        rm_purchase_order_details.monthly_price AS dppBulanan,
+        rm_purchase_order_details.general_price AS dppUmum,
+        rm_purchase_orders.pph AS poPPH,
+        supplier_harga.spesifikasi AS spekName
+        ";
+        $condition = [
+            'rm_purchase_orders.is_posted' => '1',
+            'penerimaan_barang.status_post' => 'FINISH',
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            'rm_purchase_orders.company_id'  => $companyId
+        ];
+
+        if (!empty($dateStart) and !empty($dateEnd)) {
+            $condition['rm_purchase_orders.po_date >='] = $dateStart;
+            $condition['rm_purchase_orders.po_date <='] = $dateEnd;
+        }
+
+        if (!empty($bahanBaku)) {
+            $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
+        }
+        if (!empty($warehouse)) {
+            $condition['penerimaan_barang.warehouse_id'] = $warehouse;
+        }
+        if (!empty($supplier)) {
+            $condition['rm_purchase_orders.supplier_id'] = $supplier;
+        }
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            ->where($condition)
+            ->findAll();
+
+        return $poBBLokalData;
+    }
+
+
+    //TABLE
+    public function getPoBBLokalForSupplier($availableSort, $condition, $addCondition, $limit = 10, $offset = 0)
+    {
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
+        suppliers.name AS supplierName, 
+        rm_purchase_orders.po_no AS poNum, 
+        rm_purchase_orders.po_date AS poDate, 
+        barang_master.barang_name AS barangName, 
+        warehouses.warehouse_name AS warehouseName, 
+        rm_purchase_order_details.qty AS qtyPO, 
+        satuans.nama_satuan AS satuanName, 
+        companies.company AS companyName, 
+        rm_purchase_orders.subsidi_langsung AS subsidi, 
+        rm_purchase_order_details.daily_price AS dppHarian,
+        rm_purchase_order_details.monthly_price AS dppBulanan,
+        rm_purchase_order_details.general_price AS dppUmum,
+        rm_purchase_orders.pph AS poPPH,
+        supplier_harga.spesifikasi AS spekName
+        ";
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+
+        $totalData = $poBBLokalData->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+            $poBBLokalData->groupStart();
+        }
+
+        if ($addCondition['supplierId']) {
+            $poBBLokalData->where('rm_purchase_orders.supplier_id', $addCondition['supplierId']);
+        }
+
+        if ($addCondition['barangId']) {
+            $poBBLokalData->where('rm_purchase_orders.barang_id', $addCondition['barangId']);
+        }
+
+        if ($addCondition['warehouseId']) {
+            $poBBLokalData->where('penerimaan_barang.warehouse_id', $addCondition['warehouseId']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $poBBLokalData->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+            $poBBLokalData->groupEnd();
+        }
+
+        $totalFilteredData = $poBBLokalData->countAllResults(false);
+        $data = $poBBLokalData->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+    // pendapatan supplier
+
     public function getPoBBLokalForAllSupplierReport($startDate, $finishDate)
     {
         $selectQry = "
@@ -336,8 +482,8 @@ class RMPurchaseOrderModel extends Model
         ";
         $condition = [
             'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.po_date >=' => $startDate,
-            'rm_purchase_orders.po_date <=' => $finishDate,
+            // 'rm_purchase_orders.po_date >=' => $startDate,
+            // 'rm_purchase_orders.po_date <=' => $finishDate,
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
             'penerimaan_barang.tipe_bahan' => 'BAKU',
@@ -361,6 +507,133 @@ class RMPurchaseOrderModel extends Model
         return $poBBLokalData;
     }
 
+    //laporan rekap all suplier pdf
+    public function getPoBBLokalForAllSupplierReportPdf($dateStart, $dateEnd, $supplier, $bahanBaku, $companyId)
+    {
+        $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
+        suppliers.name AS supplierName, 
+        barang_master.barang_name AS barangName, 
+        SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
+        SUM(rm_purchase_order_details.daily_price) AS dppHarian,
+        SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
+        SUM(rm_purchase_order_details.general_price) AS dppUmum,
+        rm_purchase_orders.pph AS poPPH
+        ";
+        $condition = [
+            'rm_purchase_orders.is_posted' => '1',
+            // 'rm_purchase_orders.po_date >=' => $startDate,
+            // 'rm_purchase_orders.po_date <=' => $finishDate,
+            'penerimaan_barang.status_post' => 'FINISH',
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            'rm_purchase_orders.company_id'  => $companyId
+        ];
+
+        if (!empty($dateStart) and !empty($dateEnd)) {
+            $condition['rm_purchase_orders.po_date >='] = $dateStart;
+            $condition['rm_purchase_orders.po_date <='] = $dateEnd;
+        }
+
+        if (!empty($bahanBaku)) {
+            $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
+        }
+
+        if (!empty($supplier)) {
+            $condition['rm_purchase_orders.supplier_id'] = $supplier;
+        }
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->where($condition)
+            ->groupBy(['suppliers.name', 'barang_master.barang_name'])
+            ->findAll();
+
+        return $poBBLokalData;
+    }
+
+    //laporan rekap all suplier table
+    public function getPoBBLokalForAllSupplier($availableSort, $condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
+        suppliers.name AS supplierName, 
+        barang_master.barang_name AS barangName, 
+        SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
+        SUM(rm_purchase_order_details.daily_price) AS dppHarian,
+        SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
+        SUM(rm_purchase_order_details.general_price) AS dppUmum,
+        rm_purchase_orders.pph AS poPPH
+        ";
+
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->where($condition)
+            ->groupBy(['suppliers.name', 'barang_master.barang_name'])
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poBBLokalData->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId']) {
+            $poBBLokalData->groupStart();
+        }
+
+        if ($addCondition['supplierId']) {
+            $poBBLokalData->where('rm_purchase_orders.supplier_id', $addCondition['supplierId']);
+        }
+
+        if ($addCondition['barangId']) {
+            $poBBLokalData->where('rm_purchase_orders.barang_id', $addCondition['barangId']);
+        }
+
+
+
+        if ($addCondition['dateStart']) {
+            $poBBLokalData->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId']) {
+            $poBBLokalData->groupEnd();
+        }
+
+        $totalFilteredData = $poBBLokalData->countAllResults(false);
+        $data = $poBBLokalData->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     public function getPoBBLokalForSupplierReportRekap($startDate, $finishDate, $supplier, $bahanBaku, $warehouse)
     {
         $selectQry = "
@@ -378,12 +651,13 @@ class RMPurchaseOrderModel extends Model
         ";
         $condition = [
             'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.po_date >=' => $startDate,
-            'rm_purchase_orders.po_date <=' => $finishDate,
+            // 'rm_purchase_orders.po_date >=' => $startDate,
+            // 'rm_purchase_orders.po_date <=' => $finishDate,
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
             'penerimaan_barang.tipe_bahan' => 'BAKU',
         ];
+
         if (!empty($bahanBaku)) {
             $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
         }
@@ -405,13 +679,152 @@ class RMPurchaseOrderModel extends Model
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
-            ->join('bagian', 'bagian.id = rm_purchase_order_details.bagian', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->join('bagian', 'bagian.division_id = divisis.id', 'left')
             ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->where($condition)
             ->groupBy(['bagian.nama_bagian', 'barang_master.barang_name', 'suppliers.name'])
             ->findAll();
 
         return $poBBLokalData;
+    }
+
+    //rekap all barang
+    public function getPoBBLokalForSupplierReportRekapPdf($dateStart, $dateEnd, $warehouse, $bahanBaku, $companyId)
+    {
+        $selectQry = "
+        suppliers.name AS supplierName, 
+        barang_master.barang_name AS barangName, 
+        bagian.nama_bagian AS bagianName, 
+        SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
+        SUM(rm_purchase_order_details.daily_price) AS dppHarian,
+        SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
+        SUM(rm_purchase_order_details.general_price) AS dppUmum,
+        SUM(rm_purchase_order_details.qty) AS qtyPO,
+        rm_purchase_orders.pph AS poPPH,
+        supplier_harga.spesifikasi AS spekName, 
+        satuans.nama_satuan AS satuanName, 
+        ";
+        $condition = [
+            'rm_purchase_orders.is_posted' => '1',
+            'penerimaan_barang.status_post' => 'FINISH',
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            'rm_purchase_orders.company_id'  => $companyId
+        ];
+
+        if (!empty($dateStart) and !empty($dateEnd)) {
+            $condition['rm_purchase_orders.po_date >='] = $dateStart;
+            $condition['rm_purchase_orders.po_date <='] = $dateEnd;
+        }
+
+        if (!empty($warehouse)) {
+            $condition['rm_purchase_orders.warehouse_id'] = $warehouse;
+        }
+
+        if (!empty($bahanBaku)) {
+            $condition['rm_purchase_orders.barang_id'] = $bahanBaku;
+        }
+
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->join('bagian', 'bagian.division_id = divisis.id', 'left')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            ->where($condition)
+            ->groupBy(['bagian.nama_bagian', 'barang_master.barang_name', 'suppliers.name'])
+            ->findAll();
+
+        return $poBBLokalData;
+    }
+
+    //table rekap
+    public function getPoBBLokalForSupplierRekap($availableSort, $condition, $addCondition, $limit = 10, $offset = 0)
+    {
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+        suppliers.name AS supplierName, 
+        barang_master.barang_name AS barangName, 
+        bagian.nama_bagian AS bagianName, 
+        SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
+        SUM(rm_purchase_order_details.daily_price) AS dppHarian,
+        SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
+        SUM(rm_purchase_order_details.general_price) AS dppUmum,
+        SUM(rm_purchase_order_details.qty) AS qtyPO,
+        rm_purchase_orders.pph AS poPPH,
+        supplier_harga.spesifikasi AS spekName, 
+        satuans.nama_satuan AS satuanName, 
+        ";
+
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->join('bagian', 'bagian.division_id = divisis.id', 'left')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            ->where($condition)
+            ->groupBy(['bagian.nama_bagian', 'barang_master.barang_name', 'suppliers.name'])
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poBBLokalData->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+            $poBBLokalData->groupStart();
+        }
+
+        if ($addCondition['barangId']) {
+            $poBBLokalData->where('rm_purchase_orders.barang_id', $addCondition['barangId']);
+        }
+
+        if ($addCondition['warehouseId']) {
+            $poBBLokalData->where('rm_purchase_orders.warehouse_id', $addCondition['warehouseId']);
+        }
+
+
+        if ($addCondition['dateStart']) {
+            $poBBLokalData->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+            $poBBLokalData->groupEnd();
+        }
+
+        $totalFilteredData = $poBBLokalData->countAllResults(false);
+        $data = $poBBLokalData->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
     }
 
     public function getPOByNoPO($noPO, $companyID, $barang1ID, $barang2ID)

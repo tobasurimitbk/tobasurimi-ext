@@ -4,12 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pendapatan Supplier</h1>
+        <h1>Pendapatan Perbarang</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rincian-perbarang/print"); ?>')">PDF</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
@@ -39,20 +39,6 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-floating mb-3">
-                        <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
-                            <option value="" data-code=""></option>
-
-                            <?php foreach ($getSupplier as $row) : ?>
-                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
-                            <?php endforeach; ?>
-
-
-                        </select>
-                        <label for="floatingInput">Filter Suplier</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
                         <select class="form-select filter_warehouse" name="filter_warehouse" id="filter_warehouse">
                             <option value="" data-code=""></option>
 
@@ -65,6 +51,21 @@
                         <label for="floatingInput">Filter Warehouse</label>
                     </div>
                 </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
+                            <option value="" data-code=""></option>
+
+                            <?php foreach ($getSupplier as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
+                            <?php endforeach; ?>
+
+
+                        </select>
+                        <label for="floatingInput">Filter Suplier</label>
+                    </div>
+                </div>
+
                 <div class="col-md-2">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
@@ -87,26 +88,18 @@
                             <tr>
                                 <th rowspan="2">No</th>
                                 <th onclick="changeSort('supplierName')" class="sort" rowspan="2">Supplier</th>
+                                <th onclick="changeSort('supplierNpwp')" class="sort" rowspan="2">NPWP</th>
+                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Jenis</th>
+                                <th onclick="changeSort('spekName')" class="sort" rowspan="2">Spesifikasi</th>
+                                <th onclick="changeSort('warehouseName')" class="sort" rowspan="2">Divisi</th>
                                 <th onclick="changeSort('poNum')" class="sort" rowspan="2">No PO</th>
                                 <th onclick="changeSort('poDate')" class="sort" rowspan="2">Tgl PO</th>
-                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
-                                <th onclick="changeSort('warehouseName')" class="sort" rowspan="2">Gudang</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
-                                <th rowspan="2">Unit</th>
                                 <th colspan="3">Harian</th>
                                 <th colspan="3">Tambahan Harian</th>
-                                <th colspan="3">Tambahan Bulanan</th>
-                                <th colspan="3">Subsidi</th>
-                                <th rowspan="2">Total</th>
                             </tr>
                             <tr>
-                                <th>DPP</th>
-                                <th>PPh</th>
-                                <th>Dibayarkan</th>
-                                <th>DPP</th>
-                                <th>PPh</th>
-                                <th>Dibayarkan</th>
                                 <th>DPP</th>
                                 <th>PPh</th>
                                 <th>Dibayarkan</th>
@@ -145,7 +138,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier"); ?>",
+            url: "<?= base_url("/laporan-supplier-lokal-bb/rincian-perbarang/all-rincian-perbarang"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.dateStart = $(".dateStart").val();
@@ -177,6 +170,22 @@
 
             },
             {
+                data: "supplierNpwp",
+                className: "text-center",
+            },
+            {
+                data: "barangName",
+                className: "text-center",
+            },
+            {
+                data: "spekName",
+                className: "text-center",
+            },
+            {
+                data: "warehouseName",
+                className: "text-center",
+            },
+            {
                 data: "poNum",
                 className: "text-center",
             },
@@ -185,23 +194,11 @@
                 className: "text-center",
             },
             {
-                data: "barangName",
-                className: "text-center",
-            },
-            {
-                data: "warehouseName",
-                className: "text-center",
-            },
-            {
                 data: "qtyPO",
                 className: "text-center",
             },
             {
                 data: "satuanName",
-                className: "text-center",
-            },
-            {
-                data: "companyName",
                 className: "text-center",
             },
             {
@@ -228,35 +225,7 @@
                 data: "totalHarian",
                 className: "text-center",
             },
-            {
-                data: "dppBulanan",
-                className: "text-center",
-            },
-            {
-                data: "pphBulanan",
-                className: "text-center",
-            },
-            {
-                data: "totalBulanan",
-                className: "text-center",
-            },
-            {
-                data: "subsidi",
-                className: "text-center",
-            },
-            {
-                data: "pphSubsidi",
-                className: "text-center",
 
-            },
-            {
-                data: "totalSubsidi",
-                className: "text-center",
-            },
-            {
-                data: "totalRow",
-                className: "text-center",
-            },
         ],
         columnDefs: [{
             defaultContent: "-",
