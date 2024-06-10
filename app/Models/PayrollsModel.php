@@ -134,7 +134,7 @@ class PayrollsModel extends Model
         ];
     }
 
-    public function generate($employeeID, $yearMonth, $payrollID, $totalKehadiran, $startDate, $endDate)
+    public function generate($employeeID, $yearMonth, $payrollID, $startDate, $endDate)
     {
         $result = [
             'nominal_cadangan' => 0,
@@ -152,6 +152,7 @@ class PayrollsModel extends Model
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
+        $payrollGajiHarianModel = new PayrollGajiHarianModel();
 
         // set uang lembur
         $uangLemburTotal = $formLemburModel->select("SUM(total_uang_lembur) as total")
@@ -196,10 +197,16 @@ class PayrollsModel extends Model
             $result['nominal_pinjaman_karyawan'] = $pinjamanKaryawan['nominal'];
         }
 
-        $nominalGajiHarian = ($gajiHarian != null) ? $gajiHarian['nominal'] : 0;
-        $nominalGajiCadangan = ($gajiCadangan != null) ? $gajiCadangan['nominal'] : 0;
-
-        $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $totalKehadiran;
+        // GENERATE 
+        // $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $totalKehadiran;
+        $payroll = $this->asArray()->find($payrollID);
+        $nominalUangGaji = $payrollGajiHarianModel->generate(
+            $payrollID,
+            $payroll['company_id'],
+            $employeeID,
+            $yearMonth,
+        );
+        $result['nominal_uang_gaji'] = $nominalUangGaji;
 
         // nominal pengurangan gaji ( keterlambatan absen + komponen gaji minus)
         // keterlambatan kehadiran
@@ -266,6 +273,7 @@ class PayrollsModel extends Model
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
+        $payrollGajiHarianModel = new PayrollGajiHarianModel();
 
         $payroll = $this->asArray()->where('id', $payrollID)->first();
 
@@ -297,10 +305,15 @@ class PayrollsModel extends Model
             $result['nominal_pinjaman_karyawan'] = $pinjamanKaryawan['nominal'];
         }
 
-        $nominalGajiHarian = $payroll['nominal_gaji_harian'];
-        $nominalGajiCadangan = $payroll['nominal_cadangan'];
-
-        $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $payroll['hadir'];
+        // GENERATE 
+        // $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $totalKehadiran;
+        $nominalUangGaji = $payrollGajiHarianModel->generate(
+            $payrollID,
+            $payroll['company_id'],
+            $payroll['employee_id'],
+            $payroll['year_month'],
+        );
+        $result['nominal_uang_gaji'] = $nominalUangGaji;
 
         // nominal pengurangan gaji ( keterlambatan absen + komponen gaji minus)
 
@@ -478,7 +491,6 @@ class PayrollsModel extends Model
         $companyModel = new CompaniesModel();
         $bagianModel = new BagianModel();
 
-        $divisiData = $divisiModel->where('company_id', $companyID)->where('deletedAt', null)->findAll();
         $bagianData = $bagianModel->where('division_id', $divisionID)->where('deletedAt', null)->findAll();
 
         $res = [];
