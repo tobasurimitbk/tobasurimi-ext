@@ -913,14 +913,14 @@ class Invoice extends BaseController
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->find($id);
 
-        if ($invData->document_type == 'pengiriman') {
-            $sjData = $this->SuratJalanModel->asObject()
-                ->find($invData->document_id);
+        // if ($invData->document_type == 'pengiriman') {
+        //     $sjData = $this->SuratJalanModel->asObject()
+        //         ->find($invData->document_id);
 
-            $soIds = json_decode($sjData->multiple_id_so);
-        } else {
-            $soIds = json_decode($invData->document_id);
-        }
+        //     $soIds = json_decode($sjData->multiple_id_so);
+        // } else {
+        //     $soIds = json_decode($invData->document_id);
+        // }
 
         $soSelectQry = "sales_order_invoice_detail.id AS id,
         sales_order_invoice_detail.id_barang_invoice AS id_barang,

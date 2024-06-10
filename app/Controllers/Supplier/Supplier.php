@@ -1025,7 +1025,7 @@ class Supplier extends BaseController
                 $newAkhirDate = date("Y-m-d", strtotime($akhirDate));
                 $barangId = $this->request->getPost('barang_id_per_barang');
 
-                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport($newAwalDate, $newAkhirDate, '', $barangId, '');
+                $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReport2($newAwalDate, $newAkhirDate, '', $barangId, '');
                 $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $barangId)->where('type_barang', 'bahan_baku')->first();
 
                 if (!empty($dataBBLokal)) {

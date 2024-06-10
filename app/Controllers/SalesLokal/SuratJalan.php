@@ -578,6 +578,7 @@ class SuratJalan extends BaseController
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
             ->whereIn('sales_order.id', $soIds)
+            ->where('tipe_input', "order_form")
             ->findAll();
 
         /* $soDetQry = "barangs.nama_barang AS namaBarang, 

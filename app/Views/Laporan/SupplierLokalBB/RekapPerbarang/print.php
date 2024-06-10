@@ -88,9 +88,14 @@
             <tr>
                 <td style="width:100px">Tanggal</td>
                 <td style="width:10px">:</td>
-                <td style="width:80px"><?= $tanggalAwal; ?></td>
-                <td style="width:10px"> S/D </td>
-                <td><?= $tanggalAkhir; ?></td>
+                <?php if (!empty($tanggalAwal) && !empty($tanggalAkhir)) : ?>
+                    <td style="width:80px"><?= $tanggalAwal; ?></td>
+                    <td style="width:10px"> S/D </td>
+                    <td><?= $tanggalAkhir; ?></td>
+                <?php else : ?>
+                    <td colspan="3" style="width:80px">ALL</td>
+
+                <?php endif; ?>
             </tr>
             <tr>
                 <td>Bahan Baku</td>

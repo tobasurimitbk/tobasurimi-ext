@@ -4,12 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pendapatan Supplier</h1>
+        <h1>Rekap All Barang</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
@@ -37,20 +37,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
-                            <option value="" data-code=""></option>
 
-                            <?php foreach ($getSupplier as $row) : ?>
-                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
-                            <?php endforeach; ?>
-
-
-                        </select>
-                        <label for="floatingInput">Filter Suplier</label>
-                    </div>
-                </div>
                 <div class="col-md-2">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_warehouse" name="filter_warehouse" id="filter_warehouse">
@@ -65,6 +52,8 @@
                         <label for="floatingInput">Filter Warehouse</label>
                     </div>
                 </div>
+
+
                 <div class="col-md-2">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
@@ -86,24 +75,18 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2">No</th>
-                                <th onclick="changeSort('supplierName')" class="sort" rowspan="2">Supplier</th>
-                                <th onclick="changeSort('poNum')" class="sort" rowspan="2">No PO</th>
-                                <th onclick="changeSort('poDate')" class="sort" rowspan="2">Tgl PO</th>
-                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
-                                <th onclick="changeSort('warehouseName')" class="sort" rowspan="2">Gudang</th>
+                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Jenis</th>
+
+                                <th onclick="changeSort('spekName')" class="sort" rowspan="2">Spesifikasi</th>
+                                <th onclick="changeSort('bagianName')" class="sort" rowspan="2">Divisi</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
-                                <th rowspan="2">Unit</th>
                                 <th colspan="3">Harian</th>
                                 <th colspan="3">Tambahan Harian</th>
                                 <th colspan="3">Tambahan Bulanan</th>
-                                <th colspan="3">Subsidi</th>
-                                <th rowspan="2">Total</th>
+
                             </tr>
                             <tr>
-                                <th>DPP</th>
-                                <th>PPh</th>
-                                <th>Dibayarkan</th>
                                 <th>DPP</th>
                                 <th>PPh</th>
                                 <th>Dibayarkan</th>
@@ -126,7 +109,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "poNum";
+    let sort = "barangName";
     let sortType = "desc";
     var row = 0;
 
@@ -145,14 +128,14 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier"); ?>",
+            url: "<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/all-rekap-all-barang"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
                 data.sortType = sortType;
-                data.filter_supplier = $(".filter_supplier").val();
+
                 data.filter_warehouse = $(".filter_warehouse").val();
                 data.filter_barang = $(".filter_barang").val();
             },
@@ -172,38 +155,31 @@
                 sortable: false
             },
             {
-                data: "supplierName",
+                data: "barangName",
                 className: "text-center",
 
             },
+
             {
-                data: "poNum",
+                data: "spekName",
                 className: "text-center",
             },
+
             {
-                data: "poDate",
+                data: "bagianName",
                 className: "text-center",
             },
-            {
-                data: "barangName",
-                className: "text-center",
-            },
-            {
-                data: "warehouseName",
-                className: "text-center",
-            },
+
             {
                 data: "qtyPO",
                 className: "text-center",
             },
+
             {
                 data: "satuanName",
                 className: "text-center",
             },
-            {
-                data: "companyName",
-                className: "text-center",
-            },
+
             {
                 data: "dppUmum",
                 className: "text-center",
@@ -240,23 +216,8 @@
                 data: "totalBulanan",
                 className: "text-center",
             },
-            {
-                data: "subsidi",
-                className: "text-center",
-            },
-            {
-                data: "pphSubsidi",
-                className: "text-center",
 
-            },
-            {
-                data: "totalSubsidi",
-                className: "text-center",
-            },
-            {
-                data: "totalRow",
-                className: "text-center",
-            },
+
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -307,24 +268,24 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_supplier, .filter_warehouse, .filter_barang").change(function() {
+    $(".dateStart, .dateEnd, .filter_warehouse ,.filter_barang").change(function() {
         table.ajax.reload();
     });
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang').select2({
+    $(' .filter_warehouse , .filter_barang').select2({
         placeholder: "",
         theme: "bootstrap-5",
         allowClear: true,
     })
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang')
+    $(' .filter_warehouse , .filter_barang')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang')
+    $(' .filter_warehouse , .filter_barang')
         .parent('div')
         .children('span')
         .children('span')
@@ -332,7 +293,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang')
+    $(' .filter_warehouse , .filter_barang')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -341,11 +302,11 @@
 
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
-        let filter_supplier = $(".filter_supplier").val();
+
         let filter_warehouse = $(".filter_warehouse").val();
         let filter_barang = $(".filter_barang").val();
 
-        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

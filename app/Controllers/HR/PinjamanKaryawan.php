@@ -148,7 +148,7 @@ class PinjamanKaryawan extends BaseController
                 }
             }
 
-            $golonganDetail = $golonganModel->where('golongan_name', $e['tipe'])->first();
+            $golonganDetail = $golonganModel->where('company_id', $this->this_company_id)->where('golongan_name', $e['tipe'])->first();
             $nominalPinjaman = $golonganDetail == null ? 0 : $golonganDetail['nominal_pinjaman'];
 
             $pinjamanKaryawanModel->insert([

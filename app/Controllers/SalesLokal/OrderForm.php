@@ -908,6 +908,7 @@ class OrderForm extends BaseController
             ->select('barang_master_sales.barang_name AS namaBarang, barang_master_sales.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
+            ->where('tipe_input', "order_form")
             ->where('id_sales_order', $id)
             ->findAll();
 
