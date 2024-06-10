@@ -436,6 +436,7 @@
             list_items_barang_jadi = [];
             list_items_barang_digunakan = [];
             list_items_barang_scrap = [];
+            list_items_barang_filling = [];
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
                 list_items_barang_jadi.push({
                     'barang_detail_id': getID(),
@@ -490,6 +491,26 @@
                 });
             <?php endforeach; ?>
             drawTableBarangDigunakan();
+            <?php foreach ($dataResultBarangReturn as $key => $br) : ?>
+                list_items_barang_filling.push({
+                    'barang_detail_id': getID(),
+                    'production_result_detail_id': '<?= $br->id; ?>',
+                    'barang1_id': '<?= $br->barang1_id; ?>',
+                    'barang2_id': '<?= $br->barang2_id; ?>',
+                    'barang_name': '<?= $br->barang_name; ?>',
+                    'kode_barang': '<?= $br->kode_barang; ?>',
+                    'satuan': '<?= $br->kode_satuan; ?>',
+                    'nama_barang': '<?= $br->nama_barang; ?>',
+                    'qty': '<?= $br->qty; ?>',
+                    'ref_no': '<?= $br->no_ref; ?>',
+                    'no_aju': '<?= $br->no_aju; ?>',
+                    'type_barang': '<?= $br->barang_type; ?>',
+                    'type_barang_text': '<?= $br->type_barang_text; ?>',
+                    'kondisi_barang': '<?= $br->kondisi_barang; ?>',
+                    'kondisi_barang_text': '<?= strtoupper($br->kondisi_barang); ?>',
+                });
+            <?php endforeach; ?>
+            drawTableBarangFilling();
         <?php endif; ?>
         // Departemen
         $('.kondisi_barang').select2({
