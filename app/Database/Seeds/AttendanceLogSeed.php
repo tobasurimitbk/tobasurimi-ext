@@ -12,9 +12,9 @@ class AttendanceLogSeed extends Seeder
     {
         $month = "06";
         $year = "2024";
-        $companyID = "2";
-        $attendancesUnitID = "1";
-        $mulaiMasuk = "08:30:00";
+        $companyID = "15";
+        $attendancesUnitID = "2";
+        $mulaiMasuk = "16:00:00";
 
         $modelEmployees = new EmployeesModel();
         $modelAttendanceLog = new AttendancesLogModel();
