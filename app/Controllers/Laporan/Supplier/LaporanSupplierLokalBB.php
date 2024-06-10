@@ -1215,7 +1215,7 @@ class LaporanSupplierLokalBB extends BaseController
         ];
 
 
-        return view('Laporan/SupplierLokalBB/RekapPerBarang/index', $data);
+        return view('Laporan/SupplierLokalBB/RekapPerbarang/index', $data);
     }
 
     public function allLaporanRekapPerbarang()
