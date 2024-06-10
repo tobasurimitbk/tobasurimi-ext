@@ -427,7 +427,7 @@
                 </div>
             </div>
         </div>
-
+    </div>
 </section>
 <div class="modal" id="detailModal" tabindex="-1">
     <div class="modal-dialog">
@@ -445,6 +445,17 @@
                     <div class="form-floating mb-2" style="height: 50px;">
                         <input type="text" name="tanggal" class="form-control" id="tanggal" disabled>
                         <label for="tanggal">Tanggal</label>
+                    </div>
+                    <div class="input-group">
+                        <div class="form-floating mb-2" style="height: 50px;">
+                            <input type="text" name="jamKerjaName" class="form-control" id="jamKerjaName" disabled>
+                            <label for="tanggal">Jam Kerja</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button class="btn btn-success jamKerjaDetail" id="jamKerjaDetail" type="button">
+                                <i class="fas fa-calendar-week"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="form-floating mb-2" style="height: 50px;">
                         <input type="text" name="statusKehadiran" class="form-control" id="statusKehadiran" disabled>
@@ -477,8 +488,52 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Close</button>
+                    <button type="button" class="btn btn-hide-form btn-discard btn-discard-1 mr-3">Close</button>
                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal" id="detail2Modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Jam Kerja</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2" style="height: 50px;">
+                            <input type="text" id="jamKerjaNameDetail" class="form-control jamKerjaNameDetail" disabled>
+                            <label for="checkin">Jenis Jam Kerja</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2" style="height: 50px;">
+                            <input type="text" id="jamTerlambatDetail" class="form-control jamTerlambatDetail" disabled>
+                            <label for="checkout">Jam Terlambat</label>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered nowrap table-striped table-hover-tobasurimi dataTable table-form-tts" id="dataTable2" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="text-align: center; width:10px;">No</th>
+                            <th style="text-align: center;">Hari</th>
+                            <th style="text-align: center;">Masuk</th>
+                            <th style="text-align: center;">Mulai Istirahat</th>
+                            <th style="text-align: center;">Selesai Istirahat</th>
+                            <th style="text-align: center;">Pulang</th>
+                        </tr>
+                    </thead>
+                    <tbody class="body-table">
+                    </tbody>
+                    <tfoot></tfoot>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-2 mr-3">Close</button>
+            </div>
             </form>
         </div>
     </div>
@@ -588,7 +643,6 @@
                 var data = response.data;
                 csrf.val(response.token);
 
-
                 $('#employeeName').val(data.employee?.name);
                 $('#tanggal').val(data.tanggal);
                 $('#statusKehadiran').val(data.status);
@@ -596,6 +650,12 @@
                 $('#checkIn').val(data.checkIn);
                 $('#checkOut').val(data.checkOut);
                 $('#jamTerlambat').val(data.jamTerlambat);
+                $('#jamKerjaName').val(data.jamKerja.jenis);
+
+                // ASSIGN ATTR
+                $('#jamKerjaDetail').data('jam_kerja_id', data.jamKerja.id);
+                $('#jamKerjaDetail').data('jenis', data.jamKerja.jenis);
+                $('#jamKerjaDetail').data('jam_terlambat', data.jamKerja.jam_terlambat);
 
                 $('#detailModal').modal('show');
             },
@@ -608,9 +668,75 @@
             }
         });
     });
-    $('.btn-discard').click(function() {
+    $('.jamKerjaDetail').click(function() {
+        var element = $(this);
+        var jamKerjaId = element.data('jam_kerja_id');
+        var jenis = element.data('jenis');
+        var jamTerlambat = element.data('jam_terlambat');
+        // ASSIGN
+        $('#jamKerjaNameDetail').val(jenis);
+        $('#jamTerlambatDetail').val(jamTerlambat);
+        // GET DETAIL JAM KERJA
+        getListDetailJamKerja(jamKerjaId);
+
+        $('#detail2Modal').modal('show');
+
+    })
+
+    $('.btn-discard-1').click(function() {
         $('#detailModal').modal('hide');
     });
+
+    $('.btn-discard-2').click(function() {
+        $('#detail2Modal').modal('hide');
+    });
+
+    function getListDetailJamKerja(jamKerjaId) {
+        $.ajax({
+            url: `<?= base_url('employee/get-jam-kerja-detail'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                jam_kerja_id: jamKerjaId,
+            },
+            dataType: "json",
+            success: function(res) {
+                var listData = res.data;
+                var no = 1;
+
+                const table = $('#dataTable2');
+                table.find('tbody').empty();
+                table.find('tfoot').empty();
+
+                if (listData.length === 0) {
+                    var newRow = $('<tr>');
+                    newRow.append($('<td colspan="6" style="text-align:center">Tidak Ada Jam Kerja</td>'));
+                    table.find('tfoot').append(newRow);
+                } else {
+                    $.each(listData, function(i, v) {
+                        var newRow = $('<tr style="color:whitesmoke;">');
+                        newRow.append($('<td style="text-align: center;">').html(
+                            `
+                            ${no++} 
+                        `
+                        ));
+                        newRow.append($('<td style="text-align: center;">').text(v.hari));
+                        newRow.append($('<td style="text-align: center;">').text(v.jam_masuk));
+                        newRow.append($('<td style="text-align: center;">').text(v.jam_istirahat_mulai));
+                        newRow.append($('<td style="text-align: center;">').text(v.jam_istirahat_selesai));
+                        newRow.append($('<td style="text-align: center;">').text(v.jam_pulang));
+                        table.find('tbody').append(newRow);
+                    });
+                }
+            }
+        });
+
+    }
 </script>
 
 

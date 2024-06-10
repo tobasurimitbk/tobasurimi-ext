@@ -5,9 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Form Lembur</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("lembur/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Personalia', 'Form Lembur', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("lembur/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <?= csrf_field() ?>
     <div class="card">

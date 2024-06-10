@@ -242,7 +242,7 @@ class MaterialRequestsModel extends Model
         ];
     }
 
-    public function get_no($tgl, $bln, $thn, $last_day)
+    public function get_no($tgl, $bln, $thn, $last_day, $company_id)
     {
         $romanNumb = [
             'I',
@@ -264,7 +264,8 @@ class MaterialRequestsModel extends Model
         $builder = $this->db->table('material_requests');
         $builder->select('req_no');
         $builder->orderBy('req_no', 'desc')
-            ->where('deletedAt', null);
+            ->where('deletedAt', null)
+            ->where('company_id', $company_id);
         $builder->like('req_no', $lastStr);
         $query = $builder->get();
 

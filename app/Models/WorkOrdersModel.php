@@ -104,7 +104,7 @@ class WorkOrdersModel extends Model
         ];
     }
 
-    public function get_no($tgl, $bln, $thn, $last_day)
+    public function get_no($tgl, $bln, $thn, $last_day, $company_id)
     {
         $romanNumb = [
             'I',
@@ -126,7 +126,8 @@ class WorkOrdersModel extends Model
         $builder = $this->db->table('work_orders');
         $builder->select('wo_no');
         $builder->orderBy('wo_no', 'desc')
-            ->where('deletedAt', null);
+            ->where('deletedAt', null)
+            ->where('company_id', $company_id);
         $builder->like('wo_no', $lastStr);
         $query = $builder->get();
 

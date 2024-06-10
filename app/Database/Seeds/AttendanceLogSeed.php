@@ -10,16 +10,17 @@ class AttendanceLogSeed extends Seeder
 {
     public function run()
     {
-        $month = "10";
-        $year = "2023";
-        $companyID = "1";
-        $attendancesUnitID = "1";
-        $mulaiMasuk = "17:30:00";
+        $month = "06";
+        $year = "2024";
+        $companyID = "15";
+        $attendancesUnitID = "2";
+        $mulaiMasuk = "16:00:00";
 
         $modelEmployees = new EmployeesModel();
         $modelAttendanceLog = new AttendancesLogModel();
 
-        $employeeData = $modelEmployees->where('employees.deletedAt', null)
+        $employeeData = $modelEmployees->where('company_id', $companyID)
+            ->where('employees.deletedAt', null)
             ->findAll();
 
         $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);

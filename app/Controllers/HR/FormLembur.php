@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
 use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
+use App\Models\EmployeeJamKerjaModel;
 use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
 use App\Models\GajiConjunctionModel;
@@ -62,6 +63,8 @@ class FormLembur extends BaseController
         $formLemburModel = new FormLemburModel();
         $DivisiModel = new DivisisModel();
 
+        $id = decrypt($id);
+
         $data = [
             "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
             'employees' => $employeesModel->getEmployeesAndDivisi($this->this_company_id),
@@ -73,7 +76,7 @@ class FormLembur extends BaseController
 
     public function delete()
     {
-        $id = $this->request->getPost("id");
+        $id = \decrypt($this->request->getPost("id"));
 
         $formLemburModel = new FormLemburModel();
         $formLemburModel->where('id', $id)->delete();
@@ -133,13 +136,13 @@ class FormLembur extends BaseController
 
             array_push($dataFormLembur, [
                 "no" => $no++,
-                "id" => $p->id,
+                "id" => encrypt($p->id),
                 "nip" => $p->employeesNIP,
                 "name" => $p->employeesName,
                 "divisi" => $p->divisiName,
                 "periode" => $tanggalObj->format('d/m/Y'),
                 "jam_lembur" => $jam . " Jam " . $menit . " Menit",
-                "uang_lembur" => "Rp. " . number_format($p->total_uang_lembur, 0, ',', '.')
+                "uang_lembur" => "" . number_format($p->total_uang_lembur, 0, ',', '.')
             ]);
         }
         $data = [
@@ -165,8 +168,8 @@ class FormLembur extends BaseController
         $modelJamKerja = new JamKerjaModel();
         $modelGaji = new GajiConjunctionModel();
         $modelLogAttendance = new AttendancesLogModel();
-        $modelEmployee = new EmployeesModel();
         $modelBigDays = new BigDaysModel();
+        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
 
         // declare Variable
         $checkOutLog = ""; // di set sebagai selesai lembur
@@ -247,16 +250,16 @@ class FormLembur extends BaseController
             $checkOutLog = $jamSelesaiLembur;
         }
 
-        // employee get first
-        $employee = $modelEmployee->where('id', $employeeID)->first();
         // get jam kerja
         $hariInIndonesia = static::getDayIndonesia(date('l', strtotime($tanggal)));
+        // GET JAM KERJA USED
+        $jamKerja = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
+
         $jamKerjaDetail = $modelJamKerja
             ->select('jam_kerja_detail.*')
             ->join('jam_kerja_detail', 'jam_kerja.id = jam_kerja_detail.jam_kerja_id')
-            ->join('divisis', 'divisis.jam_kerja_id = jam_kerja.id')
             ->where('jam_kerja.company_id', $this->this_company_id)
-            ->where('divisis.id', $employee['division_id'])
+            ->where('jam_kerja.id', $jamKerja['id'])
             ->where('jam_kerja_detail.hari', $hariInIndonesia)
             ->first();
 
@@ -314,7 +317,7 @@ class FormLembur extends BaseController
 
         if ($totalJamLembur <= 0.9) {
             return \response()->setJSON([
-                'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam",
+                'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam. Tanggal " . date('d/m/Y', strtotime($tanggal)) . " hanya menghasilkan total jam lembur sebesar " . $waktuSelisihPulangLembur['menit'] . " Menit. Pegawai Checkout Jam " . $checkOutLog . " dan Waktu Pulang di Jam Kerja Adalah Jam " . $jamKerjaDetail['jam_pulang'] . ". Sehingga tidak memenuhi persyaratan :)",
                 'status' => \false,
                 'code' => 400
             ]);

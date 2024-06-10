@@ -123,7 +123,6 @@
                                 <th onclick="changeSort('pinjaman_karyawan.tidak_hadir')">Tidak Hadir</th>
                                 <th>Nominal</th>
                                 <th>Status Pinjaman</th>
-                                <!-- <th>Action</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">

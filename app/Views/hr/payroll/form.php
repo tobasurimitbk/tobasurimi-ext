@@ -6,7 +6,7 @@
         <h1 class="title-name">Detail Payroll</h1>
         <div class="col-button-tambah-spp">
             <?php $splitMonthYear = explode("-", $payrollDetail['year_month']); ?>
-            <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url("payroll/print/single/" . $payrollDetail['id']); ?>">
+            <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url("payroll/print/single/" . encrypt($payrollDetail['id'])); ?>">
                 <i class="fa-solid fa-print"></i> Print
             </a>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("payroll?year=" . $splitMonthYear[0] . "&month=" . $splitMonthYear[1]); ?>">
@@ -196,6 +196,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link <?= (@$_GET['location'] == "pinjamanKaryawan") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#pinjamanKaryawan" type="button" role="tab" aria-selected="false">Pinjaman Karyawan</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link <?= (@$_GET['location'] == "rekapGajiHarian") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#rekapGajiHarian" type="button" role="tab" aria-selected="false">Rekap Gaji Harian</button>
+                    </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade <?= (@$_GET['location'] == "nilaiKomponenGaji" || empty(@$_GET['location'])) ? 'show active' : '' ?> " id="perhitunganGaji" role="tabpanel">
@@ -351,6 +354,46 @@
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade <?= (@$_GET['location'] == "rekapGajiHarian") ? 'show active' : '' ?>" id="rekapGajiHarian" role="tabpanel">
+                        <table class="table nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 10px; text-align:center;" class="sort">No</th>
+                                    <th style="text-align: center;" class="sort">Tanggal</th>
+                                    <th style="text-align: center;" class="sort">Jam Kerja</th>
+                                    <th style="text-align: center;" class="sort">CheckIn</th>
+                                    <th style="text-align: center;" class="sort">Mulai Istirahat</th>
+                                    <th style="text-align: center;" class="sort">Selesai Istirahat</th>
+                                    <th style="text-align: center;" class="sort">CheckOut</th>
+                                    <th style="text-align: center;" class="sort">Total Jam</th>
+                                    <th style="text-align: center;" class="sort">Nominal ((GP + CADANGAN) / 7 * Total Jam)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table">
+                                <?php $i = 1; ?>
+                                <?php foreach ($rekapGajiHarian as $r) : ?>
+                                    <tr style="color: whitesmoke; text-align:center;">
+                                        <td><?= $i++ ?></td>
+                                        <td><?= $r['tanggal'] ?></td>
+                                        <td><?= $r['jenis'] ?></td>
+                                        <td><?= $r['jam_masuk'] ?></td>
+                                        <td><?= $r['jam_istirahat_mulai'] ?></td>
+                                        <td><?= $r['jam_istirahat_selesai'] ?></td>
+                                        <td><?= $r['jam_pulang'] ?></td>
+                                        <td><?= number_format($r['total_jam'], 2) ?></td>
+                                        <td style="font-weight: bold;">Rp. <?= number_format($r['nominal_diterima'], 2) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr>
+                                    <td colspan="8" style="text-align:right;"><b>Total Gaji Berdasarkan Jam Kerja</b></td>
+                                    <td style=" text-align:center;">
+                                        <b>Rp. <?= number_format($payrollDetail['nominal_uang_gaji'], 2) ?></b>
+                                    </td>
+                                </tr>
+                            </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -639,7 +682,11 @@
                         url: "<?= base_url("payroll/update/nominal-keterlambatan-presensi"); ?>",
                         data: data,
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",

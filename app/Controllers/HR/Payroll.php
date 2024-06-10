@@ -14,6 +14,7 @@ use App\Models\FormPerizinanNotApprovedModel;
 use App\Models\GajiDivisiModel;
 use App\Models\GolonganModel;
 use App\Models\PayrollGajiConjunctionModel;
+use App\Models\PayrollGajiHarianModel;
 use App\Models\PayrollsModel;
 use App\Models\PinjamanKaryawanModel;
 use Dompdf\Dompdf;
@@ -104,7 +105,7 @@ class Payroll extends BaseController
             $bagian = $bagianModel->where('id', $p->bagianID)->first();
             array_push($dataPayRolls, [
                 "no" => $no++,
-                "id" => $p->id,
+                "id" => encrypt($p->id),
                 "employee_id" => $p->employee_id,
                 "nip" => $p->employeesNIP,
                 "namaBagian" => ($bagian == null) ? "-" : $bagian['nama_bagian'],
@@ -246,7 +247,6 @@ class Payroll extends BaseController
                     $e['id'],
                     $yearMonth,
                     $payrollID,
-                    ($status['HADIR_H'] + $res['total_perizinan_approved']),
                     $startDate,
                     $endDate
                 );
@@ -375,7 +375,6 @@ class Payroll extends BaseController
             $employeesData['id'],
             $yearMonth,
             $payrollID,
-            ($status['HADIR_H'] + $res['total_perizinan_approved']),
             $startDate,
             $endDate
         );
@@ -405,12 +404,15 @@ class Payroll extends BaseController
 
     public function detailPayrollView($id)
     {
+        $id = decrypt($id);
+
         $payrollModel = new PayrollsModel();
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
         $formLemburModel = new FormLemburModel();
         $rekapPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
+        $payrollGajiHarian = new PayrollGajiHarianModel();
 
         $payroll = $payrollModel->where('id', $id)->first();
 
@@ -428,7 +430,8 @@ class Payroll extends BaseController
             'rekapLembur' => $formLemburModel->rekap($payroll['employee_id'], $payroll['year_month']),
             'rekapPerizinanNotApproved' => $rekapPerizinanNotApprovedModel->rekap($id),
             'totalNominalRekapPerizinanNotApproved' => $rekapPerizinanNotApprovedModel->getTotalRekap($id),
-            'rekapPinjaman' => $pinjamanKaryawanModel->getPinjamanKaryawanDiambil($payroll['employee_id'], $payroll['year_month'])
+            'rekapPinjaman' => $pinjamanKaryawanModel->getPinjamanKaryawanDiambil($payroll['employee_id'], $payroll['year_month']),
+            'rekapGajiHarian' => $payrollGajiHarian->getList($id)
         ];
 
         return view('hr/payroll/form', $data);
@@ -480,7 +483,7 @@ class Payroll extends BaseController
         return \response()->setJSON([
             'message' => "Nominal pengurangan keterlambatan presensi berhasil diperbaruhi",
             'location' => "rekapKeterlambatanPresensi",
-            'id' => $payrollID
+            'id' => encrypt($payrollID)
         ]);
     }
 

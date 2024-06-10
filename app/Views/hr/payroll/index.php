@@ -487,6 +487,10 @@
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                             // show loading
                             $('#loadingSpinner').show();
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,
@@ -594,6 +598,10 @@
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                             // show loading
                             $('#loadingSpinner').show();
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         processData: false,
                         contentType: false,
@@ -650,12 +658,14 @@
         placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
+        dropdownParent: $('#generateModal')
     });
 
     $("select[name='filterEmployeeID']").select2({
         placeholder: "Cari Berdasarkan Karyawan",
         theme: "bootstrap-5",
         allowClear: true,
+        dropdownParent: $('#generateModal')
     });
 
     $("select[name='filterDivisiID']").on('change', function(e) {
