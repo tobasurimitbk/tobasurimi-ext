@@ -114,6 +114,7 @@
         <tr>
             <th rowspan="2">No.</th>
             <th rowspan="2">Bahan Baku</th>
+            <th rowspan="2">Spesifikasi</th>
             <th rowspan="2">Gudang</th>
             <th rowspan="2">No PO</th>
             <th rowspan="2">Tgl PO</th>
@@ -144,6 +145,7 @@
                 <tr>
                     <td><?= $no++; ?></td>
                     <td><?= $do->barangName; ?></td>
+                    <td><?= $do->spekName; ?></td>
                     <td><?= $do->warehouseName; ?></td>
                     <td><?= $do->poNum; ?></td>
                     <td><?= $do->poDate; ?></td>
@@ -165,7 +167,7 @@
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td colspan="7">Total</td>
+                <td colspan="8">Total</td>
                 <td id="totalDppUmum"><?= $totalDppUmum; ?></td>
                 <td id="totalPphUmum"><?= $totalPphUmum; ?></td>
                 <td id="totalTotalUmum"><?= $totalTotalUmum; ?></td>
@@ -183,7 +185,7 @@
             </tr>
         <?php else : ?>
             <tr>
-                <td colspan="23">Tidak ada data yang tersedia.</td>
+                <td colspan="24">Tidak ada data yang tersedia.</td>
             </tr>
         <?php endif; ?>
     </table>

@@ -62,7 +62,7 @@
 
 
                         </select>
-                        <label for="floatingInput">Filter Suplier</label>
+                        <label for="floatingInput">Filter Supplier</label>
                     </div>
                 </div>
 

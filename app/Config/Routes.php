@@ -1556,7 +1556,12 @@ $routes->get('/laporan-supplier-lokal-bb/rekap-perbarang', 'Laporan\Supplier\Lap
 $routes->get('/laporan-supplier-lokal-bb/rekap-perbarang/all-rekap-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapPerbarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-perbarang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapPerbarang', ['filter' => 'Auth']);
 
+//Laporan Warehouse
+$routes->get('/laporan-warehouse', 'Laporan\Warehouse\LaporanWarehouse::index', ['filter' => 'Auth']);
 
+$routes->get('/laporan-warehouse/sales-order', 'Laporan\Warehouse\LaporanWarehouse::laporanSalesOrder', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/sales-order/all-sales-order', 'Laporan\Warehouse\LaporanWarehouse::allLaporanSalesOrder', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/sales-order/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanSalesOrder', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

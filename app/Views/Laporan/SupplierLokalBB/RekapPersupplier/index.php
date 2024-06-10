@@ -88,6 +88,7 @@
                                 <th rowspan="2">No</th>
 
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
+                                <th onclick="changeSort('spekName')" class="sort" rowspan="2">Spesifikasi</th>
                                 <th onclick="changeSort('warehouseName')" class="sort" rowspan="2">Gudang</th>
                                 <th onclick="changeSort('poNum')" class="sort" rowspan="2">No PO</th>
                                 <th onclick="changeSort('poDate')" class="sort" rowspan="2">Tgl PO</th>
@@ -172,6 +173,10 @@
             },
             {
                 data: "barangName",
+                className: "text-center",
+            },
+            {
+                data: "spekName",
                 className: "text-center",
             },
             {
