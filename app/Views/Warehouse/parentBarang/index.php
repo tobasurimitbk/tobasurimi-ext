@@ -36,6 +36,9 @@
                     <a class="nav-link <?= $type == "bahan_modal" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_modal') ?>">Barang Modal</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link <?= $type == "bahan_setengah_jadi" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=bahan_setengah_jadi') ?>">Bahan Setengah Jadi</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <?= $type == "kemasan" ? "active" : "" ?>" href="<?= base_url('parent-barang?type=kemasan') ?>">Kemasan</a>
                 </li>
             </ul>

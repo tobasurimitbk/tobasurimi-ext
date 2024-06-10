@@ -260,7 +260,7 @@
         $('.kode_barang').select2({
             placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content"),
+            dropdownParent: $(".detail-modal"),
             tags: false,
             allowClear: true
         }).change(function() {
@@ -320,6 +320,7 @@
             validator_detail.resetForm();
             validator_detail.reset();
             var type = "bahan_jadi";
+            var type2 = "bahan_setengah_jadi";
             $(".spp_type_bypass").val(type)
             if (type) {
                 $.ajax({
@@ -327,13 +328,14 @@
                     method: "GET",
                     dataType: "json",
                     data: {
-                        type: type
+                        type: type,
+                        type2: type2
                     },
                     success: function(res) {
                         $(".kode_barang").empty();
                         $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                         res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" value="${item.kode_barang}">(${item.kode_barang}) ${item.barang_name}</option>`);
                         })
                         $(".kode_barang").val("").change();
                         $(".detail-modal").modal("show");

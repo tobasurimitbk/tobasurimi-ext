@@ -125,7 +125,7 @@ class BarangMasterModel extends Model
         ];
     }
 
-    public function getBarangByType($type)
+    public function getBarangByType($type, $type2 = null)
     {
         $arrCondition = [
             'barang_master.deletedAt' => null,
@@ -134,15 +134,23 @@ class BarangMasterModel extends Model
         ];
 
         $selectQry = "barang_master.*, satuans.nama_satuan, parent_barang.parent_name";
-        $data = $this->select($selectQry)
+
+        $this->select($selectQry)
             ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
             ->join('parent_barang', 'barang_master.parent_type_id = parent_barang.id', 'left')
-            ->where($arrCondition)
-            ->orderBy('barang_master.barang_name', "ASC")
-            ->findAll();
+            ->where($arrCondition);
+
+        if ($type2 !== null) {
+            $this->orWhere('barang_master.type_barang', $type2);
+        }
+
+        $this->orderBy('barang_master.barang_name', "ASC");
+
+        $data = $this->findAll();
 
         return $data;
     }
+
 
     public function getBarangByTypeWithSpec($condition)
     {

@@ -147,6 +147,8 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "Bahan Scrap";
             } elseif ($value->barang_type == "bahan_modal") {
                 $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
             }
         }
         $productionResDetSelectBS = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse, divisis.divisi as divisi";
@@ -172,6 +174,8 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "Bahan Scrap";
             } elseif ($value->barang_type == "bahan_modal") {
                 $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
             }
         }
         $productionResDetSelectBD = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name, divisis.divisi";
@@ -196,6 +200,8 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "Bahan Scrap";
             } elseif ($value->barang_type == "bahan_modal") {
                 $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
             }
         }
 
@@ -219,6 +225,8 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "Bahan Scrap";
             } elseif ($value->barang_type == "bahan_modal") {
                 $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
             } else {
                 $value->type_barang_text = "Bahan Return";
             }
@@ -237,6 +245,7 @@ class ProductionResult extends BaseController
             ->where('description', "bahan_baku")
             ->orWhere('description', "bahan_jadi")
             ->orWhere('description', "bahan_scrap")
+            ->orWhere('description', "bahan_setengah_jadi")
             ->findAll();
 
         $dataWarehouse = $this->warehousesModel->asArray()->where('company_id', $this->this_company_id)->findAll();
@@ -610,6 +619,8 @@ class ProductionResult extends BaseController
                     $value['type_barang_text'] = "Bahan Scrap";
                 } elseif ($value['type_barang'] == "bahan_modal") {
                     $value['type_barang_text'] = "Bahan Modal";
+                } elseif ($value['type_barang'] == "bahan_setengah_jadi") {
+                    $value['type_barang_text'] = "Bahan Setengah Jadi";
                 }
             }
             return response()->setJSON([

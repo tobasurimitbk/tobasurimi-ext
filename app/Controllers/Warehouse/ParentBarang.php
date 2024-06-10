@@ -36,7 +36,7 @@ class ParentBarang extends BaseController
         $parentBarangModel = new ParentBarangModel();
 
         $type = $this->request->getVar('type');
-        $parentName = $this->request->getVar('parentName');
+        $parentName = strtoupper($this->request->getVar('parentName'));
 
         if ($parentBarangModel->where('company_id', $this->this_company_id)->where('parent_name', $parentName)->where('parent_type', $type)->where('deletedAt', null)->first() != null) {
             return response()->setJSON([
