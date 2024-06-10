@@ -316,6 +316,14 @@ class JasaVendorOut extends BaseController
                 $barang2_id = $stock['barang2_id'];
             }
 
+            // BARANG LAMA
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $j['stock_out_id'],
+                $j['bc_out_id'],
+                $j['no_aju_out'],
+                $j['stock_dokumen']
+            );
+
             $stok = $this->stockModel->insertStok(
                 $jasaVendorOut['company_id'],
                 $jasaVendorOut['warehouse_id'],
@@ -346,7 +354,11 @@ class JasaVendorOut extends BaseController
                 $qty,
                 $j['no_aju_out'],
                 $jasaVendorOut['no_surat_jalan'],
-                $j['stock_dokumen']
+                $j['stock_dokumen'],
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan']
             );
         }
 

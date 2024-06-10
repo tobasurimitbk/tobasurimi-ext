@@ -292,6 +292,13 @@ class BC27 extends BaseController
                 $barang2_id = $stock['barang2_id'];
             }
 
+            // BARANG LAMA
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $m['stock_id'],
+                $m['bc_id'],
+                $m['no_aju'],
+                $m['stock_dokumen']
+            );
 
             $stok = $this->stockModel->insertStok(
                 $mutasiGlobal['company_asal_id'],
@@ -322,7 +329,12 @@ class BC27 extends BaseController
                 $stokDetail,
                 $qty,
                 $m['no_aju'],
-                $m['stock_dokumen']
+                $mutasiGlobal['no_mutasi'],
+                $m['stock_dokumen'],
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan']
             );
         }
 

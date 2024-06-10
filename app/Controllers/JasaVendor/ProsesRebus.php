@@ -319,6 +319,14 @@ class ProsesRebus extends BaseController
             $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
             $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
 
+            // BARANG LAMA
+            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_rebus_id'],
+                $p['bc_rebus_id'],
+                $p['no_aju_rebus'],
+                $p['stock_dokumen']
+            );
+
             $stok = $this->stockModel->insertStok(
                 $prosesRebus['company_id'],
                 $prosesRebus['warehouse_id'],
@@ -349,7 +357,12 @@ class ProsesRebus extends BaseController
                 $p['qty_rebus'],
                 $p['no_aju_rebus'],
                 "-",
-                $p['stock_dokumen']
+                $p['stock_dokumen'],
+                $stockRebusDetail['supplier_id'],
+                $stockRebusDetail['harga_umum'],
+                $stockRebusDetail['harga_harian'],
+                $stockRebusDetail['harga_bulanan']
+
             );
 
             // -----
@@ -364,46 +377,7 @@ class ProsesRebus extends BaseController
                 $p['qty_hasil_rebus']
             );
 
-            $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
-                $this->this_company_id,
-                $prosesRebus['warehouse_id'],
-                $prosesRebus['divisi_id'],
-                "bahan_baku",
-                $stockHasilRebus['barang1_id'],
-                $stockHasilRebus['barang2_id'],
-                $p['bc_rebus_id'],
-                $p['no_aju_rebus'],
-                $stok
-            );
 
-            if ($checkStokDetail == null) {
-                // INSERT STOK INISIASI
-                $stokDetail = $this->stockDetailModel->insertStokDetail(
-                    $stok,
-                    0,
-                    "In",
-                    date('Y-m-d'),
-                    $this->this_user_id,
-                    "INISIASI",
-                    "-",
-                    "-"
-                );
-                $this->stockDetail2Model->insertStokDetail2(
-                    $p['bc_rebus_id'],
-                    $p['stock_hasil_rebus_id'],
-                    $stokDetail,
-                    0,
-                    $p['no_aju_rebus'],
-                    "-"
-                );
-            }
-
-            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
-                $p['stock_rebus_id'],
-                $p['bc_rebus_id'],
-                $p['no_aju_rebus'],
-                $p['stock_dokumen']
-            );
 
             // DETAIL
             $stokDetail = $this->stockDetailModel->insertStokDetail(
@@ -425,7 +399,11 @@ class ProsesRebus extends BaseController
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
                 $p['stock_dokumen'],
-                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )"
+                $p['stock_dokumen'],
+                $stockRebusDetail['supplier_id'],
+                $stockRebusDetail['harga_umum'],
+                $stockRebusDetail['harga_harian'],
+                $stockRebusDetail['harga_bulanan']
             );
         }
 
@@ -449,6 +427,14 @@ class ProsesRebus extends BaseController
             // BARANG OUT DARI INVENTORI
             $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
             $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
+
+            // BARANG LAMA
+            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_rebus_id'],
+                $p['bc_rebus_id'],
+                $p['no_aju_rebus'],
+                $p['stock_dokumen']
+            );
 
             $stok = $this->stockModel->insertStok(
                 $prosesRebus['company_id'],
@@ -480,7 +466,11 @@ class ProsesRebus extends BaseController
                 $p['qty_rebus'],
                 $p['no_aju_rebus'],
                 "-",
-                $p['stock_dokumen']
+                $p['stock_dokumen'],
+                $stockRebusDetail['supplier_id'],
+                $stockRebusDetail['harga_umum'],
+                $stockRebusDetail['harga_harian'],
+                $stockRebusDetail['harga_bulanan']
             );
 
             // -----
@@ -494,40 +484,6 @@ class ProsesRebus extends BaseController
                 $stockHasilRebus['barang2_id'],
                 $p['qty_hasil_rebus']
             );
-
-            $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
-                $this->this_company_id,
-                $prosesRebus['warehouse_id'],
-                $prosesRebus['divisi_id'],
-                "bahan_baku",
-                $stockHasilRebus['barang1_id'],
-                $stockHasilRebus['barang2_id'],
-                $p['bc_rebus_id'],
-                $p['no_aju_rebus'],
-                $stok
-            );
-
-            if ($checkStokDetail == null) {
-                // INSERT STOK INISIASI
-                $stokDetail = $this->stockDetailModel->insertStokDetail(
-                    $stok,
-                    0,
-                    "In",
-                    date('Y-m-d'),
-                    $this->this_user_id,
-                    "INISIASI",
-                    "-",
-                    "-"
-                );
-                $this->stockDetail2Model->insertStokDetail2(
-                    $p['bc_rebus_id'],
-                    $p['stock_hasil_rebus_id'],
-                    $stokDetail,
-                    0,
-                    $p['no_aju_rebus'],
-                    "-"
-                );
-            }
 
             $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
                 $p['stock_rebus_id'],
@@ -556,7 +512,11 @@ class ProsesRebus extends BaseController
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
                 $p['stock_dokumen'],
-                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )"
+                $p['stock_dokumen'],
+                $stockRebusDetail['supplier_id'],
+                $stockRebusDetail['harga_umum'],
+                $stockRebusDetail['harga_harian'],
+                $stockRebusDetail['harga_bulanan']
             );
         }
 

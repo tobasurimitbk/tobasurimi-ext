@@ -438,41 +438,6 @@ class PenerimaanBarangModel extends Model
                         0
                     );
                 }
-
-                // CHECK STOK DETAIL
-                if (
-                    $stockModel->isDefinedStockSubDetail(
-                        $rmDetail['company_id'],
-                        $rmDetail['warehouse_id'],
-                        $rmDetail['divisi_id'],
-                        "bahan_baku",
-                        $r['barang1_id'],
-                        $r['barang2_id'],
-                        $rmDetail['bc_type'],
-                        "-",
-                        is_array($stok) ? $stok['id'] : $stok,
-                    ) == null
-                ) {
-                    // INSERT STOK INISIASI
-                    $stokDetail = $stockDetailModel->insertStokDetail(
-                        is_array($stok) ? $stok['id'] : $stok,
-                        0,
-                        "In",
-                        date('Y-m-d'),
-                        $rmDetail['createdBy'],
-                        "INISIASI",
-                        "-",
-                        "-"
-                    );
-                    $stockDetail2Model->insertStokDetail2(
-                        $rmDetail['bc_type'],
-                        is_array($stok) ? $stok['id'] : $stok,
-                        $stokDetail,
-                        0,
-                        "-",
-                        "-"
-                    );
-                }
             }
 
             // CHECK STOK KEMASAN HEADER
@@ -494,41 +459,6 @@ class PenerimaanBarangModel extends Model
                     0,
                     $rmDetail['kemasan_id'],
                     0
-                );
-            }
-
-            // CHECK STOK KEMASAN DETAIL
-            if (
-                $stockModel->isDefinedStockSubDetail(
-                    $rmDetail['company_id'],
-                    $rmDetail['warehouse_id'],
-                    $rmDetail['divisi_id'],
-                    "kemasan",
-                    0,
-                    $rmDetail['kemasan_id'],
-                    $rmDetail['bc_type'],
-                    "-",
-                    is_array($stok) ? $stok['id'] : $stok,
-                ) == null
-            ) {
-                // INSERT STOK INISIASI
-                $stokDetail = $stockDetailModel->insertStokDetail(
-                    is_array($stok) ? $stok['id'] : $stok,
-                    0,
-                    "In",
-                    date('Y-m-d'),
-                    $rmDetail['createdBy'],
-                    "INISIASI",
-                    "-",
-                    "-"
-                );
-                $stockDetail2Model->insertStokDetail2(
-                    $rmDetail['bc_type'],
-                    is_array($stok) ? $stok['id'] : $stok,
-                    $stokDetail,
-                    0,
-                    "-",
-                    "-"
                 );
             }
         }
@@ -634,7 +564,11 @@ class PenerimaanBarangModel extends Model
                     $p['qty'],
                     "-",
                     $po['po_no'],
-                    $po['po_no']
+                    $po['po_no'],
+                    $penerimaanBarang['supplier_id'],
+                    $p['harga'],
+                    $p['harga_harian'],
+                    $p['harga_bulanan']
                 );
             }
 
@@ -672,6 +606,7 @@ class PenerimaanBarangModel extends Model
                 "-",
                 $penerimaanBarang['no_penerimaan_barang'],
                 $penerimaanBarang['no_penerimaan_barang'],
+                $penerimaanBarang['supplier_id'],
             );
         }
 

@@ -2123,7 +2123,11 @@ class BC40 extends BaseController
                         $p['jml_masuk'],
                         $bc40['no_aju'],
                         $po['po_no'],
-                        $po['po_no']
+                        $po['po_no'],
+                        $penerimaanBarang['supplier_id'],
+                        $p['harga'],
+                        $p['harga_harian'],
+                        $p['harga_bulanan']
                     );
                 }
 
@@ -2159,6 +2163,7 @@ class BC40 extends BaseController
                     $bc40['no_aju'],
                     $penerimaanBarang['no_penerimaan_barang'],
                     $penerimaanBarang['no_penerimaan_barang'],
+                    $penerimaanBarang['supplier_id'],
                 );
             }
 

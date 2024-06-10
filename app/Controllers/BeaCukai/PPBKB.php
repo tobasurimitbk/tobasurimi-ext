@@ -310,6 +310,13 @@ class PPBKB extends BaseController
                 $barang2_id = $stock['barang2_id'];
             }
 
+            // BARANG LAMA
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $m['stock_id'],
+                $m['bc_id'],
+                $m['no_aju'],
+                $m['stock_dokumen']
+            );
 
             $stok = $this->stockModel->insertStok(
                 $mutasi['company_id'],
@@ -340,7 +347,12 @@ class PPBKB extends BaseController
                 $stokDetail,
                 $qty,
                 $m['no_aju'],
-                $m['stock_dokumen']
+                $mutasi['no_mutasi'],
+                $m['stock_dokumen'],
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan']
             );
         }
 

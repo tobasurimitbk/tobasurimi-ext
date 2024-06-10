@@ -372,8 +372,6 @@ class JasaVendorIn extends BaseController
             $stock = $this->stockModel->find($j['stock_in_id']);
             $qty = $j['qty_bersih'];
 
-            $jasaVendorOut = $this->jasaVendorOutModel->find($j['jasa_vendor_out_id']);
-
             $stok = $this->stockModel->insertStok(
                 $jasaVendorIn['company_id'],
                 $jasaVendorIn['warehouse_id'],
@@ -384,53 +382,14 @@ class JasaVendorIn extends BaseController
                 $qty
             );
 
-            $checkStokDetail =  $this->stockModel->isDefinedStockSubDetail(
-                $this->this_company_id,
-                $jasaVendorIn['warehouse_id'],
-                $jasaVendorIn['divisi_id'],
-                "bahan_baku",
-                $stock['barang1_id'],
-                $stock['barang2_id'],
-                $j['bc_in_id'],
-                $j['no_aju_in'],
-                $stok
-            );
-
-            if ($checkStokDetail == null) {
-                // INSERT STOK INISIASI
-                $stokDetail = $this->stockDetailModel->insertStokDetail(
-                    $stok,
-                    0,
-                    "In",
-                    date('Y-m-d'),
-                    $this->this_user_id,
-                    "INISIASI",
-                    "-",
-                    "-"
-                );
-                $this->stockDetail2Model->insertStokDetail2(
-                    $j['bc_in_id'],
-                    $j['stock_in_id'],
-                    $stokDetail,
-                    0,
-                    $j['no_aju_in'],
-                    "-"
-                );
-            }
-
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
 
-            if ($jasaVendorOutDetail) {
-                $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
-                    $jasaVendorOutDetail['stock_out_id'],
-                    $jasaVendorOutDetail['bc_out_id'],
-                    $jasaVendorOutDetail['no_aju_out'],
-                    $jasaVendorOutDetail['stock_dokumen']
-                );
-            } else {
-                $stockRebusDetail = null;
-            }
-
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $jasaVendorOutDetail['stock_out_id'],
+                $jasaVendorOutDetail['bc_out_id'],
+                $jasaVendorOutDetail['no_aju_out'],
+                $jasaVendorOutDetail['stock_dokumen']
+            );
 
             // DETAIL
             $stokDetail = $this->stockDetailModel->insertStokDetail(
@@ -440,12 +399,9 @@ class JasaVendorIn extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "JASA VENDOR",
-                $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
+                $stockOldDetail['no_dokumen_1'],
                 $jasaVendorIn['keterangan']
             );
-
-            // TOBA-RBS/WH-2/06/V/2024 ( PO/LBB-052024/000012 )
-            $noPOFromStockDokumen = splitStokDokumen2($j['stock_dokumen']); // PO/LBB-052024/000012
 
             // SUB DETAIL
             $this->stockDetail2Model->insertStokDetail2(
@@ -455,7 +411,11 @@ class JasaVendorIn extends BaseController
                 $qty,
                 $j['no_aju_in'],
                 $jasaVendorIn['no_penerimaan_surat_jalan'],
-                $jasaVendorIn['no_penerimaan_surat_jalan'] . " ( " . $noPOFromStockDokumen . " ) ",
+                $j['stock_dokumen'],
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan']
             );
         }
 
