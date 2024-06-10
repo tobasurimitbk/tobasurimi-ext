@@ -5,7 +5,11 @@
     <div class="section-header">
         <h1 class="title-name">Detail Payroll</h1>
         <div class="col-button-tambah-spp">
-            <?php $splitMonthYear = explode("-", $payrollDetail['year_month']); ?>
+            <?php
+
+            use Carbon\Carbon;
+
+            $splitMonthYear = explode("-", $payrollDetail['year_month']); ?>
             <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url("payroll/print/single/" . encrypt($payrollDetail['id'])); ?>">
                 <i class="fa-solid fa-print"></i> Print
             </a>
@@ -373,15 +377,16 @@
                             </thead>
                             <tbody class="body-table" id="body-table">
                                 <?php $i = 1; ?>
+                                <?php Carbon::setLocale('id'); ?>
                                 <?php foreach ($rekapGajiHarian as $r) : ?>
                                     <tr style="color: whitesmoke; text-align:center;">
                                         <td><?= $i++ ?></td>
-                                        <td><?= $r['tanggal'] ?></td>
+                                        <td><?= Carbon::createFromFormat('Y-m-d', $r['tanggal'])->translatedFormat('l, d F Y'); ?></td>
                                         <td><?= $r['jenis'] ?></td>
-                                        <td><?= $r['jam_masuk'] ?></td>
-                                        <td><?= $r['jam_istirahat_mulai'] ?></td>
-                                        <td><?= $r['jam_istirahat_selesai'] ?></td>
-                                        <td><?= $r['jam_pulang'] ?></td>
+                                        <td><?= $r['jam_masuk'] ?? "-" ?></td>
+                                        <td><?= $r['jam_istirahat_mulai'] ?? "-" ?></td>
+                                        <td><?= $r['jam_istirahat_selesai'] ?? "-" ?></td>
+                                        <td><?= $r['jam_pulang'] ?? "-"     ?></td>
                                         <td><?= number_format($r['total_jam'], 2) ?></td>
                                         <td style="font-weight: bold;">Rp. <?= number_format($r['nominal_diterima'], 2) ?></td>
                                     </tr>

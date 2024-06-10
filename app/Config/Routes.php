@@ -717,6 +717,7 @@ $routes->get('barang-bahan-penolong', 'Warehouse\Barang::bahanPenolongView', ['f
 $routes->get('barang-bahan-jadi', 'Warehouse\Barang::bahanJadiView', ['filter' => 'Auth']);
 $routes->get('barang-scrap', 'Warehouse\Barang::bahanScrapView', ['filter' => 'Auth']);
 $routes->get('barang-modal', 'Warehouse\Barang::bahanModalView', ['filter' => 'Auth']);
+$routes->get('barang-setengah-jadi', 'Warehouse\Barang::bahanSetengahJadiView', ['filter' => 'Auth']);
 $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->get('all', 'Warehouse\Barang::all');
     $routes->post('get', 'Warehouse\Barang::get');

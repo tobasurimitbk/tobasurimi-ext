@@ -111,6 +111,7 @@ class MaterialRequest extends BaseController
             ->where('description', "bahan_baku")
             ->orWhere('description', "bahan_jadi")
             ->orWhere('description', "bahan_scrap")
+            ->orWhere('description', "bahan_setengah_jadi")
             ->findAll();
 
         $data = [

@@ -1196,6 +1196,7 @@
             placeholder: "Cari Departemen",
             theme: "bootstrap-5",
             allowClear: true,
+            dropdownParent: $('#generateModal')
         });
         // select2 filter employee ajax
         $("select[name='filterEmployee']").select2({

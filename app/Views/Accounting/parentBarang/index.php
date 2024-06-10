@@ -24,6 +24,9 @@
                     <a class="nav-link <?= $type == "bahan_modal" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_modal') ?>">Barang Modal</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link <?= $type == "bahan_setengah_jadi" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=bahan_setengah_jadi') ?>">Bahan Setengah Jadi</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <?= $type == "kemasan" ? "active" : "" ?>" href="<?= base_url('tipe-barang?type=kemasan') ?>">Kemasan</a>
                 </li>
             </ul>
@@ -63,7 +66,11 @@
                                 <th>No.</th>
                                 <th>Barang</th>
                                 <th>Departemen</th>
-                                <th>Akun Pembelian</th>
+                                <?php if ($type == "bahan_jadi" || $type == "bahan_setengah_jadi") : ?>
+                                    <th>Akun Persediaan</th>
+                                <?php else : ?>
+                                    <th>Akun Pembelian</th>
+                                <?php endif; ?>
                                 <th>Akun Penjualan</th>
                             </tr>
                         </thead>
@@ -119,7 +126,11 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Akun Pembelian</label>
+                                <?php if ($type == "bahan_jadi" || $type == "bahan_setengah_jadi") : ?>
+                                    <label for="floatingInput">Akun Persediaan</label>
+                                <?php else : ?>
+                                    <label for="floatingInput">Akun Pembelian</label>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-4">

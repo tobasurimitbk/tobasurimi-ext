@@ -21,7 +21,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class Barang extends BaseController
 {
     protected $this_company_id;
-    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap, $kodeBahanModal;
+    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap, $kodeBahanModal, $kodeBahanSetengahJadi;
 
     public function __construct()
     {
@@ -31,6 +31,7 @@ class Barang extends BaseController
         $this->kodeBahanJadi = "BJ";
         $this->kodeBahanScrap = "BS";
         $this->kodeBahanModal = "BM";
+        $this->kodeBahanSetengahJadi = "BSJ";
     }
 
     public function bahanBakuView()
@@ -100,6 +101,19 @@ class Barang extends BaseController
         ];
 
         return view('Warehouse/barangMaster/bahanModal', $data);
+    }
+
+    public function bahanSetengahJadiView()
+    {
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
+        $data = [
+            'type' => "bahan_setengah_jadi",
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_setengah_jadi")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
+        ];
+
+        return view('Warehouse/barangMaster/bahanSetengahJadi', $data);
     }
 
     public function create()
@@ -426,6 +440,8 @@ class Barang extends BaseController
             $codeName = $this->kodeBahanJadi;
         } elseif ($type == "bahan_scrap") {
             $codeName = $this->kodeBahanScrap;
+        } elseif ($type == "bahan_setengah_jadi") {
+            $codeName = $this->kodeBahanSetengahJadi;
         } else {
             $codeName = $this->kodeBahanModal;
         }
@@ -556,7 +572,8 @@ class Barang extends BaseController
         $barangModel = new BarangMasterModel();
 
         $type = $this->request->getGet("type");
-        $dataBarang = $barangModel->getBarangByType($type);
+        $type2 = $this->request->getGet("type2");
+        $dataBarang = $barangModel->getBarangByType($type, $type2);
 
         for ($i = 0; $i < count($dataBarang); $i++) {
             $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
