@@ -832,6 +832,8 @@
                                 <th onclick="changeSortRebus('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortRebus('stock_details.no_dokumen')">No Rebus</th>
+                                <th onclick="changeSortRebus('stock_details2.supplier_id')">Supplier</th>
+                                <th onclick="changeSortRebus('stock_details2.stock_dokumen')">No Purchase Order</th>
                                 <th onclick="changeSortRebus('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
@@ -840,7 +842,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4"></td>
+                                <td colspan="6"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalRebus']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                             </tr>
@@ -1780,6 +1782,14 @@
                 className: "text-center",
                 searchable: false,
                 sortable: false
+            },
+            {
+                data: "no_dokumen2",
+                className: "text-center",
+            },
+            {
+                data: "supplier_name",
+                className: "text-center",
             },
             {
                 data: "stock_dokumen",

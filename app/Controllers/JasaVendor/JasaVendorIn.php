@@ -382,6 +382,7 @@ class JasaVendorIn extends BaseController
                 $qty
             );
 
+            $jasaVendorOut = $this->jasaVendorOutModel->find($j['jasa_vendor_out_id']);
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
 
             $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
@@ -399,7 +400,7 @@ class JasaVendorIn extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "JASA VENDOR",
-                $stockOldDetail['no_dokumen_1'],
+                $jasaVendorOut['no_surat_jalan'],
                 $jasaVendorIn['keterangan']
             );
 

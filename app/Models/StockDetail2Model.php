@@ -143,6 +143,7 @@ class StockDetail2Model extends Model
             'stock_details.no_dokumen' => 'stock_details.no_dokumen',
             'stock_details2.stock_dokumen' => 'stock_details2.stock_dokumen',
             'stock_details2.bc_id' => 'stock_details2.bc_id',
+            'stock_details2.supplier_id' => 'stock_details2.supplier_id',
             'stock.barang1_id' => 'stock.barang1_id',
             'stock_details2.qty' => 'stock_details2.qty',
             'stock_details2.no_aju' => 'stock_details2.no_aju',
@@ -159,6 +160,7 @@ class StockDetail2Model extends Model
         // no_dokumen2 => PO
 
         $selectQry = '
+            suppliers.name AS supplier_name,
             stock_details2.no_dokumen AS no_dokumen2, 
             stock_details.no_dokumen AS no_dokumen1,
             stock.barang1_id,
@@ -184,6 +186,7 @@ class StockDetail2Model extends Model
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('kemasan', 'kemasan.id = stock.kemasan_id', 'left')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -318,6 +321,7 @@ class StockDetail2Model extends Model
     {
 
         $selectQry = '
+            suppliers.name AS supplier_name,
             stock_details2.id,
             stock_details2.bc_id,
             stock_details2.stock_detail_id,
@@ -341,6 +345,7 @@ class StockDetail2Model extends Model
         $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->where('stock_details2.stock_id', $stockID)
             ->where('stock_details2.bc_id', $bcID)
             ->where('stock_details2.no_aju', $noAju)

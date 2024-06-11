@@ -96,7 +96,12 @@ class ProsesRebus extends BaseController
                 ->where('deletedAt', null)
                 ->findAll();
 
-            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
+            $prosesRebusId = array();
+            foreach ($prosesRebusDetail as $p) {
+                array_push($prosesRebusId, $p['proses_rebus_id']);
+            }
+
+            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->whereIn('proses_rebus_id', $prosesRebusId)->first();
 
             array_push($dataResult, [
                 "no"                    => $no++,
@@ -356,7 +361,7 @@ class ProsesRebus extends BaseController
                 $stokDetail,
                 $p['qty_rebus'],
                 $p['no_aju_rebus'],
-                "-",
+                $prosesRebus['no_rebus'],
                 $p['stock_dokumen'],
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
@@ -387,7 +392,7 @@ class ProsesRebus extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "REBUS",
-                $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
+                $prosesRebus['no_rebus'],
                 $prosesRebus['keterangan']
             );
 
@@ -398,7 +403,7 @@ class ProsesRebus extends BaseController
                 $stokDetail,
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
-                $p['stock_dokumen'],
+                $prosesRebus['no_rebus'],
                 $p['stock_dokumen'],
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
@@ -500,7 +505,7 @@ class ProsesRebus extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "REBUS",
-                $stockRebusDetail == null ? "-" : $stockRebusDetail['no_dokumen_1'], // AMBIL NOMOR LPB NYA (GET SUPPLIER NYA)
+                $prosesRebus['no_rebus'],
                 $prosesRebus['keterangan']
             );
 
