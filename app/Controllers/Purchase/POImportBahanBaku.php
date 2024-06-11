@@ -539,8 +539,13 @@ class POImportBahanBaku extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $listBarang = $this->rmImportPODetailModel
-            ->select('rm_import_po_details.qty_diterima AS diterima, rm_import_po_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, rm_import_po_details.qty')
-            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id')
+            ->select('rm_import_po_details.qty_diterima AS diterima, 
+            rm_import_po_details.remaining_qty AS sisa, 
+            CONCAT(barang_master.barang_name, " - ",barang_master_spesifikasi.spesifikasi) AS nama_barang, 
+            barang_master.kode_barang, 
+            rm_import_po_details.qty')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_import_po_details.spesifikasi_id', 'left')
             ->where('rm_import_po_details.rm_import_po_id', $id)
             ->where('rm_import_po_details.deletedAt', null)
             ->findAll();

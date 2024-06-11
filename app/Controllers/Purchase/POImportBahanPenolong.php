@@ -528,8 +528,14 @@ class POImportBahanPenolong extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $listBarang = $this->amPurchaseOrderDetailModel
-            ->select('am_purchase_order_details.qty_diterima AS diterima, am_purchase_order_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, am_purchase_order_details.qty')
-            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->select('
+            am_purchase_order_details.qty_diterima AS diterima, 
+            am_purchase_order_details.remaining_qty AS sisa, 
+            CONCAT(barang_master.barang_name, " - ",barang_master_spesifikasi.spesifikasi) AS nama_barang, 
+            barang_master.kode_barang, 
+            am_purchase_order_details.qty')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
             ->where('am_purchase_order_details.am_purchase_order_id', $id)
             ->where('am_purchase_order_details.deletedAt', null)
             ->findAll();
