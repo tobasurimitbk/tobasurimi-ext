@@ -43,12 +43,14 @@ class AccountDepartmentController extends BaseController
         if ($getDataAccountDivisis != null) {
             $this->accountDivisisModel->update($getDataAccountDivisis['id'], [
                 'divisis_id' => $divisisId,
+                'company_id' => $this->this_company_id,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id')
             ]);
         } else {
             $this->accountDivisisModel->insert([
                 'divisis_id' => $divisisId,
+                'company_id' => $this->this_company_id,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id')
             ]);

@@ -1047,6 +1047,9 @@
                                 'warehouse_id': item.warehouse_tujuan_id,
                                 'divisi_id': item.divisi_tujuan_id,
                                 'kondisi_barang': item.kondisi_barang,
+                                'harga_umum': item.harga_umum,
+                                'harga_harian': item.harga_harian,
+                                'harga_bulanan': item.harga_bulanan,
                             });
                             $(".kode_barang_filling").append(`<option 
                             data-material_request_detail_id="${item.id}" 
@@ -1069,6 +1072,9 @@
                             data-unit="${item.unit}" 
                             data-warehouse_id="${item.warehouse_tujuan_id}" 
                             data-divisi_id="${item.divisi_tujuan_id}" 
+                            data-harga_umum="${item.harga_umum}" 
+                            data-harga_harian="${item.harga_harian}" 
+                            data-harga_bulanan="${item.harga_bulanan}" 
                             value="${item.kode_barang}">(${item.kode_barang}) ${item.nama_barang}</option>`);
                         });
                         $(".kode_barang_filling").val("").change();
@@ -1215,6 +1221,9 @@
                 let unit = $(".kode_barang_filling option:selected").data("unit");
                 let warehouse_id = $(".kode_barang_filling option:selected").data("warehouse_id");
                 let divisi_id = $(".kode_barang_filling option:selected").data("divisi_id");
+                let harga_umum = $(".kode_barang_filling option:selected").data("harga_umum");
+                let harga_harian = $(".kode_barang_filling option:selected").data("harga_harian");
+                let harga_bulanan = $(".kode_barang_filling option:selected").data("harga_bulanan");
 
                 list_items_barang_filling.push({
                     'barang_detail_id': getID(),
@@ -1240,6 +1249,9 @@
                     'divisi_id': divisi_id,
                     'kondisi_barang': kondisiBarang,
                     'kondisi_barang_text': kondisiBarangText,
+                    'harga_umum': harga_umum,
+                    'harga_harian': harga_harian,
+                    'harga_bulanan': harga_bulanan,
                 });
 
                 drawTableBarangFilling(); // Menggambar tabel

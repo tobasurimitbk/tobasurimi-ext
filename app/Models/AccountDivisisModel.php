@@ -16,6 +16,7 @@ class AccountDivisisModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'divisis_id',
+        'company_id',
         'ap_id',
         'ar_id',
         'deleted_at',
@@ -44,4 +45,14 @@ class AccountDivisisModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getAccountDivisiForJurnal($condition = [])
+    {
+        $select =   "account_divisis.*";
+        return $this->asObject()
+            ->select($select)
+            ->where($condition)
+            ->where('account_divisis.deleted_at', null)
+            ->findAll();
+    }
 }

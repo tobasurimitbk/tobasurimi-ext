@@ -346,6 +346,7 @@ class MaterialRequest extends BaseController
                         'satuan' => $s->satuan,
                         'stock_id' => $s->stock_id,
                         'bc_id' => $s->bc_id,
+                        'supplier_id' => $s->supplier_id,
                         'no_aju' => $s->no_aju,
                         'ref_no' => $s->bc_type,
                         'stock_date' => $stockDetailBarang->stock_date,
@@ -355,6 +356,9 @@ class MaterialRequest extends BaseController
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
                         'qty_now' => $s->qty_isi,
+                        'harga_umum' => (float)$s->harga_umum,
+                        'harga_harian' => (float)$s->harga_harian,
+                        'harga_bulanan' => (float)$s->harga_bulanan,
                         'kondisi_barang' => 'request',
                     ];
                 } else {
@@ -370,6 +374,7 @@ class MaterialRequest extends BaseController
                         'satuan' => $s->satuan,
                         'stock_id' => $s->stock_id,
                         'bc_id' => $s->bc_id,
+                        'supplier_id' => $s->supplier_id,
                         'no_aju' => $s->no_aju,
                         'ref_no' => $s->bc_type,
                         'stock_date' => $stockDetailBarang->stock_date,
@@ -379,6 +384,9 @@ class MaterialRequest extends BaseController
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
                         'qty_now' => $s->qty2,
+                        'harga_umum' => (float)$s->harga_umum,
+                        'harga_harian' => (float)$s->harga_harian,
+                        'harga_bulanan' => (float)$s->harga_bulanan,
                         'kondisi_barang' => 'request',
                     ];
                 }
@@ -444,6 +452,7 @@ class MaterialRequest extends BaseController
                             'satuan' => $s->satuan,
                             'stock_id' => $s->stock_id,
                             'bc_id' => $s->bc_id,
+                            'supplier_id' => $s->supplier_id,
                             'no_aju' => $s->no_aju,
                             'ref_no' => $s->bc_type,
                             'stock_date' => $stockDetailBarang->stock_date,
@@ -453,6 +462,9 @@ class MaterialRequest extends BaseController
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
                             'qty_now' => $s->qty_isi,
+                            'harga_umum' => (float)$s->harga_umum,
+                            'harga_harian' => (float)$s->harga_harian,
+                            'harga_bulanan' => (float)$s->harga_bulanan,
                             'kondisi_barang' => 'request',
                         ];
                     } else {
@@ -468,6 +480,7 @@ class MaterialRequest extends BaseController
                             'satuan' => $s->satuan,
                             'stock_id' => $s->stock_id,
                             'bc_id' => $s->bc_id,
+                            'supplier_id' => $s->supplier_id,
                             'no_aju' => $s->no_aju,
                             'ref_no' => $s->bc_type,
                             'stock_date' => $stockDetailBarang->stock_date,
@@ -477,6 +490,9 @@ class MaterialRequest extends BaseController
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
                             'qty_now' => $s->qty2,
+                            'harga_umum' => (float)$s->harga_umum,
+                            'harga_harian' => (float)$s->harga_harian,
+                            'harga_bulanan' => (float)$s->harga_bulanan,
                             'kondisi_barang' => 'request',
                         ];
                     }
@@ -568,6 +584,10 @@ class MaterialRequest extends BaseController
                             $value['no_aju'],
                             $materialRequestData['req_no'],
                             $value['stock_dokumen'],
+                            $value['supplier_id'],
+                            $value['harga_umum'],
+                            $value['harga_harian'],
+                            $value['harga_bulanan'],
                         );
 
                         // -----
@@ -648,6 +668,10 @@ class MaterialRequest extends BaseController
                             $value['no_aju'],
                             $materialRequestData['req_no'],
                             $value['stock_dokumen'],
+                            $value['supplier_id'],
+                            $value['harga_umum'],
+                            $value['harga_harian'],
+                            $value['harga_bulanan'],
                         );
                         $this->materialRequestModel->update($id, $payload);
 

@@ -1038,6 +1038,7 @@
             dataType: "json",
             success: function(res) {
                 // LIST STOK PER BC
+                console.log(res.data);
                 listStockAsal = [];
                 listStockAsal = res.data;
                 drawTableAsalBarang(res.data);

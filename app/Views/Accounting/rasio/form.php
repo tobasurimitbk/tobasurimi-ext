@@ -4,11 +4,11 @@
 <section class="section">
     <div class="section-header">
         <h1><?= empty($jasaVendorOut) ? "Tambah Rasio" : "Update Rasio" ?></h1>
-        <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("rasio"); ?>">
+        <div class="col-button-tambah-spp text-right">
+            <a class="btn btn-hide-form btn-discard" href="<?= base_url("rasio"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+            <button class="btn btn-show-form btn-save btn-submit-parent">
                 Simpan
             </button>
         </div>
@@ -76,6 +76,17 @@
                 <div id="rawMaterialICard">
                     <input type="hidden" name="id" id="id" value="" class="id">
                     <?= csrf_field() ?>
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="">Bahan Digunakan</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Bahan Proses Ulang</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Bahan Jadi</a>
+                        </li>
+                    </ul>
                     <div class="row justify-content-end">
                         <div class="col mb-3">
                             <label class="form-label font-weight-bold lable-title">Data Rasio Raw Material I</label>
@@ -174,7 +185,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-4">
-                            <div class="form-floating " style="height: 50px;">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select akun_coa_subsidi" name="akun_coa_subsidi" id="akun_coa_subsidi" onchange="getDataJurnalSubsidi()">
                                     <option value=""></option>
                                     <?php
@@ -981,7 +992,20 @@
         var no = 1;
         var strip = "-";
         if (list_items_barang_digunakan.length === 0) {
+            var totalQtyPO = 0;
+            var totalHargaPO = 0;
+            var hargaSatuanPO = 0;
+            var totalQtyLPB = 0;
+            var totalHargaLPB = 0;
+            var hargaSatuanLPB = 0;
             row += '<tr><td colspan="10" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.qtyTotalPembelian').val(totalQtyPO.toLocaleString());
+            $('.hargaTotalPembelian').val(formatRupiah(totalHargaPO));
+            $('.hargaSatuanPembelian').val(formatRupiah(hargaSatuanPO));
+
+            $('.qtyTotalPenerimaan').val(totalQtyLPB.toLocaleString());
+            $('.hargaTotalPenerimaan').val(formatRupiah(totalHargaLPB));
+            $('.hargaSatuanPenerimaan').val(formatRupiah(hargaSatuanLPB));
             $('.tfoot-detail-table').append(row);
         } else {
             var totalQtyPO = 0;
