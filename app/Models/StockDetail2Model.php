@@ -298,7 +298,9 @@ class StockDetail2Model extends Model
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_dokumen')
-                ->groupBy('stock_details.sumber')
+                // ->groupBy('stock_details.sumber')
+                ->groupBy('stock_details2.bc_id')
+                ->groupBy('stock_details2.no_aju')
                 ->orderBy('stock_details.createdAt', "ASC")
                 ->findAll();
         } else {
@@ -308,7 +310,9 @@ class StockDetail2Model extends Model
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_dokumen')
-                ->groupBy('stock_details.sumber')
+                // ->groupBy('stock_details.sumber')
+                ->groupBy('stock_details2.bc_id')
+                ->groupBy('stock_details2.no_aju')
                 ->having('stok_total >', 0)
                 ->orderBy('stock_details.createdAt', "ASC")
                 ->findAll();
@@ -351,9 +355,9 @@ class StockDetail2Model extends Model
             ->where('stock_details2.no_aju', $noAju)
             ->where('stock_details2.stock_dokumen', $stockDokumen)
             ->groupBy('stock_details2.stock_dokumen')
-            ->groupBy('stock_details.sumber')
-            // ->groupBy('stock_details2.bc_id')
-            // ->groupBy('stock_details2.no_aju')
+            // ->groupBy('stock_details.sumber')
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.no_aju')
             ->first();
 
         return $dataQry;
