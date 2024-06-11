@@ -130,7 +130,7 @@ class PenerimaanMutasi extends BaseController
     {
         $data = [
             'tanggal' => date('Y-m-d'),
-            'jenisMutasi' => $this->metaDataModel->where('name', "Jenis Mutasi")->findAll()
+            'divisi' => $this->divisiModel->getDivisiAccess()
         ];
 
         return view('Warehouse/penerimaanMutasi/form', $data);
@@ -433,9 +433,9 @@ class PenerimaanMutasi extends BaseController
 
     public function dropdownListNomorMutasi()
     {
-        $warehouseID = $this->request->getVar('warehouse_id');
+        $divisiId = $this->request->getVar('divisi_id');
         $data = $this->penerimaanMutasiModel->getListNomorMutasi(
-            $warehouseID
+            $divisiId
         );
 
         return response()->setJSON([
@@ -474,13 +474,13 @@ class PenerimaanMutasi extends BaseController
     public function getPenerimaanMutasiNo()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $warehouseID = $this->request->getVar('warehouse_id');
+        $divisiID = $this->request->getVar('divisi_id');
 
-        if (empty($warehouseID)) {
-            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, "", $warehouseID);
+        if (empty($divisiID)) {
+            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, "", $divisiID);
         } else {
-            $warehouse = $this->warehouseModel->where('id', $warehouseID)->first();
-            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, strtoupper($warehouse['code_warehouse']), $warehouseID);
+            $divisi = $this->divisiModel->where('id', $divisiID)->first();
+            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisiID);
         }
         return response()->setJSON([
             'status' => true,

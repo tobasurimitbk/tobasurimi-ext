@@ -366,7 +366,8 @@ class ProsesRebus extends BaseController
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
                 $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan']
+                $stockRebusDetail['harga_bulanan'],
+                $stockRebusDetail['no_po']
 
             );
 
@@ -404,11 +405,12 @@ class ProsesRebus extends BaseController
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
                 $prosesRebus['no_rebus'],
-                $p['stock_dokumen'],
+                $prosesRebus['no_rebus'],
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
                 $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan']
+                $stockRebusDetail['harga_bulanan'],
+                $stockRebusDetail['no_po']
             );
         }
 
@@ -475,7 +477,8 @@ class ProsesRebus extends BaseController
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
                 $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan']
+                $stockRebusDetail['harga_bulanan'],
+                $stockRebusDetail['no_po']
             );
 
             // -----
@@ -517,7 +520,7 @@ class ProsesRebus extends BaseController
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
                 $p['stock_dokumen'],
-                $p['stock_dokumen'],
+                $prosesRebus['no_rebus'],
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
                 $stockRebusDetail['harga_harian'],

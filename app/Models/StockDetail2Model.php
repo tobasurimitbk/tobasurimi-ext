@@ -117,7 +117,8 @@ class StockDetail2Model extends Model
         $supplier_id = null,
         $harga_umum = null,
         $harga_harian = null,
-        $harga_bulanan = null
+        $harga_bulanan = null,
+        $no_po = null,
     ) {
         $stokDetail2 = $this->insert([
             'bc_id' => $bc_id,
@@ -130,7 +131,8 @@ class StockDetail2Model extends Model
             'supplier_id' => $supplier_id,
             'harga_umum' => $harga_umum,
             'harga_harian' => $harga_harian,
-            'harga_bulanan' => $harga_bulanan
+            'harga_bulanan' => $harga_bulanan,
+            'no_po' => $no_po
         ]);
 
         return $stokDetail2;
@@ -281,6 +283,7 @@ class StockDetail2Model extends Model
             stock_details2.harga_umum,
             stock_details2.harga_harian,
             stock_details2.harga_bulanan,
+            stock_details2.no_po,
             stock_details.no_dokumen AS no_dokumen_1,
             stock_details.stock_date,
             stock_details.sumber,
@@ -298,7 +301,6 @@ class StockDetail2Model extends Model
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_dokumen')
-                // ->groupBy('stock_details.sumber')
                 ->groupBy('stock_details2.bc_id')
                 ->groupBy('stock_details2.no_aju')
                 ->orderBy('stock_details.createdAt', "ASC")
@@ -310,7 +312,6 @@ class StockDetail2Model extends Model
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_dokumen')
-                // ->groupBy('stock_details.sumber')
                 ->groupBy('stock_details2.bc_id')
                 ->groupBy('stock_details2.no_aju')
                 ->having('stok_total >', 0)
@@ -336,6 +337,7 @@ class StockDetail2Model extends Model
             stock_details2.harga_umum,
             stock_details2.harga_harian,
             stock_details2.harga_bulanan,
+            stock_details2.no_po,
             stock_details.stock_date,
             stock_details.sumber,
             stock_details.no_dokumen AS no_dokumen_1,
@@ -355,7 +357,6 @@ class StockDetail2Model extends Model
             ->where('stock_details2.no_aju', $noAju)
             ->where('stock_details2.stock_dokumen', $stockDokumen)
             ->groupBy('stock_details2.stock_dokumen')
-            // ->groupBy('stock_details.sumber')
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')
             ->first();

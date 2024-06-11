@@ -153,7 +153,7 @@ class PenerimaanMutasiModel extends Model
         }
     }
 
-    public function getListNomorMutasi($warehouseID)
+    public function getListNomorMutasi($divisiId)
     {
         $mutasiModel = new MutasiModel();
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
@@ -161,7 +161,7 @@ class PenerimaanMutasiModel extends Model
         $listMutasi = $mutasiModel
             ->select('mutasi.id, mutasi.no_mutasi, SUM(qty) AS qty_mutasi')
             ->join('mutasi_detail', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
-            ->where('mutasi.warehouse_tujuan_id', $warehouseID)
+            ->where('mutasi.divisi_tujuan_id', $divisiId)
             ->where('mutasi.deletedAt', null)
             ->where('mutasi_detail.deletedAt', null)
             ->groupBy('mutasi_detail.mutasi_id')
@@ -319,20 +319,20 @@ class PenerimaanMutasiModel extends Model
         return $response;
     }
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouseID)
+    public function get_no($bln, $thn, $last_day, $divisiName, $divisiID)
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('penerimaan_mutasi');
         $builder->select('penerimaan_mutasi_no');
         $builder->orderBy('penerimaan_mutasi_no', 'desc');
-        $builder->where('penerimaan_mutasi.warehouse_id', $warehouseID);
+        $builder->where('penerimaan_mutasi.divisi_id', $divisiID);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('penerimaan_mutasi_no', $lastStr);
         $query = $builder->get();
 
-        $kode = 'PMU/' . $warehouseKode;
+        $kode = 'PMU/' . $divisiName;
 
         $lastPenerimaan = '1';
 
