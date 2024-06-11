@@ -627,9 +627,14 @@ class POLokalBahanBaku extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $listBarang = $this->RMPurchaseOrderDetailModel
-            ->select('rm_purchase_order_details.qty_diterima AS diterima, rm_purchase_order_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, rm_purchase_order_details.qty')
-            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id')
-            ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+            ->select('
+            rm_purchase_order_details.qty_diterima AS diterima, 
+            rm_purchase_order_details.remaining_qty AS sisa, 
+            CONCAT(barang_master.barang_name, " - ",barang_master_spesifikasi.spesifikasi) AS nama_barang, 
+            barang_master.kode_barang, 
+            rm_purchase_order_details.qty')
+            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
             ->where('rm_purchase_order_details.rm_purchase_order_id', $id)
             ->where('rm_purchase_order_details.deletedAt', null)
             ->findAll();
