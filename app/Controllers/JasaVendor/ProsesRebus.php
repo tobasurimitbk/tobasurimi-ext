@@ -96,12 +96,7 @@ class ProsesRebus extends BaseController
                 ->where('deletedAt', null)
                 ->findAll();
 
-            $prosesRebusId = array();
-            foreach ($prosesRebusDetail as $p) {
-                array_push($prosesRebusId, $p['proses_rebus_id']);
-            }
-
-            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->whereIn('proses_rebus_id', $prosesRebusId)->first();
+            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
 
             array_push($dataResult, [
                 "no"                    => $no++,
@@ -188,6 +183,7 @@ class ProsesRebus extends BaseController
             'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'no_rebus' => $this->request->getVar('no_rebus'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            "tanggal_selesai" => $this->request->getVar("tanggal_selesai") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_selesai")), "Y-m-d") : "",
             'keterangan' => $this->request->getVar('keterangan'),
             'type_barang' => "bahan_baku",
             'status_posting' => '0'
@@ -233,6 +229,7 @@ class ProsesRebus extends BaseController
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            "tanggal_selesai" => $this->request->getVar("tanggal_selesai") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_selesai")), "Y-m-d") : "",
             'keterangan' => $this->request->getVar('keterangan'),
             'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'type_barang' => "bahan_baku",
@@ -383,8 +380,6 @@ class ProsesRebus extends BaseController
                 $p['qty_hasil_rebus']
             );
 
-
-
             // DETAIL
             $stokDetail = $this->stockDetailModel->insertStokDetail(
                 $stok,
@@ -405,7 +400,7 @@ class ProsesRebus extends BaseController
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
                 $prosesRebus['no_rebus'],
-                $prosesRebus['no_rebus'],
+                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )",
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
                 $stockRebusDetail['harga_harian'],
@@ -435,7 +430,7 @@ class ProsesRebus extends BaseController
             $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
             $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
 
-            // BARANG LAMA
+            // BARANG IN YANG DIREBUS
             $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
                 $p['stock_rebus_id'],
                 $p['bc_rebus_id'],
@@ -472,7 +467,7 @@ class ProsesRebus extends BaseController
                 $stokDetail,
                 $p['qty_rebus'],
                 $p['no_aju_rebus'],
-                "-",
+                $prosesRebus['no_rebus'],
                 $p['stock_dokumen'],
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
@@ -482,7 +477,7 @@ class ProsesRebus extends BaseController
             );
 
             // -----
-            // BARANG IN KE INVENTORI
+            // BARANG OUT HASIL REBUS
             $stok = $this->stockModel->insertStok(
                 $prosesRebus['company_id'],
                 $prosesRebus['warehouse_id'],
@@ -519,12 +514,13 @@ class ProsesRebus extends BaseController
                 $stokDetail,
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],
-                $p['stock_dokumen'],
                 $prosesRebus['no_rebus'],
+                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )",
                 $stockRebusDetail['supplier_id'],
                 $stockRebusDetail['harga_umum'],
                 $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan']
+                $stockRebusDetail['harga_bulanan'],
+                $stockRebusDetail['no_po']
             );
         }
 

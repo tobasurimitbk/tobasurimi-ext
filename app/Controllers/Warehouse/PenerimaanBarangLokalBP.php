@@ -667,7 +667,7 @@ class PenerimaanBarangLokalBP extends BaseController
                         $p['harga'],
                         $p['harga_harian'],
                         $p['harga_bulanan'],
-                        $p['po_no']
+                        $po['po_no']
                     );
                 }
             }

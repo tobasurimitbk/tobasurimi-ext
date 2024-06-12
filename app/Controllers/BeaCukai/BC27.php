@@ -318,7 +318,7 @@ class BC27 extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "MUTASI",
-                $mutasiGlobal['no_mutasi'],
+                "-", // NO PENERIMAAN MUTASI
                 $mutasiGlobal['keterangan'],
             );
 
