@@ -336,7 +336,7 @@ class PPBKB extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "MUTASI",
-                $mutasi['no_mutasi'],
+                "-", // NO PENERIMAAN MUTASI
                 $mutasi['keterangan'],
             );
 

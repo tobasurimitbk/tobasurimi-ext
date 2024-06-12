@@ -176,6 +176,7 @@ class StockDetail2Model extends Model
             stock_details2.qty AS stok_total,
             stock_details2.bc_id,
             stock_details2.no_aju,
+            stock_details2.no_po,
             stock_details.stock_date,
             stock_details.keterangan,
             stock_details2.createdAt

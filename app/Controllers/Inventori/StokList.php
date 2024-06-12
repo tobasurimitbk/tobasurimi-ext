@@ -6,12 +6,14 @@ use App\Controllers\BaseController;
 use App\Models\AdjusmentModel;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\BC27Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
 use App\Models\ParentBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\PPBKBModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
@@ -42,6 +44,8 @@ class StokList extends BaseController
     protected $supplierModel;
     protected $adjusmentModel;
     protected $parentBarangModel;
+    protected $ppbkbModel;
+    protected $bc27Model;
 
     public function __construct()
     {
@@ -64,6 +68,8 @@ class StokList extends BaseController
         $this->warehouseModel = new WarehousesModel();
         $this->adjusmentModel = new AdjusmentModel();
         $this->parentBarangModel = new ParentBarangModel();
+        $this->ppbkbModel = new PPBKBModel();
+        $this->bc27Model = new BC27Model();
     }
 
     public function index()
@@ -1226,6 +1232,26 @@ class StokList extends BaseController
             $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
+            $dokumenPabeanMutasi = "-";
+
+            $ppbkb = $this->ppbkbModel
+                ->join('mutasi', 'mutasi.id = ppbkb.mutasi_id', 'left')
+                ->where('no_mutasi', $data->no_dokumen2)
+                ->first();
+
+            $bc27 = $this->bc27Model
+                ->join('mutasi_global', 'mutasi_global.id = bc_27.mutasi_global_id', 'left')
+                ->where('no_mutasi', $data->no_dokumen2)
+                ->first();
+
+            if ($ppbkb != null) {
+                $dokumenPabeanMutasi = "PPB-KB / " . $ppbkb['no_ppbkb'];
+            }
+
+            if ($bc27 != null) {
+                $dokumenPabeanMutasi = "BC 2.7 / " . $bc27['no_aju'];
+            }
+
             if ($stok['kemasan_id'] == 0) {
                 // BARANG
                 $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
@@ -1234,12 +1260,17 @@ class StokList extends BaseController
                 $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
                 $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
 
+
+
                 array_push($dataResult, [
                     "no" => $no++,
                     "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
                     "dokumen" => $bcName . " / " . $data->no_aju,
                     "no_penerimaan_mutasi" => $data->no_dokumen1,
+                    "dokumen_pabean_mutasi" => $dokumenPabeanMutasi,
                     "no_mutasi" => $data->no_dokumen2,
+                    "supplier_name" => $data->supplier_name,
+                    "no_po" => $data->no_po,
                     "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
                     "stok_1" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => $satuan_2 == null ? "-" : $in_out . (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
@@ -1250,9 +1281,12 @@ class StokList extends BaseController
                 array_push($dataResult, [
                     "no" => $no++,
                     "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                    "dokumen_pabean_mutasi" => $dokumenPabeanMutasi,
                     "dokumen" => $bcName . " / " . $data->no_aju,
                     "no_penerimaan_mutasi" => $data->no_dokumen1,
                     "no_mutasi" => $data->no_dokumen2,
+                    "supplier_name" => $data->supplier_name,
+                    "no_po" => "-",
                     "barang" => strtoupper($barang['name']),
                     "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => "-",
@@ -1340,6 +1374,8 @@ class StokList extends BaseController
                     "dokumen" => $bcName . " / " . $data->no_aju,
                     "no_penerimaan_surat_jalan" => $data->no_dokumen1,
                     "no_surat_jalan" => $data->no_dokumen2,
+                    "supplier_name" => $data->supplier_name,
+                    "no_po" => $data->no_po,
                     "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
                     "stok_1" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => $satuan_2 == null ? "-" : $in_out . (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
@@ -1353,6 +1389,8 @@ class StokList extends BaseController
                     "dokumen" => $bcName . " / " . $data->no_aju,
                     "no_penerimaan_surat_jalan" => $data->no_dokumen1,
                     "no_surat_jalan" => $data->no_dokumen2,
+                    "supplier_name" => $data->supplier_name,
+                    "no_po" => "-",
                     "barang" => strtoupper($barang['name']),
                     "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => "-",
@@ -1543,6 +1581,7 @@ class StokList extends BaseController
                     "no_dokumen1" => $data->no_dokumen1,
                     "no_dokumen2" => $data->no_dokumen2,
                     "stock_dokumen" => $data->stock_dokumen,
+                    "no_po" => $data->no_po,
                     "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
                     "stok_1" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => $satuan_2 == null ? "-" : $in_out . (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
@@ -1558,6 +1597,7 @@ class StokList extends BaseController
                     "no_dokumen1" => $data->no_dokumen1,
                     "no_dokumen2" => $data->no_dokumen2,
                     "stock_dokumen" => $data->stock_dokumen,
+                    "no_po" => "-",
                     "barang" => strtoupper($barang['name']),
                     "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => "-",

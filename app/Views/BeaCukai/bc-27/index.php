@@ -202,15 +202,15 @@
                 render: function(data, type, row) {
                     let htmlRes = '';
 
-                    if (row.status_posting === "0") {
-                        <?php if (can('Bea Cukai', 'BC.27', 'd')) : ?>
+                    if (row.status_posting == "0") {
+                        <?php if (can('Bea Cukai', 'BC 2.7', 'd')) : ?>
                             htmlRes += `
                                 <button data-toggle="tooltip" title="Hapus" onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
                             `;
                         <?php endif; ?>
-                        <?php if (can('Bea Cukai', 'BC.27', 'a')) : ?>
+                        <?php if (can('Bea Cukai', 'BC 2.7', 'a')) : ?>
                             htmlRes += `
                                 <button data-toggle="tooltip" title="Posting" onclick="postingAction('${row.id}')" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>

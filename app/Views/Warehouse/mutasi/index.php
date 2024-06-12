@@ -168,7 +168,17 @@
                 data: "no_ppbkb",
                 className: "text-center",
                 searchable: false,
-                sortable: false
+                sortable: false,
+                render: function(data, type, row) {
+                    if (row.no_ppbkb == "-") {
+                        return '<div class="text-danger">BELUM DIBUAT</div>';
+
+                    } else {
+                        return row.no_ppbkb
+
+                    }
+
+                }
             },
             {
                 data: "total_item",
