@@ -381,7 +381,8 @@ class JasaVendorOut extends BaseController
                 $stockOldDetail['supplier_id'],
                 $stockOldDetail['harga_umum'],
                 $stockOldDetail['harga_harian'],
-                $stockOldDetail['harga_bulanan']
+                $stockOldDetail['harga_bulanan'],
+                $stockOldDetail['no_po']
             );
         }
 

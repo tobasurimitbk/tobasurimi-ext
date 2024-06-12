@@ -47,12 +47,17 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Penerimaan Mutasi</label>
-                </div>
-            </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+
+                <ul class="nav nav-tabs mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Penerimaan Mutasi PPBKB</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('mutasi/create-global') ?>">Penerimaan Mutasi BC 2.7</a>
+                    </li>
+                </ul>
+
                 <input type="hidden" name="id" id="id" value="<?= !empty($penerimaanMutasi) ? encrypt($penerimaanMutasi['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
@@ -60,7 +65,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" disabled class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($penerimaanMutasi) ? $penerimaanMutasi['tanggal'] : $tanggal)); ?>">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($penerimaanMutasi) ? $penerimaanMutasi['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -73,8 +78,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($penerimaanMutasi) ? 'disabled=true' : ''; ?> value="<?= !empty($penerimaanMutasi) ? $penerimaanMutasi['penerimaan_mutasi_no'] : "PMU//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control penerimaan_mutasi_no" id="penerimaan_mutasi_no" name="penerimaan_mutasi_no" placeholder="No. Adjusment">
-                                    <label for="floatingInput">No. Penerimaan Mutasi</label>
+                                    <input readonly autocomplete="one-time-code" <?= !empty($penerimaanMutasi) ? 'disabled=true' : ''; ?> value="<?= !empty($penerimaanMutasi) ? $penerimaanMutasi['penerimaan_mutasi_no'] : "PMU//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control penerimaan_mutasi_no" id="penerimaan_mutasi_no" name="penerimaan_mutasi_no" placeholder="No. Penerimaan Mutasi">
+                                    <label for="floatingInput">No Mutasi</label>
                                 </div>
                                 <div style="<?= !empty($penerimaanMutasi) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
@@ -85,29 +90,16 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($penerimaanMutasi) ? 'disabled'  : '' ?> class="form-select jenis_mutasi" id="jenis_mutasi" name="jenis_mutasi" aria-label="Floating label select example">
+                            <select <?= !empty($penerimaanMutasi) ?  'disabled'  : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php foreach ($jenisMutasi as $j) : ?>
-                                    <option <?= !empty($penerimaanMutasi) ? ($penerimaanMutasi['jenis_mutasi'] == $j['value'] ? 'selected' : '') : '' ?> value="<?= $j['value'] ?>">
-                                        <?= strtoupper($j['description']); ?>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option value="<?= $d['id'] ?>">
+                                        <?= $d['divisi'] ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Jenis Mutasi</label>
+                            <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
                         </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
-                            <select <?= !empty($penerimaanMutasi) ?  'disabled'  : '' ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php if (!empty($warehouse)) : ?>
-                                    <option selected value="<?= $warehouse['id'] ?>">(<?= strtoupper($warehouse['divisi']) ?>) <?= strtoupper($warehouse['warehouse_name']) ?></option>
-                                <?php endif; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Departemen - Warehouse Tujuan</label>
-                        </div>
-                        <small class="mb-3"><i>Hanya menampilkan penerimaan barang yang belum lengkap</i></small>
                     </div>
 
                     <div class="col-md-4">
@@ -120,7 +112,7 @@
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">No. Penerimaan Mutasi</label>
+                            <label for="floatingInput" style="z-index: 1;">No. Mutasi</label>
                         </div>
                     </div>
 
@@ -148,24 +140,25 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">No Mutasi</th>
                                     <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
-                                    <th style="text-align: center;">Tgl Penerimaan</th>
+                                    <th style="text-align: center;">Kode Barang</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center;">Warehouse</th>
+                                    <th style="text-align: center;">Supplier</th>
+                                    <th style="text-align: center;">Tgl Penerimaan</th>
+                                    <th style="text-align: center;">Dokumen Pabean</th>
                                     <th style="text-align: center;">Qty Mutasi</th>
                                     <th style="text-align: center;">Qty Diterima Total</th>
                                     <th style="text-align: center;">Qty Diterima Sekarang</th>
                                     <th style="text-align: center;">Qty Sisa</th>
+                                    <th style="text-align: center;">Satuan</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="12" style="text-align: center;">
+                                    <td colspan="13" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -186,19 +179,15 @@
     const csrf = $(`[name="${csrfToken}"]`);
     var listBarang = [];
 
-    $('#jenis_mutasi').select2({
-        placeholder: "Pilih Jenis Mutasi",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        getListWarehouse();
-        getListMutasi();
-        listBarang = [];
-        drawTable(listBarang);
-    });
+    $(".tanggal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
 
-    $('#warehouse_id').select2({
-        placeholder: "Pilih Departemen - Warehouse Tujuan",
+    $('#divisi_id').select2({
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -237,7 +226,7 @@
         })
     });
 
-    $("#jenis_mutasi,#warehouse_id,.multiple_mutasi_id")
+    $("#divisi_id,.multiple_mutasi_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -471,7 +460,7 @@
                 stopLoading();
             },
             data: {
-                warehouse_id: $(".warehouse_id option:selected").val(),
+                divisi_id: $(".divisi_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
@@ -481,32 +470,6 @@
                     $(".multiple_mutasi_id").append(`<option value="${item.id}">${item.no_mutasi}</option>`)
                 })
                 $(".multiple_mutasi_id").val();
-
-            }
-        });
-    }
-
-    function getListWarehouse() {
-        $.ajax({
-            url: `<?= base_url('penerimaan-mutasi/list-warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                jenis_mutasi: $(".jenis_mutasi option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_id").empty()
-                $(".warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_id").append(`<option value="${item.id}">(${item.divisi.toUpperCase()}) ${item.warehouse_name.toUpperCase()}</option>`)
-                })
-                $(".warehouse_id").val();
 
             }
         });
@@ -568,7 +531,7 @@
                 url: `<?= base_url("penerimaan-mutasi/get-penerimaan-mutasi-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouse_id: $('#warehouse_id option:selected').val()
+                    divisi_id: $('#divisi_id option:selected').val()
                 },
                 dataType: "json",
                 success: function(res) {

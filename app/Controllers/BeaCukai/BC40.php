@@ -2127,7 +2127,8 @@ class BC40 extends BaseController
                         $penerimaanBarang['supplier_id'],
                         $p['harga'],
                         $p['harga_harian'],
-                        $p['harga_bulanan']
+                        $p['harga_bulanan'],
+                        $po['po_no']
                     );
                 }
 

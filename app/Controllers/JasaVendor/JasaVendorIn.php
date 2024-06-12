@@ -412,11 +412,12 @@ class JasaVendorIn extends BaseController
                 $qty,
                 $j['no_aju_in'],
                 $jasaVendorIn['no_penerimaan_surat_jalan'],
-                $j['stock_dokumen'],
+                $jasaVendorIn['no_penerimaan_surat_jalan'],
                 $stockOldDetail['supplier_id'],
                 $stockOldDetail['harga_umum'],
                 $stockOldDetail['harga_harian'],
-                $stockOldDetail['harga_bulanan']
+                $stockOldDetail['harga_bulanan'],
+                $stockOldDetail['no_po']
             );
         }
 
