@@ -1470,6 +1470,7 @@ $routes->post('/rasio/save', 'Accounting\Rasio\RasioController::saveRasio', ['fi
 $routes->post('/rasio/update', 'Accounting\Rasio\RasioController::updateRasio', ['filter' => 'Auth']);
 $routes->post('/rasio/delete', 'Accounting\Rasio\RasioController::deleteRasio', ['filter' => 'Auth']);
 $routes->post('/rasio/get', 'Accounting\Rasio\RasioController::get', ['filter' => 'Auth']);
+$routes->get('/rasio/load_content', 'Accounting\Rasio\RasioController::load_content', ['filter' => 'Auth']);
 
 //Laporan
 //Accounting

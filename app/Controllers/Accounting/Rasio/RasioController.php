@@ -745,4 +745,35 @@ class RasioController extends BaseController
 
         return $harga;
     }
+
+    public function load_content()
+    {
+        $page = $this->request->getGet('page') ?? "";
+
+        $subAkunsModel = $this->subAkunModel->asObject()->findAll();
+        $data = [
+            'dataDivisi' => $this->divisisModel->getDivisiAccess(),
+            'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
+            "subAkuns" => $subAkunsModel
+        ];
+
+        $validPages = [
+            'bahan_digunakan',
+            'bahan_proses_ulang',
+            'saldo_awal',
+            'saldo_akhir',
+            'saldo_adjustment',
+            'bahan_filling',
+            'saldo_jual',
+            'saldo_trimming',
+            'saldo_kopek',
+            'bahan_jadi'
+        ];
+
+        if (in_array($page, $validPages)) {
+            return view('Accounting/rasio/' . $page, $data);
+        } else {
+            return view('default_view', $data);
+        }
+    }
 }
