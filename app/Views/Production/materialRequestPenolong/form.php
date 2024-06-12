@@ -9,19 +9,19 @@
         <?php } else { ?>
             <h1 class="title-name">Tambah Material Request</h1>
         <?php } ?>
-        <div class="col-button-tambah-spp">
+        <div class="col-button-tambah-spp text-right">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-penolong"); ?>">
                 Batal
             </a>
             <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted != 1) { ?>
-                <button class="btn btn-success float-right" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
+                <button class="btn btn-success mr-1" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
                     Posting
                 </button>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                <button class="btn btn-show-form btn-save btn-submit-form mr-1">
                     Simpan
                 </button>
             <?php } else if (!isset($dataMaterialRequests)) { ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                <button class="btn btn-show-form btn-save btn-submit-form mr-1">
                     Simpan
                 </button>
             <?php } else { ?>

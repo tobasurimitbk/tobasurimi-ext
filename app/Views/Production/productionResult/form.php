@@ -10,19 +10,19 @@
         <?php if (isset($data)) : ?>
             <h1 class="title-name">Detail Penerimaan Hasil Produksi</h1>
         <?php endif; ?>
-        <div class="col-button-tambah-spp">
+        <div class="col-button-tambah-spp text-right">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("production-result"); ?>">
                 Batal
             </a>
             <?php if (isset($data) && $data->is_posted != 1) { ?>
-                <button class="btn btn-success float-right" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
+                <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
                     Posting
                 </button>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form" type="button">
+                <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
                     Simpan
                 </button>
             <?php } else if (!isset($data)) { ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form" type="button">
+                <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
                     Simpan
                 </button>
             <?php } else { ?>
