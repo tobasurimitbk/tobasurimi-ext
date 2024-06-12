@@ -518,7 +518,7 @@ class JurnalUmum extends BaseController
                             } else {
                                 $result[] = array(
                                     'id_transaksi' => $id_transaksi_jurnal,
-                                    'divisi_id' => $dataBB->divisi_id,
+                                    'divisi_id' => $dataBB->division_id,
                                     'company_id' => $this->this_company_id,
                                     'id_coa' =>  $barangAP,
                                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
@@ -550,7 +550,7 @@ class JurnalUmum extends BaseController
                         //untuk insert ke jurnal umum
                         $result[] = array(
                             'id_transaksi' => $id_transaksi_jurnal,
-                            'divisi_id' => $dataBB->divisi_id,
+                            'divisi_id' => $dataBB->division_id,
                             'company_id' => $this->this_company_id,
                             'id_coa' =>  $UtangAP,
                             'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),

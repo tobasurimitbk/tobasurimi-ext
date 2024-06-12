@@ -84,6 +84,27 @@
                             <a class="nav-link" id="">Bahan Proses Ulang</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" id="">Saldo Stock Awal</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Saldo Stock Akhir</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Saldo Adjustment</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Bahan Filling dan Ditapak</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Saldo Jual</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Saldo Trimming</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="">Saldo Kopek</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" id="">Bahan Jadi</a>
                         </li>
                     </ul>
@@ -305,7 +326,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-md-12">
                             <div class="table-responsive">
                                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableRasio" width="100%" border="1" cellspacing="0">
