@@ -7,6 +7,7 @@ use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\PenerimaanMutasiGlobalDetailModel;
 use App\Models\PenerimaanMutasiGlobalModel;
+use App\Models\StockModel;
 
 class PenerimaanMutasiGlobal extends BaseController
 {
@@ -16,6 +17,7 @@ class PenerimaanMutasiGlobal extends BaseController
     protected $divisiModel;
     protected $penerimaanMutasiGlobalModel;
     protected $penerimaanMutasiGlobalDetailModel;
+    protected $stockModel;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class PenerimaanMutasiGlobal extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->penerimaanMutasiGlobalModel = new PenerimaanMutasiGlobalModel();
         $this->penerimaanMutasiGlobalDetailModel = new PenerimaanMutasiGlobalDetailModel();
+        $this->stockModel = new StockModel();
     }
 
     public function index()
@@ -68,10 +71,10 @@ class PenerimaanMutasiGlobal extends BaseController
 
     public function dropdownListBarang()
     {
-        $mutasiID = json_decode($this->request->getVar('mutasi_id'));
-        $penerimaanMutasiID = decrypt($this->request->getVar('penerimaan_mutasi_id'));
+        $mutasiGlobalID = json_decode($this->request->getVar('mutasi_global_id'));
+        $penerimaanMutasiGlobalID = decrypt($this->request->getVar('penerimaan_mutasi_global_id'));
 
-        if (empty($mutasiID)) {
+        if (empty($mutasiGlobalID)) {
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'data' => [],
@@ -80,8 +83,8 @@ class PenerimaanMutasiGlobal extends BaseController
         } else {
 
             $data = $this->penerimaanMutasiGlobalModel->getListBarangMutasi(
-                $mutasiID,
-                $penerimaanMutasiID
+                $mutasiGlobalID,
+                $penerimaanMutasiGlobalID
             );
 
             return response()->setJSON([
@@ -90,6 +93,21 @@ class PenerimaanMutasiGlobal extends BaseController
                 'status' => true
             ]);
         }
+    }
+
+    public function dropdownListBarangMasuk()
+    {
+        $data = $this->stockModel->getBarangAndStock(
+            $this->request->getVar('tipe_barang'),
+            $this->request->getVar('divisi_id'),
+            $this->request->getVar('warehouse_id')
+        );
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $data
+        ]);
     }
 
     public function getPenerimaanMutasiNo()
