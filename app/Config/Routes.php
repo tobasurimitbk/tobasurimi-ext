@@ -935,6 +935,8 @@ $routes->get('/penerimaan-mutasi/global', 'Inventori\PenerimaanMutasiGlobal::ind
 $routes->get('/penerimaan-mutasi/create-global', 'Inventori\PenerimaanMutasiGlobal::create', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-global-no', 'Inventori\PenerimaanMutasiGlobal::getPenerimaanMutasiNo', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/list-mutasi-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListNomorMutasi', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-barang-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarang', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-barang-masuk', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarangMasuk', ['filter' => 'Auth']);
 
 // MUTASI GLOBAL
 $routes->get('/mutasi/global', 'Inventori\MutasiGlobal::index', ['filter' => 'Auth']);
