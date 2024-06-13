@@ -758,6 +758,22 @@ class ProductionResult extends BaseController
                                 $this->materialRequestDetailModel->insert($dataMaterialDetail);
                             }
                         }
+                    } else if ($value['type'] == 'DIGUNAKAN') {
+                        $materialRequest = $this->materialRequestDetailModel
+                            ->where('material_request_id', $value['material_request_id'])
+                            ->where('id', $value['material_request_detail_id'])
+                            ->findAll();
+                        foreach ($materialRequest as $materialRequestData) {
+                            $qtyNow = (float) $materialRequestData['qty_now'];
+                            $qtyProduksi = (float) $value['qty'];
+                            $qtyHasil = $qtyNow - $qtyProduksi;
+                            if ($qtyHasil == 0) {
+                                $datas = [
+                                    'qty_now' => $qtyHasil,
+                                ];
+                                $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                            }
+                        }
                     }
 
                     if ($value['type'] == 'JADI') {
