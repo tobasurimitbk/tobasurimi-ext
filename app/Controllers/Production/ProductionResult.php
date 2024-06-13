@@ -397,9 +397,6 @@ class ProductionResult extends BaseController
                         "qty" => (float) $qty,
                         "qty2" => (float) $bj->berat_isi_jadi,
                         "qty_isi" => (float) $bj->qty_isi_jadi,
-                        "harga_umum" => (float) $bj->harga_umum,
-                        "harga_harian" => (float) $bj->harga_harian,
-                        "harga_bulanan" => (float) $bj->harga_bulanan,
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
                 }
@@ -712,7 +709,7 @@ class ProductionResult extends BaseController
 
             // po posting
             $payload = [
-                "is_posted" => $this->request->getVar('status_posting') == '1' ? $this->request->getVar('status_posting') : null,
+                "is_posted" => $this->request->getVar('status_posting') == '1' ? $this->request->getVar('status_posting') : 0,
             ];
 
             if (!empty($id)) {
@@ -759,6 +756,22 @@ class ProductionResult extends BaseController
                                     'kondisi_barang' => $value['kondisi_barang'],
                                 ];
                                 $this->materialRequestDetailModel->insert($dataMaterialDetail);
+                            }
+                        }
+                    } else if ($value['type'] == 'DIGUNAKAN') {
+                        $materialRequest = $this->materialRequestDetailModel
+                            ->where('material_request_id', $value['material_request_id'])
+                            ->where('id', $value['material_request_detail_id'])
+                            ->findAll();
+                        foreach ($materialRequest as $materialRequestData) {
+                            $qtyNow = (float) $materialRequestData['qty_now'];
+                            $qtyProduksi = (float) $value['qty'];
+                            $qtyHasil = $qtyNow - $qtyProduksi;
+                            if ($qtyHasil == 0) {
+                                $datas = [
+                                    'qty_now' => $qtyHasil,
+                                ];
+                                $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
                             }
                         }
                     }

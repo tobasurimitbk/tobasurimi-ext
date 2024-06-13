@@ -151,6 +151,29 @@ class BarangMasterModel extends Model
         return $data;
     }
 
+    public function getBarangByTypeCondition($companyId, $type, $type2 = null)
+    {
+        $selectQry = "barang_master.*, satuans.nama_satuan, parent_barang.parent_name";
+
+        $this->select($selectQry)
+            ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
+            ->join('parent_barang', 'barang_master.parent_type_id = parent_barang.id', 'left')
+            ->where('barang_master.company_id', $companyId)
+            ->groupStart()  // Start grouping
+            ->where('barang_master.type_barang', $type);
+
+        if ($type2 !== null) {
+            $this->orWhere('barang_master.type_barang', $type2);
+        }
+
+        $this->groupEnd()  // End grouping
+            ->orderBy('barang_master.barang_name', "ASC");
+
+        $data = $this->findAll();
+
+        return $data;
+    }
+
 
     public function getBarangByTypeWithSpec($condition)
     {
