@@ -32,7 +32,7 @@ class PenerimaanMutasiGlobal extends BaseController
 
     public function index()
     {
-        return view('Warehouse/PenerimaanMutasi/index_global');
+        return view('Warehouse/penerimaanMutasi/index_global');
     }
 
     public function create()
