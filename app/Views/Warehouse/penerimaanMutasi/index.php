@@ -3,8 +3,8 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Penerimaan Mutasi</h1>
-        <?php if (can("Inventori", "Mutasi", "c")) : ?>
+        <h1>Penerimaan Mutasi PPBKB</h1>
+        <?php if (can("Inventori", "Penerimaan Mutasi", "c")) : ?>
             <a href="<?= base_url('penerimaan-mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -12,6 +12,14 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Penerimaan Mutasi PPBKB</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi/global') ?>">Penerimaan Mutasi BC 2.7</a>
+                </li>
+            </ul>
             <?= csrf_field() ?>
             <div class="row mb-4">
                 <div class="col-sm-4 mt-2">
@@ -22,7 +30,7 @@
                                 <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <label style="z-index: 1;">Departemen</label>
+                        <label style="z-index: 1;">Departemen Penerima</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-2">
@@ -39,6 +47,12 @@
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search penerimaan_mutasi_no" id="search" name="search" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Penerimaan Mutasi </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search multiple_no_mutasi" id="multiple_no_mutasi" name="multiple_no_mutasi" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Mutasi </label>
                     </div>
                 </div>
                 <div class="col-md-4 mt-2">
@@ -74,11 +88,11 @@
                         <tr>
                             <th>No</th>
                             <th onclick="changeSort('penerimaan_mutasi_no')">No Penerimaan Mutasi</th>
-                            <th>Nomor Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal</th>
-                            <th onclick="changeSort('penerimaan_mutasi.warehouse_id')">Warehouse Tujuan</th>
-                            <th onclick="changeSort('penerimaan_mutasi.jenis_mutasi')">Dokumen Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.bc_no')">Nomor Dokumen Pabean</th>
+                            <th onclick="changeSort('penerimaan_mutasi.multiple_mutasi_no')">Nomor Mutasi</th>
+                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal Penerimaan</th>
+                            <th onclick="changeSort('penerimaan_mutasi.divisi_id')">Departemen Penerima</th>
+                            <th>Departemen Pengirim</th>
+                            <th>Dokumen Mutasi Barang</th>
                             <th>Total Item</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -121,6 +135,7 @@
                 data.divisi_id = $(".divisi_id").val();
                 data.status = $(".status").val();
                 data.penerimaan_mutasi_no = $(".penerimaan_mutasi_no").val();
+                data.multiple_mutasi_no = $(".multiple_no_mutasi").val();
                 data.dateStart = $('#dateStart').val();
                 data.dateEnd = $('#dateEnd').val();
 
@@ -156,16 +171,21 @@
                 className: "text-center"
             },
             {
-                data: "warehouse_tujuan",
+                data: "divisi_penerima",
+                className: "text-center"
+            },
+            {
+                data: "divisi_pengirim",
                 className: "text-center",
+                searchable: false,
+                sortable: false,
             },
+
             {
-                data: "jenis_mutasi",
-                className: "text-center"
-            },
-            {
-                data: "bc_no",
-                className: "text-center"
+                data: "dokumen_mutasi_barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
             },
             {
                 data: "total_item",
@@ -174,15 +194,28 @@
                 sortable: false
             },
             {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
+                data: "status_posting",
+                className: "text-center",
                 render: function(data, type, row) {
-                    return '<i class="fa-solid fa-square text-danger"></i>';
+                    let htmlRes = '';
+
+                    if (row.status_posting == "1") {
+                        htmlRes += `
+                        <div class="text-success">
+                            <b>SUDAH POSTING</b>
+                        </div>`
+                    } else {
+                        htmlRes += `
+                        <div class="text-danger">
+                           <b>BELUM POSTING<b/>
+                        </div>`
+                    }
+
+                    return htmlRes;
 
                 }
-            }, {
+            },
+            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
@@ -218,7 +251,7 @@
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                        
+
                     `
                     }
 
@@ -260,7 +293,7 @@
     })
 
     $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
+        placeholder: "Pilih Departemen Penerima",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -274,6 +307,10 @@
     }).change(function() {
         table.ajax.reload();
     });
+
+    $('#multiple_no_mutasi').keyup(function() {
+        table.ajax.reload();
+    })
 
 
     $('#dateStart,#dateEnd').change(function() {

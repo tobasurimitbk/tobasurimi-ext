@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Mutasi</h1>
+        <h1>Mutasi PPBKB</h1>
         <?php if (can("Inventori", "Mutasi", "c")) : ?>
             <a href="<?= base_url('mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah

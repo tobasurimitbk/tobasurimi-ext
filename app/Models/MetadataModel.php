@@ -107,6 +107,11 @@ class MetadataModel extends Model
         return $this->asArray()->where('name', 'jenis_dok_aju')->like('description', '%' . $po_used . '%')->findAll();
     }
 
+    public function getBCFirst($bcName)
+    {
+        return $this->asArray()->where('name', 'jenis_dok_aju')->where('value', $bcName)->first();
+    }
+
     public function getKodeSatuanBarang($search)
     {
         $data = [];
