@@ -397,9 +397,6 @@ class ProductionResult extends BaseController
                         "qty" => (float) $qty,
                         "qty2" => (float) $bj->berat_isi_jadi,
                         "qty_isi" => (float) $bj->qty_isi_jadi,
-                        "harga_umum" => (float) $bj->harga_umum,
-                        "harga_harian" => (float) $bj->harga_harian,
-                        "harga_bulanan" => (float) $bj->harga_bulanan,
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
                 }
@@ -712,7 +709,7 @@ class ProductionResult extends BaseController
 
             // po posting
             $payload = [
-                "is_posted" => $this->request->getVar('status_posting') == '1' ? $this->request->getVar('status_posting') : null,
+                "is_posted" => $this->request->getVar('status_posting') == '1' ? $this->request->getVar('status_posting') : 0,
             ];
 
             if (!empty($id)) {

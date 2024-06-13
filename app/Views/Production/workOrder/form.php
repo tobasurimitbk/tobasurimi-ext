@@ -324,7 +324,7 @@
             $(".spp_type_bypass").val(type)
             if (type) {
                 $.ajax({
-                    url: `<?= base_url("barang/dropdown/type-nospec"); ?>`,
+                    url: `<?= base_url("barang/dropdown/type-nospecwo"); ?>`,
                     method: "GET",
                     dataType: "json",
                     data: {
