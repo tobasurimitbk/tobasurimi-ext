@@ -42,7 +42,7 @@ class PenerimaanMutasiGlobal extends BaseController
             'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id),
             'divisi' => $this->divisiModel->getDivisiAccess()
         ];
-        return view('Warehouse/PenerimaanMutasi/form_global', $data);
+        return view('Warehouse/penerimaanMutasi/form_global', $data);
     }
 
     public function dropdownListNomorMutasi()
