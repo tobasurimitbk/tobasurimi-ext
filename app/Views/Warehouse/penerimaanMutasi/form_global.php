@@ -3,25 +3,25 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($penerimaanMutasi) ? "Tambah Penerimaan Mutasi PPBKB" : "Update Penerimaan Mutasi PPBKB" ?></h1>
+        <h1><?= empty($penerimaanMutasiGlobal) ? "Tambah Penerimaan Mutasi BC 2.7" : "Update Penerimaan Mutasi BC 2.7" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-mutasi"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-mutasi/global"); ?>">
                 Batal
             </a>
-            <?php if (!empty($penerimaanMutasi)) : ?>
-                <?php if ($penerimaanMutasi['status_posting'] == "0") : ?>
+            <?php if (!empty($penerimaanMutasiGlobal)) : ?>
+                <?php if ($penerimaanMutasiGlobal['status_posting'] == "0") : ?>
                     <?php if (can('Inventori', 'Penerimaan Mutasi', 'd')) : ?>
-                        <button class="btn btn-hapus delete-parent float-right" onclick="remove('<?= encrypt($penerimaanMutasi['id']); ?>')">
+                        <button class="btn btn-hapus delete-parent float-right" onclick="remove('<?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
                             Hapus
                         </button>
                     <?php endif; ?>
                     <?php if (can('Inventori', 'Penerimaan Mutasi', 'a')) : ?>
-                        <button class="btn btn-success posting-spp float-right posting-mutasi" onclick="posting('<?= encrypt($penerimaanMutasi['id']); ?>')">
+                        <button class="btn btn-success posting-spp float-right posting-mutasi" onclick="posting('<?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
                             Posting
                         </button>
                     <?php endif; ?>
                     <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?><?= encrypt($penerimaanMutasi['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?><?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
                             Print
                         </button>
                     <?php endif; ?>
@@ -33,7 +33,7 @@
 
                 <?php else : ?>
                     <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?><?= encrypt($penerimaanMutasi['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?><?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
                             Print
                         </button>
                     <?php endif; ?>
@@ -51,21 +51,21 @@
 
                 <ul class="nav nav-tabs mb-3">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Penerimaan Mutasi PPBKB</a>
+                        <a class="nav-link" href="<?= base_url('penerimaan-mutasi/create') ?>">Penerimaan Mutasi PPBKB</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('penerimaan-mutasi/create-global') ?>">Penerimaan Mutasi BC 2.7</a>
+                        <a class="nav-link active" href="#">Penerimaan Mutasi BC 2.7</a>
                     </li>
                 </ul>
 
-                <input type="hidden" name="id" id="id" value="<?= !empty($penerimaanMutasi) ? encrypt($penerimaanMutasi['id']) : '' ?>" class="id">
+                <input type="hidden" name="id" id="id" value="<?= !empty($penerimaanMutasiGlobal) ? encrypt($penerimaanMutasiGlobal['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($penerimaanMutasi) ? ($penerimaanMutasi['status_posting'] == "1" ? "disabled" : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($penerimaanMutasi) ? $penerimaanMutasi['tanggal'] : $tanggal)); ?>">
+                                    <input <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] == "1" ? "disabled" : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($penerimaanMutasiGlobal) ? $penerimaanMutasiGlobal['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -78,10 +78,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($penerimaanMutasi) ? ($penerimaanMutasi['status_posting'] == "1" ? "disabled" : 'disabled') : ''; ?> value="<?= !empty($penerimaanMutasi) ? $penerimaanMutasi['penerimaan_mutasi_no'] : "PMU//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control penerimaan_mutasi_no" id="penerimaan_mutasi_no" name="penerimaan_mutasi_no" placeholder="No. Penerimaan Mutasi">
+                                    <input readonly autocomplete="one-time-code" <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] == "1" ? "disabled" : 'disabled') : ''; ?> value="<?= !empty($penerimaanMutasiGlobal) ? $penerimaanMutasiGlobal['penerimaan_mutasi_no'] : "PMG//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control penerimaan_mutasi_no" id="penerimaan_mutasi_no" name="penerimaan_mutasi_no" placeholder="No. Penerimaan Mutasi">
                                     <label for="floatingInput">No Mutasi</label>
                                 </div>
-                                <div style="<?= !empty($penerimaanMutasi) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($penerimaanMutasiGlobal) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -90,25 +90,47 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($penerimaanMutasi) ?  ($penerimaanMutasi['status_posting'] == "1" ? "disabled" : 'disabled') : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <select <?= !empty($penerimaanMutasiGlobal) ?  ($penerimaanMutasiGlobal['status_posting'] == "1" ? "disabled" : 'disabled') : '' ?> class="form-select company_pengirim_id" id="company_pengirim_id" name="company_pengirim_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php foreach ($divisi as $d) : ?>
-                                    <option <?= !empty($penerimaanMutasi) ? ($penerimaanMutasi['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                        <?= $d['divisi'] ?>
+                                <?php foreach ($dropdownCompanyExcept as $d) : ?>
+                                    <option <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['company_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= strtoupper($d['company']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Departemen Penerimaan</label>
+                            <label for="floatingInput" style="z-index: 1;">Company Pengirim</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_penerima_id" id="divisi_penerima_id" name="divisi_penerima_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['divisi_penerima_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen Penerima</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_penerima_id" id="warehouse_penerima_id" name="warehouse_penerima_id" aria-label="Floating label select example">
+                                <option value=""></option>
+
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Warehouse Penerima</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($penerimaanMutasi) ?  ($penerimaanMutasi['status_posting'] == "1" ? "disabled" : 'disabled') : ''; ?> multiple class="form-select multiple_mutasi_id" name="multiple_mutasi_id[]" id="multiple_mutasi_id[]">
+                            <select <?= !empty($penerimaanMutasiGlobal) ?  ($penerimaanMutasiGlobal['status_posting'] == "1" ? "disabled" : 'disabled') : ''; ?> multiple class="form-select multiple_mutasi_id" name="multiple_mutasi_id[]" id="multiple_mutasi_id[]">
                                 <option value=""></option>
-                                <?php if (!empty($penerimaanMutasi)) : ?>
-                                    <?php foreach (json_decode($penerimaanMutasi['multiple_mutasi_id']) as $i => $p) : ?>
-                                        <option selected value="<?= $p ?>"><?= json_decode($penerimaanMutasi['multiple_no_mutasi'])[$i] ?></option>
+                                <?php if (!empty($penerimaanMutasiGlobal)) : ?>
+                                    <?php foreach (json_decode($penerimaanMutasiGlobal['multiple_mutasi_id']) as $i => $p) : ?>
+                                        <option selected value="<?= $p ?>"><?= json_decode($penerimaanMutasiGlobal['multiple_no_mutasi'])[$i] ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
@@ -118,7 +140,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($penerimaanMutasi) ? ($penerimaanMutasi['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($penerimaanMutasi) ? $penerimaanMutasi['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
+                            <input <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($penerimaanMutasiGlobal) ? $penerimaanMutasiGlobal['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
@@ -128,11 +150,12 @@
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">List Barang <?= !empty($penerimaanMutasi) ? "(Hanya Menampilkan Barang berdasarkan data yang sudah disimpan sebelumnya)" : "(Hanya Menampilkan Barang yang Belum Diterima Full)" ?></label>
+                        <label class="form-label font-weight-bold modal-sub-title">List Barang Yang Dikirim</label>
                     </div>
                 </div>
             </div>
             <div class="row mt-3">
+
 
                 <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
@@ -141,19 +164,16 @@
                                 <tr>
                                     <th style="text-align: center;">No</th>
                                     <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Kode Barang</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
+                                    <th style="text-align: center;">Kode Barang (Asal)</th>
+                                    <th style="text-align: center;">Barang - Spesifikasi (Asal)</th>
                                     <th style="text-align: center;">Dokumen Mutasi</th>
                                     <th style="text-align: center;">Dokumen Asal</th>
-                                    <th style="text-align: center;">Warehouse Penerimaan</th>
                                     <th style="text-align: center;">Departemen / Warehouse Pengirim</th>
                                     <th style="text-align: center;">Supplier</th>
                                     <th style="text-align: center;">No Purchase Order</th>
                                     <th style="text-align: center;">Qty Mutasi</th>
-                                    <th style="text-align: center;">Qty Diterima Total</th>
-                                    <th style="text-align: center;">Qty Diterima Sekarang</th>
-                                    <th style="text-align: center;">Qty Sisa</th>
                                     <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
@@ -188,15 +208,34 @@
         autoclose: true
     })
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
+    $('#company_pengirim_id').select2({
+        placeholder: "Pilih Company Pengirim",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        getListMutasi();
-        listBarang = [];
-        drawTable(listBarang);
+        // NO MUTASI DROPDOWN
+        getListMutasiGlobal();
+    });
+
+    $('#divisi_penerima_id').select2({
+        placeholder: "Pilih Departemen Penerima",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // WAREHOUSE PENERIMA DROPDOWN DAN NO MUTASI
+        getListWarehousePenerima();
+        getListMutasiGlobal();
         changeStatus();
+
+    });
+
+    $('#warehouse_penerima_id').select2({
+        placeholder: "Pilih Warehouse Penerima",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // WAREHOUSE PENERIMA DROPDOWN DAN NO MUTASI
+        getListMutasiGlobal();
 
     });
 
@@ -228,7 +267,7 @@
         })
     });
 
-    $("#divisi_id,.multiple_mutasi_id")
+    $("#company_pengirim_id,.multiple_mutasi_id,#divisi_penerima_id,#warehouse_penerima_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -246,7 +285,7 @@
             penerimaan_mutasi_no: {
                 required: true
             },
-            divisi_id: {
+            company_pengirim_id: {
                 required: true
             },
 
@@ -258,7 +297,7 @@
             penerimaan_mutasi_no: {
                 required: "No penerimaan wajib diisi"
             },
-            divisi_id: {
+            company_pengirim_id: {
                 required: "Departemen wajib diisi"
             },
 
@@ -420,10 +459,10 @@
         }
     });
 
-
-    function getListBarang() {
+    // GET LIST MUTASI GLOBAL NOMOR
+    function getListMutasiGlobal() {
         $.ajax({
-            url: `<?= base_url('penerimaan-mutasi/list-barang'); ?>`,
+            url: `<?= base_url('penerimaan-mutasi/list-mutasi-global'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -432,34 +471,7 @@
                 stopLoading();
             },
             data: {
-                jenis_mutasi: $(".jenis_mutasi option:selected").val(),
-
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_id").empty()
-                $(".warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_id").append(`<option value="${item.id}">(${item.divisi.toUpperCase()}) ${item.warehouse_name.toUpperCase()}</option>`)
-                })
-                $(".warehouse_id").val();
-
-            }
-        });
-    }
-
-    function getListMutasi() {
-        $.ajax({
-            url: `<?= base_url('penerimaan-mutasi/list-mutasi'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_id option:selected").val(),
+                company_pengirim_id: $(".company_pengirim_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
@@ -469,7 +481,6 @@
                     $(".multiple_mutasi_id").append(`<option value="${item.id}">${item.no_mutasi}</option>`)
                 })
                 $(".multiple_mutasi_id").val();
-
             }
         });
     }
@@ -501,7 +512,7 @@
                 newRow.append($('<td>').text(v.qty_diterima_all));
                 newRow.append($('<td>').html(
                     `
-                        <input <?= !empty($penerimaanMutasi) ? (($penerimaanMutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" style="height: 40px; padding-bottom: 10px;" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.mutasi_detail_id}" data-qty_sisa="${v.qty_sisa}" class="form-control" type="text" value="${v.qty_diterima_current}">
+                        <input <?= !empty($penerimaanMutasiGlobal) ? (($penerimaanMutasiGlobal['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" style="height: 40px; padding-bottom: 10px;" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.mutasi_detail_id}" data-qty_sisa="${v.qty_sisa}" class="form-control" type="text" value="${v.qty_diterima_current}">
                     `
                 ));
                 newRow.append($('<td>').text(v.qty_sisa));
@@ -530,10 +541,10 @@
         if (value) {
             $(".penerimaan_mutasi_no").attr("readonly", true);
             $.ajax({
-                url: `<?= base_url("penerimaan-mutasi/get-penerimaan-mutasi-no"); ?>`,
+                url: `<?= base_url("penerimaan-mutasi/get-penerimaan-mutasi-global-no"); ?>`,
                 method: "GET",
                 data: {
-                    divisi_id: $('#divisi_id option:selected').val()
+                    divisi_penerima_id: $('#divisi_penerima_id option:selected').val()
                 },
                 dataType: "json",
                 success: function(res) {
@@ -557,7 +568,7 @@
         }
     }
 
-    <?php if (!empty($penerimaanMutasi)) : ?>
+    <?php if (!empty($penerimaanMutasiGlobal)) : ?>
         let arr = $('.multiple_mutasi_id').val();
         $.ajax({
             url: `<?= base_url("penerimaan-mutasi/list-barang"); ?>`,
@@ -576,6 +587,31 @@
     <?php endif; ?>
     const print = function(url) {
         window.open(url, "_blank");
+    }
+
+    // GET LIST WAREHOUSE PENERIMA
+    function getListWarehousePenerima() {
+        $.ajax({
+            url: `<?= base_url('mutasi/warehouse'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $(".divisi_penerima_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".warehouse_penerima_id").empty()
+                $(".warehouse_penerima_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".warehouse_penerima_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
+            }
+        });
     }
 
     const posting = function(id) {

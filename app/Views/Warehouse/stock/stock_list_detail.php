@@ -1368,7 +1368,7 @@
                 sortable: false
             },
             {
-                data: "dokumen",
+                data: "dokumen_asal",
                 className: "text-center"
             },
             {

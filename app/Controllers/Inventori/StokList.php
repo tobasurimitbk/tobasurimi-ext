@@ -10,9 +10,11 @@ use App\Models\BC27Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
+use App\Models\MutasiModel;
 use App\Models\ParentBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\PenerimaanMutasiModel;
 use App\Models\PPBKBModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
@@ -46,6 +48,7 @@ class StokList extends BaseController
     protected $parentBarangModel;
     protected $ppbkbModel;
     protected $bc27Model;
+    protected $mutasiModel;
 
     public function __construct()
     {
@@ -70,6 +73,7 @@ class StokList extends BaseController
         $this->parentBarangModel = new ParentBarangModel();
         $this->ppbkbModel = new PPBKBModel();
         $this->bc27Model = new BC27Model();
+        $this->mutasiModel = new MutasiModel();
     }
 
     public function index()
@@ -1228,8 +1232,6 @@ class StokList extends BaseController
 
         foreach ($dataQry['data'] as $data) {
 
-            $dokumenBC = $this->metaDataModel->find($data->bc_id);
-            $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
             $dokumenPabeanMutasi = "-";
@@ -1252,6 +1254,28 @@ class StokList extends BaseController
                 $dokumenPabeanMutasi = "BC 2.7 / " . $bc27['no_aju'];
             }
 
+            if ($data->status == 'In') {
+                // MASUK (CARI DI PENERIMAAN MUTASI)
+                $mutasi = $this->mutasiModel
+                    ->select('bc_id, no_aju')
+                    ->join('mutasi_detail', 'mutasi.id = mutasi_detail.mutasi_id', 'left')
+                    ->where('mutasi.no_mutasi', $data->no_dokumen2)
+                    ->first();
+                if ($mutasi != null) {
+                    $dokumenBC = $this->metaDataModel->find($mutasi['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    // MASUK 
+                    $dokumenAsal =  $bcName . " / " . $mutasi['no_aju'];
+                } else {
+                    $dokumenAsal =  "-";
+                }
+            } else {
+                $dokumenBC = $this->metaDataModel->find($data->bc_id);
+                $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                // KELUAR 
+                $dokumenAsal =  $bcName . " / " . $data->no_aju;
+            }
+
             if ($stok['kemasan_id'] == 0) {
                 // BARANG
                 $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
@@ -1265,7 +1289,7 @@ class StokList extends BaseController
                 array_push($dataResult, [
                     "no" => $no++,
                     "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
-                    "dokumen" => $bcName . " / " . $data->no_aju,
+                    "dokumen_asal" => $dokumenAsal,
                     "no_penerimaan_mutasi" => $data->no_dokumen1,
                     "dokumen_pabean_mutasi" => $dokumenPabeanMutasi,
                     "no_mutasi" => $data->no_dokumen2,
@@ -1281,6 +1305,7 @@ class StokList extends BaseController
                 array_push($dataResult, [
                     "no" => $no++,
                     "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                    "dokumen_asal" => $dokumenAsal,
                     "dokumen_pabean_mutasi" => $dokumenPabeanMutasi,
                     "dokumen" => $bcName . " / " . $data->no_aju,
                     "no_penerimaan_mutasi" => $data->no_dokumen1,

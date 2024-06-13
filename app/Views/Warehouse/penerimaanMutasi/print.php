@@ -12,7 +12,7 @@
         }
 
         @page {
-            size: 11.27in 6.50in landscape;
+            size: 14.27in 6.50in landscape;
             margin: 25px;
             padding: 25px;
         }
@@ -123,12 +123,12 @@
                     <div><span class="txt-bold">Tanggal : <?= date("d/m/Y", strtotime($penerimaanMutasi->tanggal)); ?></span></div>
                 </td>
                 <td class="txt-right">
-                    <div><span class="txt-bold">Jenis Mutasi: <?= $penerimaanMutasi->jenis_mutasi; ?></span></div>
+                    <div><span class="txt-bold">Jenis Mutasi: PPBKB</span></div>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Warehouse : <?= '(' . $penerimaanMutasi->divisi . ') ' . $penerimaanMutasi->warehouse_name ?></span></div>
+                    <div><span class="txt-bold">Departemen Penerima : <?= $penerimaanMutasi->divisi  ?></span></div>
                 </td>
                 <td>
                     <div><span class="txt-bold">Keterangan : <?= $penerimaanMutasi->keterangan; ?></span></div>
@@ -140,11 +140,13 @@
                 <th class="txt-left" style="text-align:center; width: 30px;">No</th>
                 <th class="txt-left" style="text-align:center; width: 100px;">No Mutasi</th>
                 <th class="txt-left" style="text-align:center; width: 40px;">Tipe Barang</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Dokumen Pabean</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">No Aju</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Dokumen Mutasi</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Departemen / Warehouse Pengirim</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Warehouse Penerima</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Supplier</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Barang - Spesifikasi</th>
-                <th class="txt-left" style=" text-align:center; width: 150px;">Satuan</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Qty Diterima</th>
+                <th class="txt-left" style=" text-align:center; width: 150px;">Satuan</th>
             </tr>
 
             <?php $no = 1; ?>
@@ -153,11 +155,13 @@
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail['no_mutasi'] ?></td>
                     <td class="txt-right" style="text-align:center;"><?= $detail["tipe_barang"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["bc_name"]; ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail['no_aju'] ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["bc_mutasi_name"] . " / " . $detail['no_aju_mutasi']; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["divisi_asal_name"] . " / " . $detail['warehouse_asal_name']; ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail['warehouse_name'] ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail['supplier_name'] ?></td>
                     <td class="txt-right" style="text-align:center;"><?= $detail['barang'] ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["satuan"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["qty_diterima_current"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["satuan"]; ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

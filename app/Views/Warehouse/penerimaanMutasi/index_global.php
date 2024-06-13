@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Penerimaan Mutasi PPBKB</h1>
+        <h1>Penerimaan Mutasi BC 2.7</h1>
         <?php if (can("Inventori", "Penerimaan Mutasi", "c")) : ?>
-            <a href="<?= base_url('penerimaan-mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+            <a href="<?= base_url('penerimaan-mutasi/create-global') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -14,23 +14,21 @@
         <div class="card-body">
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Penerimaan Mutasi PPBKB</a>
+                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi') ?>">Penerimaan Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi/global') ?>">Penerimaan Mutasi BC 2.7</a>
+                    <a class="nav-link active" href="#">Penerimaan Mutasi BC 2.7</a>
                 </li>
             </ul>
             <?= csrf_field() ?>
             <div class="row mb-4">
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating">
-                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                        <select class="form-select company_pengirim_id" id="company_pengirim_id" name="company_pengirim_id" aria-label="Floating label select example">
                             <option value=""></option>
-                            <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
-                            <?php endforeach; ?>
+
                         </select>
-                        <label style="z-index: 1;">Departemen Penerima</label>
+                        <label style="z-index: 1;">Company Pengirim</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-2">
@@ -88,9 +86,9 @@
                         <tr>
                             <th>No</th>
                             <th onclick="changeSort('penerimaan_mutasi_no')">No Penerimaan Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.multiple_mutasi_no')">Nomor Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal Penerimaan</th>
-                            <th onclick="changeSort('penerimaan_mutasi.divisi_id')">Departemen Penerima</th>
+                            <th onclick="changeSort('penerimaan_mutasi_global.multiple_mutasi_no')">Nomor Mutasi</th>
+                            <th onclick="changeSort('penerimaan_mutasi_global.tanggal')">Tanggal Penerimaan</th>
+                            <th onclick="changeSort('penerimaan_mutasi_global.company_pengirim_id')">Departemen Penerima</th>
                             <th>Departemen Pengirim</th>
                             <th>Dokumen Mutasi Barang</th>
                             <th>Total Item</th>
@@ -114,169 +112,6 @@
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
-    const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        processing: true,
-        serverSide: true,
-        ordering: true,
-        order: [
-            [4, 'desc']
-        ],
-        fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("penerimaan-mutasi/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.divisi_id = $(".divisi_id").val();
-                data.status = $(".status").val();
-                data.penerimaan_mutasi_no = $(".penerimaan_mutasi_no").val();
-                data.multiple_mutasi_no = $(".multiple_no_mutasi").val();
-                data.dateStart = $('#dateStart').val();
-                data.dateEnd = $('#dateEnd').val();
-
-                data.sort = sort;
-                data.sortType = sortType;
-            }
-        },
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        columns: [{
-                data: "no",
-                className: "text-center",
-                orderable: false
-            },
-            {
-                data: "penerimaan_mutasi_no",
-                className: "text-center",
-
-            },
-            {
-                data: "multiple_no_mutasi",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
-            },
-            {
-                data: "tanggal",
-                className: "text-center"
-            },
-            {
-                data: "divisi_penerima",
-                className: "text-center"
-            },
-            {
-                data: "divisi_pengirim",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
-            },
-
-            {
-                data: "dokumen_mutasi_barang",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "total_item",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "status_posting",
-                className: "text-center",
-                render: function(data, type, row) {
-                    let htmlRes = '';
-
-                    if (row.status_posting == "1") {
-                        htmlRes += `
-                        <div class="text-success">
-                            <b>SUDAH POSTING</b>
-                        </div>`
-                    } else {
-                        htmlRes += `
-                        <div class="text-danger">
-                           <b>BELUM POSTING<b/>
-                        </div>`
-                    }
-
-                    return htmlRes;
-
-                }
-            },
-            {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let id = row.id;
-                    let status = row.status_posting
-
-                    if (status === "0") {
-                        return `
-                        <div class="mt-0">
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'a')) : ?>
-                            <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
-                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'd')) : ?>
-                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                        </div>
-                    `
-                    } else {
-                        return `
-                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-
-                    `
-                    }
-
-                }
-            }
-        ],
-        "drawCallback": function(settings) {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
-        },
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
 
     $(".dateStart").datepicker({
         todayHighlight: true,
@@ -292,8 +127,8 @@
         autoclose: true
     })
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen Penerima",
+    $('#company_pengirim_id').select2({
+        placeholder: "Pilih Company Pengirim",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -317,7 +152,7 @@
         table.ajax.reload();
     });
 
-    $("#divisi_id,#status")
+    $("#company_pengirim_id,#status")
         .parent('div')
         .children('span')
         .children('span')

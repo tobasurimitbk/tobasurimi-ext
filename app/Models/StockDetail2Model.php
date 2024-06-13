@@ -118,7 +118,7 @@ class StockDetail2Model extends Model
         $harga_umum = null,
         $harga_harian = null,
         $harga_bulanan = null,
-        $no_po = null,
+        $no_po = null
     ) {
         $stokDetail2 = $this->insert([
             'bc_id' => $bc_id,
