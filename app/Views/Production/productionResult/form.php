@@ -49,8 +49,6 @@
                                     <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan" value="<?= isset($data) ? $data->pr_no : "AUTO GENERATE"; ?>" <?= isset($data) ? "readonly" : "readonly"; ?>>
                                     <label for="floatingInput">Kode Penerimaan</label>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
@@ -197,7 +195,7 @@
                             <div class="tab-pane fade show active" id="nav-barang-jadi" role="tabpanel" aria-labelledby="nav-home-tab">
                                 <div class="col-subtitle-modal">
                                     <div class="row mt-3">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12 text-left">
                                             <label class="form-label font-weight-bold modal-sub-title">Daftar Bahan Digunakan</label>
                                         </div>
                                     </div>
@@ -229,8 +227,13 @@
                                 </div>
                                 <div class="col-subtitle-modal">
                                     <div class="row mt-3">
-                                        <div class="col-md-6">
+                                        <div class="col-md-10">
                                             <label class="form-label font-weight-bold modal-sub-title">Daftar Barang Jadi</label>
+                                        </div>
+                                        <div class="col-md-2 text-right">
+                                            <button class="btn btn-show-detail btn-add btn-add-barang-jadi" type="button">
+                                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -415,6 +418,61 @@
     </div>
 </section>
 
+<div class="modal" id="add_barang_produksi" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Barang Hasil Produksi</h5>
+            </div>
+            <div class="modal-body">
+                <form class="form-excel" method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="hidden" class="id_barang_hasil" name="id_barang_hasil" id="id_barang_hasil" />
+                                <select class="form-select kode_barang_add" name="kode_barang_add" id="kode_barang_add" aria-label="Floating label select example">
+                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                </select>
+                                <label for="floatingInput">Kode Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly class="form-control satuan_barang_add" name="satuan_barang_add" id="satuan_barang_add" placeholder="Satuan">
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control qty_barang_add" name="qty_barang_add" id="qty_barang_add" placeholder="Qty Hasil">
+                                <label for="floatingInput">Qty Hasil</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control kg_barang_add" name="kg_barang_add" id="kg_barang_add" placeholder="Berat Isi">
+                                <label for="floatingInput">Berat Isi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" readonly class="form-control qty_kg_barang_add" name="qty_kg_barang_add" id="qty_kg_barang_add" placeholder="Qty dalam KG">
+                                <label for="floatingInput">Qty dalam KG</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-barang mr-2">Batal</button>
+                <button type="button" class="btn btn-submit-form btn-add-barang">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
 
@@ -450,6 +508,9 @@
                     'qty': '<?= $bj->qty; ?>',
                     'qty2': '<?= $bj->qty2; ?>',
                     'qty_isi': '<?= $bj->qty_isi; ?>',
+                    'qty_jadi': '<?= $bj->qty; ?>',
+                    'berat_isi_jadi': '<?= $bj->qty2; ?>',
+                    'qty_isi_jadi': '<?= $bj->qty_isi; ?>',
                     'type_barang': '<?= $bj->barang_type; ?>',
                     'type_barang_text': '<?= $bj->type_barang_text; ?>',
                 });
@@ -592,22 +653,21 @@
         });
 
         // KODE BARANG
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling').select2({
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add').select2({
             placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
-            tags: false,
             allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add')
             .parent('div')
             .children('span')
             .children('span')
@@ -615,7 +675,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -754,18 +814,108 @@
             })
         });
 
-        $(".btn-submit-form").click(function() {
-            console.log(list_items_barang_digunakan);
-            console.log(list_items_barang_jadi);
-            console.log(list_items_barang_scrap);
-            console.log(list_items_barang_filling);
+        $(".btn-add-barang-jadi").click(function() {
+            $('#add_barang_produksi').modal('show');
+        });
+
+        $(".btn-discard-add-barang").click(function() {
+            $(".kode_barang_add").val("").change();
+            $(".qty_barang_add").val();
+            $(".kg_barang_add").val();
+            $(".qty_kg_barang_add").val();
+            $('#add_barang_produksi').modal('hide');
+        });
+
+        $(".btn-add-barang").click(function() {
+            let detail_work_order = $(".kode_barang_add option:selected").data("detail_work_order") ? $(".kode_barang_add option:selected").data("detail_work_order") : "";
+            let barang1_id = $(".kode_barang_add option:selected").data("barang1_id") ? $(".kode_barang_add option:selected").data("barang1_id") : "";
+            let barang2_id = $(".kode_barang_add option:selected").data("barang2_id") ? $(".kode_barang_add option:selected").data("barang2_id") : "";
+            let barang_name = $(".kode_barang_add option:selected").data("barang_name") ? $(".kode_barang_add option:selected").data("barang_name") : "";
+
+            let kode_barang = $(".kode_barang_add option:selected").data("kode_barang") ? $(".kode_barang_add option:selected").data("kode_barang") : "";
+            let kode_satuan = $(".kode_barang_add option:selected").data("kode_satuan") ? $(".kode_barang_add option:selected").data("kode_satuan") : "";
+            let nama_barang = $(".kode_barang_add option:selected").data("nama_barang") ? $(".kode_barang_add option:selected").data("nama_barang") : "";
+            let warehouse_id = $(".kode_barang_add option:selected").data("warehouse_id") ? $(".kode_barang_add option:selected").data("warehouse_id") : "";
+
+            let divisi_id = $(".kode_barang_add option:selected").data("divisi_id") ? $(".kode_barang_add option:selected").data("divisi_id") : "";
+            let note = $(".kode_barang_add option:selected").data("note") ? $(".kode_barang_add option:selected").data("note") : "";
+            let qty_jadi = $(".qty_barang_add").val() ?? "";
+            let berat_isi_jadi = $(".kg_barang_add").val() ?? "";
+
+            let qty_isi_jadi = $(".qty_kg_barang_add").val() ?? "";
+            let type_barang = $(".kode_barang_add option:selected").data("type_barang") ? $(".kode_barang_add option:selected").data("type_barang") : "";
+            let type_barang_text = $(".kode_barang_add option:selected").data("type_barang_text") ? $(".kode_barang_add option:selected").data("type_barang_text") : "";
+            let unit = $(".kode_barang_add option:selected").data("unit") ? $(".kode_barang_add option:selected").data("unit") : "";
+
+            // Check if the item with the same barang1_id and barang2_id already exists
+            let exists = list_items_barang_jadi.some(item => item.barang1_id === barang1_id && item.barang2_id === barang2_id);
+
+            if (exists) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Barang sudah ada',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else {
+                list_items_barang_jadi.push({
+                    'barang_detail_id': getID(),
+                    'detail_work_order': detail_work_order,
+                    'barang1_id': barang1_id,
+                    'barang2_id': barang2_id,
+                    'barang_name': barang_name,
+                    'kode_barang': kode_barang,
+                    'kode_satuan': kode_satuan,
+                    'nama_barang': nama_barang,
+                    'warehouse_id': warehouse_id,
+                    'divisi_id': divisi_id,
+                    'note': note,
+                    'qty': qty_jadi,
+                    'qty2': berat_isi_jadi,
+                    'qty_isi': qty_isi_jadi,
+                    'qty_jadi': qty_jadi,
+                    'berat_isi_jadi': berat_isi_jadi,
+                    'qty_isi_jadi': qty_isi_jadi,
+                    'type_barang': type_barang,
+                    'type_barang_text': type_barang_text,
+                    'unit': unit,
+                });
+                drawTableBarangJadi();
+
+                $(".kode_barang_add").val("").change();
+                $(".satuan_barang_add").val("");
+                $(".qty_barang_add").val("");
+                $(".kg_barang_add").val("");
+                $(".qty_kg_barang_add").val("");
+                $('#add_barang_produksi').modal('hide');
+            }
+        });
+
+        $('.qty_barang_add, .kg_barang_add').on('input change', function() {
+            var valueQtyBarangJadi = $('.qty_barang_add').val();
+            var valueBeratBarangJadi = $('.kg_barang_add').val();
+
+
+            var jumlahQtyBeratJadi = parseFloat(valueQtyBarangJadi) * parseFloat(valueBeratBarangJadi);
+
+            $('.qty_kg_barang_add').val(jumlahQtyBeratJadi);
+        });
+
+        $(".btn-save").click(function() {
             var listMaterialCheck = [].concat(list_items_barang_digunakan, list_items_barang_jadi, list_items_barang_filling);
 
             console.log(listMaterialCheck);
-            if (listMaterialCheck.length == 0) {
+            if (list_items_barang_jadi.length == 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Barang yang akan direquest tidak boleh kosong !',
+                    title: 'Barang jadi tidak boleh kosong !',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (list_items_barang_digunakan.length == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Barang digunakan tidak boleh kosong !',
                     confirmButtonColor: '#4e73df',
                     confirmButtonText: 'Ok'
                 });
@@ -818,6 +968,7 @@
                                                 .then(() => {
                                                     window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
                                                 })
+                                            stopLoading()
                                         } else {
                                             Swal.fire({
                                                 icon: 'error',
@@ -947,29 +1098,54 @@
                         list_items_barang_jadi = [];
                         list_items_barang_scrap = [];
                         list_items_barang_digunakan = [];
+                        $(".kode_barang_add").empty();
+                        $(".kode_barang_add").append(`<option 
+                        data-detail_work_order="" 
+                        data-barang1_id="" 
+                        data-barang2_id="" 
+                        data-barang_name="" 
+                        data-kode_barang="" 
+                        data-kode_satuan="" 
+                        data-nama_barang="" 
+                        data-warehouse_id="" 
+                        data-divisi_id="" 
+                        data-note="" 
+                        data-qty="" 
+                        data-qty2="" 
+                        data-qty_isi="" 
+                        data-type_barang="" 
+                        data-type_barang_text="" 
+                        data-unit="" 
+                        value=""></option>`);
+
                         res.data.forEach(function(item) {
                             // Push each item into the list_items_barang_jadi array
-                            list_items_barang_jadi.push({
-                                'barang_detail_id': getID(),
-                                'detail_work_order': item.id,
-                                'barang1_id': item.barang1_id,
-                                'barang2_id': item.barang2_id,
-                                'barang_name': item.barang_name + " - " + item.spesifikasi,
-                                'kode_barang': item.kode_barang,
-                                'kode_satuan': item.kode_satuan,
-                                'nama_barang': item.nama_barang,
-                                'warehouse_id': item.warehouse_id,
-                                'divisi_id': item.divisi_id,
-                                'note': item.note,
-                                'qty': 0,
-                                'qty2': 0,
-                                'qty_isi': 0,
-                                'type_barang': item.type_barang,
-                                'type_barang_text': item.type_barang_text,
-                                'unit': item.unit,
-                            });
+                            $(".kode_barang_add").append(`<option 
+                            data-barang_detail_id="${getID()}" 
+                            data-detail_work_order="${item.id}" 
+                            data-barang1_id="${item.barang1_id}" 
+                            data-barang2_id="${item.barang2_id}" 
+                            data-barang_name="${item.barang_name + " - " + item.spesifikasi}" 
+                            
+                            data-kode_barang="${item.kode_barang}" 
+                            data-kode_satuan="${item.kode_satuan}" 
+                            data-nama_barang="${item.nama_barang}" 
+                            data-warehouse_id="${item.warehouse_id}" 
+                            
+                            data-divisi_id="${item.divisi_id}" 
+                            data-note="${item.note}" 
+                            data-qty="${0}" 
+                            data-qty2="${0}" 
+                            
+                            data-qty_isi="${0}" 
+                            data-type_barang="${item.type_barang}" 
+                            data-type_barang_text="${item.type_barang_text}" 
+                            data-unit="${item.unit}" 
+                            
+                            value="${item.kode_barang}">(${item.kode_barang}) ${item.barang_name + " - " + item.spesifikasi}</option>`);
                         });
-                        drawTableBarangJadi();
+                        $(".kode_barang_add").val("").change();
+                        // drawTableBarangJadi();
                         stopLoading();
                     }
                 });
@@ -981,10 +1157,25 @@
             }
         })
 
+        $(".kode_barang_add").change(function() {
+            if ($(this).val()) {
+                let kode_satuan = $(".kode_barang_add option:selected").data("kode_satuan") ? $(".kode_barang_add option:selected").data("kode_satuan") : "";
+                let qty = $(".kode_barang_add option:selected").data("qty") ? $(".kode_barang_add option:selected").data("qty") : 0;
+                let qty2 = $(".kode_barang_add option:selected").data("qty2") ? $(".kode_barang_add option:selected").data("qty2") : 0;
+                let qty_isi = $(".kode_barang_add option:selected").data("qty_isi") ? $(".kode_barang_add option:selected").data("qty_isi") : 0;
+
+
+                $(".satuan_barang_add").val(kode_satuan);
+                $(".qty_barang_add").val(qty).change();
+                $(".kg_barang_add").val(qty2).change();
+                $(".qty_kg_barang_add").val(qty_isi).change();
+            }
+        });
+
         $(".kode_request").change(function() {
             if ($(".kode_request option:selected").val()) {
                 let date_request = $(".kode_request option:selected").data("tanggal-request") ? $(".kode_request option:selected").data("tanggal-request") : "";
-                let user_request = $(".kode_request option:select ed").data("user-request") ? $(".kode_request option:selected").data("user-request") : "";
+                let user_request = $(".kode_request option:selected").data("user-request") ? $(".kode_request option:selected").data("user-request") : "";
                 let warehouse_id = $(".kode_request option:selected").data("warehouse-request") ? $(".kode_request option:selected").data("warehouse-request") : "";
                 let divisi_id = $(".kode_request option:selected").data("divisi-request") ? $(".kode_request option:selected").data("divisi-request") : "";
 
