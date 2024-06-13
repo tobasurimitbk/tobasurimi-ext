@@ -605,20 +605,22 @@
                 }
             });
             type = "bahan_jadi";
+            type2 = "bahan_setengah_jadi";
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/type-nospec"); ?>`,
+                url: `<?= base_url("barang/dropdown/type-nospecwo"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    type: type
+                    type: type,
+                    type2: type2,
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
                     $(".kode_barang").append(`<option data-barang_name_master=""  data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                     res.data.forEach(function(item) {
                         if (barang_id === item.id) {
-                            $(".kode_barang").append(`<option selected data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                            $(".kode_barang").append(`<option selected data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" value="${item.kode_barang}">(${item.kode_barang}) ${item.barang_name}</option>`);
                         } else {
                             $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_id="${item.id}" data-nama="${item.barang_name}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                         }
