@@ -233,6 +233,310 @@ class RMImportPODetailModel extends Model
         ];
     }
 
+    public function getListLPBBahanBakuReport($condition,  $addCondition, $statusPenerimaan, $tipeBahan, $limit = 10, $offset = 0)
+    {
+        $res = [];
+
+        $availableSort = [
+            'po_no'          => 'rm_import_pos.po_no',
+            'po_date'        => 'rm_import_pos.po_date',
+
+
+
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_import_pos.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+
+        $selectQry = "
+            rm_import_pos.po_no,
+            rm_import_pos.po_date,
+            rm_import_po_details.*,
+            barang_master.barang_name AS nama_barang,
+            barang_master.kode_barang,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master_spesifikasi.id AS spesifikasi_id,
+            satuans.kode_satuan,
+            suppliers.name AS nama_supplier
+        ";
+
+        $rmImportPoModel = new RMImportPOModel();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+
+        $barangs = $rmImportPoModel
+            ->select($selectQry)
+            ->where($condition)
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.multiple_po_id = rm_import_pos.id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+            ->join('barang_master_spesifikasi', 'rm_import_po_details.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->orderBy($sort, $sortType);
+
+
+        $totalData = $barangs->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $barangs->groupStart();
+        }
+
+        if ($addCondition['dateStart']) {
+            $barangs->where('rm_import_pos.po_date >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $barangs->where('rm_import_pos.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $barangs->groupEnd();
+        }
+
+        $totalFilteredData = $barangs->countAllResults(false);
+        $barangs = $barangs->findAll($limit, $offset);
+
+
+        $jmlOrderTotal = 0;
+        $jmlDiterimaInTotal = 0;
+        $jmlDiterimaTotal = 0;
+        $sisaDiterimaTotal = 0;
+        $hargaPerBarangTotal = 0;
+        $subTotal = 0;
+
+        foreach ($barangs as $b) {
+
+            $allLPB = $penerimaanBarangModel
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+                ->join('rm_import_pos', 'rm_import_pos.id = penerimaan_barang.multiple_po_id', 'left')
+                ->where('purchase_order_id', $b['rm_import_po_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('tipe_bahan', $tipeBahan)
+                ->where('penerimaan_barang.status_penerimaan', $statusPenerimaan)
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->groupBy('purchase_order_id', 'purchase_order_details_id')
+                ->findAll();
+
+            $jmlMasukAll = 0;
+            foreach ($allLPB as $a) {
+                $jmlMasukAll = $a['jmlMasuk'];
+            }
+
+            $firstLPB =  $penerimaanBarangModel
+                ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+                ->join('rm_import_pos', 'rm_import_pos.id = penerimaan_barang.multiple_po_id', 'left')
+                ->where('purchase_order_id', $b['rm_import_po_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('tipe_bahan', $tipeBahan)
+                ->where('penerimaan_barang.status_penerimaan', $statusPenerimaan)
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->first();
+
+            $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
+            $sisaDiterima = $b['qty'] - $jmlMasukAll;
+
+            // TAMPILKAN YANG MASIH ADA SISA AJA
+            $diskonHarga = ($b['disc'] / 100) * ($b['price']);
+            $harga = ($b['price'] - $diskonHarga) + $b['additional_cost'];
+
+            $res[] = [
+                'rm_import_po_details_id' => $b['id'],
+                'rm_import_po_id' => $b['rm_import_po_id'],
+                'kode_barang' => $b['kode_barang'],
+                'nama_barang' => $b['nama_barang'] . ' - ' . $b['spesifikasi'] . '',
+                'spesifikasi_name' => $b['spesifikasi'],
+                'nama_barang_master' => $b['nama_barang'],
+                'po_no' => $b['po_no'],
+                'po_date' => $b['po_date'],
+                'nama_supplier' => $b['nama_supplier'],
+                'satuan' => $b['kode_satuan'],
+                'jml_order' => $b['qty'],
+                'jml_diterima_lpb' => $inLPB,
+                'jml_diterima_total' => $jmlMasukAll,
+                'sisa_total' => $sisaDiterima,
+                'harga' => $harga,
+                'sub_total' => ($inLPB * $harga),
+                'keterangan' => $b['note']
+            ];
+
+            $jmlOrderTotal += $b['qty'];
+            $jmlDiterimaInTotal += $inLPB;
+            $jmlDiterimaTotal +=   $jmlMasukAll;
+            $sisaDiterimaTotal += $sisaDiterima;
+            $hargaPerBarangTotal += $harga;
+            $subTotal += ($inLPB * $harga);
+        }
+
+        return [
+            'result' => $res,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'jml_order_total' => $jmlOrderTotal,
+            'jml_diterima_in_total' => $jmlDiterimaInTotal,
+            'jml_diterima_total' => $jmlDiterimaTotal,
+            'sisa_diterima_total' => $sisaDiterimaTotal,
+            'harga_per_barang_total' => $hargaPerBarangTotal,
+            'sub_total' => $subTotal
+        ];
+    }
+
+    public function getListLPBBahanBakuReportPDF($condition,  $addCondition, $statusPenerimaan, $tipeBahan)
+    {
+        $res = [];
+
+        $availableSort = [
+            'po_no'          => 'rm_import_pos.po_no',
+            'po_date'        => 'rm_import_pos.po_date',
+
+
+
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_import_pos.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+
+        $selectQry = "
+            rm_import_pos.po_no,
+            rm_import_pos.po_date,
+            rm_import_po_details.*,
+            barang_master.barang_name AS nama_barang,
+            barang_master.kode_barang,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master_spesifikasi.id AS spesifikasi_id,
+            satuans.kode_satuan,
+            suppliers.name AS nama_supplier
+        ";
+
+        $rmImportPoModel = new RMImportPOModel();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+
+        $barangs = $rmImportPoModel
+            ->select($selectQry)
+            ->where($condition)
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.multiple_po_id = rm_import_pos.id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+            ->join('barang_master_spesifikasi', 'rm_import_po_details.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->orderBy($sort, $sortType);
+
+
+        $totalData = $barangs->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $barangs->groupStart();
+        }
+
+        if ($addCondition['dateStart']) {
+            $barangs->where('rm_import_pos.po_date >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $barangs->where('rm_import_pos.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $barangs->groupEnd();
+        }
+
+        $totalFilteredData = $barangs->countAllResults(false);
+        $barangs = $barangs->findAll();
+
+
+        $jmlOrderTotal = 0;
+        $jmlDiterimaInTotal = 0;
+        $jmlDiterimaTotal = 0;
+        $sisaDiterimaTotal = 0;
+        $hargaPerBarangTotal = 0;
+        $subTotal = 0;
+
+        foreach ($barangs as $b) {
+
+            $allLPB = $penerimaanBarangModel
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+                ->join('rm_import_pos', 'rm_import_pos.id = penerimaan_barang.multiple_po_id', 'left')
+                ->where('purchase_order_id', $b['rm_import_po_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('tipe_bahan', $tipeBahan)
+                ->where('penerimaan_barang.status_penerimaan', $statusPenerimaan)
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->groupBy('purchase_order_id', 'purchase_order_details_id')
+                ->findAll();
+
+            $jmlMasukAll = 0;
+            foreach ($allLPB as $a) {
+                $jmlMasukAll = $a['jmlMasuk'];
+            }
+
+            $firstLPB =  $penerimaanBarangModel
+                ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+                ->join('rm_import_pos', 'rm_import_pos.id = penerimaan_barang.multiple_po_id', 'left')
+                ->where('purchase_order_id', $b['rm_import_po_id'])
+                ->where('purchase_order_details_id', $b['id'])
+                ->where('tipe_bahan', $tipeBahan)
+                ->where('penerimaan_barang.status_penerimaan', $statusPenerimaan)
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->first();
+
+            $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
+            $sisaDiterima = $b['qty'] - $jmlMasukAll;
+
+            // TAMPILKAN YANG MASIH ADA SISA AJA
+            $diskonHarga = ($b['disc'] / 100) * ($b['price']);
+            $harga = ($b['price'] - $diskonHarga) + $b['additional_cost'];
+
+            $res[] = [
+                'rm_import_po_details_id' => $b['id'],
+                'rm_import_po_id' => $b['rm_import_po_id'],
+                'kode_barang' => $b['kode_barang'],
+                'nama_barang' => $b['nama_barang'] . ' - ' . $b['spesifikasi'] . '',
+                'spesifikasi_name' => $b['spesifikasi'],
+                'nama_barang_master' => $b['nama_barang'],
+                'po_no' => $b['po_no'],
+                'po_date' => $b['po_date'],
+                'nama_supplier' => $b['nama_supplier'],
+                'satuan' => $b['kode_satuan'],
+                'jml_order' => $b['qty'],
+                'jml_diterima_lpb' => $inLPB,
+                'jml_diterima_total' => $jmlMasukAll,
+                'sisa_total' => $sisaDiterima,
+                'harga' => $harga,
+                'sub_total' => ($inLPB * $harga),
+                'keterangan' => $b['note']
+            ];
+
+            $jmlOrderTotal += $b['qty'];
+            $jmlDiterimaInTotal += $inLPB;
+            $jmlDiterimaTotal +=   $jmlMasukAll;
+            $sisaDiterimaTotal += $sisaDiterima;
+            $hargaPerBarangTotal += $harga;
+            $subTotal += ($inLPB * $harga);
+        }
+
+        return [
+            'result' => $res,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'jml_order_total' => $jmlOrderTotal,
+            'jml_diterima_in_total' => $jmlDiterimaInTotal,
+            'jml_diterima_total' => $jmlDiterimaTotal,
+            'sisa_diterima_total' => $sisaDiterimaTotal,
+            'harga_per_barang_total' => $hargaPerBarangTotal,
+            'sub_total' => $subTotal
+        ];
+    }
+
     public function getPoBBImportDetailById($id)
     {
         $selectQry = "rm_import_po_details.*";

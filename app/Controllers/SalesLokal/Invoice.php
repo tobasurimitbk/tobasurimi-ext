@@ -1174,6 +1174,9 @@ class Invoice extends BaseController
         $postData = $this->request->getPost();
         $postItemsData = json_decode($this->request->getPost('items'), true);
 
+        // var_dump($postItemsData);
+        // die();
+
         // var_dump($postItemsData['id_detail_invoice'][0]);
         // die();
 
@@ -1236,6 +1239,8 @@ class Invoice extends BaseController
                 if (isset($value['id_detail_invoice'])) {
                     $valuesDetail = [
                         "id_barang_invoice"             => $value['id_barang'],
+                        "qty_invoice_awal"                   => $value['qty'],
+                        "qty_invoice_sisa"                   => $value['qty_sekarang'] - $value['qty_input'],
                         "qty_invoice"                   => $value['qty_input'],
                         "keterangan_invoice"            => "-",
                         "discount_percentage_invoice"   => $value['disc'],
@@ -1263,6 +1268,7 @@ class Invoice extends BaseController
                 }
             }
             foreach ($postItemsData as $value) {
+
                 $valuesDetail = [
                     "id_sales_order_invoice"        => $payload['id'],
                     "id_barang_invoice"             => $value['id_barang'],

@@ -352,6 +352,8 @@
     var listData = [];
     var listFromDatabase = [];
 
+
+
     $(".tanggal_penerimaan_lpb").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
@@ -839,6 +841,7 @@
         const table = $('#dataTable');
         table.find('tbody').empty();
 
+        console.log(listData);
         if (listData.length == 0) {
             table.find('tfoot').empty();
             var newRow = $('<tr>');

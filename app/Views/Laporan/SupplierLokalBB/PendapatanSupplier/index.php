@@ -22,6 +22,20 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_po_no" name="filter_po_no" id="filter_po_no">
+                            <option value="" data-code=""></option>
+
+                            <?php foreach ($getPoNo as $row) : ?>
+                                <option value="<?= $row['po_no']; ?>" data-code=""><?= $row['po_no'] ?></option>
+                            <?php endforeach; ?>
+
+
+                        </select>
+                        <label for="floatingInput">Filter No PO</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -156,6 +170,7 @@
                 data.filter_supplier = $(".filter_supplier").val();
                 data.filter_warehouse = $(".filter_warehouse").val();
                 data.filter_barang = $(".filter_barang").val();
+                data.filter_po_no = $(".filter_po_no").val();
             },
         },
         // scrollX: true,
@@ -312,24 +327,24 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_supplier, .filter_warehouse, .filter_barang").change(function() {
+    $(".dateStart, .dateEnd, .filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no").change(function() {
         table.ajax.reload();
     });
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang').select2({
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no').select2({
         placeholder: "",
         theme: "bootstrap-5",
         allowClear: true,
     })
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
         .parent('div')
         .children('span')
         .children('span')
@@ -337,7 +352,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -349,8 +364,9 @@
         let filter_supplier = $(".filter_supplier").val();
         let filter_warehouse = $(".filter_warehouse").val();
         let filter_barang = $(".filter_barang").val();
+        let filter_po_no = $(".filter_po_no").val();
 
-        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&filter_po_no=${filter_po_no}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

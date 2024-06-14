@@ -283,4 +283,85 @@ class SalesOrderInvoiceModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getAllSalesOrderInvoiceReportLaporan($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+
+
+        $availableSort = [
+            'no_faktur'          => 'sales_order_invoice.no_faktur',
+            'tanggal_faktur'          => 'sales_order_invoice.tanggal_faktur',
+            'nama_pelanggan'            => 'customers.name',
+
+
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'sales_order_invoice.no_faktur';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_invoice.*,
+                      barang_master_sales.kode_barang AS kode_barang,
+                      barang_master_sales.barang_name AS nama_barang,
+                       satuans.kode_satuan AS satuan,
+                       sales_order_invoice_detail.qty_invoice AS qty_invoice,
+                        sales_order_invoice_detail.amount_invoice AS amount_invoice,
+                        sales_order_invoice_detail.qty_invoice_awal AS qty,
+                       sales_order_invoice_detail.qty_invoice_sisa AS qty_sekarang,
+                      DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+                      customers.name AS nama_pelanggan,
+                      customers.kode AS kode_pelanggan,
+                      
+                      ";
+
+        $salesOrderInvoice = $this->asObject()
+            ->select($selectQry)
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'LEFT')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'LEFT')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'LEFT')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesOrderInvoice->countAllResults(false);
+
+        if ($addCondition['filter_jenis_dokumen'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesOrderInvoice->groupStart();
+        }
+
+
+        if ($addCondition['filter_jenis_dokumen']) {
+            $salesOrderInvoice->where('sales_order_invoice.document_type', $addCondition['filter_jenis_dokumen']);
+        }
+
+        // if ($addCondition['filter_status']) {
+
+        //     if ($addCondition['filter_status'] == 1) {
+        //         $salesOrderInvoice->where('sales_order_invoice.status_posting', "1");
+        //     } else {
+        //         $salesOrderInvoice->where('sales_order_invoice.status_posting', "0");
+        //     }
+        // }
+
+        if ($addCondition['dateStart']) {
+            $salesOrderInvoice->where('sales_order_invoice.tanggal_faktur >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $salesOrderInvoice->where('sales_order_invoice.tanggal_faktur <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['filter_jenis_dokumen'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesOrderInvoice->groupEnd();
+        }
+
+        $totalFilteredData = $salesOrderInvoice->countAllResults(false);
+        $data = $salesOrderInvoice->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

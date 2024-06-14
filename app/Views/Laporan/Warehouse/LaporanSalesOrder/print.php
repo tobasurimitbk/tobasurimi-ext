@@ -82,7 +82,7 @@
 </head>
 
 <body>
-    <h2><?= $header; ?></h2>
+    <h2>LAPORAN SALES ORDER</h2>
     <table class="w-100">
         <tbody>
             <tr>
@@ -97,67 +97,57 @@
 
                 <?php endif; ?>
             </tr>
+            <tr>
+                <td>Jenis Dokumen</td>
+                <td>:</td>
+                <td colspan="3" style="text-transform: uppercase;"><?= $filter_jenis_dokumen; ?></td>
+            </tr>
+
         </tbody>
     </table>
 
     <table class="w-100 item-table">
         <tr>
-            <th rowspan="2">No.</th>
-            <th rowspan="2">Jenis</th>
+            <th>No</th>
+            <th>Jenis PO</th>
+            <th>Nomor</th>
+            <th>Tanggal</th>
+            <th>Customer</th>
+            <th>Kode Barang</th>
+            <th>Nama Barang</th>
+            <th>Satuan</th>
+            <th>Dokumen No</th>
+            <th>Jumlah Order</th>
+            <th>Jumlah Diterima</th>
+            <th>Total Harga</th>
+            <th>Sisa</th>
+        </tr>
 
-            <th rowspan="2">Divisi</th>
-            <th rowspan="2">Qty</th>
-            <th rowspan="2">Satuan</th>
-            <th colspan="3">Harian</th>
-            <th colspan="3">Tambahan Harian</th>
-            <th colspan="3">Tambahan Bulanan</th>
-        </tr>
-        <tr>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-        </tr>
-        <?php if (!empty($dataOrder)) : ?>
-            <?php foreach ($dataOrder as $do) : ?>
+
+
+        <?php if (!empty($dataAllSalesOrderInvoice)) : ?>
+            <?php foreach ($dataAllSalesOrderInvoice as $row) : ?>
                 <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= $do->barangName; ?></td>
+                    <td><?= $row['document_type']; ?></td>
+                    <td><?= $row['no_faktur']; ?></td>
+                    <td><?= $row['tanggal_faktur']; ?></td>
+                    <td><?= $row['nama_pelanggan']; ?></td>
+                    <td><?= $row['kode_barang']; ?></td>
+                    <td><?= $row['nama_barang']; ?></td>
+                    <td><?= $row['satuan']; ?></td>
+                    <td><?= $row['document_no']; ?></td>
+                    <td><?= $row['qty']; ?></td>
+                    <td><?= $row['qty_invoice']; ?></td>
+                    <td><?= $row['amount_invoice']; ?></td>
+                    <td><?= $row['qty_sekarang']; ?></td>
 
-                    <td><?= $do->bagianName; ?></td>
-                    <td><?= $do->qtyPO; ?></td>
-                    <td><?= $do->satuanName; ?></td>
-                    <td><?= number_format($do->dppUmum); ?></td>
-                    <td><?= number_format($do->pphUmum); ?></td>
-                    <td><?= number_format($do->totalUmum); ?></td>
-                    <td><?= number_format($do->dppHarian); ?></td>
-                    <td><?= number_format($do->pphHarian); ?></td>
-                    <td><?= number_format($do->totalHarian); ?></td>
-                    <td><?= number_format($do->dppBulanan); ?></td>
-                    <td><?= number_format($do->pphBulanan); ?></td>
-                    <td><?= number_format($do->totalBulanan); ?></td>
                 </tr>
             <?php endforeach; ?>
-            <tr>
-                <td colspan="5">Total</td>
-                <td id="totalDppUmum"><?= number_format($totalDppUmum); ?></td>
-                <td id="totalPphUmum"><?= number_format($totalPphUmum); ?></td>
-                <td id="totalTotalUmum"><?= number_format($totalTotalUmum); ?></td>
-                <td id="totalDppHarian"><?= number_format($totalDppHarian); ?></td>
-                <td id="totalPphHarian"><?= number_format($totalPphHarian); ?></td>
-                <td id="totalTotalHarian"><?= number_format($totalTotalHarian); ?></td>
-                <td id="totalDppBulanan"><?= number_format($totalDppBulanan); ?></td>
-                <td id="totalPphBulanan"><?= number_format($totalPphBulanan); ?></td>
-                <td id="totalTotalBulanan"><?= number_format($totalTotalBulanan); ?></td>
-            </tr>
+
         <?php else : ?>
             <tr>
-                <td colspan="22">Tidak ada data yang tersedia.</td>
+                <td colspan="13">Tidak ada data yang tersedia.</td>
             </tr>
         <?php endif; ?>
     </table>
