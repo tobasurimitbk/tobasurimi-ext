@@ -1465,6 +1465,12 @@
                 },
                 success: function(response) {
                     $('#content').html(response);
+                    if (list_items_barang_digunakan.length != 0) {
+                        drawTableDigunakan();
+                    }
+                    if (list_items_barang_jadi.length != 0) {
+                        drawTableRasio();
+                    }
                 },
                 error: function() {
                     $('#content').html('<div class="alert alert-danger" role="alert">Failed to load content.</div>');

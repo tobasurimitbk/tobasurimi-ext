@@ -20,9 +20,9 @@
                         <th style="text-align: center;">Satuan</th>
                     </tr>
                 </thead>
-                <tbody class="body-detail-table">
+                <tbody class="body-detail-table-barang-proses-ulang">
                 </tbody>
-                <tfoot style="background: #ffffff !important;" class="tfoot-detail-table" id="tfoot-detail-table">
+                <tfoot style="background: #ffffff !important;" class="tfoot-detail-table-barang-proses-ulang" id="tfoot-detail-table-barang-proses-ulang">
                     <tr>
                         <td colspan="12" style="text-align: center;">
                             Tidak Ada Barang
@@ -41,19 +41,19 @@
 <div class="row mb-2">
     <div class="col-md-4">
         <div class="form-floating mb-3" style="height: 50px;">
-            <input readonly placeholder="Qty" value="" class="form-control qtyTotalPembelian" id="qtyTotalPembelian" name="qtyTotalPembelian" aria-label="Floating label select example" />
+            <input readonly placeholder="Qty" value="" class="form-control qtyTotalPembelianProsesUlang" id="qtyTotalPembelianProsesUlang" name="qtyTotalPembelianProsesUlang" aria-label="Floating label select example" />
             <label for="floatingInput" style="z-index: 1;">Qty</label>
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-floating mb-3" style="height: 50px;">
-            <input readonly placeholder="Harga Total" value="" class="form-control hargaTotalPembelian" id="hargaTotalPembelian" name="hargaTotalPembelian" aria-label="Floating label select example" />
+            <input readonly placeholder="Harga Total" value="" class="form-control hargaTotalPembelianProsesUlang" id="hargaTotalPembelianProsesUlang" name="hargaTotalPembelianProsesUlang" aria-label="Floating label select example" />
             <label for="floatingInput" style="z-index: 1;">Harga Total</label>
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-floating mb-3" style="height: 50px;">
-            <input readonly placeholder="Rata-rata Harga Satuan" value="" class="form-control hargaSatuanPembelian" id="hargaSatuanPembelian" name="hargaSatuanPembelian" aria-label="Floating label select example" />
+            <input readonly placeholder="Rata-rata Harga Satuan" value="" class="form-control hargaSatuanPembelianProsesUlang" id="hargaSatuanPembelianProsesUlang" name="hargaSatuanPembelianProsesUlang" aria-label="Floating label select example" />
             <label for="floatingInput" style="z-index: 1;">Rata-rata Harga Satuan</label>
         </div>
     </div>

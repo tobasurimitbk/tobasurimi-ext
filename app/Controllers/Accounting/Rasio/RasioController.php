@@ -405,6 +405,7 @@ class RasioController extends BaseController
                 'kategori_id' => $this->request->getVar('kategori'),
             ];
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultWithDetail($conditionProduction);
+
             $totalQtyAll = 0;
             foreach ($productionResultDataTitle as $value) {
                 $totalQtyAll += $value['qtyTotal'];
