@@ -72,6 +72,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= !empty($prosesRebus) ? ($prosesRebus['status_posting'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_selesai" id="tanggal_selesai" name="tanggal_selesai" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($prosesRebus) ? $prosesRebus['tanggal_selesai'] : $tanggal)); ?>">
+                                    <label for="floatingInput">Tanggal Selesai Rebus</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -271,7 +284,7 @@
     var listStockAsal = [];
     var listStockSelected = [];
 
-    $(".tanggal").datepicker({
+    $(".tanggal,.tanggal_selesai").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -456,6 +469,9 @@
             tanggal: {
                 required: true
             },
+            tanggal_selesai: {
+                required: true
+            },
             divisi_id: {
                 required: true
             },
@@ -469,6 +485,9 @@
             },
             tanggal: {
                 required: "Tanggal wajib diisi"
+            },
+            tanggal: {
+                required: "Tanggal selesai rebus wajib diisi"
             },
             divisi_id: {
                 required: "Pilih Departemen"

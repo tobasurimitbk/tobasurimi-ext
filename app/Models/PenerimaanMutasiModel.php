@@ -43,11 +43,10 @@ class PenerimaanMutasiModel extends Model
     public function getList($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'penerimaan_mutasi_no'                => 'penerimaan_mutasi_no',
-            'penerimaan_mutasi.tanggal'           => 'penerimaan_mutasi.tanggal',
-            'penerimaan_mutasi.warehouse_id'      => 'penerimaan_mutasi.warehouse_id',
-            'penerimaan_mutasi.jenis_mutasi'      => 'penerimaan_mutasi.jenis_mutasi',
-            'penerimaan_mutasi.bc_no'             => 'penerimaan_mutasi.bc_no'
+            'penerimaan_mutasi_no'                 => 'penerimaan_mutasi_no',
+            'penerimaan_mutasi.multiple_mutasi_no' => 'penerimaan_mutasi.multiple_mutasi_no',
+            'penerimaan_mutasi.tanggal'            => 'penerimaan_mutasi.tanggal',
+            'penerimaan_mutasi.divisi_id'          => 'penerimaan_mutasi.divisi_id',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -55,13 +54,10 @@ class PenerimaanMutasiModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "penerimaan_mutasi.*,
-        warehouses.warehouse_name AS warehouse_tujuan,
-        divisis.divisi AS divisi_tujuan
-        ";
+        divisis.divisi AS divisi_penerima";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
-            ->join('warehouses', 'warehouses.id = penerimaan_mutasi.warehouse_id', 'left')
             ->join('divisis', 'divisis.id = penerimaan_mutasi.divisi_id', 'left')
             ->where($condition)
             ->whereIn('penerimaan_mutasi.divisi_id', $conditionArr)
@@ -90,6 +86,10 @@ class PenerimaanMutasiModel extends Model
 
         if ($addCondition['penerimaan_mutasi_no']) {
             $dataQry->like('penerimaan_mutasi_no', $addCondition['penerimaan_mutasi_no']);
+        }
+
+        if ($addCondition['multiple_mutasi_no']) {
+            $dataQry->like('multiple_mutasi_no', $addCondition['multiple_mutasi_no']);
         }
 
         if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
@@ -153,7 +153,7 @@ class PenerimaanMutasiModel extends Model
         }
     }
 
-    public function getListNomorMutasi($warehouseID)
+    public function getListNomorMutasi($divisiId)
     {
         $mutasiModel = new MutasiModel();
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
@@ -161,7 +161,7 @@ class PenerimaanMutasiModel extends Model
         $listMutasi = $mutasiModel
             ->select('mutasi.id, mutasi.no_mutasi, SUM(qty) AS qty_mutasi')
             ->join('mutasi_detail', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
-            ->where('mutasi.warehouse_tujuan_id', $warehouseID)
+            ->where('mutasi.divisi_tujuan_id', $divisiId)
             ->where('mutasi.deletedAt', null)
             ->where('mutasi_detail.deletedAt', null)
             ->groupBy('mutasi_detail.mutasi_id')
@@ -195,24 +195,31 @@ class PenerimaanMutasiModel extends Model
         $mutasiDetailModel = new MutasiDetailModel();
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
         $stockDetail2Model = new StockDetail2Model();
+        $metaDataModel = new MetadataModel();
+        $ppbkbModel = new PPBKBModel();
+        $mutasiModel = new MutasiModel();
 
         $selectQry = "
             mutasi.no_mutasi, 
             mutasi_detail.*, 
             stock.tipe_barang, 
-            metadata.value AS bc_name
+            metadata.value AS bc_name,
+            warehouses.warehouse_name
         ";
 
         $mutasiDetailList = $mutasiDetailModel
             ->select($selectQry)
-            ->join('mutasi', 'mutasi.id = mutasi_detail.mutasi_id')
+            ->join('mutasi', 'mutasi.id = mutasi_detail.mutasi_id', 'left')
             ->join('stock', 'stock.id = mutasi_detail.stock_id', 'left')
             ->join('metadata', 'metadata.id = mutasi_detail.bc_id', 'left')
+            ->join('warehouses', 'warehouses.id = mutasi.warehouse_tujuan_id', 'left')
             ->whereIn('mutasi_id', $mutasiArrID)
             ->where('mutasi_detail.deletedAt', null)
             ->findAll();
 
         $barangResult = [];
+
+        $bcMutasiId = $metaDataModel->getBCFirst('PPB-KB');
 
         foreach ($mutasiDetailList as $m) {
             $penerimaanTotal = $penerimaanMutasiDetailModel
@@ -241,21 +248,31 @@ class PenerimaanMutasiModel extends Model
                 $m['stock_dokumen']
             );
 
+            $ppbkb = $ppbkbModel->where('mutasi_id', $m['mutasi_id'])->first();
+
+            $divisiWarehouseAsal = $mutasiModel->select('divisis.divisi, warehouses.warehouse_name')
+                ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
+                ->join('warehouses', 'warehouses.id = mutasi.warehouse_asal_id', 'left')
+                ->where('mutasi.id', $m['mutasi_id'])
+                ->first();
+
             if ($m['tipe_barang'] == 'kemasan') {
                 // Kemasan
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
                 $satuan = $satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
                 $barang = $kemasan['name'];
+                $kodeBarang = $kemasan['kode'];
             } else {
                 // Barang
                 $barangSpesifikasi = $barangMasterModel
-                    ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang")
+                    ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
                     ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
                     ->where('barang_master_spesifikasi.id', $stock['barang2_id'])
                     ->where('barang_master_spesifikasi.barang_master_id', $stock['barang1_id'])
                     ->first();
                 $satuan = $satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
                 $barang = $barangSpesifikasi['barang'];
+                $kodeBarang = $barangSpesifikasi['kode_barang'];
             }
 
             if ($penerimaanMutasiID == null) {
@@ -264,20 +281,31 @@ class PenerimaanMutasiModel extends Model
                     array_push($barangResult, [
                         'mutasi_id' => $m['mutasi_id'],
                         'mutasi_detail_id' => $m['id'],
-                        'stock_id' => $m['stock_id'],
-                        'bc_id' => $m['bc_id'],
+                        'stock_asal_id' => $m['stock_id'],
+                        'bc_asal_id' => $m['bc_id'],
+                        'no_aju_asal' => $m['no_aju'],
+                        'stock_dokumen_asal' => $m['stock_dokumen'],
+                        'stock_date_asal' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
+                        'bc_asal_name' => $m['bc_name'] == null ? "NON PABEAN" : $m['bc_name'],
+                        'divisi_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['divisi'],
+                        'warehouse_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['warehouse_name'],
+                        // ---
+                        'bc_mutasi_id' => $bcMutasiId['id'],
+                        'bc_mutasi_name' => $bcMutasiId['value'],
+                        'no_aju_mutasi' => $ppbkb['no_ppbkb'],
+                        // -----
                         'qty' => $m['qty'],
                         'qty_diterima_all' => count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima'],
                         'qty_diterima_current' => count($penerimaanTotalCurrent) == 0 ? 0 : $penerimaanTotalCurrent[0]['qty_diterima'],
                         'qty_sisa' => $m['qty'] - $qtyDiterima,
-                        'stock_date' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
-                        // --
                         'no_mutasi' => $m['no_mutasi'],
                         'tipe_barang' => strtoupper(str_replace('_', ' ', $m['tipe_barang'])),
-                        'bc_name' => $m['bc_name'] == null ? "NON PABEAN" : $m['bc_name'],
-                        'no_aju' => $m['no_aju'],
                         'barang' => $barang,
-                        'satuan' => $satuan
+                        'satuan' => $satuan,
+                        'kode_barang' => $kodeBarang,
+                        'warehouse_name' => $m['warehouse_name'],
+                        'supplier_name' => $stockListDetail['supplier_name'],
+                        'no_po' => $stockListDetail['no_po']
                     ]);
                 }
             } else {
@@ -286,20 +314,31 @@ class PenerimaanMutasiModel extends Model
                     array_push($barangResult, [
                         'mutasi_id' => $m['mutasi_id'],
                         'mutasi_detail_id' => $m['id'],
-                        'stock_id' => $m['stock_id'],
-                        'bc_id' => $m['bc_id'],
+                        'stock_asal_id' => $m['stock_id'],
+                        'bc_asal_id' => $m['bc_id'],
+                        'no_aju_asal' => $m['no_aju'],
+                        'stock_dokumen_asal' => $m['stock_dokumen'],
+                        'stock_date_asal' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
+                        'bc_asal_name' => $m['bc_name'] == null ? "NON PABEAN" : $m['bc_name'],
+                        'divisi_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['divisi'],
+                        'warehouse_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['warehouse_name'],
+                        // ---
+                        'bc_mutasi_id' => $bcMutasiId['id'],
+                        'bc_mutasi_name' => $bcMutasiId['value'],
+                        'no_aju_mutasi' => $ppbkb['no_ppbkb'],
+                        // -----                       
                         'qty' => $m['qty'],
                         'qty_diterima_all' => count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima'],
                         'qty_diterima_current' => count($penerimaanTotalCurrent) == 0 ? 0 : $penerimaanTotalCurrent[0]['qty_diterima'],
                         'qty_sisa' => $m['qty'] - $qtyDiterima,
-                        'stock_date' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
-                        // --
                         'no_mutasi' => $m['no_mutasi'],
                         'tipe_barang' => strtoupper(str_replace('_', ' ', $m['tipe_barang'])),
-                        'bc_name' => $m['bc_name'] == null ? "NON PABEAN" : $m['bc_name'],
-                        'no_aju' => $m['no_aju'],
                         'barang' => $barang,
-                        'satuan' => $satuan
+                        'satuan' => $satuan,
+                        'kode_barang' => $kodeBarang,
+                        'warehouse_name' => $m['warehouse_name'],
+                        'supplier_name' => $stockListDetail['supplier_name'],
+                        'no_po' => $stockListDetail['no_po']
                     ]);
                 }
             }
@@ -319,20 +358,20 @@ class PenerimaanMutasiModel extends Model
         return $response;
     }
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouseID)
+    public function get_no($bln, $thn, $last_day, $divisiName, $divisiID)
     {
         $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('penerimaan_mutasi');
         $builder->select('penerimaan_mutasi_no');
         $builder->orderBy('penerimaan_mutasi_no', 'desc');
-        $builder->where('penerimaan_mutasi.warehouse_id', $warehouseID);
+        $builder->where('penerimaan_mutasi.divisi_id', $divisiID);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('penerimaan_mutasi_no', $lastStr);
         $query = $builder->get();
 
-        $kode = 'PMU/' . $warehouseKode;
+        $kode = 'PMU/' . $divisiName;
 
         $lastPenerimaan = '1';
 

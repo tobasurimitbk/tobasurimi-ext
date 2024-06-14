@@ -351,6 +351,9 @@ class MaterialRequestKimia extends BaseController
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
+                        'harga_umum' => (float)$s->harga_umum,
+                        'harga_harian' => (float)$s->harga_harian,
+                        'harga_bulanan' => (float)$s->harga_bulanan,
                     ];
                 } else {
                     $dataMaterialDetail = [
@@ -373,6 +376,9 @@ class MaterialRequestKimia extends BaseController
                         'qty' => $s->qty,
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
+                        'harga_umum' => (float)$s->harga_umum,
+                        'harga_harian' => (float)$s->harga_harian,
+                        'harga_bulanan' => (float)$s->harga_bulanan,
                     ];
                 }
                 $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -443,6 +449,9 @@ class MaterialRequestKimia extends BaseController
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
+                            'harga_umum' => (float)$s->harga_umum,
+                            'harga_harian' => (float)$s->harga_harian,
+                            'harga_bulanan' => (float)$s->harga_bulanan,
                         ];
                     } else {
                         $dataMaterialDetail = [
@@ -465,6 +474,9 @@ class MaterialRequestKimia extends BaseController
                             'qty' => $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
+                            'harga_umum' => (float)$s->harga_umum,
+                            'harga_harian' => (float)$s->harga_harian,
+                            'harga_bulanan' => (float)$s->harga_bulanan,
                         ];
                     }
                     $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -552,6 +564,10 @@ class MaterialRequestKimia extends BaseController
                         $value['no_aju'],
                         $materialRequestData['req_no'],
                         $value['stock_dokumen'],
+                        $value['supplier_id'],
+                        $value['harga_umum'],
+                        $value['harga_harian'],
+                        $value['harga_bulanan'],
                     );
                     // }
 

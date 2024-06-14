@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Mutasi</h1>
+        <h1>Mutasi PPBKB</h1>
         <?php if (can("Inventori", "Mutasi", "c")) : ?>
             <a href="<?= base_url('mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -168,7 +168,17 @@
                 data: "no_ppbkb",
                 className: "text-center",
                 searchable: false,
-                sortable: false
+                sortable: false,
+                render: function(data, type, row) {
+                    if (row.no_ppbkb == "-") {
+                        return '<div class="text-danger">BELUM DIBUAT</div>';
+
+                    } else {
+                        return row.no_ppbkb
+
+                    }
+
+                }
             },
             {
                 data: "total_item",

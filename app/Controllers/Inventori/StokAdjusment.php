@@ -429,10 +429,7 @@ class StokAdjusment extends BaseController
             }
             for ($i = 0; $i < count($dataResult); $i++) {
                 $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-                $supplier = $this->supplierModel->select('suppliers.*')
-                    ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
-                    ->where('penerimaan_barang.no_penerimaan_barang', $dataResult[$i]['no_dokumen_1'])
-                    ->first();
+
                 $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                 $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
@@ -442,7 +439,6 @@ class StokAdjusment extends BaseController
                 $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
                 $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
             }
             return response()->setJSON([

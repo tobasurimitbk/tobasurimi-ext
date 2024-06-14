@@ -10,6 +10,7 @@ use App\Models\JasaVendorOutDetailModel;
 use App\Models\JasaVendorOutModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
+use App\Models\ProsesRebusModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
@@ -37,6 +38,7 @@ class JasaVendorOut extends BaseController
     protected $kemasanModel;
     protected $satuanModel;
     protected $supplierModel;
+    protected $prosesRebusModel;
     protected $dompdf;
 
     public function __construct()
@@ -57,6 +59,7 @@ class JasaVendorOut extends BaseController
         $this->kemasanModel = new KemasanModel();
         $this->satuanModel = new SatuansModel();
         $this->supplierModel = new SupplierModel();
+        $this->prosesRebusModel = new ProsesRebusModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -200,7 +203,16 @@ class JasaVendorOut extends BaseController
         $barang = json_decode($this->request->getVar('listBarang'));
 
         foreach ($barang as $b) {
+            // CEK STOK DARI PROSES REBUS
+            $stockDetail = $this->stockDetail2Model->getStockListDetail(
+                $b->stock_id,
+                $b->bc_id,
+                $b->no_aju,
+                $b->stock_dokumen
+            );
+            $stockRebus = $this->prosesRebusModel->where('no_rebus', $stockDetail['no_dokumen_1'])->first();
             $this->jasaVendorOutDetailModel->insert([
+                'proses_rebus_id' => $stockRebus == null ? null : $stockRebus['id'],
                 'jasa_vendor_out_id' => $id,
                 'stock_out_id' => $b->stock_id,
                 'bc_out_id' => $b->bc_id,
@@ -243,6 +255,15 @@ class JasaVendorOut extends BaseController
                 ->where('stock_dokumen', $b->stock_dokumen)
                 ->first();
 
+            // CEK STOK DARI PROSES REBUS
+            $stockDetail = $this->stockDetail2Model->getStockListDetail(
+                $b->stock_id,
+                $b->bc_id,
+                $b->no_aju,
+                $b->stock_dokumen
+            );
+            $stockRebus = $this->prosesRebusModel->where('no_rebus', $stockDetail['no_dokumen_1'])->first();
+
             if ($check == null) {
                 // Belum Ada
                 $this->jasaVendorOutDetailModel
@@ -254,6 +275,7 @@ class JasaVendorOut extends BaseController
                     ->delete();
 
                 $id_detail_new = $this->jasaVendorOutDetailModel->insert([
+                    'proses_rebus_id' => $stockRebus == null ? null : $stockRebus['id'],
                     'jasa_vendor_out_id' => $id,
                     'stock_out_id' => $b->stock_id,
                     'bc_out_id' => $b->bc_id,
@@ -265,6 +287,7 @@ class JasaVendorOut extends BaseController
             } else {
                 // ada
                 $this->jasaVendorOutDetailModel->update($check['id'], [
+                    'proses_rebus_id' => $stockRebus == null ? null : $stockRebus['id'],
                     'jasa_vendor_out_id' => $id,
                     'stock_out_id' => $b->stock_id,
                     'bc_out_id' => $b->bc_id,
@@ -316,6 +339,14 @@ class JasaVendorOut extends BaseController
                 $barang2_id = $stock['barang2_id'];
             }
 
+            // BARANG LAMA
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $j['stock_out_id'],
+                $j['bc_out_id'],
+                $j['no_aju_out'],
+                $j['stock_dokumen']
+            );
+
             $stok = $this->stockModel->insertStok(
                 $jasaVendorOut['company_id'],
                 $jasaVendorOut['warehouse_id'],
@@ -346,7 +377,12 @@ class JasaVendorOut extends BaseController
                 $qty,
                 $j['no_aju_out'],
                 $jasaVendorOut['no_surat_jalan'],
-                $j['stock_dokumen']
+                $j['stock_dokumen'],
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan'],
+                $stockOldDetail['no_po']
             );
         }
 
@@ -433,8 +469,8 @@ class JasaVendorOut extends BaseController
     public function getListStockByStockID()
     {
         if (!empty($this->request->getVar('stock_id'))) {
-            $dataResult = $this->jasaVendorOutDetailModel->getStockListWithBCDoc(
-                $this->request->getVar('stock_id')
+            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
+                $this->request->getVar('stock_id'),
             );
             $stock = $this->stockModel->find($this->request->getVar('stock_id'));
             if ($stock['kemasan_id'] == 0) {
@@ -451,10 +487,6 @@ class JasaVendorOut extends BaseController
 
             for ($i = 0; $i < count($dataResult); $i++) {
                 $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-                $supplier = $this->supplierModel->select('suppliers.*')
-                    ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
-                    ->where('penerimaan_barang.no_penerimaan_barang', $dataResult[$i]['no_dokumen_1'])
-                    ->first();
 
                 $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
@@ -465,7 +497,6 @@ class JasaVendorOut extends BaseController
                 $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
                 $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
 
                 if ($dataResult[$i]['stok_total'] > 0) {

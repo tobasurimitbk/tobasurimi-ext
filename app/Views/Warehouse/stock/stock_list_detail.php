@@ -102,7 +102,7 @@
             </div>
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_per_dokumen" id="bc_id_stok_per_dokumen" name="bc_id_stok_per_dokumen" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -159,7 +159,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_inisasi" id="bc_id_stok_inisasi" name="bc_id_stok_inisasi" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -244,7 +244,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_pemasukkan_barang" name="bc_id_stok_inisasi" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -331,7 +331,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_pemasukkan_barang" id="bc_id_stok_adjusment" name="bc_id_stok_adjusment" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -346,7 +346,7 @@
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select tipe_adjusment" id="tipe_adjusment" name="tipe_adjusment" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php foreach ($tipeAdjusment as $t) : ?>
@@ -432,7 +432,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_mutasi" id="bc_id_stok_mutasi" name="bc_id_stok_mutasi" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -443,7 +443,7 @@
                             <?php endforeach; ?>
 
                         </select>
-                        <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
+                        <label for="floatingInput" style="z-index: 1;">Dokumen Asal</label>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -486,10 +486,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSortMutasi('stock_details2.no_aju')">Dokumen</th>
+                                <th>Dokumen Mutasi</th>
+                                <th onclick="changeSortMutasi('stock_details2.no_aju')">Dokumen Asal</th>
                                 <th onclick="changeSortMutasi('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortMutasi('stock_details.no_dokumen')">No Penerimaan Mutasi</th>
+                                <th onclick="changeSortMutasi('stock_details2.supplier_id')">Supplier</th>
+                                <th onclick="changeSortMutasi('stock_details2.no_po')">No Purchase Order</th>
                                 <th onclick="changeSortMutasi('stock_details2.no_dokumen')">No Mutasi</th>
                                 <th onclick="changeSortMutasi('stock_details2.qty')">Qty</th>
                             </tr>
@@ -499,7 +502,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5"></td>
+                                <td colspan="8"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalMutasi']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                             </tr>
@@ -518,7 +521,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_jasa_vendor" id="bc_id_stok_jasa_vendor" name="bc_id_stok_jasa_vendor" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -576,6 +579,8 @@
                                 <th onclick="changeSortJasaVendor('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortJasaVendor('stock_details.no_dokumen')">No Penerimaan Surat Jalan</th>
+                                <th onclick="changeSortJasaVendor('stock_details2.supplier_id')">Supplier</th>
+                                <th onclick="changeSortJasaVendor('stock_details2.no_po')">No Purchase Order</th>
                                 <th onclick="changeSortJasaVendor('stock_details2.no_dokumen')">No Surat Jalan</th>
                                 <th onclick="changeSortJasaVendor('stock_details2.qty')">Qty</th>
                             </tr>
@@ -585,7 +590,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5"></td>
+                                <td colspan="7"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalJasaVendor']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                             </tr>
@@ -604,7 +609,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_produksi_out" id="bc_id_stok_produksi_out" name="bc_id_stok_produksi_out" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -689,7 +694,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_produksi_in" id="bc_id_stok_produksi_in" name="bc_id_stok_produksi_in" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -774,7 +779,7 @@
 
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating" style="height: 50px;">
                         <select class="form-select bc_id_stok_rebus" id="bc_id_stok_rebus" name="bc_id_stok_rebus" aria-label="Floating label select example">
                             <option value=""></option>
                             <option value="0">NON PABEAN</option>
@@ -832,6 +837,8 @@
                                 <th onclick="changeSortRebus('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th onclick="changeSortRebus('stock_details.no_dokumen')">No Rebus</th>
+                                <th onclick="changeSortRebus('stock_details2.supplier_id')">Supplier</th>
+                                <th onclick="changeSortRebus('stock_details2.stock_dokumen')">No Purchase Order</th>
                                 <th onclick="changeSortRebus('stock_details2.qty')">Qty</th>
                             </tr>
                         </thead>
@@ -840,7 +847,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4"></td>
+                                <td colspan="6"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalRebus']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                             </tr>
@@ -1355,7 +1362,13 @@
                 sortable: false
             },
             {
-                data: "dokumen",
+                data: "dokumen_pabean_mutasi",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "dokumen_asal",
                 className: "text-center"
             },
             {
@@ -1370,6 +1383,14 @@
             },
             {
                 data: "no_penerimaan_mutasi",
+                className: "text-center",
+            },
+            {
+                data: "supplier_name",
+                className: "text-center",
+            },
+            {
+                data: "no_po",
                 className: "text-center",
             },
             {
@@ -1475,6 +1496,14 @@
             },
             {
                 data: "no_penerimaan_surat_jalan",
+                className: "text-center",
+            },
+            {
+                data: "supplier_name",
+                className: "text-center",
+            },
+            {
+                data: "no_po",
                 className: "text-center",
             },
             {
@@ -1782,7 +1811,15 @@
                 sortable: false
             },
             {
-                data: "stock_dokumen",
+                data: "no_dokumen2",
+                className: "text-center",
+            },
+            {
+                data: "supplier_name",
+                className: "text-center",
+            },
+            {
+                data: "no_po",
                 className: "text-center",
             },
             {

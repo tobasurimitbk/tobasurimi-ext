@@ -17,6 +17,7 @@ use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\AccountSupplierModel;
 use App\Models\AccountBarangModel;
+use App\Models\AccountDivisisModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\LocalPOPaymentModel;
@@ -47,6 +48,7 @@ class JurnalUmum extends BaseController
     protected $accountSupplierModel;
     protected $accountModuleModel;
     protected $accountBarangModel;
+    protected $accountDivisisModel;
     protected $localPOPaymentModel;
     protected $localPOPaymentDetailModel;
     protected $importPOPaymentModel;
@@ -75,6 +77,7 @@ class JurnalUmum extends BaseController
         $this->accountSupplierModel = new AccountSupplierModel();
         $this->accountModuleModel = new AccountModuleModel();
         $this->accountBarangModel = new AccountBarangModel();
+        $this->accountDivisisModel = new AccountDivisisModel();
         $this->localPOPaymentModel = new LocalPOPaymentModel();
         $this->localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
         $this->importPOPaymentModel = new ImportPOPaymentModel();
@@ -515,7 +518,7 @@ class JurnalUmum extends BaseController
                             } else {
                                 $result[] = array(
                                     'id_transaksi' => $id_transaksi_jurnal,
-                                    'divisi_id' => $dataBB->divisi_id,
+                                    'divisi_id' => $dataBB->division_id,
                                     'company_id' => $this->this_company_id,
                                     'id_coa' =>  $barangAP,
                                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
@@ -547,7 +550,7 @@ class JurnalUmum extends BaseController
                         //untuk insert ke jurnal umum
                         $result[] = array(
                             'id_transaksi' => $id_transaksi_jurnal,
-                            'divisi_id' => $dataBB->divisi_id,
+                            'divisi_id' => $dataBB->division_id,
                             'company_id' => $this->this_company_id,
                             'id_coa' =>  $UtangAP,
                             'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
@@ -922,6 +925,7 @@ class JurnalUmum extends BaseController
         $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal($conditionAccountBarang);
         $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'MUTASI')->findAll();
         $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+        $dataAccountDivisi = $this->accountDivisisModel->getAccountDivisiForJurnal();
         $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
         $dataMetadataValutaIDR = $this->MetadataModel->asObject()->where('name', 'Valuta')->where('value', 'IDR')->first();
 
@@ -936,7 +940,7 @@ class JurnalUmum extends BaseController
             }
             $valas = $dataPO["dataPO"]["currency"];
             $valasText = $this->MetadataModel->asObject()->find($dataPO["dataPO"]["currency"]);
-        } else {
+        } else if ($typeBarang == "bahan_baku") {
             $dataPO = $this->rMPurchaseOrderModel->getPOByNoPO($noPO, $this->this_company_id, $barang1ID, $barang2ID);
             if ($dataPO) {
                 $kategori = "LOKAL";
@@ -955,6 +959,11 @@ class JurnalUmum extends BaseController
                 $valas = $dataPO["dataPO"]["currency"];
                 $valasText = $this->MetadataModel->asObject()->find($dataPO["dataPO"]["currency"]);
             }
+        } else {
+            $kategori = "LOKAL";
+            $kurs = 1;
+            $valas = $dataMetadataValutaIDR->id;
+            $valasText = "IDR";
         }
 
         foreach ($dataMetadataTipeTransaksi as $val) {
@@ -962,27 +971,44 @@ class JurnalUmum extends BaseController
             $idTransaksi = $val->id;
         }
 
-        if ($dataAccountSupplier) {
-            foreach ($dataAccountSupplier as $valueAccount) {
-                if ($dataPO["dataPO"]["supplier_id"] == $valueAccount->supplier_id) {
+        if ($typeBarang != "bahan_jadi" || $typeBarang != "bahan_setengah_jadi") {
+            if ($dataAccountSupplier) {
+                foreach ($dataAccountSupplier as $valueAccount) {
+                    if ($dataPO["dataPO"]["supplier_id"] == $valueAccount->supplier_id) {
+                        $UtangAP = $valueAccount->ap_id;
+                        $UtangAR = $valueAccount->ar_id;
+                    }
+                }
+            }
+
+            foreach ($dataAccountModule as $valueModule) {
+                if ($valueModule->type == strtoupper(str_replace("_", " ", $typeBarang)) && $valueModule->kategori == strtoupper($kategori) && $valueModule->module == "pembelian") {
+                    $UtangAP = $valueModule->ap_id;
+                    $UtangAR = $valueModule->ar_id;
+                }
+            }
+
+            foreach ($dataAccountBarang as $value) {
+                if ($barang1ID == $value->barang_master_id && $divisiID == $value->divisi_id && $companyID == $value->company_id) {
+                    $barangAP = $value->ap_id;
+                    $barangAR = $value->ar_id;
+                    $barangAPFound = true;
+                }
+            }
+        } else {
+            foreach ($dataAccountDivisi as $valueAccount) {
+                if ($divisiID == $valueAccount->divisis_id) {
                     $UtangAP = $valueAccount->ap_id;
                     $UtangAR = $valueAccount->ar_id;
                 }
             }
-        }
 
-        foreach ($dataAccountModule as $valueModule) {
-            if ($valueModule->type == strtoupper(str_replace("_", " ", $typeBarang)) && $valueModule->kategori == strtoupper($kategori) && $valueModule->module == "pembelian") {
-                $UtangAP = $valueModule->ap_id;
-                $UtangAR = $valueModule->ar_id;
-            }
-        }
-
-        foreach ($dataAccountBarang as $value) {
-            if ($barang1ID == $value->barang_master_id && $divisiID == $value->divisi_id && $companyID == $value->company_id) {
-                $barangAP = $value->ap_id;
-                $barangAR = $value->ar_id;
-                $barangAPFound = true;
+            foreach ($dataAccountBarang as $value) {
+                if ($barang1ID == $value->barang_master_id && $divisiID == $value->divisi_id && $companyID == $value->company_id) {
+                    $barangAP = $value->ap_id;
+                    $barangAR = $value->ar_id;
+                    $barangAPFound = true;
+                }
             }
         }
 

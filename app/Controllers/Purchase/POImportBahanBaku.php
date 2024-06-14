@@ -95,6 +95,9 @@ class POImportBahanBaku extends BaseController
             "dataSupplier" =>  $this->supplierModel->getSupplierByType('INTERNASIONAL'),
             "barang" => $this->barangMasterModel->getBarangByTypeWithSpec([
                 'barang_master.type_barang'  => 'bahan_baku',
+                'barang_master.company_id' => $this->this_company_id,
+                'barang_master.deletedAt' => null,
+                'barang_master_spesifikasi.deletedAt' => null
             ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
             "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
@@ -539,8 +542,13 @@ class POImportBahanBaku extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $listBarang = $this->rmImportPODetailModel
-            ->select('rm_import_po_details.qty_diterima AS diterima, rm_import_po_details.remaining_qty AS sisa, barang_master.barang_name AS nama_barang, barang_master.kode_barang, rm_import_po_details.qty')
-            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id')
+            ->select('rm_import_po_details.qty_diterima AS diterima, 
+            rm_import_po_details.remaining_qty AS sisa, 
+            CONCAT(barang_master.barang_name, " - ",barang_master_spesifikasi.spesifikasi) AS nama_barang, 
+            barang_master.kode_barang, 
+            rm_import_po_details.qty')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_import_po_details.spesifikasi_id', 'left')
             ->where('rm_import_po_details.rm_import_po_id', $id)
             ->where('rm_import_po_details.deletedAt', null)
             ->findAll();

@@ -9,6 +9,7 @@ use App\Models\MutasiDetailModel;
 use App\Models\MutasiModel;
 use App\Models\PenerimaanMutasiDetailModel;
 use App\Models\PenerimaanMutasiModel;
+use App\Models\PPBKBModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
@@ -27,6 +28,7 @@ class PenerimaanMutasi extends BaseController
     protected $stockDetail2Model;
     protected $mutasiModel;
     protected $mutasiDetailModel;
+    protected $ppbkbModel;
     protected $dompdf;
     protected $this_user_id;
     protected $this_company_id;
@@ -45,6 +47,7 @@ class PenerimaanMutasi extends BaseController
         $this->stockModel = new StockModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
+        $this->ppbkbModel = new PPBKBModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -73,6 +76,7 @@ class PenerimaanMutasi extends BaseController
             "divisi_id" => $this->request->getVar("divisi_id"),
             "status" => $this->request->getVar("status"),
             "penerimaan_mutasi_no" => $this->request->getVar("penerimaan_mutasi_no"),
+            "multiple_mutasi_no" => $this->request->getVar("multiple_mutasi_no"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
@@ -85,7 +89,6 @@ class PenerimaanMutasi extends BaseController
         $condition = [
             'penerimaan_mutasi.company_id' => $this->this_company_id,
             'divisis.deletedAt' => null,
-            'warehouses.deletedAt' => null,
             'penerimaan_mutasi.deletedAt' => null
         ];
 
@@ -100,17 +103,38 @@ class PenerimaanMutasi extends BaseController
             $listItem = $this->penerimaanMutasiDetailModel->where('penerimaan_mutasi_id', $data->id)->findAll();
             $totalItem = count($listItem);
 
+            // CARI DIVISI PENGIRIM
+            $divisiPengirimArr = $this->mutasiModel
+                ->select('divisis.divisi')
+                ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
+                ->whereIn('mutasi.id', json_decode($data->multiple_mutasi_id))
+                ->findAll();
+
+            $divisiPengirimResultArr = [];
+
+            foreach ($divisiPengirimArr as $d) {
+                array_push($divisiPengirimResultArr, $d['divisi']);
+            }
+            $divisiPengirimResultArr = array_unique($divisiPengirimResultArr);
+
+            // CARI DOKUMEN PPBKB
+            $mutasiNameArr = [];
+            foreach ($listItem as $l) {
+                $ppbkb = $this->ppbkbModel->where('mutasi_id', $l['mutasi_id'])->first();
+                array_push($mutasiNameArr, $ppbkb['no_ppbkb']);
+            }
+            $mutasiNameArr = array_unique($mutasiNameArr);
+
             array_push($dataResult, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "penerimaan_mutasi_no"  => $data->penerimaan_mutasi_no,
-                "multiple_no_mutasi"    => str_replace(['"', ']', '['], "", $data->multiple_no_mutasi),
+                "multiple_no_mutasi"    => str_replace(['"', ']', '['], " ", $data->multiple_no_mutasi),
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
-                "warehouse_tujuan"      => $data->divisi_tujuan . ' - ' . $data->warehouse_tujuan,
-                "jenis_mutasi"          => $data->jenis_mutasi,
-                "bc_no"                 => $data->bc_no == "" ? "-" : $data->bc_no,
+                "divisi_penerima"       => $data->divisi_penerima,
+                "divisi_pengirim"       => implode(', ', $divisiPengirimResultArr),
+                "dokumen_mutasi_barang" => "PPBKB (" . implode(', ', $mutasiNameArr) . ")",
                 "total_item"            => $totalItem,
-                "state"                 => '0',
                 "status_posting"        => $data->status_posting
             ]);
         }
@@ -130,7 +154,7 @@ class PenerimaanMutasi extends BaseController
     {
         $data = [
             'tanggal' => date('Y-m-d'),
-            'jenisMutasi' => $this->metaDataModel->where('name', "Jenis Mutasi")->findAll()
+            'divisi' => $this->divisiModel->getDivisiAccess()
         ];
 
         return view('Warehouse/penerimaanMutasi/form', $data);
@@ -147,11 +171,7 @@ class PenerimaanMutasi extends BaseController
 
         $data = [
             'penerimaanMutasi' => $penerimaanMutasi,
-            'jenisMutasi' => $this->metaDataModel->where('name', "Jenis Mutasi")->findAll(),
-            'warehouse' => $this->warehouseModel->select('warehouses.*, divisis.divisi')
-                ->join('divisis', 'divisis.id = warehouses.divisi_id')
-                ->where('warehouses.id', $penerimaanMutasi['warehouse_id'])
-                ->first(),
+            'divisi' => $this->divisiModel->getDivisiAccess()
         ];
 
         return view('Warehouse/penerimaanMutasi/form', $data);
@@ -163,14 +183,12 @@ class PenerimaanMutasi extends BaseController
         $selectQry = "
             penerimaan_mutasi.*,
             divisis.divisi,
-            warehouses.warehouse_name
         ";
 
         $penerimaanMutasi = $this->penerimaanMutasiModel
             ->asObject()
             ->select($selectQry)
             ->join('divisis', 'divisis.id = penerimaan_mutasi.divisi_id', 'left')
-            ->join('warehouses', 'warehouses.id = penerimaan_mutasi.warehouse_id', 'left')
             ->where('penerimaan_mutasi.id', $id)
             ->first();
 
@@ -194,12 +212,23 @@ class PenerimaanMutasi extends BaseController
 
     public function createAction()
     {
-        $warehouse = $this->warehouseModel->find($this->request->getVar('warehouse_id'));
-        $jenisMutasi = $this->request->getVar('jenis_mutasi');
         $mutasiNo = $this->penerimaanMutasiModel->getMutasiNo($this->request->getVar('multiple_mutasi_id'));
-        $bc = $this->metaDataModel->where('name', "jenis_dok_aju")->where('value', $jenisMutasi)->first();
         $barang = json_decode($_POST['listBarang']);
         $qty_diterima_current = 0;
+
+        $first = $this->penerimaanMutasiModel
+            ->where('company_id', $this->this_company_id)
+            ->where('penerimaan_mutasi_no', $this->request->getVar('penerimaan_mutasi_no'))
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'message' => "Nomor penerimaan mutasi sudah ada"
+            ]);
+        }
+
 
         foreach ($barang as $b) {
             $qty_diterima_current += $b->qty_diterima_current;
@@ -215,15 +244,11 @@ class PenerimaanMutasi extends BaseController
 
         $id = $this->penerimaanMutasiModel->insert([
             'company_id' => $this->this_company_id,
-            'divisi_id' => $warehouse['divisi_id'],
-            'warehouse_id' => $warehouse['id'],
-            'bc_id' => $bc['id'],
-            'bc_no' => "",
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'penerimaan_mutasi_no' => $this->request->getVar('penerimaan_mutasi_no'),
-            'jenis_mutasi' => $jenisMutasi,
             'multiple_mutasi_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_mutasi_id'))),
             'multiple_no_mutasi' => str_replace(['\\"', '\\'], '', json_encode($mutasiNo)),
-            'tanggal' => date('Y-m-d'),
+            'tanggal' =>  $this->request->getPost("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
             'keterangan' => $this->request->getVar('keterangan'),
             'status_posting' => '0',
             'createdBy' => $this->this_user_id
@@ -235,9 +260,12 @@ class PenerimaanMutasi extends BaseController
                     'penerimaan_mutasi_id' => $id,
                     'mutasi_id' => $b->mutasi_id,
                     'mutasi_detail_id' => $b->mutasi_detail_id,
-                    'stock_id' => $b->stock_id,
-                    'bc_id' => $b->bc_id,
-                    'no_aju' => $b->no_aju,
+                    'stock_asal_id' => $b->stock_asal_id,
+                    'bc_asal_id' => $b->bc_asal_id,
+                    'no_aju_asal' => $b->no_aju_asal,
+                    'stock_dokumen_asal' => $b->stock_dokumen_asal,
+                    'bc_mutasi_id' => $b->bc_mutasi_id,
+                    'no_aju_mutasi' => $b->no_aju_mutasi,
                     'qty' => $b->qty_diterima_current
                 ]);
             }
@@ -254,12 +282,23 @@ class PenerimaanMutasi extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
-        $warehouse = $this->warehouseModel->find($this->request->getVar('warehouse_id'));
-        $jenisMutasi = $this->request->getVar('jenis_mutasi');
-        $mutasiNo = $this->penerimaanMutasiModel->getMutasiNo($this->request->getVar('multiple_po_id'));
-        $bc = $this->metaDataModel->where('name', "jenis_dok_aju")->where('value', $jenisMutasi)->first();
         $barang = json_decode($_POST['listBarang']);
         $qty_diterima_current = 0;
+
+        $first = $this->penerimaanMutasiModel
+            ->where('company_id', $this->this_company_id)
+            ->where('penerimaan_mutasi_no', $this->request->getVar('penerimaan_mutasi_no'))
+            ->where('id !=', $id)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'message' => "Nomor penerimaan mutasi sudah ada"
+            ]);
+        }
+
 
         foreach ($barang as $b) {
             $qty_diterima_current += $b->qty_diterima_current;
@@ -273,51 +312,60 @@ class PenerimaanMutasi extends BaseController
             ]);
         }
 
+        // PMU/PTS/01/VI/2024
+
         $this->penerimaanMutasiModel->update($id, [
             'company_id' => $this->this_company_id,
-            'divisi_id' => $warehouse['divisi_id'],
-            'warehouse_id' => $warehouse['id'],
-            'bc_id' => $bc['id'],
-            'bc_no' => "",
-            'jenis_mutasi' => $jenisMutasi,
-            'multiple_mutasi_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
-            'multiple_no_mutasi' => str_replace(['\\"', '\\'], '', json_encode($mutasiNo)),
+            // 'divisi_id' => $this->request->getVar('divisi_id'),
+            // 'penerimaan_mutasi_no' => $this->request->getVar('penerimaan_mutasi_no'),
+            // 'multiple_mutasi_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_mutasi_id'))),
+            // 'multiple_no_mutasi' => str_replace(['\\"', '\\'], '', json_encode($mutasiNo)),
+            'tanggal' =>  $this->request->getPost("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
             'keterangan' => $this->request->getVar('keterangan'),
             'status_posting' => '0',
             'createdBy' => $this->this_user_id
         ]);
 
+        $id_not_delete = [];
         foreach ($barang as $b) {
             if ($b->qty_diterima_current != 0) {
                 // update or insert
                 $check = $this->penerimaanMutasiDetailModel
                     ->where('penerimaan_mutasi_id', $id)
-                    ->where('mutasi_id', $b->id)
+                    ->where('mutasi_id', $b->mutasi_id)
                     ->where('mutasi_detail_id', $b->mutasi_detail_id)
                     ->first();
 
                 if ($check == null) {
                     // insert
-                    $this->penerimaanMutasiDetailModel->insert([
+                    $id = $this->penerimaanMutasiDetailModel->insert([
                         'penerimaan_mutasi_id' => $id,
                         'mutasi_id' => $b->mutasi_id,
                         'mutasi_detail_id' => $b->mutasi_detail_id,
-                        'stock_id' => $b->stock_id,
-                        'bc_id' => $b->bc_id,
-                        'no_aju' => $b->no_aju,
+                        'stock_asal_id' => $b->stock_asal_id,
+                        'bc_asal_id' => $b->bc_asal_id,
+                        'no_aju_asal' => $b->no_aju_asal,
+                        'stock_dokumen_asal' => $b->stock_dokumen_asal,
+                        'bc_mutasi_id' => $b->bc_mutasi_id,
+                        'no_aju_mutasi' => $b->no_aju_mutasi,
                         'qty' => $b->qty_diterima_current
                     ]);
+                    array_push($id_not_delete, $id);
                 } else {
                     // update
                     $this->penerimaanMutasiDetailModel->update($check['id'], [
                         'penerimaan_mutasi_id' => $id,
                         'mutasi_id' => $b->mutasi_id,
                         'mutasi_detail_id' => $b->mutasi_detail_id,
-                        'stock_id' => $b->stock_id,
-                        'bc_id' => $b->bc_id,
-                        'no_aju' => $b->no_aju,
+                        'stock_asal_id' => $b->stock_asal_id,
+                        'stock_dokumen_asal' => $b->stock_dokumen_asal,
+                        'bc_asal_id' => $b->bc_asal_id,
+                        'no_aju_asal' => $b->no_aju_asal,
+                        'bc_mutasi_id' => $b->bc_mutasi_id,
+                        'no_aju_mutasi' => $b->no_aju_mutasi,
                         'qty' => $b->qty_diterima_current
                     ]);
+                    array_push($id_not_delete, $check['id']);
                 }
             } else {
                 // delete
@@ -328,6 +376,8 @@ class PenerimaanMutasi extends BaseController
                     ->delete();
             }
         }
+
+        $this->penerimaanMutasiDetailModel->whereNotIn('id', $id_not_delete)->where('penerimaan_mutasi_id', $id)->delete();
 
         return response()->setJSON([
             'message' => "Penerimaan mutasi berhasil diupdate",
@@ -358,45 +408,81 @@ class PenerimaanMutasi extends BaseController
         // Inventori Stok Minus
         foreach ($penerimaanMutasiList as $p) {
             $mutasi = $this->mutasiModel->find($p['mutasi_id']);
-            $stock = $this->stockModel->find($p['stock_id']);
-            $qty = $p['qty'];
+            $stockMutasiAsal = $this->stockModel->find($p['stock_asal_id']);
 
-            if ($stock['tipe_barang'] == "kemasan") {
-                $barang2_id = $stock['kemasan_id'];
+            if ($stockMutasiAsal['tipe_barang'] == "kemasan") {
+                $barang2Id = $stockMutasiAsal['kemasan_id'];
             } else {
-                $barang2_id = $stock['barang2_id'];
+                $barang2Id = $stockMutasiAsal['barang2_id'];
             }
 
-            $stok = $this->stockModel->insertStok(
-                $mutasi['company_id'],
-                $mutasi['warehouse_asal_id'],
-                $mutasi['divisi_asal_id'],
-                $stock['tipe_barang'],
-                $stock['barang1_id'],
-                $barang2_id,
-                ($qty * -1),
+            // INIT STOK NYA (KARENA BARANG NYA BISA AJA TIDAK ADA DI INVENTORI)
+            $stok = $this->stockModel->getStokMaster(
+                $this->this_company_id,
+                $mutasi['warehouse_tujuan_id'],
+                $mutasi['divisi_tujuan_id'],
+                $stockMutasiAsal['tipe_barang'],
+                $stockMutasiAsal['barang1_id'],
+                $barang2Id
             );
 
-            // DETAIL
+            if ($stok == null) {
+                $stok = $this->stockModel->insertStok(
+                    $this->this_company_id,
+                    $mutasi['warehouse_tujuan_id'],
+                    $mutasi['divisi_tujuan_id'],
+                    $stockMutasiAsal['tipe_barang'],
+                    $stockMutasiAsal['barang1_id'],
+                    $barang2Id,
+                    0
+                );
+            }
+
+            // INSERT LEVEL 1
+            $stok = $this->stockModel->insertStok(
+                $this->this_company_id,
+                $mutasi['warehouse_tujuan_id'],
+                $mutasi['divisi_tujuan_id'],
+                $stockMutasiAsal['tipe_barang'],
+                $stockMutasiAsal['barang1_id'],
+                $barang2Id,
+                $p['qty']
+            );
+
+            // INSERT LEVEL 2
             $stokDetail = $this->stockDetailModel->insertStokDetail(
                 $stok,
-                $qty,
-                "Out",
+                $p['qty'],
+                'In',
                 date('Y-m-d'),
                 $this->this_user_id,
                 "MUTASI",
                 $penerimaanMutasi['penerimaan_mutasi_no'],
-                $penerimaanMutasi['keterangan'],
+                "-",
             );
 
-            // SUB DETAIL
+            // STOK OLD 
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_asal_id'],
+                $p['bc_asal_id'],
+                $p['no_aju_asal'],
+                $p['stock_dokumen_asal']
+            );
+
+            // INSERT LEVEL 3 
             $this->stockDetail2Model->insertStokDetail2(
-                $p['bc_id'],
+                $p['bc_mutasi_id'],
                 $stok,
                 $stokDetail,
-                $qty,
-                $p['no_aju'],
-                $mutasi['no_mutasi']
+                $p['qty'],
+                $p['no_aju_mutasi'],
+                $mutasi['no_mutasi'],
+                $mutasi['no_mutasi'] . " (" . $stockOldDetail['no_po'] . ") ",
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan'],
+                $stockOldDetail['no_po']
             );
         }
 
@@ -433,9 +519,9 @@ class PenerimaanMutasi extends BaseController
 
     public function dropdownListNomorMutasi()
     {
-        $warehouseID = $this->request->getVar('warehouse_id');
+        $divisiId = $this->request->getVar('divisi_id');
         $data = $this->penerimaanMutasiModel->getListNomorMutasi(
-            $warehouseID
+            $divisiId
         );
 
         return response()->setJSON([
@@ -474,13 +560,13 @@ class PenerimaanMutasi extends BaseController
     public function getPenerimaanMutasiNo()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $warehouseID = $this->request->getVar('warehouse_id');
+        $divisiID = $this->request->getVar('divisi_id');
 
-        if (empty($warehouseID)) {
-            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, "", $warehouseID);
+        if (empty($divisiID)) {
+            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, "", $divisiID);
         } else {
-            $warehouse = $this->warehouseModel->where('id', $warehouseID)->first();
-            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, strtoupper($warehouse['code_warehouse']), $warehouseID);
+            $divisi = $this->divisiModel->where('id', $divisiID)->first();
+            $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisiID);
         }
         return response()->setJSON([
             'status' => true,

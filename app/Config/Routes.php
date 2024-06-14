@@ -695,6 +695,7 @@ $routes->get('/barang/dropdown/parent', 'Warehouse\Barang::dropdownParentBarang'
 $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKategori', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type', 'Warehouse\Barang::dropdownBarangType', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-nospec', 'Warehouse\Barang::dropdownBarangTypeWithoutSpec', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/type-nospecwo', 'Warehouse\Barang::dropdownBarangTypeWithoutSpecWO', ['filter' => 'Auth']);
 
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
@@ -915,7 +916,7 @@ $routes->post('/mutasi/posting', 'Inventori\Mutasi::posting', ['filter' => 'Auth
 $routes->get('/mutasi/id/(:segment)', 'Inventori\Mutasi::detail/$1', ['filter' => 'Auth']);
 $routes->get('/mutasi/all', 'Inventori\Mutasi::all', ['filter' => 'Auth']);
 $routes->post('/mutasi/un-posting', 'Inventori\Mutasi::unPosting', ['filter' => 'Auth']);
-// PENERIMAAN MUTASI
+// PENERIMAAN MUTASI PPBKB
 $routes->get('/penerimaan-mutasi', 'Inventori\PenerimaanMutasi::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/create', 'Inventori\PenerimaanMutasi::create', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/list-warehouse', 'Inventori\PenerimaanMutasi::dropdownListDivisi', ['filter' => 'Auth']);
@@ -929,6 +930,14 @@ $routes->get('/penerimaan-mutasi/id/(:segment)', 'Inventori\PenerimaanMutasi::de
 $routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-no', 'Inventori\PenerimaanMutasi::getPenerimaanMutasiNo', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/all', 'Inventori\PenerimaanMutasi::all', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/print/(:segment)', 'Inventori\PenerimaanMutasi::print/$1', ['filter' => 'Auth']);
+// PENERIMAAN MUTASI BC 2.7
+$routes->get('/penerimaan-mutasi/global', 'Inventori\PenerimaanMutasiGlobal::index', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/create-global', 'Inventori\PenerimaanMutasiGlobal::create', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-global-no', 'Inventori\PenerimaanMutasiGlobal::getPenerimaanMutasiNo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-mutasi-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListNomorMutasi', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-barang-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarang', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/list-barang-masuk', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarangMasuk', ['filter' => 'Auth']);
+
 // MUTASI GLOBAL
 $routes->get('/mutasi/global', 'Inventori\MutasiGlobal::index', ['filter' => 'Auth']);
 $routes->get('/mutasi/all-global', 'Inventori\MutasiGlobal::all', ['filter' => 'Auth']);
@@ -1470,6 +1479,7 @@ $routes->post('/rasio/save', 'Accounting\Rasio\RasioController::saveRasio', ['fi
 $routes->post('/rasio/update', 'Accounting\Rasio\RasioController::updateRasio', ['filter' => 'Auth']);
 $routes->post('/rasio/delete', 'Accounting\Rasio\RasioController::deleteRasio', ['filter' => 'Auth']);
 $routes->post('/rasio/get', 'Accounting\Rasio\RasioController::get', ['filter' => 'Auth']);
+$routes->get('/rasio/load_content', 'Accounting\Rasio\RasioController::load_content', ['filter' => 'Auth']);
 
 //Laporan
 //Accounting

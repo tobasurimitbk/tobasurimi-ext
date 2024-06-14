@@ -4,30 +4,25 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AccountDivisisModel extends Model
+class PenerimaanMutasiGlobalDetailModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'account_divisis';
+    protected $table            = 'penerimaan_mutasi_global_detail';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'divisis_id',
-        'company_id',
-        'ap_id',
-        'ar_id',
-        'deleted_at',
-    ];
+    protected $useSoftDeletes   = true;
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
+
 
     // Validation
     protected $validationRules      = [];
@@ -45,14 +40,4 @@ class AccountDivisisModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function getAccountDivisiForJurnal($condition = [])
-    {
-        $select =   "account_divisis.*";
-        return $this->asObject()
-            ->select($select)
-            ->where($condition)
-            ->where('account_divisis.deleted_at', null)
-            ->findAll();
-    }
 }

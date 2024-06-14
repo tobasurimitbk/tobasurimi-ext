@@ -609,41 +609,6 @@ class PenerimaanBarangLokalBB extends BaseController
                             0
                         );
                     }
-
-                    // CHECK STOK DETAIL
-                    if (
-                        $this->stockModel->isDefinedStockSubDetail(
-                            $this->this_company_id,
-                            $penerimaanBarang['warehouse_id'],
-                            $penerimaanBarang['divisi_id'],
-                            "bahan_baku",
-                            $p['barang_id'],
-                            $p['spesifikasi_id'],
-                            $penerimaanBarang['bc_type'],
-                            "-",
-                            is_array($stok) ? $stok['id'] : $stok,
-                        ) == null
-                    ) {
-                        // INSERT STOK INISIASI
-                        $stokDetail = $this->stockDetailModel->insertStokDetail(
-                            is_array($stok) ? $stok['id'] : $stok,
-                            0,
-                            "In",
-                            date('Y-m-d'),
-                            $this->this_user_id,
-                            "INISIASI",
-                            "-",
-                            "-"
-                        );
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $penerimaanBarang['bc_type'],
-                            is_array($stok) ? $stok['id'] : $stok,
-                            $stokDetail,
-                            0,
-                            "-",
-                            "-"
-                        );
-                    }
                 }
 
                 // CHECK STOK KEMASAN HEADER
@@ -665,42 +630,6 @@ class PenerimaanBarangLokalBB extends BaseController
                         0,
                         $penerimaanBarang['kemasan_id'],
                         0
-                    );
-                }
-
-                // CHECK STOK KEMASAN DETAIL
-                if (
-                    $this->stockModel->isDefinedStockSubDetail(
-                        $this->this_company_id,
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        "kemasan",
-                        0,
-                        $penerimaanBarang['kemasan_id'],
-                        $penerimaanBarang['bc_type'],
-                        "-",
-                        is_array($stok) ? $stok['id'] : $stok,
-                    ) == null
-                ) {
-
-                    // INSERT STOK INISIASI
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        is_array($stok) ? $stok['id'] : $stok,
-                        0,
-                        "In",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "INISIASI",
-                        "-",
-                        "-"
-                    );
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $penerimaanBarang['bc_type'],
-                        is_array($stok) ? $stok['id'] : $stok,
-                        $stokDetail,
-                        0,
-                        "-",
-                        "-"
                     );
                 }
 
@@ -740,6 +669,11 @@ class PenerimaanBarangLokalBB extends BaseController
                         "-",
                         $po['po_no'],
                         $po['po_no'],
+                        $penerimaanBarang['supplier_id'],
+                        $p['harga'],
+                        $p['harga_harian'],
+                        $p['harga_bulanan'],
+                        $po['po_no']
                     );
                 }
             }
@@ -776,7 +710,8 @@ class PenerimaanBarangLokalBB extends BaseController
                 $penerimaanBarang['jumlah_kemasan'],
                 "-",
                 $penerimaanBarang['no_penerimaan_barang'],
-                $penerimaanBarang['no_penerimaan_barang']
+                $penerimaanBarang['no_penerimaan_barang'],
+                $penerimaanBarang['supplier_id'],
             );
         } catch (Exception $e) {
             return response()->setJSON([

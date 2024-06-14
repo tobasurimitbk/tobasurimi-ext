@@ -13,16 +13,8 @@ class ProductionResultModel extends Model
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'company_id',
-        'work_order_id',
-        'material_request_id',
-        'is_posted',
-        'warehouse_id',
-        'pr_no',
-        'receive_date'
-    ];
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = false;
@@ -126,12 +118,12 @@ class ProductionResultModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
-            ->join('account_barang', 'account_barang.barang_master_id = production_result_details.barang1_id', 'left')
+            // ->join('account_barang', 'account_barang.barang_master_id = production_result_details.barang1_id', 'left')
             ->like('production_results.receive_date', $where['tanggal_jurnal'])
             ->where('production_result_details.type', 'JADI')
             ->where('work_orders.divisi_id', $where['divisi_id'])
-            ->where('account_barang.divisi_id', $where['divisi_id'])
-            ->where('account_barang.kategori_id', $where['kategori_id'])
+            // ->where('account_barang.divisi_id', $where['divisi_id'])
+            // ->where('account_barang.kategori_id', $where['kategori_id'])
             ->where('production_result_details.deletedAt', $where['deletedAt'])
             ->where('production_results.deletedAt', $where['deletedAt'])
             ->groupBy('production_result_details.barang1_id, production_result_details.barang2_id')
@@ -144,19 +136,19 @@ class ProductionResultModel extends Model
     {
         $where['deletedAt'] = null;
         $selectQryJadi = '
-    barang_master.barang_name, 
-    barang_master_spesifikasi.spesifikasi,
-    production_result_details.barang1_id,
-    production_result_details.barang2_id,
-    stock_details2.stock_dokumen AS stock_dokumen2,
-    stock_details.no_dokumen,
-    TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(production_result_details.stock_dokumen, \'(\', -1), \')\', 1)) AS stock_dokumen
-    ';
+        barang_master.barang_name, 
+        barang_master_spesifikasi.spesifikasi,
+        production_result_details.barang1_id,
+        production_result_details.barang2_id,
+        stock_details2.stock_dokumen AS stock_dokumen2,
+        stock_details.no_dokumen,
+        production_result_details.stock_dokumen AS stock_dokumen
+        ';
 
         $dataQry = $this->asArray()
             ->select($selectQryJadi)
             ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
-            ->join('stock_details2', 'stock_details2.stock_dokumen = TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(production_result_details.stock_dokumen, \'(\', -1), \')\', 1))', 'left')
+            ->join('stock_details2', 'stock_details2.stock_dokumen = production_result_details.stock_dokumen', 'left')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id AND stock_details.sumber = "LPB"', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.no_penerimaan_barang = stock_details.no_dokumen', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.barang_id = production_result_details.barang1_id AND penerimaan_barang_detail.spesifikasi_id = production_result_details.barang2_id', 'left')
@@ -167,6 +159,7 @@ class ProductionResultModel extends Model
             ->like('production_results.receive_date', $where['tanggal_jurnal'])
             ->where('work_orders.divisi_id', $where['divisi_id'])
             ->where('production_result_details.type', 'DIGUNAKAN')
+            ->where('production_results.is_posted', '1')
             ->where('production_result_details.barang_type !=', 'bahan_penolong')
             ->where('production_result_details.deletedAt', $where['deletedAt'])
             ->where('production_results.deletedAt', $where['deletedAt'])
