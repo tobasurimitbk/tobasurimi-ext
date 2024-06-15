@@ -279,7 +279,7 @@
                     } else if (row.status == "SIAP KIRIM") {
                         htmlRes += `
                         <div class="text-primary">
-                            SUDAH KIRIM
+                            SIAP KIRIM
                         </div>`
                     }
 
