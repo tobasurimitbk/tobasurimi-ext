@@ -74,6 +74,9 @@ class POLokalBahanPenolong extends BaseController
             "supplier" => $this->supplierModel->getSupplierByType("Bahan Penolong"),
             "barang" => $this->barangMasterModel->getBarangByTypeWithSpec([
                 'barang_master.type_barang'  => 'bahan_penolong',
+                'barang_master.company_id' => $this->this_company_id,
+                'barang_master.deletedAt' => null,
+                'barang_master_spesifikasi.deletedAt' => null
             ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
             "ppn" => $this->taxModel->getTaxByType("ppn"),
@@ -297,6 +300,9 @@ class POLokalBahanPenolong extends BaseController
             "supplier" => $this->supplierModel->getSupplierByType("Bahan Penolong"),
             "barang" => $this->barangMasterModel->getBarangByTypeWithSpec([
                 'barang_master.type_barang'  => 'bahan_penolong',
+                'barang_master.company_id' => $this->this_company_id,
+                'barang_master.deletedAt' => null,
+                'barang_master_spesifikasi.deletedAt' => null
             ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
             "ppn" => $this->taxModel->getTaxByType("ppn"),

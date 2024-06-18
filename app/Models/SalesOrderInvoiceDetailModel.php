@@ -20,6 +20,8 @@ class SalesOrderInvoiceDetailModel extends Model
         'id_sales_order_invoice',
         'id_barang_invoice',
         'qty_invoice',
+        'qty_invoice_awal',
+        'qty_invoice_sisa',
         'keterangan_invoice',
         'discount_percentage_invoice',
         'harga_barang_invoice',

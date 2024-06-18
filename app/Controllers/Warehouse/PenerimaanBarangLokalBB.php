@@ -739,6 +739,7 @@ class PenerimaanBarangLokalBB extends BaseController
     public function listBarangLPB()
     {
         $penerimaanBarangID = empty($this->request->getVar('penerimaan_barang_id')) ? null : decrypt($this->request->getVar('penerimaan_barang_id'));
+
         $rmPurchaseOrderID = json_decode($this->request->getVar('rm_purchase_order_id'));
 
         if (count($rmPurchaseOrderID) == 0) {

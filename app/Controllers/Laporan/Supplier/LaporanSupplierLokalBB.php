@@ -54,6 +54,7 @@ class LaporanSupplierLokalBB extends BaseController
     public function laporanPendapatanSupplier()
     {
         $data = [
+            'getPoNo' => $this->RMPurchaseOrderModel->select('id ,po_no')->where('deletedAt', NULL)->where('company_id', '1')->findAll(),
             'getSupplier' => $this->supplierModel->where('deletedAt', NULL)->where('type', 'BAHAN BAKU')->findAll(),
             'getWarehouse' => $this->warehousesModel->get_by_company_id($this->this_company_id),
             'getBarang' => $this->barangMasterModel->getBarangByType("bahan_baku"),
@@ -94,6 +95,7 @@ class LaporanSupplierLokalBB extends BaseController
             "supplierId"        => $this->request->getGet("filter_supplier"),
             "barangId"        => $this->request->getGet("filter_barang"),
             "warehouseId"        => $this->request->getGet("filter_warehouse"),
+            "poNo"        => $this->request->getGet("filter_po_no"),
 
         ];
 
@@ -140,6 +142,7 @@ class LaporanSupplierLokalBB extends BaseController
             $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
             $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
             $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
             $totalDppUmum += $row->dppUmum;
             $totalPphUmum += $row->pphUmum;
             $totalTotalUmum += $row->totalUmum;
@@ -152,6 +155,19 @@ class LaporanSupplierLokalBB extends BaseController
             $totalDppSubsidi += $row->subsidi;
             $totalPphSubsidi += $row->pphSubsidi;
             $totalTotalSubsidi += $row->totalSubsidi;
+            $row->pphUmum = number_format($row->pphUmum);
+            $row->dppUmum = number_format($row->dppUmum);
+            $row->totalUmum = number_format($row->totalUmum);
+            $row->dppHarian = number_format($row->dppHarian);
+            $row->pphHarian = number_format($row->pphHarian);
+            $row->totalHarian = number_format($row->totalHarian);
+            $row->dppBulanan = number_format($row->dppBulanan);
+            $row->pphBulanan = number_format($row->pphBulanan);
+            $row->totalBulanan = number_format($row->totalBulanan);
+            $row->subsidi = number_format($row->subsidi);
+            $row->pphSubsidi = number_format($row->pphSubsidi);
+            $row->totalSubsidi = number_format($row->totalSubsidi);
+            $row->totalRow = number_format($row->totalRow);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 
@@ -206,11 +222,13 @@ class LaporanSupplierLokalBB extends BaseController
         $supplierId = $this->request->getVar('filter_supplier');
         $barangId = $this->request->getVar('filter_barang');
         $warehouseId = $this->request->getVar('filter_warehouse');
+        $poNo = $this->request->getVar('filter_po_no');
         $companyId  = $this->this_company_id;
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportPdf($newDateStart, $newDateEnd, $supplierId, $barangId, $warehouseId, $companyId);
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportPdf($newDateStart, $newDateEnd, $supplierId, $barangId, $warehouseId, $companyId, $poNo);
         $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $barangId)->where('type_barang', 'bahan_baku')->first();
         $dataWarehouse = $this->warehousesModel->asObject()->where('id', $warehouseId)->first();
+        $dataSupplier = $this->supplierModel->asObject()->where('id', $supplierId)->first();
         $dataTotalBBLokal = [];
         if (!empty($dataBBLokal)) {
             foreach ($dataBBLokal as $row) {
@@ -247,6 +265,8 @@ class LaporanSupplierLokalBB extends BaseController
             'tanggalAkhir' => $dateEnd,
             'bahanBaku' => !empty($dataBahanBaku) ? $dataBahanBaku->barang_name : "All",
             'warehouse' => !empty($dataWarehouse) ? $dataWarehouse->warehouse_name : "All",
+            'supplier' => !empty($dataSupplier) ? $dataSupplier->name : "ALL",
+            'poNo' => !empty($poNo) ? $poNo : "ALL",
             'dataOrder' => $dataBBLokal,
             'totalDppUmum' => $totalDppUmum,
             'totalPphUmum' => $totalPphUmum,
@@ -387,6 +407,20 @@ class LaporanSupplierLokalBB extends BaseController
             $totalDppSubsidi += $row->subsidi;
             $totalPphSubsidi += $row->pphSubsidi;
             $totalTotalSubsidi += $row->totalSubsidi;
+
+            $row->pphUmum = number_format($row->pphUmum);
+            $row->dppUmum = number_format($row->dppUmum);
+            $row->totalUmum = number_format($row->totalUmum);
+            $row->dppHarian = number_format($row->dppHarian);
+            $row->pphHarian = number_format($row->pphHarian);
+            $row->totalHarian = number_format($row->totalHarian);
+            $row->dppBulanan = number_format($row->dppBulanan);
+            $row->pphBulanan = number_format($row->pphBulanan);
+            $row->totalBulanan = number_format($row->totalBulanan);
+            $row->subsidi = number_format($row->subsidi);
+            $row->pphSubsidi = number_format($row->pphSubsidi);
+            $row->totalSubsidi = number_format($row->totalSubsidi);
+            $row->totalRow = number_format($row->totalRow);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 
@@ -614,6 +648,20 @@ class LaporanSupplierLokalBB extends BaseController
             $totalDppSubsidi += $row->subsidi;
             $totalPphSubsidi += $row->pphSubsidi;
             $totalTotalSubsidi += $row->totalSubsidi;
+
+            $row->pphUmum = number_format($row->pphUmum);
+            $row->dppUmum = number_format($row->dppUmum);
+            $row->totalUmum = number_format($row->totalUmum);
+            $row->dppHarian = number_format($row->dppHarian);
+            $row->pphHarian = number_format($row->pphHarian);
+            $row->totalHarian = number_format($row->totalHarian);
+            $row->dppBulanan = number_format($row->dppBulanan);
+            $row->pphBulanan = number_format($row->pphBulanan);
+            $row->totalBulanan = number_format($row->totalBulanan);
+            $row->subsidi = number_format($row->subsidi);
+            $row->pphSubsidi = number_format($row->pphSubsidi);
+            $row->totalSubsidi = number_format($row->totalSubsidi);
+            $row->totalRow = number_format($row->totalRow);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 
@@ -845,6 +893,20 @@ class LaporanSupplierLokalBB extends BaseController
             $totalDppSubsidi += $row->subsidi;
             $totalPphSubsidi += $row->pphSubsidi;
             $totalTotalSubsidi += $row->totalSubsidi;
+
+            $row->pphUmum = number_format($row->pphUmum);
+            $row->dppUmum = number_format($row->dppUmum);
+            $row->totalUmum = number_format($row->totalUmum);
+            $row->dppHarian = number_format($row->dppHarian);
+            $row->pphHarian = number_format($row->pphHarian);
+            $row->totalHarian = number_format($row->totalHarian);
+            $row->dppBulanan = number_format($row->dppBulanan);
+            $row->pphBulanan = number_format($row->pphBulanan);
+            $row->totalBulanan = number_format($row->totalBulanan);
+            $row->subsidi = number_format($row->subsidi);
+            $row->pphSubsidi = number_format($row->pphSubsidi);
+            $row->totalSubsidi = number_format($row->totalSubsidi);
+            $row->totalRow = number_format($row->totalRow);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 
@@ -979,7 +1041,7 @@ class LaporanSupplierLokalBB extends BaseController
     public function laporanRekapAllbarang()
     {
         $data = [
-            'getWarehouse' => $this->warehousesModel->get_by_company_id($this->this_company_id),
+            'getDivisi' => $this->divisiModel->getDivisiAccess(),
             'getBarang' => $this->barangMasterModel->getBarangByType("bahan_baku"),
         ];
 
@@ -999,6 +1061,7 @@ class LaporanSupplierLokalBB extends BaseController
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
             'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id'  => $this->this_company_id,
+            'rm_purchase_orders.deletedAt'  => null,
         ];
 
         $payload = [
@@ -1015,17 +1078,14 @@ class LaporanSupplierLokalBB extends BaseController
             "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-
-            "warehouseId"        => $this->request->getGet("filter_warehouse"),
+            "divisiId"        => $this->request->getGet("filter_divisi"),
             "barangId"        => $this->request->getGet("filter_barang"),
 
 
         ];
 
         $availableSort = [
-
             'barangName'             => 'barang_master.barang_name',
-            'spekName'             => 'supplier_harga.spesifikasi',
             'bagianName'             => 'bagian.nama_bagian',
 
         ];
@@ -1077,6 +1137,19 @@ class LaporanSupplierLokalBB extends BaseController
             $totalDppSubsidi += $row->subsidi;
             $totalPphSubsidi += $row->pphSubsidi;
             $totalTotalSubsidi += $row->totalSubsidi;
+            $row->pphUmum = number_format($row->pphUmum);
+            $row->dppUmum = number_format($row->dppUmum);
+            $row->totalUmum = number_format($row->totalUmum);
+            $row->dppHarian = number_format($row->dppHarian);
+            $row->pphHarian = number_format($row->pphHarian);
+            $row->totalHarian = number_format($row->totalHarian);
+            $row->dppBulanan = number_format($row->dppBulanan);
+            $row->pphBulanan = number_format($row->pphBulanan);
+            $row->totalBulanan = number_format($row->totalBulanan);
+            $row->subsidi = number_format($row->subsidi);
+            $row->pphSubsidi = number_format($row->pphSubsidi);
+            $row->totalSubsidi = number_format($row->totalSubsidi);
+            $row->totalRow = number_format($row->totalRow);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 
@@ -1130,11 +1203,11 @@ class LaporanSupplierLokalBB extends BaseController
         $newDateEnd = $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "";
 
         $barangId = $this->request->getVar('filter_barang');
-        $warehouseId = $this->request->getVar('filter_warehouse');
+        $divisiId = $this->request->getVar('filter_divisi');
 
         $companyId  = $this->this_company_id;
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportRekapPdf($newDateStart, $newDateEnd,  $warehouseId, $barangId, $companyId);
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportRekapPdf($newDateStart, $newDateEnd, $divisiId, $barangId, $companyId);
 
         $dataTotalBBLokal = [];
         if (!empty($dataBBLokal)) {
@@ -1306,6 +1379,20 @@ class LaporanSupplierLokalBB extends BaseController
             $totalDppSubsidi += $row->subsidi;
             $totalPphSubsidi += $row->pphSubsidi;
             $totalTotalSubsidi += $row->totalSubsidi;
+
+            $row->pphUmum = number_format($row->pphUmum);
+            $row->dppUmum = number_format($row->dppUmum);
+            $row->totalUmum = number_format($row->totalUmum);
+            $row->dppHarian = number_format($row->dppHarian);
+            $row->pphHarian = number_format($row->pphHarian);
+            $row->totalHarian = number_format($row->totalHarian);
+            $row->dppBulanan = number_format($row->dppBulanan);
+            $row->pphBulanan = number_format($row->pphBulanan);
+            $row->totalBulanan = number_format($row->totalBulanan);
+            $row->subsidi = number_format($row->subsidi);
+            $row->pphSubsidi = number_format($row->pphSubsidi);
+            $row->totalSubsidi = number_format($row->totalSubsidi);
+            $row->totalRow = number_format($row->totalRow);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 

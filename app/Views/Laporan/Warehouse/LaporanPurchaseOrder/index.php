@@ -4,15 +4,15 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Rekap All Barang</h1>
+        <h1>Laporan Purchase Order</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/purchase_order/print"); ?>')">PDF</button></li>
         </ul>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
                 Batal
             </a>
         </div>
@@ -21,7 +21,18 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <!-- <div class="col-md-2">
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_po_type" name="filter_po_type" id="filter_po_type">
+                            <option selected value="PO LOKAL BB" data-code="">PO LOKAL BB</option>
+                            <option value="PO LOKAL BP" data-code="">PO LOKAL BP</option>
+                            <option value="PO IMPOR BB" data-code="">PO IMPOR BB</option>
+                            <option value="PO IMPOR BP" data-code="">PO IMPOR BP</option>
+                        </select>
+                        <label for="floatingInput">Filter Tipe PO</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -29,74 +40,38 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
                     </div>
-                </div> -->
-
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
-                            <option value="" data-code=""></option>
-
-                            <?php foreach ($getDivisi as $row) : ?>
-                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['divisi'] ?></option>
-                            <?php endforeach; ?>
-
-
-                        </select>
-                        <label for="floatingInput">Filter Divisi</label>
-                    </div>
                 </div>
 
 
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
-                            <option value="" data-code=""></option>
 
-                            <?php foreach ($getBarang as $row) : ?>
-                                <option value="<?= $row['id']; ?>" data-code=""><?= strtoupper($row["barang_name"]); ?></option>
-                            <?php endforeach; ?>
-
-
-                        </select>
-                        <label for="floatingInput">Filter Barang</label>
-                    </div>
-                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th rowspan="2">No</th>
-                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Jenis</th>
-
-                                <!-- <th onclick="changeSort('spekName')" class="sort" rowspan="2">Spesifikasi</th> -->
-                                <th onclick="changeSort('bagianName')" class="sort" rowspan="2">Divisi</th>
-                                <th rowspan="2">Qty</th>
-                                <th rowspan="2">Satuan</th>
-                                <th colspan="3">Harian</th>
-                                <th colspan="3">Tambahan Harian</th>
-                                <th colspan="3">Tambahan Bulanan</th>
+                                <th>No</th>
+                                <th onclick="changeSort('po_no')" class="sort">Nomor</th>
+                                <th onclick="changeSort('po_date')" class="sort">Tanggal</th>
+                                <th onclick="changeSort('nama_supplier')" class="sort">Supplier</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
+                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('satuan')" class="sort">Satuan</th>
+                                <th onclick="changeSort('spesifikasi_name')" class="sort">Spesifikasi</th>
+                                <th onclick="changeSort('jml_order')" class="sort">Jumlah Order</th>
+                                <th onclick="changeSort('jml_diterima_lpb')" class="sort">Jumlah Diterima</th>
+                                <th onclick="changeSort('sisa_total')" class="sort">Sisa</th>
+                                <th onclick="changeSort('sub_total')" class="sort">Total Harga</th>
 
                             </tr>
-                            <tr>
-                                <th>DPP</th>
-                                <th>PPh</th>
-                                <th>Dibayarkan</th>
-                                <th>DPP</th>
-                                <th>PPh</th>
-                                <th>Dibayarkan</th>
-                                <th>DPP</th>
-                                <th>PPh</th>
-                                <th>Dibayarkan</th>
-                            </tr>
+
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
@@ -109,7 +84,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "barangName";
+    let sort = "po_date";
     let sortType = "desc";
     var row = 0;
 
@@ -128,16 +103,16 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/all-rekap-all-barang"); ?>",
+            url: "<?= base_url("/laporan-warehouse/purchase_order/all-purchase_order"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
+                data.filter_po_type = $(".filter_po_type").val();
                 data.sort = sort;
                 data.sortType = sortType;
 
-                data.filter_divisi = $(".filter_divisi").val();
-                data.filter_barang = $(".filter_barang").val();
+
             },
         },
         // scrollX: true,
@@ -155,68 +130,50 @@
                 sortable: false
             },
             {
-                data: "barangName",
+                data: "po_no",
                 className: "text-center",
 
             },
-
-            // {
-            //     data: "spekName",
-            //     className: "text-center",
-            // },
-
             {
-                data: "bagianName",
-                className: "text-center",
-            },
-
-            {
-                data: "qtyPO",
-                className: "text-center",
-            },
-
-            {
-                data: "satuanName",
-                className: "text-center",
-            },
-
-            {
-                data: "dppUmum",
+                data: "po_date",
                 className: "text-center",
             },
             {
-                data: "pphUmum",
+                data: "nama_supplier",
                 className: "text-center",
             },
             {
-                data: "totalUmum",
+                data: "kode_barang",
                 className: "text-center",
             },
             {
-                data: "dppHarian",
+                data: "nama_barang",
                 className: "text-center",
             },
             {
-                data: "pphHarian",
+                data: "satuan",
                 className: "text-center",
             },
             {
-                data: "totalHarian",
+                data: "spesifikasi_name",
                 className: "text-center",
             },
             {
-                data: "dppBulanan",
+                data: "jml_order",
                 className: "text-center",
             },
             {
-                data: "pphBulanan",
+                data: "jml_diterima_lpb",
                 className: "text-center",
             },
             {
-                data: "totalBulanan",
+                data: "sisa_total",
                 className: "text-center",
             },
-
+            {
+                data: "sub_total",
+                className: "text-center",
+            },
 
         ],
         columnDefs: [{
@@ -268,24 +225,23 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_divisi ,.filter_barang").change(function() {
+    $(".dateStart, .dateEnd, .filter_po_type").change(function() {
         table.ajax.reload();
     });
 
-    $(' .filter_divisi , .filter_barang').select2({
+    $('.filter_po_type').select2({
         placeholder: "",
-        theme: "bootstrap-5",
-        allowClear: true,
+        theme: "bootstrap-5"
     })
 
-    $(' .filter_divisi , .filter_barang')
+    $('.filter_po_type')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $(' .filter_divisi , .filter_barang')
+    $('.filter_po_type')
         .parent('div')
         .children('span')
         .children('span')
@@ -293,7 +249,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $(' .filter_divisi , .filter_barang')
+    $('.filter_po_type')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -302,11 +258,10 @@
 
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
+        let filter_po_type = $(".filter_po_type").val();
 
-        let filter_divisi = $(".filter_divisi").val();
-        let filter_barang = $(".filter_barang").val();
 
-        window.open(url + `?filter_divisi=${filter_divisi}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_po_type=${filter_po_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

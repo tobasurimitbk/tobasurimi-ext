@@ -143,36 +143,36 @@
                     <td><?= $do->supplierName; ?></td>
                     <td><?= $do->qtyPO; ?></td>
                     <td><?= $do->satuanName; ?></td>
-                    <td><?= number_format($do->dppUmum, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->pphUmum, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalUmum, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->dppHarian, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->pphHarian, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalHarian, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->dppBulanan, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->pphBulanan, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalBulanan, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->subsidi, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->pphSubsidi, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalSubsidi, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalRow, 0, '.', ''); ?></td>
+                    <td><?= number_format($do->dppUmum); ?></td>
+                    <td><?= number_format($do->pphUmum); ?></td>
+                    <td><?= number_format($do->totalUmum); ?></td>
+                    <td><?= number_format($do->dppHarian); ?></td>
+                    <td><?= number_format($do->pphHarian); ?></td>
+                    <td><?= number_format($do->totalHarian); ?></td>
+                    <td><?= number_format($do->dppBulanan); ?></td>
+                    <td><?= number_format($do->pphBulanan); ?></td>
+                    <td><?= number_format($do->totalBulanan); ?></td>
+                    <td><?= number_format($do->subsidi); ?></td>
+                    <td><?= number_format($do->pphSubsidi); ?></td>
+                    <td><?= number_format($do->totalSubsidi); ?></td>
+                    <td><?= number_format($do->totalRow); ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td colspan="4">Total</td>
-                <td id="totalDppUmum"><?= $totalDppUmum; ?></td>
-                <td id="totalPphUmum"><?= $totalPphUmum; ?></td>
-                <td id="totalTotalUmum"><?= $totalTotalUmum; ?></td>
-                <td id="totalDppHarian"><?= $totalDppHarian; ?></td>
-                <td id="totalPphHarian"><?= $totalPphHarian; ?></td>
-                <td id="totalTotalHarian"><?= $totalTotalHarian; ?></td>
-                <td id="totalDppBulanan"><?= $totalDppBulanan; ?></td>
-                <td id="totalPphBulanan"><?= $totalPphBulanan; ?></td>
-                <td id="totalTotalBulanan"><?= $totalTotalBulanan; ?></td>
-                <td id="totalDppSubsidi"><?= $totalDppSubsidi; ?></td>
-                <td id="totalPphSubsidi"><?= $totalPphSubsidi; ?></td>
-                <td id="totalTotalSubsidi"><?= $totalTotalSubsidi; ?></td>
-                <td id="totalTotalRow"><?= $totalTotalRow; ?></td>
+                <td id="totalDppUmum"><?= number_format($totalDppUmum); ?></td>
+                <td id="totalPphUmum"><?= number_format($totalPphUmum); ?></td>
+                <td id="totalTotalUmum"><?= number_format($totalTotalUmum); ?></td>
+                <td id="totalDppHarian"><?= number_format($totalDppHarian); ?></td>
+                <td id="totalPphHarian"><?= number_format($totalPphHarian); ?></td>
+                <td id="totalTotalHarian"><?= number_format($totalTotalHarian); ?></td>
+                <td id="totalDppBulanan"><?= number_format($totalDppBulanan); ?></td>
+                <td id="totalPphBulanan"><?= number_format($totalPphBulanan); ?></td>
+                <td id="totalTotalBulanan"><?= number_format($totalTotalBulanan); ?></td>
+                <td id="totalDppSubsidi"><?= number_format($totalDppSubsidi); ?></td>
+                <td id="totalPphSubsidi"><?= number_format($totalPphSubsidi); ?></td>
+                <td id="totalTotalSubsidi"><?= number_format($totalTotalSubsidi); ?></td>
+                <td id="totalTotalRow"><?= number_format($totalTotalRow); ?></td>
             </tr>
         <?php else : ?>
             <tr>

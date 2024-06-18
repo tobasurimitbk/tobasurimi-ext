@@ -136,22 +136,22 @@
                     <td><?= $do->poDate; ?></td>
                     <td><?= $do->qtyPO; ?></td>
                     <td><?= $do->satuanName; ?></td>
-                    <td><?= number_format($do->dppUmum, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->pphUmum, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalUmum, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->dppHarian, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->pphHarian, 0, '.', ''); ?></td>
-                    <td><?= number_format($do->totalHarian, 0, '.', ''); ?></td>
+                    <td><?= number_format($do->dppUmum); ?></td>
+                    <td><?= number_format($do->pphUmum); ?></td>
+                    <td><?= number_format($do->totalUmum); ?></td>
+                    <td><?= number_format($do->dppHarian); ?></td>
+                    <td><?= number_format($do->pphHarian); ?></td>
+                    <td><?= number_format($do->totalHarian); ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td colspan="10">Total</td>
-                <td id="totalDppUmum"><?= $totalDppUmum; ?></td>
-                <td id="totalPphUmum"><?= $totalPphUmum; ?></td>
-                <td id="totalTotalUmum"><?= $totalTotalUmum; ?></td>
-                <td id="totalDppHarian"><?= $totalDppHarian; ?></td>
-                <td id="totalPphHarian"><?= $totalPphHarian; ?></td>
-                <td id="totalTotalHarian"><?= $totalTotalHarian; ?></td>
+                <td id="totalDppUmum"><?= number_format($totalDppUmum); ?></td>
+                <td id="totalPphUmum"><?= number_format($totalPphUmum); ?></td>
+                <td id="totalTotalUmum"><?= number_format($totalTotalUmum); ?></td>
+                <td id="totalDppHarian"><?= number_format($totalDppHarian); ?></td>
+                <td id="totalPphHarian"><?= number_format($totalPphHarian); ?></td>
+                <td id="totalTotalHarian"><?= number_format($totalTotalHarian); ?></td>
             </tr>
         <?php else : ?>
             <tr>

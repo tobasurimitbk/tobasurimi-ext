@@ -323,7 +323,7 @@ class RMPurchaseOrderModel extends Model
 
     // pendapatan supplier
     //PDF
-    public function getPoBBLokalForSupplierReportPdf($dateStart, $dateEnd, $supplier, $bahanBaku, $warehouse, $companyId)
+    public function getPoBBLokalForSupplierReportPdf($dateStart, $dateEnd, $supplier, $bahanBaku, $warehouse, $companyId, $poNo)
     {
         $selectQry = "
         suppliers.no_npwp AS supplierNpwp,
@@ -363,6 +363,10 @@ class RMPurchaseOrderModel extends Model
         }
         if (!empty($supplier)) {
             $condition['rm_purchase_orders.supplier_id'] = $supplier;
+        }
+
+        if (!empty($poNo)) {
+            $condition['rm_purchase_orders.po_no'] = $poNo;
         }
 
         $poBBLokalData = $this->asObject()
@@ -429,7 +433,7 @@ class RMPurchaseOrderModel extends Model
 
         $totalData = $poBBLokalData->countAllResults(false);
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId'] || $addCondition['poNo']) {
             $poBBLokalData->groupStart();
         }
 
@@ -445,6 +449,11 @@ class RMPurchaseOrderModel extends Model
             $poBBLokalData->where('penerimaan_barang.warehouse_id', $addCondition['warehouseId']);
         }
 
+        if ($addCondition['poNo']) {
+
+            $poBBLokalData->where('rm_purchase_orders.po_no', $addCondition['poNo']);
+        }
+
         if ($addCondition['dateStart']) {
             $poBBLokalData->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
         }
@@ -453,7 +462,7 @@ class RMPurchaseOrderModel extends Model
         }
 
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId'] || $addCondition['poNo']) {
             $poBBLokalData->groupEnd();
         }
 
@@ -690,19 +699,19 @@ class RMPurchaseOrderModel extends Model
     }
 
     //rekap all barang
-    public function getPoBBLokalForSupplierReportRekapPdf($dateStart, $dateEnd, $warehouse, $bahanBaku, $companyId)
+    public function getPoBBLokalForSupplierReportRekapPdf($dateStart, $dateEnd, $divisi, $bahanBaku, $companyId)
     {
         $selectQry = "
         suppliers.name AS supplierName, 
         barang_master.barang_name AS barangName, 
-        bagian.nama_bagian AS bagianName, 
+        divisis.divisi AS bagianName, 
         SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
         SUM(rm_purchase_order_details.daily_price) AS dppHarian,
         SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
         SUM(rm_purchase_order_details.general_price) AS dppUmum,
         SUM(rm_purchase_order_details.qty) AS qtyPO,
         rm_purchase_orders.pph AS poPPH,
-        supplier_harga.spesifikasi AS spekName, 
+        barang_master_spesifikasi.spesifikasi AS spekName, 
         satuans.nama_satuan AS satuanName, 
         ";
         $condition = [
@@ -718,8 +727,8 @@ class RMPurchaseOrderModel extends Model
             $condition['rm_purchase_orders.po_date <='] = $dateEnd;
         }
 
-        if (!empty($warehouse)) {
-            $condition['rm_purchase_orders.warehouse_id'] = $warehouse;
+        if (!empty($divisi)) {
+            $condition['rm_purchase_orders.divisi_id'] = $divisi;
         }
 
         if (!empty($bahanBaku)) {
@@ -730,19 +739,20 @@ class RMPurchaseOrderModel extends Model
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
-            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
-            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
-            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            // ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            // ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
-            ->join('bagian', 'bagian.division_id = divisis.id', 'left')
-            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            // ->join('bagian', 'bagian.division_id = divisis.id', 'left')
+            // ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->where($condition)
-            ->groupBy(['bagian.nama_bagian', 'barang_master.barang_name', 'suppliers.name'])
+            ->groupBy(['divisis.divisi', 'barang_master.barang_name', 'suppliers.name'])
             ->findAll();
 
         return $poBBLokalData;
@@ -760,14 +770,14 @@ class RMPurchaseOrderModel extends Model
         $selectQry = "
         suppliers.name AS supplierName, 
         barang_master.barang_name AS barangName, 
-        bagian.nama_bagian AS bagianName, 
+        divisis.divisi AS bagianName, 
         SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
         SUM(rm_purchase_order_details.daily_price) AS dppHarian,
         SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
         SUM(rm_purchase_order_details.general_price) AS dppUmum,
         SUM(rm_purchase_order_details.qty) AS qtyPO,
         rm_purchase_orders.pph AS poPPH,
-        supplier_harga.spesifikasi AS spekName, 
+        barang_master_spesifikasi.spesifikasi AS spekName, 
         satuans.nama_satuan AS satuanName, 
         ";
 
@@ -775,24 +785,25 @@ class RMPurchaseOrderModel extends Model
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
-            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
-            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
-            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            // ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            // ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
-            ->join('bagian', 'bagian.division_id = divisis.id', 'left')
-            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            // ->join('bagian', 'bagian.division_id = divisis.id', 'left')
+            // ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->where($condition)
-            ->groupBy(['bagian.nama_bagian', 'barang_master.barang_name', 'suppliers.name'])
+            ->groupBy(['divisis.divisi', 'barang_master.barang_name', 'suppliers.name'])
             ->orderBy($sort, $sortType);
 
         $totalData = $poBBLokalData->countAllResults(false);
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['barangId'] || $addCondition['divisiId']) {
             $poBBLokalData->groupStart();
         }
 
@@ -800,10 +811,9 @@ class RMPurchaseOrderModel extends Model
             $poBBLokalData->where('rm_purchase_orders.barang_id', $addCondition['barangId']);
         }
 
-        if ($addCondition['warehouseId']) {
-            $poBBLokalData->where('rm_purchase_orders.warehouse_id', $addCondition['warehouseId']);
+        if ($addCondition['divisiId']) {
+            $poBBLokalData->where('rm_purchase_orders.divisi_id', $addCondition['divisiId']);
         }
-
 
         if ($addCondition['dateStart']) {
             $poBBLokalData->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
@@ -812,8 +822,7 @@ class RMPurchaseOrderModel extends Model
             $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
         }
 
-
-        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['barangId'] || $addCondition['warehouseId']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['barangId'] || $addCondition['divisiId']) {
             $poBBLokalData->groupEnd();
         }
 
