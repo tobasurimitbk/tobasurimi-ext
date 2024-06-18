@@ -665,44 +665,44 @@ class PenerimaanBarangImportBB extends BaseController
                         $po['po_no']
                     );
                 }
+
+                // KEMASAN
+                // HEADER
+                $stok = $this->stockModel->insertStok(
+                    $this->this_company_id,
+                    $penerimaanBarang['warehouse_id'],
+                    $penerimaanBarang['divisi_id'],
+                    "kemasan",
+                    0,
+                    $penerimaanBarang['kemasan_id'],
+                    $penerimaanBarang['jumlah_kemasan']
+                );
+
+
+                // DETAIL
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    $penerimaanBarang['jumlah_kemasan'],
+                    "In",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "LPB",
+                    $penerimaanBarang['no_penerimaan_barang'],
+                    "-",
+                );
+
+                // SUB DETAIL
+                $this->stockDetail2Model->insertStokDetail2(
+                    $penerimaanBarang['bc_type'],
+                    $stok,
+                    $stokDetail,
+                    $penerimaanBarang['jumlah_kemasan'],
+                    "-",
+                    $penerimaanBarang['no_penerimaan_barang'],
+                    $penerimaanBarang['no_penerimaan_barang'],
+                    $penerimaanBarang['supplier_id'],
+                );
             }
-
-            // KEMASAN
-            // HEADER
-            $stok = $this->stockModel->insertStok(
-                $this->this_company_id,
-                $penerimaanBarang['warehouse_id'],
-                $penerimaanBarang['divisi_id'],
-                "kemasan",
-                0,
-                $penerimaanBarang['kemasan_id'],
-                $penerimaanBarang['jumlah_kemasan']
-            );
-
-
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $penerimaanBarang['jumlah_kemasan'],
-                "In",
-                date('Y-m-d'),
-                $this->this_user_id,
-                "LPB",
-                $penerimaanBarang['no_penerimaan_barang'],
-                "-",
-            );
-
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $penerimaanBarang['bc_type'],
-                $stok,
-                $stokDetail,
-                $penerimaanBarang['jumlah_kemasan'],
-                "-",
-                $penerimaanBarang['no_penerimaan_barang'],
-                $penerimaanBarang['no_penerimaan_barang'],
-                $penerimaanBarang['supplier_id'],
-            );
         } catch (Exception $e) {
             return response()->setJSON([
                 'status' => false,

@@ -937,6 +937,13 @@ $routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-global-no', 'Inventori\Pe
 $routes->get('/penerimaan-mutasi/list-mutasi-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListNomorMutasi', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/list-barang-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarang', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/list-barang-masuk', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarangMasuk', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/save-global', 'Inventori\PenerimaanMutasiGlobal::createAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/update-global', 'Inventori\PenerimaanMutasiGlobal::updateAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/delete-global', 'Inventori\PenerimaanMutasiGlobal::delete', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/all-global', 'Inventori\PenerimaanMutasiGlobal::all', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/id-global/(:segment)', 'Inventori\PenerimaanMutasiGlobal::detail/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/print-global/(:segment)', 'Inventori\PenerimaanMutasiGlobal::print/$1', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/posting-global', 'Inventori\PenerimaanMutasiGlobal::posting', ['filter' => 'Auth']);
 
 // MUTASI GLOBAL
 $routes->get('/mutasi/global', 'Inventori\MutasiGlobal::index', ['filter' => 'Auth']);

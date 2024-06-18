@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penerimaan Mutasi PPBKB</title>
+    <title>Penerimaan Mutasi BC 2.7</title>
     <style>
         body {
             font-size: 13px;
@@ -112,26 +112,29 @@
 </head>
 
 <body>
-    <?php if (!empty($penerimaanMutasi)) { ?>
-        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN MUTASI PPBKB</span></div>
+    <?php if (!empty($penerimaanMutasiGlobal)) { ?>
+        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN MUTASI BC 2.7</span></div>
         <table class="w-100 mt-050">
             <tr>
                 <td>
-                    <div><span class="txt-bold">No. Penerimaan : <?= $penerimaanMutasi->penerimaan_mutasi_no; ?></span></div>
+                    <div><span class="txt-bold">No. Penerimaan : <?= $penerimaanMutasiGlobal->penerimaan_mutasi_no; ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Tanggal : <?= date("d/m/Y", strtotime($penerimaanMutasi->tanggal)); ?></span></div>
+                    <div><span class="txt-bold">Tanggal : <?= date("d/m/Y", strtotime($penerimaanMutasiGlobal->tanggal)); ?></span></div>
                 </td>
                 <td class="txt-right">
-                    <div><span class="txt-bold">Jenis Mutasi: PPBKB</span></div>
+                    <div><span class="txt-bold">Jenis Mutasi: BC 2.7</span></div>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Departemen Penerima : <?= $penerimaanMutasi->divisi  ?></span></div>
+                    <div><span class="txt-bold">Departemen / Warehouse Penerima : <?= $penerimaanMutasiGlobal->divisi_penerima . " / " . $penerimaanMutasiGlobal->warehouse_penerima ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Keterangan : <?= $penerimaanMutasi->keterangan; ?></span></div>
+                    <div><span class="txt-bold">Company Pengirim : <?= $penerimaanMutasiGlobal->company_pengirim  ?></span></div>
+                </td>
+                <td>
+                    <div><span class="txt-bold">Keterangan : <?= $penerimaanMutasiGlobal->keterangan; ?></span></div>
                 </td>
             </tr>
         </table>
@@ -141,8 +144,8 @@
                 <th class="txt-left" style="text-align:center; width: 100px;">No Mutasi</th>
                 <th class="txt-left" style="text-align:center; width: 40px;">Tipe Barang</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Dokumen Mutasi</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Dokumen Asal</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Departemen / Warehouse Pengirim</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Warehouse Penerima</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Supplier</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Barang - Spesifikasi</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Qty Diterima</th>
@@ -150,14 +153,14 @@
             </tr>
 
             <?php $no = 1; ?>
-            <?php foreach ($penerimaanMutasiDetail as $detail) : ?>
+            <?php foreach ($penerimaanMutasiDetailGlobal as $detail) : ?>
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail['no_mutasi'] ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail["tipe_barang"]; ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail["tipe_barang_text"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["bc_mutasi_name"] . " / " . $detail['no_aju_mutasi']; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["bc_asal_name"] . " / " . $detail['no_aju_asal']; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["divisi_asal_name"] . " / " . $detail['warehouse_asal_name']; ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail['warehouse_name'] ?></td>
                     <td class="txt-right" style="text-align:center;"><?= $detail['supplier_name'] ?></td>
                     <td class="txt-right" style="text-align:center;"><?= $detail['barang'] ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["qty_diterima_current"]; ?></td>

@@ -21,7 +21,7 @@
                         </button>
                     <?php endif; ?>
                     <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?><?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print-global/"); ?><?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
                             Print
                         </button>
                     <?php endif; ?>
@@ -33,7 +33,7 @@
 
                 <?php else : ?>
                     <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?><?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-mutasi/print-global/"); ?><?= encrypt($penerimaanMutasiGlobal['id']); ?>')">
                             Print
                         </button>
                     <?php endif; ?>
@@ -54,7 +54,7 @@
                         <a class="nav-link" href="<?= base_url('penerimaan-mutasi/create') ?>">Penerimaan Mutasi PPBKB</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Penerimaan Mutasi BC 2.7</a>
+                        <a class="nav-link active" href="#">Penerimaan Mutasi BC 2.7 (BC 2.7 IN)</a>
                     </li>
                 </ul>
 
@@ -93,7 +93,7 @@
                             <select <?= !empty($penerimaanMutasiGlobal) ?  ($penerimaanMutasiGlobal['status_posting'] == "1" ? "disabled" : 'disabled') : '' ?> class="form-select company_pengirim_id" id="company_pengirim_id" name="company_pengirim_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dropdownCompanyExcept as $d) : ?>
-                                    <option <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['company_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                    <option <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['company_pengirim_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
                                         <?= strtoupper($d['company']) ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -118,7 +118,13 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_penerima_id" id="warehouse_penerima_id" name="warehouse_penerima_id" aria-label="Floating label select example">
                                 <option value=""></option>
-
+                                <?php if (!empty($penerimaanMutasiGlobal)) :  ?>
+                                    <?php foreach ($warehouse as $w) : ?>
+                                        <option <?= $penerimaanMutasiGlobal['warehouse_penerima_id'] == $w['id'] ? 'selected' : '' ?> value="<?= $w['id'] ?>">
+                                            <?= $w['warehouse_name'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Warehouse Penerima</label>
                         </div>
@@ -186,7 +192,7 @@
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="16" style="text-align: center;">
+                                    <td colspan="18" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -202,7 +208,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Detail Barang Masuk</h5>
+                <h5 class="modal-title">Detail Barang Masuk (BC 2.7 Incoming)</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form-barang-masuk" role="form" method="POST" enctype="multipart/form-data">
@@ -265,16 +271,21 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="form-floating" style="height: 50px;">
                                 <select <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] == '1' ? 'disabled' : '') : '' ?> class="form-select stock_mutasi_id" name="stock_mutasi_id" id="stock_mutasi_id">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Pilih Barang Masuk</label>
                             </div>
+                            <small class=" mb-3">
+                                <i>
+                                    Hanya muncul barang yang ada di inventori sesuai dengan departemen dan warehouse penerima
+                                </i>
+                            </small>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" type="text" class="form-control qty_diterima_current" id="qty_diterima_current" name="qty_diterima_current" placeholder="Qty Diterima Sekarang" oninput="preventNegativeInput(this)">
+                                <input <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] == '1' ? 'disabled' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control qty_diterima_current" id="qty_diterima_current" name="qty_diterima_current" placeholder="Qty Diterima Sekarang" oninput="preventNegativeInput(this)">
                                 <label for="floatingInput">Qty Barang Masuk</label>
                             </div>
                         </div>
@@ -369,7 +380,7 @@
     });
 
     $('#stock_mutasi_id').select2({
-        placeholder: "Pilih Barang Masuk",
+        placeholder: "Pilih Barang Masuk (Hanya yang ada di inventori)",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {});
@@ -486,54 +497,112 @@
             });
         } else {
             if ($('.create-form').valid()) {
-                var isValid = true;
-                var dataError = null;
 
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data ?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: "Penerimaan Mutasi Berhasil Disimpan",
-                            confirmButtonColor: '#4e73df',
-                            confirmButtonText: 'Ok'
-                        })
+                if (listBarang.length == 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Barang yang diterima tidak boleh kosong",
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    })
 
-                    }
-                });
+                } else {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data ?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let id = $('#id').val();
+                            let data = new FormData(document.querySelector(".create-form"));
+                            data.append('listBarang', JSON.stringify(listBarang));
+                            if (id) {
+                                // UPDATE
+                                $.ajax({
+                                    url: "<?= base_url("penerimaan-mutasi/update-global"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        setLoading();
+                                    },
+                                    complete: function() {
+                                        stopLoading()
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        if (response.status) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = "<?= base_url("penerimaan-mutasi/global") ?>";
+                                                }
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            });
+                                        }
 
-                // $.each(listBarang, function(i, v) {
-                //     var element = $('input[data-id="' + v.mutasi_detail_id + '"].stok-mutasi');
-                //     var input_user = parseFloat(element.val());
-                //     var qty_sisa = parseFloat(element.data('qty_sisa'));
+                                    },
+                                });
+                            } else {
+                                // INSERT
+                                $.ajax({
+                                    url: "<?= base_url("penerimaan-mutasi/save-global"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        setLoading();
+                                    },
+                                    complete: function() {
+                                        stopLoading()
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        if (response.status) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = "<?= base_url("penerimaan-mutasi/global") ?>";
+                                                }
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            });
+                                        }
 
-                //     if ((input_user > qty_sisa && qty_sisa != 0) || isNaN(input_user) || input_user == undefined) {
-                //         dataError = listBarang[i];
-                //         isValid = false;
-                //     } else {
-                //         listBarang[i].qty_diterima_current = input_user;
-                //     }
-                // });
-
-
-                // if (!isValid) {
-                //     Swal.fire({
-                //         icon: 'error',
-                //         title: 'Stok mutasi barang ' + dataError.barang + ' dengan dokumen ' + dataError.bc_mutasi_name + ' / ' + dataError.no_aju_mutasi + ' tidak valid!',
-                //         confirmButtonColor: '#4e73df',
-                //         confirmButtonText: 'Ok'
-                //     });
-                // } else {
-
-                // }
+                                    },
+                                });
+                            }
+                        }
+                    });
+                }
             }
         }
     });
@@ -551,6 +620,8 @@
                 }
             });
 
+            $('#qty_diterima_current').val(listBarang[index].qty_diterima_current);
+
             if (parseFloat(listBarang[index].qty_sisa) < qtyBarangDiterima) {
                 Swal.fire({
                     icon: 'error',
@@ -562,7 +633,7 @@
                 listBarang[index].stock_mutasi_id = $('#stock_mutasi_id option:selected').val();
                 listBarang[index].kode_barang_diterima = $('#stock_mutasi_id option:selected').data('kode_barang');
                 listBarang[index].barang_diterima = $('#stock_mutasi_id option:selected').data('barang');
-                listBarang[index].qty_barang_diterima = $('#qty_diterima_current').val();
+                listBarang[index].qty_diterima_current = qtyBarangDiterima
                 listBarang[index].satuan_diterima = kodeSatuanDiterima;
 
                 $('#update_barang_masuk').modal('hide');
@@ -628,7 +699,7 @@
                 newRow.append($('<td>').text(v.satuan));
                 newRow.append($('<td>').text(v.kode_barang_diterima));
                 newRow.append($('<td>').text(v.barang_diterima));
-                newRow.append($('<td>').text(v.qty_barang_diterima));
+                newRow.append($('<td>').text(v.qty_diterima_current));
                 newRow.append($('<td>').text(v.satuan_diterima));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -758,11 +829,11 @@
     <?php if (!empty($penerimaanMutasiGlobal)) : ?>
         let arr = $('.multiple_mutasi_id').val();
         $.ajax({
-            url: `<?= base_url("penerimaan-mutasi/list-barang"); ?>`,
+            url: `<?= base_url("penerimaan-mutasi/list-barang-global"); ?>`,
             method: "GET",
             data: {
-                mutasi_id: JSON.stringify(arr),
-                penerimaan_mutasi_id: $('.id').val()
+                mutasi_global_id: JSON.stringify(arr),
+                penerimaan_mutasi_global_id: $('.id').val()
             },
             dataType: "json",
             success: function(res) {
@@ -815,7 +886,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-mutasi/posting"); ?>",
+                    url: "<?= base_url("penerimaan-mutasi/posting-global"); ?>",
                     data: {
                         id: id
                     },
@@ -836,7 +907,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url("penerimaan-mutasi") ?>";
+                                window.location.href = "<?= base_url("penerimaan-mutasi/global") ?>";
                             });
                         } else {
                             Swal.fire({
@@ -865,7 +936,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-mutasi/delete"); ?>",
+                    url: "<?= base_url("penerimaan-mutasi/delete-global"); ?>",
                     data: {
                         id: id
                     },
@@ -885,7 +956,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                location.reload();
+                                window.location.href = "<?= base_url("penerimaan-mutasi/global") ?>";
                             });
                         }
                     },
