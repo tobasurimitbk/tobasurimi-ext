@@ -134,4 +134,119 @@ class SalesOrderExportModel extends Model
 
         return $query->getResult();
     }
+
+    public function getAllSalesOrderExportReport($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'sales_order_export_no' => 'sales_order_export.sales_order_export_no',
+            'customer_name'         => 'customers.name',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_export.*, 
+                      customers.name AS customer_name,
+                      barang_master.barang_name as nama_barang, barang_master.kode_barang,
+                      sales_order_detail_export.*,  satuans.id as id_satuan, satuans.nama_satuan as satuan";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+            ->join('barang_master', 'barang_master.id = sales_order_detail_export.barang_id', 'left')
+            ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesDataQry->groupStart();
+        }
+
+
+
+        if ($addCondition['dateStart']) {
+            $salesDataQry->where('DATE(sales_order_export.updatedAt) >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $salesDataQry->where('DATE(sales_order_export.updatedAt) <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+
+    public function getAllSalesOrderExportReportPDF($condition, $addCondition)
+    {
+        $availableSort = [
+            'sales_order_export_no' => 'sales_order_export.sales_order_export_no',
+            'customer_name'         => 'customers.name',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_export.*, 
+                      customers.name AS customer_name,
+                      barang_master.barang_name as nama_barang, barang_master.kode_barang,
+                      sales_order_detail_export.*,  satuans.id as id_satuan, satuans.nama_satuan as satuan";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+            ->join('barang_master', 'barang_master.id = sales_order_detail_export.barang_id', 'left')
+            ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesDataQry->groupStart();
+        }
+
+
+
+        if ($addCondition['dateStart']) {
+            $salesDataQry->where('DATE(sales_order_export.updatedAt) >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $salesDataQry->where('DATE(sales_order_export.updatedAt) <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }

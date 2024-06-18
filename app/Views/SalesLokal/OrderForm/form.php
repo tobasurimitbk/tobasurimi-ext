@@ -179,7 +179,7 @@
 
                                 <option value="1445" selected>BC 3.0</option>
                             </select>
-                            <label for="floatingInput">Dokumen Pabean (Opsional)</label>
+                            <label for="floatingInput">Dokumen Pabean</label>
                         </div>
                         <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
                     </div>

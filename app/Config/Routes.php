@@ -1574,6 +1574,10 @@ $routes->get('/laporan-warehouse/sales-order', 'Laporan\Warehouse\LaporanWarehou
 $routes->get('/laporan-warehouse/sales-order/all-sales-order', 'Laporan\Warehouse\LaporanWarehouse::allLaporanSalesOrder', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/sales-order/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanSalesOrder', ['filter' => 'Auth']);
 
+$routes->get('/laporan-warehouse/sales-order-ekspor', 'Laporan\Warehouse\LaporanWarehouse::laporanSalesOrderEkspor', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/sales-order-ekspor/all-sales-order-ekspor', 'Laporan\Warehouse\LaporanWarehouse::allLaporanSalesOrderEkspor', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/sales-order-ekspor/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanSalesOrderEkspor', ['filter' => 'Auth']);
+
 
 $routes->get('/laporan-warehouse/purchase_order', 'Laporan\Warehouse\LaporanWarehouse::laporanPurchaseOrder', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/purchase_order/all-purchase_order', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPurchaseOrder', ['filter' => 'Auth']);

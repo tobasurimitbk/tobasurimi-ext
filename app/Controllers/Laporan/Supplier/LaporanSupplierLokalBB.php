@@ -54,7 +54,7 @@ class LaporanSupplierLokalBB extends BaseController
     public function laporanPendapatanSupplier()
     {
         $data = [
-            'getPoNo' => $this->RMPurchaseOrderModel->select('id ,po_no')->where('deletedAt', NULL)->where('company_id', '1')->findAll(),
+            'getPoNo' => $this->RMPurchaseOrderModel->select('id ,po_no')->where('deletedAt', NULL)->where('is_posted', '1')->where('company_id', $this->this_company_id)->findAll(),
             'getSupplier' => $this->supplierModel->where('deletedAt', NULL)->where('type', 'BAHAN BAKU')->findAll(),
             'getWarehouse' => $this->warehousesModel->get_by_company_id($this->this_company_id),
             'getBarang' => $this->barangMasterModel->getBarangByType("bahan_baku"),
