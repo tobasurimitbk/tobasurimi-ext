@@ -445,6 +445,7 @@ class RasioController extends BaseController
                 $poBBImport = $this->rmImportPOModel->where('po_no', $value['stock_dokumen'])->first();
                 $poBP = $this->amPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
 
+
                 $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
                 if ($poBBLokal) {
                     $totalQty = 0;
@@ -473,6 +474,7 @@ class RasioController extends BaseController
                     $totalQty = 0;
                     $totalHarga = 0;
                     $hargaSatuan = 0;
+                    $hargaSatuanDisc = 0;
                     $satuanPO = "";
                     $poBBImportDetail = $this->rmImportPODetailModel
                         ->select('rm_import_po_details.*, satuans.kode_satuan')
@@ -482,7 +484,8 @@ class RasioController extends BaseController
                         ->where('spesifikasi_id', $value['barang2_id'])
                         ->findAll();
                     foreach ($poBBImportDetail as $valuePoBBImport) {
-                        $hargaSatuan = $valuePoBBImport['price'] * $valuePoBBImport['disc'];
+                        $hargaSatuanDisc = $valuePoBBImport['price'] * ($valuePoBBImport['disc'] / 100);
+                        $hargaSatuan = $valuePoBBImport['price'] - $hargaSatuanDisc;
                         $totalQty += $valuePoBBImport['qty'];
                         $satuanPO = $valuePoBBImport['kode_satuan'];
                     }
@@ -541,8 +544,34 @@ class RasioController extends BaseController
                     $value['satuanLPB'] = $satuanLPB;
                 }
             }
-            // var_dump($productionResultDataTitle);
-            // exit;
+
+            if ($productionResultDataTitle) {
+                return response()->setJSON([
+                    'data' => $productionResultDataTitle,
+                    'token' => csrf_hash(),
+                    'status' => true
+                ]);
+            } else {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+        }
+    }
+
+    public function getRasioBarangDigunakanJadi()
+    {
+        if (!empty($this->request->getVar('bulan'))) {
+            $monthData = $this->request->getVar('bulan');
+            list($month, $year) = explode('/', $monthData);
+            $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $conditionProduction = [
+                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'divisi_id' => $this->request->getVar('department'),
+            ];
+            $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuJadiWithDetail($conditionProduction);
+
             if ($productionResultDataTitle) {
                 return response()->setJSON([
                     'data' => $productionResultDataTitle,

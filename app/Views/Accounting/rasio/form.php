@@ -84,6 +84,9 @@
                             <a class="nav-link nav-link-raw-material-i" id="rawIBahanProsesUlang" href="#bahan_proses_ulang">Bahan Proses Ulang</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link nav-link-raw-material-i" id="rawIBahanFilling" href="#bahan_filling">Bahan Filling dan Ditapak</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoAwal" href="#saldo_awal">Saldo Stock Awal</a>
                         </li>
                         <li class="nav-item">
@@ -91,9 +94,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoAdjustment" href="#saldo_adjustment">Saldo Adjustment</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-raw-material-i" id="rawIBahanFilling" href="#bahan_filling">Bahan Filling dan Ditapak</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoJual" href="#saldo_jual">Saldo Jual</a>
@@ -294,9 +294,13 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     let list_items_barang_jadi = [];
-    let list_items_barang_jadi_material_2 = [];
     let list_items_barang_digunakan = [];
+    let list_items_barang_digunakan_ulang = [];
+    let list_items_barang_digunakan_alokasi = [];
+
+    let list_items_barang_jadi_material_2 = [];
     let list_items_barang_digunakan_material_2 = [];
+
     let list_items_labor_cost = [];
     let list_items_title_cost = [];
     let list_items_overhead_cost = [];
@@ -513,6 +517,32 @@
                         stopLoading()
                         list_items_barang_digunakan = [];
                         drawTableDigunakan();
+                    }
+                },
+            });
+            $.ajax({
+                url: `<?= base_url('rasio/get-barang-digunakan-jadi'); ?>`,
+                method: "GET",
+                data: {
+                    department: department_id,
+                    bulan: bulan,
+                    kategori: kategori,
+                },
+                dataType: "json",
+                success: function(res) {
+                    stopLoading()
+                    if (res.status) {
+                        list_items_barang_digunakan = [];
+                        let no = 0;
+                        // Iterate over each item in the response data
+                        res.data.forEach(function(item) {
+                            list_items_barang_digunakan_ulang.push(item);
+                        });
+                        drawTableDigunakanJadi();
+                    } else {
+                        stopLoading()
+                        list_items_barang_digunakan_ulang = [];
+                        drawTableDigunakanJadi();
                     }
                 },
             });
@@ -773,6 +803,66 @@
         }
     }
 
+    const drawTableDigunakanJadi = function() {
+        $('.body-detail-table-barang-proses-ulang').empty();
+        $('.tfoot-detail-table-barang-proses-ulang').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_barang_digunakan_ulang.length === 0) {
+            var totalQtyPO = 0;
+            var totalHargaPO = 0;
+            var hargaSatuanPO = 0;
+            var totalQtyLPB = 0;
+            var totalHargaLPB = 0;
+            var hargaSatuanLPB = 0;
+            row += '<tr><td colspan="10" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.qtyTotalPembelian').val(totalQtyPO.toLocaleString());
+            $('.hargaTotalPembelian').val(formatRupiah(totalHargaPO));
+            $('.hargaSatuanPembelian').val(formatRupiah(hargaSatuanPO));
+
+            $('.qtyTotalPenerimaan').val(totalQtyLPB.toLocaleString());
+            $('.hargaTotalPenerimaan').val(formatRupiah(totalHargaLPB));
+            $('.hargaSatuanPenerimaan').val(formatRupiah(hargaSatuanLPB));
+            $('.tfoot-detail-table').append(row);
+        } else {
+            var totalQtyPO = 0;
+            var totalHargaPO = 0;
+            var hargaSatuanPO = 0;
+            var totalQtyLPB = 0;
+            var totalHargaLPB = 0;
+            var hargaSatuanLPB = 0;
+            list_items_barang_digunakan_ulang.map((item, index) => {
+                // counting total
+                totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
+                totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
+                hargaSatuanPO += item.hargaSatuanPO !== undefined ? item.hargaSatuanPO : 0;
+                totalQtyLPB += item.totalQtyLPB !== undefined ? item.totalQtyLPB : 0;
+                totalHargaLPB += item.totalHargaLPB !== undefined ? item.totalHargaLPB : 0;
+                hargaSatuanLPB += item.hargaSatuanLPB !== undefined ? item.hargaSatuanLPB : 0;
+                // end counting
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                row += '<td>' + (item.totalQtyPO !== undefined ? parseFloat(item.totalQtyPO).toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.totalHargaPO !== undefined ? formatRupiah(parseFloat(item.totalHargaPO)) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.hargaSatuanPO !== undefined ? formatRupiah(item.hargaSatuanPO) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.satuanPO !== undefined ? item.satuanPO : strip) + '</td>';
+                row += '<td>' + (item.totalQtyLPB !== undefined ? item.totalQtyLPB.toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.totalHargaLPB !== undefined ? formatRupiah(item.totalHargaLPB) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.hargaSatuanLPB !== undefined ? formatRupiah(item.hargaSatuanLPB) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.satuanLPB !== undefined ? item.satuanLPB : strip) + '</td>';
+                row += '</tr>';
+                no++;
+            });
+            $('.qtyTotalPembelian').val(totalQtyPO.toLocaleString());
+            $('.hargaTotalPembelian').val(formatRupiah(totalHargaPO));
+            $('.hargaSatuanPembelian').val(formatRupiah(hargaSatuanPO));
+
+            $('.body-detail-table-barang-proses-ulang').append(row);
+        }
+    }
 
     const drawTableRasioMaterialII = function() {
         $('.head-table-rasio-material2').empty();
