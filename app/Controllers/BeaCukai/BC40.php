@@ -1555,7 +1555,13 @@ class BC40 extends BaseController
 
         // return response()->setJSON($payload);
         $res = $beacukaiApi->kirimDokumenBC($payload, false);
-
+        if ($res['status'] == false) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal Kirim Ceisa Karena : " . $res['message'],
+            ]);
+        }
         // UPDATE STATUS
         $this->bc40Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
 
